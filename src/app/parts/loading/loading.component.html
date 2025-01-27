@@ -1,0 +1,8 @@
+<div class="loading" [class.active]="loading || loadingRequest.length > 0 || loadingInitial == true">
+    <div class="mr-2 w-full flex align-items-center justify-content-center">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+    </div>
+    <br>
+    <p *ngIf="!message">Loading</p>
+    <p *ngIf="message" class="message w-100 text-center" [innerHTML]="message"></p>
+</div>

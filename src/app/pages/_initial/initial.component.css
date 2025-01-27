@@ -1,0 +1,19 @@
+.main {
+    padding: 0;
+    z-index: 0;
+    position: relative;
+    min-height: calc(100vh - 26px);
+}
+@media (min-width: 800px) {
+    .main-content {
+        max-width: calc(100%);
+        transition: .3s;
+        margin-right: 0;
+        margin-left: auto;
+        min-height: calc(100vh - 26px);
+    }
+
+    .main-content.navigation-open {
+        max-width: calc(100% - 230px);
+    }
+}

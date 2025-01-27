@@ -1,0 +1,84 @@
+<p-dialog header="My Account"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          (onShow)="visibleChange()"
+          (onHide)="visibleChange()"
+          [style]="{ maxWidth: '700px', width: '95vw' }">
+
+    <p-confirmDialog key="profile" />
+   
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field sm:col-6 col-12"> <!-- Name -->
+                <label for="name">Name: <small class="text-red-600">*</small></label>
+                <input type="text"
+                        pInputText
+                        #name="ngModel"
+                        [(ngModel)]="object.name"
+                        id="name"
+                        name="name"
+                        class="w-full"
+                        [required]="true">
+                <div *ngIf="name.touched && name.invalid && name.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">This field is required.</p>
+                </div>
+            </div>
+            <div class="field sm:col-6 col-12"> <!-- Phone Number -->
+                <label for="phone">Phone Number: <small class="text-red-600">*</small></label>
+                <input type="text"
+                        pInputText
+                        #phone="ngModel"
+                        [(ngModel)]="object.phone"
+                        id="phone"
+                        name="phone"
+                        class="w-full"
+                        [required]="true">
+                <div *ngIf="phone.touched && phone.invalid && phone.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">This field is required.</p>
+                </div>
+            </div>
+            <div class="field col-12"> <!-- E-mail -->
+                <label for="email">E-mail:</label>
+                <input type="email"
+                        pInputText
+                        [value]="object.email"
+                        id="email"
+                        name="email"
+                        class="w-full"
+                        placeholder="example@gmail.com"
+                        [readonly]="true"
+                        [disabled]="true"
+                        [required]="true">
+            </div>
+        </div>
+        <div class="formgrid grid align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <p class="text-red-500" *ngIf="!error">Enter the information correctly to save.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto flex align-items-center">
+                <p-button 
+                    type="button"
+                    [disabled]="form.invalid || loading"
+                    label="Change password" 
+                    icon="pi pi-key" 
+                    iconPos="right" 
+                    [rounded]="true" 
+                    size="small"
+                    class="mr-2"
+                    severity="secondary"
+                    (onClick)="changePassworModalOpen()" />
+                <p-button 
+                    type="submit"
+                    [disabled]="form.invalid || loading"
+                    label="Save" 
+                    icon="pi pi-check" 
+                    iconPos="right" 
+                    [loading]="loading"
+                    [rounded]="true" 
+                    size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

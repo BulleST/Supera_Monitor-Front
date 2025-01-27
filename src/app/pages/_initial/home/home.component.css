@@ -1,0 +1,53 @@
+.home {
+    height: calc(100vh - 50px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.home__background {
+    width: 100%;
+    height: 100%;
+    background-size: 550px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--neutral);
+    animation: _ngcontent-ng-c3567483081_home .7s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home__background img {
+    width: 90%;
+    max-width: 500px;
+    filter: brightness(0) invert(1);
+}
+
+@keyframes home {
+    from {
+        opacity: 0
+    }
+    to {
+        opacity: 1
+    }
+}
+
+:root {
+    --a: #6C5BDB;
+    --b: #6454D1;
+    --c: #140E44;
+}
+
+:root {
+    --a: #28B1D4;
+    --b: #64746C;
+    --c: #565658;
+}
+
+:root {
+    --a: #64B4DC;
+    --b: #346038;
+    --c: #040404;
+}

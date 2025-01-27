@@ -1,0 +1,145 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, EventEmitter, Inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, Observable, lastValueFrom, of, throwError } from 'rxjs';
+import { Account, ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/account.model';
+import { catchError, tap } from 'rxjs/operators';
+import { getError } from '../utils';
+import { Response } from '../helpers/request-response.interface';
+import { environment } from '../../environments/environment.prod';
+
+@Injectable({
+    providedIn: 'root'
+})
+export class AccountService {
+    url = '';
+    accountSubject: BehaviorSubject<Account | undefined> = new BehaviorSubject<Account | undefined>(undefined);
+    public account: Observable<Account | undefined> = new Observable<Account | undefined>(undefined);
+
+    changePasswordModalOpen = new EventEmitter<boolean>();
+    profileModalOpen = new EventEmitter<boolean>();
+    emitChangePasswordRequired = new EventEmitter<boolean>();
+
+    constructor(
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
+        private http: HttpClient,
+        // @Inject('BASE_URL') url: string
+    ) {
+        // this.url = url + 'back'
+this.url = environment.url + 'back';
+
+        this.account = this.accountSubject.asObservable();
+
+        this.profileModalOpen.subscribe(res => {
+            localStorage.setItem('profile', res.toString());
+        })
+
+        this.changePasswordModalOpen.subscribe(res => {
+            localStorage.setItem('change-password', res.toString());
+        })
+    }
+
+    setAccount(where: string, value?: Account) {
+        this.accountSubject.next(value)
+    }
+
+    public get accountValue() {
+        return this.accountSubject.value;
+  }
+
+  weatherforecast() {
+    return this.http.get<any>(`${this.url}/weatherforecast`);
+  }
+
+    login(model: Login) {
+        return this.http.post<Account>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
+            tap(async (account) => {
+                this.setAccount('login', account);
+                const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
+                this.router.navigateByUrl(returnUrl);
+                this.startRefreshTokenTimer();
+                return of(account);
+            }),
+            catchError((err => {
+                this.setAccount('login', undefined);
+                return throwError(err);
+            }))
+        );
+    }
+
+    async logout() {
+        lastValueFrom(this.http.post<any>(`${this.url}/accounts/revoke-token`, { token: this.accountValue?.refreshToken }, { withCredentials: true } /**/))
+            .catch(error => {
+            })
+        this.stopRefreshTokenTimer();
+        this.setAccount('logout', undefined);
+        this.router.navigate(['account', 'login']);
+    }
+
+    refreshToken(where: string) {
+        return this.http.post<Account>(`${this.url}/accounts/refresh-token`, {}, { withCredentials: true })
+            .pipe(tap({
+                next: async account => {
+                    this.setAccount('refreshToken', account);
+                    this.startRefreshTokenTimer();
+                },
+                error: (err) => {
+                    var error = getError(err);
+                    // this.router.navigate(['account', 'login']);
+                    this.setAccount('refreshToken', undefined);
+                    this.startRefreshTokenTimer();
+                },
+            }));
+
+    }
+
+    register(model: Register) {
+        return this.http.post<Response>(`${this.url}/accounts/register`, model);
+    }
+
+    forgotPassword(email: string) {
+        return this.http.post<Response>(`${this.url}/accounts/forgot-password`, { email: email });
+    }
+
+    resetPassword(object: ResetPassword) {
+        return this.http.post<Response>(`${this.url}/accounts/reset-password`, object);
+    }
+
+    verifyEmail(token: string) {
+        return this.http.post<Response>(`${this.url}/accounts/verify-email`, { token: token });
+    }
+
+    changePassword(object: ChangePassword) {
+        return this.http.post<Response>(`${this.url}/accounts/change-password`, object);
+    }
+
+    updateAccount(object: UpdateAccount) {
+        return this.http.post<Response>(`${this.url}/accounts/update-account`, object);
+    }
+
+    private refreshTokenTimeout: any;
+
+    private startRefreshTokenTimer() {
+        try {
+            if (this.accountValue) {
+                /** atop is not depreciated
+                 * ignore de typescrypt warning
+                 */
+                const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
+
+                // set a timeout to refresh the token a minute before it expires
+                const expires = new Date(jwtToken.exp * 1000);
+                const timeout = expires.getTime() - Date.now() - (60 * 1000);
+                this.refreshTokenTimeout = setTimeout(() => this.refreshToken('startRefreshTokenTimer'), timeout);
+            }
+        } catch (e) {
+
+        }
+    }
+
+    private stopRefreshTokenTimer() {
+        clearTimeout(this.refreshTokenTimeout);
+    }
+
+}

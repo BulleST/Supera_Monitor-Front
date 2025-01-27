@@ -1,0 +1,33 @@
+<p-sidebar #sidebar
+           [(visible)]="menuOpen"
+           (visibleChange)="setWidth()"
+           [modal]="false"
+           [transitionOptions]="'.3s'">
+    <ng-template pTemplate="headless">
+        <div class="h-screen">
+            <div style="height: 120px;" class="border border-black-alpha-20 border-bottom-1 px-3 py-2">
+                <div class="flex align-items-center justify-content-between w-full my-3">
+                    <h3>Lorem Ipsum</h3>
+                    <div class="flex align-items-center ">
+                        <p-button [text]="true" icon="pi pi-refresh" title="Atualizar" (onClick)="atualizar()" [loading]="loading"></p-button>
+                        <span>
+                            <p-button type="button" (onClick)="closeCallback($event)" icon="pi pi-times" [rounded]="true" [outlined]="true" styleClass="h-2rem w-2rem"></p-button>
+                        </span>
+                    </div>
+                </div>
+                <div class="p-input-icon-right col-12 px-0 -my-3">
+                    <i class="pi pi-search"></i>
+                    <input type="text" 
+                            pInputText 
+                            class="w-full"
+                            placeholder="Global Search" 
+                            #input />
+                </div>
+            </div>
+            <div style="height: calc(100% - 120px);" class="sidebar overflow-auto" (scroll)="cm.hide()">
+           
+            </div>
+        </div>
+        <p-contextMenu #cm [model]="treeMenu" appendTo="body" triggerEvent="click"></p-contextMenu>
+    </ng-template>
+</p-sidebar>

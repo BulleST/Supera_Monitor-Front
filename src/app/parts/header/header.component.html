@@ -1,0 +1,45 @@
+<header class="w-full">
+    <p-menubar [model]="items"
+               styleClass=" border-none shadow-2 border-noround	"
+               #menuBig>
+               <ng-template pTemplate="start">
+                   <div class="ml-2 mr-3 flex align-items-center">
+                       <!-- <p-button (onClick)="toggleAside()" pRipple [raised]="true" [rounded]="true" icon="pi pi-bars"></p-button> -->
+                       <img src="assets/imgs/logo.png" height="40" class="ml-3" />
+                   </div>
+               </ng-template>
+        <ng-template pTemplate="end">
+            <div class="flex align-items-center">
+                <!-- <p-button styleClass="mr-3"
+                            (onClick)="toggleThemeAside()"
+                            [icon]="'pi pi-palette'"
+                            [label]="'Theme'"
+                            size="small"
+                            [text]="true" /> -->
+                <!-- <p-badge [value]="'2'"
+                         class="pi pi-bell text-2xl p-overlay-badge mr-3 "
+                         styleClass="aa"></p-badge> -->
+                <p-button [text]="true"
+                          [rounded]="true"
+                          styleClass="ml-3 mr-2 p-0 focus:shadow-none active:shadow-none "
+                          (onClick)="menu.toggle($event)">
+                    <p-avatar [label]="accountAbreviacao"
+                              styleClass="bg-primary text-base mr-3"
+                              size="large"
+                              shape="circle">
+                    </p-avatar>
+                    <span>{{accountName}}</span>
+                    <p-avatar icon="bi bi-caret-down-fill"
+                              styleClass="bg-transparent"></p-avatar>
+                </p-button>
+                <p-menu #menu
+                        [model]="headerItem"
+                        [popup]="true"></p-menu>
+            </div>
+        </ng-template>
+    </p-menubar>
+</header>
+
+<app-profile  style="position: relative; z-index: 1;"></app-profile>
+
+<app-change-password style="position: relative; z-index: 2;"></app-change-password>

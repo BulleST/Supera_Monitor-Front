@@ -1,0 +1,237 @@
+<p-confirmDialog />
+<div class="m-4">
+    <p-table
+             #dt
+             [value]="list"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100, 1000]"
+             [paginator]="list.length > 0"
+             [columns]="tableColumns"
+             [globalFilterFields]="tableGlobalFilterFields"
+             selectionMode="single"
+             [(selection)]="tableSelectedItem"
+             (selectionChange)="selectionChange($event)"
+             styleClass="p-datatable-striped"
+             dataKey="id">
+        <ng-template pTemplate="caption">
+            <p-toolbar styleClass="border-0">
+                <div class="p-toolbar-group-start">
+                    <div class="flex align-items-center">
+                        <p-avatar icon="pi pi-bars" styleClass="mr-1 bg-transparent" />
+                        <h3 class="text-lg font-normal my-0">{{'Users' | translate }}</h3>
+                    </div>
+                </div>
+                <div class="p-toolbar-group-center"></div>
+                <div class="p-toolbar-group-end align-items-stretch">
+                    <ng-template [ngIf]="screen == 'lg' || screen == 'xl'" [ngIfElse]="tableActions_Mobile">
+                        <ng-template #buttons let-disabled="disabled" let-show="show">
+                            <p-button [disabled]="disabled"
+                                      *ngIf="show"
+                                      icon="fa-solid fa-key text-purple-400"
+                                      severity="secondary"
+                                      class="mr-2"
+                                      (onClick)="resetPasswordConfirm($event)"
+                                      title="Reset Password"
+                                      label="Reset Password"
+                                      size="small"
+                                      [rounded]="true"
+                                      styleClass="border-3" />
+                            <p-button [disabled]="disabled"
+                                      *ngIf="show"
+                                      [icon]="'fa-solid ' + (tableSelectedItem && tableSelectedItem.active ? 'fa-lock text-red-500' : 'fa-lock-open text-green-400') "
+                                      severity="secondary"
+                                      class="mr-2"
+                                      (onClick)="deactivated($event)"
+                                      [title]="(tableSelectedItem && tableSelectedItem.active ? 'Disable' : 'Enable')"
+                                      [label]="(tableSelectedItem && tableSelectedItem.active ? 'Disable' : 'Enable')"
+                                      size="small"
+                                      [rounded]="true"
+                                      styleClass="border-3" />
+                            <p-button [disabled]="disabled"
+                                      *ngIf="show"
+                                      icon="fa-solid fa-pen text-orange-500"
+                                      severity="secondary"
+                                      class="mr-2"
+                                      (onClick)="edit()"
+                                      label="Edit"
+                                      size="small"
+                                      [rounded]="true"
+                                      styleClass="border-3" />
+                        </ng-template>
+                        <ng-container *ngTemplateOutlet="buttons; context: { disabled: !tableSelectedItem, show: tableSelectedItem && account && account!.role_Id <= tableSelectedItem!.role_Id  }"></ng-container>
+                        <span class="p-input-icon-right mr-2">
+                            <i class="pi pi-search"></i>
+                            <input pInputText
+                                   type="text"
+                                   #_tableSearch="ngModel"
+                                   [(ngModel)]="tableSearch"
+                                   id="search"
+                                   name="search"
+                                   (enter)="dt.filterGlobal(tableSearch, 'contains')"
+                                   placeholder="Search keyword" />
+                        </span>
+                        <p-button icon="pi pi-filter-slash" (onClick)="clear(dt)" severity="secondary" tooltip="Clear filter" class="mr-2" />
+                        <p-button icon="pi pi-sync text-sm" (onClick)="update()" severity="secondary" tooltip="Sync list" class="mr-2" />
+                        <p-button icon="pi pi-plus" label="Create" [routerLink]="['create' ]" [rounded]="true" size="small" iconPos="right" styleClass="border-3" />
+                    </ng-template>
+                    <ng-template #tableActions_Mobile>
+                        <p-button (onClick)="overlayPanel.toggle($event)" icon="pi pi-external-link" label="Actions" size="small" iconPos="right" severity="warning" />
+                        <p-overlayPanel #overlayPanel [dismissable]="false"
+                                        appendTo="body"
+                                        [style]="{ maxWidth: '400px', width: '80vw' }"
+                                        styleClass="p-overlaypanel-table-actions"
+                                        [showCloseIcon]="true">
+                            <div class="flex flex-column flex-wrap">
+                                <div class="w-full mb-3 p-3 surface-hover border-radius-xs">
+                                    <span class="font-medium text-900 block mb-3">Actions</span>
+                                    <div class="flex flex-wrap gap-2">
+                                        <ng-template #buttonsActions let-disabled="disabled">
+                                            <p-button [disabled]="disabled"
+                                                      icon="fa-solid fa-pen text-orange-500"
+                                                      severity="secondary"
+                                                      (onClick)="edit();overlayPanel.hide()"
+                                                      label="Edit"
+                                                      size="small"
+                                                      [rounded]="true"
+                                                      styleClass="border-3" />
+                                            <p-button [disabled]="disabled"
+                                                      [icon]="'fa-solid ' + (tableSelectedItem && tableSelectedItem.active ? 'fa-lock text-red-500' : 'fa-lock-open text-green-400') "
+                                                      severity="secondary"
+                                                      (onClick)="deactivated($event);overlayPanel.hide()"
+                                                      [title]="(tableSelectedItem && tableSelectedItem.active ? 'Disable' : 'Enable')"
+                                                      [label]="(tableSelectedItem && tableSelectedItem.active ? 'Disable' : 'Enable')"
+                                                      size="small"
+                                                      [rounded]="true"
+                                                      styleClass="border-3" />
+                                            <p-button [disabled]="disabled"
+                                                      icon="fa-solid fa-key text-purple-400"
+                                                      severity="secondary"
+                                                      (onClick)="resetPasswordConfirm($event);overlayPanel.hide()"
+                                                      title="Reset Password"
+                                                      label="Reset Password"
+                                                      size="small"
+                                                      [rounded]="true"
+                                                      styleClass="border-3" />
+                                        </ng-template>
+                                        <p-button icon="pi pi-plus"
+                                                  label="Create"
+                                                  [routerLink]="['create' ]"
+                                                  (onClick)="overlayPanel.hide()"
+                                                  [rounded]="true"
+                                                  size="small"
+                                                  iconPos="right"
+                                                  styleClass="border-3" />
+                                        <p-button icon="pi pi-sync text-sm"
+                                                  (onClick)="update();overlayPanel.hide()"
+                                                  severity="secondary"
+                                                  tooltip="Sync list" />
+                                        <ng-container *ngTemplateOutlet="buttonsActions; context: { disabled: !(tableSelectedItem && account && account!.role_Id <= tableSelectedItem!.role_Id) }"></ng-container>
+                                    </div>
+                                </div>
+                                <div class="w-full mb-3 p-3 surface-hover border-radius-xs">
+                                    <span class="font-medium text-900 block mb-3">Filtering</span>
+                                    <span class="p-input-icon-right mr-2">
+                                        <i class="pi pi-search"></i>
+                                        <input pInputText
+                                               type="text"
+                                               #_tableSearch="ngModel"
+                                               [(ngModel)]="tableSearch"
+                                               id="search"
+                                               name="search"
+                                               (enter)="dt.filterGlobal(tableSearch, 'contains');overlayPanel.hide()"
+                                               placeholder="Search keyword" />
+                                    </span>
+                                    <p-button
+                                              icon="pi pi-filter-slash"
+                                              (onClick)="clear(dt);overlayPanel.hide()"
+                                              severity="secondary"
+                                              tooltip="Clear filter" />
+                                </div>
+                            </div>
+                        </p-overlayPanel>
+                    </ng-template>
+                </div>
+            </p-toolbar>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
+                <th class="surface-hover" style="width: 4rem"></th>
+                <th class="surface-hover" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
+                    <div class="flex align-items-center">
+                        <span>{{ col.label | translate }}</span>
+                        <div class="flex align-items-center ml-3">
+                            <p-sortIcon [field]="col.field" />
+                            <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" class="mt-1" />
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 
+                    'bg-black-alpha-60': item == tableSelectedItem,
+                    'p-highlight': tableSelectedItems.includes(item),
+                 }">
+                <td>
+                    <p-tableRadioButton *ngIf="account!.role_Id <= item.role_Id" [value]="item" />
+                </td>
+                <td *ngFor="let col of tableColumns"
+                    [pSelectableRow]="account!.role_Id <= item.role_Id ? item : undefined"
+                    [pSelectableRowIndex]="account!.role_Id <= item.role_Id ? rowIndex : undefined"
+                    [class]="account!.role_Id <= item.role_Id ? '' : 'cursor-auto'">
+                    <span *ngIf="col.displayType == DisplayType.options">
+                        <ng-container
+                                      *ngTemplateOutlet="tag; context:{ 
+                                item: item,
+                                option: getOption(col, item)
+                                }"></ng-container>
+                        <ng-template #tag let-item="item" let-option="option">
+                            <p-tag *ngIf="option"
+                                   [icon]="option.icon"
+                                   [value]="option.label"
+                                   [severity]="option.severity"
+                                   [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Deactivated at ' + item['deactivated'] : undefined" />
+                        </ng-template>
+                    </span>
+                    <span *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</span>
+                    <span *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</span>
+                    <span *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</span>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="summary">
+            <div *ngIf="list.length > 0" class="flex align-items-center justify-content-between"> In total there are {{list ? list.length : 0 }} items. </div>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <ng-container *ngIf="tableLoading; else elseTemplate">
+                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 39.5px;">
+                    <td><p-skeleton /></td>
+                    <td *ngFor="let col of tableColumns"><p-skeleton /></td>
+                </tr>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <tr>
+                    <td [attr.colspan]="tableColumns.length + 1">
+                        <div class="flex align-items-center">
+                            <span>No items found. Click </span>
+                            <p-button styleClass="text-orange-600 overflow-visible" [link]="true" [routerLink]="['create' ]">
+                                <span class="p-overlay-badge"> here <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
+                                </span>
+                            </p-button>
+                            <span> to create. </span>
+                            <span>
+                                <p-button styleClass="text-orange-600 overflow-visible" [link]="true" (onClick)="update()">
+                                    <span class="text-white">(&nbsp;&nbsp;</span>
+                                    <span class="p-overlay-badge"> update here <i class="p-badge pi pi-sync bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
+                                    </span>
+                                    <span class="text-white">&nbsp;&nbsp;)</span>
+                                </p-button>
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </ng-template>
+    </p-table>
+</div>
+<router-outlet></router-outlet>

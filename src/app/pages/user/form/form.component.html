@@ -1,0 +1,101 @@
+<p-dialog [header]="isEditPage ? 'Edit' : 'Create'"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ maxWidth: '600px', width: '95vw' }">
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field md:col-4 col-12"> <!-- Name -->
+                <label for="name">Name: <small class="text-red-600">*</small></label>
+                <input type="text"
+                        pInputText
+                        #name="ngModel"
+                        [(ngModel)]="object.name"
+                        id="name"
+                        name="name"
+                        class="w-full"
+                        [required]="true">
+                <div *ngIf="name.touched && name.invalid && name.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">This field is required.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 col-12"> <!-- Phone Number -->
+                <label for="phone">Phone Number: <small class="text-red-600">*</small></label>
+                <input type="text"
+                        pInputText
+                        #phone="ngModel"
+                        [(ngModel)]="object.phone"
+                        id="phone"
+                        name="phone"
+                        class="w-full"
+                        [required]="true">
+                <div *ngIf="phone.touched && phone.invalid && phone.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">This field is required.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 col-12"> <!-- Role -->
+                <label for="role_Id">Role: <small class="text-red-600">*</small></label>
+                <p-dropdown
+                    [options]="roles"
+                    [(ngModel)]="object.role_Id"
+                    #role_Id="ngModel"
+                    styleClass="w-full"
+                    class="w-full"
+                    name="role_Id"
+                    inputId="role_Id"
+                    optionLabel="role"
+                    optionValue="id"
+                    placeholder="Select Role"
+                    [showClear]="true"
+                    [checkmark]="true"
+                    [filter]="true"
+                    filterBy="role"
+                    appendTo="body" 
+                    optionDisabled="isDisabled"/>
+                <div *ngIf="role_Id.touched && role_Id.invalid && role_Id.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="role_Id.errors['required']">This field is required.</p>
+                </div>
+            </div>
+            <div class="field col-12"> <!-- E-mail -->
+                <label for="email">E-mail: <small class="text-red-600">*</small></label>
+                <input type="email"
+                        [email]="true"
+                        pInputText
+                        #email="ngModel"
+                        [(ngModel)]="object.email"
+                        id="email"
+                        name="email"
+                        class="w-full"
+                        [required]="true"
+                        [pattern]="emailPattern"
+                        placeholder="example@gmail.com"
+                        [readonly]="isEditPage"
+                        [disabled]="isEditPage">
+                <div *ngIf="email.touched && email.invalid && email.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">This field is required.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválid.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválid.</p>
+                </div>
+            </div>
+        </div>
+        <div class="formgrid grid align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <p class="text-red-500" *ngIf="!error">Enter the information correctly to save.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button 
+                    type="submit"
+                    [disabled]="form.invalid || loading"
+                    class="w-full" 
+                    styleClass="w-full" 
+                    label="Save" 
+                    icon="pi pi-check" 
+                    iconPos="right" 
+                    [loading]="loading"
+                    [rounded]="true" 
+                    size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>
