@@ -1,4 +1,4 @@
-import { afterNextRender, AfterRenderPhase, Component, inject, Injector, OnDestroy } from '@angular/core';
+import { afterNextRender, Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
@@ -38,10 +38,10 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService
     ) {
 
-        afterNextRender(() =>
-            this.loadPage(),
-            { injector: this.injector, phase: AfterRenderPhase.Read }
-        );
+        // afterNextRender({ read: () => this.loadPage() },
+        //     { injector: this.injector }
+        // );
+        this.loadPage();
     }
 
     ngOnDestroy(): void {

@@ -1,4 +1,4 @@
-import { AfterRenderPhase, Injectable, Injector, afterNextRender, inject } from "@angular/core";
+import { Injectable, Injector, afterNextRender, inject } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import $ from 'jquery';
 // declare var $:any 
@@ -12,10 +12,10 @@ export class MobileService {
     injector = inject(Injector);
 
     constructor() {
-        afterNextRender(() =>
-            this.set(),
-            { injector: this.injector, phase: AfterRenderPhase.Read }
-        );
+        // afterNextRender({ read: () => this.set() },
+        //     { injector: this.injector }
+        // );
+        this.set();
     }
 
     set() {
