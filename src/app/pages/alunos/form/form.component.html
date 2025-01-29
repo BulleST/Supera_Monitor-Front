@@ -1,0 +1,60 @@
+<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ maxWidth: '600px', width: '95vw' }">
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field md:col-8 col-12"> <!-- Nome -->
+                <label for="nome">Nome: <small class="text-red-600">*</small></label>
+                <input type="text"
+                        pInputText
+                        #nome="ngModel"
+                        [(ngModel)]="object.nome"
+                        id="nome"
+                        name="nome"
+                        class="w-full"
+                        [required]="true">
+                <div *ngIf="nome.touched && nome.invalid && nome.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 col-12"> <!-- Data de Nascimento -->
+                <label for="dataNascimento">Data de Nascimento: <small class="text-red-600">*</small></label>
+                <p-datepicker 
+                    #dataNascimento="ngModel"
+                    [(ngModel)]="object.dataNascimento"
+                    [showIcon]="true" 
+                    [iconDisplay]="'input'"
+                    inputId="dataNascimento"
+                    name="dataNascimento"
+                    class="w-full"
+                    [required]="true"
+                    appendTo="body" />
+
+                <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+        </div>
+        <div class="formgrid grid gap-4 align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <p class="text-red-500" *ngIf="!error">Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button 
+                    type="submit"
+                    [disabled]="form.invalid || loading"
+                    class="w-full" 
+                    styleClass="w-full" 
+                    label="Salvar" 
+                    icon="pi pi-check" 
+                    iconPos="right" 
+                    [loading]="loading"
+                    [rounded]="true" 
+                    size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

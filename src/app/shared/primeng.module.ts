@@ -67,6 +67,7 @@ import { TreeSelectModule } from 'primeng/treeselect';
 import { ConfirmationService, FilterMatchMode /*, PrimeNGConfig */ } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
+import { DatePickerModule } from 'primeng/datepicker';
 
 @NgModule({
     imports: [
@@ -84,6 +85,7 @@ import { PrimeNG } from 'primeng/config';
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
+        DatePickerModule,
         DialogModule,
         DividerModule,
         DragDropModule,
@@ -150,6 +152,7 @@ import { PrimeNG } from 'primeng/config';
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
+        DatePickerModule,
         DialogModule,
         DividerModule,
         DragDropModule,

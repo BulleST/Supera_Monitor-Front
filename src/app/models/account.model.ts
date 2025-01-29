@@ -81,7 +81,7 @@ export var userColumns: ColumnTable[] = [
         displayType: DisplayType.options,
         options: { 
             "items": [
-                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": true }, 
+                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false }, 
                 { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
             ]
         },
