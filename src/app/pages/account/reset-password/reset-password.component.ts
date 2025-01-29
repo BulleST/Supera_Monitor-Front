@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom } from 'rxjs';
-import { ResetPassword } from '../../../models/account.model';
+import { ResetPassword } from '../../../models/accounts.model';
 import { AccountService } from '../../../services/account.service';
 import { getError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
@@ -10,7 +10,8 @@ import { ConfirmationService } from 'primeng/api';
 @Component({
     selector: 'app-reset-password',
     templateUrl: './reset-password.component.html',
-    styleUrls: ['./../account.component.css']
+    styleUrls: ['./../account.component.css'],
+    standalone: false
 })
 export class ResetPasswordComponent {
     faChevronCircleLeft = faChevronCircleLeft;

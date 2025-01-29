@@ -4,7 +4,8 @@ import { NavigationEnd, Router } from '@angular/router';
 @Component({
     selector: 'app-account',
     templateUrl: './account.component.html',
-    styleUrls: ['./account.component.css']
+    styleUrls: ['./account.component.css'],
+    standalone: false
 })
 export class AccountComponent {
 

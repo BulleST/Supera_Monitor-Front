@@ -1,11 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UserRoutingModule } from './user-routing.module';
 import { ListComponent } from './list/list.component';
 import { FormComponent } from './form/form.component';
 import { SharedModule } from '../../shared/shared.module';
-import { TranslateModule, TranslatePipe } from '@ngx-translate/core';
+import { UsuariosRoutingModule } from './usuarios.routing';
 
 
 @NgModule({
@@ -15,12 +14,8 @@ import { TranslateModule, TranslatePipe } from '@ngx-translate/core';
     ],
     imports: [
         CommonModule,
-        UserRoutingModule,
+        UsuariosRoutingModule,
         SharedModule,
-        TranslateModule.forChild(),
-    ],
-    providers: [
-        TranslatePipe
     ]
 })
-export class UserModule { }
+export class UsuariosModule { }

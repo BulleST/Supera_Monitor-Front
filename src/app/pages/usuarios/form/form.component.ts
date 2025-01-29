@@ -1,19 +1,20 @@
-import { afterNextRender, Component, inject, Injector, OnDestroy } from '@angular/core';
+import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { Account } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
 import { AccountRole, Role, roles } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
+import { Account } from '../../../models/account.model';
 
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrl: './form.component.css',
-    providers: [ConfirmationService, MessageService]
+    providers: [ConfirmationService, MessageService],
+    standalone: false
 })
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
@@ -24,7 +25,7 @@ export class FormComponent implements OnDestroy {
     isEditPage = false;
     emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
-    roles: AccountRole[] = roles;
+    roles: AccountRole[] = [];
     roleDisabled: boolean = false; 
     Role: typeof Role = Role;
 
@@ -42,6 +43,13 @@ export class FormComponent implements OnDestroy {
         //     { injector: this.injector }
         // );
         this.loadPage();
+
+        lastValueFrom(this.service.getRoles())
+        .then(res => {
+            this.loading = false;
+            this.roles = res
+        })
+        .catch(res => this.loading = false);
     }
 
     ngOnDestroy(): void {
@@ -57,6 +65,7 @@ export class FormComponent implements OnDestroy {
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
+                
                 lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;

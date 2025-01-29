@@ -9,8 +9,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 @Component({
     selector: 'app-forgot-password',
     templateUrl: './forgot-password.component.html',
-    styleUrls: ['./../account.component.css','./forgot-password.component.css'],
-    providers: [ConfirmationService, MessageService]
+    styleUrls: ['./../account.component.css', './forgot-password.component.css'],
+    providers: [ConfirmationService, MessageService],
+    standalone: false
 })
 export class ForgotPasswordComponent {
 

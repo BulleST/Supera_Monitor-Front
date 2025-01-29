@@ -3,12 +3,13 @@ import { lastValueFrom } from 'rxjs';
 import { AccountService } from '../../../services/account.service';
 import { LoadingService } from '../../../parts/loading/loading';
 import { getError } from '../../../utils';
-import { Login } from '../../../models/account.model';
+import { Login } from '../../../models/accounts.model';
 
 @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
-    styleUrls: ['./../account.component.css']
+    styleUrls: ['./../account.component.css'],
+    standalone: false
 })
 export class LoginComponent {
     object = new Login;
@@ -24,7 +25,6 @@ export class LoginComponent {
 
     send() {
       this.loadingHelper.loading.next(true);
-      lastValueFrom(this.accountService.weatherforecast())
 
         lastValueFrom(this.accountService.login(this.object))
             .then(res => {

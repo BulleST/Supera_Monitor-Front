@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PrimengModule } from './primeng.module';
-import { FormsModule } from '@angular/forms';
 import { provideHttpClient, withFetch,  withInterceptorsFromDi } from '@angular/common/http';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { ProfileComponent } from './profile/profile.component';
-import { ToastrModule } from 'ngx-toastr';
-import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { ChangePasswordComponent } from './change-password/change-password.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { FormsModule } from '@angular/forms';
+import { PrimengModule } from './primeng.module';
+import { ToastrModule } from 'ngx-toastr';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     declarations: [
@@ -19,7 +19,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     exports: [
         FormsModule,
         PrimengModule,
-        FontAwesomeModule,
         ToastrModule,
         FontAwesomeModule,
         NgxMaskDirective,

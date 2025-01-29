@@ -1,15 +1,16 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { Account } from '../../models/account.model';
 import { AccountService } from '../../services/account.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { getError } from '../../utils';
+import { Account } from '../../models/account.model';
 
 @Component({
     selector: 'app-profile',
     templateUrl: './profile.component.html',
-    styleUrl: './profile.component.css'
+    styleUrl: './profile.component.css',
+    standalone: false
 })
 export class ProfileComponent implements OnDestroy {
     @Input() visible = false;

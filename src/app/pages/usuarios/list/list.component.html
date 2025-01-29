@@ -1,0 +1,163 @@
+<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
+<p-confirmDialog />
+<p-toast />
+<div class="px-3 pb-4">
+    <p-table
+             #dt
+             [value]="list"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100, 1000]"
+             [paginator]="list.length > 50"
+             [columns]="tableColumns"
+             [globalFilterFields]="tableGlobalFilterFields"
+             [(contextMenuSelection)]="tableSelectedItem"
+             [contextMenu]="cm"
+             (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
+             dataKey="id"
+             stripedRows
+             showGridlines
+             [rowHover]="true">
+        <ng-template pTemplate="caption">
+            <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
+                <div class="p-toolbar-group-start">
+                    <h2 class="flex align-items-center ">
+                        <fa-icon [icon]="faUsers" class="mr-3 text-primary text-2xl"></fa-icon>
+                        <span class="text-2xl font-normal my-0">Usuários</span>
+                    </h2>
+                </div>
+                <div class="p-toolbar-group-center"></div>
+                <div class="p-toolbar-group-end items-stretch">
+                    <div class="flex align-items-strech">
+                        <p-iconfield class="mr-2">
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input type="text"
+                                   pInputText
+                                   #_tableSearch="ngModel"
+                                   [(ngModel)]="tableSearch"
+                                   id="search"
+                                   name="search"
+                                   (input)="dt.filterGlobal(tableSearch, 'contains')"
+                                   placeholder="Pesquisar" />
+                        </p-iconfield>
+                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" tooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" tooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['create' ]" [rounded]="true" iconPos="right" size="small" styleClass="h-full px-3" />
+                    </div>
+                </div>
+            </p-toolbar>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
+                <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
+                <th class="surface-900 py-0 border-none text-white" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
+                    <div class="flex align-items-center">
+                        <span>{{ col.label }}</span>
+                        <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                            <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                            <p-sortIcon [field]="col.field" />
+                        </div>
+                    </div>
+                </th>
+                <th class="surface-900 py-0 border-bottom-none text-white"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr [pContextMenuRow]="item"
+                (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);"
+                class="cursor-pointer"
+                [ngClass]="{ 
+                'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
+                }">
+                <td *ngFor="let col of tableColumns"
+                    [pSelectableRow]="item"
+                    [pSelectableRowIndex]="rowIndex"
+                    class="border-none white-space-nowrap"
+                    [class.w-6rem]="col.displayType == DisplayType.options">
+                    <span *ngIf="col.displayType == DisplayType.options">
+                        <ng-container *ngTemplateOutlet="tag; 
+                                    context: { 
+                                        item: item,
+                                        option: getOption(col, item)
+                                    }">
+                        </ng-container>
+                        <ng-template #tag let-item="item" let-option="option">
+                            <p-tag *ngIf="option"
+                                   styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="option.icon + ' mr-2 text-sm'"
+                                   [value]="option.label"
+                                   [severity]="option.severity"
+                                   [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </ng-template>
+                    </span>
+                    <span *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</span>
+                    <span *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</span>
+                    <span *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</span>
+                </td>
+                <td class="border-none px-0">
+                </td>
+                <!-- <td class="border-none px-0 "
+                [ngClass]="{ 
+                    'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
+                }">
+                    <div class="flex align-items-center justify-content-end -my-2">
+                        <p-button icon="fas fa-key text-grey-400"
+                                  label="Resetar senha"
+                                    severity="secondary"
+                                  class="mr-2"
+                                  (onClick)="resetPassword($event, item)"
+                                  title="Resetar Senha"
+                                  [rounded]="true"
+                                  [size]="'small'"
+                                  [text]="true"
+                                  [raised]="true"
+                                  styleClass="white-space-nowrap bg-white " />
+                        <p-button [icon]="'fa-solid ' + (item && item.active ? 'fa-lock text-red-500' : 'fa-lock-open text-green-400') "
+                                  label="{{item && item.active ? 'Desabilitar' : 'Habilitar'}}"
+                                    severity="secondary"
+                                  class="mr-2"
+                                  (onClick)="deactivated($event, item)"
+                                  [title]="(item && item.active ? 'Desabilitar' : 'Habilitar')"
+                                  [rounded]="true"
+                                  [size]="'small'"
+                                  [text]="true"
+                                  [raised]="true"
+                                  styleClass="white-space-nowrap bg-white w-7rem" />
+                        <p-button icon="fa-solid fa-pen text-orange-500"
+                                  label="Editar"
+                                    severity="secondary"
+                                  class="mr-2"
+                                  (onClick)="edit(item)"
+                                  [rounded]="true"
+                                  [size]="'small'"
+                                  [text]="true"
+                                  [raised]="true"
+                                  styleClass="white-space-nowrap bg-white" />
+                    </div>
+                </td> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <ng-container *ngIf="tableLoading; else elseTemplate">
+                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 39.5px;">
+                    <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
+                </tr>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <tr>
+                    <td [attr.colspan]="tableColumns.length + 1">
+                        <div class="flex align-items-center" *ngIf="!tableSearch">
+                            <span>Nenhum item registrado. Clique</span>
+                            <p-button styleClass="text-orange-600 overflow-visible" [link]="true" [routerLink]="['create' ]">
+                                <span class="p-overlay-badge">aqui <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
+                                </span>
+                            </p-button>
+                            <span> para cadastrar. </span>
+                        </div>
+                        <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </ng-template>
+    </p-table>
+</div>
+<router-outlet></router-outlet>

@@ -31,7 +31,7 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextareaModule } from 'primeng/inputtextarea';
+// import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MegaMenuModule } from 'primeng/megamenu';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
@@ -51,7 +51,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
-import { SlideMenuModule } from 'primeng/slidemenu';
+// import { SlideMenuModule } from 'primeng/slidemenu';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { TableModule } from 'primeng/table';
@@ -64,12 +64,12 @@ import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeSelectModule } from 'primeng/treeselect';
 
-import { ConfirmationService, FilterMatchMode, PrimeNGConfig } from 'primeng/api';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ConfirmationService, FilterMatchMode /*, PrimeNGConfig */ } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
+import { PrimeNG } from 'primeng/config';
 
 @NgModule({
     imports: [
-        TranslateModule.forRoot(),
         CommonModule,
         AccordionModule,
         AvatarModule,
@@ -101,7 +101,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         InputNumberModule,
         InputSwitchModule,
         InputTextModule,
-        InputTextareaModule,
+        // InputTextareaModule,
         MegaMenuModule,
         MenuModule,
         MenubarModule,
@@ -120,7 +120,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         SelectButtonModule,
         SidebarModule,
         SkeletonModule,
-        SlideMenuModule,
+        // SlideMenuModule,
         SliderModule,
         SplitButtonModule,
         SpeedDialModule,
@@ -130,6 +130,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         ToastModule,
         ToolbarModule,
         ToggleButtonModule,
+        TooltipModule,
         TreeModule,
         TreeTableModule,
         TreeSelectModule,
@@ -166,7 +167,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         InputNumberModule,
         InputSwitchModule,
         InputTextModule,
-        InputTextareaModule,
+        // InputTextareaModule,
         MegaMenuModule,
         MenuModule,
         MenubarModule,
@@ -185,7 +186,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         SelectButtonModule,
         SidebarModule,
         SkeletonModule,
-        SlideMenuModule,
+        // SlideMenuModule,
         SliderModule,
         SplitButtonModule,
         SpeedDialModule,
@@ -194,71 +195,71 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         TagModule,
         ToastModule,
         ToolbarModule,
+        TooltipModule,
         ToggleButtonModule,
         TreeModule,
         TreeTableModule,
         TreeSelectModule,
     ],
     providers: [
-        ConfirmationService
+        ConfirmationService,
     ]
 })
 export class PrimengModule {
     constructor(
-        private config: PrimeNGConfig,
-        private translateService: TranslateService
-
+        // private config: PrimeNGConfig,
+        private primeng: PrimeNG
     ) {
         // this.translateService.setDefaultLang('pt-BR');
         // this.translateService.use('pt-BR');
 
-        // this.config.setTranslation({
-        //     startsWith: 'Começa com',
-        //     contains: 'Contém',
-        //     notContains: 'Não contem',
-        //     endsWith: 'Termina com',
-        //     equals: 'Igual a',
-        //     notEquals: 'Diferente de',
-        //     noFilter: 'Sem filtro',
-        //     lt: 'Menor que', // Less Than
-        //     lte: 'Menor que ou igual a', // Less Than or Equal to
-        //     gt: 'Maior que', // Greater than
-        //     gte: 'Maior que ou igual a', // Greater than or equal to
-        //     is: 'Igual a',
-        //     isNot: 'Diferente de',
-        //     before: 'Anterior a',
-        //     after: 'Posterior a',
-        //     dateIs: 'Data igual a',
-        //     dateIsNot: 'Data diferente de',
-        //     dateBefore: 'Data anterior a',
-        //     dateAfter: 'Data posterior a',
-        //     clear: 'Limpar filtro',
-        //     apply: 'Filtrar',
-        //     matchAll: 'Filtrar todos que',
-        //     matchAny: 'Filtrar qualquer um que',
-        //     addRule: 'Adicionar filtro',
-        //     removeRule: 'Remover filtro',
-        //     weak: 'Fraca',
-        //     medium: 'Média',
-        //     strong: 'Forte',
-        //     emptyMessage: 'Nenhum resultado encontrado',
-        //     emptyFilterMessage: 'Nenhum resultado encontrado',
-        //     dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
-        //     dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-        //     dayNamesMin: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
-        //     monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-        //     chooseYear: 'Ano',
-        //     chooseMonth: 'Mês',
-        //     chooseDate: 'Dia',
-        //     today: 'Hoje',
-        //     dateFormat: 'dd/mm/yy',
-        //     prevYear: 'Anterior',
-        //     nextYear: 'Próximo',
-        //     prevMonth: 'Anterior',
-        //     nextMonth: 'Próximo',
-        // })
+        this.primeng.setTranslation({
+            startsWith: 'Começa com',
+            contains: 'Contém',
+            notContains: 'Não contem',
+            endsWith: 'Termina com',
+            equals: 'Igual a',
+            notEquals: 'Diferente de',
+            noFilter: 'Sem filtro',
+            lt: 'Menor que', // Less Than
+            lte: 'Menor que ou igual a', // Less Than or Equal to
+            gt: 'Maior que', // Greater than
+            gte: 'Maior que ou igual a', // Greater than or equal to
+            is: 'Igual a',
+            isNot: 'Diferente de',
+            before: 'Anterior a',
+            after: 'Posterior a',
+            dateIs: 'Data igual a',
+            dateIsNot: 'Data diferente de',
+            dateBefore: 'Data anterior a',
+            dateAfter: 'Data posterior a',
+            clear: 'Limpar filtro',
+            apply: 'Filtrar',
+            matchAll: 'Filtrar todos que',
+            matchAny: 'Filtrar qualquer um que',
+            addRule: 'Adicionar filtro',
+            removeRule: 'Remover filtro',
+            weak: 'Fraca',
+            medium: 'Média',
+            strong: 'Forte',
+            emptyMessage: 'Nenhum resultado encontrado',
+            emptyFilterMessage: 'Nenhum resultado encontrado',
+            dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+            dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+            dayNamesMin: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'],
+            monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+            chooseYear: 'Ano',
+            chooseMonth: 'Mês',
+            chooseDate: 'Dia',
+            today: 'Hoje',
+            dateFormat: 'dd/mm/yy',
+            prevYear: 'Anterior',
+            nextYear: 'Próximo',
+            prevMonth: 'Anterior',
+            nextMonth: 'Próximo',
+        })
 
-        this.config.filterMatchModeOptions = {
+        this.primeng.filterMatchModeOptions = {
             text: [
                 FilterMatchMode.STARTS_WITH,
                 FilterMatchMode.CONTAINS,

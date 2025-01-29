@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
                 const expires = new Date(jwtToken.exp * 1000);
                 if (new Date() > expires) {
                     resolve(false);
-                    this.router.navigate(['account/login']);
+                    this.router.navigate(['accounts/login']);
                     return;
                 }
 
@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
             })
             .catch(res => {
                
-                this.router.navigate(['account/login']);
+                this.router.navigate(['accounts/login']);
                 resolve(false);
 
             })            

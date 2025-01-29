@@ -8,7 +8,8 @@ import { getError } from '../../../utils';
 @Component({
     selector: 'app-verify-email',
     templateUrl: './verify-email.component.html',
-    styleUrls: ['./../account.component.css', './verify-email.component.css']
+    styleUrls: ['./../account.component.css', './verify-email.component.css'],
+    standalone: false
 })
 export class VerifyEmailComponent {
 
@@ -28,10 +29,15 @@ export class VerifyEmailComponent {
         
         lastValueFrom(this.accountService.verifyEmail(token))
         .then((res) => {
-                delete this.error;
+            this.loading = false;
+            if (res.success) {
                 this.success = res.message;
-                this.loading = false;
-            })
+                delete this.error;
+            } else {
+                this.error = res.message;
+                delete this.success;
+            }
+        })
             .catch((res) => {
                 delete this.success;
                 this.error = getError(res)

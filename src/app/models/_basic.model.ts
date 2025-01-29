@@ -9,8 +9,8 @@ export class Basic_List  {
     account_Created_Id: number = 0;
     account_Created: string = '';
 
-    customer_Id: number = 0;
-    customer: string = '';
+    // customer_Id: number = 0;
+    // customer: string = '';
 }
 
 export class Basic {

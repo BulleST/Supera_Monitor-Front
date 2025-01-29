@@ -1,4 +1,4 @@
-<p-dialog [header]="isEditPage ? 'Edit' : 'Create'"
+<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
@@ -16,7 +16,7 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="name.touched && name.invalid && name.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">This field is required.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field md:col-4 col-12"> <!-- Phone Number -->
@@ -30,7 +30,7 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="phone.touched && phone.invalid && phone.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">This field is required.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field md:col-4 col-12"> <!-- Role -->
@@ -53,7 +53,7 @@
                     appendTo="body" 
                     optionDisabled="isDisabled"/>
                 <div *ngIf="role_Id.touched && role_Id.invalid && role_Id.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="role_Id.errors['required']">This field is required.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="role_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12"> <!-- E-mail -->
@@ -72,15 +72,15 @@
                         [readonly]="isEditPage"
                         [disabled]="isEditPage">
                 <div *ngIf="email.touched && email.invalid && email.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">This field is required.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválid.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválid.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
                 </div>
             </div>
         </div>
-        <div class="formgrid grid align-items-center flex-wrap justify-content-between">
+        <div class="formgrid grid gap-4 align-items-center flex-wrap justify-content-between">
             <div class="sm:col-9 col-12">
-                <p class="text-red-500" *ngIf="!error">Enter the information correctly to save.</p>
+                <p class="text-red-500" *ngIf="!error">Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
@@ -89,7 +89,7 @@
                     [disabled]="form.invalid || loading"
                     class="w-full" 
                     styleClass="w-full" 
-                    label="Save" 
+                    label="Salvar" 
                     icon="pi pi-check" 
                     iconPos="right" 
                     [loading]="loading"

@@ -4,7 +4,8 @@ import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 @Component({
     selector: 'app-termos-de-uso',
     templateUrl: './termos-de-uso.component.html',
-    styleUrls: ['./termos-de-uso.component.css']
+    styleUrls: ['./termos-de-uso.component.css'],
+    standalone: false
 })
 export class TermosDeUsoComponent {
     faChevronCircleLeft = faChevronCircleLeft;

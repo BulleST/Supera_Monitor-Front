@@ -1,32 +1,16 @@
-export class Login {
-    email: string = '';
-    password: string = '';
-}
+import { ColumnTable, DisplayType, FilterType } from "../utils";
+import { Basic_List } from "./_basic.model";
 
-export class Register {
-    name: string = '';
-    email: string = '';
-    phone: string = '';
-    password: string = '';
-    confirmPassword: string = '';
-    acceptTerms: boolean = false;
-}
-
-export interface Account_List {
+export interface Account_List extends Basic_List {
     id: number;
     name: string;
     email: string;
     phone: string;
     role: string;
+    role_Id: number;
     verified?: Date;
     isVerified: boolean;
     passwordReset?: Date;
-    created: Date;
-    updated?: Date;
-    deactivated?: Date;
-    customer_Id: number;
-    role_Id: number;
-    active: boolean;
 }
 
 export interface Account {
@@ -61,21 +45,45 @@ export class Account {
     customer_Id: number = 0;
 }
 
-export class ResetPassword {
-    token: string = '';
-    password: string = '';
-    confirmPassword: string = '';
-}
-
-export class ChangePassword {
-    currentPassword: string = '';
-    newPassword: string = '';
-    confirmPassword: string = '';
-}
-
-export class UpdateAccount {
-    name: string = '';
-    phone: string = '';
-    email: string = '';
-}
-
+export var userColumns: ColumnTable[] = [
+    {
+        field: 'name',
+        label: 'Nome',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'email',
+        label: 'E-mail',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'phone',
+        label: 'Telefone/Celular',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'role',
+        label: 'Perfil',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'active',
+        label: 'Status',
+        filterType: FilterType.text,
+        displayType: DisplayType.options,
+        options: { 
+            "items": [
+                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": true }, 
+                { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
+            ]
+        },
+    },
+];

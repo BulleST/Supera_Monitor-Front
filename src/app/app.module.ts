@@ -1,23 +1,24 @@
 import { NgModule } from '@angular/core';
+import { CurrencyPipe, DatePipe } from '@angular/common';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SharedModule } from './shared/shared.module';
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch } from '@angular/common/http';
+
+import { provideEnvironmentNgxMask, provideNgxMask } from 'ngx-mask';
+import { providePrimeNG } from 'primeng/config';
+import { ConfirmationService, MessageService } from 'primeng/api';
+
+import { AppComponent } from './app.component';
 import { LoadingComponent } from './parts/loading/loading.component';
 import { AlertComponent } from './parts/alert/alert.component';
-import { HTTP_INTERCEPTORS, HttpClient, provideHttpClient, withFetch } from '@angular/common/http';
 import { RequestInterceptor } from './helpers/request.interceptor';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { LoadingService } from './parts/loading/loading';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { CurrencyPipe, DatePipe } from '@angular/common';
-import { provideEnvironmentNgxMask, provideNgxMask } from 'ngx-mask';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-
+import { SharedModule } from './shared/shared.module';
+import { MyPreset } from '../mytheme';
+import Material from '@primeng/themes/material'
+import { AppRoutingModule } from './app.routing';
 @NgModule({
     declarations: [
         AppComponent,
@@ -26,8 +27,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
     ],
     imports: [
         BrowserModule,
-        AppRoutingModule,
         BrowserAnimationsModule,
+        AppRoutingModule,
         SharedModule,
     ],
     providers: [
@@ -39,9 +40,17 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
         DatePipe,
         MessageService,
         LoadingService,
-        // { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-        // { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },
         provideAnimationsAsync(),
+        providePrimeNG({
+            theme: {
+                preset: MyPreset,
+                options: {
+                    darkModeSelector: '.my-app-dark'
+                }
+            }
+        })
     ],
     bootstrap: [AppComponent]
 })

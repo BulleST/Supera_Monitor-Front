@@ -1,50 +1,54 @@
-import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
-import { Account, Account_List } from '../../../models/account.model';
-import { ColumnTable, DisplayType } from '../../../utils/table';
-import { ConfirmationService } from 'primeng/api';
-import { UserService } from '../../../services/user.service';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faKey } from '@fortawesome/free-solid-svg-icons';
-import { TranslateService } from '@ngx-translate/core';
-import { Crypto, getError, insertOrReplace } from '../../../utils';
+import { faKey, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Table } from 'primeng/table';  
+import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { Table } from 'primeng/table';
+import { UserService } from '../../../services/user.service';
+import { ColumnTable, Crypto, DisplayType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
+import { Account, Account_List, userColumns } from '../../../models/account.model';
 
 @Component({
     selector: 'app-list',
     templateUrl: './list.component.html',
     styleUrl: './list.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService, MessageService],
+    standalone: false
 })
 export class ListComponent implements OnDestroy {
     faKey = faKey;
+    faUsers = faUsers;
 
     list: Account_List[] = [];
     tableLoading = false;
     tableSearch: string = '';
     tableColumns: ColumnTable[] = [];
     tableGlobalFilterFields: string[] = [];
-    tableSelectedItems: any[] = [];
     tableSelectedItem: any;
-    DisplayType = DisplayType;
+    tableMenu: MenuItem[] = [];
     account?: Account;
+    DisplayType: typeof DisplayType = DisplayType;
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
     constructor(
         private confirmationService: ConfirmationService,
+        private messageService: MessageService,
         private service: UserService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private accountService: AccountService,
-        private translate: TranslateService,
         private mobileService: MobileService
     ) {
+        this.tableColumns = userColumns;
+        this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
+
+        this.update();
 
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
@@ -52,23 +56,7 @@ export class ListComponent implements OnDestroy {
         var account = this.accountService.account.subscribe(account => this.account = account);
         this.subscription.push(account);
 
-        this.translate.get(['Users'])
-            .subscribe(translations => {
-                console.log('translations', translations);
-            });
-
-
-
-
-        var list = this.service.list.subscribe(res => {
-            this.list = res;
-
-            if (this.tableSelectedItem) {
-                var index = res.findIndex(x => x.id == this.tableSelectedItem.id);
-                if (index == -1)
-                    delete this.tableSelectedItem;
-            }
-        });
+        var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
 
     }
@@ -83,56 +71,81 @@ export class ListComponent implements OnDestroy {
         this.tableLoading = true;
         lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
-            .catch(res => this.tableLoading = false);
+            .catch(res => {
+                this.tableLoading = false;
+
+            });
     }
 
+    contextMenuSelectionChange(item: any) {
+        this.tableMenu = [
+            {
+                label: 'Menu',
+                disabled: true,
+                styleClass: 'text-500 font-bold opacity-100',
+            },
+            { separator: true },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen text-orange-500',
+                command: () => this.edit(item)
+            },
+            {
+                label: item.active ? 'Desabilitar' : 'Habilitar',
+                icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
+                command: (event: any) => this.deactivated(event, item)
+            },
+            {
+                label: 'Resetar Senha',
+                icon: 'fa-solid fa-key text-grey-400',
+                command: (event: any) => this.resetPassword(event, item)
+            }
 
-
-    edit() {
-        var encrypted = this.crypto.encrypt(this.tableSelectedItem.id);
-        this.router.navigate(['edit', encrypted], { relativeTo: this.activatedRoute });
+        ];
     }
+
 
     clear(dt: Table) {
         this.tableSearch = '';
         dt.clear();
     }
 
-    @HostListener('keydown.escape', ['$event']) 
+    @HostListener('keydown.escape', ['$event'])
     onKeydownHandler(event: KeyboardEvent) {
         this.unselectItems();
     }
 
     selectionChange(e: any) {
-        this.tableSelectedItem = e;
     }
 
     unselectItems() {
         this.tableSelectedItem = undefined;
-        this.tableSelectedItems = [];
     }
 
-    deactivated(e: any) {
-        var deactivated = !this.tableSelectedItem.active;
+    edit(item: any) {
+        var encrypted = this.crypto.encrypt(item.id);
+        this.router.navigate(['edit', encrypted], { relativeTo: this.activatedRoute });
+    }
+
+    deactivated(e: any, item: any) {
+        var deactivated = !item.active;
 
         this.confirmationService.confirm({
             target: e.target,
-            message: `Are you sure you want to ${deactivated ? 'enable' : 'disable'} the selected item? 
-                                                    \r\n You won't be able to assign this item to other new records.
-                                                    \r\n This user will be logged out and will not be able perform any action. `,
-            header: 'Confirmation',
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o item selecionado? 
+                      ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
+            header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
-            acceptLabel: `${deactivated ? 'Enable' : 'Disable'}`,
-            acceptIcon: 'none',
+            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             acceptButtonStyleClass: 'p-button-sm mr-0',
-            rejectIcon: 'none',
+            rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                lastValueFrom(this.service.deactivated(this.tableSelectedItem.id, deactivated))
+                lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
                         if (res.success) {
                             insertOrReplace(this.service, res.object);
-                            this.tableSelectedItem = res.object;
+                            item = res.object;
                         } else {
                             setTimeout(() => {
                                 this.showError(res.message, e);
@@ -146,23 +159,22 @@ export class ListComponent implements OnDestroy {
         });
     }
 
-
-    resetPasswordConfirm(e: any) {
+    resetPassword(e: any, item: any) {
         this.confirmationService.confirm({
             target: e.target,
-            message: 'Are you sure you want reset password for the selected user?',
-            header: 'Confirmation',
+            message: `Tem certeza que deseja resetar a senha deste usuário? 
+                        Uma mensagem com a nova senha será enviada para o e-mail cadastrado.`,
+            header: 'Resetar Senha?',
             icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Reset password',
-            acceptIcon: "none",
+            acceptLabel: 'Resetar Senha',
             acceptButtonStyleClass: 'p-button-sm mr-0',
-            rejectIcon: "none",
+            rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                lastValueFrom(this.service.resetPassword(this.tableSelectedItem.id))
+                lastValueFrom(this.service.resetPassword(item.id))
                     .then(res => {
                         if (res.success) {
-                            this.tableSelectedItem = res.object;
+                            item = res.object;
                         } else {
                             setTimeout(() => {
                                 this.showError(res.message, e);
@@ -182,7 +194,6 @@ export class ListComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptIcon: "none",
             acceptLabel: 'Ok',
             acceptButtonStyleClass: 'p-button-sm mr-0',
             rejectVisible: false,

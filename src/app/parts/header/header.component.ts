@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { faBell } from '@fortawesome/free-regular-svg-icons';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
@@ -7,25 +7,25 @@ import { Header } from '../../utils/header';
 import { ThemeService } from '../../utils/theme';
 import { Menubar } from 'primeng/menubar';
 import { AccountService } from '../../services/account.service';
-import { Account } from '../../models/account.model';
 import { Role } from '../../models/account-perfil.model';
+import { Account } from '../../models/account.model';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+    selector: 'app-header',
+    templateUrl: './header.component.html',
+    styleUrl: './header.component.css',
+    standalone: false
 })
 export class HeaderComponent implements OnDestroy {
   faRegularBell = faBell;
   faChevronDown = faChevronDown;
   items: MenuItem[] = [];
-  darkMode = false;
   headerItem: MenuItem[] = [];
   subscription: Subscription[] = [];
   account?: Account;
   Role: typeof Role = Role;
-  accountName = '';
-  accountAbreviacao = '';
+  accountName = 'Noemi C. Almeida';
+  accountAbreviacao = 'NC';
   @ViewChild('menuBig') menuBig?: Menubar;
 
 
@@ -41,18 +41,18 @@ export class HeaderComponent implements OnDestroy {
     private accountService: AccountService,
   ) {
 
-    var account = this.accountService.account.subscribe(account => {
-      this.account = account;
-      var array = account?.name.split(' ') as string[];
-      this.accountName = array[ 0 ] ?? '';
-      this.accountAbreviacao = array[ 0 ][ 0 ].toUpperCase();
+    // var account = this.accountService.account.subscribe(account => {
+    //   this.account = account;
+    //   var array = account?.name.split(' ') as string[];
+    //   this.accountName = array[ 0 ] ?? '';
+    //   this.accountAbreviacao = array[ 0 ][ 0 ].toUpperCase();
 
-      if (array.length > 1)
-        this.accountAbreviacao += array[ array.length - 1 ][ 0 ].toUpperCase();
+    //   if (array.length > 1)
+    //     this.accountAbreviacao += array[ array.length - 1 ][ 0 ].toUpperCase();
 
-      this.setMenuItems();
-    });
-    this.subscription.push(account);
+    //   this.setMenuItems();
+    // });
+    // this.subscription.push(account);
 
     this.headerItem = [
       {

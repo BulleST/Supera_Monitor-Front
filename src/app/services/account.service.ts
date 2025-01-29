@@ -2,11 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter, Inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, lastValueFrom, of, throwError } from 'rxjs';
-import { Account, ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/account.model';
+import { ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/accounts.model';
 import { catchError, tap } from 'rxjs/operators';
 import { getError } from '../utils';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
+import { Account } from '../models/account.model';
 
 @Injectable({
     providedIn: 'root'
@@ -46,10 +47,6 @@ this.url = environment.url + 'back';
 
     public get accountValue() {
         return this.accountSubject.value;
-  }
-
-  weatherforecast() {
-    return this.http.get<any>(`${this.url}/weatherforecast`);
   }
 
     login(model: Login) {

@@ -1,39 +1,37 @@
-<div class="flex align-items-center justify-content-center min-h-screen">
-    <div class="lg:col-4 md:col-6 sm:col-8 col-10 px-5 py-2 pb-6 surface-50 border-round">
-        <div class="px-0 mb-3">
-            <h3 class="text-3xl mb-0">Login</h3>
-            <p class="mb-0">Enter e-mail and password to access.</p>
-            <!-- <p *ngIf="form.invalid && form.errors">{{form.errors | json }}</p> -->
+<form #form="ngForm" (ngSubmit)="send()">
+    <div class="formgrid grid">
+        <div class="col-12 mb-4">
+            <h3 class="text-2xl mb-0 font-bold">Login</h3>
+            <p class="mb-0 mt-0">Insira e-mail e senha para acessar.</p>
         </div>
-        <form #form="ngForm" (ngSubmit)="send()">
-            <div class="formgrid grid">
-                <div class="field col-12"> <!-- E-mail -->
-                    <label for="email">E-mail: <small class="text-red-600">*</small></label>
-                    <div>
-                        <p-iconField iconPosition="left">
-                            <p-inputIcon styleClass="pi pi-envelope"/>
-                            <input type="text"
-                                pInputText
-                                #email="ngModel"
-                                [(ngModel)]="object.email"
-                                id="email"
-                                name="email"
-                                class="w-full"
-                                [required]="true"
-                                placeholder="example@gmail.com">
-                        </p-iconField>
-                    </div>
-                    <div *ngIf="email.touched && email.invalid && email.errors">
-                        <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">This field is required.</p>
-                        <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválid.</p>
-                        <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválid.</p>
-                    </div>
-                </div>
-                <div class="field col-12"> <!-- Password -->
-                    <label for="password">Password: <small class="text-red-600">*</small></label>
-                    <div>
-                        <p-iconField iconPosition="left">
-                            <p-password [feedback]="false"
+        <div class="field col-12"> <!-- E-mail -->
+            <label for="email">E-mail: <small class="text-red-600">*</small></label>
+            <div>
+                <p-iconField iconPosition="left">
+                    <p-inputIcon styleClass="pi pi-envelope" />
+                    <input type="text"
+                           pInputText
+                           #email="ngModel"
+                           [(ngModel)]="object.email"
+                           id="email"
+                           name="email"
+                           class="w-full"
+                           [required]="true"
+                           placeholder="example@gmail.com">
+                </p-iconField>
+            </div>
+            <div *ngIf="email.touched && email.invalid && email.errors">
+                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+            </div>
+        </div>
+        <div class="field col-12"> <!-- Password -->
+            <label for="password">Password: <small class="text-red-600">*</small></label>
+            <div>
+                <p-iconField iconPosition="left">
+                    <p-inputIcon styleClass="pi pi-lock" />
+                    <p-password [feedback]="false"
                                 [toggleMask]="true"
                                 #password="ngModel"
                                 [(ngModel)]="object.password"
@@ -41,32 +39,29 @@
                                 name="password"
                                 class="w-full"
                                 styleClass="w-full"
-                                inputStyleClass="w-full p-icon-field-left"
-                                [required]="true" 
-                                placeholder="******"/>
-                            <p-inputIcon styleClass="pi pi-lock"/>
-                        </p-iconField>
-                    </div>
-                    <div *ngIf="password.touched && password.invalid && password.errors">
-                        <p class="text-red-600 mt-2 mb-0" *ngIf="password.errors['required']">This field is required.</p>
-                    </div>
-                </div>
-                <div class="field col-12 mb-1 mt-3">
-                    <p class="text-red-600 mt-0 mb-2 text-center" *ngIf="error">{{error}}</p>
-                    <p-button
-                        type="submit"
-                        label="Enter"
-                        [rounded]="true"
-                        [raised]="true"
-                        class="w-full"
-                        styleClass="w-full"
-                        [disabled]="loading || form.invalid"
-                        [loading]="loading" />
-                    </div>
-                </div>
-                <div class="field col-12 mb-3 text-center">
-                    <a class="text-primary link" [routerLink]="['..', 'forgot-password']">Forgot password</a>
-                </div>
-        </form>
+                                inputStyleClass="w-full"
+                                [required]="true"
+                                placeholder="******" />
+                </p-iconField>
+            </div>
+            <div *ngIf="password.touched && password.invalid && password.errors">
+                <p class="text-red-600 mt-2 mb-0" *ngIf="password.errors['required']">Esse campo é obrigatório.</p>
+            </div>
+        </div>
+        <div class="field col-12 mb-1 mt-4">
+            <p class="text-red-600 mt-0 mb-2 text-center" *ngIf="error">{{error}}</p>
+            <p-button
+                      type="submit"
+                      label="Entrar"
+                      [rounded]="true"
+                      [raised]="true"
+                      class="w-full"
+                      styleClass="w-full"
+                      [disabled]="loading || form.invalid"
+                      [loading]="loading" />
+        </div>
     </div>
-</div>
+    <div class="col-12 text-center">
+        <a class="text-primary link" [routerLink]="['..', 'forgot-password']">Esqueci minha senha</a>
+    </div>
+</form>

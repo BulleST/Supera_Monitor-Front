@@ -1,15 +1,17 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Account, ChangePassword } from '../../models/account.model';
+import { ChangePassword } from '../../models/accounts.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { AccountService } from '../../services/account.service';
 import { ConfirmationService } from 'primeng/api';
 import { NgForm } from '@angular/forms';
 import { getError } from '../../utils';
+import { Account } from './../../models/account.model';
 
 @Component({
-  selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrl: './change-password.component.css'
+    selector: 'app-change-password',
+    templateUrl: './change-password.component.html',
+    styleUrl: './change-password.component.css',
+    standalone: false
 })
 export class ChangePasswordComponent implements OnDestroy {
     @Input() visible = false;

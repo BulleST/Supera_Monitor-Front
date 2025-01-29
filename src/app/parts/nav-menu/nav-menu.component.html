@@ -1,33 +1,67 @@
-<p-sidebar #sidebar
-           [(visible)]="menuOpen"
-           (visibleChange)="setWidth()"
-           [modal]="false"
-           [transitionOptions]="'.3s'">
-    <ng-template pTemplate="headless">
-        <div class="h-screen">
-            <div style="height: 120px;" class="border border-black-alpha-20 border-bottom-1 px-3 py-2">
-                <div class="flex align-items-center justify-content-between w-full my-3">
-                    <h3>Lorem Ipsum</h3>
-                    <div class="flex align-items-center ">
-                        <p-button [text]="true" icon="pi pi-refresh" title="Atualizar" (onClick)="atualizar()" [loading]="loading"></p-button>
-                        <span>
-                            <p-button type="button" (onClick)="closeCallback($event)" icon="pi pi-times" [rounded]="true" [outlined]="true" styleClass="h-2rem w-2rem"></p-button>
-                        </span>
-                    </div>
-                </div>
-                <div class="p-input-icon-right col-12 px-0 -my-3">
-                    <i class="pi pi-search"></i>
-                    <input type="text" 
-                            pInputText 
-                            class="w-full"
-                            placeholder="Global Search" 
-                            #input />
-                </div>
-            </div>
-            <div style="height: calc(100% - 120px);" class="sidebar overflow-auto" (scroll)="cm.hide()">
-           
-            </div>
+<p-confirmDialog />
+<p-menu [model]="items"
+        styleClass="border-none bg-white shadow-1  border-round-md min-w-0 ">
+    <ng-template #start>
+        <div class="px-3 pt-3 flex align-items-center justify-content-center">
+            <!-- <img *ngIf="menuOpen" src="assets/images/logo-supera.png" alt="Logo Supera" class="w-6rem mr-2"> -->
+            <p-button severity="primary"
+                      class="ml-auto "
+                      [class.-mb-6]="menuOpen"
+                      [rounded]="true"
+                      icon="pi pi-bars"
+                      (onClick)="setMenu()" />
         </div>
-        <p-contextMenu #cm [model]="treeMenu" appendTo="body" triggerEvent="click"></p-contextMenu>
     </ng-template>
-</p-sidebar>
+    <ng-template #submenuheader let-item>
+        <div class="flex align-items-center" style="height: 1rem">
+            <p-divider *ngIf="!menuOpen" layout="horizontal" styleClass="m-0 p-0 border-primary-500"></p-divider>
+            <span class="text-primary font-bold" *ngIf="menuOpen">{{ item.label }}</span>
+        </div>
+    </ng-template>
+    <ng-template #item let-item>
+        <a pRipple [routerLink]="item.routerLink"
+           class="p-menu-item-link flex align-items-center justify-content-center" [pTooltip]="item.tooltip">
+            <span class="p-menu-item-icon">
+                <ng-template [ngIf]="item.iconImage">
+                    <img src="./../../../assets/images/{{item.iconImage}}" alt="{{item.iconImage}}">
+                </ng-template>
+                <ng-template [ngIf]="item.icon">
+                    <i *ngIf="item.icon" [class]="item.icon"></i>
+                </ng-template>
+                <ng-template [ngIf]="item.iconFontawesome">
+                    <fa-icon [icon]="item.iconFontawesome"></fa-icon>
+                </ng-template>
+            </span>
+            <span class="ml-2 mr-auto" *ngIf="menuOpen">{{ item.label }}</span>
+            <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" />
+            <span *ngIf="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"> {{ item.shortcut }} </span>
+        </a>
+    </ng-template>
+    <ng-template #end>
+        <div class="flex justify-content-center align-items-center -mt-2 pb-3" 
+        [class.pr-3]="menuOpen">
+            <p-button *ngIf="menuOpen"
+                      pTooltip="Minha conta"
+                      styleClass="flex align-items-center justify-content-start border-none w-full"
+                      severity="secondary"
+                      [text]="true"
+                      class="flex-1"
+                      pRipple>
+                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+                <span class="flex flex-column">
+                    <span class="font-bold">Amy Elsner</span>
+                    <span class="text-sm text-left">Admin</span>
+                </span>
+            </p-button>
+            <p-button (onClick)="logout($event)"
+                      severity="secondary"
+                      pTooltip="Sair"
+                      [label]="menuOpen ? 'Sair' : undefined"
+                      icon="pi pi-sign-out text-white"
+                      iconPos="right"
+                      [rounded]="menuOpen"
+                      size="small"
+                      styleClass="ml-auto p-menu-item-icon w-full  bg-black-alpha-80 text-white {{menuOpen ? 'px-3' : ''}}"/>
+        </div>
+    </ng-template>
+</p-menu>
