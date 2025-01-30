@@ -4,10 +4,10 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
+import { ProfessorService } from '../../../services/professor.service';
+import { Professor } from '../../../models/professor.model';
+import { Account_List } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
-import { AccountRole, Role, roles } from '../../../models/account-perfil.model';
-import { AccountService } from '../../../services/account.service';
-import { Account } from '../../../models/account.model';
 
 @Component({
     selector: 'app-form',
@@ -19,37 +19,34 @@ import { Account } from '../../../models/account.model';
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
     injector = inject(Injector);
-    object = new Account;
+    object = new Professor;
     loading = false;
     error: string = '';
     isEditPage = false;
     emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
-    roles: AccountRole[] = [];
-    roleDisabled: boolean = false; 
-    Role: typeof Role = Role;
+
+    accounts: Account_List[] = [];
+    accountsSelected?: Account_List;
+    loadingAccounts: boolean = true;
 
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
-        private messageService: MessageService,
         private crypto: Crypto,
-        private service: UserService,
-        private accountService: AccountService,
+        private service: ProfessorService,
+        private userService: UserService,
         private confirmationService: ConfirmationService
     ) {
 
-        // afterNextRender({ read: () => this.loadPage() },
-        //     { injector: this.injector }
-        // );
-        this.loadPage();
-
-        lastValueFrom(this.service.getRoles())
+        lastValueFrom(this.userService.getList())
         .then(res => {
-            this.loading = false;
-            this.roles = res
+            this.accounts = res;
+            this.loadingAccounts = false;
         })
-        .catch(res => this.loading = false);
+        .catch(res => this.loadingAccounts = false)
+
+        this.loadPage();
     }
 
     ngOnDestroy(): void {
@@ -57,8 +54,6 @@ export class FormComponent implements OnDestroy {
     }
 
     loadPage() {
-        var account: Account = this.accountService.accountValue as Account;
-        this.roles.forEach(x => x.isDisabled = x.id < account.role_Id);
 
         var params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['id'];
@@ -69,8 +64,7 @@ export class FormComponent implements OnDestroy {
                 lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;
-                        if ( account && account?.role_Id < this.object.role_Id) {
-                        }
+                        this.object.dataInicio = new Date(res.dataInicio);
                         this.loading = false;
                         this.visible = true;
                     })
@@ -88,6 +82,21 @@ export class FormComponent implements OnDestroy {
         if (!this.visible) {
             var route = this.isEditPage ? ['../../'] : ['../'];
             this.router.navigate(route, { relativeTo: this.activatedRoute });
+        }
+    }
+
+    accountSelectedChange(account?: Account_List) {
+
+        if (account) {
+            this.object.account_Id = account.id;
+            this.object.nome = account.name;
+            this.object.email = account.email;
+            this.object.telefone = account.phone;
+        } else {
+            this.object.account_Id = 0;
+            this.object.nome = '';
+            this.object.email = '';
+            this.object.telefone = '';
         }
     }
     

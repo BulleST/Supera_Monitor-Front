@@ -68,6 +68,7 @@ import { ConfirmationService, FilterMatchMode /*, PrimeNGConfig */ } from 'prime
 import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
+import { SelectModule } from 'primeng/select';
 
 @NgModule({
     imports: [
@@ -120,6 +121,7 @@ import { DatePickerModule } from 'primeng/datepicker';
         RippleModule,
         ScrollPanelModule,
         SelectButtonModule,
+        SelectModule,
         SidebarModule,
         SkeletonModule,
         // SlideMenuModule,
@@ -187,6 +189,7 @@ import { DatePickerModule } from 'primeng/datepicker';
         RippleModule,
         ScrollPanelModule,
         SelectButtonModule,
+        SelectModule,
         SidebarModule,
         SkeletonModule,
         // SlideMenuModule,

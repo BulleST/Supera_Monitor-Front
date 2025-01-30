@@ -125,7 +125,7 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-sm mr-0',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
@@ -154,7 +154,7 @@ export class ListComponent implements OnDestroy {
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'Ok',
-            acceptButtonStyleClass: 'p-button-sm mr-0',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         });
     }

@@ -35,41 +35,40 @@ export class ForgotPasswordComponent {
 
     send(e: any) {
         lastValueFrom(this.service.forgotPassword(this.object.email))
-        .then(res => {
-            this.loading = false;
-            this.error = '';
-            
-            this.confirmationService.confirm({
-                target: e.target,
-                message: res.message,
-                header: 'Success',
-                icon: 'pi pi-envelope',
-                rejectVisible: false,
-                acceptIcon: "none",
-                acceptLabel: 'Go to Login',
-                acceptButtonStyleClass: 'p-button-sm mr-0',
-                accept: () => {
-                    this.router.navigate(['account', 'login']);
-                }
-            })
+            .then(res => {
+                this.loading = false;
+                this.error = '';
 
-        })
-        .catch(res => {
-            this.error = getError(res);
-            this.loading = false;
-            this.confirmationService.confirm({
-                target: e.target,
-                message: this.error,
-                header: 'Error',
-                icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
-                rejectVisible: false,
-                acceptIcon: "none",
-                acceptLabel: 'Ok',
-              acceptButtonStyleClass: 'p-button-sm mr-0',
-              rejectIcon: "none",
-              rejectButtonStyleClass: 'p-button-text p-button-sm',
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: res.message,
+                    header: 'Sucesso',
+                    icon: 'pi pi-envelope',
+                    rejectVisible: false,
+                    acceptLabel: 'Fazer Login',
+                    acceptButtonStyleClass: 'p-button-sm p-button-rounded px-3 mr-0',
+                    accept: () => {
+                        this.router.navigate(['accounts', 'login']);
+                    }
+                })
+
             })
-        });
+            .catch(res => {
+                this.error = getError(res);
+                this.loading = false;
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: this.error,
+                    header: 'Erro',
+                    icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
+                    rejectVisible: false,
+                    acceptIcon: "none",
+                    acceptLabel: 'Ok',
+                    acceptButtonStyleClass: 'p-button-sm p-button-rounded px-3 mr-0',
+                    rejectIcon: "none",
+                    rejectButtonStyleClass: 'p-button-text p-button-sm',
+                })
+            });
     }
 
 }

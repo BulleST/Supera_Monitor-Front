@@ -279,3 +279,9 @@ body {
     background-color: var(--surface-100)!important;
     cursor: default;
 }
+
+
+.p-dialog-maximized {
+   height: 95vh!important;
+   border-radius: var(--p-dialog-border-radius)!important;
+}

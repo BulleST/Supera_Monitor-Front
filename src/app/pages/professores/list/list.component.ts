@@ -4,12 +4,13 @@ import { faKey, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { UserService } from '../../../services/user.service';
 import { ColumnTable, Crypto, DisplayType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
-import { Account, Account_List, userColumns } from '../../../models/account.model';
+import { Professor, professorColumns } from '../../../models/professor.model';
+import { ProfessorService } from '../../../services/professor.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
     selector: 'app-list',
@@ -19,14 +20,13 @@ import { Account, Account_List, userColumns } from '../../../models/account.mode
     standalone: false
 })
 export class ListComponent implements OnDestroy {
-    list: Account_List[] = [];
+    list: Professor[] = [];
     tableLoading = false;
     tableSearch: string = '';
     tableColumns: ColumnTable[] = [];
     tableGlobalFilterFields: string[] = [];
     tableSelectedItem: any;
     tableMenu: MenuItem[] = [];
-    account?: Account;
     DisplayType: typeof DisplayType = DisplayType;
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
@@ -34,24 +34,20 @@ export class ListComponent implements OnDestroy {
 
     constructor(
         private confirmationService: ConfirmationService,
-        private messageService: MessageService,
-        private service: UserService,
+        private service: ProfessorService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
-        private accountService: AccountService,
-        private mobileService: MobileService
+        private mobileService: MobileService,
+        private userService: UserService
     ) {
-        this.tableColumns = userColumns;
+        this.tableColumns = professorColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
 
         this.update();
 
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
-
-        var account = this.accountService.account.subscribe(account => this.account = account);
-        this.subscription.push(account);
 
         var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
@@ -129,7 +125,7 @@ export class ListComponent implements OnDestroy {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
                       ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
@@ -138,10 +134,12 @@ export class ListComponent implements OnDestroy {
             rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                lastValueFrom(this.service.deactivated(item.id, deactivated))
+                lastValueFrom(this.userService.deactivated(item.account_Id, deactivated))
                     .then(res => {
                         if (res.success) {
-                            insertOrReplace(this.service, res.object);
+                            item.active = res.object.active;
+                            item.deactivated = res.object.deactivated;
+                            insertOrReplace(this.service, item);
                             item = res.object;
                         } else {
                             setTimeout(() => {
@@ -159,7 +157,7 @@ export class ListComponent implements OnDestroy {
     resetPassword(e: any, item: any) {
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja resetar a senha deste usuário? 
+            message: `Tem certeza que deseja resetar a senha deste professor? 
                         Uma mensagem com a nova senha será enviada para o e-mail cadastrado.`,
             header: 'Resetar Senha?',
             icon: 'pi pi-exclamation-triangle',
@@ -168,7 +166,7 @@ export class ListComponent implements OnDestroy {
             rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                lastValueFrom(this.service.resetPassword(item.id))
+                lastValueFrom(this.userService.resetPassword(item.account_Id))
                     .then(res => {
                         if (res.success) {
                             item = res.object;
@@ -189,7 +187,7 @@ export class ListComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Error',
+            header: 'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'Ok',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',

@@ -59,7 +59,7 @@ export class ProfileComponent implements OnDestroy {
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptIcon: "none",
             acceptLabel: 'Ok',
-            acceptButtonStyleClass: 'p-button-sm mr-0',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }

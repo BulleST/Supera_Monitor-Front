@@ -73,10 +73,10 @@ export class UserService {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/users/${id}/${activated}`, {})
+        return this.http.patch<Response>(`${this.url}/users/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar usuário', life: 3000 });
+                            this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: `Não foi possível ${( activated ? 'desabilitar' : 'habilitar')}  usuário`, life: 3000 });
                 }
             }));
     }

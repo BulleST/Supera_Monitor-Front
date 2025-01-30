@@ -11,7 +11,8 @@ import { ConfirmationService } from 'primeng/api';
     selector: 'app-reset-password',
     templateUrl: './reset-password.component.html',
     styleUrls: ['./../account.component.css'],
-    standalone: false
+    standalone: false,
+    providers: [ConfirmationService]
 })
 export class ResetPasswordComponent {
     faChevronCircleLeft = faChevronCircleLeft;
@@ -36,32 +37,30 @@ export class ResetPasswordComponent {
                     this.confirmationService.confirm({
                         target: e.target,
                         message: res.message,
-                        header: 'Success',
-                        icon: 'fa-solid fa-key text-2xl',
+                        header: 'Sucesso',
+                        icon: 'pi pi-key text-xl',
                         rejectVisible: false,
-                        acceptIcon: "none",
-                        acceptLabel: 'Go to Login',
-                      acceptButtonStyleClass: 'p-button-sm mr-0',
+                        acceptLabel: 'Fazer Login',
+                        acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
                         accept: () => {
                             this.router.navigate(['account', 'login']);
                         }
                     })
-                } 
+                }
                 else {
                     this.error = res.message;
-                    
+
                     this.confirmationService.confirm({
                         target: e.target,
                         message: res.message,
-                        header: 'Error',
+                        header: 'Erro',
                         icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
                         rejectVisible: false,
-                        acceptIcon: "none",
                         acceptLabel: 'Ok',
-                        acceptButtonStyleClass: 'p-button-sm mr-0',
+                        acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
                     })
                 }
-            
+
             })
             .catch((res) => {
                 this.error = getError(res);

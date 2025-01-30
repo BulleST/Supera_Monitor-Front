@@ -35,7 +35,7 @@ export class RequestInterceptor implements HttpInterceptor {
 
     constructor(
         private router: Router,
-        private toastr: ToastrService,
+        // private toastr: ToastrService,
         private loadingService: LoadingService,
     ) { }
 
@@ -86,7 +86,7 @@ export class RequestInterceptor implements HttpInterceptor {
                                             }
                                         }
                                         if (notToastrError.length == 0) {
-                                            this.toastr.error(message, 'Error');
+                                            // this.toastr.error(message, 'Error');
 
                                         }
                                     }
@@ -103,8 +103,9 @@ export class RequestInterceptor implements HttpInterceptor {
                                         else if (request.method == 'DELETE') {
                                             message = 'Register deleted successfully.';
                                         }
-                                        if (message && notToastr.length == 0)
-                                            this.toastr.success(message, 'Success', { enableHtml: true });
+                                        if (message && notToastr.length == 0) {
+                                            // this.toastr.success(message, 'Success', { enableHtml: true });
+                                        }
                                     }
                                 }
                             }
