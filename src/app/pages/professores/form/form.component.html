@@ -52,8 +52,8 @@
                     <p-divider layout="horizontal" align="left"> <span class="font-bold text-primary">Cadastrar um novo</span> </p-divider>
                 </div>
             </ng-template>
-            <div class="field sm:col-8 col-12"> <!-- Nome -->
-                <label for="nome">Nome: <small class="text-red-600">*</small></label>
+            <div class="field col-12"> <!-- Nome -->
+                <label for="nome">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
                        #nome="ngModel"
@@ -63,25 +63,28 @@
                        class="w-full"
                        [required]="true">
                 <div *ngIf="nome.touched && nome.invalid && nome.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Telefone/Celular -->
-                <label for="telefone">Telefone/Celular: <small class="text-red-600">*</small></label>
-                <input type="text"
-                       pInputText
-                       #telefone="ngModel"
-                       [(ngModel)]="object.telefone"
-                       id="telefone"
-                       name="telefone"
-                       class="w-full"
-                       [required]="true">
+                <label for="telefone">Telefone/Celular: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #telefone="ngModel"
+                             [(ngModel)]="object.telefone"
+                             mask="(99) ?9.9999-9999"
+                             placeholder="(99) *9.9999-9999"
+                             [autoClear]="true"
+                             id="telefone"
+                             name="telefone"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
                 <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-12"> <!-- E-mail -->
-                <label for="email">E-mail: <small class="text-red-600">*</small></label>
+            <div class="field sm:col-8 col-12"> <!-- E-mail -->
+                <label for="email">E-mail: <span class="text-red-500">*</span> <small *ngIf="!isEditPage">(Não é possível alterar o e-mail após o primeiro cadastro)</small></label>
                 <input type="email"
                        [email]="true"
                        pInputText
@@ -96,59 +99,89 @@
                        [readonly]="isEditPage || accountsSelected != undefined"
                        [disabled]="isEditPage || accountsSelected != undefined">
                 <div *ngIf="email.touched && email.invalid && email.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
                 </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Data de Início -->
-                <label for="dataInicio">Data de Início: <small class="text-red-600">*</small></label>
+                <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
                               [(ngModel)]="object.dataInicio"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
+                              [minDate]="minDate"
+                              [maxDate]="maxDate"
                               inputId="dataInicio"
                               name="dataInicio"
                               class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
                               [required]="true"
                               appendTo="body" />
                 <div *ngIf="dataInicio.touched && dataInicio.invalid && dataInicio.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Nível Ábaco -->
-                <label for="nivelAbaco">Nível Ábaco: <small class="text-red-600">*</small></label>
-                <input type="text"
-                       pInputText
-                       #nivelAbaco="ngModel"
-                       [(ngModel)]="object.nivelAbaco"
-                       id="nivelAbaco"
-                       name="nivelAbaco"
-                       class="w-full"
-                       [required]="true">
-                <div *ngIf="nivelAbaco.touched && nivelAbaco.invalid && nivelAbaco.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="nivelAbaco.errors['required']">Esse campo é obrigatório.</p>
+                <label for="professor_NivelAbaco_Id">Nível Ábaco: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="nivelAbaco"
+                          [(ngModel)]="object.professor_NivelAbaco_Id"
+                          #professor_NivelAbaco_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_NivelAbaco_Id"
+                          inputId="professor_NivelAbaco_Id"
+                          optionLabel="descricao"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body" />
+                <div *ngIf="professor_NivelAbaco_Id.touched && professor_NivelAbaco_Id.invalid && professor_NivelAbaco_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAbaco_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Nível AH -->
-                <label for="nivelAh">Nível AH: <small class="text-red-600">*</small></label>
-                <input type="text"
-                       pInputText
-                       #nivelAh="ngModel"
-                       [(ngModel)]="object.nivelAh"
-                       id="nivelAh"
-                       name="nivelAh"
-                       class="w-full"
-                       [required]="true">
-                <div *ngIf="nivelAh.touched && nivelAh.invalid && nivelAh.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="nivelAh.errors['required']">Esse campo é obrigatório.</p>
+                <label for="professor_NivelAH_Id">Nível AH: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="nivelAH"
+                          [(ngModel)]="object.professor_NivelAH_Id"
+                          #professor_NivelAH_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_NivelAH_Id"
+                          inputId="professor_NivelAH_Id"
+                          optionLabel="descricao"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body" />
+                <div *ngIf="professor_NivelAH_Id.touched && professor_NivelAH_Id.invalid && professor_NivelAH_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAH_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field col-12 "> <!-- Legenda -->
+                <div>
+                    <label for="color">Legenda: <span class="text-red-500">*</span></label>
+                    <p-colorpicker
+                                   #color="ngModel"
+                                   [(ngModel)]="object.color"
+                                   inputId="color"
+                                   name="color"
+                                   appendTo="body"
+                                   styleClass="ml-2" />
+                </div>
+                <small class="">Esse campo representa a cor utilizada para o professor na visão do calendário de aulas.</small>
+                <div *ngIf="color.touched && color.invalid && color.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="color.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
         </div>
         <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
-            <div class="sm:col-9 col-12">
-                <p class="text-red-500" *ngIf="!error">Preencha os campos corretamente para salvar.</p>
+            <div class="sm:col-9 col-12 pl-0">
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
@@ -156,7 +189,7 @@
                           type="submit"
                           [disabled]="form.invalid || loading"
                           class="w-full"
-                          styleClass="w-full"
+                          styleClass="w-full px-3"
                           label="Salvar"
                           icon="pi pi-check"
                           iconPos="right"

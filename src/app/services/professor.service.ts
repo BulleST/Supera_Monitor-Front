@@ -4,7 +4,8 @@ import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
 import { MessageService } from 'primeng/api';
-import { Professor } from '../models/professor.model';
+import { Professor, Professor_NivelApostila, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
+import { Map } from '../utils/map';
 
 @Injectable({
     providedIn: 'root',
@@ -22,6 +23,24 @@ export class ProfessorService {
     }
 
 
+    getNivelAbaco() {
+        return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/abaco/all`)
+            .pipe(tap({
+                error: err => {
+                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar nível ábaco', life: 3000 });
+                }
+            }));
+    }
+    
+    getNivelAH() {
+        return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/ah/all`)
+            .pipe(tap({
+                error: err => {
+                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar nível AH', life: 3000 });
+                }
+            }));
+    }
+
     getList() {
         return this.http.get<Professor[]>(`${this.url}/professor/all/`)
             .pipe(tap({
@@ -37,13 +56,13 @@ export class ProfessorService {
 
     get(id: number) {
         return new Observable<Professor>((observer => {
-            var item = this.list.value.find(x => x.id == id);
-            if (item) {
+            var item = this.list.value.find(x => x.id == id) as Professor;
+            item.dataInicio = new Date(item.dataInicio);
+
+            if (item)
                 observer.next(item);
-            }
-            else {
+            else
                 observer.error('Professor não encontrado.')
-            }
             observer.complete();
             return;
         }))
@@ -55,7 +74,8 @@ export class ProfessorService {
         //     }));
     }
 
-    create(request: Professor) {
+    create(model: Professor) {
+        var request = Map(model, new ProfessorCreateRequest);
         return this.http.post<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
@@ -64,7 +84,8 @@ export class ProfessorService {
             }));
     }
 
-    edit(request: Professor) {
+    edit(model: Professor) {
+        var request = Map(model, new ProfessorCreateRequest);
         return this.http.put<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {

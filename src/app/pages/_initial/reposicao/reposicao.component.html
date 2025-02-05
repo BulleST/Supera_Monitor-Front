@@ -1,0 +1,36 @@
+<p-dialog [header]="'Agendar reposição'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+    <div class="formgrid grid">
+        <div class="field sm:col-12 col-12">
+            <!-- <label for="professor">Selecione uma data: </label> -->
+            <div class="surface-50 p-4">
+                <div #calendarDiv id="myCalendar" class="w-full"></div>
+            </div>
+        </div>
+        <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <!-- <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p> -->
+                <!-- <p class="text-red-500" *ngIf="error">{{error}}</p> -->
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          class="w-full"
+                          styleClass="w-full px-3"
+                          label="Finalizar aula"
+                          icon="pi pi-check"
+                          iconPos="right"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </div>
+</p-dialog>
+<p-confirmDialog />
+<p-toast />

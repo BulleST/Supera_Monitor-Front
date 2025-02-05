@@ -1,59 +1,85 @@
-<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
+<p-dialog [header]="'Dados do Aluno'"
           [modal]="true"
+          [maximizable]="true"
+          [draggable]="true"
+          icon
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ maxWidth: '600px', width: '95vw' }">
-    <form (ngSubmit)="send(form, $event)" #form="ngForm">
-        <div class="formgrid grid">
-            <div class="field md:col-8 col-12"> <!-- Nome -->
-                <label for="nome">Nome: <small class="text-red-600">*</small></label>
-                <input type="text"
-                        pInputText
-                        #nome="ngModel"
-                        [(ngModel)]="object.nome"
-                        id="nome"
-                        name="nome"
-                        class="w-full"
-                        [required]="true">
-                <div *ngIf="nome.touched && nome.invalid && nome.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+          [style]="{ width: '1100px', maxWidth: '95vw', maxHeight: '95vh' }">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">Dados do Aluno</span>
+            <p-button class="ml-auto"
+                      type="button"
+                      icon="pi pi-exclamation-circle"
+                      size="large"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="secondary"
+                      (onClick)="toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white w-20rem">
+                <div class="px-2">
+                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                    <table class="w-full">
+                        <tr>
+                            <td><b>Cadastrado em</b></td>
+                            <td class="text-right">{{object.dataCadastro | date : 'dd/MM/YYYY'}}</td>
+                        </tr>
+                        <tr *ngIf="object.aspNetUsers_Created">
+                            <td><b>Cadastrado por</b></td>
+                            <td class="text-right">{{ object.aspNetUsers_Created }}</td>
+                        </tr>
+                        <tr>
+                            <td><b>Data de Entrada</b></td>
+                            <td class="text-right">{{object.dataEntrada | date : 'dd/MM/YYYY'}}</td>
+                        </tr>
+                        <tr *ngIf="object.lastUpdated">
+                            <td><b>Última atualização</b></td>
+                            <td class="text-right">{{object.lastUpdated | date : 'dd/MM/YYYY'}}</td>
+                        </tr>
+                        <tr *ngIf="object.deactivated">
+                            <td><b>Inativo em</b></td>
+                            <td class="text-right">{{object.deactivated | date : 'dd/MM/YYYY'}}</td>
+                        </tr>
+                    </table>
                 </div>
-            </div>
-            <div class="field md:col-4 col-12"> <!-- Data de Nascimento -->
-                <label for="dataNascimento">Data de Nascimento: <small class="text-red-600">*</small></label>
-                <p-datepicker 
-                    #dataNascimento="ngModel"
-                    [(ngModel)]="object.dataNascimento"
-                    [showIcon]="true" 
-                    [iconDisplay]="'input'"
-                    inputId="dataNascimento"
-                    name="dataNascimento"
-                    class="w-full"
-                    [required]="true"
-                    appendTo="body" />
-
-                <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
+            </p-popover>
         </div>
-        <div class="formgrid grid gap-4 align-items-center flex-wrap justify-content-between">
+    </ng-template>
+    <form (ngSubmit)="send(form, $event)" #form="ngForm" class="px-2">
+        <div class="card">
+            <p-tabs [value]="0">
+                <p-tablist>
+                    <p-tab [value]="0">Dados Cadastrais</p-tab>
+                    <p-tab [value]="1">Checklist</p-tab>
+                </p-tablist>
+                <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
+                    <p-tabpanel [value]="0">
+                        <app-dados-cadastrais [object]="object"></app-dados-cadastrais>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="1">
+                        <app-checklist></app-checklist>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
+        </div>
+        <div class="formgrid grid pr-3 py-2 gap-4 align-items-center flex-wrap justify-content-between">
             <div class="sm:col-9 col-12">
-                <p class="text-red-500" *ngIf="!error">Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
-                <p-button 
-                    type="submit"
-                    [disabled]="form.invalid || loading"
-                    class="w-full" 
-                    styleClass="w-full" 
-                    label="Salvar" 
-                    icon="pi pi-check" 
-                    iconPos="right" 
-                    [loading]="loading"
-                    [rounded]="true" 
-                    size="small" />
+                <p-button
+                          type="submit"
+                          [disabled]="form.invalid || loading"
+                          class="w-full"
+                          styleClass="w-full px-3"
+                          label="Salvar"
+                          icon="pi pi-check"
+                          iconPos="right"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
             </div>
         </div>
     </form>

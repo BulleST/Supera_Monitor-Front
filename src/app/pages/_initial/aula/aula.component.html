@@ -1,0 +1,218 @@
+<p-dialog [header]="'Aula'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+    <div class="formgrid grid">
+        <div class="field sm:col-6 col-12">
+            <label for="professor">Professor: </label>
+            <p-iconfield>
+                <input type="text"
+                       pInputText
+                       [value]="object.professor.nome"
+                       styleClass="w-full"
+                       class="w-full"
+                       id="professor"
+                       readonly />
+                <p-inputicon styleClass="fa-solid fa-person-chalkboard" />
+            </p-iconfield>
+        </div>
+        <div class="field sm:col-6 col-12">
+            <label for="turma">Turma: </label>
+            <p-iconfield>
+                <input type="text"
+                       pInputText
+                       [value]="object.turma"
+                       styleClass="w-full"
+                       class="w-full"
+                       id="turma"
+                       readonly />
+                <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+            </p-iconfield>
+        </div>
+        <div class="field sm:col-4 col-12"> <!-- Data de Início -->
+            <label for="dataInicio">Data:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-calendar" />
+                <input type="text"
+                       pInputText
+                       [value]="object.dataInicio | date : 'dd/MM/yyyy'"
+                       styleClass="w-full"
+                       class="w-full"
+                       id="professor"
+                       readonly />
+            </p-iconfield>
+        </div>
+        <div class="field sm:col-4 col-12"> <!-- Horário -->
+            <label for="dataInicio">Início:</label>
+            <p-iconfield>
+                <input type="text"
+                       pInputText
+                       [value]="object.dataInicio | date : 'HH:mm'"
+                       styleClass="w-full"
+                       class="w-full"
+                       id="professor"
+                       readonly />
+                <p-inputicon styleClass="pi pi-clock" />
+            </p-iconfield>
+        </div>
+        <!-- <div class="col py-4 py-6 px-0">
+            <span class="flex align-items-center justify-content-center line-height-1 text-sm text-center">até</span>
+        </div> -->
+        <div class="field sm:col-4 col-12"> <!-- Horário -->
+            <label for="dataFim">Fim:</label>
+            <p-iconfield>
+                <input type="text"
+                       pInputText
+                       [value]="object.dataFim | date : 'HH:mm'"
+                       styleClass="w-full"
+                       class="w-full"
+                       id="professor"
+                       readonly />
+                <p-inputicon styleClass="pi pi-clock" />
+            </p-iconfield>
+        </div>
+        <div class="field col-12">
+            <p-popover #op (onHide)="selectedAluno = undefined">
+                <ng-template #content>
+                    <div *ngIf="selectedAluno" class="flex pr-4">
+                        <div class="relative flex align-items-center justify-content-center border-circle border-1 border-color-500 w-13rem h-13rem ">
+                            <i class="pi pi-user text-xl" *ngIf="!selectedAluno.foto"></i>
+                            <img *ngIf="selectedAluno.foto"
+                                 class=" border-circle"
+                                 [src]="selectedAluno.foto"
+                                 [alt]="selectedAluno.nome" />
+                            <p-badge *ngIf="selectedAluno.flagNovo" value="Aula 1" class="absolute top-0 left-50 -ml-4 -mt-2" />
+                            <p-badge *ngIf="selectedAluno.flagReposicao" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" />
+
+                        </div>
+                        <div class="py-4 mx-2">
+                            <p-divider layout="vertical"></p-divider>
+                        </div>
+                        <div class="pt-4 flex flex-column ">
+                            <div class="flex align-items-center justify-content-between mt-1">
+                                <p class="text-lg font-medium mb-0">{{ selectedAluno.nome }}</p>
+                                <a class="text-primary link -mr-2" [routerLink]="['home', 'alunos']" >Ver dados<i class="pi pi-user-edit ml-2"></i></a>
+                            </div>
+                            <p class="text-lg font-medium mt-1 mb-0"><b>Turma: </b>{{ selectedAluno.turma }} </p>
+                            <p class="text-lg font-medium mt-1 mb-0"><b>Apostila: </b>{{ selectedAluno.apostila }} / <b>Página: </b>{{ selectedAluno.pagina }}</p>
+                            <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.presente != undefined">{{ selectedAluno.presente }}</p>
+                            <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.dataNascimento"><b>Data de Nascimento:</b> {{ selectedAluno.dataNascimento | date : 'dd/MM/yyyy' }}</p>
+                            <div class=" mt-3">
+                                <p-button [routerLink]="['../../', 'reposicao']"
+                                    [label]=" selectedAluno.flagReposicao ? 'Reagendar reposição' : 'Agendar reposição'"
+                                    size="small"
+                                    [rounded]="true"
+                                    icon="pi pi-calendar"
+                                    iconPos="left"
+                                    severity="secondary" />
+
+                                
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-popover>
+            <p-table [value]="object.alunos"
+                     dataKey="id">
+                <ng-template #header>
+                    <tr>
+                        <th class="w-2rem"></th>
+                        <th>Nome</th>
+                        <th class="w-10rem"><span class="pl-2">Apostila</span></th>
+                        <th class="w-5rem">Página</th>
+                        <th class="w-3rem">Presença</th>
+                    </tr>
+                </ng-template>
+                <ng-template #body let-item let-editing="editing">
+                    <tr [class.border-red-500]="editing == true">
+                        <td>
+                            <span class="flex  align-items-center justify-content-center border-circle border-1 border-color-500 w-2rem h-2rem overflow-hidden">
+                                <i class="pi pi-user text-sm" *ngIf="!item.foto"></i>
+                                <img [src]="item.foto" *ngIf="item.foto">
+                            </span>
+                        </td>
+                        <td (click)="displayPopover($event, item)" class="cursor-pointer">
+                            <div class="flex w-full p-button-link">
+                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-13rem">{{ item.nome }}</span>
+                                <p-badge *ngIf="item.flagReposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+                                <p-badge *ngIf="item.flagNovo" styleClass="ml-2 " value="Aula 1" size="small"></p-badge>
+                            </div>
+                        </td>
+                        <td [pEditableColumn]="item.apostila" pEditableColumnField="code" class="w-10rem">
+                            <p-cellEditor>
+                                <ng-template #input>
+                                    <input
+                                           pInputText
+                                           type="text"
+                                           [(ngModel)]="item.apostila"
+                                           id="apostila"
+                                           name="apostila"
+                                           #apostila="ngModel"
+                                           class="w-full"
+                                           required />
+                                </ng-template>
+                                <ng-template #output> <span class="pl-2"> {{ item.apostila }}</span> </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td [pEditableColumn]="item.pagina" pEditableColumnField="code" class="w-5rem text-center">
+                            <p-cellEditor>
+                                <ng-template #input>
+                                    <input
+                                           pInputText
+                                           type="text"
+                                           [(ngModel)]="item.pagina"
+                                           id="pagina"
+                                           name="pagina"
+                                           #pagina="ngModel"
+                                           class="w-full  text-center" />
+                                </ng-template>
+                                <ng-template #output> {{ item.pagina }} </ng-template>
+                            </p-cellEditor>
+                        </td>
+                        <td [pEditableColumn]="item.presenca" pEditableColumnField="code" class="w-3rem cursor-pointer text-center" (click)="item.presenca = item.presenca ?? false">
+                            <p-cellEditor>
+                                <ng-template #input>
+                                    <p-button (onClick)="item.presenca = !item.presenca"
+                                              [label]="item.presenca ? 'Presente': 'Faltou'"
+                                              [severity]="item.presenca ? 'success': 'danger'"
+                                              size="small"
+                                              styleClass="py-1 line-height-2" />
+                                </ng-template>
+                                <ng-template #output>
+                                    <small *ngIf="item.presenca == undefined" class="text-primary">Clique</small>
+                                    <p-button *ngIf="item.presenca != undefined"
+                                              (onClick)="item.presenca = !item.presenca"
+                                              [label]="item.presenca ? 'Presente': 'Faltou'"
+                                              [severity]="item.presenca ? 'success': 'danger'"
+                                              size="small"
+                                              styleClass="py-1 line-height-2" />
+                                </ng-template>
+                            </p-cellEditor>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <!-- <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p> -->
+                <!-- <p class="text-red-500" *ngIf="error">{{error}}</p> -->
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          class="w-full"
+                          styleClass="w-full px-3"
+                          label="Finalizar aula"
+                          icon="pi pi-check"
+                          iconPos="right"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </div>
+</p-dialog>

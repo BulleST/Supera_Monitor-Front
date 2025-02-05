@@ -1,4 +1,4 @@
-<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
+<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
 <p-confirmDialog />
 <p-toast />
 <div class="px-3 pb-4">
@@ -16,7 +16,7 @@
              dataKey="id"
              stripedRows
              showGridlines
-             [rowHover]="true">
+             [rowHover]="list.length > 0">
         <ng-template pTemplate="caption">
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
@@ -52,10 +52,12 @@
                 <th class="surface-900 py-0 border-none text-white white-space-nowrap" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
-                        <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                            <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
-                            <p-sortIcon [field]="col.field" />
-                        </div>
+                        <ng-template [ngIf]="col.filterType != FilterType.none">
+                            <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                                <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                <p-sortIcon [field]="col.field" />
+                            </div>
+                        </ng-template>
                     </div>
                 </th>
                 <th class="surface-900 py-0 border-bottom-none text-white"></th>
@@ -73,38 +75,41 @@
                     [pSelectableRowIndex]="rowIndex"
                     class="border-none white-space-nowrap"
                     [class.w-6rem]="col.displayType == DisplayType.options">
-                    <span *ngIf="col.displayType == DisplayType.options">
+                    <ng-template [ngIf]="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; 
-                                    context: { 
-                                        item: item,
-                                        option: getOption(col, item)
-                                    }">
+                            context: { 
+                                item: item,
+                                option: getOption(col, item)
+                            }">
                         </ng-container>
                         <ng-template #tag let-item="item" let-option="option">
                             <p-tag *ngIf="option"
                                    styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="option.icon + ' mr-2 text-sm'"
+                                   [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
                                    [value]="option.label"
-                                   [severity]="option.severity"
+                                   [severity]="option.severity ? option.severity : 'secondary'"
                                    [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                         </ng-template>
-                    </span>
-                    <span *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</span>
-                    <span *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</span>
-                    <span *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</span>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.color">
+                        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                 </td>
-                <td class="border-none px-0">
-                </td>
+                <td class="border-none px-0"></td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 39.5px;">
+                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>
             <ng-template #elseTemplate>
-                <tr>
+                <tr class="p-datatable-empty-text">
                     <td [attr.colspan]="tableColumns.length + 1">
                         <div class="flex align-items-center" *ngIf="!tableSearch">
                             <span>Nenhum item registrado. Clique</span>

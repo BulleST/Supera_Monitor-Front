@@ -5,7 +5,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { UserService } from '../../../services/user.service';
-import { ColumnTable, Crypto, DisplayType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
@@ -28,6 +28,7 @@ export class ListComponent implements OnDestroy {
     tableMenu: MenuItem[] = [];
     account?: Account;
     DisplayType: typeof DisplayType = DisplayType;
+    FilterType: typeof FilterType = FilterType;
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];

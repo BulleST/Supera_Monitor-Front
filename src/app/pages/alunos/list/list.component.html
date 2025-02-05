@@ -16,7 +16,7 @@
              dataKey="id"
              stripedRows
              showGridlines
-             [rowHover]="true">
+             [rowHover]="list.length > 0">
         <ng-template pTemplate="caption">
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
@@ -41,7 +41,6 @@
                         </p-iconfield>
                         <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" tooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
                         <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" tooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['create' ]" [rounded]="true" iconPos="right" size="small" styleClass="h-full px-3" />
                     </div>
                 </div>
             </p-toolbar>
@@ -52,10 +51,12 @@
                 <th class="surface-900 py-0 border-none text-white white-space-nowrap" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
-                        <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                            <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
-                            <p-sortIcon [field]="col.field" />
-                        </div>
+                        <ng-template [ngIf]="col.filterType != FilterType.none">
+                            <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                                <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                <p-sortIcon [field]="col.field" />
+                            </div>
+                        </ng-template>
                     </div>
                 </th>
                 <th class="surface-900 py-0 border-bottom-none text-white"></th>
@@ -73,85 +74,46 @@
                     [pSelectableRowIndex]="rowIndex"
                     class="border-none white-space-nowrap"
                     [class.w-6rem]="col.displayType == DisplayType.options">
-                    <span *ngIf="col.displayType == DisplayType.options">
+                    <ng-template [ngIf]="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; 
-                                    context: { 
-                                        item: item,
-                                        option: getOption(col, item)
-                                    }">
+                            context: { 
+                                item: item,
+                                option: getOption(col, item)
+                            }">
                         </ng-container>
                         <ng-template #tag let-item="item" let-option="option">
                             <p-tag *ngIf="option"
                                    styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="option.icon + ' mr-2 text-sm'"
+                                   [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
                                    [value]="option.label"
-                                   [severity]="option.severity"
+                                   [severity]="option.severity ? option.severity : 'secondary'"
                                    [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                         </ng-template>
-                    </span>
-                    <span *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</span>
-                    <span *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</span>
-                    <span *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</span>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.color">
+                        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+
                 </td>
                 <td class="border-none px-0">
                 </td>
-                <!-- <td class="border-none px-0 "
-                [ngClass]="{ 
-                    'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
-                }">
-                    <div class="flex align-items-center justify-content-end -my-2">
-                        <p-button icon="fas fa-key text-grey-400"
-                                  label="Resetar senha"
-                                    severity="secondary"
-                                  class="mr-2"
-                                  (onClick)="resetPassword($event, item)"
-                                  title="Resetar Senha"
-                                  [rounded]="true"
-                                  [size]="'small'"
-                                  [text]="true"
-                                  [raised]="true"
-                                  styleClass="white-space-nowrap bg-white " />
-                        <p-button [icon]="'fa-solid ' + (item && item.active ? 'fa-lock text-red-500' : 'fa-lock-open text-green-400') "
-                                  label="{{item && item.active ? 'Desabilitar' : 'Habilitar'}}"
-                                    severity="secondary"
-                                  class="mr-2"
-                                  (onClick)="deactivated($event, item)"
-                                  [title]="(item && item.active ? 'Desabilitar' : 'Habilitar')"
-                                  [rounded]="true"
-                                  [size]="'small'"
-                                  [text]="true"
-                                  [raised]="true"
-                                  styleClass="white-space-nowrap bg-white w-7rem" />
-                        <p-button icon="fa-solid fa-pen text-orange-500"
-                                  label="Editar"
-                                    severity="secondary"
-                                  class="mr-2"
-                                  (onClick)="edit(item)"
-                                  [rounded]="true"
-                                  [size]="'small'"
-                                  [text]="true"
-                                  [raised]="true"
-                                  styleClass="white-space-nowrap bg-white" />
-                    </div>
-                </td> -->
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 39.5px;">
+                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>
             <ng-template #elseTemplate>
-                <tr>
+                <tr class="p-datatable-empty-text">
                     <td [attr.colspan]="tableColumns.length + 1">
                         <div class="flex align-items-center" *ngIf="!tableSearch">
-                            <span>Nenhum item registrado. Clique</span>
-                            <p-button styleClass="text-orange-600 overflow-visible" [link]="true" [routerLink]="['create' ]">
-                                <span class="p-overlay-badge">aqui <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
-                                </span>
-                            </p-button>
-                            <span> para cadastrar. </span>
+                            <span>Nenhum item registrado.</span>
                         </div>
                         <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
                     </td>

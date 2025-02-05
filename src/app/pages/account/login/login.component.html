@@ -5,7 +5,7 @@
             <p class="mb-0 mt-0">Insira e-mail e senha para acessar.</p>
         </div>
         <div class="field col-12"> <!-- E-mail -->
-            <label for="email">E-mail: <small class="text-red-600">*</small></label>
+            <label for="email">E-mail: <span class="text-red-500">*</span></label>
             <div>
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-envelope" />
@@ -21,13 +21,13 @@
                 </p-iconField>
             </div>
             <div *ngIf="email.touched && email.invalid && email.errors">
-                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
-                <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
             </div>
         </div>
         <div class="field col-12"> <!-- Password -->
-            <label for="password">Password: <small class="text-red-600">*</small></label>
+            <label for="password">Password: <span class="text-red-500">*</span></label>
             <div>
                 <p-iconField iconPosition="left">
                     <p-inputIcon styleClass="pi pi-lock" />
@@ -45,11 +45,11 @@
                 </p-iconField>
             </div>
             <div *ngIf="password.touched && password.invalid && password.errors">
-                <p class="text-red-600 mt-2 mb-0" *ngIf="password.errors['required']">Esse campo é obrigatório.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="password.errors['required']">Esse campo é obrigatório.</p>
             </div>
         </div>
         <div class="field col-12 mb-1 mt-4">
-            <p class="text-red-600 mt-0 mb-2 text-center" *ngIf="error">{{error}}</p>
+            <p class="text-red-500 mt-0 mb-2 text-center" *ngIf="error">{{error}}</p>
             <p-button
                       type="submit"
                       label="Entrar"

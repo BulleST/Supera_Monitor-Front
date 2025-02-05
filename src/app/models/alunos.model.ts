@@ -1,18 +1,90 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
-import { Basic, Basic_List } from "./_basic.model";
 
-export class Alunos extends Basic {
-    nome: string = '';
-    dataNascimento: Date = new Date;
+export class AlunoRequest {
+    id: number = 0
+	nome: string = '';
+	dataNascimento: string = '';
+	cpf: string = '';
+	rg: string = '';
+	celular: string = '';
+	telefone: string = '';
+	email: string = '';
+	endereco: string = '';
+	observacao: string = '';
+	turma_Id: number = 0
+	pessoa_FaixaEtaria_Id: number = 0
+	pessoa_Geracao_Id: number = 0
+	pessoa_Sexo_Id: number = 0
 }
-export class Alunos_List extends Basic_List {
-    
+
+export class Aluno  {
+
+    id: number = 0
+	pessoa_Id: number = 0
+	nome: string = '';
+	dataCadastro: Date = new Date;
+	dataEntrada: Date = new Date;
+	dataNascimento: Date = new Date;
+	cpf: string = '';
+	rg: string = '';
+	celular: string = '';
+	telefone: string = '';
+	email: string = '';
+	endereco: string = '';
+	observacao: string = '';
+	unidade_Id: number = 0
+	turma_Id: number = 0
+	turma: string = '';
+	professor_Id: number = 0
+	professor: string = '';
+	pessoa_FaixaEtaria_Id?: number;
+	pessoa_FaixaEtaria: string = '';
+	pessoa_Geracao_Id?: number;
+	pessoa_Geracao: string = '';
+	pessoa_Indicou_Id?: number;
+	pessoa_Indicou: string = '';
+	pessoa_Origem_Canal_Id?: number;
+	pessoa_Origem_Canal: string = '';
+	pessoa_Origem_Id?: number;
+	pessoa_Origem: string = '';
+	pessoa_Sexo_Id?: number;
+	pessoa_Sexo: string = '';
+	pessoa_Status_Id?: number;
+	pessoa_Status: string = '';
+    active: boolean = false;
+    created: Date = new Date;
+    lastUpdated?: Date;
+    deactivated?: Date;
+    aspNetUsers_Created_Id?: number;
+	aspNetUsers_Created: string = '';
+	aluno_Foto?: string;
 }
+
+export interface Pessoa_DropDown { 
+    id: number;
+	nome: string;
+}
+
+export interface Pessoa_Sexo extends Pessoa_DropDown {}
+export interface Pessoa_FaixaEtaria extends Pessoa_DropDown {}
+export interface Pessoa_Geracao extends Pessoa_DropDown {}
+
+export interface Pessoa_Origem extends Pessoa_DropDown {}
+export interface Pessoa_Origem_Canal extends Pessoa_DropDown {}
+export interface Pessoa_Origem_Categoria extends Pessoa_DropDown {}
+export interface Pessoa_Status extends Pessoa_DropDown {}
 
 export var alunosColumns: ColumnTable[] = [
     {
         field: 'nome',
         label: 'Nome',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'pessoa_FaixaEtaria',
+        label: 'Faixa Etária',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
@@ -25,13 +97,11 @@ export var alunosColumns: ColumnTable[] = [
         options: undefined,
     },
     {
-        field: 'dataNascimento',
-        label: 'Data de Nascimento',
-        filterType: FilterType.date,
-        displayType: DisplayType.date,
-        options: {
-            format: 'dd/MM/yyyy'
-        },
+        field: 'professor',
+        label: 'Professor',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
     },
     {
         field: 'active',

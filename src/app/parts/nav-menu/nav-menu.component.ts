@@ -23,7 +23,6 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     selectedNode: any;
     @ViewChild('sidebar') sidebar!: Sidebar;
     @ViewChild('cm') cm!: ContextMenu;
-    @Output('menuOpen') menuOpenEvent: EventEmitter<boolean> = new EventEmitter();
     treeMenu: MenuItem[] = [
         {
             label: 'Editar',
@@ -50,9 +49,10 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
                         iconFontawesome: faHome
                     },
                     {
-                        label: 'Calendário',
-                        tooltip: 'Calendário',
-                        iconFontawesome: faCalendar
+                        label: 'Calendário de Aulas',
+                        tooltip: 'Calendário de Aulas',
+                        iconFontawesome: faCalendar,
+                        routerLink: '/home'
                         // icon: 'bi bi-calendar-week'
                     }
                 ]
@@ -79,14 +79,14 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
                         // iconImage: 'icon-turma.png',
                         routerLink: ['turmas']
                     },
-                    {
-                        label: 'Salas de Aula',
-                        tooltip: 'Salas de Aula',
-                        // iconFontawesome: faLocationDot,
-                        icon: 'bi bi-pin-map-fill',
-                        // iconImage: 'icon-turma.png',
-                        routerLink: ['turmas']
-                    },
+                    // {
+                    //     label: 'Salas de Aula',
+                    //     tooltip: 'Salas de Aula',
+                    //     // iconFontawesome: faLocationDot,
+                    //     icon: 'bi bi-pin-map-fill',
+                    //     // iconImage: 'icon-turma.png',
+                    //     routerLink: ['turmas']
+                    // },
                     {
                         label: 'Usuários',
                         tooltip: 'Usuários',
@@ -136,7 +136,7 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
 
     setMenu() {
         this.menuOpen = !this.menuOpen;
-        this.menuOpenEvent.emit(this.menuOpen)
+        this.header.menuAsideOpen.next(this.menuOpen);
     }
 
 

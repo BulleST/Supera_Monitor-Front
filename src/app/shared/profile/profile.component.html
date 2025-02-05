@@ -11,7 +11,7 @@
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid gap-4">
             <div class="field sm:col-6 col-12"> <!-- Name -->
-                <label for="name">Name: <small class="text-red-600">*</small></label>
+                <label for="name">Name: <span class="text-red-500">*</span></label>
                 <input type="text"
                         pInputText
                         #name="ngModel"
@@ -21,11 +21,11 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="name.touched && name.invalid && name.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field sm:col-6 col-12"> <!-- Phone Number -->
-                <label for="phone">Phone Number: <small class="text-red-600">*</small></label>
+                <label for="phone">Phone Number: <span class="text-red-500">*</span></label>
                 <input type="text"
                         pInputText
                         #phone="ngModel"
@@ -35,7 +35,7 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="phone.touched && phone.invalid && phone.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12"> <!-- E-mail -->

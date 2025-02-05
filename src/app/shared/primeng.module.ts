@@ -11,6 +11,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChipModule } from 'primeng/chip';
+import { ColorPickerModule } from 'primeng/colorpicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
@@ -37,6 +38,7 @@ import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { OrganizationChartModule } from 'primeng/organizationchart';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { OverlayModule } from 'primeng/overlay';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PanelMenuModule } from 'primeng/panelmenu';
@@ -55,7 +57,8 @@ import { SliderModule } from 'primeng/slider';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { TableModule } from 'primeng/table';
-import { TabViewModule } from 'primeng/tabview';
+import { TabsModule } from 'primeng/tabs';
+// import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { ToggleButtonModule } from 'primeng/togglebutton';
@@ -63,13 +66,12 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeSelectModule } from 'primeng/treeselect';
-
+import { PopoverModule } from 'primeng/popover';
 import { ConfirmationService, FilterMatchMode /*, PrimeNGConfig */ } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
-
 @NgModule({
     imports: [
         CommonModule,
@@ -83,6 +85,7 @@ import { SelectModule } from 'primeng/select';
         CardModule,
         CheckboxModule,
         ChipModule,
+        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -110,12 +113,14 @@ import { SelectModule } from 'primeng/select';
         MenubarModule,
         MultiSelectModule,
         OrganizationChartModule,
+        OverlayBadgeModule,
         OverlayModule,
         OverlayPanelModule,
         PanelMenuModule,
         PanelModule,
         PasswordModule,
         PickListModule,
+        PopoverModule,
         ProgressBarModule,
         ProgressSpinnerModule,
         RippleModule,
@@ -129,7 +134,8 @@ import { SelectModule } from 'primeng/select';
         SplitButtonModule,
         SpeedDialModule,
         TableModule,
-        TabViewModule,
+        TabsModule,
+        // TabViewModule,
         TagModule,
         ToastModule,
         ToolbarModule,
@@ -151,6 +157,7 @@ import { SelectModule } from 'primeng/select';
         CardModule,
         CheckboxModule,
         ChipModule,
+        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -178,12 +185,14 @@ import { SelectModule } from 'primeng/select';
         MenubarModule,
         MultiSelectModule,
         OrganizationChartModule,
+        OverlayBadgeModule,
         OverlayModule,
         OverlayPanelModule,
         PanelMenuModule,
         PanelModule,
         PasswordModule,
         PickListModule,
+        PopoverModule,
         ProgressBarModule,
         ProgressSpinnerModule,
         RippleModule,
@@ -197,7 +206,8 @@ import { SelectModule } from 'primeng/select';
         SplitButtonModule,
         SpeedDialModule,
         TableModule,
-        TabViewModule,
+        TabsModule,
+        // TabViewModule,
         TagModule,
         ToastModule,
         ToolbarModule,

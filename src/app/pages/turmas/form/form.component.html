@@ -1,0 +1,158 @@
+<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field sm:col-8 col-12"> <!-- Nome -->
+                <label for="nome">Nome: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #nome="ngModel"
+                       [(ngModel)]="object.nome"
+                       id="nome"
+                       name="nome"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="nome.touched && nome.invalid && nome.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Faixa Etária -->
+                <label for="turma_Tipo_Id">Faixa Etária: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="tipos"
+                          [(ngModel)]="object.turma_Tipo_Id"
+                          [loading]="loadingTurmaTipo"
+                          #turma_Tipo_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="turma_Tipo_Id"
+                          inputId="turma_Tipo_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body" />
+            </div>
+            <div class="field col-12"> <!-- Professor -->
+                <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="professores"
+                          [(ngModel)]="object.professor_Id"
+                          #professor_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_Id"
+                          inputId="professor_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold">{{ item.nome }}</p>
+                                <p class="text-sm">
+                                    <{{ item.email }}>
+                                </p>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Dias de Aula -->
+                <label for="diaSemana">Dias de Aula: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="diasSemana"
+                          [(ngModel)]="object.diaSemana"
+                          #diaSemana="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="diaSemana"
+                          inputId="diaSemana"
+                          optionLabel="label"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="diaSemana.touched && diaSemana.invalid && diaSemana.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="diaSemana.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Horário -->
+                <label for="horario">Horário: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              [(ngModel)]="object.horario"
+                              #horario="ngModel"
+                              styleClass="w-full"
+                              class="w-full"
+                              name="horario"
+                              inputId="horario"
+                              [required]="true"
+                              appendTo="body"
+                              [iconDisplay]="'input'"
+                              [showIcon]="true"
+                              [timeOnly]="true"
+                              [hourFormat]="'24'"
+                              placeholder="hh:mm">
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
+                <div *ngIf="horario.touched && horario.invalid && horario.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="horario.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Limite de Alunos -->
+                <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
+                <p-inputnumber 
+                    #capacidadeMaximaAlunos="ngModel"
+                    [(ngModel)]="object.capacidadeMaximaAlunos"
+                    id="capacidadeMaximaAlunos"
+                    name="capacidadeMaximaAlunos"
+                    class="w-full"
+                    styleClass="w-full"
+                    inputStyleClass="w-full"
+                    [required]="true" />
+                <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          [disabled]="form.invalid || loading"
+                          class="w-full"
+                          styleClass="w-full px-3"
+                          label="Salvar"
+                          icon="pi pi-check"
+                          iconPos="right"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

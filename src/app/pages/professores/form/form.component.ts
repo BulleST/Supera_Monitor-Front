@@ -5,7 +5,7 @@ import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ProfessorService } from '../../../services/professor.service';
-import { Professor } from '../../../models/professor.model';
+import { Professor, Professor_NivelApostila } from '../../../models/professor.model';
 import { Account_List } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
 
@@ -23,12 +23,20 @@ export class FormComponent implements OnDestroy {
     loading = false;
     error: string = '';
     isEditPage = false;
-    emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
+    emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
     accounts: Account_List[] = [];
     accountsSelected?: Account_List;
     loadingAccounts: boolean = true;
+
+    nivelAbaco: Professor_NivelApostila[] = [];
+    loadingNivelAbaco = true;
+    nivelAH: Professor_NivelApostila[] = [];
+    loadingNivelAH = true;
+    
+    minDate: Date = new Date(1900, 1, 1);
+    maxDate: Date = new Date();
 
     constructor(
         private router: Router,
@@ -38,6 +46,20 @@ export class FormComponent implements OnDestroy {
         private userService: UserService,
         private confirmationService: ConfirmationService
     ) {
+
+        lastValueFrom(this.service.getNivelAbaco())
+        .then(res => {
+            this.nivelAbaco = res;
+            this.loadingNivelAbaco = false;
+        })
+        .catch(res => this.loadingNivelAbaco = false);
+
+        lastValueFrom(this.service.getNivelAH())
+        .then(res => {
+            this.nivelAH = res;
+            this.loadingNivelAH = false;
+        })
+        .catch(res => this.loadingNivelAH = false);
 
         lastValueFrom(this.userService.getList())
         .then(res => {
@@ -64,7 +86,6 @@ export class FormComponent implements OnDestroy {
                 lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;
-                        this.object.dataInicio = new Date(res.dataInicio);
                         this.loading = false;
                         this.visible = true;
                     })
@@ -101,12 +122,11 @@ export class FormComponent implements OnDestroy {
     }
     
     showError(message: string, e: any) {
-        this.confirmationService.confirm({
+         this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptIcon: "none",
             acceptLabel: 'Ok',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,

@@ -4,7 +4,7 @@ import { faKey, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ColumnTable, Crypto, DisplayType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
@@ -28,6 +28,7 @@ export class ListComponent implements OnDestroy {
     tableSelectedItem: any;
     tableMenu: MenuItem[] = [];
     DisplayType: typeof DisplayType = DisplayType;
+    FilterType: typeof FilterType = FilterType;
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];

@@ -15,16 +15,17 @@ export const INITIAL_EVENTS: EventInput[] = [
 { title: 'event 2', date: '2025-01-16' },
   {
     id: createEventId(),
-    title: 'Timed event',
+    title: 'Turma A',
     start: TODAY_STR + 'T00:00:00',
     end: TODAY_STR + 'T01:00:00'
   },
   {
     id: createEventId(),
-    title: 'Timed event',
+    title: 'Turma B',
     start: TODAY_STR + 'T12:00:00',
     end: TODAY_STR + 'T13:00:00'
-  }
+  },
+
 ];
 
 export function createEventId() {

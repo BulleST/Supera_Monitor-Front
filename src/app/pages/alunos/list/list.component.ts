@@ -1,14 +1,13 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faKey, faUserGraduate, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ColumnTable, Crypto, DisplayType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
-import { Alunos_List, alunosColumns } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
+import { Aluno, alunosColumns } from '../../../models/alunos.model';
 
 @Component({
     selector: 'app-list',
@@ -18,9 +17,7 @@ import { AlunoService } from '../../../services/alunos.service';
     standalone: false
 })
 export class ListComponent implements OnDestroy {
-    faKey = faKey;
-
-    list: Alunos_List[] = [];
+    list: Aluno[] = [];
     tableLoading = false;
     tableSearch: string = '';
     tableColumns: ColumnTable[] = [];
@@ -28,18 +25,18 @@ export class ListComponent implements OnDestroy {
     tableSelectedItem: any;
     tableMenu: MenuItem[] = [];
     DisplayType: typeof DisplayType = DisplayType;
+    FilterType: typeof FilterType = FilterType;
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
     constructor(
         private confirmationService: ConfirmationService,
-        private messageService: MessageService,
         private service: AlunoService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
-        private mobileService: MobileService
+        private mobileService: MobileService,
     ) {
         this.tableColumns = alunosColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
@@ -87,7 +84,7 @@ export class ListComponent implements OnDestroy {
                 label: item.active ? 'Desabilitar' : 'Habilitar',
                 icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
                 command: (event: any) => this.deactivated(event, item)
-            },
+            }
 
         ];
     }
@@ -112,15 +109,14 @@ export class ListComponent implements OnDestroy {
 
     edit(item: any) {
         var encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['edit', encrypted], { relativeTo: this.activatedRoute });
+        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
-
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o item selecionado? 
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
                       ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
@@ -132,7 +128,9 @@ export class ListComponent implements OnDestroy {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
                         if (res.success) {
-                            insertOrReplace(this.service, res.object);
+                            item.active = res.object.active;
+                            item.deactivated = res.object.deactivated;
+                            insertOrReplace(this.service, item);
                             item = res.object;
                         } else {
                             setTimeout(() => {
@@ -151,7 +149,7 @@ export class ListComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Error',
+            header: 'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'Ok',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',

@@ -1,0 +1,22 @@
+:host ::ng-deep {
+    .p-tooltip .p-tooltip-text {
+        width: fit-content; 
+    }
+    
+
+}
+::ng-deep.surface-900.p-popover:before,
+::ng-deep.surface-900.p-popover:after {
+    border-bottom-color: var(--surface-900)!important;
+}
+::ng-deep.surface-900.p-popover:after {
+    /* background-color: var(--surface-900)!important;
+    border-color: var(--surface-900)!important; */
+}
+
+::ng-deep.p-popover.popover-styled::before,
+::ng-deep.p-popover.popover-styled::after {
+    /* left: var(--overlayArrowLeft) */
+    display: none;
+    opacity: 0;
+}

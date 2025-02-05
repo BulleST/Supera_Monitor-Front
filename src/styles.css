@@ -276,12 +276,71 @@ body {
 }
 
 .p-inputtext:disabled {
-    background-color: var(--surface-100)!important;
+    background-color: var(--surface-100) !important;
     cursor: default;
 }
 
-
 .p-dialog-maximized {
-   height: 95vh!important;
-   border-radius: var(--p-dialog-border-radius)!important;
+    height: 95vh !important;
+    border-radius: var(--p-dialog-border-radius) !important;
+}
+
+.p-datatable-tbody .p-datatable-empty-text,
+.p-datatable-empty-text td {
+    pointer-events: none;
+    border: none !important;
+    background-color: var(--surface-50) !important;
+}
+
+.fc .fc-button-primary {
+    background-color: var(--p-button-secondary-background);
+    border-color: var(--p-button-secondary-border-color);
+    color: var(--p-button-secondary-color);
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--p-button-secondary-active-background);
+    border-color: var(--p-button-secondary-active-border-color);
+    color: var(--p-button-secondary-active-color);
+}
+
+.fc .fc-button-primary:active {
+    background-color: var(--p-button-primary-active-background);
+    border-color: var(--p-button-primary-active-border-color);
+    color: var(--p-button-primary-active-color);
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background-color: var(--p-button-primary-background);
+    border-color: var(--p-button-primary-border-color);
+    color: var(--p-button-primary-color);
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.2rem;
+}
+
+.fc-event.selected,
+.fc-daygrid-event.selected {
+    border: 2px var(--p-primary-500) solid!important;
+    background-color: var(--p-primary-500)!important;
+    color: #fff;
+}
+.fc-day.selected {
+    background-color: var(--p-primary-200);
+}
+
+.p-fileupload-header {
+    display: none!important;
+}
+
+.p-fileupload-content {
+    padding-top: 15px!important;
+    background-color: transparent!important;
+    border-color: var(--surface-50)!important;
+}
+
+.p-fileupload-advanced {
+    background: transparent!important;
 }

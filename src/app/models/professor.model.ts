@@ -6,14 +6,47 @@ export class Professor extends Basic_List {
     telefone: string = '';
     email: string = '';
     dataInicio: Date = new Date;
-    nivelAbaco: number = undefined as unknown as number;
-    nivelAh: number = undefined as unknown as number;
+    professor_NivelAbaco_Id: number = undefined as unknown as number;
+    professor_NivelAbaco: string = '';
+    professor_NivelAH_Id: number = undefined as unknown as number;
+    professor_NivelAH: string = '';
     account_Id: number = 0;
     role_Id: number = 0;
     role: string = '';
+    color: string = '';
 }
 
+export class ProfessorCreateRequest {
+    account_Id: number = 0;
+    nome: string = '';
+    telefone: string = '';
+    dataInicio: Date = new Date;
+    professor_NivelAbaco_Id: number = undefined as unknown as number;
+    professor_NivelAH_Id: number = undefined as unknown as number;
+    color: string = '';
+}
+export class ProfessorEditRequest {
+    nome: string = '';
+    telefone: string = '';
+    dataInicio: Date = new Date;
+    professor_NivelAbaco_Id: number = undefined as unknown as number;
+    professor_NivelAH_Id: number = undefined as unknown as number;
+    color: string = '';
+}
+
+export class Professor_NivelApostila {
+    id: number = 0;
+    descricao: string = '';
+}
+
+
 export var professorColumns: ColumnTable[] = [
+    {
+        field: 'corLegenda',
+        label: '',
+        filterType: FilterType.none,
+        displayType: DisplayType.color,
+    },
     {
         field: 'nome',
         label: 'Nome',
@@ -52,7 +85,7 @@ export var professorColumns: ColumnTable[] = [
         options: undefined,
     },
     {
-        field: 'nivelAh',
+        field: 'nivelAH',
         label: 'Nível AH',
         filterType: FilterType.text,
         displayType: DisplayType.text,
@@ -63,9 +96,9 @@ export var professorColumns: ColumnTable[] = [
         label: 'Status',
         filterType: FilterType.text,
         displayType: DisplayType.options,
-        options: { 
+        options: {
             "items": [
-                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false }, 
+                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false },
                 { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
             ]
         },

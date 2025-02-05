@@ -136,7 +136,7 @@ export class RequestInterceptor implements HttpInterceptor {
                     if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
                         if (notLoading.length == 0) {
 
-                            console.log('block', block);
+                            // console.log('block', block);
 
                             this.loadingService.loading.next(false);
                             this.loadingService.removeLoadingRequest();

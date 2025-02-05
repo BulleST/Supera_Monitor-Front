@@ -1,1 +1,49 @@
-            <full-calendar [options]="calendarOptions"></full-calendar>
+<p-toast />
+<p-confirmDialog styleClass="w-25rem" />
+<div class="p-6 w-full">
+    <p-popover #op styleClass="z-2 w-15rem min-h-3rem" >
+        <!-- cdkDropListGroup -->
+        <div *ngIf="selectedEvent" class="py-2">
+            <p class="flex align-items-center">
+                <b>Professor: </b>
+                <span>{{selectedEvent.professor.nome }}</span>
+                <span class="ml-2 flex w-1rem h-1rem border-rounded-circle" [ngStyle]="{bacgroundColor: selectedEvent.professor.color}"></span>
+            </p>
+            <p>
+                <b>Turma: </b>
+                <span>{{selectedEvent.turma }}</span>
+            </p>
+            <p>
+                <b>Horário: </b>
+                <span>{{selectedEvent.dataInicio | date : 'HH:mm'}}</span>
+            </p>
+            <div class="flex align-items-center justify-content-between">
+                <span class="font-bold block mt-2 text-primary">Alunos</span>
+                <span class="font-bold block mt-2 " [class.text-red-500]="selectedEvent.alunos.length > selectedEvent.capacidadeMaxima">
+                    <i class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite" *ngIf="selectedEvent.alunos.length > selectedEvent.capacidadeMaxima"></i> {{selectedEvent.alunos.length}}/{{selectedEvent.capacidadeMaxima}} </span>
+            </div>
+            <ul id="draggableContainer" class="list-none p-0 m-0 ">
+                <!--  -->
+                <li *ngFor="let member of selectedEvent.alunos" class="item-class"  >
+                    <!---->
+                    <div class="flex align-items-center justify-content-between p-2">
+                        <span class="font-medium">{{ member.nome }}</span>
+                        <p-tag *ngIf="member.flagNovo" value="Aula 1" styleClass="bg-primary-500 text-white" />
+                        <p-tag *ngIf="member.flagReposicao" value="Reposição" severity="secondary" styleClass="surface-500 text-white" />
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </p-popover>
+    <!-- <full-calendar [options]="calendarOptions" #fullCalendar ></full-calendar> -->
+    <div #calendarDiv id="calendarDiv"></div>
+    <div class="flex">
+        <div class="bg-black-alpha-10 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+            <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
+                <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.color }"></div>
+                <span class="ml-2">{{item.label}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

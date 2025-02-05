@@ -1,11 +1,16 @@
-import { Component, inject, Injector, OnDestroy } from '@angular/core';
+import { Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { Alunos } from '../../../models/alunos.model';
+import { Aluno, Pessoa_FaixaEtaria, Pessoa_Geracao, Pessoa_Sexo } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
+import { Popover } from 'primeng/popover';
+import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
+import { PrimeNG } from 'primeng/config';
+import { Turma } from '../../../models/turma.model';
+import { TurmaService } from '../../../services/turma.service';
 
 
 @Component({
@@ -16,14 +21,16 @@ import { AlunoService } from '../../../services/alunos.service';
     standalone: false
 })
 export class FormComponent implements OnDestroy {
-    visible: boolean = false;
+    visible: boolean = true;
     injector = inject(Injector);
-    object = new Alunos;
+    object = new Aluno;
     loading = false;
     error: string = '';
     isEditPage = false;
-    emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
+    @ViewChild('op') op!: Popover;
+
+
 
     constructor(
         private router: Router,
@@ -31,9 +38,9 @@ export class FormComponent implements OnDestroy {
         private messageService: MessageService,
         private crypto: Crypto,
         private service: AlunoService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
     ) {
-
+     
         this.loadPage();
     }
 
@@ -41,13 +48,14 @@ export class FormComponent implements OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
+
     loadPage() {
         var params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['id'];
-            if (this.isEditPage) {
+            if (res['id']) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
-                
+
                 lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;
@@ -58,7 +66,8 @@ export class FormComponent implements OnDestroy {
                         this.visible = false;
                     });
             } else {
-                this.visible = true;
+                this.visible = false;
+                this.visibleChange()
             }
         })
         this.subscription.push(params);
@@ -66,24 +75,31 @@ export class FormComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            var route = this.isEditPage ? ['../../'] : ['../'];
-            this.router.navigate(route, { relativeTo: this.activatedRoute });
+            this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
     }
-    
+
+    toggle(event: MouseEvent) {
+        this.op.toggle(event);
+        if (this.op.overlayVisible)
+        {
+            setTimeout(() => {
+                this.op.align();
+            }, 300);
+        }
+    }
     showError(message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptIcon: "none",
+
             acceptLabel: 'Ok',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }
-
 
     send(form: NgForm, e: any) {
         if (form.invalid) {
@@ -91,14 +107,14 @@ export class FormComponent implements OnDestroy {
         }
         this.loading = true;
 
-        this.request()
+        lastValueFrom(this.service.edit(this.object))
             .then(res => {
                 this.loading = false;
                 if (res.success) {
                     insertOrReplace(this.service, res.object);
-                    this.visible = false; 
+                    this.visible = false;
                     this.visibleChange();
-                } 
+                }
                 else {
                     this.error = res.message;
                     this.showError(this.error, e);
@@ -109,13 +125,6 @@ export class FormComponent implements OnDestroy {
                 this.loading = false;
                 this.showError(this.error, e);
             })
-    }
-
-    request() {
-        if (this.isEditPage) {
-            return lastValueFrom(this.service.edit(this.object));
-        }
-        return lastValueFrom(this.service.create(this.object));
     }
 
 }

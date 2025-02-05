@@ -1,1 +1,131 @@
-<p>list works!</p>
+<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
+<p-confirmDialog />
+<p-toast />
+<div class="px-3 pb-4">
+    <p-table
+             #dt
+             [value]="list"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100, 1000]"
+             [paginator]="list.length > 50"
+             [columns]="tableColumns"
+             [globalFilterFields]="tableGlobalFilterFields"
+             [(contextMenuSelection)]="tableSelectedItem"
+             [contextMenu]="cm"
+             (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
+             dataKey="id"
+             stripedRows
+             showGridlines
+             [rowHover]="list.length > 0">
+        <ng-template pTemplate="caption">
+            <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
+                <div class="p-toolbar-group-start">
+                    <h2 class="flex align-items-center ">
+                        <i class="fa-solid fa-users-between-lines mr-3 text-primary text-2xl"></i>
+                        <span class="text-2xl font-normal my-0">Turmas</span>
+                    </h2>
+                </div>
+                <div class="p-toolbar-group-center"></div>
+                <div class="p-toolbar-group-end items-stretch">
+                    <div class="flex align-items-strech">
+                        <p-iconfield class="mr-2">
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input type="text"
+                                   pInputText
+                                   #_tableSearch="ngModel"
+                                   [(ngModel)]="tableSearch"
+                                   id="search"
+                                   name="search"
+                                   (input)="dt.filterGlobal(tableSearch, 'contains')"
+                                   placeholder="Pesquisar" />
+                        </p-iconfield>
+                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" tooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" tooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true" iconPos="right" size="small" styleClass="h-full px-3" />
+                    </div>
+                </div>
+            </p-toolbar>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
+                <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
+                <th class="surface-900 py-0 border-none text-white white-space-nowrap" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
+                    <div class="flex align-items-center">
+                        <span>{{ col.label }}</span>
+                        <ng-template [ngIf]="col.filterType != FilterType.none">
+                            <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                                <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                <p-sortIcon [field]="col.field" />
+                            </div>
+                        </ng-template>
+                    </div>
+                </th>
+                <th class="surface-900 py-0 border-bottom-none text-white"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr [pContextMenuRow]="item"
+                (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);"
+                class="cursor-pointer"
+                [ngClass]="{ 
+                'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
+                }">
+                <td *ngFor="let col of tableColumns"
+                    [pSelectableRow]="item"
+                    [pSelectableRowIndex]="rowIndex"
+                    class="border-none white-space-nowrap"
+                    [class.w-6rem]="col.displayType == DisplayType.options">
+                    <ng-template [ngIf]="col.displayType == DisplayType.options">
+                        <ng-container *ngTemplateOutlet="tag; 
+                            context: { 
+                                item: item,
+                                option: getOption(col, item)
+                            }">
+                        </ng-container>
+                        <ng-template #tag let-item="item" let-option="option">
+                            <p-tag *ngIf="option"
+                                   styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
+                                   [value]="option.label"
+                                   [severity]="option.severity ? option.severity : 'secondary'"
+                                   [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </ng-template>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.color">
+                        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+                    </ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.time">{{ formatTime(item[col.field]) }}</ng-template>
+
+                </td>
+                <td class="border-none px-0">
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <ng-container *ngIf="tableLoading; else elseTemplate">
+                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
+                    <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
+                </tr>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <tr class="p-datatable-empty-text">
+                    <td [attr.colspan]="tableColumns.length + 1">
+                        <div class="flex align-items-center" *ngIf="!tableSearch">
+                            <span>Nenhum item registrado. Clique</span>
+                            <p-button styleClass="text-orange-600 overflow-visible pointer-events-auto" class="pointer-events-auto" [link]="true" [routerLink]="['cadastrar' ]">
+                                <span class="p-overlay-badge">aqui <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
+                                </span>
+                            </p-button>
+                            <span> para cadastrar. </span>
+                        </div>
+                        <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </ng-template>
+    </p-table>
+</div>
+<router-outlet></router-outlet>

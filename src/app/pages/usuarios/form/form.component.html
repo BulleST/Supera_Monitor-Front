@@ -6,7 +6,7 @@
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <div class="field md:col-4 col-12"> <!-- Nome -->
-                <label for="name">Nome: <small class="text-red-600">*</small></label>
+                <label for="name">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                         pInputText
                         #name="ngModel"
@@ -16,11 +16,11 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="name.touched && name.invalid && name.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field md:col-4 col-12"> <!-- Telefone/Celular -->
-                <label for="phone">Telefone/Celular: <small class="text-red-600">*</small></label>
+                <label for="phone">Telefone/Celular: <span class="text-red-500">*</span></label>
                 <input type="text"
                         pInputText
                         #phone="ngModel"
@@ -30,11 +30,11 @@
                         class="w-full"
                         [required]="true">
                 <div *ngIf="phone.touched && phone.invalid && phone.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field md:col-4 col-12"> <!-- Perfil -->
-                <label for="role_Id">Perfil: <small class="text-red-600">*</small></label>
+                <label for="role_Id">Perfil: <span class="text-red-500">*</span></label>
                 <p-dropdown
                     [options]="roles"
                     [(ngModel)]="object.role_Id"
@@ -53,11 +53,11 @@
                     appendTo="body" 
                     optionDisabled="isDisabled"/>
                 <div *ngIf="role_Id.touched && role_Id.invalid && role_Id.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="role_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="role_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12"> <!-- E-mail -->
-                <label for="email">E-mail: <small class="text-red-600">*</small></label>
+                <label for="email">E-mail: <span class="text-red-500">*</span></label>
                 <input type="email"
                         [email]="true"
                         pInputText
@@ -72,15 +72,15 @@
                         [readonly]="isEditPage"
                         [disabled]="isEditPage">
                 <div *ngIf="email.touched && email.invalid && email.errors">
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
-                    <p class="text-red-600 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
                 </div>
             </div>
         </div>
         <div class="formgrid grid gap-4 align-items-center flex-wrap justify-content-between">
             <div class="sm:col-9 col-12">
-                <p class="text-red-500" *ngIf="!error">Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
@@ -88,7 +88,7 @@
                     type="submit"
                     [disabled]="form.invalid || loading"
                     class="w-full" 
-                    styleClass="w-full" 
+                    styleClass="w-full px-3"
                     label="Salvar" 
                     icon="pi pi-check" 
                     iconPos="right" 

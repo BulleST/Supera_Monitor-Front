@@ -23,7 +23,9 @@ export enum DisplayType {
     decimal = 'decimal',
     date = 'date',
     dateTime = 'dateTime',
-    options = 'options'
+    options = 'options',
+    color = 'color',
+    time = 'time',
 }
 
 export enum FilterType {
@@ -32,6 +34,8 @@ export enum FilterType {
     decimal = 'decimal',
     date = 'date',
     dateTime = 'dateTime',
+    time = 'time',
+    none = 'none',
 }
 
 export class ColumnTable {

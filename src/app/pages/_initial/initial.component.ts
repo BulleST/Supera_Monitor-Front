@@ -17,7 +17,6 @@ export class InitialComponent implements OnDestroy {
     private swipeTime?: number;
     navigationOpen = false;
     account?: Account = new Account;
-    menuOpen: boolean = true;
 
     constructor(
         private accountService: AccountService,

@@ -51,3 +51,13 @@
     --b: #346038;
     --c: #040404;
 }
+
+.event-item-header,
+.event-item-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: 2;
+    white-space: nowrap;
+    overflow: hidden;
+}

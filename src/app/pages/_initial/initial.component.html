@@ -20,11 +20,11 @@
         <div class="flex align-items-strech justify-content-between relative z-1 px-6">
             <div class="sticky pt-6 transition-linear transition-duration-100 transition-all top-0 mr-5"
                 
-                [ngStyle]="{ width: menuOpen ? '20rem' : '4rem' }">
-                <app-nav-menu (menuOpen)="menuOpen = $event"></app-nav-menu>
+                [ngStyle]="{ width: navigationOpen ? '20rem' : '4rem' }">
+                <app-nav-menu></app-nav-menu>
             </div>
             <div class="bg-white shadow-1 border-round-md mt-6 flex-grow-1 flex-shrink-1 flex-1 overflow-x-auto"
-            [ngStyle]="{ width: menuOpen ? '55%' : '80%' }">
+            [ngStyle]="{ width: navigationOpen ? '55%' : '80%' }">
                 <router-outlet></router-outlet>
             </div>
         </div>

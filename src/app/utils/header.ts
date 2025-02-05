@@ -8,7 +8,7 @@ import { BehaviorSubject } from "rxjs";
     providedIn: 'root'
 })
 export class Header {
-    menuAsideOpen = new BehaviorSubject<boolean>(false);
+    menuAsideOpen = new BehaviorSubject<boolean>(true);
     minhaContaOpen = new BehaviorSubject<boolean>(false);
     sidebarWidth = new BehaviorSubject<any>(undefined);
     

@@ -10,7 +10,11 @@ import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions } from '@fullcalendar/core';
+import { EventDetailsComponent } from './event-details/event-details.component';
+import { ChamadaComponent } from './chamada/chamada.component';
+import { ReposicaoComponent } from './reposicao/reposicao.component';
+import { AulaComponent } from './aula/aula.component';
+import { AlunosComponent } from './alunos/alunos.component';
 
 @NgModule({
     declarations: [
@@ -18,6 +22,11 @@ import { CalendarOptions } from '@fullcalendar/core';
         HeaderComponent,
         HomeComponent,
         NavMenuComponent,
+        EventDetailsComponent,
+        ChamadaComponent,
+        ReposicaoComponent,
+        AulaComponent,
+        AlunosComponent,
     ],
     imports: [
         CommonModule,

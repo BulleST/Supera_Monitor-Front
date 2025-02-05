@@ -1,0 +1,399 @@
+<div class="formgrid grid">
+    <div class="lg:col-3 md:col-3 col-12 px-0 flex overflow-hidden">
+        <p-fileupload
+                      #fileUpload
+                      class="w-full"
+                      styleclass="gap-0 w-full"
+                      name="myfile[]"
+                      accept="image/*"
+                      (onSelect)="onSelectedFiles($event)"
+                      styleClass="border-none"
+                      [showUploadButton]="false"
+                      [showCancelButton]="false"
+                      [chooseStyleClass]="'hidden'"
+                      headerTemplate="">
+            <ng-template #content
+                         let-files
+                         let-uploadedFiles="uploadedFiles"
+                         let-removeFileCallback="removeFileCallback"
+                         let-removeUploadedFileCallback="removeUploadedFileCallback">
+            </ng-template>
+            <ng-template #file>
+                <div class="w-full flex flex-column align-items-center justify-content-center">
+                    <p-button (onClick)="choose(fileUpload)"
+                              icon="pi pi-images"
+                              [rounded]="true"
+                              label="Selecionar foto"
+                              size="small"
+                              class="-mb-5 relative z-2" />
+                    <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
+                        <div *ngIf="loadingFile" class="w-full flex align-items-center justify-content-center absolute z-1">
+                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
+                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" style="font-size: 2rem"></i>
+                        </div>
+                        <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                             [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + object.aluno_Foto + ')' }">
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #empty>
+                <div class="w-full flex flex-column align-items-center justify-content-center">
+                    <p-button (onClick)="choose(fileUpload)"
+                              icon="pi pi-images"
+                              [rounded]="true"
+                              label="Selecionar foto"
+                              size="small"
+                              class="-mb-5 relative z-2" />
+                    <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
+                        <div *ngIf="loadingFile" class="w-full flex align-items-center justify-content-center absolute z-1">
+                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
+                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" style="font-size: 2rem"></i>
+                        </div>
+                        <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0">
+                        </div>
+                        <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
+                    </div>
+                </div>
+            </ng-template>
+        </p-fileupload>
+    </div>
+    <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
+        <p-divider layout="vertical" class="hidden md:block h-21rem min-h-0 mt-2"></p-divider>
+        <div class="formgrid grid pl-2 sm:px-4">
+            <div class="field md:col-6 col-12"> <!-- Nome -->
+                <label for="nome">Nome: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #nome="ngModel"
+                       [(ngModel)]="object.nome"
+                       id="nome"
+                       name="nome"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="nome.touched && nome.invalid && nome.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Data de Nascimento -->
+                <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #dataNascimento="ngModel"
+                              [(ngModel)]="object.dataNascimento"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                                [minDate]="minDate"
+                                [maxDate]="maxDate"
+                              inputId="dataNascimento"
+                              name="dataNascimento"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              appendTo="body" />
+                <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Data da Matrícula -->
+                <label for="created">Data da Matrícula: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #created="ngModel"
+                              [(ngModel)]="object.created"
+                              [minDate]="minDate"
+                              [maxDate]="maxDate"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              inputId="created"
+                              name="created"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              appendTo="body" />
+                <div *ngIf="created.touched && created.invalid && created.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="created.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <!-- RG -->
+            <!-- <div class="field lg:col-3 sm:col-3 col-12"> 
+                <label for="rg">RG: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #rg="ngModel"
+                             [(ngModel)]="object.rg"
+                             mask="99.999.999-9"
+                             placeholder="99.999.999-9"
+                             id="rg"
+                             name="rg"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="rg.touched && rg.invalid && rg.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="rg.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div> -->
+            <!-- CPF -->
+            <!-- <div class="field lg:col-3 sm:col-3 col-12"> 
+                <label for="cpf">CPF: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #cpf="ngModel"
+                             [(ngModel)]="object.cpf"
+                             mask="999.999.999-99"
+                             placeholder="999.999.999-99"
+                             id="cpf"
+                             name="cpf"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="cpf.touched && cpf.invalid && cpf.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="cpf.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div> -->
+            <div class="field lg:col-3 sm:col-3 col-12"> <!-- Telefone -->
+                <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #telefone="ngModel"
+                             [(ngModel)]="object.telefone"
+                             mask="(99) 9999-9999"
+                             placeholder="(99) 9999-9999"
+                             [autoClear]="true" 
+                             id="telefone"
+                             name="telefone"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field lg:col-3 sm:col-3 col-12"> <!-- Celular -->
+                <label for="celular">Celular: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #celular="ngModel"
+                             [(ngModel)]="object.celular"
+                             mask="(99) 9.9999-9999"
+                             placeholder="(99) 9.9999-9999"
+                             [autoClear]="true" 
+                             id="celular"
+                             name="celular"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="celular.touched && celular.invalid && celular.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-6 sm:col-6 col-12"> <!-- E-mail -->
+                <label for="email">E-mail: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       [email]="true"
+                       #email="ngModel"
+                       [(ngModel)]="object.email"
+                       id="email"
+                       name="email"
+                       class="w-full"
+                       [required]="true"
+                       placeholder="example@gmail.com">
+                <div *ngIf="email.touched && email.invalid && email.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Gênero -->
+                <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="sexos"
+                          [(ngModel)]="object.pessoa_Sexo_Id"
+                          [loading]="loadingSexos"
+                          #pessoa_Sexo_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="pessoa_Sexo_Id"
+                          inputId="pessoa_Sexo_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-8 sm:col-6 col-12"> <!-- Endereço -->
+                <label for="endereco">Endereço: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #endereco="ngModel"
+                       [(ngModel)]="object.endereco"
+                       id="endereco"
+                       name="endereco"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Turma -->
+                <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
+                <p-select
+                        [options]="turmas"
+                        [(ngModel)]="selectedTurma"
+                        [loading]="loadingTurmas"
+                        #turma_Id="ngModel"
+                        styleClass="w-full"
+                        class="w-full"
+                        name="turma_Id"
+                        inputId="turma_Id"
+                        optionLabel="nome"
+                        [showClear]="true"
+                        [checkmark]="true"
+                        [filter]="true"
+                        filterBy="nome"
+                        appendTo="body"
+                        optionDisabled="deactivated"
+                        (ngModelChange)="turmaChanged()">
+                    <!-- <ng-template #selectedItem let-selectedOption>
+                        <span *ngIf="selectedOption">{{ selectedOption.name }} </span>
+                    </ng-template> -->
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold">{{ item.nome }}</p>
+                                <p class="text-sm">{{ item.professor }}</p>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                [value]="item.active ? 'Ativo': 'Inativo'"
+                                [severity]="item.active ? 'success': 'danger'"
+                                [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="turma_Id.touched && turma_Id.invalid && turma_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-3 col-12"> <!-- Professor -->
+                <label for="professor">Professor: </label>
+                <input type="text"
+                    pInputText
+                    [value]="object.professor"
+                    id="professor"
+                    name="professor"
+                    class="w-full"
+                    readonly>
+            </div>
+            <div class="field sm:col-3 col-12"> <!-- Apostila -->
+                <label for="professor">Apostila: </label>
+                <input type="text"
+                    pInputText
+                    [value]="object.professor"
+                    id="professor"
+                    name="professor"
+                    class="w-full"
+                    readonly>
+            </div>
+            <div class="field sm:col-2 col-12"> <!-- Página -->
+                <label for="professor">Página: </label>
+                <input type="text"
+                    pInputText
+                    [value]="object.professor"
+                    id="professor"
+                    name="professor"
+                    class="w-full"
+                    readonly>
+            </div>
+            <!-- Faixa Etária -->
+            <!-- <div class="field sm:col-4 col-12"> 
+                <label for="pessoa_FaixaEtaria_Id">Faixa Etária: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="faixaEtarias"
+                          [(ngModel)]="object.pessoa_FaixaEtaria_Id"
+                          [loading]="loadingFaixaEtarias"
+                          #pessoa_FaixaEtaria_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="pessoa_FaixaEtaria_Id"
+                          inputId="pessoa_FaixaEtaria_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="pessoa_FaixaEtaria_Id.touched && pessoa_FaixaEtaria_Id.invalid && pessoa_FaixaEtaria_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_FaixaEtaria_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div> -->
+           <!-- Geração -->
+            <!-- <div class="field sm:col-4 col-12"> 
+                <label for="pessoa_Geracao_Id">Geração: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="geracoes"
+                          [(ngModel)]="object.pessoa_Geracao_Id"
+                          [loading]="loadingGeracoes"
+                          #pessoa_Geracao_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="pessoa_Geracao_Id"
+                          inputId="pessoa_Geracao_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="pessoa_Geracao_Id.touched && pessoa_Geracao_Id.invalid && pessoa_Geracao_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Geracao_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div> -->
+        </div>
+    </div>
+</div>
+<div class="formgrid grid pr-3">
+    <!-- Origem -->
+    <!-- <div class="field md:col-3 sm:col-6 col-12"> 
+        <label for="pessoa_Origem">Origem: </label>
+        <input type="text"
+               pInputText
+               [value]="object.pessoa_Origem"
+               id="pessoa_Origem"
+               name="pessoa_Origem"
+               class="w-full"
+               readonly>
+    </div> -->
+    <!-- Canal -->
+    <!-- <div class="field md:col-3 sm:col-6 col-12"> 
+        <label for="pessoa_Origem_Canal">Canal: </label>
+        <input type="text"
+               pInputText
+               [value]="object.pessoa_Origem_Canal"
+               id="pessoa_Origem_Canal"
+               name="pessoa_Origem_Canal"
+               class="w-full"
+               readonly>
+    </div> -->
+    <!-- Status -->
+    <!-- <div class="field md:col-3 sm:col-6 col-12"> 
+        <label for="pessoa_Status">Status: </label>
+        <input type="text"
+               pInputText
+               [value]="object.pessoa_Status"
+               id="pessoa_Status"
+               name="pessoa_Status"
+               class="w-full"
+               readonly>
+    </div> -->
+    <!-- Indicação -->
+    <!-- <div class="field md:col-3 sm:col-6 col-12"> 
+        <label for="pessoa_Indicou">Indicação: </label>
+        <input type="text"
+               pInputText
+               [value]="object.pessoa_Indicou"
+               id="pessoa_Indicou"
+               name="pessoa_Indicou"
+               class="w-full"
+               readonly>
+    </div> -->
+</div>
