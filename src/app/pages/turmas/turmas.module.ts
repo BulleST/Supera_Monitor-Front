@@ -5,12 +5,14 @@ import { TurmasRoutingModule } from './turmas.routing';
 import { ListComponent } from './list/list.component';
 import { FormComponent } from './form/form.component';
 import { SharedModule } from '../../shared/shared.module';
+import { CalendarioComponent } from './calendario/calendario.component';
 
 
 @NgModule({
     declarations: [
         ListComponent,
-        FormComponent
+        FormComponent,
+        CalendarioComponent
     ],
     imports: [
         CommonModule,

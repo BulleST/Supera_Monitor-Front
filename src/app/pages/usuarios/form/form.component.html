@@ -1,8 +1,47 @@
+<p-confirmDialog />
+
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ maxWidth: '600px', width: '95vw' }">
+          [style]="{ maxWidth: '600px', width: '95vw' }"
+          appendTo="body">
+          <ng-template #header>
+              <div class="w-full flex align-items-center ">
+                  <span class="p-dialog-title">{{isEditPage ? 'Editar'  : 'Cadastrar'}}</span>
+                  <p-button class="ml-auto"
+                            type="button"
+                            icon="pi pi-exclamation-circle"
+                            size="large"
+                            [text]="true"
+                            [rounded]="true"
+                            severity="secondary"
+                            (onClick)="op.toggle($event)"  />
+                  <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                      <div class="px-2">
+                          <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                          <table class="w-full">
+                              <tr>
+                                  <td class="p-1"><b>Cadastrado em</b></td>
+                                  <td class="p-1 pl-3 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                              </tr>
+                              <tr *ngIf="object.account_Created">
+                                  <td class="p-1"><b>Cadastrado por</b></td>
+                                  <td class="p-1 pl-3 text-right">{{ object.account_Created }}</td>
+                              </tr>
+                              <tr *ngIf="object.lastUpdated">
+                                  <td class="p-1"><b>Última atualização</b></td>
+                                  <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                              </tr>
+                              <tr *ngIf="object.deactivated">
+                                  <td class="p-1"><b>Inativo em</b></td>
+                                  <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                              </tr>
+                          </table>
+                      </div>
+                  </p-popover>
+              </div>
+          </ng-template>
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <div class="field md:col-4 col-12"> <!-- Nome -->
@@ -34,30 +73,17 @@
                 </div>
             </div>
             <div class="field md:col-4 col-12"> <!-- Perfil -->
-                <label for="role_Id">Perfil: <span class="text-red-500">*</span></label>
-                <p-dropdown
-                    [options]="roles"
-                    [(ngModel)]="object.role_Id"
-                    #role_Id="ngModel"
-                    styleClass="w-full"
-                    class="w-full"
-                    name="role_Id"
-                    inputId="role_Id"
-                    optionLabel="role"
-                    optionValue="id"
-                    placeholder="Select Role"
-                    [showClear]="true"
-                    [checkmark]="true"
-                    [filter]="true"
-                    filterBy="role"
-                    appendTo="body" 
-                    optionDisabled="isDisabled"/>
-                <div *ngIf="role_Id.touched && role_Id.invalid && role_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="role_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
+                <label for="role">Perfil: </label>
+                    <input type="text"
+                        pInputText
+                        [value]="object.role ? object.role : 'Assistant'"
+                        id="role"
+                        name="role"
+                        class="w-full"
+                        [readonly]="true">
             </div>
             <div class="field col-12"> <!-- E-mail -->
-                <label for="email">E-mail: <span class="text-red-500">*</span></label>
+                <label for="email">E-mail: <span *ngIf="!isEditPage" class="text-red-500">*</span></label>
                 <input type="email"
                         [email]="true"
                         pInputText
@@ -69,8 +95,7 @@
                         [required]="true"
                         [pattern]="emailPattern"
                         placeholder="example@gmail.com"
-                        [readonly]="isEditPage"
-                        [disabled]="isEditPage">
+                        [readonly]="isEditPage">
                 <div *ngIf="email.touched && email.invalid && email.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>

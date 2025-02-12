@@ -49,24 +49,25 @@ export var turmaColumns: ColumnTable[] = [
         displayType: DisplayType.options,
         options: {
             "items": [
-                { "value": 1, "label": "Domingo" },
-                { "value": 2, "label": "Segunda-feira" },
-                { "value": 3, "label": "Terça-feira" },
-                { "value": 4, "label": "Quarta-feira" },
-                { "value": 5, "label": "Quinta-feira" },
-                { "value": 6, "label": "Sexta-feira" },
-                { "value": 7, "label": "Sábado" },
+                { "value": 0, "label": "Domingo" },
+                { "value": 1, "label": "Segunda-feira" },
+                { "value": 2, "label": "Terça-feira" },
+                { "value": 3, "label": "Quarta-feira" },
+                { "value": 4, "label": "Quinta-feira" },
+                { "value": 5, "label": "Sexta-feira" },
+                { "value": 6, "label": "Sábado" },
             ]
             
         },
     },
     {
         field: 'horario',
-        label: 'Horário de Aula',
+        label: 'Horário',
         filterType: FilterType.time,
         displayType: DisplayType.time,
         options: {
-            format: 'HH\'h\'mm'
+            format: 'HH\'h\'mm',
+            width: '15px'
         },
     },
     {
@@ -77,10 +78,12 @@ export var turmaColumns: ColumnTable[] = [
         options: undefined,
     },{
         field: 'capacidadeMaximaAlunos',
-        label: 'Limite de Alunos',
+        label: 'Limite',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
+        options: {
+            width: '15px'
+        },
     },
     {
         field: 'active',

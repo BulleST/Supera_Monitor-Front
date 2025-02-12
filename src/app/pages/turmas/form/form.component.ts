@@ -1,13 +1,14 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Crypto, getError, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { Turma, TurmaRequest, Turma_Tipo } from '../../../models/turma.model';
+import { Turma,  Turma_Tipo } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import { Professor } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-form',
@@ -25,12 +26,13 @@ export class FormComponent implements OnDestroy {
     isEditPage = false;
     subscription: Subscription[] = [];
     diasSemana = [
-        { id: 2, label: 'Segunda-feira' },
-        { id: 3, label: 'Terça-feira' },
-        { id: 4, label: 'Quarta-feira' },
-        { id: 5, label: 'Quinta-feira' },
-        { id: 6, label: 'Sexta-feira' },
-        { id: 7, label: 'Sábado' },
+        { id: 0, label: 'Domingo' },
+        { id: 1, label: 'Segunda-feira' },
+        { id: 2, label: 'Terça-feira' },
+        { id: 3, label: 'Quarta-feira' },
+        { id: 4, label: 'Quinta-feira' },
+        { id: 5, label: 'Sexta-feira' },
+        { id: 6, label: 'Sábado' },
     ];
 
     tipos: Turma_Tipo[] = [];
@@ -112,7 +114,7 @@ export class FormComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
@@ -138,11 +140,11 @@ export class FormComponent implements OnDestroy {
                     this.showError(this.error, e);
                 }
             })
-            .catch(res => {
-                this.error = getError(res);
-                this.loading = false;
-                this.showError(this.error, e);
-            })
+                        .catch((res: HttpErrorResponse) => {
+                            this.error = res.error.message;
+                            this.loading = false;
+                            this.showError(this.error, e);
+                        })
     }
 
     request() {

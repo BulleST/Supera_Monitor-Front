@@ -8,7 +8,7 @@ export class LoadingService {
     loading = new BehaviorSubject<boolean>(false);
     loadingRequest = new BehaviorSubject<boolean[]>([]);
 
-    message = new BehaviorSubject<string>('');
+    message = new BehaviorSubject<string | undefined>(undefined);
 
     constructor() { 
     }

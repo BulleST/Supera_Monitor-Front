@@ -24,14 +24,16 @@ export class Crypto {
 
 	decrypt(data: any) {
 		try {
+            console.log(data)
             if (!data) {
                 return null;
             }
-            while(data.includes('slash')) {
+            while(data.toString().includes('slash')) {
                 data = data.replace('slash', '/'); // Reaplicando as barras para decryptar
             }
 			const bytes = CryptoJS.AES.decrypt(data, this.encryptSecretKey);
-			if (bytes.toString()) {
+            console.log(bytes, bytes.toString())
+			if (bytes.toString(CryptoJS.enc.Utf8)) {
 				return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 			}
 			return null;

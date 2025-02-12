@@ -10,11 +10,11 @@ import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { EventDetailsComponent } from './event-details/event-details.component';
 import { ChamadaComponent } from './chamada/chamada.component';
 import { ReposicaoComponent } from './reposicao/reposicao.component';
 import { AulaComponent } from './aula/aula.component';
 import { AlunosComponent } from './alunos/alunos.component';
+import { MonitoramentoComponent } from './monitoramento/monitoramento.component';
 
 @NgModule({
     declarations: [
@@ -22,11 +22,11 @@ import { AlunosComponent } from './alunos/alunos.component';
         HeaderComponent,
         HomeComponent,
         NavMenuComponent,
-        EventDetailsComponent,
         ChamadaComponent,
         ReposicaoComponent,
         AulaComponent,
         AlunosComponent,
+        MonitoramentoComponent,
     ],
     imports: [
         CommonModule,

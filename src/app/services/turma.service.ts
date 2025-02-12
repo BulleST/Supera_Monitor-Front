@@ -7,22 +7,14 @@ import { MessageService } from 'primeng/api';
 import { TurmaRequest, Turma, Turma_Tipo } from '../models/turma.model';
 import moment from 'moment';
 import { Map } from '../utils/map';
+import { Service } from '../helpers/service.service';
 
 @Injectable({
     providedIn: 'root',
 
 })
-export class TurmaService {
-    url = '';
-    list = new BehaviorSubject<Turma[]>([]);
-
-    constructor(
-        private http: HttpClient,
-        private messageService: MessageService,
-    ) {
-        this.url = environment.url + 'back';
-    }
-
+export class TurmaService extends Service {
+    override list = new BehaviorSubject<Turma[]>([]);
 
     getTipos() {
         return this.http.get<Turma_Tipo[]>(`${this.url}/turmas/types/`)
@@ -81,7 +73,7 @@ export class TurmaService {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/turmas/${id}/${activated}`, {})
+        return this.http.patch<Response>(`${this.url}/turmas/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar turma', life: 3000 });

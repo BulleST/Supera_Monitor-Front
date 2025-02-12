@@ -9,7 +9,7 @@ import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
-import { Account, Account_List, userColumns } from '../../../models/account.model';
+import { AccountResponse, Account, userColumns } from '../../../models/account.model';
 
 @Component({
     selector: 'app-list',
@@ -19,14 +19,14 @@ import { Account, Account_List, userColumns } from '../../../models/account.mode
     standalone: false
 })
 export class ListComponent implements OnDestroy {
-    list: Account_List[] = [];
+    list: Account[] = [];
     tableLoading = false;
     tableSearch: string = '';
     tableColumns: ColumnTable[] = [];
     tableGlobalFilterFields: string[] = [];
     tableSelectedItem: any;
     tableMenu: MenuItem[] = [];
-    account?: Account;
+    account?: AccountResponse;
     DisplayType: typeof DisplayType = DisplayType;
     FilterType: typeof FilterType = FilterType;
     Role: typeof Role = Role;
@@ -192,7 +192,7 @@ export class ListComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         });

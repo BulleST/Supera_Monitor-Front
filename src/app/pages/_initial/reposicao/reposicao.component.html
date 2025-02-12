@@ -4,12 +4,49 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+   
+          <ng-template #header>
+            <div class="w-full flex align-items-center ">
+                <span class="p-dialog-title"><i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>  Agendar reposição</span>
+            </div>
+        </ng-template>
     <div class="formgrid grid">
+        <div class="field md:col-4 sm:col-6 col-12">
+            <label for="aluno">Aluno:</label>
+            <input type="text"
+                       pInputText
+                       [value]="aluno.nome"
+                       id="nome"
+                       name="nome"
+                       class="w-full"
+                       readonly>
+        </div>
+        <div class="field md:col-4 sm:col-6 col-12">
+            <label for="turma">Turma:</label>
+            <input type="text"
+                       pInputText
+                       [value]="aluno.turma"
+                       id="turma"
+                       name="turma"
+                       class="w-full"
+                       readonly>
+        </div>
+        <div class="field md:col-4 sm:col-6 col-12">
+            <label for="professor">Professor:</label>
+            <input type="text"
+                       pInputText
+                       [value]="aluno.professor"
+                       id="professor"
+                       name="professor"
+                       class="w-full"
+                       readonly>
+        </div>
         <div class="field sm:col-12 col-12">
-            <!-- <label for="professor">Selecione uma data: </label> -->
-            <div class="surface-50 p-4">
-                <div #calendarDiv id="myCalendar" class="w-full"></div>
+            <label for="professor" class="-mb-4">Selecione uma aula disponível: </label>
+            <div class="">
+                <full-calendar [options]="calendarOptions" #calendar  ></full-calendar>
             </div>
         </div>
         <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
@@ -22,7 +59,7 @@
                           type="submit"
                           class="w-full"
                           styleClass="w-full px-3"
-                          label="Finalizar aula"
+                          label="Agendar"
                           icon="pi pi-check"
                           iconPos="right"
                           [loading]="loading"

@@ -79,13 +79,25 @@ export class ListComponent implements OnDestroy {
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen text-orange-500',
-                command: () => this.edit(item)
+                command: () => {
+                    var encrypted = this.crypto.encrypt(item.id);
+                    this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+                }
             },
             {
                 label: item.active ? 'Desabilitar' : 'Habilitar',
                 icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
                 command: (event: any) => this.deactivated(event, item)
-            }
+            },
+            { separator: true },
+            {
+                label: 'Calendário de aulas',
+                icon: 'fa-solid fa-calendar',
+                command: () => {
+                    var encrypted = this.crypto.encrypt(item.id);
+                    this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
+                }
+            },
 
         ];
     }
@@ -108,10 +120,6 @@ export class ListComponent implements OnDestroy {
         this.tableSelectedItem = undefined;
     }
 
-    edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
-    }
 
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
@@ -152,7 +160,7 @@ export class ListComponent implements OnDestroy {
             message: message,
             header: 'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         });

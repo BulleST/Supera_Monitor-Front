@@ -1,48 +1,39 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
 
-export interface Account_List extends Basic_List {
-    id: number;
-    name: string;
-    email: string;
-    phone: string;
-    role: string;
-    role_Id: number;
+export class Account extends Basic_List {
+    name: string = '';
+    email: string = '';
+    phone: string = '';
+    role: string = '';
+    role_Id: number = 0;
     verified?: Date;
-    isVerified: boolean;
+    isVerified: boolean = false;
     passwordReset?: Date;
 }
 
-export interface Account {
-    id: number;
-    name: string;
-    phone: string;
-    email: string;
-    role: string;
-    created: Date;
-    updated?: Date;
-    isVerified: boolean;
-    passwordReset?: Date;
-    jwtToken: string;
-    refreshToken: string;
-    role_Id: number;
-    customer_Id: number;
-}
-
-export class Account {
+export class AccountRequest {
     id: number = 0;
     name: string = '';
     phone: string = '';
     email: string = '';
-    role: string = '';
+    role_Id: number = 0;
+}
+
+export class AccountResponse {
+    id: number = 0;
+    name: string = '';
+    phone: string = '';
+    email: string = '';
     created: Date = new Date;
     updated?: Date;
     isVerified: boolean = false;
     passwordReset?: Date;
     jwtToken: string = '';
     refreshToken: string = '';
+    role: string = '';
     role_Id: number = 0;
-    customer_Id: number = 0;
+    professor_Id?: number;
 }
 
 export var userColumns: ColumnTable[] = [

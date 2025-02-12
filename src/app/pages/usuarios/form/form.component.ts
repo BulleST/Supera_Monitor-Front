@@ -1,13 +1,14 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Crypto, getError, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
-import { AccountRole, Role, roles } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
-import { Account } from '../../../models/account.model';
+import { Account, AccountResponse } from '../../../models/account.model';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Role } from '../../../models/account-perfil.model';
 
 @Component({
     selector: 'app-form',
@@ -19,16 +20,14 @@ import { Account } from '../../../models/account.model';
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
     injector = inject(Injector);
-    object = new Account;
+    object: Account = new Account;
     loading = false;
     error: string = '';
     isEditPage = false;
     emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
-    roles: AccountRole[] = [];
-    roleDisabled: boolean = false; 
-    Role: typeof Role = Role;
-
+    account?: AccountResponse;
+Role: typeof Role = Role;
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -39,17 +38,12 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService
     ) {
 
-        // afterNextRender({ read: () => this.loadPage() },
-        //     { injector: this.injector }
-        // );
-        this.loadPage();
+        var account = this.accountService.account.subscribe(account => {
+            this.account = account;
+        });
+        this.subscription.push(account);
 
-        lastValueFrom(this.service.getRoles())
-        .then(res => {
-            this.loading = false;
-            this.roles = res
-        })
-        .catch(res => this.loading = false);
+        this.loadPage();
     }
 
     ngOnDestroy(): void {
@@ -57,8 +51,7 @@ export class FormComponent implements OnDestroy {
     }
 
     loadPage() {
-        var account: Account = this.accountService.accountValue as Account;
-        this.roles.forEach(x => x.isDisabled = x.id < account.role_Id);
+        var account: AccountResponse = this.accountService.accountValue as AccountResponse;
 
         var params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['id'];
@@ -97,7 +90,7 @@ export class FormComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
@@ -109,6 +102,8 @@ export class FormComponent implements OnDestroy {
             return;
         }
         this.loading = true;
+
+        this.object.role_Id = Role.Assistant;
 
         this.request()
             .then(res => {
@@ -123,8 +118,8 @@ export class FormComponent implements OnDestroy {
                     this.showError(this.error, e);
                 }
             })
-            .catch(res => {
-                this.error = getError(res);
+            .catch((res: HttpErrorResponse) => {
+                this.error = res.error.message;
                 this.loading = false;
                 this.showError(this.error, e);
             })

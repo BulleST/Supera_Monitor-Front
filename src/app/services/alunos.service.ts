@@ -1,27 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
 import { MessageService } from 'primeng/api';
 import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_FaixaEtaria, Pessoa_Geracao, Pessoa_Status } from '../models/alunos.model';
 import moment from 'moment';
 import { Map } from '../utils/map';
+import { Service } from '../helpers/service.service';
+import { Reposicao, ReposicaoRequest } from '../models/reposicao.model';
 
 @Injectable({
     providedIn: 'root',
 
 })
-export class AlunoService {
-    url = '';
-    list = new BehaviorSubject<Aluno[]>([]);
-
-    constructor(
-        private http: HttpClient,
-        private messageService: MessageService,
-    ) {
-        this.url = environment.url + 'back';
-    }
+export class AlunoService extends Service {
+    override list = new BehaviorSubject<Aluno[]>([]);
 
     getGeracao() {
         return this.http.get<Pessoa_Geracao[]>(`${this.url}/pessoas/geracoes/all`)
@@ -90,6 +84,19 @@ export class AlunoService {
             }));
     }
 
+    getFoto(id: number): Observable<string> {
+        return this.http.get<Response>(`${this.url}/alunos/image/${id}`)
+        .pipe(map(
+            res => {
+                return res.object;
+            }, 
+        ), tap({
+            error: res => {
+                return of('');
+            }
+        }));
+    }
+
     get(id: number) {
         return new Observable<Aluno>((observer => {
             var item = this.list.value.find(x => x.id == id) as Aluno;
@@ -140,10 +147,19 @@ export class AlunoService {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/alunos/${id}/${activated}`, {})
+        return this.http.patch<Response>(`${this.url}/alunos/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar aluno', life: 3000 });
+                }
+            }));
+    }
+
+    reposicao(request: ReposicaoRequest) {
+        return this.http.post<Response>(`${this.url}/alunos/reposicao/`, request)
+            .pipe(tap({
+                error: err => {
+                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível marcar reposição', life: 3000 });
                 }
             }));
     }

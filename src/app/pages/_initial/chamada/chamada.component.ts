@@ -1,12 +1,12 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Aulas_List } from '../../../models/aulas.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AulaService } from '../../../services/aulas.service';
 import { Crypto } from '../../../utils';
 import { Professor } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
+import { CalendarioAlunoList, CalendarioList } from '../../../models/calendario.model';
 
 @Component({
     selector: 'app-chamada',
@@ -18,7 +18,7 @@ import { ProfessorService } from '../../../services/professor.service';
 })
 export class ChamadaComponent implements OnDestroy {
     visible: boolean = false;
-    object = new Aulas_List;
+    object: CalendarioList = new CalendarioList;
     loading = false;
     error: string = '';
     isEditPage = false;
@@ -59,11 +59,8 @@ export class ChamadaComponent implements OnDestroy {
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
-                console.log(id)
-
                 lastValueFrom(this.service.get(id))
                     .then(res => {
-                        console.log(res);
                         this.object = res;
                         this.loading = false;
                         this.visible = true;
@@ -97,8 +94,7 @@ export class ChamadaComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })

@@ -6,8 +6,10 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ProfessorService } from '../../../services/professor.service';
 import { Professor, Professor_NivelApostila } from '../../../models/professor.model';
-import { Account_List } from '../../../models/account.model';
+import { Account } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
+import { Response } from '../../../helpers/request-response.interface';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-form',
@@ -26,8 +28,8 @@ export class FormComponent implements OnDestroy {
     subscription: Subscription[] = [];
     emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
-    accounts: Account_List[] = [];
-    accountsSelected?: Account_List;
+    accounts: Account[] = [];
+    accountsSelected?: Account;
     loadingAccounts: boolean = true;
 
     nivelAbaco: Professor_NivelApostila[] = [];
@@ -76,14 +78,13 @@ export class FormComponent implements OnDestroy {
     }
 
     loadPage() {
-
-        var params = this.activatedRoute.params.subscribe(res => {
+        var params = this.activatedRoute.params.subscribe(async res => {
             this.isEditPage = !!res['id'];
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
                 
-                lastValueFrom(this.service.get(id))
+                lastValueFrom(await this.service.get(id))
                     .then(res => {
                         this.object = res;
                         this.loading = false;
@@ -106,8 +107,7 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    accountSelectedChange(account?: Account_List) {
-
+    accountSelectedChange(account?: Account) {
         if (account) {
             this.object.account_Id = account.id;
             this.object.nome = account.name;
@@ -127,20 +127,20 @@ export class FormComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }
 
 
-    send(form: NgForm, e: any) {
+    async send(form: NgForm, e: any) {
         if (form.invalid) {
             return;
         }
         this.loading = true;
 
-        this.request()
+       this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
@@ -153,8 +153,8 @@ export class FormComponent implements OnDestroy {
                     this.showError(this.error, e);
                 }
             })
-            .catch(res => {
-                this.error = getError(res);
+            .catch((res: HttpErrorResponse) => {
+                this.error = res.error.message;
                 this.loading = false;
                 this.showError(this.error, e);
             })

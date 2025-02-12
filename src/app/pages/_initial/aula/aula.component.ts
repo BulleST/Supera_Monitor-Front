@@ -1,6 +1,5 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Aluno_Aula, Aulas_List } from '../../../models/aulas.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AulaService } from '../../../services/aulas.service';
@@ -8,6 +7,7 @@ import { Crypto } from '../../../utils';
 import { Professor } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { Popover } from 'primeng/popover';
+import { CalendarioAlunoList, CalendarioList } from '../../../models/calendario.model';
 
 @Component({
     selector: 'app-aula',
@@ -18,17 +18,16 @@ import { Popover } from 'primeng/popover';
 })
 export class AulaComponent implements OnDestroy {
     visible: boolean = false;
-    object = new Aulas_List;
+    object = new CalendarioList;
     loading = false;
     error: string = '';
-    isEditPage = false;
     subscription: Subscription[] = [];
 
     professores: Professor[] = [];
     loadingProfessores = true;
 
     @ViewChild('op') op!: Popover;
-    selectedAluno?: Aluno_Aula;
+    selectedAluno?: CalendarioAlunoList;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -56,28 +55,18 @@ export class AulaComponent implements OnDestroy {
     }
 
     loadPage() {
-        var params = this.activatedRoute.params.subscribe(res => {
-            this.isEditPage = !!res['id'];
-            if (this.isEditPage) {
-                this.loading = true;
-                var id = this.crypto.decrypt(res['id'])
-                console.log(id)
 
-                lastValueFrom(this.service.get(id))
-                    .then(res => {
-                        console.log(res);
-                        this.object = res;
-                        this.loading = false;
-                        this.visible = true;
-                    })
-                    .catch(res => {
-                        this.visible = false;
-                    });
-            } else {
-                this.visible = true;
-            }
-        })
-        this.subscription.push(params);
+        // var local = localStorage.getItem('current-event')?.toString();
+        // console.log(local)
+        // this.object = this.crypto.decrypt(localStorage);
+        // console.log(this.object)
+        // if (!local || !this.object) {
+        //     this.visible = false;
+        //     this.visibleChange()
+        // }
+        this.loading = false;
+        this.visible = true;
+    
     }
 
     toDate(horario: string) {
@@ -88,8 +77,7 @@ export class AulaComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            var route = this.isEditPage ? ['../../'] : ['../'];
-            this.router.navigate(route, { relativeTo: this.activatedRoute });
+            this.router.navigate( ['../'], { relativeTo: this.activatedRoute });
         }
     }
 
@@ -99,26 +87,25 @@ export class AulaComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }
 
 
-    displayPopover(event: any, aluno: Aluno_Aula) {
-        if (this.selectedAluno && this.selectedAluno.id === aluno.id) {
-            this.op.hide();
-            delete this.selectedAluno;
-        } else {
-            this.selectedAluno = aluno;
-            this.op.show(event);
+    displayPopover(event: any, aluno: CalendarioList) {
+        // if (this.selectedAluno && this.selectedAluno.id === aluno.id) {
+        //     this.op.hide();
+        //     delete this.selectedAluno;
+        // } else {
+        //     this.selectedAluno = aluno;
+        //     this.op.show(event);
 
-            if (this.op.container) {
-                this.op.align();
-            }
-        }
+        //     if (this.op.container) {
+        //         this.op.align();
+        //     }
+        // }
     }
 
     hidePopover() {

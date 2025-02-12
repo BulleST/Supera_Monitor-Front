@@ -7,15 +7,15 @@ import { catchError, tap } from 'rxjs/operators';
 import { getError } from '../utils';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
-import { Account } from '../models/account.model';
+import { AccountResponse } from '../models/account.model';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AccountService {
     url = '';
-    accountSubject: BehaviorSubject<Account | undefined> = new BehaviorSubject<Account | undefined>(undefined);
-    public account: Observable<Account | undefined> = new Observable<Account | undefined>(undefined);
+    accountSubject: BehaviorSubject<AccountResponse | undefined> = new BehaviorSubject<AccountResponse | undefined>(undefined);
+    public account: Observable<AccountResponse | undefined> = new Observable<AccountResponse | undefined>(undefined);
 
     changePasswordModalOpen = new EventEmitter<boolean>();
     profileModalOpen = new EventEmitter<boolean>();
@@ -41,7 +41,7 @@ this.url = environment.url + 'back';
         })
     }
 
-    setAccount(where: string, value?: Account) {
+    setAccount(where: string, value?: AccountResponse) {
         this.accountSubject.next(value)
     }
 
@@ -50,7 +50,7 @@ this.url = environment.url + 'back';
   }
 
     login(model: Login) {
-        return this.http.post<Account>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
+        return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
             tap(async (account) => {
                 this.setAccount('login', account);
                 const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
@@ -75,7 +75,7 @@ this.url = environment.url + 'back';
     }
 
     refreshToken(where: string) {
-        return this.http.post<Account>(`${this.url}/accounts/refresh-token`, {}, { withCredentials: true })
+        return this.http.post<AccountResponse>(`${this.url}/accounts/refresh-token`, {}, { withCredentials: true })
             .pipe(tap({
                 next: async account => {
                     this.setAccount('refreshToken', account);

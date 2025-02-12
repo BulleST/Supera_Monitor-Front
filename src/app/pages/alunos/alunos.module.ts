@@ -7,6 +7,7 @@ import { FormComponent } from './form/form.component';
 import { SharedModule } from '../../shared/shared.module';
 import { DadosCadastraisComponent } from './form/dados-cadastrais/dados-cadastrais.component';
 import { ChecklistComponent } from './form/checklist/checklist.component';
+import { CalendarioComponent } from './form/calendario/calendario.component';
 
 
 @NgModule({
@@ -14,7 +15,8 @@ import { ChecklistComponent } from './form/checklist/checklist.component';
         ListComponent,
         FormComponent,
         DadosCadastraisComponent,
-        ChecklistComponent
+        ChecklistComponent,
+        CalendarioComponent
     ],
     imports: [
         CommonModule,

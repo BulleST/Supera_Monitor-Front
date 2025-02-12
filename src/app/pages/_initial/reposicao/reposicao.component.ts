@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Crypto } from '../../../utils';
-import { Calendar, DayCellContentArg, EventApi, EventClickArg, EventContentArg } from '@fullcalendar/core';
-import { Aulas_List, Calendario } from '../../../models/aulas.model';
+import { Calendar, CalendarOptions, DayCellContentArg, EventApi, EventClickArg, EventContentArg } from '@fullcalendar/core';
+// import { Aulas_List, Calendario } from '../../../models/aulas.model';
 import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
 import $ from 'jquery';
@@ -14,6 +14,12 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import listPlugin from '@fullcalendar/list';
 import { VerboseFormattingArg } from '@fullcalendar/core/internal';
+import { CalendarioList } from '../../../models/calendario.model';
+import { AlunoService } from '../../../services/alunos.service';
+import { Aluno } from '../../../models/alunos.model';
+import { Reposicao, ReposicaoRequest } from '../../../models/reposicao.model';
+import { Turma } from '../../../models/turma.model';
+import { TurmaService } from '../../../services/turma.service';
 
 
 @Component({
@@ -25,17 +31,75 @@ import { VerboseFormattingArg } from '@fullcalendar/core/internal';
 })
 export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     visible: boolean = true;
-    object: any = {};
+    object: Reposicao = new Reposicao;
     loading = false;
     error: string = '';
-    isEditPage = false;
     subscription: Subscription[] = [];
-    calendar!: Calendar;
-    calendario: Calendario[] = [];
-    selectedEvent?: Aulas_List;
-    currentEvents = signal<EventApi[]>([]);
 
-    date: Date = new Date;
+    calendarVisible = signal(true);
+    currentEvents = signal<EventApi[]>([]);
+    calendario: CalendarioList[] = []
+    calendarOptions: CalendarOptions = {
+        initialView: 'multiMonthYear',
+        themeSystem: 'standard',
+        locale: 'pt-BR',
+        plugins: [
+            dayGridPlugin,
+            interactionPlugin,
+            timeGridPlugin,
+            listPlugin,
+            multiMonthPlugin
+        ],
+        dayHeaders: true,
+        weekends: false,
+        weekNumberCalculation: (m: Date) => {
+            const weekNumber = this.getDateWeek(m, new Date(2025, 1, 10));
+            return weekNumber;
+        },
+        expandRows: true,
+        editable: false,
+        showNonCurrentDates: true,
+        defaultAllDay: false,
+        allDaySlot: false,
+        headerToolbar: {
+            left: '',
+            center: '',
+            right: ''
+        },
+        nowIndicator: true,
+        dayMaxEvents: true,
+        // businessHours: true,
+        events: [],
+        scrollTime: '10:00',
+        eventStartEditable: false,
+        eventDurationEditable: false,
+        handleWindowResize: false,
+        buttonText: {
+            today: 'hoje',
+            year: 'ano',
+            month: 'mês',
+            week: 'semana',
+            list: 'lista'
+        },
+        droppable: true,
+        loading: (arg) => {
+        },
+        eventClick: this.eventClick.bind(this),
+        eventsSet: this.events.bind(this),
+        eventClassNames: (arg) => {
+            console.log(arg)
+            return arg.event.id;
+        }
+    }
+
+    aluno: Aluno = new Aluno;
+    alunos: Aluno[] = [];
+    loadingAluno = false;
+
+    turma: Turma = new Turma;
+    turmas: Turma[] = [];
+    loadingTurma = false;
+
     constructor(
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
@@ -43,25 +107,76 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         private crypto: Crypto,
         private aulasService: AulaService,
         private changeDetector: ChangeDetectorRef,
+        private alunoService: AlunoService,
+        private turmaService: TurmaService,
     ) {
 
         var list = this.aulasService.list.subscribe(res => this.calendario = res);
         this.subscription.push(list);
+
+        var params = this.activatedRoute.params.subscribe(res => {
+            if (res['object']) {
+                this.loading = true;
+                this.object = this.crypto.decrypt(res['object']);
+
+                this.loadAluno();
+                this.loadTurma();
+
+                this.loading = false;
+                this.visible = true;
+
+            } else {
+                this.visible = false;
+                this.visibleChange()
+            }
+        })
+        this.subscription.push(params);
     }
 
     ngAfterViewInit(): void {
-        this.initCalendar();
     }
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
+
     visibleChange() {
         if (!this.visible) {
-            var route = this.isEditPage ? ['../../'] : ['../'];
+            var route = ['../../'] ;
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
+    
+    async loadAluno() {
+        this.loadingAluno = true;
+        await lastValueFrom(this.alunoService.getList())
+        this.alunos = this.alunoService.list.value;
+        this.aluno = this.alunos.find(x => x.id == this.object.aluno_Id) as Aluno;
+        if (!this.aluno)
+            this.visible = false;
+        
+        this.loadingAluno = false;
+
+        this.loadCalendar();
+    }
+    
+    async loadTurma() {
+        this.loadingTurma = true;
+        await lastValueFrom(this.turmaService.getList())
+        this.turmas = this.turmaService.list.value;
+        this.turma  = this.turmas.find(x => x.id == this.object.aluno_Id) as Turma;
+        if (!this.aluno)
+            this.visible = false;
+        
+        this.loadingAluno = false;
+
+        this.loadCalendar();
+    }
+
+    loadCalendar() {
+
+    }
+
     getDateWeek(date: Date, inicioAnoLetivo: Date) {
         const currentDate = (typeof date === 'object') ? date : new Date();
         inicioAnoLetivo = new Date(currentDate.getFullYear(), 0, 15);
@@ -71,128 +186,14 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         return (currentDate < nextMonday) ? 52 : (currentDate > nextMonday ? Math.ceil((currentDate.valueOf() - nextMonday.valueOf()) / (24 * 3600 * 1000) / 7) : 1);
     }
 
-    addHours(data: Date, h: number) {
-        data.setTime(data.getTime() + (h * 60 * 60 * 1000));
-        return data;
-    }
-
-
-    async initCalendar() {
-        console.log('initCalendar')
-        await lastValueFrom(this.aulasService.getList())
-            .then(res => {
-                let calendarDiv = document.getElementById('myCalendar') as HTMLElement;
-
-                console.log('calendarDiv', calendarDiv)
-                this.calendario = res;
-                this.calendar = new Calendar(calendarDiv, {
-                    initialView: 'multiMonthYear',
-                    themeSystem: 'standard',
-                    locale: 'pt-BR',
-                    plugins: [
-                        dayGridPlugin,
-                        interactionPlugin,
-                        timeGridPlugin,
-                        listPlugin,
-                        multiMonthPlugin
-                    ],
-                    selectable: true,
-                    dayHeaders: true,
-                    weekends: false,
-                    expandRows: true,
-                    editable: false,
-                    showNonCurrentDates: true,
-                    defaultAllDay: false,
-                    allDaySlot: false,
-                    headerToolbar: {
-                        left: 'title',
-                        center: '',
-                        right: 'timeGridWeek,multiMonthYear'
-                    },
-                    titleFormat: (arg: VerboseFormattingArg) => {
-                        console.log(arg)
-                        const weekNumber = this.getDateWeek(arg.start.marker, new Date(2025, 1, 10));
-                        return `Selecione uma data`
-                        // return `Semana ${weekNumber} - Tema: XYZ`
-                    },
-                    nowIndicator: true,
-                    dayMaxEvents: true,
-                    businessHours: true,
-                    eventSources: res.filter(x => x.professor == 'Antônio').map(x => ({
-                        id: x.id.toString(), // id do professor
-                        backgroundColor: x.color,
-                        borderColor: x.color,
-                        events: x.aulas.map(y => ({
-                            id: y.id.toString(), // id da aula
-                            title: y.turma,
-                            start: y.dataInicio,
-                            end: this.addHours(y.dataFim, 1),
-                            data: y,
-                        }))
-                    })),
-                    scrollTime: '08:00',
-                    eventStartEditable: false,
-                    eventDurationEditable: false,
-                    handleWindowResize: false,
-                    buttonText: {
-                        today: 'hoje',
-                        year: 'mês',
-                        month: 'mês',
-                        week: 'semana',
-                        day: 'dia',
-                        list: 'lista'
-                    },
-                    dayCellClassNames: (renderProps: DayCellContentArg) => {
-                        console.log(renderProps)
-                        if (this.selectedEvent && moment(renderProps.date).format('DD/MM/YYYY') == moment(this.selectedEvent?.dataInicio).format('DD/MM/YYYY')) {
-                            return ['selected'];
-                        }
-                        return [''];
-                    },
-                    eventClassNames: (e: EventContentArg) => {
-                        if (this.selectedEvent && e.event.extendedProps['data'].id == this.selectedEvent?.id) {
-                            return ['selected'];
-                        }
-                        return [''];
-                    },
-                    droppable: true,
-                    eventsSet: this.events.bind(this),
-                    eventClick: this.eventClick.bind(this),
-                });
-                console.log('calendar', this.calendar)
-                this.calendar.render();
-                this.calendar.updateSize()
-            })
-    }
-
-    eventClick(e: EventClickArg) {
-        var item = e.event.extendedProps['data'] as Aulas_List;
-
-        this.selectedEvent = item;
-        this.calendar.select(e)
-        this.calendar.render();
-        // this.confirmationService.confirm({
-        //     target: e.jsEvent.target as EventTarget,
-        //     message: `Agendar reposição para o dia ${moment(item.dataInicio).format('DD/MM/YYYY')} às ${moment(item.dataInicio).format('HH:mm')}`,
-        //     header: 'Confirmação',
-        //     icon: 'pi pi-exclamation-triangle',
-        //     acceptLabel: `Selecionar data`,
-        //     acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-        //     rejectLabel: 'Cancelar',
-        //     rejectButtonStyleClass: 'p-button-text p-button-sm',
-        //     accept: () => {
-
-
-        //     },
-        // });
-
-    }
-
     events(events: EventApi[]) {
         this.currentEvents.set(events);
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
 
+    eventClick(e: EventClickArg) {
+
+    }
 
 
 }

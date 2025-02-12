@@ -1,0 +1,115 @@
+<!-- <div class="bg"></div> -->
+
+<!-- <drag-scroll #dragScroll
+             [style]="{
+       width: width ? width + 'px' : '100%',
+       height: 'unset',
+       overflowY: 'visible',
+       cursor: 'pointer'
+     }"
+             (dragStart)="scrollDragStart(dragScroll)"
+             (dragEnd)="scrollDragEnd(dragScroll)"
+             class="w-full "
+             cdkDropListGroup>
+    <div class="flex p-4 pt-0 gap-2 align-items-start">
+        <div *ngFor="let checklist of checklists"
+             cdkDropListGroup
+             id="dragContainer"
+             class="p-2 bg-transparent w-20rem border-round-md ">
+            <p-tag [value]="checklist.nome"
+            severity="contrast"
+                   styleClass="white-space-normal text-center surface-700"
+                   class="mb-2 sticky top-0" />
+            <div class="flex flex-column gap-2">
+                <div *ngFor="let item of checklist.items"
+                     class="surface-50 p-3 w-full flex flex-column border-round-lg shadow-1">
+                    <span [pTooltip]="item.nome"
+                          class="bg-primary-200  mb-2 flex w-17rem border-round-md px-3 py-1">
+                        <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{item.nome}} </span>
+                    </span>
+                    <div class="flex flex-column gap-2 overflow-auto">
+                        <div *ngFor="let aluno of item.alunos"
+                                 class="p-2 bg-white border-round-md shadow-1 cursor-pointer">
+                                <div class="flex align-items-center">
+                                    <div class="border-circle border-2 border-200 w-3rem h-3rem flex overflow-hidden mr-2">
+                                        <img *ngIf="aluno.aluno.foto" [src]="aluno.aluno.foto" class="">
+                                        <i *ngIf="!aluno.aluno.foto" class="pi pi-user m-auto text-primary-500"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex align-items-center justify-content-between">
+                                            <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis">{{aluno.aluno.nome}}</span>
+                                        </div>
+                                        <span class="flex mx-auto w-full mt-1">
+                                            <i class="pi pi-paperclip text-xs font-light text-400  mr-1"></i>
+                                            <span class="text-xs font-light text-400 line-height-1">2</span>
+                                        </span>
+                                    </div>
+                                    <p-tag size="small" [value]="aluno.status" class="ml-auto"
+                                           [severity]="aluno.status == 'Em Andamento' ? 'success' : 'danger' "
+                                           class="ml-2 my-auto flex align-items-center h-full"
+                                           styleClass="white-space-nowrap text-xs font-light my-auto flex {{aluno.status == 'Em Andamento' ? 'bg-green-200' : 'bg-red-200'}}" />
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</drag-scroll> -->
+<!-- <div class="flex flex-column justify-content-start align-items-start flex-wrap gap-3 overflow-y-auto" style="font-size: 10px">
+    <div *ngFor="let checklist of checklists"
+         class="border-round-md w-full flex flex-column justify-content-start align-items-start ">
+        <drag-scroll #dragScroll
+                     [style]="{
+                        width: width ? width + 'px' : '100%',
+                        height: 'unset',
+                        overflowY: 'visible',
+                        cursor: 'pointer'
+                        }"
+                     (dragStart)="scrollDragStart(dragScroll)"
+                     (dragEnd)="scrollDragEnd(dragScroll)"
+                     [scrollbar-hidden]="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)"
+                     class="w-full "
+                     cdkDropListGroup>
+            <div class="px-2 py-2">
+                <p-tag [value]="checklist.nome"
+                       severity="contrast"
+                       styleClass="white-space-normal text-center surface-700 flex-none"
+                       class="mb-2 sticky left-0 flex-none" />
+                <div class="flex gap-2 ">
+                    <div *ngFor="let item of checklist.items"
+                         class="surface-50 shadow-1 p-2 w-18rem border-round-lg flex-none">
+                        <span [pTooltip]="item.nome"
+                              class="bg-primary-200 mb-2 flex w-17rem border-round-md px-3 py-1">
+                            <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{item.nome}} </span>
+                        </span>
+                        <div class="flex flex-column gap-2 pb-2 pt-0 ">
+                            <div *ngFor="let aluno of item.alunos"
+                                 class="p-2 bg-white border-round-md shadow-1 cursor-pointer">
+                                <div class="flex">
+                                    <div class="border-circle border-1 border-100 w-3rem h-3rem flex overflow-hidden mr-2">
+                                        <img *ngIf="aluno.aluno.foto" [src]="aluno.aluno.foto" class="">
+                                        <i *ngIf="!aluno.aluno.foto" class="pi pi-user m-auto"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex align-items-center justify-content-between">
+                                            <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis">{{aluno.aluno.nome}}</span>
+                                            <p-tag size="small" [value]="aluno.status" class="ml-auto"
+                                                   [severity]="aluno.status == 'Em Andamento' ? 'success' : 'danger' "
+                                                   class="ml-2"
+                                                   styleClass="white-space-nowrap text-xs font-light {{aluno.status == 'Em Andamento' ? 'bg-green-200' : 'bg-red-200'}}" />
+                                        </div>
+                                        <span class="flex mx-auto w-full mt-1">
+                                            <i class="pi pi-paperclip text-xs font-light text-400  mr-1"></i>
+                                            <span class="text-xs font-light text-400 line-height-1">2</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </drag-scroll>
+    </div>
+</div> -->

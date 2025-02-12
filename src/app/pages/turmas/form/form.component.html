@@ -1,10 +1,50 @@
+<p-confirmDialog />
+
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+          
+          <ng-template #header>
+            <div class="w-full flex align-items-center ">
+                <span class="p-dialog-title">{{isEditPage ? 'Editar'  : 'Cadastrar'}}</span>
+                <p-button class="ml-auto"
+                          type="button"
+                          icon="pi pi-exclamation-circle"
+                          size="large"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="secondary"
+                          (onClick)="op.toggle($event)"  />
+                <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                    <div class="px-2">
+                        <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                        <table class="w-full">
+                            <tr>
+                                <td class="p-1"><b>Cadastrado em</b></td>
+                                <td class="p-1 pl-3 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                            </tr>
+                            <tr *ngIf="object.account_Created">
+                                <td class="p-1"><b>Cadastrado por</b></td>
+                                <td class="p-1 pl-3 text-right">{{ object.account_Created }}</td>
+                            </tr>
+                            <tr *ngIf="object.lastUpdated">
+                                <td class="p-1"><b>Última atualização</b></td>
+                                <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                            </tr>
+                            <tr *ngIf="object.deactivated">
+                                <td class="p-1"><b>Inativo em</b></td>
+                                <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </p-popover>
+            </div>
+        </ng-template>
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <div class="field sm:col-8 col-12"> <!-- Nome -->

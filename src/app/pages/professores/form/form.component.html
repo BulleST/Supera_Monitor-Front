@@ -1,10 +1,48 @@
+<p-confirmDialog />
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
+            <p-button class="ml-auto"
+                      type="button"
+                      icon="pi pi-exclamation-circle"
+                      size="large"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="secondary"
+                      (onClick)="op.toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                <div class="px-2">
+                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                    <table class="w-full">
+                        <tr>
+                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Cadastrado em</td>
+                            <td class="py-2 px-3 surface-800 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.account_Created">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Cadastrado por</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{ object.account_Created }}</td>
+                        </tr>
+                        <tr *ngIf="object.lastUpdated">
+                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Última atualização</td>
+                            <td class="py-2 px-3 surface-800 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.deactivated">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Inativo em</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </p-popover>
+        </div>
+    </ng-template>
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <ng-template [ngIf]="!isEditPage">
@@ -84,25 +122,33 @@
                 </div>
             </div>
             <div class="field sm:col-8 col-12"> <!-- E-mail -->
-                <label for="email">E-mail: <span class="text-red-500">*</span> <small *ngIf="!isEditPage">(Não é possível alterar o e-mail após o primeiro cadastro)</small></label>
-                <input type="email"
-                       [email]="true"
-                       pInputText
-                       #email="ngModel"
-                       [(ngModel)]="object.email"
-                       id="email"
-                       name="email"
-                       class="w-full"
-                       [required]="true"
-                       [pattern]="emailPattern"
-                       placeholder="example@gmail.com"
-                       [readonly]="isEditPage || accountsSelected != undefined"
-                       [disabled]="isEditPage || accountsSelected != undefined">
-                <div *ngIf="email.touched && email.invalid && email.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
-                </div>
+                <label for="email">E-mail: <span class="text-red-500" *ngIf="!isEditPage && !accountsSelected">* <small class="text-black">(Não é possível alterar o e-mail após o primeiro cadastro)</small></span> </label>
+                <ng-template [ngIf]="!isEditPage && !accountsSelected">
+                    <input type="email"
+                           [email]="true"
+                           pInputText
+                           #email="ngModel"
+                           [(ngModel)]="object.email"
+                           id="email"
+                           name="email"
+                           class="w-full"
+                           [required]="true"
+                           [pattern]="emailPattern"
+                           placeholder="example@gmail.com">
+                    <div *ngIf="email.touched && email.invalid && email.errors">
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+                    </div>
+                </ng-template>
+                <ng-template [ngIf]="isEditPage || accountsSelected">
+                    <input type="email"
+                           pInputText
+                           [value]="object.email"
+                           id="email"
+                           class="w-full"
+                           readonly>
+                </ng-template>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Data de Início -->
                 <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
@@ -138,7 +184,8 @@
                           optionValue="id"
                           [showClear]="true"
                           [checkmark]="true"
-                          appendTo="body" />
+                          appendTo="body"
+                          [required]="true" />
                 <div *ngIf="professor_NivelAbaco_Id.touched && professor_NivelAbaco_Id.invalid && professor_NivelAbaco_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAbaco_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -157,25 +204,32 @@
                           optionValue="id"
                           [showClear]="true"
                           [checkmark]="true"
-                          appendTo="body" />
+                          appendTo="body"
+                          [required]="true" />
                 <div *ngIf="professor_NivelAH_Id.touched && professor_NivelAH_Id.invalid && professor_NivelAH_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAH_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12 "> <!-- Legenda -->
                 <div>
-                    <label for="color">Legenda: <span class="text-red-500">*</span></label>
-                    <p-colorpicker
-                                   #color="ngModel"
-                                   [(ngModel)]="object.color"
-                                   inputId="color"
-                                   name="color"
-                                   appendTo="body"
-                                   styleClass="ml-2" />
+                    <label for="corLegenda">Legenda: <span class="text-red-500">*</span></label>
+                    <div class="flex align-items-center my-3 mt-2 -ml-2">
+                        <p-colorpicker
+                                       #corLegenda="ngModel"
+                                       [(ngModel)]="object.corLegenda"
+                                       inputId="corLegenda"
+                                       name="corLegenda"
+                                       appendTo="body"
+                                       styleClass="ml-2"
+                                       [required]="true"
+                                       value="#ffffff" />
+                        <span class="ml-2">{{object.corLegenda}}</span>
+                        <span class="ml-2" *ngIf="!object.corLegenda">Selecione uma cor</span>
+                    </div>
                 </div>
-                <small class="">Esse campo representa a cor utilizada para o professor na visão do calendário de aulas.</small>
-                <div *ngIf="color.touched && color.invalid && color.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="color.errors['required']">Esse campo é obrigatório.</p>
+                <span class="flex align-items-center text-sm"><i class="pi pi-exclamation-circle mr-2"></i> Obs.: Esse campo representa a cor utilizada para o professor na visão do calendário de aulas.</span>
+                <div *ngIf="corLegenda.touched && corLegenda.invalid && corLegenda.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="corLegenda.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
         </div>

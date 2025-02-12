@@ -4,7 +4,7 @@ import { AccountService } from '../../services/account.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { getError } from '../../utils';
-import { Account } from '../../models/account.model';
+import { AccountResponse } from '../../models/account.model';
 
 @Component({
     selector: 'app-profile',
@@ -14,7 +14,7 @@ import { Account } from '../../models/account.model';
 })
 export class ProfileComponent implements OnDestroy {
     @Input() visible = false;
-    object: Account = new Account;
+    object: AccountResponse = new AccountResponse;
     error: string = '';
     subscription: Subscription[] = [];
     loading = false;
@@ -57,7 +57,7 @@ export class ProfileComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })

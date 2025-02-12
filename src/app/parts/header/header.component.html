@@ -2,34 +2,10 @@
     <p-menubar [model]="items"
                styleClass="bg-primary-500 border-none shadow-1 border-noround"
                #menuBig>
-               <ng-template pTemplate="start">
-                   <div class="ml-4 mr-4 flex align-items-center">
-                       <!-- <p-button (onClick)="toggleAside()" pRipple [raised]="true" [rounded]="true" icon="pi pi-bars"></p-button> -->
-                       <img src="assets/images/logo-supera-white.png" class="ml-4 w-7rem my-2" />
-                   </div>
-               </ng-template>
-        <!-- <ng-template pTemplate="end">
-            <div class="flex align-items-center">
-                <p-button [text]="true"
-                          [rounded]="true"
-                          styleClass="ml-4 mr-2 p-0 focus:shadow-none active:shadow-none "
-                          (onClick)="menu.toggle($event)">
-                    <p-avatar [label]="accountAbreviacao"
-                              styleClass="bg-primary text-primary-contrast text-xs mr-2"
-                              size="large"
-                              shape="circle"/>
-                    <span class="font-medium">{{accountName}}</span>
-                    <p-avatar icon="bi bi-caret-down-fill"
-                              styleClass="bg-transparent"></p-avatar>
-                </p-button>
-                <p-menu #menu
-                        [model]="headerItem"
-                        [popup]="true"></p-menu>
+        <ng-template pTemplate="start">
+            <div class="ml-4 mr-4 flex align-items-center">
+                <img src="assets/images/logo-supera-white.png" class="ml-4 w-6rem my-1" />
             </div>
-        </ng-template> -->
+        </ng-template>
     </p-menubar>
 </header>
-
-<app-profile  style="position: relative; z-index: 1;"></app-profile>
-
-<app-change-password style="position: relative; z-index: 2;"></app-change-password>

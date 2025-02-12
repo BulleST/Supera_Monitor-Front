@@ -19,17 +19,13 @@ export class RequestInterceptor implements HttpInterceptor {
         "accounts/reset-password",
         "accounts/forgot-password",
         "accounts/revoke-token",
-        "document",
-        "tag",
-        "can-approve",
     ];
 
     excludeUrlsToastrError = [
-        "can-approve",
     ]
 
     excludeUrlsLoading = [
-        // "account/refresh-token",
+        "account/refresh-token",
     ];
 
 
@@ -135,9 +131,6 @@ export class RequestInterceptor implements HttpInterceptor {
                 finalize(() => {
                     if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
                         if (notLoading.length == 0) {
-
-                            // console.log('block', block);
-
                             this.loadingService.loading.next(false);
                             this.loadingService.removeLoadingRequest();
                         }

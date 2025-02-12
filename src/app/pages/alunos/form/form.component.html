@@ -1,11 +1,13 @@
+<p-confirmDialog />
+
 <p-dialog [header]="'Dados do Aluno'"
           [modal]="true"
           [maximizable]="true"
           [draggable]="true"
-          icon
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '1100px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '1100px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">Dados do Aluno</span>
@@ -16,30 +18,30 @@
                       [text]="true"
                       [rounded]="true"
                       severity="secondary"
-                      (onClick)="toggle($event)" />
-            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white w-20rem">
+                      (onClick)="op.toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white  min-w-w-20rem">
                 <div class="px-2">
                     <h3 class="text-xl mb-2">Informações Adicionais</h3>
                     <table class="w-full">
                         <tr>
-                            <td><b>Cadastrado em</b></td>
-                            <td class="text-right">{{object.dataCadastro | date : 'dd/MM/YYYY'}}</td>
+                            <td class="p-1"><b>Cadastrado em</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.dataCadastro | date : 'dd/MM/YYYY'}}</td>
                         </tr>
                         <tr *ngIf="object.aspNetUsers_Created">
-                            <td><b>Cadastrado por</b></td>
-                            <td class="text-right">{{ object.aspNetUsers_Created }}</td>
+                            <td class="p-1"><b>Cadastrado por</b></td>
+                            <td class="p-1 pl-3 text-right">{{ object.aspNetUsers_Created }}</td>
                         </tr>
                         <tr>
-                            <td><b>Data de Entrada</b></td>
-                            <td class="text-right">{{object.dataEntrada | date : 'dd/MM/YYYY'}}</td>
+                            <td class="p-1"><b>Data de Entrada</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.dataEntrada | date : 'dd/MM/YYYY'}}</td>
                         </tr>
                         <tr *ngIf="object.lastUpdated">
-                            <td><b>Última atualização</b></td>
-                            <td class="text-right">{{object.lastUpdated | date : 'dd/MM/YYYY'}}</td>
+                            <td class="p-1"><b>Última atualização</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/YYYY'}}</td>
                         </tr>
                         <tr *ngIf="object.deactivated">
-                            <td><b>Inativo em</b></td>
-                            <td class="text-right">{{object.deactivated | date : 'dd/MM/YYYY'}}</td>
+                            <td class="p-1"><b>Inativo em</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/YYYY'}}</td>
                         </tr>
                     </table>
                 </div>

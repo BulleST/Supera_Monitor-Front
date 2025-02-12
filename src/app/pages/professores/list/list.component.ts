@@ -1,12 +1,10 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faKey, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
-import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Professor, professorColumns } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
@@ -82,7 +80,10 @@ export class ListComponent implements OnDestroy {
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen text-orange-500',
-                command: () => this.edit(item)
+                command: () => {
+                    var encrypted = this.crypto.encrypt(item.id);
+                    this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+                }
             },
             {
                 label: item.active ? 'Desabilitar' : 'Habilitar',
@@ -93,7 +94,17 @@ export class ListComponent implements OnDestroy {
                 label: 'Resetar Senha',
                 icon: 'fa-solid fa-key text-grey-400',
                 command: (event: any) => this.resetPassword(event, item)
-            }
+            },
+            { separator: true },
+            {
+                label: 'Calendário de aulas',
+                icon: 'fa-solid fa-calendar',
+                command: () => {
+                    var encrypted = this.crypto.encrypt(item.id);
+                    this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
+                }
+            },
+
 
         ];
     }
@@ -114,11 +125,6 @@ export class ListComponent implements OnDestroy {
 
     unselectItems() {
         this.tableSelectedItem = undefined;
-    }
-
-    edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 
     deactivated(e: any, item: any) {
@@ -190,7 +196,7 @@ export class ListComponent implements OnDestroy {
             message: message,
             header: 'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         });

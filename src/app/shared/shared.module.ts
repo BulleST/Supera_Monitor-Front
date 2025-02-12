@@ -10,6 +10,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { TranslateModule } from '@ngx-translate/core';
+import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
 
 @NgModule({
     declarations: [
@@ -27,6 +28,8 @@ import { TranslateModule } from '@ngx-translate/core';
         ProfileComponent,
         ChangePasswordComponent,
         DragDropModule,
+        DragScrollComponent, 
+        DragScrollItemDirective
     ],
     imports: [
         CommonModule,
@@ -38,7 +41,9 @@ import { TranslateModule } from '@ngx-translate/core';
         FormsModule,
         NgxMaskPipe,
         TranslateModule,
-        DragDropModule
+        DragDropModule,
+        DragScrollComponent, 
+        DragScrollItemDirective
     ],
     providers: [
         provideHttpClient(withFetch()),

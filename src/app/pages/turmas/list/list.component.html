@@ -1,7 +1,7 @@
 <p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
 <p-confirmDialog />
 <p-toast />
-<div class="px-3 pb-4">
+<div class="px-3 pb-4 bg-white">
     <p-table
              #dt
              [value]="list"
@@ -49,7 +49,11 @@
         <ng-template pTemplate="header">
             <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
                 <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
-                <th class="surface-900 py-0 border-none text-white white-space-nowrap" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
+                <th *ngFor="let col of tableColumns" [pSortableColumn]="col.field"
+                class="surface-900 py-0 border-none text-white white-space-nowrap" 
+                [style]="{ 
+                    width: col.options && col.options.width ? col.options.width : ''
+                }">
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
                         <ng-template [ngIf]="col.filterType != FilterType.none">
@@ -74,7 +78,10 @@
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="rowIndex"
                     class="border-none white-space-nowrap"
-                    [class.w-6rem]="col.displayType == DisplayType.options">
+                    [style]="{ 
+                        width: col.options && col.options.width ? col.options.width : ''
+                    }"
+                   >
                     <ng-template [ngIf]="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; 
                             context: { 
@@ -84,7 +91,7 @@
                         </ng-container>
                         <ng-template #tag let-item="item" let-option="option">
                             <p-tag *ngIf="option"
-                                   styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   styleClass="font-normal"
                                    [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
                                    [value]="option.label"
                                    [severity]="option.severity ? option.severity : 'secondary'"
@@ -108,6 +115,7 @@
             <ng-container *ngIf="tableLoading; else elseTemplate">
                 <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
+                    <td  class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>
             <ng-template #elseTemplate>

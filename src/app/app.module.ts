@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { BrowserModule } from '@angular/platform-browser';
@@ -17,8 +17,13 @@ import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { LoadingService } from './parts/loading/loading';
 import { SharedModule } from './shared/shared.module';
 import { MyPreset } from '../mytheme';
-import Material from '@primeng/themes/material'
 import { AppRoutingModule } from './app.routing';
+
+import { registerLocaleData } from '@angular/common';
+import localeBr  from '@angular/common/locales/pt';
+
+registerLocaleData(localeBr , 'pt-BR');
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -32,6 +37,7 @@ import { AppRoutingModule } from './app.routing';
         SharedModule,
     ],
     providers: [
+        { provide: LOCALE_ID, useValue: "pt-BR" }, 
         provideNgxMask(),
         provideEnvironmentNgxMask(),
         provideHttpClient(withFetch()),

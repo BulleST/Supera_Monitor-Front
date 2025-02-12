@@ -4,14 +4,15 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
     <div class="formgrid grid">
         <div class="field sm:col-6 col-12">
             <label for="professor">Professor: </label>
             <p-iconfield>
                 <input type="text"
                        pInputText
-                       [value]="object.professor.nome"
+                       [value]="object.professor"
                        styleClass="w-full"
                        class="w-full"
                        id="professor"
@@ -38,7 +39,7 @@
                 <p-inputicon styleClass="pi pi-calendar" />
                 <input type="text"
                        pInputText
-                       [value]="object.dataInicio | date : 'dd/MM/yyyy'"
+                       [value]="object.data | date : 'dd/MM/yyyy'"
                        styleClass="w-full"
                        class="w-full"
                        id="professor"
@@ -50,7 +51,7 @@
             <p-iconfield>
                 <input type="text"
                        pInputText
-                       [value]="object.dataInicio | date : 'HH:mm'"
+                       [value]="object.data | date : 'HH:mm'"
                        styleClass="w-full"
                        class="w-full"
                        id="professor"
@@ -63,7 +64,7 @@
         </div> -->
         <div class="field sm:col-4 col-12"> <!-- Horário -->
             <label for="dataFim">Fim:</label>
-            <p-iconfield>
+            <!-- <p-iconfield>
                 <input type="text"
                        pInputText
                        [value]="object.dataFim | date : 'HH:mm'"
@@ -72,20 +73,20 @@
                        id="professor"
                        readonly />
                 <p-inputicon styleClass="pi pi-clock" />
-            </p-iconfield>
+            </p-iconfield> -->
         </div>
         <div class="field col-12">
             <p-popover #op (onHide)="selectedAluno = undefined">
                 <ng-template #content>
                     <div *ngIf="selectedAluno" class="flex pr-4">
                         <div class="relative flex align-items-center justify-content-center border-circle border-1 border-color-500 w-13rem h-13rem ">
-                            <i class="pi pi-user text-xl" *ngIf="!selectedAluno.foto"></i>
+                            <!-- <i class="pi pi-user text-xl" *ngIf="!selectedAluno.foto"></i>
                             <img *ngIf="selectedAluno.foto"
                                  class=" border-circle"
                                  [src]="selectedAluno.foto"
                                  [alt]="selectedAluno.nome" />
                             <p-badge *ngIf="selectedAluno.flagNovo" value="Aula 1" class="absolute top-0 left-50 -ml-4 -mt-2" />
-                            <p-badge *ngIf="selectedAluno.flagReposicao" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" />
+                            <p-badge *ngIf="selectedAluno.flagReposicao" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" /> -->
 
                         </div>
                         <div class="py-4 mx-2">
@@ -93,16 +94,16 @@
                         </div>
                         <div class="pt-4 flex flex-column ">
                             <div class="flex align-items-center justify-content-between mt-1">
-                                <p class="text-lg font-medium mb-0">{{ selectedAluno.nome }}</p>
+                                <p class="text-lg font-medium mb-0">{{ selectedAluno.aluno }}</p>
                                 <a class="text-primary link -mr-2" [routerLink]="['home', 'alunos']" >Ver dados<i class="pi pi-user-edit ml-2"></i></a>
                             </div>
                             <p class="text-lg font-medium mt-1 mb-0"><b>Turma: </b>{{ selectedAluno.turma }} </p>
-                            <p class="text-lg font-medium mt-1 mb-0"><b>Apostila: </b>{{ selectedAluno.apostila }} / <b>Página: </b>{{ selectedAluno.pagina }}</p>
+                            <!-- <p class="text-lg font-medium mt-1 mb-0"><b>Apostila: </b>{{ selectedAluno.apostila }} / <b>Página: </b>{{ selectedAluno.pagina }}</p> -->
                             <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.presente != undefined">{{ selectedAluno.presente }}</p>
-                            <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.dataNascimento"><b>Data de Nascimento:</b> {{ selectedAluno.dataNascimento | date : 'dd/MM/yyyy' }}</p>
+                            <!-- <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.dataNascimento"><b>Data de Nascimento:</b> {{ selectedAluno.dataNascimento | date : 'dd/MM/yyyy' }}</p> -->
                             <div class=" mt-3">
                                 <p-button [routerLink]="['../../', 'reposicao']"
-                                    [label]=" selectedAluno.flagReposicao ? 'Reagendar reposição' : 'Agendar reposição'"
+                                    [label]=" selectedAluno.reposicao ? 'Reagendar reposição' : 'Agendar reposição'"
                                     size="small"
                                     [rounded]="true"
                                     icon="pi pi-calendar"

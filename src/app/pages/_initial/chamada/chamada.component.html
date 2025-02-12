@@ -4,7 +4,8 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }">
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
     <form #form="ngForm">
         <!--  (ngSubmit)="send(form, $event)" -->
         <div class="formgrid grid">
@@ -12,7 +13,7 @@
                 <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
-                          [(ngModel)]="object.professor.id"
+                          [(ngModel)]="object.professor_Id"
                           #professor_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
@@ -49,7 +50,7 @@
                 <label for="dataInicio">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
-                              [(ngModel)]="object.dataInicio"
+                              [(ngModel)]="object.data"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               inputId="dataInicio"
@@ -64,7 +65,7 @@
             <div class="field sm:col-3 col-12"> <!-- Horário -->
                 <label for="dataInicio">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker
-                              [(ngModel)]="object.dataInicio"
+                              [(ngModel)]="object.data"
                               #dataInicio="ngModel"
                               styleClass="w-full"
                               class="w-full"

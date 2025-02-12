@@ -1,27 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
 import { MessageService } from 'primeng/api';
 import { Professor, Professor_NivelApostila, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
 import { Map } from '../utils/map';
+import moment from 'moment';
+import { Service } from '../helpers/service.service';
 
 @Injectable({
     providedIn: 'root',
-
 })
-export class ProfessorService {
-    url = '';
-    list = new BehaviorSubject<Professor[]>([]);
-
-    constructor(
-        private http: HttpClient,
-        private messageService: MessageService,
-    ) {
-        this.url = environment.url + 'back';
-    }
-
+export class ProfessorService extends Service {
+    override list = new BehaviorSubject<Professor[]>([]);
 
     getNivelAbaco() {
         return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/abaco/all`)
@@ -54,17 +46,19 @@ export class ProfessorService {
             }));
     }
 
-    get(id: number) {
+    async get(id: number) {
+        if (this.list.value.length == 0) 
+            await lastValueFrom(this.getList());
+
         return new Observable<Professor>((observer => {
             var item = this.list.value.find(x => x.id == id) as Professor;
-            item.dataInicio = new Date(item.dataInicio);
-
+            if(item.dataInicio)
+                item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD'))
             if (item)
                 observer.next(item);
             else
                 observer.error('Professor não encontrado.')
             observer.complete();
-            return;
         }))
         // return this.http.get<Professor>(`${this.url}/professor/${id}`)
         //     .pipe(tap({
@@ -85,7 +79,7 @@ export class ProfessorService {
     }
 
     edit(model: Professor) {
-        var request = Map(model, new ProfessorCreateRequest);
+        var request = Map(model, new ProfessorEditRequest);
         return this.http.put<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {

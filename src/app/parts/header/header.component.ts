@@ -8,7 +8,7 @@ import { ThemeService } from '../../utils/theme';
 import { Menubar } from 'primeng/menubar';
 import { AccountService } from '../../services/account.service';
 import { Role } from '../../models/account-perfil.model';
-import { Account } from '../../models/account.model';
+import { AccountResponse } from '../../models/account.model';
 
 @Component({
     selector: 'app-header',
@@ -22,7 +22,7 @@ export class HeaderComponent implements OnDestroy {
   items: MenuItem[] = [];
   headerItem: MenuItem[] = [];
   subscription: Subscription[] = [];
-  account?: Account;
+  account?: AccountResponse;
   Role: typeof Role = Role;
   accountName = 'Noemi C. Almeida';
   accountAbreviacao = 'NC';

@@ -14,7 +14,7 @@ export class LoadingComponent implements OnDestroy, OnChanges {
   loading = false;
   loadingRequest: boolean[] = [];
   subscription: Subscription[] = [];
-  message: string = '';
+  message?: string;
 
   constructor(
     private loadingUtils: LoadingService,

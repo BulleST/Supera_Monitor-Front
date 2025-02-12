@@ -1,8 +1,16 @@
-<div class="loading" [class.active]="loading || loadingRequest.length > 0 || loadingInitial == true">
+<!-- <div class="loading" [class.active]="loading || loadingRequest.length > 0 || loadingInitial == true">
     <div class="mr-2 w-full flex align-items-center justify-center">
         <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
     </div>
     <br>
     <p *ngIf="!message">Loading</p>
     <p *ngIf="message" class="message w-100 text-center" [innerHTML]="message"></p>
+</div> -->
+
+<div *ngIf="loading" class="fixed bottom-0 " >
+    <div class="flex align-items-center justify-content-end mb-4 ml-4">
+        <i class="pi pi-spin pi-spinner mr-2" style="font-size: 1.5rem"></i>
+        <span class="">{{ message ?? 'Carregando' }}</span>
+    </div>
+    <p-progressbar mode="indeterminate" styleClass="fixed bottom-0 w-full" [style]="{ height: '6px' }" />
 </div>

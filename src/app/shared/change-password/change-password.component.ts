@@ -5,7 +5,7 @@ import { AccountService } from '../../services/account.service';
 import { ConfirmationService } from 'primeng/api';
 import { NgForm } from '@angular/forms';
 import { getError } from '../../utils';
-import { Account } from './../../models/account.model';
+import { AccountResponse } from './../../models/account.model';
 
 @Component({
     selector: 'app-change-password',
@@ -15,7 +15,7 @@ import { Account } from './../../models/account.model';
 })
 export class ChangePasswordComponent implements OnDestroy {
     @Input() visible = false;
-    account: Account = new Account;
+    account: AccountResponse = new AccountResponse;
     object: ChangePassword = new ChangePassword
     error: string = '';
     subscription: Subscription[] = [];
@@ -53,7 +53,7 @@ export class ChangePasswordComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
@@ -77,7 +77,7 @@ export class ChangePasswordComponent implements OnDestroy {
                     header: 'Success',
                     icon: 'pi pi-check-circle text-2xl -mr-2 text-green-400',
                    
-                    acceptLabel: 'Ok',
+                    acceptLabel: 'OK',
                     acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
                     rejectVisible: false,
                 })

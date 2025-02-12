@@ -50,9 +50,15 @@
                             <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
                             <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" style="font-size: 2rem"></i>
                         </div>
-                        <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0">
-                        </div>
-                        <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
+                        <ng-template [ngIf]="!object.aluno_Foto">
+                            <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
+                            <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
+                        </ng-template>
+                        <ng-template [ngIf]="object.aluno_Foto">
+                            <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                                 [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + object.aluno_Foto + ')' }">
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
             </ng-template>
@@ -82,8 +88,8 @@
                               [(ngModel)]="object.dataNascimento"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
-                                [minDate]="minDate"
-                                [maxDate]="maxDate"
+                              [minDate]="minDate"
+                              [maxDate]="maxDate"
                               inputId="dataNascimento"
                               name="dataNascimento"
                               class="w-full"
@@ -96,8 +102,16 @@
                 </div>
             </div>
             <div class="field md:col-3 sm:col-6 col-12"> <!-- Data da Matrícula -->
-                <label for="created">Data da Matrícula: <span class="text-red-500">*</span></label>
-                <p-datepicker
+                <label for="created">Data da Matrícula: <!-- <span class="text-red-500">*</span> -->
+                </label>
+                <input type="text"
+                       pInputText
+                       [value]="object.created | date : 'dd/MM/yyyy'"
+                       id="created"
+                       name="created"
+                       class="w-full"
+                       readonly>
+                <!-- <p-datepicker
                               #created="ngModel"
                               [(ngModel)]="object.created"
                               [minDate]="minDate"
@@ -113,7 +127,7 @@
                               appendTo="body" />
                 <div *ngIf="created.touched && created.invalid && created.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="created.errors['required']">Esse campo é obrigatório.</p>
-                </div>
+                </div> -->
             </div>
             <!-- RG -->
             <!-- <div class="field lg:col-3 sm:col-3 col-12"> 
@@ -156,7 +170,7 @@
                              [(ngModel)]="object.telefone"
                              mask="(99) 9999-9999"
                              placeholder="(99) 9999-9999"
-                             [autoClear]="true" 
+                             [autoClear]="true"
                              id="telefone"
                              name="telefone"
                              class="w-full"
@@ -173,7 +187,7 @@
                              [(ngModel)]="object.celular"
                              mask="(99) 9.9999-9999"
                              placeholder="(99) 9.9999-9999"
-                             [autoClear]="true" 
+                             [autoClear]="true"
                              id="celular"
                              name="celular"
                              class="w-full"
@@ -220,7 +234,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-8 sm:col-6 col-12"> <!-- Endereço -->
+            <div class="field sm:col-8 col-12"> <!-- Endereço -->
                 <label for="endereco">Endereço: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -234,25 +248,25 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Turma -->
+            <div class="field sm:col-6 col-12"> <!-- Turma -->
                 <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
                 <p-select
-                        [options]="turmas"
-                        [(ngModel)]="selectedTurma"
-                        [loading]="loadingTurmas"
-                        #turma_Id="ngModel"
-                        styleClass="w-full"
-                        class="w-full"
-                        name="turma_Id"
-                        inputId="turma_Id"
-                        optionLabel="nome"
-                        [showClear]="true"
-                        [checkmark]="true"
-                        [filter]="true"
-                        filterBy="nome"
-                        appendTo="body"
-                        optionDisabled="deactivated"
-                        (ngModelChange)="turmaChanged()">
+                          [options]="turmas"
+                          [(ngModel)]="selectedTurma"
+                          [loading]="loadingTurmas"
+                          #turma_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="turma_Id"
+                          inputId="turma_Id"
+                          optionLabel="nome"
+                          [showClear]="true"
+                          [checkmark]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          (ngModelChange)="turmaChanged()">
                     <!-- <ng-template #selectedItem let-selectedOption>
                         <span *ngIf="selectedOption">{{ selectedOption.name }} </span>
                     </ng-template> -->
@@ -263,10 +277,10 @@
                                 <p class="text-sm">{{ item.professor }}</p>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                                [value]="item.active ? 'Ativo': 'Inativo'"
-                                [severity]="item.active ? 'success': 'danger'"
-                                [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                         </div>
                     </ng-template>
                 </p-select>
@@ -274,35 +288,55 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-3 col-12"> <!-- Professor -->
+            <div class="field sm:col-6 col-12"> <!-- Professor -->
                 <label for="professor">Professor: </label>
                 <input type="text"
-                    pInputText
-                    [value]="object.professor"
-                    id="professor"
-                    name="professor"
-                    class="w-full"
-                    readonly>
+                       pInputText
+                       [value]="object.professor"
+                       id="professor"
+                       name="professor"
+                       class="w-full"
+                       readonly>
             </div>
-            <div class="field sm:col-3 col-12"> <!-- Apostila -->
-                <label for="professor">Apostila: </label>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Apostila Ábaco -->
+                <label for="apostilaAbaco">Apostila Ábaco: </label>
                 <input type="text"
-                    pInputText
-                    [value]="object.professor"
-                    id="professor"
-                    name="professor"
-                    class="w-full"
-                    readonly>
+                       pInputText
+                       [value]="object.apostilaAbaco"
+                       id="apostilaAbaco"
+                       name="apostilaAbaco"
+                       class="w-full"
+                       readonly>
             </div>
-            <div class="field sm:col-2 col-12"> <!-- Página -->
-                <label for="professor">Página: </label>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Página -->
+                <label for="numeroPaginaAbaco">Página: </label>
                 <input type="text"
-                    pInputText
-                    [value]="object.professor"
-                    id="professor"
-                    name="professor"
-                    class="w-full"
-                    readonly>
+                       pInputText
+                       [value]="object.numeroPaginaAbaco"
+                       id="numeroPaginaAbaco"
+                       name="numeroPaginaAbaco"
+                       class="w-full"
+                       readonly>
+            </div>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Apostila AH -->
+                <label for="ah">Apostila AH: </label>
+                <input type="text"
+                       pInputText
+                       [value]="object.ah"
+                       id="ah"
+                       name="ah"
+                       class="w-full"
+                       readonly>
+            </div>
+            <div class="field md:col-3 sm:col-6 col-12"> <!-- Página -->
+                <label for="numeroPaginaAH">Página: </label>
+                <input type="text"
+                       pInputText
+                       [value]="object.numeroPaginaAH"
+                       id="numeroPaginaAH"
+                       name="numeroPaginaAH"
+                       class="w-full"
+                       readonly>
             </div>
             <!-- Faixa Etária -->
             <!-- <div class="field sm:col-4 col-12"> 
@@ -326,7 +360,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_FaixaEtaria_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div> -->
-           <!-- Geração -->
+            <!-- Geração -->
             <!-- <div class="field sm:col-4 col-12"> 
                 <label for="pessoa_Geracao_Id">Geração: <span class="text-red-500">*</span></label>
                 <p-select

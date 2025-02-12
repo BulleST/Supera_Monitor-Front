@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { MobileService } from './utils';
 
 @Component({
     selector: 'app-root',
@@ -9,5 +10,14 @@ import { ConfirmationService, MessageService } from 'primeng/api';
     providers: [MessageService]
 })
 export class AppComponent {
-  title = 'Supera - PED4U';
+    title = 'Supera - PED4U';
+
+    constructor(private mobile: MobileService) {
+
+    }
+
+    @HostListener('window:resize', ['$event'])
+    resize() {
+        this.mobile.set();
+    }
 }

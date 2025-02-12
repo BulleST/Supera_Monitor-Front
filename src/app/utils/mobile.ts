@@ -1,4 +1,4 @@
-import { Injectable, Injector, afterNextRender, inject } from "@angular/core";
+import { HostListener, Injectable, Injector, afterNextRender, inject } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import $ from 'jquery';
 // declare var $:any 
@@ -12,12 +12,9 @@ export class MobileService {
     injector = inject(Injector);
 
     constructor() {
-        // afterNextRender({ read: () => this.set() },
-        //     { injector: this.injector }
-        // );
         this.set();
     }
-
+    @HostListener('window:resize', ['$event'])
     set() {
         try {
             var width: number = $(window).width() ?? 0;

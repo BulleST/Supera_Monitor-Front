@@ -1,3 +1,4 @@
+import { Service } from "../helpers/service.service";
 
 export function remove(service: any, objeto: any, property = 'list') {
     var list = JSON.parse(JSON.stringify(service[property].value)) as any[];
@@ -6,8 +7,9 @@ export function remove(service: any, objeto: any, property = 'list') {
     service[property].next(list);
 }
 
-export function insertOrReplace(service: any, object: any, property = 'list') {
-    var list = JSON.parse(JSON.stringify(service[property].value)) as any[];
+export function insertOrReplace(service: Service, object: any, property = 'list') {
+   try {
+    var list = JSON.parse(JSON.stringify(service.list.value)) as any[];
     if (object.id) {
         var index = list.findIndex(x => x.id == object.id);
         if (index == -1) {
@@ -17,5 +19,9 @@ export function insertOrReplace(service: any, object: any, property = 'list') {
     } else {
         list.push(object);
     }
-    service[property].next(list);
+    service.list.next(list);
+   }
+   catch(e) {
+    console.error(e)
+   }
 }

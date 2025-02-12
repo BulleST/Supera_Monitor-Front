@@ -1,28 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { AccountRole } from '../models/account-perfil.model';
 import { environment } from '../../environments/environment.prod';
 import { MessageService } from 'primeng/api';
-import { Account, Account_List } from '../models/account.model';
+import { AccountResponse, Account, AccountRequest } from '../models/account.model';
+import { Map } from '../utils/map';
+import { Service } from '../helpers/service.service';
 
 @Injectable({
     providedIn: 'root',
 
 })
-export class UserService {
-    url = '';
-    list = new BehaviorSubject<Account_List[]>([]);
-    objeto = new BehaviorSubject<Account | undefined>(undefined);
-
-    constructor(
-        private http: HttpClient,
-        private messageService: MessageService,
-    ) {
-        this.url = environment.url + 'back';
-    }
-
+export class UserService extends Service {
+    override list = new BehaviorSubject<Account[]>([]);
+  
     getRoles() {
         return this.http.get<AccountRole[]>(`${this.url}/users/roles`)
             .pipe(tap({
@@ -33,7 +26,7 @@ export class UserService {
     }
 
     getList() {
-        return this.http.get<Account_List[]>(`${this.url}/users/all/`)
+        return this.http.get<Account[]>(`${this.url}/users/all/`)
             .pipe(tap({
                 next: list => {
                     this.list.next(list);
@@ -46,15 +39,19 @@ export class UserService {
     }
 
     get(id: number) {
-        return this.http.get<Account>(`${this.url}/users/${id}`)
-            .pipe(tap({
-                error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar usuário', life: 3000 });
-                }
+            return new Observable<Account>((observer => {
+                var item = this.list.value.find(x => x.id == id) as Account;
+                if (item) 
+                    observer.next(item);
+                else 
+                    observer.error('Usuários não encontrado.')
+                observer.complete();
+                return;
             }));
     }
 
-    create(request: Account) {
+    create(model: Account) {
+        var request = Map(model, new AccountRequest)
         return this.http.post<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
@@ -63,7 +60,8 @@ export class UserService {
             }));
     }
 
-    edit(request: Account) {
+    edit(model: Account) {
+        var request = Map(model, new AccountRequest)
         return this.http.put<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {

@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { Header } from '../../utils/header';
 import { faCalendar, faHome, faLocationDot, faMapPin, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines, } from '@fortawesome/free-solid-svg-icons';
 import { AccountService } from '../../services/account.service';
+import { RouterLinkActive } from '@angular/router';
+import { AccountResponse } from '../../models/account.model';
 
 @Component({
     selector: 'app-nav-menu',
@@ -21,6 +23,11 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     treeNodes: TreeNode[] = [];
     loading = false;
     selectedNode: any;
+
+    accountName = 'Noemi C. Almeida';
+    accountAbreviacao = 'NC';
+    account?: AccountResponse;
+
     @ViewChild('sidebar') sidebar!: Sidebar;
     @ViewChild('cm') cm!: ContextMenu;
     treeMenu: MenuItem[] = [
@@ -44,17 +51,21 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
                 label: 'Home',
                 items: [
                     {
-                        label: 'Dashboard',
-                        tooltip: 'Dashboard',
-                        iconFontawesome: faHome
-                    },
-                    {
                         label: 'Calendário de Aulas',
                         tooltip: 'Calendário de Aulas',
                         iconFontawesome: faCalendar,
-                        routerLink: '/home'
-                        // icon: 'bi bi-calendar-week'
-                    }
+                        routerLink: '/home',
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
+                    },
+                    {
+                        label: 'Monitoramento de Checklist',
+                        tooltip: 'Monitoramento de Checklist',
+                        iconFontawesome: faHome,
+                        routerLink: '/checklist',
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
+                    },
                 ]
             },
             {
@@ -64,66 +75,51 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
                         label: 'Professores',
                         tooltip: 'Professores',
                         iconFontawesome: faPersonChalkboard,
-                        routerLink: ['professores']
+                        routerLink: ['professores'],
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
                     },
                     {
                         label: 'Alunos',
                         tooltip: 'Alunos',
                         iconFontawesome: faUserGraduate,
-                        routerLink: ['alunos']
+                        routerLink: ['alunos'],
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
                     },
                     {
                         label: 'Turmas',
                         tooltip: 'Turmas',
                         iconFontawesome: faUsersBetweenLines,
-                        // iconImage: 'icon-turma.png',
-                        routerLink: ['turmas']
+                        routerLink: ['turmas'],
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
                     },
-                    // {
-                    //     label: 'Salas de Aula',
-                    //     tooltip: 'Salas de Aula',
-                    //     // iconFontawesome: faLocationDot,
-                    //     icon: 'bi bi-pin-map-fill',
-                    //     // iconImage: 'icon-turma.png',
-                    //     routerLink: ['turmas']
-                    // },
                     {
                         label: 'Usuários',
                         tooltip: 'Usuários',
                         iconFontawesome: faUsers,
-                        routerLink: ['usuarios']
+                        routerLink: ['usuarios'],
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
                     },
 
                 ]
             },
             {
-                label: 'Minha conta',
-                // items: [
-                //     {
-                //         label: 'Configurações',
-                //         icon: 'pi pi-cog',
-                //         // shortcut: '⌘+O'
-                //     },
-                //     {
-                //         label: 'Notificações',
-                //         icon: 'pi pi-inbox',
-                //         badge: '2'
-                //     },
-                //     {
-                //         label: 'Sair',
-                //         icon: 'pi pi-sign-out',
-                //         // shortcut: '⌘+Q'
-                //     }
-                // ]
+                label: 'Minha conta'
             },
         ];
 
-        // this.menuOpen = this.header.menuAsideOpen.value;
-        // var open = this.header.menuAsideOpen.subscribe(res => {
-        //     this.menuOpen = res;
-        //     this.setWidth();
-        // });
-        // this.subscription.push(open);
+        var account = this.accountService.account.subscribe(account => {
+            this.account = account;
+            var array = account?.name.split(' ') as string[];
+            this.accountName = array[0] ?? '';
+            this.accountAbreviacao = array[0][0].toUpperCase();
+            if (array.length > 1)
+                this.accountAbreviacao += array[array.length - 1][0].toUpperCase();
+        });
+        this.subscription.push(account);
     }
 
     ngOnDestroy(): void {

@@ -15,6 +15,7 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
+import { DataViewModule } from 'primeng/dataview';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { DragDropModule } from 'primeng/dragdrop';
@@ -67,7 +68,8 @@ import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { PopoverModule } from 'primeng/popover';
-import { ConfirmationService, FilterMatchMode /*, PrimeNGConfig */ } from 'primeng/api';
+import { ConfirmationService, FilterMatchMode, /*, PrimeNGConfig */ 
+MessageService} from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -90,6 +92,7 @@ import { SelectModule } from 'primeng/select';
         ConfirmPopupModule,
         ContextMenuModule,
         DatePickerModule,
+        DataViewModule,
         DialogModule,
         DividerModule,
         DragDropModule,
@@ -162,6 +165,7 @@ import { SelectModule } from 'primeng/select';
         ConfirmPopupModule,
         ContextMenuModule,
         DatePickerModule,
+        DataViewModule,
         DialogModule,
         DividerModule,
         DragDropModule,
@@ -219,6 +223,7 @@ import { SelectModule } from 'primeng/select';
     ],
     providers: [
         ConfirmationService,
+        MessageService
     ]
 })
 export class PrimengModule {

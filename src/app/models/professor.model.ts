@@ -13,7 +13,7 @@ export class Professor extends Basic_List {
     account_Id: number = 0;
     role_Id: number = 0;
     role: string = '';
-    color: string = '';
+    corLegenda: string = '';
 }
 
 export class ProfessorCreateRequest {
@@ -23,15 +23,18 @@ export class ProfessorCreateRequest {
     dataInicio: Date = new Date;
     professor_NivelAbaco_Id: number = undefined as unknown as number;
     professor_NivelAH_Id: number = undefined as unknown as number;
-    color: string = '';
+    corLegenda: string = '';
 }
 export class ProfessorEditRequest {
+    id: number = 0;
+    account_Id: number = 0;
     nome: string = '';
     telefone: string = '';
     dataInicio: Date = new Date;
     professor_NivelAbaco_Id: number = undefined as unknown as number;
     professor_NivelAH_Id: number = undefined as unknown as number;
-    color: string = '';
+    corLegenda: string = '';
+
 }
 
 export class Professor_NivelApostila {

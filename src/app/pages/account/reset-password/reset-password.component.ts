@@ -56,7 +56,7 @@ export class ResetPasswordComponent {
                         header: 'Erro',
                         icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
                         rejectVisible: false,
-                        acceptLabel: 'Ok',
+                        acceptLabel: 'OK',
                         acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
                     })
                 }

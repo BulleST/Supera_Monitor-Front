@@ -5,9 +5,9 @@ export class AccountRole {
 }
 
 export enum Role {
-    Admin = 1,
-    Master = 2,
-    Consultant = 3,
+    Admin = 3,
+    Teacher = 2,
+    Assistant = 3,
 }
 
 export var roles: AccountRole[] = [

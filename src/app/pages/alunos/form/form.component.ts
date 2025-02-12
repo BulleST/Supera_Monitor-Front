@@ -11,6 +11,7 @@ import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { PrimeNG } from 'primeng/config';
 import { Turma } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -23,7 +24,7 @@ import { TurmaService } from '../../../services/turma.service';
 export class FormComponent implements OnDestroy {
     visible: boolean = true;
     injector = inject(Injector);
-    object = new Aluno;
+    object: Aluno = new Aluno;
     loading = false;
     error: string = '';
     isEditPage = false;
@@ -40,7 +41,7 @@ export class FormComponent implements OnDestroy {
         private service: AlunoService,
         private confirmationService: ConfirmationService,
     ) {
-     
+
         this.loadPage();
     }
 
@@ -79,15 +80,6 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    toggle(event: MouseEvent) {
-        this.op.toggle(event);
-        if (this.op.overlayVisible)
-        {
-            setTimeout(() => {
-                this.op.align();
-            }, 300);
-        }
-    }
     showError(message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
@@ -95,7 +87,7 @@ export class FormComponent implements OnDestroy {
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
 
-            acceptLabel: 'Ok',
+            acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
@@ -120,8 +112,8 @@ export class FormComponent implements OnDestroy {
                     this.showError(this.error, e);
                 }
             })
-            .catch(res => {
-                this.error = getError(res);
+            .catch((res: HttpErrorResponse) => {
+                this.error = res.error.message;
                 this.loading = false;
                 this.showError(this.error, e);
             })
