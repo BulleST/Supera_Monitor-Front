@@ -4,13 +4,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { Aluno, Pessoa_FaixaEtaria, Pessoa_Geracao, Pessoa_Sexo } from '../../../models/alunos.model';
+import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Popover } from 'primeng/popover';
-import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-import { PrimeNG } from 'primeng/config';
-import { Turma } from '../../../models/turma.model';
-import { TurmaService } from '../../../services/turma.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
@@ -30,8 +26,6 @@ export class FormComponent implements OnDestroy {
     isEditPage = false;
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
-
-
 
     constructor(
         private router: Router,
@@ -57,7 +51,7 @@ export class FormComponent implements OnDestroy {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
 
-                lastValueFrom(this.service.get(id))
+                this.service.get(id)
                     .then(res => {
                         this.object = res;
                         this.loading = false;
@@ -86,7 +80,6 @@ export class FormComponent implements OnDestroy {
             message: message,
             header: 'Error',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,

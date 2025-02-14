@@ -20,18 +20,22 @@ export class LoadingComponent implements OnDestroy, OnChanges {
     private loadingUtils: LoadingService,
   ) {
 
-
-
-
-
-
     var loading = this.loadingUtils.loading.subscribe(async res => {
-        this.loading = res;
+        if (this.loadingRequest.length > 0) {
+            this.loading = true
+        } else {
+            this.loading = res;
+        }
     });
     this.subscription.push(loading);
 
     var loadingRequests = this.loadingUtils.loadingRequest.subscribe(res => {
         this.loadingRequest = res;
+        if (this.loadingRequest.length > 0) {
+            this.loading = true
+        } else {
+            this.loading = false;
+        }
     });
     this.subscription.push(loadingRequests);
 

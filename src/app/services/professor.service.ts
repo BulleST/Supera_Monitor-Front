@@ -23,7 +23,7 @@ export class ProfessorService extends Service {
                 }
             }));
     }
-    
+
     getNivelAH() {
         return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/ah/all`)
             .pipe(tap({
@@ -46,26 +46,20 @@ export class ProfessorService extends Service {
             }));
     }
 
-    async get(id: number) {
-        if (this.list.value.length == 0) 
-            await lastValueFrom(this.getList());
+    get(id: number) {
+        return new Promise<Professor>(async (resolve, reject) => {
+            if (this.list.value.length == 0)
+                await lastValueFrom(this.getList());
 
-        return new Observable<Professor>((observer => {
             var item = this.list.value.find(x => x.id == id) as Professor;
-            if(item.dataInicio)
-                item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD'))
-            if (item)
-                observer.next(item);
-            else
-                observer.error('Professor não encontrado.')
-            observer.complete();
-        }))
-        // return this.http.get<Professor>(`${this.url}/professor/${id}`)
-        //     .pipe(tap({
-        //         error: err => {
-        //             this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar aluno', life: 3000 });
-        //         }
-        //     }));
+            if (!item)
+                reject('Professor não encontrado.')
+
+            if (item.dataInicio)
+                item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD[T]HH:mm:ss'))
+
+            return resolve(item);
+        })
     }
 
     create(model: Professor) {

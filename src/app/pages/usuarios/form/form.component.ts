@@ -27,7 +27,7 @@ export class FormComponent implements OnDestroy {
     emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     subscription: Subscription[] = [];
     account?: AccountResponse;
-Role: typeof Role = Role;
+    Role: typeof Role = Role;
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -58,12 +58,10 @@ Role: typeof Role = Role;
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
-                
-                lastValueFrom(this.service.get(id))
+
+                this.service.get(id)
                     .then(res => {
                         this.object = res;
-                        if ( account && account?.role_Id < this.object.role_Id) {
-                        }
                         this.loading = false;
                         this.visible = true;
                     })
@@ -83,9 +81,9 @@ Role: typeof Role = Role;
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
-    
+
     showError(message: string, e: any) {
-         this.confirmationService.confirm({
+        this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Error',
@@ -110,9 +108,9 @@ Role: typeof Role = Role;
                 this.loading = false;
                 if (res.success) {
                     insertOrReplace(this.service, res.object);
-                    this.visible = false; 
+                    this.visible = false;
                     this.visibleChange();
-                } 
+                }
                 else {
                     this.error = res.message;
                     this.showError(this.error, e);

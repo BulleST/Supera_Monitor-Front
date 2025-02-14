@@ -4,7 +4,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { Turma,  Turma_Tipo } from '../../../models/turma.model';
+import { Turma, Turma_Tipo } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import { Professor } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
@@ -52,18 +52,18 @@ export class FormComponent implements OnDestroy {
 
         this.loadPage();
         lastValueFrom(this.service.getTipos())
-        .then(res => {
-            this.loadingTurmaTipo = false;
-            this.tipos = res
-        })
-        .catch(res => this.loadingTurmaTipo = false);
+            .then(res => {
+                this.loadingTurmaTipo = false;
+                this.tipos = res
+            })
+            .catch(res => this.loadingTurmaTipo = false);
 
         lastValueFrom(this.professorService.getList())
-        .then(res => {
-            this.loadingProfessores = false;
-            this.professores = res.sort((x,y) => Number(x.deactivated) - Number( y.deactivated))
-        })
-        .catch(res => this.loadingProfessores = false);
+            .then(res => {
+                this.loadingProfessores = false;
+                this.professores = res.sort((x, y) => Number(x.deactivated) - Number(y.deactivated))
+            })
+            .catch(res => this.loadingProfessores = false);
     }
 
     ngOnDestroy(): void {
@@ -78,9 +78,9 @@ export class FormComponent implements OnDestroy {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
 
-                lastValueFrom(this.service.get(id))
+                this.service.get(id)
                     .then(res => {
-                        this.object = JSON.parse(JSON.stringify(res));
+                        this.object = res;
                         this.object.horario = this.toDate(res.horario.toString());
                         this.loading = false;
                         this.visible = true;
@@ -96,7 +96,7 @@ export class FormComponent implements OnDestroy {
     }
 
     toDate(horario: string) {
-        var stringDate = new Date(2025, 1, 1).toISOString().substring(0,10) + 'T' + horario;
+        var stringDate = new Date(2025, 1, 1).toISOString().substring(0, 10) + 'T' + horario;
         return new Date(stringDate);
 
     }
@@ -109,7 +109,7 @@ export class FormComponent implements OnDestroy {
     }
 
     showError(message: string, e: any) {
-         this.confirmationService.confirm({
+        this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Error',
@@ -140,11 +140,11 @@ export class FormComponent implements OnDestroy {
                     this.showError(this.error, e);
                 }
             })
-                        .catch((res: HttpErrorResponse) => {
-                            this.error = res.error.message;
-                            this.loading = false;
-                            this.showError(this.error, e);
-                        })
+            .catch((res: HttpErrorResponse) => {
+                this.error = res.error.message;
+                this.loading = false;
+                this.showError(this.error, e);
+            })
     }
 
     request() {

@@ -26,39 +26,18 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     selectedTurma?: Turma;
     turmas: Turma[] = [];
     loadingTurmas = true;
-
-    faixaEtarias: Pessoa_FaixaEtaria[] = [];
-    loadingFaixaEtarias = true;
-
-    geracoes: Pessoa_Geracao[] = [];
-    loadingGeracoes = true;
-
     sexos: Pessoa_Sexo[] = [];
     loadingSexos = true;
 
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
 
-    // fileBase64: string = ''
     constructor(
 
         private service: AlunoService,
         private turmaService: TurmaService,
     ) {
-        lastValueFrom(this.service.getFaixaEtaria())
-            .then(res => {
-                this.faixaEtarias = res;
-                this.loadingFaixaEtarias = false;
-            })
-            .catch(res => this.loadingFaixaEtarias = false);
-
-        lastValueFrom(this.service.getGeracao())
-            .then(res => {
-                this.geracoes = res;
-                this.loadingGeracoes = false;
-            })
-            .catch(res => this.loadingGeracoes = false);
-
+      
         lastValueFrom(this.service.getSexo())
             .then(res => {
                 this.sexos = res;
@@ -131,6 +110,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 };
             };
         })
+        console.log(this.object)
         this.object.aluno_Foto = base64;
         this.loadingFile = false;
     }
@@ -150,78 +130,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    /**async onSelectedFiles(event: FileSelectEvent) {
-        this.loadingFile = true;
-        var file = event.files[0];
-        
-        var options = {
-            maxSizeMB: 1,
-            maxWidthOrHeight: 500,
-            useWebWorker: true,
-        }
-        const compressedFile = await imageCompression(file, options);
-        const arrayBuffer = await compressedFile.arrayBuffer();
-        const bytes1 = new Uint8Array(arrayBuffer);
-        this.arrayBufferToBase64(new Uint8Array(bytes1));
-        console.log('bytes1', bytes1)
-        var base64 = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(event.currentFiles[0]);
-            reader.onloadend = () => {
-                const base64data = reader.result as string;
-
-                let img = document.createElement("img");
-                img.src = base64data;
-                img.onload = (e: any) => {
-
-                    const WIDTH = 500;
-                    let canvas = document.createElement("canvas");
-                    let ratio = WIDTH / e.target.width;
-
-                    canvas.width = WIDTH;
-                    canvas.height = e.target.height * ratio;
-                    // context is where the canvas references to know what data to render
-                    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
-                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    // here we specify the quality, which is the second argument in .toDataUrl(...) | here the output should be 50% the quality of the original, lowering the detail and file size
-                    let newImageUrl = context.canvas.toDataURL("image/jpg", 50); // quality ranges 1-100
-
-                    resolve(newImageUrl);
-                };
-            };
-        })
-
-        const bytes = this.base64ToArrayBuffer(base64)
-        this.object.aluno_Foto = bytes;
-        console.log(bytes)
-        this.fileBase64 = base64
-        this.loadingFile = false;
-    }
-
-    arrayBufferToBase64( buffer: Uint8Array ) {
-        this.loadingFile = true;
-        var binary = '';
-        var bytes = new Uint8Array( buffer );
-        var len = bytes.byteLength;
-        for (var i = 0; i < len; i++) {
-            binary += String.fromCharCode( bytes[ i ] );
-        }
-        var base64 = window.btoa( binary )
-        this.fileBase64 = 'data:image/jpeg;base64,'+ base64;
-        this.loadingFile = false;
-        return base64;
-    }
-    
-    base64ToArrayBuffer(base64: string) {
-        var binaryString = atob(base64.split(',')[1]);
-        var bytes = new Uint8Array(binaryString.length);
-        for (var i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-        return new Uint8Array(bytes.buffer);
-    }
- */
     turmaChanged() {
         if (this.selectedTurma) {
             this.object.turma = this.selectedTurma.nome;

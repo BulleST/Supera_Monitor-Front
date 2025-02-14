@@ -10,54 +10,55 @@ export class AlunoRequest {
     endereco: string = '';
     observacao: string = '';
     turma_Id: number = 0
-    pessoa_Sexo_Id: number = 0
-    aluno_Foto?: string;
+    pessoa_Sexo_Id: number = 0;
+    aluno_Foto: string = '';
+    apostila_Kit_Id?: number;
 }
 
 export class Aluno {
     id: number = 0
     pessoa_Id: number = 0
     nome: string = '';
-    dataCadastro: Date = new Date;
-    dataEntrada: Date = new Date;
     dataNascimento: Date = new Date;
-    // cpf: string = '';
-    // rg: string = '';
     celular: string = '';
     telefone: string = '';
     email: string = '';
-    endereco: string = '';
     observacao: string = '';
+    endereco: string = '';
     unidade_Id: number = 0
+    aluno_Foto: string = '';
+
     turma_Id: number = 0
     turma: string = '';
-    aluno_Foto?: string;
+
     professor_Id: number = 0
     professor: string = '';
-    // pessoa_FaixaEtaria_Id?: number;
-    // pessoa_FaixaEtaria: string = '';
-    // pessoa_Geracao_Id?: number;
-    // pessoa_Geracao: string = '';
-    // pessoa_Indicou_Id?: number;
-    // pessoa_Indicou: string = '';
-    // pessoa_Origem_Canal_Id?: number;
-    // pessoa_Origem_Canal: string = '';
-    // pessoa_Origem_Id?: number;
-    // pessoa_Origem: string = '';
+
     pessoa_Sexo_Id?: number;
     pessoa_Sexo: string = '';
-    // pessoa_Status_Id?: number;
-    // pessoa_Status: string = '';
-    active: boolean = false;
+
     created: Date = new Date;
     lastUpdated?: Date;
     deactivated?: Date;
+    active: boolean = false;
+
     aspNetUsers_Created_Id?: number;
     aspNetUsers_Created: string = '';
-    apostilaAbaco?: string;
-    ah?: string;
-    numeroPaginaAbaco?: string;
-    numeroPaginaAH?: string;
+
+    apostila_Abaco_Id?: number;
+    apostila_AH_Id?: number;
+    
+    apostila_Abaco?: string;
+    apostila_AH?: string;
+    
+    numeroPaginaAH?: number;
+    numeroPaginaAbaco?: number;
+    
+    apostila_Abaco_Kit_Id?: number;
+    apostila_AH_Kit_Id?: number;
+    
+    kit?: string;
+    apostila_Kit_Id?: number;
 }
 
 export interface Pessoa_DropDown {

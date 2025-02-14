@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment.prod';
 import { MessageService } from 'primeng/api';
@@ -24,7 +24,7 @@ export class TurmaService extends Service {
                 }
             }));
     }
-    
+
     getList() {
         return this.http.get<Turma[]>(`${this.url}/turmas/all/`)
             .pipe(tap({
@@ -39,15 +39,16 @@ export class TurmaService extends Service {
     }
 
     get(id: number) {
-        return new Observable<Turma>((observer => {
+        return new Promise<Turma>(async (resolve, reject) => {
+            if (this.list.value.length == 0)
+                await lastValueFrom(this.getList());
+
             var item = this.list.value.find(x => x.id == id) as Turma;
-            if (item) 
-                observer.next(item);
-            else 
-                observer.error('Turma não encontrada.')
-            observer.complete();
-            return;
-        }))
+            if (!item)
+                reject('Turma não encontrada.')
+
+            return resolve(item);
+        })
     }
 
     create(model: Turma) {

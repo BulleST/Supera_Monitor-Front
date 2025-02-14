@@ -24,7 +24,6 @@ export class Crypto {
 
 	decrypt(data: any) {
 		try {
-            console.log(data)
             if (!data) {
                 return null;
             }
@@ -32,7 +31,6 @@ export class Crypto {
                 data = data.replace('slash', '/'); // Reaplicando as barras para decryptar
             }
 			const bytes = CryptoJS.AES.decrypt(data, this.encryptSecretKey);
-            console.log(bytes, bytes.toString())
 			if (bytes.toString(CryptoJS.enc.Utf8)) {
 				return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 			}

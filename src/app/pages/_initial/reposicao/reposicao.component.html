@@ -4,8 +4,9 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
-          appendTo="body">
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
    
           <ng-template #header>
             <div class="w-full flex align-items-center ">
@@ -13,17 +14,17 @@
             </div>
         </ng-template>
     <div class="formgrid grid">
-        <div class="field md:col-4 sm:col-6 col-12">
+        <div class="field col-12">
             <label for="aluno">Aluno:</label>
             <input type="text"
                        pInputText
-                       [value]="aluno.nome"
+                       [value]="object.aluno"
                        id="nome"
                        name="nome"
                        class="w-full"
                        readonly>
         </div>
-        <div class="field md:col-4 sm:col-6 col-12">
+        <div class="field sm:col-4 col-6">
             <label for="turma">Turma:</label>
             <input type="text"
                        pInputText
@@ -33,7 +34,7 @@
                        class="w-full"
                        readonly>
         </div>
-        <div class="field md:col-4 sm:col-6 col-12">
+        <div class="field sm:col-4 col-6">
             <label for="professor">Professor:</label>
             <input type="text"
                        pInputText
@@ -43,24 +44,84 @@
                        class="w-full"
                        readonly>
         </div>
+        <div class="field sm:col-4 col-12">
+            <label for="faixaetaria">Faixa Etária:</label>
+            <input type="text"
+                       pInputText
+                       [value]="object.source_Turma_Tipo"
+                       id="faixaetaria"
+                       name="faixaetaria"
+                       class="w-full"
+                       readonly>
+        </div>
         <div class="field sm:col-12 col-12">
-            <label for="professor" class="-mb-4">Selecione uma aula disponível: </label>
+            <div class="flex align-items-center justify-content-between">
+                <label for="professor" class="-mb-1">Selecione uma aula disponível: </label>
+                <p-button class="ml-auto"
+                type="button"
+                icon="pi pi-exclamation-circle"
+                size="large"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                styleClass="ml-auto"
+                class="ml-auto"
+                (onClick)="op.toggle($event)"  />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white max-w-20rem">
+                <div class="px-2">
+                    <h3 class="text-base mb-2">Regras para agendar reposição: </h3>
+                    <ul>
+                        <li class="mb-2 white-space-normal">
+                            <i class="fa-solid fa-check text-green-500 mr-2 text-xs border-2 border-green-500 border-circle p-1" style="width: 18px; height: 18px;" ></i>
+                            <span>A reposição deve ser agendada entre turmas de mesma faixa etária</span>
+                        </li>
+                        <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
+                        <li class="mb-2 white-space-normal">
+                            <i class="fa-solid fa-check text-green-500 mr-2 text-xs border-2 border-green-500 border-circle p-1" style="width: 18px; height: 18px;" ></i>
+                            <span>A reposição deve ser agendada para até 30 dias da aula</span>
+                        </li>
+                    </ul>
+                </div>
+            </p-popover>
+            </div>
             <div class="">
-                <full-calendar [options]="calendarOptions" #calendar  ></full-calendar>
+                <div class="relative">
+                    <full-calendar [options]="calendarioOptions" #fullCalendar class="relative z-0">
+                        <ng-template #eventContent let-arg>
+                            <div *ngIf="true" 
+                                class="cursor-pointer w-full overflow-hidden p-1 border-round-sm  flex flex-column "
+                                 [ngStyle]="{
+                                    backgroundColor: arg.event.extendedProps.data.corLegenda,
+                                    border: selectedAula && selectedAula.id == arg.event.id ? '2px red solid' : '' ,
+                                }">
+                                <div class="flex align-items-center">
+                                    <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data.data | date : 'HH:mm'}}</span>
+                                    <span class="text-xs overflow-hidden text-white text-overflow-ellipsis w-12rem white-space-nowrap">{{ arg.event.title }}</span>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </full-calendar>
+                </div>
+                <div class="flex" *ngIf="!loading">
+                    <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+                        <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
+                            <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.backgroundColor }"></div>
+                            <span class="ml-2">{{item.label}}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
             <div class="sm:col-9 col-12">
-                <!-- <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p> -->
-                <!-- <p class="text-red-500" *ngIf="error">{{error}}</p> -->
             </div>
             <div class="ml-auto">
                 <p-button
-                          type="submit"
+                          (onClick)="confirmaReposicao($event)"
                           class="w-full"
                           styleClass="w-full px-3"
                           label="Agendar"
-                          icon="pi pi-check"
+                          [icon]="'pi pi-check'"
                           iconPos="right"
                           [loading]="loading"
                           [rounded]="true"
@@ -69,5 +130,9 @@
         </div>
     </div>
 </p-dialog>
-<p-confirmDialog />
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
 <p-toast />

@@ -180,7 +180,7 @@
 }
 
 html {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 body {
@@ -292,6 +292,11 @@ body {
     background-color: var(--surface-50) !important;
 }
 
+.fc-daygrid-body, .fc-daygrid-body table {
+    width: 100% !important;
+}
+
+
 .fc .fc-button-primary {
     background-color: var(--p-button-secondary-background);
     border-color: var(--p-button-secondary-border-color);
@@ -318,7 +323,8 @@ body {
 }
 
 .fc .fc-toolbar-title {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+    text-align: left;
 }
 
 .fc-event.selected,
@@ -393,12 +399,12 @@ body {
         width: 100% !important;
     }
 }
-.fc .fc-toolbar {
+/* .fc .fc-toolbar {
     display: flex!important;
     gap: 15px;
     flex-flow: wrap;
-}
-
+} */
+/* 
 .fc-toolbar-chunk {
     display: flex;
 }
@@ -412,13 +418,13 @@ body {
     flex: 1 0 auto;
 }
 .fc-toolbar-chunk .fc-button-group:nth-child(3) {
-    /* margin: 0 auto */
+    margin: 0 auto
     justify-content: flex-end!important
     
-}
+} */
 .fc-button-group {
     /* display: flex!important; */
-    width: 100%;
+    /* width: 100%; */
     /* justify-content: center; */
     /* align-items: center; */
 }
@@ -428,20 +434,35 @@ body {
 }
 
 .fc .fc-button {
-    display: flex;
-    flex: 0 0 auto!important;
+    /* display: flex; */
+    /* flex: 0 0 auto!important; */
     /* align-items: center; */
     /* justify-content: center; */
 }
 
 .fc-today-button  {
-    margin-right: auto!important;
+    /* margin-right: auto!important; */
     
 }
+
+.fc-button {
+    padding-block: 10px;
+    padding-inline: 10px;
+    font-size: 1rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 .fc-timeGridWeek-button {
-    margin-left: auto!important;
+    /* margin-left: auto!important; */
     
 }
 .p-popover:after, .p-popover:before {
     display: none;
+}
+.fc .fc-multimonth-title {
+    padding: 0px 0!important;
+    background-color: var(--surface-800)!important;
+    font-weight: 700;
+    color: #fff;
 }

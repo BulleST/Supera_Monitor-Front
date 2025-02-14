@@ -36,7 +36,7 @@ export class FormComponent implements OnDestroy {
     loadingNivelAbaco = true;
     nivelAH: Professor_NivelApostila[] = [];
     loadingNivelAH = true;
-    
+
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
 
@@ -50,25 +50,25 @@ export class FormComponent implements OnDestroy {
     ) {
 
         lastValueFrom(this.service.getNivelAbaco())
-        .then(res => {
-            this.nivelAbaco = res;
-            this.loadingNivelAbaco = false;
-        })
-        .catch(res => this.loadingNivelAbaco = false);
+            .then(res => {
+                this.nivelAbaco = res;
+                this.loadingNivelAbaco = false;
+            })
+            .catch(res => this.loadingNivelAbaco = false);
 
         lastValueFrom(this.service.getNivelAH())
-        .then(res => {
-            this.nivelAH = res;
-            this.loadingNivelAH = false;
-        })
-        .catch(res => this.loadingNivelAH = false);
+            .then(res => {
+                this.nivelAH = res;
+                this.loadingNivelAH = false;
+            })
+            .catch(res => this.loadingNivelAH = false);
 
         lastValueFrom(this.userService.getList())
-        .then(res => {
-            this.accounts = res;
-            this.loadingAccounts = false;
-        })
-        .catch(res => this.loadingAccounts = false)
+            .then(res => {
+                this.accounts = res;
+                this.loadingAccounts = false;
+            })
+            .catch(res => this.loadingAccounts = false)
 
         this.loadPage();
     }
@@ -83,8 +83,8 @@ export class FormComponent implements OnDestroy {
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
-                
-                lastValueFrom(await this.service.get(id))
+
+                this.service.get(id)
                     .then(res => {
                         this.object = res;
                         this.loading = false;
@@ -120,9 +120,9 @@ export class FormComponent implements OnDestroy {
             this.object.telefone = '';
         }
     }
-    
+
     showError(message: string, e: any) {
-         this.confirmationService.confirm({
+        this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Error',
@@ -140,14 +140,14 @@ export class FormComponent implements OnDestroy {
         }
         this.loading = true;
 
-       this.request()
+        this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
                     insertOrReplace(this.service, res.object);
-                    this.visible = false; 
+                    this.visible = false;
                     this.visibleChange();
-                } 
+                }
                 else {
                     this.error = res.message;
                     this.showError(this.error, e);

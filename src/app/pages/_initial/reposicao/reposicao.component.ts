@@ -1,26 +1,20 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Crypto } from '../../../utils';
-import { Calendar, CalendarOptions, DayCellContentArg, EventApi, EventClickArg, EventContentArg } from '@fullcalendar/core';
-// import { Aulas_List, Calendario } from '../../../models/aulas.model';
+import { CalendarOptions, DatesSetArg, EventApi, EventClickArg } from '@fullcalendar/core';
 import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
-import $ from 'jquery';
-import interactionPlugin, { DateClickArg, Draggable } from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import listPlugin from '@fullcalendar/list';
-import { VerboseFormattingArg } from '@fullcalendar/core/internal';
-import { CalendarioList } from '../../../models/calendario.model';
+import { CalendarioList, CalendarioRequest } from '../../../models/calendario.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno } from '../../../models/alunos.model';
 import { Reposicao, ReposicaoRequest } from '../../../models/reposicao.model';
-import { Turma } from '../../../models/turma.model';
-import { TurmaService } from '../../../services/turma.service';
-
+import { FullCalendarComponent } from '@fullcalendar/angular';
+import { EventImpl } from '@fullcalendar/core/internal';
+import { AulaCreateRequest } from '../../../models/aulas.model';
 
 @Component({
     selector: 'app-reposicao',
@@ -35,105 +29,108 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     loading = false;
     error: string = '';
     subscription: Subscription[] = [];
+    legenda: { backgroundColor: string, label: string }[] = [];
+    request: CalendarioRequest = new CalendarioRequest;
 
+    @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
+    selectedAula?: EventImpl;
     calendarVisible = signal(true);
     currentEvents = signal<EventApi[]>([]);
-    calendario: CalendarioList[] = []
-    calendarOptions: CalendarOptions = {
-        initialView: 'multiMonthYear',
+    calendarioList: CalendarioList[] = []
+    calendarioOptions: CalendarOptions = {
+        initialView: 'dayGridMonth',
         themeSystem: 'standard',
         locale: 'pt-BR',
         plugins: [
             dayGridPlugin,
-            interactionPlugin,
-            timeGridPlugin,
-            listPlugin,
             multiMonthPlugin
         ],
+        dayMaxEvents: 3,
+        multiMonthMaxColumns: 1,// force a single column,
+        views: {
+            multiMonthFourMonth: {
+                type: 'multiMonth',
+                duration: { months: 4 }
+            }
+        },
         dayHeaders: true,
         weekends: false,
-        weekNumberCalculation: (m: Date) => {
-            const weekNumber = this.getDateWeek(m, new Date(2025, 1, 10));
-            return weekNumber;
-        },
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
         defaultAllDay: false,
         allDaySlot: false,
         headerToolbar: {
-            left: '',
+            left: 'title',
             center: '',
-            right: ''
+            right: 'today prev next'
         },
-        nowIndicator: true,
-        dayMaxEvents: true,
-        // businessHours: true,
         events: [],
-        scrollTime: '10:00',
+        scrollTime: '10:00:00',
         eventStartEditable: false,
         eventDurationEditable: false,
-        handleWindowResize: false,
-        buttonText: {
-            today: 'hoje',
-            year: 'ano',
-            month: 'mês',
-            week: 'semana',
-            list: 'lista'
-        },
-        droppable: true,
-        loading: (arg) => {
-        },
+        handleWindowResize: true,
+        lazyFetching: true,
         eventClick: this.eventClick.bind(this),
         eventsSet: this.events.bind(this),
-        eventClassNames: (arg) => {
-            console.log(arg)
-            return arg.event.id;
-        }
+        datesSet: (arg: DatesSetArg) => {
+        
+            this.request.intervaloDe = new Date(arg.start.getTime());
+            this.request.intervaloAte = undefined;
+
+            this.getCalendario(this.request);
+        },
     }
 
     aluno: Aluno = new Aluno;
-    alunos: Aluno[] = [];
-    loadingAluno = false;
-
-    turma: Turma = new Turma;
-    turmas: Turma[] = [];
-    loadingTurma = false;
 
     constructor(
-        private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private crypto: Crypto,
-        private aulasService: AulaService,
+        private service: AulaService,
         private changeDetector: ChangeDetectorRef,
         private alunoService: AlunoService,
-        private turmaService: TurmaService,
+        private confirmationService: ConfirmationService,
     ) {
 
-        var list = this.aulasService.list.subscribe(res => this.calendario = res);
+        var list = this.service.list.subscribe(res => this.calendarioList = res);
         this.subscription.push(list);
 
+        var encrypted = localStorage.getItem('reposicao');
+        if (!encrypted) {
+            this.visible = false;
+            this.visibleChange();
+            return;
+        }
+        this.object = this.crypto.decrypt(encrypted) as Reposicao;
+        if (!this.object) {
+            this.visible = false;
+            this.visibleChange();
+            return;
+        }
+
+        this.loadAluno();
+
+        this.request.intervaloDe = moment(this.object.source_Data).add(-1, 'month').toDate();
+        this.request.intervaloAte = moment(this.object.source_Data).add(1, 'month').toDate();
+        this.request.turma_Tipo_Id = this.object.source_Turma_Tipo_Id;
+        
+        this.getCalendario(this.request);
+
         var params = this.activatedRoute.params.subscribe(res => {
-            if (res['object']) {
-                this.loading = true;
-                this.object = this.crypto.decrypt(res['object']);
-
-                this.loadAluno();
-                this.loadTurma();
-
-                this.loading = false;
-                this.visible = true;
-
-            } else {
+            if (!res['aluno_id']) {
                 this.visible = false;
-                this.visibleChange()
+                this.visibleChange();
+                return;
             }
         })
         this.subscription.push(params);
     }
 
+    
     ngAfterViewInit(): void {
+
     }
 
     ngOnDestroy(): void {
@@ -142,57 +139,227 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
     visibleChange() {
         if (!this.visible) {
-            var route = ['../../'] ;
+            var route = ['../../'];
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
-    
+
     async loadAluno() {
-        this.loadingAluno = true;
-        await lastValueFrom(this.alunoService.getList())
-        this.alunos = this.alunoService.list.value;
-        this.aluno = this.alunos.find(x => x.id == this.object.aluno_Id) as Aluno;
-        if (!this.aluno)
+        this.loading = true;
+        if (this.alunoService.list.value.length == 0) {
+            await lastValueFrom(this.alunoService.getList());
+        }
+        this.aluno = await this.alunoService.get(this.object.aluno_Id);
+        if (!this.aluno) {
             this.visible = false;
-        
-        this.loadingAluno = false;
-
-        this.loadCalendar();
-    }
-    
-    async loadTurma() {
-        this.loadingTurma = true;
-        await lastValueFrom(this.turmaService.getList())
-        this.turmas = this.turmaService.list.value;
-        this.turma  = this.turmas.find(x => x.id == this.object.aluno_Id) as Turma;
-        if (!this.aluno)
-            this.visible = false;
-        
-        this.loadingAluno = false;
-
-        this.loadCalendar();
+            this.visibleChange();
+        }
+        this.loading = false;
     }
 
-    loadCalendar() {
+    async getCalendario(request: CalendarioRequest) {
+
+        this.loading = true;
+
+        await lastValueFrom(this.service.getCalendario(request))
+            .then(calendarioList => {
+
+                calendarioList
+                .filter(x => x.alunos.length < x.capacidadeMaximaAlunos && x.data >= new Date)
+                .forEach(aula => {
+                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
+                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
+                    if (index == -1){
+                        this.calendarioList.push(aula);
+                    }
+                    else {
+                        this.calendarioList.splice(index, 1, aula);
+                    }
+
+                })
+                this.calendarioList.sort((x, y) => (x.data > y.data ? -1 : 1));
+
+                this.setCalendario();
+                this.setLegenda(this.calendarioList);
+            })
+            .catch(res => {
+                this.loading = false;
+            })
 
     }
 
-    getDateWeek(date: Date, inicioAnoLetivo: Date) {
-        const currentDate = (typeof date === 'object') ? date : new Date();
-        inicioAnoLetivo = new Date(currentDate.getFullYear(), 0, 15);
-        const daysToNextMonday = (inicioAnoLetivo.getDay() === 1) ? 0 : (7 - inicioAnoLetivo.getDay()) % 7;
-        const nextMonday = new Date(currentDate.getFullYear(), 0, inicioAnoLetivo.getDate() + daysToNextMonday);
+    setCalendario() {
+        this.loading = true;
+        this.calendarioOptions.events = this.calendarioList.map(item => {
+            var event = {
+                id: this.eventRamdomId(),
+                backgroundColor: item.corLegenda,
+                borderColor: item.corLegenda,
+                title: item.turma,
+                start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
+                end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
+                data: item,
+            }
+            return event;
+        });
 
-        return (currentDate < nextMonday) ? 52 : (currentDate > nextMonday ? Math.ceil((currentDate.valueOf() - nextMonday.valueOf()) / (24 * 3600 * 1000) / 7) : 1);
+        this.loading = false;
     }
+
+    addHours(data: Date, h: number) {
+        data.setTime(data.getTime() + (h * 60 * 60 * 1000));
+        return data;
+    }
+
+    eventRamdomId() {
+        let length = 5;
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+        return result;
+    }
+
+    getForeColor(hex: string) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        var rgb = result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : {
+            r: 0,
+            g: 0,
+            b: 0
+        };
+        return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 200 ? '#000' : '#fff';
+    }
+
+
+    setLegenda(c: CalendarioList[]) {
+        this.legenda = [];
+        c.forEach(item => {
+            if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {
+                this.legenda.push(
+                    {
+                        label: item.professor,
+                        backgroundColor: item.corLegenda,
+                    }
+                )
+            }
+        })
+        var calendar = this.fullCalendar.getApi();
+
+        calendar.gotoDate(this.calendarioList[0].data)
+    }
+
 
     events(events: EventApi[]) {
         this.currentEvents.set(events);
-        this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
+        this.changeDetector.detectChanges();
     }
 
     eventClick(e: EventClickArg) {
+        this.confirmationService.confirm({
+            target: e.jsEvent.target ?? undefined,
+            message: `Selecionar aula do dia <b class="text-primary-500">${moment(e.event.start).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${e.event.extendedProps['data'].turma}</b> com o professor <b>${e.event.extendedProps['data'].professor}</b>?`,
+            header: 'Selecionar aula',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Selecionar',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: async () => {
+                this.selectedAula = e.event;
+            },
+            reject: () => {
+            }
+        });
+    }
 
+    showError(header: string, message: string, e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: message,
+            header: header,
+            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            acceptLabel: 'OK',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            rejectVisible: false,
+        })
+    }
+    
+    confirmaReposicao(e: any) {
+
+        var target = this.selectedAula!.extendedProps['data'] as CalendarioList;
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja marcar reposição do aluno <b>${this.object.aluno} </b> do dia <b>${moment(this.object.source_Data).format('DD/MM/YYYY [às] HH[h]mm')}</b> para o dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.turma}</b> com o professor <b>${target.professor}</b>?`,
+            header: 'Agendar reposição',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Selecionar',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: () => {
+                this.send(target)
+            },
+            reject: () => {
+            }
+        });
+    }
+
+
+    async send(target: CalendarioList) {
+
+        this.loading = true;
+
+        var reposicaoRequest = new ReposicaoRequest;
+        reposicaoRequest.aluno_Id = this.object.aluno_Id;
+
+        // Se a aula source não existir, cria a aula
+        if (!this.object.source_Aula_Id) {
+            var aulaRequest: AulaCreateRequest = {
+                turma_Id: this.object.source_Turma_Id,
+                data: moment(this.object.source_Data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                professor_Id: this.object.source_Professor_Id
+            }
+            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
+            reposicaoRequest.source_Aula_Id = aulaResponse.object.id;
+        }
+
+        // Se a aula target não existir, cria a aula
+        if (!target.aula_Id) {
+            var aulaRequest: AulaCreateRequest = {
+                turma_Id: target.turma_Id,
+                data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                professor_Id: target.professor_Id
+            }
+            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
+            reposicaoRequest.dest_Aula_Id = aulaResponse.object.id;
+        }
+
+        await lastValueFrom(this.alunoService.reposicao(reposicaoRequest))
+            .then(res => {
+                this.loading = false;
+                this.selectedAula = undefined;
+
+                this.visible = false;
+                this.visibleChange();
+
+                
+            })
+            .catch(res => {
+                this.loading = false;
+            })
     }
 
 

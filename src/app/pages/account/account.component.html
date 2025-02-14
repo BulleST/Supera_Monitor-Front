@@ -10,5 +10,9 @@
             <router-outlet></router-outlet>
         </div>
     </div>
-    <p-confirmDialog />
+    <p-confirmdialog styleClass="w-25rem">
+        <ng-template #message let-message>
+            <div [innerHTML]="message.message"></div>
+        </ng-template>
+    </p-confirmdialog>
 </div>

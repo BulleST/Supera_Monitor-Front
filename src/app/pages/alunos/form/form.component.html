@@ -1,4 +1,10 @@
-<p-confirmDialog />
+
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+
 
 <p-dialog [header]="'Dados do Aluno'"
           [modal]="true"
@@ -23,17 +29,9 @@
                 <div class="px-2">
                     <h3 class="text-xl mb-2">Informações Adicionais</h3>
                     <table class="w-full">
-                        <tr>
-                            <td class="p-1"><b>Cadastrado em</b></td>
-                            <td class="p-1 pl-3 text-right">{{object.dataCadastro | date : 'dd/MM/YYYY'}}</td>
-                        </tr>
                         <tr *ngIf="object.aspNetUsers_Created">
                             <td class="p-1"><b>Cadastrado por</b></td>
                             <td class="p-1 pl-3 text-right">{{ object.aspNetUsers_Created }}</td>
-                        </tr>
-                        <tr>
-                            <td class="p-1"><b>Data de Entrada</b></td>
-                            <td class="p-1 pl-3 text-right">{{object.dataEntrada | date : 'dd/MM/YYYY'}}</td>
                         </tr>
                         <tr *ngIf="object.lastUpdated">
                             <td class="p-1"><b>Última atualização</b></td>

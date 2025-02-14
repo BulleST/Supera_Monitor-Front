@@ -1,135 +1,178 @@
 <p-toast />
-<p-confirmdialog styleClass="w-25rem" >
+<p-confirmdialog styleClass="w-25rem">
     <ng-template #message let-message>
-       <div [innerHTML]="message.message"></div>
+        <div [innerHTML]="message.message"></div>
     </ng-template>
 </p-confirmdialog>
-<div class="w-full bg-white border-round-md p-6" >
-    <p-popover #op styleClass="z-2 absolute p-0" appendTo="body" >
-        <div *ngIf="selected" class="p-2 flex flex-column row-gap-1 -m-2">
-            <div class="p-2 white-space-normal">
-                <p>
-                    <b>Professor:</b> {{selected.professor }} <span class="inline-flex w-1rem h-1rem border-circle ml-2 -mb-1" [style]="{backgroundColor: selected.corLegenda}"></span>
-                </p>
-                <p>
-                    <b>Turma: </b>
-                    <span>{{selected.turma }}</span>
-                </p>
-                <p>
-                    <b>Data: </b>
-                    <span>{{selected.data | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</span>
-                </p>
-            </div>
-            <div class="flex align-items-center justify-content-between px-2">
-                <span class="font-bold block mt-2 text-primary">Alunos</span>
-                <span class="font-bold block mt-2 " [class.text-red-500]="selected.alunos.length > selected.capacidadeMaximaAlunos">
-                    <i class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite" *ngIf="selected.alunos.length > selected.capacidadeMaximaAlunos"></i> {{selected.alunos.length}}/{{selected.capacidadeMaximaAlunos}} </span>
-            </div>
-            <ul class="list-none p-0"
-                id="alunos"
-                cdkDropList 
-                [cdkDropListData]="selected.alunos" 
-                [cdkDropListConnectedTo]="eventItems"
-                [cdkDropListSortingDisabled]="true"
-                #alunos="cdkDropList"
-                >
-                <li *ngFor="let aluno of selected.alunos"
-                    cdkDrag 
-                    [cdkDragData]="aluno"
-                    (cdkDragStarted)="cdkDragStarted($event)"
-                    (cdkDragEntered)="cdkDragEntered($event)"
-                    (cdkDragExited)="cdkDragExited($event)"
-                    class="p-0 m-0" >
-
-                    <div *cdkDragPlaceholder  ></div>
-                    <div *cdkDragPreview class="p-1" >
-                        <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
-                        <div class="flex align-items-center justify-content-start  p-3 mx-2 bg-white shadow-2">
-                            <div class="w-2rem h-2rem mr-2 border-circle border-1 border-200 overflow-hidden flex align-items-center justify-content-center ">
-                                <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
-                                <i *ngIf="!aluno.aluno_Foto && !aluno.loadingFoto" class="pi pi-user text-primary text-sm"></i>
-                                <i *ngIf="!aluno.aluno_Foto && aluno.loadingFoto" class="pi pi-spin pi-spinner text-sm" ></i>
-                            </div>
-                            <span class="font-medium white-space-nowrap">{{ aluno.aluno }}</span>
-                            <p class="ml-auto pl-2">
-                                <p-tag *ngIf="aluno.reposicao" value="Reposição" severity="secondary" styleClass="surface-500 text-white" />
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <a (click)="reposicao(aluno)" class="cursor-pointer">
-                        <div class="flex align-items-center justify-content-start my-2  p-1 mx-2 bg-white">
-                            <div class="w-2rem h-2rem mr-2 border-circle border-1 border-200 overflow-hidden flex align-items-center justify-content-center ">
-                                <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
-                                <i *ngIf="!aluno.aluno_Foto && !aluno.loadingFoto" class="pi pi-user text-primary text-sm"></i>
-                                <i *ngIf="!aluno.aluno_Foto && aluno.loadingFoto" class="pi pi-spin pi-spinner text-sm" ></i>
-                            </div>
-                            <span class="font-medium">{{ aluno.aluno }}</span>
-                            <p class="ml-auto">
-                                <p-tag *ngIf="aluno.reposicao" value="Reposição" severity="secondary" styleClass="surface-500 text-white" />
-                            </p>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-            <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
-            <div class="surface-50 p-3">
-                <p-button class="w-full" styleClass="w-full"
-                          label="Ver mais"
-                          [rounded]="true"
-                          size="small" 
-                          (onClick)="verAula()"/>
-            </div>
-        </div>
-    </p-popover>
-    <div class="relative">
-        <!-- <div *ngIf="loading" class="absolute w-full h-full top-0 letf-0 flex align-items-center justify-content-center z-1">
-            <div class="absolute w-full h-full top-0 letf-0 bg-black-alpha-10 opacity-40"></div>
-            <i class="pi pi-spin pi-spinner" style="font-size: 3rem"></i>
-        </div> -->
-        <full-calendar [options]="calendarOptions" #fullCalendar class="relative z-0">
-            <ng-template #eventContent let-arg>
-                <div class="cursor-pointer h-full w-full overflow-hidden mb-2 p-2 border-round-md shadow-2 flex flex-column"
-                    [style]="{
-                        backgroundColor: arg.event.extendedProps.data.corLegenda,
-                        borderColor: arg.event.extendedProps.data.corLegenda,
-                    }"
-                    [id]="'event-' + arg.event.id"
-                    #item="cdkDropList"
-                    cdkDropList 
-                    [cdkDropListSortingDisabled]="true"
-                    [cdkDropListData]="arg.event.extendedProps.data.alunos"
-                    (cdkDropListDropped)="drop($event, arg.event.extendedProps.data)"
-                    [cdkDropListConnectedTo]="['alunos']">
-                    <div class="flex justify-content-between align-items-center">
-                        
-                        <div class="flex align-items-center">
-                            <i class="pi pi-clock mr-2 mr-1"></i>
-                            <span>{{arg.event.extendedProps.data.data | date : 'HH:mm'}}</span>
-                        </div>
-                        <p class="flex align-items-center mb-0">
-                            <span>{{arg.event.extendedProps.data.alunos.length}}/{{arg.event.extendedProps.data.capacidadeMaximaAlunos}}</span>
-                            <i class="pi pi-exclamation-circle ml-2 mr-1 fadeout animation-duration-500 animation-iteration-infinite" *ngIf="arg.event.extendedProps.data.alunos.length > arg.event.extendedProps.data.capacidadeMaximaAlunos"></i>
-                        </p>
-                    </div>
-                    <p class="overflow-hidden text-overflow-ellipsis w-full white-space-nowrap text-center text-xl font-bold my-auto">{{ arg.event.title }}</p>
-                 <div class="flex align-items-center justify-content-between flex-wrap w-full">
-                    <p class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0">{{ arg.event.extendedProps.data.professor}}</p>
-                    <p class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0 text-right">{{ arg.event.extendedProps.data.turma_Tipo}}</p>
-                 </div>
+<section id="home">
+    <div class="w-full bg-white border-round-md p-6 pt-4 ">
+        <p-dialog [modal]="true"
+                  [(visible)]="modalSelectedAlunoVisible"
+                  (visibleChange)="hideAluno()"
+                  [style]="{ width: '30rem', maxWidth: '95vw', maxHeight: '95vh' }"
+                  appendTo="body">
+            <ng-template #header>
+                <div class="w-full flex align-items-center">
+                    <span class="p-dialog-title">Dados do Aluno</span>
                 </div>
             </ng-template>
-        </full-calendar>
-    </div>
-    
-    <div class="flex" *ngIf="!loading">
-        <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
-            <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
-                <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.backgroundColor }"></div>
-                <span class="ml-2">{{item.label}}</span>
+            <div *ngIf="selectedAluno" class="p-2 flex flex-column row-gap-1 -mt-2">
+                <div class="flex align-items-center my-1  mx-2">
+                    <div class="w-5rem h-5rem mr-3 border-circle surface-50 border-2 border-200 overflow-hidden flex align-items-center justify-content-center ">
+                        <img *ngIf="selectedAluno.aluno_Foto" [src]="selectedAluno.aluno_Foto">
+                        <i *ngIf="!selectedAluno.aluno_Foto" class="pi pi-user text-primary text-md"></i>
+                    </div>
+                    <div>
+                        <div class="flex align-items-center justify-content-between ">
+                            <span class="text-lg font-bold">{{ selectedAluno.aluno }}</span>
+                            <p class="ml-auto">
+                                <p-tag *ngIf="selectedAluno.reposicao" value="Reposição" severity="secondary" styleClass="surface-500 text-white" />
+                            </p>
+                        </div>
+                        <p><b>Turma:</b> {{selectedAluno.turma }} </p>
+                        <p *ngIf="selectedAluno.apostila_Abaco">Apostila Ábaco: {{selectedAluno.apostila_Abaco }} <b>Página:</b> {{selectedAluno.numeroPaginaAbaco}}</p>
+                        <p *ngIf="selectedAluno.apostila_AH">Apostila AH: {{selectedAluno.apostila_AH }} <b>Página:</b> {{selectedAluno.numeroPaginaAH}}</p>
+                        <!-- <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" /> -->
+                        <div class="flex align-items-center justify-content-between mt-2 ">
+                            <p-button label="Ver aluno"
+                                      [rounded]="true"
+                                      icon="pi pi-user-edit"
+                                      size="small"
+                                      (onClick)="verAluno(selectedAluno)"
+                                      styleClass="py-1 mr-3" />
+                            <p-button label="Agendar Reposição"
+                                      icon="pi pi-calendar"
+                                      [rounded]="true"
+                                      size="small"
+                                      severity="secondary"
+                                      (onClick)="reposicao(selectedAluno)"
+                                      styleClass="py-1 " />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p-dialog>
+        <p-popover #popoverSelectedAula styleClass="z-2 absolute p-0" appendTo="body">
+            <div *ngIf="selectedAula" class="p-2 flex flex-column row-gap-1 -m-2">
+                <div class="p-2 white-space-normal">
+                    <p>
+                        <b>Professor:</b> {{selectedAula.professor }} <span class="inline-flex w-1rem h-1rem border-circle ml-2 -mb-1" [style]="{backgroundColor: selectedAula.corLegenda}"></span>
+                    </p>
+                    <p>
+                        <b>Turma: </b>
+                        <span>{{selectedAula.turma }}</span>
+                    </p>
+                    <p>
+                        <b>Data: </b>
+                        <span>{{selectedAula.data | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</span>
+                    </p>
+                </div>
+                <div class="flex align-items-center justify-content-between px-2">
+                    <span class="font-bold block mt-2 text-primary">Alunos</span>
+                    <span class="font-bold block mt-2 " [class.text-red-500]="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos">
+                        <i class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite" *ngIf="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos"></i> {{selectedAula.alunos.length}}/{{selectedAula.capacidadeMaximaAlunos}} </span>
+                </div>
+                <ul class="list-none p-0 max-h-10rem overflow-auto"
+                    id="alunos"
+                    cdkDropList
+                    [cdkDropListData]="selectedAula.alunos"
+                    [cdkDropListConnectedTo]="cdkEventItensId"
+                    [cdkDropListSortingDisabled]="true"
+                    #alunos="cdkDropList">
+                    <li *ngFor="let aluno of selectedAula.alunos"
+                        cdkDrag
+                        [cdkDragData]="aluno"
+                        (cdkDragStarted)="cdkDragStarted($event)"
+                        (cdkDragEntered)="cdkDragEntered($event)"
+                        (cdkDragExited)="cdkDragExited($event)"
+                        class="p-0 m-0">
+                        <div *cdkDragPlaceholder></div>
+                        <div *cdkDragPreview class="p-1">
+                            <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
+                            <div class="flex align-items-center justify-content-start  p-3 mx-2 bg-white shadow-2">
+                                <div class="w-1rem h-1rem mr-2 border-circle  overflow-hidden flex align-items-center justify-content-center ">
+                                    <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                                    <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                                    <!-- <i *ngIf="!aluno.aluno_Foto && aluno.loadingFoto" class="pi pi-spin pi-spinner text-sm" ></i> -->
+                                </div>
+                                <span class="font-medium white-space-nowrap text-sm">{{ aluno.aluno }}</span>
+                                <p class="ml-auto pl-3 flex">
+                                    <p-tag *ngIf="aluno.reposicao"
+                                           value="Reposição"
+                                           severity="secondary"
+                                           styleClass="surface-500 text-white"
+                                           size="small" />
+                                </p>
+                            </div>
+                        </div>
+                        <!-- -->
+                        <a (click)="showAluno($event, aluno)" class="cursor-pointer">
+                            <div class="flex align-items-center justify-content-start my-1 p-1 mx-2 bg-white">
+                                <div class="w-1rem h-1rem mr-2 border-circle  overflow-hidden flex align-items-center justify-content-center ">
+                                    <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                                    <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                                    <!-- <i *ngIf="!aluno.aluno_Foto && aluno.loadingFoto" class="pi pi-spin pi-spinner text-sm" ></i> -->
+                                </div>
+                                <span class="font-medium">{{ aluno.aluno }}</span>
+                                <p class="ml-auto">
+                                    <p-tag *ngIf="aluno.reposicao" value="Reposição" severity="secondary" styleClass="surface-500 text-white" />
+                                </p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
+                <div class="surface-50 p-3">
+                    <p-button class="w-full" styleClass="w-full"
+                              label="Ver mais"
+                              [rounded]="true"
+                              size="small"
+                              (onClick)="verAula()" />
+                </div>
+            </div>
+        </p-popover>
+        <div class="relative">
+            <full-calendar [options]="calendarioOptions" #fullCalendar class="relative z-0">
+                <ng-template #eventContent let-arg>
+                    <div class="cursor-pointer h-full w-full overflow-hidden mb-2 p-2 border-round-md shadow-2 flex flex-column"
+                         [style]="{
+                            backgroundColor: arg.event.extendedProps.data.corLegenda,
+                            borderColor: arg.event.extendedProps.data.corLegenda,
+                        }"
+                         [id]="'event-' + arg.event.id"
+                         #item="cdkDropList"
+                         cdkDropList
+                         [cdkDropListSortingDisabled]="true"
+                         [cdkDropListData]="arg.event.extendedProps.data.alunos"
+                         (cdkDropListDropped)="cdkDrop($event, arg.event.extendedProps.data)"
+                         [cdkDropListConnectedTo]="['alunos']">
+                        <div class="flex justify-content-between align-items-center">
+                            <div class="flex align-items-center">
+                                <i class="pi pi-clock mr-1 text-xs"></i>
+                                <span class="text-xs">{{arg.event.extendedProps.data.data | date : 'HH:mm'}}</span>
+                            </div>
+                            <p class="flex align-items-center mb-0">
+                                <span class="text-xs">{{arg.event.extendedProps.data.alunos.length}}/{{arg.event.extendedProps.data.capacidadeMaximaAlunos}}</span>
+                                <i class="pi pi-exclamation-circle text-xs ml-2 mr-1 fadeout animation-duration-500 animation-iteration-infinite" *ngIf="arg.event.extendedProps.data.alunos.length > arg.event.extendedProps.data.capacidadeMaximaAlunos"></i>
+                            </p>
+                        </div>
+                        <p class="overflow-hidden text-overflow-ellipsis w-full white-space-nowrap text-xl font-bold my-auto">{{ arg.event.title }}</p>
+                        <div class="flex align-items-center justify-content-between flex-wrap w-full">
+                            <p class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0" [pTooltip]="arg.event.extendedProps.data.professor">{{ arg.event.extendedProps.data.professor}}</p>
+                            <p class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0 text-right">{{ arg.event.extendedProps.data.turma_Tipo}}</p>
+                        </div>
+                    </div>
+                </ng-template>
+            </full-calendar>
+        </div>
+        <div class="flex" *ngIf="!loading">
+            <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+                <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
+                    <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.backgroundColor }"></div>
+                    <span class="ml-2">{{item.label}}</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 <router-outlet></router-outlet>

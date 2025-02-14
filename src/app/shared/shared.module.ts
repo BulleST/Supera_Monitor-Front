@@ -12,10 +12,24 @@ import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { TranslateModule } from '@ngx-translate/core';
 import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
 
+// Alunos
+import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
+import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
+import { ChecklistComponent as AlunoChecklistComponent } from '../pages/alunos/form/checklist/checklist.component';
+import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
+import { FullCalendarModule } from '@fullcalendar/angular';
+// End Alunos
+
 @NgModule({
     declarations: [
         ProfileComponent,
         ChangePasswordComponent,
+        // Alunos
+        AlunoFormComponent,
+        AlunoDadosCadastraisComponent,
+        AlunoChecklistComponent,
+        AlunoCalendarioComponent,
+        // End Alunos
     ],
     exports: [
         FormsModule,
@@ -28,8 +42,16 @@ import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
         ProfileComponent,
         ChangePasswordComponent,
         DragDropModule,
+        FullCalendarModule,
         DragScrollComponent, 
-        DragScrollItemDirective
+        DragScrollItemDirective,
+        
+        // Alunos
+        AlunoFormComponent,
+        AlunoDadosCadastraisComponent,
+        AlunoChecklistComponent,
+        AlunoCalendarioComponent,
+        // End Alunos
     ],
     imports: [
         CommonModule,
@@ -43,7 +65,8 @@ import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
         TranslateModule,
         DragDropModule,
         DragScrollComponent, 
-        DragScrollItemDirective
+        DragScrollItemDirective,
+        FullCalendarModule
     ],
     providers: [
         provideHttpClient(withFetch()),

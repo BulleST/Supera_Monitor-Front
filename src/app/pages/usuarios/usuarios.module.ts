@@ -6,7 +6,6 @@ import { FormComponent } from './form/form.component';
 import { SharedModule } from '../../shared/shared.module';
 import { UsuariosRoutingModule } from './usuarios.routing';
 
-
 @NgModule({
     declarations: [
         ListComponent,

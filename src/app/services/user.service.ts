@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { AccountRole } from '../models/account-perfil.model';
-import { environment } from '../../environments/environment.prod';
-import { MessageService } from 'primeng/api';
-import { AccountResponse, Account, AccountRequest } from '../models/account.model';
+import { Account, AccountRequest } from '../models/account.model';
 import { Map } from '../utils/map';
 import { Service } from '../helpers/service.service';
 
@@ -15,7 +12,7 @@ import { Service } from '../helpers/service.service';
 })
 export class UserService extends Service {
     override list = new BehaviorSubject<Account[]>([]);
-  
+
     getRoles() {
         return this.http.get<AccountRole[]>(`${this.url}/users/roles`)
             .pipe(tap({
@@ -39,15 +36,17 @@ export class UserService extends Service {
     }
 
     get(id: number) {
-            return new Observable<Account>((observer => {
-                var item = this.list.value.find(x => x.id == id) as Account;
-                if (item) 
-                    observer.next(item);
-                else 
-                    observer.error('Usuários não encontrado.')
-                observer.complete();
-                return;
-            }));
+        return new Promise<Account>(async (resolve, reject) => {
+            if (this.list.value.length == 0)
+                await lastValueFrom(this.getList());
+
+            var item = this.list.value.find(x => x.id == id) as Account;
+            if (!item)
+                reject('Usuário não encontrado.')
+
+
+            return resolve(item);
+        })
     }
 
     create(model: Account) {
@@ -74,7 +73,7 @@ export class UserService extends Service {
         return this.http.patch<Response>(`${this.url}/users/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                            this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: `Não foi possível ${( activated ? 'desabilitar' : 'habilitar')}  usuário`, life: 3000 });
+                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: `Não foi possível ${(activated ? 'desabilitar' : 'habilitar')}  usuário`, life: 3000 });
                 }
             }));
     }

@@ -22,13 +22,11 @@ export class InitialComponent implements OnDestroy {
         private accountService: AccountService,
         private header: Header,
     ) {
-
         var open = this.header.menuAsideOpen.subscribe(res => this.navigationOpen = res);
         this.subscription.push(open);
         this.accountService.account.subscribe(res => {
             this.account = res;
         })
-
     }
 
     ngOnDestroy(): void {
