@@ -1,11 +1,11 @@
-.bg {
+/* .bg {
     position: fixed;
     top: 0;
     left: 0;
     z-index: -9999;
     width: 100vw;
     height: 100vh;
-    background-image: url(/assets/images/css-gradient.jpeg);
+    background-image: url('assets/images/css-gradient.jpeg');
     background-size: cover;
     background-attachment: fixed;
     transform: rotate(180deg);
@@ -13,7 +13,7 @@
     background-color: #fc8009;
     background-repeat: no-repeat;
     background: linear-gradient(134deg, #da1b60, #fc8009);
-}
+} */
 .cdk-drag-preview,
 .cdk-drag-on {
     box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.308)!important;
