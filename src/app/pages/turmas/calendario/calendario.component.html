@@ -1,1 +1,61 @@
-<p>calendario works!</p>
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog [header]="'Cadastrar'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <h3 class="p-dialog-title text-2xl">
+                <span class="mr-3 border-circle w-3rem h-3rem inline-flex align-items-center justify-content-center"
+                      [style]="{ backgroundColor: object.corLegenda }">
+                    <i class="pi pi-user text-white text-xl"></i>
+                </span>
+                <span>Calendário - {{object.nome}}</span>
+            </h3>
+        </div>
+    </ng-template>
+    <div class="flex-1 p-2">
+        <full-calendar *ngIf="calendarVisible()" [options]="calendarioOptions" #fullCalendar class="relative z-0">
+            <ng-template #eventContent let-arg>
+                <div class="cursor-pointer w-full overflow-hidden p-1 border-round-sm  flex flex-column "
+                     [ngStyle]="{
+                        backgroundColor: arg.event.extendedProps.data.corLegenda,
+                        border: selectedAula && selectedAula.id == arg.event.id ? '2px red solid' : '' ,
+                    }">
+                    <div class="flex align-items-center">
+                        <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data.data | date : 'HH:mm'}}</span>
+                        <span class="text-xs overflow-hidden text-white text-overflow-ellipsis w-12rem white-space-nowrap">{{ arg.event.title }}</span>
+                    </div>
+                    <div class="text-white">{{arg.event.extendedProps.data.professor}}</div>
+                </div>
+            </ng-template>
+        </full-calendar>
+    </div>
+    <div class="flex" *ngIf="!loading">
+        <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+            <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
+                <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.backgroundColor }"></div>
+                <span class="ml-2">{{item.label}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="flex mt-4 ml-auto">
+        <div class="ml-auto">
+            <p-button (onClick)="goToTurma()"
+                      class="w-full"
+                      styleClass="w-full px-3"
+                      label="Ver turma"
+                      icon="fa-solid fa-users-bewteen-lines"
+                      [rounded]="true" 
+                      size="small"/>
+        </div>
+    </div>
+</p-dialog>

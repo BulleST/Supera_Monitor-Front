@@ -7,7 +7,7 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withFetch } from '@angular/common
 
 import { provideEnvironmentNgxMask, provideNgxMask } from 'ngx-mask';
 import { providePrimeNG } from 'primeng/config';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 
 import { AppComponent } from './app.component';
 import { LoadingComponent } from './parts/loading/loading.component';
@@ -44,7 +44,6 @@ registerLocaleData(localeBr , 'pt-BR');
         ConfirmationService,
         CurrencyPipe,
         DatePipe,
-        MessageService,
         LoadingService,
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },

@@ -1,5 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
-import { Basic, Basic_List } from "./_basic.model";
+import { Basic_List } from "./_basic.model";
+import { Turma } from "./turma.model";
 
 export class Professor extends Basic_List {
     nome: string = '';
@@ -10,15 +11,18 @@ export class Professor extends Basic_List {
     professor_NivelAbaco: string = '';
     professor_NivelAH_Id: number = undefined as unknown as number;
     professor_NivelAH: string = '';
-    account_Id: number = 0;
+    account_Id: number = undefined as unknown as number;
     role_Id: number = 0;
     role: string = '';
     corLegenda: string = '';
+    disponivel?: boolean;
+    disponivelTurma?: Turma;
 }
 
 export class ProfessorCreateRequest {
-    account_Id: number = 0;
+    account_Id: number = undefined as unknown as number;
     nome: string = '';
+    email: string = '';
     telefone: string = '';
     dataInicio: Date = new Date;
     professor_NivelAbaco_Id: number = undefined as unknown as number;

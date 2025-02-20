@@ -1,8 +1,8 @@
 import { BehaviorSubject } from "rxjs";
 import { environment } from "../../environments/environment";
 import { HttpClient } from "@angular/common/http";
-import { MessageService } from "primeng/api";
 import { Injectable } from "@angular/core";
+import { ToastrService } from "ngx-toastr";
 
 @Injectable({
     providedIn: 'root',
@@ -14,7 +14,7 @@ export class Service {
 
     constructor(
         public http: HttpClient,
-        public messageService: MessageService,
+        public toastrService: ToastrService
     ) {
         this.url = environment.url + 'back';
     }

@@ -4,9 +4,8 @@ import { ContextMenu } from 'primeng/contextmenu';
 import { Sidebar } from 'primeng/sidebar';
 import { Subscription } from 'rxjs';
 import { Header } from '../../utils/header';
-import { faCalendar, faHome, faLocationDot, faMapPin, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines, } from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faHome, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines, } from '@fortawesome/free-solid-svg-icons';
 import { AccountService } from '../../services/account.service';
-import { RouterLinkActive } from '@angular/router';
 import { AccountResponse } from '../../models/account.model';
 
 @Component({
@@ -72,18 +71,18 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
                 label: 'Cadastros',
                 items: [
                     {
-                        label: 'Professores',
-                        tooltip: 'Professores',
-                        iconFontawesome: faPersonChalkboard,
-                        routerLink: ['professores'],
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                    {
                         label: 'Alunos',
                         tooltip: 'Alunos',
                         iconFontawesome: faUserGraduate,
                         routerLink: ['alunos'],
+                        routerLinkActiveOptions: { exact: false },
+                        routerLinkActive: 'active-link'
+                    },
+                    {
+                        label: 'Professores',
+                        tooltip: 'Professores',
+                        iconFontawesome: faPersonChalkboard,
+                        routerLink: ['professores'],
                         routerLinkActiveOptions: { exact: false },
                         routerLinkActive: 'active-link'
                     },

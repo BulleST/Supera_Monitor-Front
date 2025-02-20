@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
@@ -9,12 +9,14 @@ import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Turma, turmaColumns } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import moment from 'moment';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-list',
     templateUrl: './list.component.html',
     styleUrl: './list.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class ListComponent implements OnDestroy {
@@ -38,6 +40,7 @@ export class ListComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private mobileService: MobileService,
+        private toastrService: ToastrService,
     ) {
         this.tableColumns = turmaColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
@@ -47,7 +50,10 @@ export class ListComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(res => this.list = res);
+        var list = this.service.list.subscribe(res => {
+            this.list = res;
+            console.log('turmaList', this.list)
+        });
         this.subscription.push(list);
 
     }
@@ -137,18 +143,17 @@ export class ListComponent implements OnDestroy {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
                         if (res.success) {
+                            this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
                         } else {
-                            setTimeout(() => {
-                                this.showError(res.message, e);
-                            }, 300);
+                            this.showError(res.message, e);
                         }
                     })
-                    .catch(res => {
-                        this.showError(getError(res), e);
+                    .catch((res: HttpErrorResponse) => {
+                        this.showError(res.error.message, e);
                     })
             },
         });
@@ -169,20 +174,6 @@ export class ListComponent implements OnDestroy {
     getOption(col: ColumnTable, row: any) {
         var item = col.options.items.find((x: any) => x.value == row[col.field]);
         return item;
-    }
-
-    formatTime(time: string){
-        if (time) {
-            var array = time.split(':')
-            var hour = parseInt(array[0]) ;
-            var minute = parseInt(array[1]);
-            var date = new Date()
-            date.setHours(hour, minute, 0)
-            return moment(date).format('HH[h]mm')
-        } else {
-            return undefined
-        }
-
     }
 
 

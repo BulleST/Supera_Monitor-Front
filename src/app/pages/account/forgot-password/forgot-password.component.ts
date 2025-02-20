@@ -4,13 +4,13 @@ import { faChevronCircleLeft, faEnvelope } from '@fortawesome/free-solid-svg-ico
 import { lastValueFrom } from 'rxjs';
 import { AccountService } from '../../../services/account.service';
 import { getError } from '../../../utils';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
     selector: 'app-forgot-password',
     templateUrl: './forgot-password.component.html',
     styleUrls: ['./../account.component.css', './forgot-password.component.css'],
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class ForgotPasswordComponent {

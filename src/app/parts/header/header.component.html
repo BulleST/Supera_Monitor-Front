@@ -1,11 +1,56 @@
-<header class="w-full">
-    <p-menubar [model]="items"
-               styleClass="bg-primary-500 border-none shadow-1 border-noround"
+<header class="w-full h-5rem bg-primary-500 border-none shadow-1 border-noround p-2 px-6 flex align-items-center justify-content-between  ">
+    <div class="flex align-items-center">
+        <img src="assets/images/logo-supera-white.png" class=" w-6rem my-1" />
+    </div>
+    <div class="mx-auto">
+        <p-select *ngIf="showCalendarView"
+                  [options]="viewMenu"
+                  [(ngModel)]="view"
+                  (ngModelChange)="calendarViewChanged()"
+                  optionValue="value"
+                  styleClass="bg-primary-400 text-white border-0 border-primary-400">
+            <ng-template let-selectedOption #selectedItem>
+                <div class="text-white">
+                    <span class="{{selectedOption.icon}}"></span>
+                    <span class="ml-2">{{ selectedOption.label }}</span>
+                </div>
+            </ng-template>
+            <ng-template let-item #item>
+                <span class="{{item.icon}}"></span>
+                <span class="ml-2">{{ item.label }}</span>
+            </ng-template>
+            <ng-template #dropdownicon>
+                <i class="pi pi-sort-down-fill  text-xs text-white"></i>
+            </ng-template>
+        </p-select>
+    </div>
+    <!-- <p-menubar styleClass="bg-primary-500 border-none shadow-1 border-noround"
                #menuBig>
-        <ng-template pTemplate="start">
+        <ng-template #start>
             <div class="ml-4 mr-4 flex align-items-center">
                 <img src="assets/images/logo-supera-white.png" class="ml-4 w-6rem my-1" />
             </div>
         </ng-template>
-    </p-menubar>
+        <ng-template #end>
+            <p-select *ngIf="showCalendarView"
+                      [options]="viewMenu"
+                      [(ngModel)]="view"
+                      optionValue="value"
+                      styleClass="bg-primary-400 text-white border-0 border-primary-400">
+                <ng-template let-selectedOption #selectedItem>
+                    <div class="text-white">
+                        <span class="{{selectedOption.icon}}"></span>
+                        <span class="ml-2">{{ selectedOption.label }}</span>
+                    </div>
+                </ng-template>
+                <ng-template let-item #item>
+                    <span class="{{item.icon}}"></span>
+                    <span class="ml-2">{{ item.label }}</span>
+                </ng-template>
+                <ng-template #dropdownicon>
+                    <i class="pi pi-sort-down-fill  text-xs text-white"></i>
+                </ng-template>
+            </p-select>
+        </ng-template>
+    </p-menubar> -->
 </header>

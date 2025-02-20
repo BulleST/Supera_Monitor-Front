@@ -1,6 +1,6 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -9,12 +9,13 @@ import { AccountService } from '../../../services/account.service';
 import { Account, AccountResponse } from '../../../models/account.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Role } from '../../../models/account-perfil.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrl: './form.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class FormComponent implements OnDestroy {
@@ -31,11 +32,11 @@ export class FormComponent implements OnDestroy {
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
-        private messageService: MessageService,
         private crypto: Crypto,
         private service: UserService,
         private accountService: AccountService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
     ) {
 
         var account = this.accountService.account.subscribe(account => {
@@ -106,7 +107,8 @@ export class FormComponent implements OnDestroy {
         this.request()
             .then(res => {
                 this.loading = false;
-                if (res.success) {
+                if (res.success) {                    
+                    this.toastrService.success( this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();

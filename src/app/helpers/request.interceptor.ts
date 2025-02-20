@@ -41,12 +41,12 @@ export class RequestInterceptor implements HttpInterceptor {
         var notToastrError = this.excludeUrlsToastrError.filter(x => request.url.includes(x));
 
         var loadingHeader = request.headers.get('loading');
-        if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
+        // if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
             if (notLoading.length == 0) {
                 this.loadingService.loading.next(true);
                 this.loadingService.addLoadingRequest();
             }
-        }
+        // }
 
 
         var block = new Promise<boolean>((resolve, reject) => {
@@ -129,12 +129,12 @@ export class RequestInterceptor implements HttpInterceptor {
                 }),
                 // Log when response observable either completes or errors
                 finalize(() => {
-                    if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
+                    // if (request.method == 'POST' || request.method == 'PUT' || request.method == 'PATCH' || request.method == 'DELETE' || loadingHeader == 'true') {
                         if (notLoading.length == 0) {
                             this.loadingService.loading.next(false);
                             this.loadingService.removeLoadingRequest();
                         }
-                    }
+                    // }
                 }),
             );
     }

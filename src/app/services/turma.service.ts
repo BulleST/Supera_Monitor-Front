@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { environment } from '../../environments/environment.prod';
-import { MessageService } from 'primeng/api';
 import { TurmaRequest, Turma, Turma_Tipo } from '../models/turma.model';
 import moment from 'moment';
 import { Map } from '../utils/map';
@@ -20,7 +17,7 @@ export class TurmaService extends Service {
         return this.http.get<Turma_Tipo[]>(`${this.url}/turmas/types/`)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar tipos da turma', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar tipos da turma');
                 }
             }));
     }
@@ -29,11 +26,16 @@ export class TurmaService extends Service {
         return this.http.get<Turma[]>(`${this.url}/turmas/all/`)
             .pipe(tap({
                 next: list => {
+                    list.map(x => {
+                        x.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + x.horario);
+                        return x;
+                    })
+
                     this.list.next(list);
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar turmas', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar turmas');
                 }
             }));
     }
@@ -44,8 +46,10 @@ export class TurmaService extends Service {
                 await lastValueFrom(this.getList());
 
             var item = this.list.value.find(x => x.id == id) as Turma;
-            if (!item)
-                reject('Turma não encontrada.')
+            if (!item) {
+               return reject('Turma não encontrada.')
+                this.toastrService.error('Turma não encontrada.');
+            }
 
             return resolve(item);
         })
@@ -57,7 +61,7 @@ export class TurmaService extends Service {
         return this.http.post<Response>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível cadastrar turma', life: 3000 });
+                    this.toastrService.error('Não foi possível cadastrar turma');
                 }
             }));
     }
@@ -68,7 +72,7 @@ export class TurmaService extends Service {
         return this.http.put<Response>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível editar turma', life: 3000 });
+                    this.toastrService.error('Não foi possível editar turma');
                 }
             }));
     }
@@ -77,7 +81,7 @@ export class TurmaService extends Service {
         return this.http.patch<Response>(`${this.url}/turmas/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar turma', life: 3000 });
+                    this.toastrService.error('Não foi possível habilitar/desabilitar turma');
                 }
             }));
     }

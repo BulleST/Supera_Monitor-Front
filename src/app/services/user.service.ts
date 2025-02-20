@@ -17,7 +17,7 @@ export class UserService extends Service {
         return this.http.get<AccountRole[]>(`${this.url}/users/roles`)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar perfis', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar perfis');
                 }
             }));
     }
@@ -30,7 +30,7 @@ export class UserService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar usuários', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar usuários');
                 }
             }));
     }
@@ -41,8 +41,10 @@ export class UserService extends Service {
                 await lastValueFrom(this.getList());
 
             var item = this.list.value.find(x => x.id == id) as Account;
-            if (!item)
-                reject('Usuário não encontrado.')
+            if (!item) {
+                this.toastrService.error('Usuário não encontrado.');
+               return reject('Usuário não encontrado.')
+            }
 
 
             return resolve(item);
@@ -54,7 +56,7 @@ export class UserService extends Service {
         return this.http.post<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível cadastrar usuário', life: 3000 });
+                    this.toastrService.error('Não foi possível cadastrar usuário');
                 }
             }));
     }
@@ -64,7 +66,7 @@ export class UserService extends Service {
         return this.http.put<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível editar usuário', life: 3000 });
+                    this.toastrService.error('Não foi possível editar usuário');
                 }
             }));
     }
@@ -73,7 +75,7 @@ export class UserService extends Service {
         return this.http.patch<Response>(`${this.url}/users/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: `Não foi possível ${(activated ? 'desabilitar' : 'habilitar')}  usuário`, life: 3000 });
+                    this.toastrService.error(`Não foi possível ${(activated ? 'desabilitar' : 'habilitar')}  usuário`);
                 }
             }));
     }
@@ -82,7 +84,7 @@ export class UserService extends Service {
         return this.http.patch<Response>(`${this.url}/users/reset-password/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível alterar senha', life: 3000 });
+                    this.toastrService.error('Não foi possível alterar senha');
                 }
             }));
     }

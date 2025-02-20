@@ -4,20 +4,20 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { CalendarioList, CalendarioRequest } from '../../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { CalendarOptions, DatesSetArg, EventApi, EventClickArg } from '@fullcalendar/core';
+import { CalendarOptions, DatesSetArg, EventApi } from '@fullcalendar/core';
 import moment from 'moment';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
 import { AulaService } from '../../../../services/aulas.service';
 
 @Component({
     selector: 'app-calendario',
-    standalone: false,
     templateUrl: './calendario.component.html',
     styleUrl: './calendario.component.css',
-    providers: [ConfirmationService, MessageService],
+    standalone: false,
+    providers: [ConfirmationService],
 })
 export class CalendarioComponent implements OnChanges, OnDestroy {
     @Input() object = new Aluno;
@@ -44,12 +44,6 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
         ],
         dayMaxEvents: 3,
         multiMonthMaxColumns: 1,// force a single column,
-        views: {
-            multiMonthFourMonth: {
-                type: 'multiMonth',
-                duration: { months: 4 }
-            }
-        },
         dayHeaders: true,
         weekends: false,
         expandRows: true,
@@ -60,7 +54,24 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
         headerToolbar: {
             left: 'title',
             center: '',
-            right: 'today prev next'
+            right: 'atualizar today prev next'
+        },
+        customButtons: {
+            atualizar: {
+                text: 'atualizar',
+                hint: 'atualizar',
+                click: () => {
+                    this.getCalendario(this.request)
+                }
+            }
+        },
+        buttonText: {
+            today: 'hoje',
+            year: 'meses',
+            month: 'mês',
+            week: 'semana',
+            day: 'dia',
+            list: 'lista'
         },
         events: [],
         scrollTime: '10:00:00',
@@ -68,12 +79,14 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
         eventDurationEditable: false,
         handleWindowResize: true,
         lazyFetching: true,
-        eventClick: this.eventClick.bind(this),
         eventsSet: this.events.bind(this),
         datesSet: (arg: DatesSetArg) => {
+            console.log('datesSet', this.object.id)
             this.request.intervaloDe = new Date(arg.start.getTime());
             this.request.intervaloAte = undefined;
-            this.getCalendario(this.request);
+            if (this.object.id) {
+                this.getCalendario(this.request);
+            }
         },
     }
 
@@ -86,10 +99,13 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
+        console.log('ngOnChanges', changes)
         if (changes['object']) {
             this.object = changes['object'].currentValue;
-            this.request.aluno_Id = this.object.id;
-            this.getCalendario(this.request)
+            if (this.object.id) {
+                this.request.aluno_Id = this.object.id;
+                
+            }
         }
     }
 
@@ -103,9 +119,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
 
 
-    eventClick(e: EventClickArg) {
 
-    }
     showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
@@ -119,24 +133,22 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
     async getCalendario(request: CalendarioRequest) {
 
-        this.loading = true;
+        this.loading = true;console.log(request)
 
         await lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
 
-                calendarioList
-                    .filter(x => x.alunos.length < x.capacidadeMaximaAlunos && x.data >= new Date)
-                    .forEach(aula => {
-                        var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
-                        var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
-                        if (index == -1)
-                            this.calendarioList.push(aula);
-                        else
-                            this.calendarioList.splice(index, 1, aula);
-
-                    })
-                this.calendarioList.sort((x, y) => (x.data > y.data ? -1 : 1));
-
+                calendarioList.forEach(aula => {
+                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
+                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
+                    if (index == -1){
+                        this.calendarioList.push(aula);
+                    }
+                    else {
+                        this.calendarioList.splice(index, 1, aula);
+                    }
+                });
+                    
                 this.setCalendario();
                 this.setLegenda(this.calendarioList);
             })
@@ -160,6 +172,10 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
             }
             return event;
         });
+        this.fullCalendar.getApi().render();
+        setTimeout(() => {
+            this.fullCalendar.getApi().render();
+        }, 100);
 
         this.loading = false;
     }

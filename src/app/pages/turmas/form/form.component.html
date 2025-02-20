@@ -1,11 +1,8 @@
-
 <p-confirmdialog styleClass="w-25rem">
     <ng-template #message let-message>
         <div [innerHTML]="message.message"></div>
     </ng-template>
 </p-confirmdialog>
-
-
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
@@ -14,44 +11,44 @@
           (visibleChange)="visibleChange()"
           [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
           appendTo="body">
-          
-          <ng-template #header>
-            <div class="w-full flex align-items-center ">
-                <span class="p-dialog-title">{{isEditPage ? 'Editar'  : 'Cadastrar'}}</span>
-                <p-button class="ml-auto"
-                          type="button"
-                          icon="pi pi-exclamation-circle"
-                          size="large"
-                          [text]="true"
-                          [rounded]="true"
-                          severity="secondary"
-                          (onClick)="op.toggle($event)"  />
-                <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
-                    <div class="px-2">
-                        <h3 class="text-xl mb-2">Informações Adicionais</h3>
-                        <table class="w-full">
-                            <tr>
-                                <td class="p-1"><b>Cadastrado em</b></td>
-                                <td class="p-1 pl-3 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
-                            </tr>
-                            <tr *ngIf="object.account_Created">
-                                <td class="p-1"><b>Cadastrado por</b></td>
-                                <td class="p-1 pl-3 text-right">{{ object.account_Created }}</td>
-                            </tr>
-                            <tr *ngIf="object.lastUpdated">
-                                <td class="p-1"><b>Última atualização</b></td>
-                                <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
-                            </tr>
-                            <tr *ngIf="object.deactivated">
-                                <td class="p-1"><b>Inativo em</b></td>
-                                <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </p-popover>
-            </div>
-        </ng-template>
-    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
+            <p-button *ngIf="isEditPage"
+                      class="ml-auto"
+                      type="button"
+                      icon="pi pi-exclamation-circle"
+                      size="large"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="secondary"
+                      (onClick)="op.toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                <div class="px-2">
+                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                    <table class="w-full">
+                        <tr *ngIf="object.created">
+                            <td class="p-1"><b>Cadastrado em</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.account_Created">
+                            <td class="p-1"><b>Cadastrado por</b></td>
+                            <td class="p-1 pl-3 text-right">{{ object.account_Created }}</td>
+                        </tr>
+                        <tr *ngIf="object.lastUpdated">
+                            <td class="p-1"><b>Última atualização</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.deactivated">
+                            <td class="p-1"><b>Inativo em</b></td>
+                            <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </p-popover>
+        </div>
+    </ng-template>
+    <form (ngSubmit)="send(form, $event)" #form="ngForm" #divForm>
         <div class="formgrid grid">
             <div class="field sm:col-8 col-12"> <!-- Nome -->
                 <label for="nome">Nome: <span class="text-red-500">*</span></label>
@@ -81,52 +78,18 @@
                           optionLabel="nome"
                           optionValue="id"
                           [showClear]="true"
-                          [checkmark]="true"
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body" />
-            </div>
-            <div class="field col-12"> <!-- Professor -->
-                <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="professores"
-                          [(ngModel)]="object.professor_Id"
-                          #professor_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="professor_Id"
-                          inputId="professor_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          [checkmark]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
-                          optionDisabled="deactivated">
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div>
-                                <p class="font-bold">{{ item.nome }}</p>
-                                <p class="text-sm">
-                                    <{{ item.email }}>
-                                </p>
-                            </div>
-                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                                   [value]="item.active ? 'Ativo': 'Inativo'"
-                                   [severity]="item.active ? 'success': 'danger'"
-                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                        </div>
-                    </ng-template>
-                </p-select>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Dias de Aula -->
                 <label for="diaSemana">Dias de Aula: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="diasSemana"
                           [(ngModel)]="object.diaSemana"
+                          (ngModelChange)="verificaDisponibilidadeProfessor()"
                           #diaSemana="ngModel"
+                          #diaSemanaEl
                           styleClass="w-full"
                           class="w-full"
                           name="diaSemana"
@@ -134,7 +97,6 @@
                           optionLabel="label"
                           optionValue="id"
                           [showClear]="true"
-                          [checkmark]="true"
                           appendTo="body"
                           [required]="true" />
                 <div *ngIf="diaSemana.touched && diaSemana.invalid && diaSemana.errors">
@@ -145,6 +107,7 @@
                 <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               [(ngModel)]="object.horario"
+                              (onBlur)="verificaDisponibilidadeProfessor()"
                               #horario="ngModel"
                               styleClass="w-full"
                               class="w-full"
@@ -167,34 +130,83 @@
             </div>
             <div class="field sm:col-4 col-12"> <!-- Limite de Alunos -->
                 <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
-                <p-inputnumber 
-                    #capacidadeMaximaAlunos="ngModel"
-                    [(ngModel)]="object.capacidadeMaximaAlunos"
-                    id="capacidadeMaximaAlunos"
-                    name="capacidadeMaximaAlunos"
-                    class="w-full"
-                    styleClass="w-full"
-                    inputStyleClass="w-full"
-                    [required]="true" />
+                <p-inputnumber
+                               #capacidadeMaximaAlunos="ngModel"
+                               [(ngModel)]="object.capacidadeMaximaAlunos"
+                               id="capacidadeMaximaAlunos"
+                               name="capacidadeMaximaAlunos"
+                               class="w-full"
+                               styleClass="w-full"
+                               inputStyleClass="w-full"
+                               [required]="true" />
                 <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
+            <div class="field col-12"> <!-- Professor -->
+                <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="professores"
+                          [(ngModel)]="object.professor_Id"
+                          (onChange)="professorChanged($event)"
+                          #professor_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_Id"
+                          inputId="professor_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1">
+                                    <span class="mr-2">{{ item.nome }}</span>
+                                    <p-badge *ngIf="item.disponivel == false" value="Indisponível" severity="danger" />
+                                </p>
+                                <p class="text-sm">
+                                    <{{ item.email }}>
+                                </p>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Professor indisponível.</p>
+                </div>
+            </div>
         </div>
-        <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
-            <div class="sm:col-9 col-12">
+        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="col">
                 <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
+                <p-button *ngIf="isEditPage"
+                          type="button"
+                          (onClick)="goToCalendario()"
+                          styleClass="border-2 px-3 mr-2"
+                          label="Ver calendário"
+                          icon="pi pi-calendar"
+                          [rounded]="true"
+                          [outlined]="true"
+                          size="small" />
                 <p-button
                           type="submit"
                           [disabled]="form.invalid || loading"
-                          class="w-full"
-                          styleClass="w-full px-3"
+                          styleClass="px-3"
                           label="Salvar"
                           icon="pi pi-check"
-                          iconPos="right"
                           [loading]="loading"
                           [rounded]="true"
                           size="small" />

@@ -1,3 +1,5 @@
+import { EventSourceInput } from "@fullcalendar/core";
+
 export class CalendarioRequest {
     intervaloDe?: Date;
     intervaloAte?: Date;
@@ -16,9 +18,10 @@ export class CalendarioList {
     professor_Id: number = 0;
     professor: string = '';
     corLegenda: string = '';
-    observacao: string = '';
+    observacao?: string = '';
     turma_Tipo: string = '';
     turma_Tipo_Id: number = 0;
+    finalizada: boolean = false;
     alunos: CalendarioAlunoList[] = [];
 }
 
@@ -53,3 +56,110 @@ export class CalendarioAlunoList {
     flagAlunoNovo: boolean = false;
     loadingFoto: boolean = false;
 }
+
+
+export var loadingEvents: any[] = [
+    {
+        "id": "1LEbK",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-17T13:00:00.000Z",
+        "end": "2025-02-17T15:00:00.000Z",
+    },
+    {
+        "id": "3dXsT",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-17T11:00:00.000Z",
+        "end": "2025-02-17T13:00:00.000Z",
+       
+    },
+    {
+        "id": "Bg3fV",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-17T15:00:00.000Z",
+        "end": "2025-02-17T17:00:00.000Z",
+        
+    },
+    {
+        "id": "KhqDY",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-18T13:00:00.000Z",
+        "end": "2025-02-18T15:00:00.000Z",
+    },
+    {
+        "id": "Yslby",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-18T11:00:00.000Z",
+        "end": "2025-02-18T13:00:00.000Z",
+    },
+    {
+        "id": "Dhyza",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-18T16:00:00.000Z",
+        "end": "2025-02-18T18:00:00.000Z",
+        
+    },
+    {
+        "id": "uRtob",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-19T13:00:00.000Z",
+        "end": "2025-02-19T15:00:00.000Z",
+       
+    },
+    {
+        "id": "Uk0Rc",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-19T16:00:00.000Z",
+        "end": "2025-02-19T18:00:00.000Z",
+       
+    },
+    {
+        "id": "U3pQX",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-19T15:00:00.000Z",
+        "end": "2025-02-19T17:00:00.000Z",
+    },
+    {
+        "id": "qFpGu",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-20T13:00:00.000Z",
+        "end": "2025-02-20T15:00:00.000Z",
+    },
+    {
+        "id": "9agrb",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-20T19:00:00.000Z",
+        "end": "2025-02-20T21:00:00.000Z",
+    },
+    {
+        "id": "jan83",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-21T13:00:00.000Z",
+        "end": "2025-02-21T15:00:00.000Z",
+    },
+    {
+        "id": "JAMBg",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-21T16:00:00.000Z",
+        "end": "2025-02-21T18:00:00.000Z",
+    },
+    {
+        "id": "dSyHx",
+        "backgroundColor": "transparent",
+        "borderColor": "transparent",
+        "start": "2025-02-21T16:00:00.000Z",
+        "end": "2025-02-21T18:00:00.000Z",
+    }
+]

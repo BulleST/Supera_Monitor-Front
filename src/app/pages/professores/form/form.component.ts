@@ -1,6 +1,6 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
@@ -8,19 +8,18 @@ import { ProfessorService } from '../../../services/professor.service';
 import { Professor, Professor_NivelApostila } from '../../../models/professor.model';
 import { Account } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
-import { Response } from '../../../helpers/request-response.interface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrl: './form.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
-    injector = inject(Injector);
     object = new Professor;
     loading = false;
     error: string = '';
@@ -46,7 +45,8 @@ export class FormComponent implements OnDestroy {
         private crypto: Crypto,
         private service: ProfessorService,
         private userService: UserService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
     ) {
 
         lastValueFrom(this.service.getNivelAbaco())
@@ -92,6 +92,7 @@ export class FormComponent implements OnDestroy {
                     })
                     .catch(res => {
                         this.visible = false;
+                        this.visibleChange();
                     });
             } else {
                 this.visible = true;
@@ -144,6 +145,7 @@ export class FormComponent implements OnDestroy {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
+                    this.toastrService.success( this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
@@ -165,6 +167,10 @@ export class FormComponent implements OnDestroy {
             return lastValueFrom(this.service.edit(this.object));
         }
         return lastValueFrom(this.service.create(this.object));
+    }
+
+    goToCalendario() {
+        this.router.navigate(['professores', 'calendario', this.crypto.encrypt(this.object.id)]);
     }
 
 }

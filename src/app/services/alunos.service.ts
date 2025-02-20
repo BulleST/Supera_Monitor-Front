@@ -1,15 +1,11 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, lastValueFrom, map, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { environment } from '../../environments/environment.prod';
-import { MessageService } from 'primeng/api';
-import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_FaixaEtaria, Pessoa_Geracao, Pessoa_Status } from '../models/alunos.model';
+import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/alunos.model';
 import moment from 'moment';
 import { Map } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { Reposicao, ReposicaoRequest } from '../models/reposicao.model';
-import { Apostila } from '../models/apostila.model';
+import { ReposicaoRequest } from '../models/reposicao.model';
 
 @Injectable({
     providedIn: 'root',
@@ -17,7 +13,6 @@ import { Apostila } from '../models/apostila.model';
 })
 export class AlunoService extends Service {
     override list = new BehaviorSubject<Aluno[]>([]);
-
 
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all/`)
@@ -27,15 +22,26 @@ export class AlunoService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar alunos', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar alunos')
                 }
             }));
     }
 
     getFoto(id: number): Observable<string> {
+
+        var list = this.list.value;
+        var index = list.findIndex(x => x.id == id);
         return this.http.get<Response>(`${this.url}/alunos/image/${id}`)
             .pipe(map(
                 res => {
+                    if (index != -1) {
+                        var aluno = list[index];
+                        if (aluno) {
+                            aluno.aluno_Foto = res.object ?? '';
+                            list.splice(index, 1, aluno);
+                            this.list.next(list);
+                        }
+                    }
                     return res.object;
                 },
             ), tap({
@@ -50,11 +56,12 @@ export class AlunoService extends Service {
             if (this.list.value.length == 0) {
                 await lastValueFrom(this.getList());
             }
-
+            
             var item = this.list.value.find(x => x.id == id) as Aluno;
-
-            if (!item)
-                reject('Aluno não encontrado.')
+            if (!item) {
+                this.toastrService.error('Aluno não encontrado.');
+                return reject('Aluno não encontrado.')
+            }
 
             if (item.dataNascimento)
                 item.dataNascimento = new Date(moment(item.dataNascimento).format('YYYY-MM-DD[T]HH:mm:ss'))
@@ -74,11 +81,10 @@ export class AlunoService extends Service {
         return this.http.post<Response>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível cadastrar aluno', life: 3000 });
+                    this.toastrService.error('Não foi possível cadastrar aluno')
                 }
             }));
     }
-
 
     edit(model: Aluno) {
         var request = Map(model, new AlunoRequest);
@@ -87,7 +93,7 @@ export class AlunoService extends Service {
         return this.http.put<Response>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível editar aluno', life: 3000 });
+                    this.toastrService.error('Não foi possível editar aluno')
                 }
             }));
     }
@@ -96,7 +102,7 @@ export class AlunoService extends Service {
         return this.http.patch<Response>(`${this.url}/alunos/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar aluno', life: 3000 });
+                    this.toastrService.error('Não foi possível habilitar/desabilitar aluno')
                 }
             }));
     }
@@ -105,24 +111,23 @@ export class AlunoService extends Service {
         return this.http.post<Response>(`${this.url}/alunos/reposicao/`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível marcar reposição', life: 3000 });
+                    this.toastrService.error('Não foi possível marcar reposição')
                 }
             }));
     }
+
     getStatus() {
         return this.http.get<Pessoa_Status[]>(`${this.url}/pessoas/status/all`)
             .pipe(tap({
-                error: err => this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar status', life: 3000 })
+                
+                error: err => this.toastrService.error( 'Não foi possível carregar status')
             }));
     }
-
 
     getSexo() {
         return this.http.get<Pessoa_Sexo[]>(`${this.url}/pessoas/sexos/all`)
             .pipe(tap({
-                error: err => this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar sexo', life: 3000 })
+                error: err => this.toastrService.error( 'Não foi possível carregar sexo')
             }));
     }
-
-
 }

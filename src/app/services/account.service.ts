@@ -25,10 +25,8 @@ export class AccountService {
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private http: HttpClient,
-        // @Inject('BASE_URL') url: string
     ) {
-        // this.url = url + 'back'
-this.url = environment.url + 'back';
+        this.url = environment.url + 'back';
 
         this.account = this.accountSubject.asObservable();
 
@@ -67,11 +65,9 @@ this.url = environment.url + 'back';
 
     async logout() {
         lastValueFrom(this.http.post<any>(`${this.url}/accounts/revoke-token`, { token: this.accountValue?.refreshToken }, { withCredentials: true } /**/))
-            .catch(error => {
-            })
         this.stopRefreshTokenTimer();
         this.setAccount('logout', undefined);
-        this.router.navigate(['account', 'login']);
+        this.router.navigate(['accounts', 'login']);
     }
 
     refreshToken(where: string) {
@@ -83,7 +79,7 @@ this.url = environment.url + 'back';
                 },
                 error: (err) => {
                     var error = getError(err);
-                    // this.router.navigate(['account', 'login']);
+                    // this.router.navigate(['accounts', 'login']);
                     this.setAccount('refreshToken', undefined);
                     this.startRefreshTokenTimer();
                 },

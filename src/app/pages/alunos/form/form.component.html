@@ -16,7 +16,7 @@
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
-            <span class="p-dialog-title">Dados do Aluno</span>
+            <span class="p-dialog-title"><i class="fa-solid fa-user-graduate mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Dados do Aluno</span>
             <p-button class="ml-auto"
                       type="button"
                       icon="pi pi-exclamation-circle"
@@ -52,6 +52,7 @@
                 <p-tablist>
                     <p-tab [value]="0">Dados Cadastrais</p-tab>
                     <p-tab [value]="1">Checklist</p-tab>
+                    <p-tab [value]="2">Calendário</p-tab>
                 </p-tablist>
                 <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
                     <p-tabpanel [value]="0">
@@ -59,6 +60,9 @@
                     </p-tabpanel>
                     <p-tabpanel [value]="1">
                         <app-checklist></app-checklist>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="2">
+                        <app-calendario [object]="object"></app-calendario>
                     </p-tabpanel>
                 </p-tabpanels>
             </p-tabs>

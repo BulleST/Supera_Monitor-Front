@@ -17,13 +17,13 @@
         <div class="relative z-2">
             <app-header></app-header>
         </div>
-        <div class="flex align-items-strech justify-content-between relative z-1 px-6"
-        style="min-height: calc(100vh - 70px)">
-            <div class="sticky pt-6 transition-linear transition-duration-100 transition-all top-0 mr-5"
+        <div class="flex align-items-strech justify-content-between relative z-1 px-5"
+        style="min-height: calc(100vh - 60px)">
+            <div class="sticky pt-5 transition-linear transition-duration-100 transition-all top-0 mr-5"
                 [ngStyle]="{ width: navigationOpen ? '20rem' : '4rem' }">
                 <app-nav-menu></app-nav-menu>
             </div>
-            <div class="border-round-md mt-6 flex-grow-1 flex-shrink-1 flex-1 overflow-x-auto"
+            <div class="border-round-md mt-5 flex-grow-1 flex-shrink-1 flex-1 overflow-x-auto"
             [ngStyle]="{ width: navigationOpen ? '55%' : '80%' }">
                 <router-outlet></router-outlet>
             </div>

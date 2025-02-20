@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
@@ -13,7 +13,7 @@ import { Aluno, alunosColumns } from '../../../models/alunos.model';
     selector: 'app-list',
     templateUrl: './list.component.html',
     styleUrl: './list.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class ListComponent implements OnDestroy {

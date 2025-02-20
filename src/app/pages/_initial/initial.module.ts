@@ -8,10 +8,6 @@ import { HomeComponent } from './home/home.component';
 import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { ReposicaoComponent } from './reposicao/reposicao.component';
-import { AulaComponent } from './aula/aula.component';
-import { AlunosComponent } from './alunos/alunos.component';
 import { MonitoramentoComponent } from './monitoramento/monitoramento.component';
 
 @NgModule({
@@ -20,9 +16,6 @@ import { MonitoramentoComponent } from './monitoramento/monitoramento.component'
         HeaderComponent,
         HomeComponent,
         NavMenuComponent,
-        ReposicaoComponent,
-        AulaComponent,
-        AlunosComponent,
         MonitoramentoComponent,
     ],
     imports: [

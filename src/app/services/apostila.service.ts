@@ -12,14 +12,14 @@ export class ApostilaService extends Service {
     listKits = new BehaviorSubject<Apostila_Kit[]>([]);
 
     getApostilas() {
-        return this.http.get<Apostila[]>(`${this.url}/professor/apostila/all/`)
+        return this.http.get<Apostila[]>(`${this.url}/professor/apostilas/all/`)
             .pipe(tap({
                 next: list => {
                     this.listApostila.next(list);
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar apostila', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar apostilas')
                 }
             }));
         }
@@ -32,7 +32,7 @@ export class ApostilaService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar apostila', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar kits')
                 }
             }));
     }

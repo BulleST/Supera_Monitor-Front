@@ -1,10 +1,8 @@
-
 <p-confirmdialog styleClass="w-25rem">
     <ng-template #message let-message>
         <div [innerHTML]="message.message"></div>
     </ng-template>
 </p-confirmdialog>
-
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
@@ -16,7 +14,8 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
-            <p-button class="ml-auto"
+            <p-button *ngIf="isEditPage"
+                      class="ml-auto"
                       type="button"
                       icon="pi pi-exclamation-circle"
                       size="large"
@@ -28,7 +27,7 @@
                 <div class="px-2">
                     <h3 class="text-xl mb-2">Informações Adicionais</h3>
                     <table class="w-full">
-                        <tr>
+                        <tr *ngIf="object.created">
                             <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Cadastrado em</td>
                             <td class="py-2 px-3 surface-800 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
                         </tr>
@@ -66,7 +65,6 @@
                               inputId="account_id"
                               optionLabel="name"
                               [showClear]="true"
-                              [checkmark]="true"
                               [filter]="true"
                               filterBy="name"
                               appendTo="body"
@@ -189,7 +187,6 @@
                           optionLabel="descricao"
                           optionValue="id"
                           [showClear]="true"
-                          [checkmark]="true"
                           appendTo="body"
                           [required]="true" />
                 <div *ngIf="professor_NivelAbaco_Id.touched && professor_NivelAbaco_Id.invalid && professor_NivelAbaco_Id.errors">
@@ -239,20 +236,27 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
-            <div class="sm:col-9 col-12 pl-0">
+        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="col">
                 <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
+                <p-button *ngIf="isEditPage"
+                          type="button"
+                          (onClick)="goToCalendario()"
+                          styleClass="border-2 px-3 mr-2"
+                          label="Ver calendário"
+                          icon="pi pi-calendar"
+                          [rounded]="true"
+                          [outlined]="true"
+                          size="small" />
                 <p-button
                           type="submit"
                           [disabled]="form.invalid || loading"
-                          class="w-full"
-                          styleClass="w-full px-3"
+                          styleClass="px-3"
                           label="Salvar"
                           icon="pi pi-check"
-                          iconPos="right"
                           [loading]="loading"
                           [rounded]="true"
                           size="small" />

@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom,  of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { environment } from '../../environments/environment.prod';
-import { MessageService } from 'primeng/api';
 import { Professor, Professor_NivelApostila, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
 import { Map } from '../utils/map';
 import moment from 'moment';
@@ -19,7 +16,7 @@ export class ProfessorService extends Service {
         return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/abaco/all`)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar nível ábaco', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar nível ábaco');
                 }
             }));
     }
@@ -28,7 +25,7 @@ export class ProfessorService extends Service {
         return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/ah/all`)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar nível AH', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar nível AH');
                 }
             }));
     }
@@ -41,7 +38,7 @@ export class ProfessorService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível carregar professores', life: 3000 });
+                    this.toastrService.error('Não foi possível carregar professores');
                 }
             }));
     }
@@ -52,8 +49,10 @@ export class ProfessorService extends Service {
                 await lastValueFrom(this.getList());
 
             var item = this.list.value.find(x => x.id == id) as Professor;
-            if (!item)
-                reject('Professor não encontrado.')
+            if (!item){
+                this.toastrService.error('Professor não encontrado.');
+               return reject('Professor não encontrado.')
+            }
 
             if (item.dataInicio)
                 item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD[T]HH:mm:ss'))
@@ -67,7 +66,7 @@ export class ProfessorService extends Service {
         return this.http.post<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível cadastrar professor', life: 3000 });
+                    this.toastrService.error('Não foi possível cadastrar professor');
                 }
             }));
     }
@@ -77,7 +76,7 @@ export class ProfessorService extends Service {
         return this.http.put<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível editar professor', life: 3000 });
+                    this.toastrService.error('Não foi possível editar professor');
                 }
             }));
     }
@@ -86,7 +85,7 @@ export class ProfessorService extends Service {
         return this.http.patch<Response>(`${this.url}/professor/${id}/${activated}`, {})
             .pipe(tap({
                 error: err => {
-                    this.messageService.add({ severity: 'danger', summary: 'Ocorreu um erro', detail: 'Não foi possível habilitar/desabilitar professor', life: 3000 });
+                    this.toastrService.error('Não foi possível habilitar/desabilitar professor');
                 }
             }));
     }

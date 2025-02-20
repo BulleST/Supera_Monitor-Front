@@ -5,14 +5,15 @@ import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { TurmaService } from '../../../../services/turma.service';
 import { AlunoService } from '../../../../services/alunos.service';
-import imageCompression from 'browser-image-compression';
+// import imageCompression from 'browser-image-compression';
+import { ControlContainer, FormGroupDirective, NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-dados-cadastrais',
     standalone: false,
-
     templateUrl: './dados-cadastrais.component.html',
-    styleUrl: './dados-cadastrais.component.css'
+    styleUrl: './dados-cadastrais.component.css',
+    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }] // Permite validação de form pai em input de componente filho
 })
 export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     @Input() object = new Aluno;

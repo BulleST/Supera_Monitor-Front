@@ -1,36 +1,39 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Crypto } from '../../../utils';
 import { CalendarOptions, DatesSetArg, EventApi, EventClickArg } from '@fullcalendar/core';
 import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import { CalendarioList, CalendarioRequest } from '../../../models/calendario.model';
+import { CalendarioList, CalendarioRequest, loadingEvents } from '../../../models/calendario.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno } from '../../../models/alunos.model';
 import { Reposicao, ReposicaoRequest } from '../../../models/reposicao.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { AulaCreateRequest } from '../../../models/aulas.model';
+import { ToastrService } from 'ngx-toastr';
+import { Crypto } from '../../../utils';
+import { TurmaService } from '../../../services/turma.service';
+import { ProfessorService } from '../../../services/professor.service';
 
 @Component({
     selector: 'app-reposicao',
     standalone: false,
     templateUrl: './reposicao.component.html',
     styleUrl: './reposicao.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
 })
 export class ReposicaoComponent implements OnDestroy, AfterViewInit {
-    visible: boolean = true;
+    visible: boolean = false;
     object: Reposicao = new Reposicao;
     loading = false;
     error: string = '';
     subscription: Subscription[] = [];
     legenda: { backgroundColor: string, label: string }[] = [];
-    request: CalendarioRequest = new CalendarioRequest;
+    calendarioRequest: CalendarioRequest = new CalendarioRequest;
 
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     selectedAula?: EventImpl;
@@ -60,10 +63,29 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         showNonCurrentDates: true,
         defaultAllDay: false,
         allDaySlot: false,
+        customButtons: {
+            atualizar: {
+                text: 'atualizar',
+                hint: 'atualizar',
+                click: () => {
+                    this.getCalendario(this.calendarioRequest, 'atualizar')
+                }
+            },
+
+        },
         headerToolbar: {
             left: 'title',
             center: '',
-            right: 'today prev next'
+            right: 'atualizar today prev next'
+        },
+
+        buttonText: {
+            today: 'hoje',
+            year: 'meses',
+            month: 'mês',
+            week: 'semana',
+            day: 'dia',
+            list: 'lista'
         },
         events: [],
         scrollTime: '10:00:00',
@@ -71,15 +93,9 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         eventDurationEditable: false,
         handleWindowResize: true,
         lazyFetching: true,
+        datesSet: this.datesSet.bind(this),
         eventClick: this.eventClick.bind(this),
         eventsSet: this.events.bind(this),
-        datesSet: (arg: DatesSetArg) => {
-        
-            this.request.intervaloDe = new Date(arg.start.getTime());
-            this.request.intervaloAte = undefined;
-
-            this.getCalendario(this.request);
-        },
     }
 
     aluno: Aluno = new Aluno;
@@ -87,48 +103,87 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
-        private crypto: Crypto,
         private service: AulaService,
         private changeDetector: ChangeDetectorRef,
         private alunoService: AlunoService,
+        private turmaService: TurmaService,
+        private professorService: ProfessorService,
         private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
+        private crypto: Crypto
     ) {
 
         var list = this.service.list.subscribe(res => this.calendarioList = res);
         this.subscription.push(list);
 
-        var encrypted = localStorage.getItem('reposicao');
-        if (!encrypted) {
-            this.visible = false;
-            this.visibleChange();
-            return;
-        }
-        this.object = this.crypto.decrypt(encrypted) as Reposicao;
-        if (!this.object) {
-            this.visible = false;
-            this.visibleChange();
-            return;
-        }
+        // var reposicao = this.service.reposicao.subscribe(res => {
+        //     if (!res){
+        //         this.visible = false;
+        //         this.visibleChange();
+        //         return;
+        //     }
+
+        //     this.object = res;
+        // });
+        // this.subscription.push(reposicao);
+
+        this.activatedRoute.queryParams.subscribe(async res => {
+            console.log(res);
+            this.object = {
+                aluno: res['a'],
+                aluno_Id: res['b'],
+                source_Aula_Id: res['c'],
+                source_Data: res['d'],
+                source_Turma_Id: res['e'],
+                source_Turma: res['f'],
+                source_Turma_Tipo_Id: res['g'],
+                source_Turma_Tipo: res['h'],
+                source_Professor_Id: res['i'],
+                source_Professor: res['j'],
+            } as Reposicao
+
+            this.visible = true;
+            this.calendarioRequest.turma_Tipo_Id = this.object.source_Turma_Tipo_Id;
+
+            this.alunoService.get(this.object.aluno_Id)
+                .catch(res => {
+                    this.visible = false;
+                    this.visibleChange();
+                });
+
+            this.turmaService.get(this.object.source_Turma_Id)
+                .catch(res => {
+                    this.visible = false;
+                    this.visibleChange();
+                });
+
+            this.professorService.get(this.object.source_Professor_Id)
+                .catch(res => {
+                    this.visible = false;
+                    this.visibleChange();
+                });
+
+            lastValueFrom(this.turmaService.getTipos())
+                .then(res => {
+                    if (!res.find(x => x.id == this.object.source_Turma_Tipo_Id)) {
+                        this.toastrService.error('Faixa etária não encontrada.');
+                        this.visible = false;
+                        this.visibleChange();
+                    }
+                })
+                .catch(res => {
+                    this.visible = false;
+                    this.visibleChange();
+                });
+
+
+        })
 
         this.loadAluno();
 
-        this.request.intervaloDe = moment(this.object.source_Data).add(-1, 'month').toDate();
-        this.request.intervaloAte = moment(this.object.source_Data).add(1, 'month').toDate();
-        this.request.turma_Tipo_Id = this.object.source_Turma_Tipo_Id;
-        
-        this.getCalendario(this.request);
-
-        var params = this.activatedRoute.params.subscribe(res => {
-            if (!res['aluno_id']) {
-                this.visible = false;
-                this.visibleChange();
-                return;
-            }
-        })
-        this.subscription.push(params);
     }
 
-    
+
     ngAfterViewInit(): void {
 
     }
@@ -157,26 +212,24 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         this.loading = false;
     }
 
-    async getCalendario(request: CalendarioRequest) {
-
+    async getCalendario(request: CalendarioRequest, where: string) {
         this.loading = true;
-
         await lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
 
                 calendarioList
-                .filter(x => x.alunos.length < x.capacidadeMaximaAlunos && x.data >= new Date)
-                .forEach(aula => {
-                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
-                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
-                    if (index == -1){
-                        this.calendarioList.push(aula);
-                    }
-                    else {
-                        this.calendarioList.splice(index, 1, aula);
-                    }
+                    .filter(x => x.alunos.length < x.capacidadeMaximaAlunos && x.data >= new Date)
+                    .forEach(aula => {
+                        var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
+                        var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
+                        if (index == -1) {
+                            this.calendarioList.push(aula);
+                        }
+                        else {
+                            this.calendarioList.splice(index, 1, aula);
+                        }
 
-                })
+                    })
                 this.calendarioList.sort((x, y) => (x.data > y.data ? -1 : 1));
 
                 this.setCalendario();
@@ -184,6 +237,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
+                this.toastrService.error('Não foi possível carregar calendário')
             })
 
     }
@@ -193,8 +247,8 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         this.calendarioOptions.events = this.calendarioList.map(item => {
             var event = {
                 id: this.eventRamdomId(),
-                backgroundColor: item.corLegenda,
-                borderColor: item.corLegenda,
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
                 title: item.turma,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
@@ -224,21 +278,6 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         return result;
     }
 
-    getForeColor(hex: string) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        var rgb = result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : {
-            r: 0,
-            g: 0,
-            b: 0
-        };
-        return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 200 ? '#000' : '#fff';
-    }
-
-
     setLegenda(c: CalendarioList[]) {
         this.legenda = [];
         c.forEach(item => {
@@ -251,16 +290,44 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 )
             }
         })
-        var calendar = this.fullCalendar.getApi();
-
-        calendar.gotoDate(this.calendarioList[0].data)
     }
-
 
     events(events: EventApi[]) {
         this.currentEvents.set(events);
         this.changeDetector.detectChanges();
     }
+    async datesSet(arg: DatesSetArg) {
+        // loadingEvents.sort((x, y) => x.start - y.start)
+        
+        
+        // let _loadingEvents: any[] = [] 
+        // console.log(arg);
+        
+        // loadingEvents.forEach(x => {
+        //     console.log('antes', x.start.substring(0,10))
+        //     var start = new Date(x.start);
+        //     start = moment(start).add(arg.start.getMonth() - start.getMonth()).toDate();
+
+        //     var week = Math.ceil((start.getDate() - 1 - start.getDay()) / 7)
+            
+        //     for (let i = 0; i < 4; i++) {                
+        //         console.log(week-i)
+        //         console.log(i-week+1)
+        //         x.start = moment(start).add(((i-week)+1), 'weeks').format('YYYY-MM-DD') + x.start.substring(10)
+        //         x.end = moment(start).add(((i-week)+1), 'weeks').format('YYYY-MM-DD') + x.end.substring(10)
+        //         console.log('depois', x.start)
+        //         _loadingEvents.push(JSON.parse(JSON.stringify(x)))
+        //     }
+        //     })
+
+        // console.log(_loadingEvents)
+        this.calendarioOptions.events = [];
+        this.calendarioRequest.intervaloDe = arg.start;
+        this.calendarioRequest.intervaloAte = arg.end;
+
+        this.getCalendario(this.calendarioRequest, 'datesSet');
+    }
+
 
     eventClick(e: EventClickArg) {
         this.confirmationService.confirm({
@@ -293,7 +360,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             rejectVisible: false,
         })
     }
-    
+
     confirmaReposicao(e: any) {
 
         var target = this.selectedAula!.extendedProps['data'] as CalendarioList;
@@ -304,13 +371,13 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             header: 'Agendar reposição',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
-            acceptLabel: 'Selecionar',
+            acceptLabel: 'Agendar',
             acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
             accept: () => {
-                this.send(target)
+                this.send(target, e)
             },
             reject: () => {
             }
@@ -318,7 +385,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     }
 
 
-    async send(target: CalendarioList) {
+    async send(target: CalendarioList, e: any) {
 
         this.loading = true;
 
@@ -330,10 +397,12 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             var aulaRequest: AulaCreateRequest = {
                 turma_Id: this.object.source_Turma_Id,
                 data: moment(this.object.source_Data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                professor_Id: this.object.source_Professor_Id
+                professor_Id: this.object.source_Professor_Id,
+                observacao: ''
             }
-            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
-            reposicaoRequest.source_Aula_Id = aulaResponse.object.id;
+            await lastValueFrom(this.service.create(aulaRequest))
+                .then(res => reposicaoRequest.source_Aula_Id = res.object.id)
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${res.error.message}`, e));
         }
 
         // Se a aula target não existir, cria a aula
@@ -341,10 +410,13 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             var aulaRequest: AulaCreateRequest = {
                 turma_Id: target.turma_Id,
                 data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                professor_Id: target.professor_Id
+                professor_Id: target.professor_Id,
+                observacao: ''
             }
-            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
-            reposicaoRequest.dest_Aula_Id = aulaResponse.object.id;
+            await lastValueFrom(this.service.create(aulaRequest))
+                .then(res => reposicaoRequest.dest_Aula_Id = res.object.id)
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${res.error.message}`, e));
+
         }
 
         await lastValueFrom(this.alunoService.reposicao(reposicaoRequest))
@@ -354,11 +426,12 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
                 this.visible = false;
                 this.visibleChange();
-
-                
+                this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
+                this.service.calendarioReload.next(true);
             })
             .catch(res => {
                 this.loading = false;
+                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${res.error.message}`, e)
             })
     }
 

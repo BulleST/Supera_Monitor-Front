@@ -4,32 +4,40 @@ import { provideHttpClient, withFetch,  withInterceptorsFromDi } from '@angular/
 import { ProfileComponent } from './profile/profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { FormsModule } from '@angular/forms';
+import { FormGroupDirective, FormsModule } from '@angular/forms';
 import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { TranslateModule } from '@ngx-translate/core';
 import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
+import { FullCalendarModule } from '@fullcalendar/angular';
 
 // Alunos
 import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
 import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
 import { ChecklistComponent as AlunoChecklistComponent } from '../pages/alunos/form/checklist/checklist.component';
 import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-import { FullCalendarModule } from '@fullcalendar/angular';
+import { ReposicaoComponent } from '../pages/_initial/reposicao/reposicao.component';
+import { AulaComponent } from '../pages/_initial/aula/aula.component';
 // End Alunos
+
+
 
 @NgModule({
     declarations: [
         ProfileComponent,
         ChangePasswordComponent,
+
         // Alunos
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoChecklistComponent,
         AlunoCalendarioComponent,
         // End Alunos
+
+        ReposicaoComponent,
+        AulaComponent,
     ],
     exports: [
         FormsModule,
@@ -52,6 +60,9 @@ import { FullCalendarModule } from '@fullcalendar/angular';
         AlunoChecklistComponent,
         AlunoCalendarioComponent,
         // End Alunos
+
+        ReposicaoComponent,
+        AulaComponent,
     ],
     imports: [
         CommonModule,

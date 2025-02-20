@@ -1,20 +1,23 @@
-import { Component, inject, Injector, OnDestroy } from '@angular/core';
+import { Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { Turma, Turma_Tipo } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import { Professor } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
+import moment from 'moment';
+import { Select, SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-form',
     templateUrl: './form.component.html',
     styleUrl: './form.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class FormComponent implements OnDestroy {
@@ -25,6 +28,10 @@ export class FormComponent implements OnDestroy {
     error: string = '';
     isEditPage = false;
     subscription: Subscription[] = [];
+
+    @ViewChild('professor_Id') professorSelect!: NgModel;
+    @ViewChild('divForm') divForm!: HTMLElement;
+
     diasSemana = [
         { id: 0, label: 'Domingo' },
         { id: 1, label: 'Segunda-feira' },
@@ -47,7 +54,8 @@ export class FormComponent implements OnDestroy {
         private crypto: Crypto,
         private service: TurmaService,
         private professorService: ProfessorService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
     ) {
 
         this.loadPage();
@@ -58,12 +66,7 @@ export class FormComponent implements OnDestroy {
             })
             .catch(res => this.loadingTurmaTipo = false);
 
-        lastValueFrom(this.professorService.getList())
-            .then(res => {
-                this.loadingProfessores = false;
-                this.professores = res.sort((x, y) => Number(x.deactivated) - Number(y.deactivated))
-            })
-            .catch(res => this.loadingProfessores = false);
+       
     }
 
     ngOnDestroy(): void {
@@ -81,12 +84,14 @@ export class FormComponent implements OnDestroy {
                 this.service.get(id)
                     .then(res => {
                         this.object = res;
-                        this.object.horario = this.toDate(res.horario.toString());
                         this.loading = false;
                         this.visible = true;
+
+                        this.verificaDisponibilidadeProfessor();
                     })
                     .catch(res => {
                         this.visible = false;
+                        this.visibleChange();
                     });
             } else {
                 this.visible = true;
@@ -95,11 +100,6 @@ export class FormComponent implements OnDestroy {
         this.subscription.push(params);
     }
 
-    toDate(horario: string) {
-        var stringDate = new Date(2025, 1, 1).toISOString().substring(0, 10) + 'T' + horario;
-        return new Date(stringDate);
-
-    }
 
     visibleChange() {
         if (!this.visible) {
@@ -108,11 +108,86 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    showError(message: string, e: any) {
+    async verificaDisponibilidadeProfessor() {
+        var valid = true;
+
+        if (!this.object.diaSemana || !this.object.horario) {
+            return valid;
+        }
+
+        var turmas = this.service.list.value;
+        if (turmas.length == 0) {
+            turmas = await lastValueFrom(this.service.getList());
+        }
+
+        if (this.professores.length == 0) {
+
+            this.loadingProfessores = true;
+            await lastValueFrom(this.professorService.getList())
+            .then(res => {
+                this.loadingProfessores = false;
+                this.professores = res.sort((x, y) => Number(x.deactivated) - Number(y.deactivated))
+            })
+            .catch(res => this.loadingProfessores = false);
+        }
+
+        this.professores.map(professor => {
+
+            var intervaloDe = moment(this.object.horario).add(-2, 'hour'); // Duas horas antes
+            var intervaloAte = moment(this.object.horario).add(2, 'hour'); // Duas horas depois
+
+            // var beginningTime = moment({ hour: intervaloDe.getHours(), minute: intervaloDe.getMinutes() });            
+            // var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
+
+            // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
+            var exists = turmas.find(x => x.id != this.object.id 
+                            && x.professor_Id == professor.id 
+                            && x.diaSemana == this.object.diaSemana 
+                            && moment(x.horario, 'HH:mm:ss').isAfter(intervaloDe) 
+                            && moment(x.horario, 'HH:mm:ss').isBefore(intervaloAte) );
+
+            
+            if (exists ) {
+                professor.disponivel = false;
+                professor.disponivelTurma = exists;
+                
+                if (professor.id == this.object.professor_Id) {
+                    valid = false;
+                    this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
+                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.nome}</b> no mesmo dia às <b>${moment(exists.horario).format('HH[h]mm')}</b>.`, { target: this.divForm } );
+                }
+            } 
+            else {
+                professor.disponivel = true;
+                professor.disponivelTurma = undefined;
+                this.professorSelect.control.setErrors({ indisponivel: null });
+                this.professorSelect.control.updateValueAndValidity();
+            }
+            return professor;
+        });
+
+        return valid
+
+    }
+
+    professorChanged(e: SelectChangeEvent) {
+        var professor = this.professores.find(x => x.id == e.value);
+
+        if (professor && professor.disponivel == false) {
+            this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
+            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelTurma!.nome}</b> no mesmo dia às <b>${moment(professor.disponivelTurma!.horario).format('HH[h]mm')}</b>.`, e.originalEvent );
+            return;
+        } else {
+            this.professorSelect.control.setErrors({ indisponivel: null });
+        }
+        this.professorSelect.control.updateValueAndValidity();
+    }
+
+    showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Error',
+            header:  'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
@@ -121,29 +196,37 @@ export class FormComponent implements OnDestroy {
     }
 
 
-    send(form: NgForm, e: any) {
-        if (form.invalid) {
+    async send(form: NgForm, e: any) {
+       var professorValido = await this.verificaDisponibilidadeProfessor();
+
+
+        if (form.invalid || this.professorSelect.invalid || professorValido == false) {
             return;
         }
-        this.loading = true;
 
+
+        this.loading = true;
         this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
+
+                    res.object.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + res.object.horario);
+
+                    this.toastrService.success( this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
                 }
                 else {
                     this.error = res.message;
-                    this.showError(this.error, e);
+                    this.showError('Ocorreu um erro', this.error, e);
                 }
             })
             .catch((res: HttpErrorResponse) => {
                 this.error = res.error.message;
                 this.loading = false;
-                this.showError(this.error, e);
+                this.showError('Ocorreu um erro', this.error, e);
             })
     }
 
@@ -152,6 +235,9 @@ export class FormComponent implements OnDestroy {
             return lastValueFrom(this.service.edit(this.object));
         }
         return lastValueFrom(this.service.create(this.object));
+    }
+    goToCalendario() {
+        this.router.navigate(['turmas', 'calendario', this.crypto.encrypt(this.object.id)]);
     }
 
 }

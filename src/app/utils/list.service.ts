@@ -9,7 +9,7 @@ export function remove(service: any, objeto: any, property = 'list') {
 
 export function insertOrReplace(service: Service, object: any, property = 'list') {
    try {
-    var list = JSON.parse(JSON.stringify(service.list.value)) as any[];
+    var list = service.list.value as any[];
     if (object.id) {
         var index = list.findIndex(x => x.id == object.id);
         if (index == -1) {

@@ -2,35 +2,36 @@ import { Component, OnDestroy, AfterViewInit, signal, ChangeDetectorRef, ViewChi
 import { CalendarOptions, DatesSetArg, EventApi, EventClickArg, EventDropArg, EventHoveringArg } from '@fullcalendar/core';
 import { AulaService } from '../../../services/aulas.service';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { Crypto, Header, MobileService } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import {  VerboseFormattingArg } from '@fullcalendar/core/internal';
+import { VerboseFormattingArg } from '@fullcalendar/core/internal';
 import { Popover } from 'primeng/popover';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import listPlugin from '@fullcalendar/list';
-import { CalendarioAlunoList, CalendarioList, CalendarioRequest } from '../../../models/calendario.model';
+import { CalendarioAlunoList, CalendarioList, CalendarioRequest, loadingEvents } from '../../../models/calendario.model';
 import { AccountService } from '../../../services/account.service';
 import { ProfessorService } from '../../../services/professor.service';
 import { AccountResponse } from '../../../models/account.model';
 import { ScreenWidth } from '../../../utils/mobile';
 import $ from 'jquery';
 import { Reposicao, ReposicaoRequest } from '../../../models/reposicao.model';
-import { CdkDragDrop, CdkDragEnter, CdkDragExit,  CdkDragStart } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import moment from 'moment';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { AlunoService } from '../../../services/alunos.service';
 import { AulaCreateRequest } from '../../../models/aulas.model';
-
+import { LoadingService } from '../../../parts/loading/loading';
+import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.css'],
     standalone: false,
-    providers: [ConfirmationService, MessageService]
+    providers: [ConfirmationService]
 })
 export class HomeComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
@@ -43,8 +44,6 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     headerOpen = true;
     cdkDragCancel = false;
 
-    // popoverSelectedAulaStyle: any = { left: '0', top: '0' }
-    // popoverSelectedAlunoStyle: any = { left: '0', top: '0' }
     account?: AccountResponse;
 
     modalSelectedAlunoVisible = false;
@@ -52,9 +51,11 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover;
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
 
+    view: 'meuCalendario' | 'calendarioGeral' = 'calendarioGeral';
+
     cdkEventItensId: string[] = [];
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
-    calendarioVisible = signal(true);
+    calendarioVisible = signal(false);
     currentEvents = signal<EventApi[]>([]);
     calendarioList: CalendarioList[] = [];
     calendarioOptions: CalendarOptions = {
@@ -85,13 +86,14 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 text: 'atualizar',
                 hint: 'atualizar',
                 click: () => {
-                    this.getCalendario({})
+                    this.getCalendario({}, 'atualizar')
                 }
-            }
+            },
+
         },
         headerToolbar: {
             left: 'title',
-            center: undefined,
+            center: '',
             right: 'atualizar today prev next'
         },
         titleFormat: (arg: VerboseFormattingArg) => {
@@ -101,8 +103,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         nowIndicator: true,
         dayMaxEvents: true,
         // businessHours: true,
-        events: [],
-        scrollTime: '10:00:00',
+        events: loadingEvents,
+        scrollTime: '08:00:00',
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
@@ -115,22 +117,16 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             list: 'lista'
         },
         lazyFetching: true,
-        datesSet: (arg: DatesSetArg) => {
-
-            this.calendarioRequest.intervaloDe = new Date(arg.start.getTime());
-            this.calendarioRequest.intervaloAte = undefined;
-
-            this.getCalendario(this.calendarioRequest);
-        },
+        datesSet: this.datesSet.bind(this),
         dateClick: this.dateClick.bind(this),
-        eventClick: this.eventClick.bind(this),
         eventsSet: this.events.bind(this),
+        eventMouseEnter: this.eventMouseEnter.bind(this),
+        eventMouseLeave: this.eventMouseLeave.bind(this),
 
     }
     constructor(
         private changeDetector: ChangeDetectorRef,
         private confirmationService: ConfirmationService,
-        private messageService: MessageService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
@@ -140,6 +136,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         private accountService: AccountService,
         private professorService: ProfessorService,
         private mobileService: MobileService,
+        private loadingService: LoadingService,
+        private toastrService: ToastrService,
     ) {
 
         var screen = this.mobileService.get().subscribe(res => {
@@ -160,11 +158,38 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
 
         var account = this.accountService.account.subscribe(res => this.account = res);
         this.subscription.push(account);
+
+        var calendarioReload = this.service.calendarioReload.subscribe(res => {
+            this.getCalendario(this.calendarioRequest, 'calendarioReload');
+        });
+        this.subscription.push(calendarioReload);
+
+
+        var calendarView = this.service.calendarView.subscribe(async view => {
+            if (view) {
+                if (this.account && this.account?.role == "Assistant") {
+                    var professores = this.professorService.list.value;
+                    if (professores.length == 0) {
+                        professores = await lastValueFrom(this.professorService.getList());
+                    }
+                    var professor = professores.find(x => x.account_Id == this.account!.id);
+                    if (professor)
+                        this.calendarioRequest.professor_Id = professor.id
+                }
+
+                this.calendarioRequest.professor_Id = this.account?.professor_Id ?? 15;
+
+            } else {
+                this.calendarioRequest.professor_Id = undefined
+            }
+
+            this.getCalendario(this.calendarioRequest, 'calendarioReload');
+
+        })
+        this.subscription.push(calendarView);
     }
 
-    ngAfterViewInit(): void {
-        this.initCalendar();
-    }
+    ngAfterViewInit(): void { }
 
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe());
@@ -183,28 +208,30 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         return result;
     }
 
-    async initCalendar() {
+    async initCalendario() {
         this.loading = true;
         var account = this.accountService.accountSubject.value as AccountResponse;
-
         if (account?.role == "Assistant") {
-            var professores = await lastValueFrom(this.professorService.getList());
+            var professores = this.professorService.list.value;
+            if (professores.length == 0) {
+                professores = await lastValueFrom(this.professorService.getList());
+            }
             var professor = professores.find(x => x.account_Id == account.id);
             if (professor)
                 this.calendarioRequest.professor_Id = professor.id
-
         }
-        const today = new Date()
-        const day = today.getDay()
-        const diff = today.getDate() - day + (day === 0 ? -6 : 1)
+
+        const today = new Date();
+        const day = today.getDay();
+        const diff = today.getDate() - day + (day === 0 ? -6 : 1);
         const monday = new Date(today.setDate(diff));
         this.calendarioRequest.intervaloDe = monday;
-        await this.getCalendario(this.calendarioRequest)
+        await this.getCalendario(this.calendarioRequest, 'initCalendar')
     }
 
-
-    async getCalendario(request: CalendarioRequest) {
+    async getCalendario(request: CalendarioRequest, where: string) {
         this.loading = true;
+
         await lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
 
@@ -223,17 +250,18 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
+                this.toastrService.error('Não foi possível carregar calendário');
             })
     }
 
     setCalendario() {
-        this.cdkEventItensId = []
+        this.cdkEventItensId = [];
 
         this.calendarioOptions.events = this.calendarioList.map(item => {
             var event = {
                 id: this.eventRamdomId(),
-                backgroundColor: '#fff',
-                borderColor: '#fff',
+                backgroundColor: 'transparent',
+                borderColor: 'transparent',
                 title: item.turma,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
@@ -242,6 +270,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             return event;
         });
 
+        this.fullCalendar.getApi().updateSize()
         this.calendarioOptions.eventDidMount = (arg) => {
             this.cdkEventItensId.push('event-' + arg.event.id)
         }
@@ -292,6 +321,22 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 200 ? '#000' : '#fff';
     }
 
+    async datesSet(arg: DatesSetArg) {
+        let _loadingEvents = loadingEvents
+            .sort((x, y) => x.start - y.start)
+            .map(x => {
+                x.start = moment(arg.start).add(new Date(x.start).getDay() - 1, 'days').format('YYYY-MM-DD') + x.start.substring(10)
+                x.end = moment(arg.start).add(new Date(x.end).getDay() - 1, 'days').format('YYYY-MM-DD') + x.end.substring(10)
+                return x
+            })
+
+        this.calendarioOptions.events = _loadingEvents;
+        this.calendarioRequest.intervaloDe = new Date(arg.start.getTime());
+        this.calendarioRequest.intervaloAte = undefined;
+
+        this.getCalendario(this.calendarioRequest, 'datesSet');
+
+    }
 
     dateClick(e: DateClickArg) {
         // var item = e.event.extendedProps['data'] as Aulas_List;
@@ -299,27 +344,42 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         this.popoverSelectedAula.hide();
     }
 
-    eventClick(e: EventClickArg) {
-        this.selectedAula = e.event.extendedProps['data'] as CalendarioList;
-        setTimeout(() => {
-            this.popoverSelectedAula.show(e.jsEvent)
-            this.popoverSelectedAula.style = {
-                top: e.jsEvent.clientY + 'px',
-                left: e.jsEvent.clientX - 10 + 'px',
-                minWidth: '15rem',
-            }
+    // eventClick(e: EventClickArg) {
+    eventClick(item: CalendarioList, e: any) {
+        console.log('eventClick', e)
+        // this.selectedAula = e.event.extendedProps['data'] as CalendarioList;
+        this.selectedAula = item;
+
+        this.popoverSelectedAula.show(e);
+        try {
+            this.popoverSelectedAula.align()
+        }
+        catch (e) {
+
+        } setTimeout(() => {
         }, 100);
+        this.selectedAula.alunos = this.selectedAula.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : x.aluno > y.aluno ? 1 : 0)
+    }
 
-
-        this.selectedAula.alunos.map(async aluno => {
-            aluno.loadingFoto = true;
-            aluno.aluno_Foto = await lastValueFrom(this.alunoService.getFoto(aluno.aluno_Id));
-            aluno.loadingFoto = false;
-            return aluno;
-        })
-
+    eventMouseEnter(e: EventHoveringArg) {
+        $('.fc-event-hover-placeholder').remove()
+        if (!this.loading) {
+            $('body').append(`
+            <div id="event-placeholder-${e.event.id}" 
+                    class="fc-event-hover-placeholder text-white fixed z-2 fadein animation-duration-200 w-15rem"
+                    style="bottom: 20px; left: 40px; " >
+                ${$(e.el).find('.fc-event-main').html()}
+            </div>
+        `)
+        }
 
     }
+
+    eventMouseLeave(e: EventHoveringArg) {
+        $('.fc-event-hover-placeholder').remove()
+    }
+
+
 
     cdkDrop(event: CdkDragDrop<CalendarioAlunoList[]>, target: CalendarioList) {
         if (this.cdkDragCancel) {
@@ -334,21 +394,18 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             if (target.alunos.length >= target.capacidadeMaximaAlunos) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup')
-                this.selectedAula = undefined;
                 return this.showError('Não autorizado', 'Essa aula atingiu o limite permitido de alunos.', event.event);
             }
 
             if (target.turma_Tipo_Id != this.selectedAula?.turma_Tipo_Id) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup')
-                this.selectedAula = undefined;
                 return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesma faixa etária são permididas.', event.event);
             }
 
             if (target.alunos.find(x => x.aluno_Id == event.item.data.aluno_Id)) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup')
-                this.selectedAula = undefined;
                 return this.showError('Não autorizado', 'Esse aluno já está marcado nessa aula', event.event);
             }
 
@@ -362,11 +419,12 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                     acceptIcon: 'pi pi-check',
                     acceptLabel: 'Agendar',
                     acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                    rejectVisible: true,
                     rejectIcon: 'pi pi-times',
                     rejectLabel: 'Cancelar',
                     rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
                     accept: async () => {
-                        this.agendaReposicao(event.item.data.aluno_Id, this.selectedAula as CalendarioList, target);
+                        this.agendaReposicao(event.item.data.aluno_Id, this.selectedAula as CalendarioList, target, { target: event.container.element.nativeElement });
                     },
                     reject: () => {
                     }
@@ -376,17 +434,16 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     cdkDragEntered(e: CdkDragEnter) {
-        console.log('cdkDragEntered', e)
         this.cdkDragCancel = false;
+        console.log(e.container.element.nativeElement)
         $(e.container.element.nativeElement).not('#alunos').addClass('scalein animation-duration-200 animation-iteration-1')
-        $(e.container.element.nativeElement).not('#alunos').addClass('sshadow-2 border-3 border-red-500')
+        $(e.container.element.nativeElement).not('#alunos').addClass('shadow-2 border-3 border-red-500')
     }
 
     cdkDragExited(e: CdkDragExit) {
-        console.log('cdkDragExited', e)
-        $(e.container.element.nativeElement).removeClass('scalein animation-duration-200 animation-iteration-1')
-        $(e.container.element.nativeElement).removeClass('sshadow-2 border-3 border-red-500')
         this.cdkDragCancel = false;
+        $(e.container.element.nativeElement).removeClass('scalein animation-duration-200 animation-iteration-1')
+        $(e.container.element.nativeElement).removeClass('shadow-2 border-3 border-red-500')
     }
 
     @HostListener('window:keyup', ['$event'])
@@ -398,9 +455,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     cdkCancelDrag(where: string) {
-        console.log('cdkCancelDrag', where)
         this.cdkDragCancel = true;
-
         this.cdkEventItensId.forEach(id => {
             $('#' + id).removeClass('scalein animation-duration-200 animation-iteration-1')
             $('#' + id).removeClass('sshadow-2 border-3 border-red-500')
@@ -408,50 +463,44 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     cdkDragStarted(e: CdkDragStart) {
-        console.log('cdkDragStarted')
         this.cdkDragCancel = false;
     }
 
     cdkDropListExited(e: CdkDragExit) {
-        console.log('cdkDragStarted')
         this.cdkDragCancel = false;
     }
-
 
     events(events: EventApi[]) {
         this.currentEvents.set(events);
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
 
-    verAluno(aluno: CalendarioAlunoList) {
-        this.router.navigate(['aluno', this.crypto.encrypt(aluno.aluno_Id)], { relativeTo: this.activatedRoute });
-    }
-
     showAluno(e: MouseEvent, aluno: CalendarioAlunoList) {
-        console.log(e)
+        aluno.loadingFoto = true;
         this.selectedAluno = aluno;
-        this.modalSelectedAlunoVisible = true
-        setTimeout(() => {
-            // this.popoverSelectedAluno.show(e)
-            // this.popoverSelectedAluno.style =  {
-            //     top: e.clientY + 'px',
-            //     left: e.clientX  + 'px',
-            //     minWidth: '15rem',
-            // }
-        }, 100);
-
-
+        this.modalSelectedAlunoVisible = true;
+        lastValueFrom(this.alunoService.getFoto(aluno.aluno_Id))
+            .then(res => {
+                aluno.loadingFoto = false;
+                aluno.aluno_Foto = res;
+            })
+            .catch(res => {
+                aluno.loadingFoto = false;
+            })
     }
 
     hideAluno() {
         if (!this.modalSelectedAlunoVisible) {
             this.selectedAluno = undefined;
             this.modalSelectedAlunoVisible = false
-            // this.popoverSelectedAluno.hide();
         }
     }
 
-    reposicao(aluno: CalendarioAlunoList) {
+    goToAluno(aluno: CalendarioAlunoList) {
+        this.router.navigate(['aluno', this.crypto.encrypt(aluno.aluno_Id)], { relativeTo: this.activatedRoute });
+    }
+
+    goToReposicao(aluno: CalendarioAlunoList) {
         if (this.selectedAula) {
             var reposicao: Reposicao = {
                 aluno: aluno.aluno,
@@ -465,23 +514,37 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 source_Professor_Id: this.selectedAula.professor_Id,
                 source_Professor: this.selectedAula.professor
             };
-            var encrypted = this.crypto.encrypt(reposicao);
-            localStorage.setItem('reposicao', encrypted ?? '')
+            // var encrypted = this.crypto.encrypt(reposicao);
+            this.service.reposicao.next(reposicao);
+            // localStorage.setItem('reposicao', encrypted ?? '')
 
-            this.router.navigate(['reposicao', this.crypto.encrypt(aluno.aluno_Id)], { relativeTo: this.activatedRoute })
+            var queryParams = {
+                a: aluno.aluno,
+                b: aluno.aluno_Id,
+                c: this.selectedAula.aula_Id,
+                d: moment(this.selectedAula.data).format('YYYY-MM-DD[T]HH:mm:ss'),
+                e: aluno.turma_Id,
+                f: aluno.turma,
+                g: this.selectedAula.turma_Tipo_Id,
+                h: this.selectedAula.turma_Tipo,
+                i: this.selectedAula.professor_Id,
+                j: this.selectedAula.professor
+            }
+            this.router.navigate(['reposicao', this.crypto.encrypt(aluno.aluno_Id)], { relativeTo: this.activatedRoute, queryParams: queryParams } )
         }
     }
 
-    verAula() {
+    goToAula() {
         if (this.selectedAula) {
-            localStorage.setItem('aula', this.crypto.encrypt(this.selectedAula) ?? '')
-            this.router.navigate(['aula', this.crypto.encrypt(this.selectedAula.aula_Id)], { relativeTo: this.activatedRoute })
+            this.service.aula.next(this.selectedAula);
+            // localStorage.setItem('aula', this.crypto.encrypt(this.selectedAula) ?? '')
+            this.router.navigate(['aula', this.crypto.encrypt(this.selectedAula.aula_Id ?? 0)], { relativeTo: this.activatedRoute })
         }
     }
 
     showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
-            target: e.target,
+            target: e.target ?? e,
             message: message,
             header: header,
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
@@ -491,22 +554,29 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         })
     }
 
-
-    async agendaReposicao(aluno_Id: number, source: CalendarioList, target: CalendarioList) {
+    async agendaReposicao(aluno_Id: number, source: CalendarioList, target: CalendarioList, e: any) {
 
         this.loading = true;
         var reposicaoRequest = new ReposicaoRequest;
         reposicaoRequest.aluno_Id = aluno_Id;
+
 
         // Se a aula source não existir, cria a aula
         if (!source.aula_Id) {
             var aulaRequest: AulaCreateRequest = {
                 turma_Id: source.turma_Id,
                 data: moment(source.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                professor_Id: source.professor_Id
+                professor_Id: source.professor_Id,
+                observacao: ''
             }
-            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
-            reposicaoRequest.source_Aula_Id = aulaResponse.object.id;
+
+            await lastValueFrom(this.service.create(aulaRequest))
+                .then(res => reposicaoRequest.source_Aula_Id = res.object.id)
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida) \n ${res.error.message}`, e));
+
+        }
+        else {
+            reposicaoRequest.source_Aula_Id = source.aula_Id;
         }
 
         // Se a aula target não existir, cria a aula
@@ -514,10 +584,16 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             var aulaRequest: AulaCreateRequest = {
                 turma_Id: target.turma_Id,
                 data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                professor_Id: target.professor_Id
+                professor_Id: target.professor_Id,
+                observacao: ''
             }
-            var aulaResponse = await lastValueFrom(this.service.create(aulaRequest))
-            reposicaoRequest.dest_Aula_Id = aulaResponse.object.id;
+
+            await lastValueFrom(this.service.create(aulaRequest))
+                .then(res => reposicaoRequest.dest_Aula_Id = res.object.id)
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida) \n ${res.error.message}`, e));
+
+        } else {
+            reposicaoRequest.dest_Aula_Id = target.aula_Id;
         }
 
         await lastValueFrom(this.alunoService.reposicao(reposicaoRequest))
@@ -526,10 +602,12 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 this.popoverSelectedAula.hide();
                 this.selectedAula = undefined;
 
-                this.getCalendario(this.calendarioRequest);
+                this.getCalendario(this.calendarioRequest, 'agendarReposicao');
+                this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
             })
             .catch(res => {
                 this.loading = false;
+                this.showError('Ocorreu um erro', 'Não foi possível agendar reposição.', e)
             })
     }
 

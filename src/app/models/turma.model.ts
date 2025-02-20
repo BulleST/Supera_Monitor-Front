@@ -13,9 +13,10 @@ export class TurmaRequest  {
 export class Turma extends Basic_List {
     nome: string = '';
     diaSemana: number = undefined as unknown as number;
-    horario: Date = new Date;
+    horario: Date = undefined as unknown as Date;
     professor_Id: number = undefined as unknown as number;
     professor: string = '';
+    corLegenda: string = '';
     turma_Tipo_Id: number = undefined as unknown as number;
     turma_Tipo: string = '';
     capacidadeMaximaAlunos: number = undefined as unknown as number;
@@ -28,6 +29,12 @@ export class Turma_Tipo {
 }
 
 export var turmaColumns: ColumnTable[] = [
+    {
+        field: 'corLegenda',
+        label: '',
+        filterType: FilterType.none,
+        displayType: DisplayType.color,
+    },
     {
         field: 'nome',
         label: 'Nome',

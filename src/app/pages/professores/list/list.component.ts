@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
@@ -9,12 +9,13 @@ import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Professor, professorColumns } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { UserService } from '../../../services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-list',
     templateUrl: './list.component.html',
     styleUrl: './list.component.css',
-    providers: [ConfirmationService, MessageService],
+    providers: [ConfirmationService],
     standalone: false
 })
 export class ListComponent implements OnDestroy {
@@ -38,7 +39,8 @@ export class ListComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private mobileService: MobileService,
-        private userService: UserService
+        private userService: UserService,
+        private toastrService: ToastrService,
     ) {
         this.tableColumns = professorColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
@@ -144,18 +146,17 @@ export class ListComponent implements OnDestroy {
                 lastValueFrom(this.userService.deactivated(item.account_Id, deactivated))
                     .then(res => {
                         if (res.success) {
+                            this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
                         } else {
-                            setTimeout(() => {
-                                this.showError(res.message, e);
-                            }, 300);
+                            this.showError(res.message, e);
                         }
                     })
                     .catch(res => {
-                        this.showError(getError(res), e);
+                        this.showError(res.error.message, e);
                     })
             },
         });
@@ -176,15 +177,14 @@ export class ListComponent implements OnDestroy {
                 lastValueFrom(this.userService.resetPassword(item.account_Id))
                     .then(res => {
                         if (res.success) {
+                            this.toastrService.success( `Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
                             item = res.object;
                         } else {
-                            setTimeout(() => {
-                                this.showError(res.message, e);
-                            }, 300);
+                            this.showError(res.message, e);
                         }
                     })
                     .catch(res => {
-                        this.showError(getError(res), e);
+                        this.showError(res.error.message, e);
                     });
             },
         });

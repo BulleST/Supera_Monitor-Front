@@ -33,7 +33,6 @@ import { InputMaskModule } from 'primeng/inputmask';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
-// import { InputTextareaModule } from 'primeng/inputtextarea';
 import { MegaMenuModule } from 'primeng/megamenu';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
@@ -61,6 +60,7 @@ import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 // import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -68,8 +68,7 @@ import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeSelectModule } from 'primeng/treeselect';
 import { PopoverModule } from 'primeng/popover';
-import { ConfirmationService, FilterMatchMode, /*, PrimeNGConfig */ 
-MessageService} from 'primeng/api';
+import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -140,6 +139,7 @@ import { SelectModule } from 'primeng/select';
         TabsModule,
         // TabViewModule,
         TagModule,
+        TextareaModule,
         ToastModule,
         ToolbarModule,
         ToggleButtonModule,
@@ -213,6 +213,7 @@ import { SelectModule } from 'primeng/select';
         TabsModule,
         // TabViewModule,
         TagModule,
+        TextareaModule,
         ToastModule,
         ToolbarModule,
         TooltipModule,
