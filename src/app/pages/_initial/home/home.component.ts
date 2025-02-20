@@ -166,19 +166,20 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
 
 
         var calendarView = this.service.calendarView.subscribe(async view => {
-            console.log(view)
             if (view) {
-                if (this.account && this.account?.role == "Assistant") {
-                    var professores = this.professorService.list.value;
-                    if (professores.length == 0) {
-                        professores = await lastValueFrom(this.professorService.getList());
-                    }
-                    var professor = professores.find(x => x.account_Id == this.account!.id);
-                    if (professor)
-                        this.calendarioRequest.professor_Id = professor.id
-                }
+                // if (this.account && this.account?.role == "Assistant") {
+                //     var professores = this.professorService.list.value;
+                //     if (professores.length == 0) {
+                //         professores = await lastValueFrom(this.professorService.getList());
+                //     }
+                //     var professor = professores.find(x => x.account_Id == this.account!.id);
+                //     if (professor)
+                //         this.calendarioRequest.professor_Id = professor.id
+                // }
 
-                this.calendarioRequest.professor_Id = this.account?.professor_Id ?? 15;
+                console.log('home', JSON.parse(JSON.stringify(this.account)))
+                // console.log(this.account, this.accountService.accountValue)
+                this.calendarioRequest.professor_Id = this.account?.professor_Id;
                 this.calendarioList = [];
 
             } else {

@@ -40,16 +40,19 @@ export class AccountService {
     }
 
     setAccount(where: string, value?: AccountResponse) {
+        console.log('setAccount', where, JSON.parse(JSON.stringify(value??{})))
         this.accountSubject.next(value)
     }
 
     public get accountValue() {
+        console.log('accountValue', JSON.parse(JSON.stringify(this.accountSubject.value ?? {})))
         return this.accountSubject.value;
   }
 
     login(model: Login) {
         return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
             tap(async (account) => {
+                console.log('login', JSON.parse(JSON.stringify(account)))
                 this.setAccount('login', account);
                 const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
                 this.router.navigateByUrl(returnUrl);

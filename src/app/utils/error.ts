@@ -3,8 +3,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 
 export function getError(res: HttpErrorResponse) {
     var msg = "Ocorreu um erro, mas não foi possível localizar a causa.";
-    
-    if (res.error.message) {
+    console.error(res)
+    if (res.error && res.error.message) {
         msg = res.error.message
     }
 
