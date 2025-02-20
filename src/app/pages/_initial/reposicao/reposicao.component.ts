@@ -297,33 +297,26 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         this.changeDetector.detectChanges();
     }
     async datesSet(arg: DatesSetArg) {
-        // loadingEvents.sort((x, y) => x.start - y.start)
+        console.log(arg)
+        let _loadingEvents: any[] = [];
+        var month = arg.view.currentStart.getMonth();
         
-        
-        // let _loadingEvents: any[] = [] 
-        // console.log(arg);
-        
-        // loadingEvents.forEach(x => {
-        //     console.log('antes', x.start.substring(0,10))
-        //     var start = new Date(x.start);
-        //     start = moment(start).add(arg.start.getMonth() - start.getMonth()).toDate();
+        loadingEvents.forEach(event => {
 
-        //     var week = Math.ceil((start.getDate() - 1 - start.getDay()) / 7)
+            var start = new Date(event.start);
+            var week = Math.ceil((start.getDate() - 1 - start.getDay()) / 7)
             
-        //     for (let i = 0; i < 4; i++) {                
-        //         console.log(week-i)
-        //         console.log(i-week+1)
-        //         x.start = moment(start).add(((i-week)+1), 'weeks').format('YYYY-MM-DD') + x.start.substring(10)
-        //         x.end = moment(start).add(((i-week)+1), 'weeks').format('YYYY-MM-DD') + x.end.substring(10)
-        //         console.log('depois', x.start)
-        //         _loadingEvents.push(JSON.parse(JSON.stringify(x)))
-        //     }
-        //     })
+            for (let i = 5; i > 1; i--) {                
+                var newDate =  moment(start).add(week - i, 'weeks').set('months', month).format('YYYY-MM-DD');
+                event.start = newDate + event.start.substring(10)
+                event.end = newDate + event.end.substring(10)
+                _loadingEvents.push(JSON.parse(JSON.stringify(event)))
+            }
+        })
 
-        // console.log(_loadingEvents)
-        this.calendarioOptions.events = [];
-        this.calendarioRequest.intervaloDe = arg.start;
-        this.calendarioRequest.intervaloAte = arg.end;
+        this.calendarioOptions.events = _loadingEvents;
+        this.calendarioRequest.intervaloDe = arg.view.currentStart;
+        this.calendarioRequest.intervaloAte = arg.view.currentEnd;
 
         this.getCalendario(this.calendarioRequest, 'datesSet');
     }

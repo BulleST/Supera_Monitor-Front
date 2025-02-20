@@ -9,7 +9,7 @@ import { Menubar } from 'primeng/menubar';
 import { AccountService } from '../../services/account.service';
 import { Role } from '../../models/account-perfil.model';
 import { AccountResponse } from '../../models/account.model';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { AulaService } from '../../services/aulas.service';
 
 @Component({
@@ -34,9 +34,6 @@ export class HeaderComponent implements OnDestroy {
 
     profileModalOpen: boolean = false;
     changePasswordModalOpen: boolean = false;
-
-    // injector = inject(Injector);
-
     showCalendarView = false;
 
     constructor(
@@ -52,7 +49,7 @@ export class HeaderComponent implements OnDestroy {
                 this.showCalendarView = !!(res.url.includes('/home') && this.accountService.accountValue && this.accountService.accountValue.professor_Id);
                 this.showCalendarView = res.url.includes('/home') == true;
             }
-        })
+        });
 
         this.setView();
         this.setModal();

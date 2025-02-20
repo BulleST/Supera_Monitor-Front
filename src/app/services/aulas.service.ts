@@ -17,7 +17,7 @@ export class AulaService extends Service {
 
     aula = new BehaviorSubject<CalendarioList | undefined>(undefined);
     reposicao = new BehaviorSubject<Reposicao | undefined>(undefined);
-    calendarView = new BehaviorSubject<boolean>(false);
+    calendarView = new BehaviorSubject<boolean>(true);
 
     calendarioReload = new EventEmitter<boolean>();
 

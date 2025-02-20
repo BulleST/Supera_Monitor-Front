@@ -166,6 +166,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
 
 
         var calendarView = this.service.calendarView.subscribe(async view => {
+            console.log(view)
             if (view) {
                 if (this.account && this.account?.role == "Assistant") {
                     var professores = this.professorService.list.value;
@@ -178,10 +179,12 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 }
 
                 this.calendarioRequest.professor_Id = this.account?.professor_Id ?? 15;
+                this.calendarioList = [];
 
             } else {
                 this.calendarioRequest.professor_Id = undefined
             }
+
 
             this.getCalendario(this.calendarioRequest, 'calendarioReload');
 
@@ -331,7 +334,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             })
 
         this.calendarioOptions.events = _loadingEvents;
-        this.calendarioRequest.intervaloDe = new Date(arg.start.getTime());
+        this.calendarioRequest.intervaloDe = new Date(arg.view.currentStart.getTime());
         this.calendarioRequest.intervaloAte = undefined;
 
         this.getCalendario(this.calendarioRequest, 'datesSet');
