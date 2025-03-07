@@ -192,7 +192,7 @@ export class CalendarioComponent {
                 id: this.eventRamdomId(),
                 backgroundColor: item.corLegenda,
                 borderColor: item.corLegenda,
-                title: item.turma,
+                title: item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
                 data: item,

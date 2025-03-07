@@ -1,3 +1,10 @@
+
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+
 <p-dialog [header]="'Agendar reposição'"
           [maximizable]="true"
           [draggable]="true"
@@ -44,12 +51,12 @@
                    readonly>
         </div>
         <div class="field sm:col-4 col-12">
-            <label for="faixaetaria">Faixa Etária:</label>
+            <label for="aluno_PerfilCognitivo">Perfil Cognitivo:</label>
             <input type="text"
                    pInputText
-                   [value]="object.source_Turma_Tipo"
-                   id="faixaetaria"
-                   name="faixaetaria"
+                   [value]="object.aluno_PerfilCognitivo"
+                   id="aluno_PerfilCognitivo"
+                   name="aluno_PerfilCognitivo"
                    class="w-full"
                    readonly>
         </div>
@@ -132,9 +139,3 @@
         </div>
     </div>
 </p-dialog>
-<p-confirmdialog styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
-    </ng-template>
-</p-confirmdialog>
-<p-toast />

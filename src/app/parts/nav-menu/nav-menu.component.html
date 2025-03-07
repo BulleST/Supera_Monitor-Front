@@ -1,13 +1,10 @@
-
 <p-confirmdialog styleClass="w-25rem">
     <ng-template #message let-message>
         <div [innerHTML]="message.message"></div>
     </ng-template>
 </p-confirmdialog>
-
 <p-menu [model]="items"
-        styleClass="border-none bg-white shadow-1  border-round-md min-w-0 "
-        >
+        styleClass="border-none bg-white shadow-1  border-round-md min-w-0 ">
     <ng-template #start>
         <div class="px-3 pt-3 flex align-items-center justify-content-center">
             <!-- <img *ngIf="menuOpen" src="assets/images/logo-supera.png" alt="Logo Supera" class="w-6rem mr-2"> -->
@@ -45,8 +42,9 @@
         </a>
     </ng-template>
     <ng-template #end>
-        <div class="flex justify-content-center align-items-center -mt-2 pb-3" 
-        [class.pr-3]="menuOpen">
+        <div class="flex justify-content-center align-items-center -mt-2 pb-3"
+             [class.pr-3]="menuOpen"
+             *ngIf="accountData">
             <p-button *ngIf="menuOpen"
                       pTooltip="Minha conta"
                       styleClass="flex align-items-center justify-content-start border-none w-full"
@@ -55,11 +53,11 @@
                       class="flex-1"
                       pRipple>
                 <span class="w-3rem h-3rem border-circle flex border-2 border-200 flex-none">
-                    <b class="m-auto flex text-sm text-primary">{{accountAbreviacao}}</b>
+                    <b class="m-auto flex text-sm text-primary">{{accountData.abreviacao}}</b>
                 </span>
                 <span class="flex flex-column text-left">
-                    <span class="font-bold ">{{accountName}}</span>
-                    <span class="text-sm ">{{account?.email}}</span>
+                    <span class="font-bold ">{{accountData.name}}</span>
+                    <span class="text-sm ">{{accountData.email}}</span>
                 </span>
             </p-button>
             <p-button (onClick)="logout($event)"
@@ -67,10 +65,9 @@
                       pTooltip="Sair"
                       [label]="menuOpen ? 'Sair' : undefined"
                       icon="pi pi-sign-out text-white"
-                      
                       [rounded]="menuOpen"
                       size="small"
-                      styleClass="ml-auto p-menu-item-icon w-full  bg-black-alpha-80 text-white {{menuOpen ? 'px-3' : ''}}"/>
+                      styleClass="ml-auto p-menu-item-icon w-full  bg-black-alpha-80 text-white {{menuOpen ? 'px-3' : ''}}" />
         </div>
     </ng-template>
 </p-menu>

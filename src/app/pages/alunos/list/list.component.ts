@@ -8,6 +8,7 @@ import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno, alunosColumns } from '../../../models/alunos.model';
+import { Checklist, checklists } from '../../../models/checklist.model';
 
 @Component({
     selector: 'app-list',
@@ -30,6 +31,9 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
+    checklist: Checklist[] = [];
+    checklistColumns: ColumnTable[] = []
+
     constructor(
         private confirmationService: ConfirmationService,
         private service: AlunoService,
@@ -48,6 +52,26 @@ export class ListComponent implements OnDestroy {
 
         var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
+
+
+
+        this.checklist = checklists;
+        this.checklist.forEach(x => {
+            var col = new ColumnTable;
+            col.field = 'status';
+            col.label = x.nome;
+            col.filterType = FilterType.none;
+            col.displayType = DisplayType.options;
+            col.options = {
+                "items": [
+                    { "value": 'Finalizado', "label": "Finalizado", "severity": "success", "icon": "pi pi-check" },
+                    { "value": 'Atrasado', "label": "Atrasado", "severity": "danger", "icon": "pi pi-times" }
+                ]
+            }
+            this.checklistColumns.push(col)
+        })
+
+
 
     }
 
@@ -116,8 +140,7 @@ export class ListComponent implements OnDestroy {
         var deactivated = !item.active;
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
-                      ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o aluno selecionado?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
@@ -161,4 +184,13 @@ export class ListComponent implements OnDestroy {
         var item = col.options.items.find((x: any) => x.value == row[col.field]);
         return item;
     }
+
+    
+    getCheckList(col: ColumnTable, row: Aluno) {
+        // var checkList = row.checklist.find(x => x.nome == col.label)
+        // return checkList;
+        return {} as any
+    }
+
+    
 }

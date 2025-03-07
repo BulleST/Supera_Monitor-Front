@@ -1,0 +1,80 @@
+<p-popover #popoverSelectedAula styleClass="z-2 -mt-1" [appendTo]="'body'">
+    <div *ngIf="selectedAula" class="p-2 flex flex-column row-gap-1 -m-2">
+        <div class="p-2 white-space-normal">
+            <p>
+                <b>Professor:</b> {{selectedAula.professor }} <span class="inline-flex w-1rem h-1rem border-circle ml-2 -mb-1" [style]="{backgroundColor: selectedAula.corLegenda}"></span>
+            </p>
+            <p>
+                <b>Turma: </b>
+                <span>{{ selectedAula.turma ?? selectedAula.descricao  }}</span>
+            </p>
+            <p>
+                <b>Data: </b>
+                <span>{{selectedAula['data'] | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</span>
+            </p>
+        </div>
+        <div class="flex align-items-center justify-content-between px-2">
+            <span class="font-bold block mt-2 text-primary">Alunos</span>
+            <span class="font-bold block mt-2 " [class.text-red-500]="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos">
+                <i class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite" *ngIf="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos"></i>
+                <span> {{selectedAula.alunos.length}}/{{selectedAula.capacidadeMaximaAlunos}} </span>
+            </span>
+        </div>
+        <p-virtualscroller
+                           id="alunos"
+                           [delay]="150"
+                           [items]="selectedAula.alunos"
+                           [itemSize]="24"
+                           scrollHeight="10rem"
+                           styleClass="border border-surface"
+                           [style]="{ maxHeight: '10rem', width: '22rem' }">
+            <ng-template #item let-aluno let-options="options">
+                <div cdkDrag
+                     [cdkDragData]="aluno"
+                     (cdkDragStarted)="cdkDragStarted($event)"
+                     (cdkDragEntered)="cdkDragEntered($event)"
+                     (cdkDragExited)="cdkDragExited($event)"
+                     class="p-0 m-0">
+                    <div *cdkDragPlaceholder></div>
+                    <div *cdkDragPreview class="p-1">
+                        <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
+                        <div class="shadow-2">
+                            <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
+                        </div>
+                    </div>
+                    <a (click)="showAluno($event, aluno)" class="cursor-pointer">
+                        <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
+                    </a>
+                    <ng-template #alunoItem let-aluno="aluno">
+                        <div class="flex align-items-center justify-content-start p-1 bg-white border-round-md">
+                            <div class="w-1rem h-1rem mr-2 border-circle  overflow-hidden flex align-items-center justify-content-center ">
+                                <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                                <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                            </div>
+                            <span class="font-medium">{{ aluno.aluno }}</span>
+                            <p class="ml-auto pl-2">
+                                <p-button severity="success" icon="pi pi-whatsapp text-white text-xs" styleClass="w-2rem h-2rem flex align-items-center justify-content-center" [rounded]="true" size="small" />
+                                <p-badge *ngIf="aluno.reposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+                            </p>
+                        </div>
+                    </ng-template>
+                </div>
+            </ng-template>
+        </p-virtualscroller>
+        <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
+        <div class="p-2 flex align-items-center gap-2">
+            <p-button severity="secondary"
+                      icon="pi pi-calendar"
+                      label="Reagendar aula"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="goToReagendamento()" />
+            <p-button
+                      label="Ver aula"
+                      icon="pi pi-plus text-xs"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="goToAula()" />
+        </div>
+    </div>
+</p-popover>

@@ -9,10 +9,13 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '800px', maxWidth: '95vw', maxHeight: '95vh' }"
+          [style]="{ width: '1000px', maxWidth: '95vw', maxHeight: '95vh' }"
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
+            <!-- <div class="border-circle w-3rem h-3rem bg-primary-500 flex align-items-center justify-content-center mr-2"> -->
+                <i class="bi bi-play-fill text-5xl text-primary-500 mr-1" *ngIf="isChamadaPage "></i>
+            <!-- </div> -->
             <span class="p-dialog-title">{{isChamadaPage ? 'Chamada em andamento' : 'Aula'}}</span>
             <p-button class="ml-auto"
                       type="button"
@@ -22,12 +25,11 @@
                       title="Observações"
                       [text]="true"
                       [rounded]="true"
-                      
                       severity="primary"
                       size="small"
                       styleClass="outline-none"
-                      (onClick)="op.toggle($event)" />
-            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white w-25rem max-h-25rem">
+                      (onClick)="togglePopover(op, $event)" />
+            <p-popover #op  appendTo="body" styleClass=" -mt-1 surface-900 border-900 white-space-nowrap text-white w-25rem max-h-25rem">
                 <div class="px-2 field flex flex-column h-full">
                     <label for="observacao" class="mb-2">Observações:</label>
                     <ng-template #observacaoEditavel>
@@ -54,7 +56,7 @@
                 <p-iconfield>
                     <input type="text"
                            pInputText
-                           [value]="object.turma"
+                           [value]="object.descricao"
                            styleClass="w-full"
                            class="w-full"
                            id="turma"
@@ -148,45 +150,6 @@
                 </p-iconfield>
             </div>
             <div class="field col-12">
-                <p-popover #popoverSelectedAluno (onHide)="selectedAluno = undefined">
-                    <ng-template #content>
-                        <div *ngIf="selectedAluno" class="align-items-center flex pl-2 pr-4">
-                            <div class="relative flex align-items-center justify-content-center border-circle border-2 border-color-500 w-9rem h-9rem my-auto">
-                                <i class="pi pi-user text-xl" *ngIf="!selectedAluno.aluno_Foto"></i>
-                                <img *ngIf="selectedAluno.aluno_Foto"
-                                     class=" border-circle"
-                                     [src]="selectedAluno.aluno_Foto"
-                                     [alt]="selectedAluno.aluno" />
-                                <!-- <p-badge *ngIf="selectedAluno.flagNovo" value="Aula 1" class="absolute top-0 left-50 -ml-4 -mt-2" /> -->
-                                <p-badge *ngIf="selectedAluno.reposicao" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" />
-                            </div>
-                            <div class="mx-2 py-3">
-                                <p-divider layout="vertical"></p-divider>
-                            </div>
-                            <div class=" flex flex-column py-3">
-                                <p class="text-lg font-medium mb-0 mt-1">{{ selectedAluno.aluno }}</p>
-                                <p class="text-lg font-medium mt-1 mb-0"><b>Turma: </b>{{ selectedAluno.turma }} </p>
-                                <p *ngIf="selectedAluno.apostila_Abaco" class="text-lg font-medium mt-1 mb-0"><b>Apostila Ábaco: </b>{{ selectedAluno.apostila_Abaco }} / <b>Página: </b>{{ selectedAluno.numeroPaginaAbaco }}</p>
-                                <p *ngIf="selectedAluno.apostila_AH" class="text-lg font-medium mt-1 mb-0"><b>Apostila AH: </b>{{ selectedAluno.apostila_AH }} / <b>Página: </b>{{ selectedAluno.numeroPaginaAH }}</p>
-                                <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.presente != undefined">{{ selectedAluno.presente }}</p>
-                                <!-- <p class="text-lg font-medium mt-1 mb-0" *ngIf="selectedAluno.dataNascimento"><b>Data de Nascimento:</b> {{ selectedAluno.dataNascimento | date : 'dd/MM/yyyy' }}</p> -->
-                                <div class="flex align-items-center gap-2 mt-2 ">
-                                    <p-button label="Ver aluno"
-                                              [rounded]="true"
-                                              icon="pi pi-user-edit"
-                                              size="small"
-                                              (onClick)="goToAluno(selectedAluno)" />
-                                    <p-button label="Agendar Reposição"
-                                              icon="pi pi-calendar"
-                                              [rounded]="true"
-                                              size="small"
-                                              severity="secondary"
-                                              (onClick)="goToReposicao(selectedAluno)" />
-                                </div>
-                            </div>
-                        </div>
-                    </ng-template>
-                </p-popover>
                 <p-table [value]="object.alunos"
                          dataKey="id"
                          stripedRows
@@ -196,23 +159,108 @@
                          [virtualScrollItemSize]="43">
                     <ng-template #header>
                         <tr>
-                            <th></th>
-                            <th></th>
-                            <th colspan="4" class="text-center border-bottom-2">Apostila</th>
-                            <th></th>
-                        </tr>
-                        <tr>
                             <th class="w-2rem"></th>
                             <th>Nome</th>
-                            <th class="w-10rem"><span class="pl-2">Ábaco</span></th>
+                            <th>Etapa Checklist</th>
+                            <th class="w-10rem"><span class="pl-2">Apostila Ábaco</span></th>
                             <th class="w-5rem">Página</th>
-                            <th class="w-10rem"><span class="pl-2">AH</span></th>
+                            <th class="w-10rem"><span class="pl-2">Apostila AH</span></th>
                             <th class="w-5rem">Página</th>
                             <th class="w-4rem">Presença</th>
                         </tr>
                     </ng-template>
                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
-                        <tr [class.border-red-500]="editing == true">
+                        <p-popover #popoverChecklist  appendTo="body">
+                                
+                            <div class="flex justify-content-between align-items-center w-full">
+                                <p-button [disabled]="!prevChecklist"
+                                            [severity]="prevChecklist ? 'primary' : 'secondary'"
+                                            size="large"
+                                            icon="pi pi-angle-left"
+                                          [rounded]="true"
+                                          [text]="true"
+                                          (onClick)="prev()"
+                                          [pTooltip]="prevChecklist ? prevChecklist.nome : ''" />
+                                <span class="font-bold text-base text-400 px-4 mx-auto">{{currentChecklist.nome}}</span>
+                                <p-button [disabled]="!nextChecklist"
+                                            [severity]="nextChecklist ? 'primary' : 'secondary'"
+                                            size="large"
+                                            icon="pi pi-angle-right"
+                                          [rounded]="true"
+                                          [text]="true"
+                                          (onClick)="next()"
+                                          [pTooltip]="nextChecklist ? nextChecklist.nome : ''" />
+                            </div>
+                            <div class="w-30rem">
+                                <ul class="p-0 ml-3"> 
+                                    @for(item of currentChecklist.items; track item) { 
+                                    <li class="flex align-items-center gap-2 py-1">
+                                        <p-checkbox 
+                                        [styleClass]="checkbox.checked ? 'cursor-auto' : ''"
+                                        [binary]="true"  
+                                        [readonly]="checkbox.checked" 
+                                        #checkbox 
+                                        (onChange)="checkboxChange(item, checkbox.checked, $event)" />
+                                        <div>
+                                            <span class="font-medium">{{ item.nome }}</span>
+                                        </div>
+                                    </li> } 
+                                </ul>
+                            </div>
+                        </p-popover>
+                        <p-popover #popoverSelectedAluno (onHide)="selectedAluno = undefined" appendTo="body">
+                            <div *ngIf="selectedAluno" class="flex pl-2 pr-4">
+                                <div class="relative my-auto flex align-items-center justify-content-center border-circle border-2 border-color-500 w-9rem h-9rem my-auto">
+                                    <i class="pi pi-user text-xl" *ngIf="!item.aluno_Foto"></i>
+                                    <img *ngIf="item.aluno_Foto"
+                                            class=" border-circle"
+                                            [src]="item.aluno_Foto"
+                                            [alt]="item.aluno" />
+                                    <!-- <p-badge *ngIf="item.flagNovo" value="Aula 1" class="absolute top-0 left-50 -ml-4 -mt-2" /> -->
+                                    <p-badge *ngIf="item.reposicaoDe_Aula_Id" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" />
+                                </div>
+                                    <p-divider  styleClass="mx-4 my-4" layout="vertical"/>
+                                <div class=" flex flex-column py-3">
+                                    <p class="text-lg mb-0 mt-1 text-primary-500 font-bold">{{ item.aluno }}</p>
+                                    <p class="text-lg font-medium mt-1 mb-0"><b>Turma: </b>{{ item.turma }} </p>
+                                    <p *ngIf="item.apostila_Abaco" class="text-lg font-medium mt-1 mb-0"><b>Apostila Ábaco: </b>{{ item.apostila_Abaco }} / <b>Página: </b>{{ item.numeroPaginaAbaco }}</p>
+                                    <p *ngIf="item.apostila_AH" class="text-lg font-medium mt-1 mb-0"><b>Apostila AH: </b>{{ item.apostila_AH }} / <b>Página: </b>{{ item.numeroPaginaAH }}</p>
+                                    <div>
+                                        <p class="text-lg font-medium mt-1 mb-0"><b>Observações: </b></p>
+                                        <textarea 
+                                            pTextarea 
+                                            rows="3"  
+                                            placeholder="Insira as observações..."
+                                            class="w-full"
+                                            [value]="item.observacao"
+                                        ></textarea>
+
+                                    </div>
+
+
+
+                                    <div class="flex align-items-center gap-2 mt-2 ">
+                                        <p-button label="Ver aluno"
+                                                    [rounded]="true"
+                                                    icon="pi pi-user-edit"
+                                                    size="small"
+                                                    (onClick)="goToAluno(item)" />
+                                        <p-button label="Agendar Reposição"
+                                                    icon="pi pi-calendar"
+                                                    [rounded]="true"
+                                                    size="small"
+                                                    severity="secondary"
+                                                    (onClick)="goToReposicao(item)" />
+                                        <p-button label="Enviar mensagem"
+                                                    severity="success"
+                                                    icon="pi pi-whatsapp "
+                                                    [rounded]="true"
+                                                    size="small" />
+                                    </div>
+                                </div>
+                            </div>
+                        </p-popover>
+                        <tr>
                             <td>
                                 <span class="flex  align-items-center justify-content-center border-circle border-1 border-color-500 w-2rem h-2rem overflow-hidden">
                                     <i class="pi pi-user text-sm" *ngIf="!item.aluno_Foto"></i>
@@ -226,6 +274,18 @@
                                     <p-badge *ngIf="item.flagNovo" styleClass="ml-2 " value="Aula 1" size="small"></p-badge>
                                 </div>
                             </td>
+                            <!--  -->
+                            <td (click)="popoverChecklist.show($event)">
+                                <p-button 
+                                    label="1ª Semana  1/6"
+                                    [text]="true"
+                                    severity="secondary"
+                                    iconPos="right"
+                                    icon="pi pi-fw pi-angle-down ml-1 text-primary-500"
+                                    size="small"
+                                    styleClass="white-space-nowrap -ml-2 font-bold" />
+                            </td>
+
                             <td [pEditableColumn]="item.apostila_Abaco"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="apostila_Abaco"

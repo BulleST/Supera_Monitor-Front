@@ -1,17 +1,33 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
+import { Aluno_Restricao } from "./aluno-restricao.model";
+import { Aluno_CheckList_Item } from "./checklist.model";
 
 export class AlunoRequest {
     id: number = 0
+    pessoa_Id: number = 0
     nome: string = '';
-    dataNascimento: string = '';
+    dataNascimento: Date = new Date;
     celular: string = '';
     telefone: string = '';
     email: string = '';
-    endereco: string = '';
     observacao: string = '';
-    turma_Id: number = 0
-    pessoa_Sexo_Id: number = 0;
+    endereco: string = '';
     aluno_Foto: string = '';
+
+    dataInicioVigencia: Date = new Date;
+    dataFimVigencia?: Date;
+
+    created: Date = new Date;
+    lastUpdated?: Date;
+    deactivated?: Date;
+    active: boolean = false;
+
+    perfilCognitivo_Id: number = 0;
+    perfilCognitivo: string = '';
+
+    turma_Id: number = 0;
+    professor_Id: number = 0;
+    pessoa_Sexo_Id?: number;
     apostila_Kit_Id?: number;
 }
 
@@ -25,25 +41,30 @@ export class Aluno {
     email: string = '';
     observacao: string = '';
     endereco: string = '';
-    unidade_Id: number = 0
     aluno_Foto: string = '';
 
-    turma_Id: number = 0
-    turma: string = '';
-
-    professor_Id: number = 0
-    professor: string = '';
-
-    pessoa_Sexo_Id?: number;
-    pessoa_Sexo: string = '';
+    dataInicioVigencia: Date = new Date;
+    dataFimVigencia?: Date;
 
     created: Date = new Date;
     lastUpdated?: Date;
     deactivated?: Date;
     active: boolean = false;
 
+    perfilCognitivo_Id: number = 0;
+    perfilCognitivo: string = '';
+
+    turma_Id: number = 0;
+    turma: string = '';
+
+    professor_Id: number = 0;
+    professor: string = '';
+
+    pessoa_Sexo_Id?: number;
+    pessoa_Sexo?: string = '';
+
     aspNetUsers_Created_Id?: number;
-    aspNetUsers_Created: string = '';
+    aspNetUsers_Created?: string = '';
 
     apostila_Abaco_Id?: number;
     apostila_AH_Id?: number;
@@ -59,6 +80,10 @@ export class Aluno {
     
     kit?: string;
     apostila_Kit_Id?: number;
+
+    // checklist: Checklist[] = checklists;
+    checklist: Aluno_CheckList_Item[] = [];
+    restricoes: Aluno_Restricao[] = [];
 }
 
 export interface Pessoa_DropDown {
@@ -85,6 +110,15 @@ export var alunosColumns: ColumnTable[] = [
     },
 
     {
+        field: 'created',
+        label: 'Matrícula',
+        filterType: FilterType.date,
+        displayType: DisplayType.date,
+        options: {
+            format: 'dd/MM/yyyy'
+        },
+    },
+    {
         field: 'turma',
         label: 'Turma',
         filterType: FilterType.text,
@@ -93,46 +127,46 @@ export var alunosColumns: ColumnTable[] = [
     },
     {
         field: 'professor',
-        label: 'Professor',
+        label: 'Educador',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
     },
-    {
-        field: 'kit',
-        label: 'Kit',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
-    {
-        field: 'apostila_Abaco',
-        label: 'Apostila Ábaco',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
-    {
-        field: 'numeroPaginaAbaco',
-        label: 'Página',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
-    {
-        field: 'apostila_AH',
-        label: 'Apostila AH',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
-    {
-        field: 'numeroPaginaAH',
-        label: 'Página',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
+    // {
+    //     field: 'kit',
+    //     label: 'Kit',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
+    // {
+    //     field: 'apostila_Abaco',
+    //     label: 'Apostila Ábaco',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
+    // {
+    //     field: 'numeroPaginaAbaco',
+    //     label: 'Página',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
+    // {
+    //     field: 'apostila_AH',
+    //     label: 'Apostila AH',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
+    // {
+    //     field: 'numeroPaginaAH',
+    //     label: 'Página',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
     {
         field: 'active',
         label: 'Status',
@@ -140,8 +174,8 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.options,
         options: {
             "items": [
-                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false },
-                { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
+                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-check", "showDeactivatedDate": false },
+                { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-times", "showDeactivatedDate": true }
             ]
         },
     },

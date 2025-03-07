@@ -23,102 +23,22 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     loading = false;
     selectedNode: any;
 
-    accountName = 'Noemi C. Almeida';
-    accountAbreviacao = 'NC';
-    account?: AccountResponse;
+    accountData: {name: string, abreviacao: string, email: string} | undefined;
 
     @ViewChild('sidebar') sidebar!: Sidebar;
     @ViewChild('cm') cm!: ContextMenu;
-    treeMenu: MenuItem[] = [
-        {
-            label: 'Editar',
-            icon: 'pi pi-pencil'
-        },
-        {
-            label: 'Apagar',
-            icon: 'pi pi-trash'
-        },
-    ];
-
+   
     constructor(
         private header: Header,
         private accountService: AccountService,
         private confirmationService: ConfirmationService,
     ) {
-        this.items = [
-            {
-                label: 'Home',
-                items: [
-                    {
-                        label: 'Calendário de Aulas',
-                        tooltip: 'Calendário de Aulas',
-                        iconFontawesome: faCalendar,
-                        routerLink: '/home',
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                    {
-                        label: 'Monitoramento de Checklist',
-                        tooltip: 'Monitoramento de Checklist',
-                        iconFontawesome: faHome,
-                        routerLink: '/checklist',
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                ]
-            },
-            {
-                label: 'Cadastros',
-                items: [
-                    {
-                        label: 'Alunos',
-                        tooltip: 'Alunos',
-                        iconFontawesome: faUserGraduate,
-                        routerLink: ['alunos'],
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                    {
-                        label: 'Professores',
-                        tooltip: 'Professores',
-                        iconFontawesome: faPersonChalkboard,
-                        routerLink: ['professores'],
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                    {
-                        label: 'Turmas',
-                        tooltip: 'Turmas',
-                        iconFontawesome: faUsersBetweenLines,
-                        routerLink: ['turmas'],
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
-                    {
-                        label: 'Usuários',
-                        tooltip: 'Usuários',
-                        iconFontawesome: faUsers,
-                        routerLink: ['usuarios'],
-                        routerLinkActiveOptions: { exact: false },
-                        routerLinkActive: 'active-link'
-                    },
 
-                ]
-            },
-            {
-                label: 'Minha conta'
-            },
-        ];
+        var accountData = this.header.accountData.subscribe(res => this.accountData = res)
+        this.subscription.push(accountData);
 
-        var account = this.accountService.account.subscribe(account => {
-            this.account = account;
-            var array = account?.name.split(' ') as string[];
-            this.accountName = array[0] ?? '';
-            this.accountAbreviacao = array[0][0].toUpperCase();
-            if (array.length > 1)
-                this.accountAbreviacao += array[array.length - 1][0].toUpperCase();
-        });
-        this.subscription.push(account);
+        var navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
+        this.subscription.push(navigationItems);
     }
 
     ngOnDestroy(): void {

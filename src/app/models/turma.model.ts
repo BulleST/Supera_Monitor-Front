@@ -1,15 +1,18 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
-import { Basic, Basic_List } from "./_basic.model";
+import { Basic_List } from "./_basic.model";
+import { PerfilCognitivo } from "./perfil-cognitivo.model";
 
-export class TurmaRequest  {
+export class TurmaRequest {
     id: number = 0;
     nome: string = '';
     diaSemana: number = undefined as unknown as number;
     horario: Date = undefined as unknown as Date;
     professor_Id: number = undefined as unknown as number;
-    turma_Tipo_Id: number = undefined as unknown as number;
-    capacidadeMaximaAlunos: number = undefined as unknown as number;
+    sala_Id: number = undefined as unknown as number;
+    capacidadeMaximaAlunos: number = 12;
+    perfilCognitivo: PerfilCognitivo[] = [];
 }
+
 export class Turma extends Basic_List {
     nome: string = '';
     diaSemana: number = undefined as unknown as number;
@@ -17,15 +20,12 @@ export class Turma extends Basic_List {
     professor_Id: number = undefined as unknown as number;
     professor: string = '';
     corLegenda: string = '';
-    turma_Tipo_Id: number = undefined as unknown as number;
-    turma_Tipo: string = '';
-    capacidadeMaximaAlunos: number = undefined as unknown as number;
-}
-
-
-export class Turma_Tipo {
-    id: number = 0;
-    nome: string = '';
+    sala_Id: number = undefined as unknown as number;
+    numeroSala: number = undefined as unknown as number;
+    andar: number = undefined as unknown as number;
+    capacidadeMaximaAlunos: number = 12;
+    perfilCognitivo: PerfilCognitivo[] = [];
+    perfilCognitivoString: string = '';
 }
 
 export var turmaColumns: ColumnTable[] = [
@@ -64,7 +64,7 @@ export var turmaColumns: ColumnTable[] = [
                 { "value": 5, "label": "Sexta-feira" },
                 { "value": 6, "label": "Sábado" },
             ]
-            
+
         },
     },
     {
@@ -78,14 +78,15 @@ export var turmaColumns: ColumnTable[] = [
         },
     },
     {
-        field: 'turma_Tipo',
-        label: 'Faixa Etária',
+        field: 'perfilCognitivoString',
+        label: 'Perfil Cognitivo',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
-    },{
+    },
+    {
         field: 'capacidadeMaximaAlunos',
-        label: 'Limite',
+        label: 'Capacidade máxima',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: {

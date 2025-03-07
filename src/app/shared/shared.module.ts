@@ -4,7 +4,7 @@ import { provideHttpClient, withFetch,  withInterceptorsFromDi } from '@angular/
 import { ProfileComponent } from './profile/profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { FormGroupDirective, FormsModule } from '@angular/forms';
+import {  FormsModule } from '@angular/forms';
 import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -18,8 +18,9 @@ import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.c
 import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
 import { ChecklistComponent as AlunoChecklistComponent } from '../pages/alunos/form/checklist/checklist.component';
 import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-import { ReposicaoComponent } from '../pages/_initial/reposicao/reposicao.component';
-import { AulaComponent } from '../pages/_initial/aula/aula.component';
+import { ReposicaoComponent } from '../pages/_initial/home/reposicao/reposicao.component';
+import { AulaComponent } from '../pages/_initial/home/aula/aula.component';
+import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos/form/restricoes/restricoes.component';
 // End Alunos
 
 
@@ -34,6 +35,7 @@ import { AulaComponent } from '../pages/_initial/aula/aula.component';
         AlunoDadosCadastraisComponent,
         AlunoChecklistComponent,
         AlunoCalendarioComponent,
+        AlunoRestricoesComponent,
         // End Alunos
 
         ReposicaoComponent,
@@ -59,6 +61,7 @@ import { AulaComponent } from '../pages/_initial/aula/aula.component';
         AlunoDadosCadastraisComponent,
         AlunoChecklistComponent,
         AlunoCalendarioComponent,
+        AlunoRestricoesComponent,
         // End Alunos
 
         ReposicaoComponent,

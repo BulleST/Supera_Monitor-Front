@@ -153,6 +153,27 @@
                            class="w-full"
                            readonly>
                 </ng-template>
+            </div> {{object.dataNascimento}}
+            <div class="field sm:col-4 col-12"> <!-- Data de Nascimento -->
+                <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                #dataNascimento="ngModel"
+                [(ngModel)]="object.dataNascimento"
+                [showIcon]="true"
+                [iconDisplay]="'input'"
+                [selectOtherMonths]="true"
+                [minDate]="minDate"
+                [maxDate]="maxDate"
+                inputId="dataNascimento"
+                name="dataNascimento"
+                class="w-full"
+                styleClass="w-full"
+                inputStyleClass="w-full"
+                [required]="true"
+                appendTo="body" />
+                <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Data de Início -->
                 <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
@@ -161,6 +182,7 @@
                               [(ngModel)]="object.dataInicio"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
+                              [selectOtherMonths]="true"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
                               inputId="dataInicio"
@@ -174,43 +196,24 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Nível Ábaco -->
-                <label for="professor_NivelAbaco_Id">Nível Ábaco: <span class="text-red-500">*</span></label>
+            <div class="field sm:col-4 col-12"> <!-- Nível Certificação -->
+                <label for="professor_NivelCertificacao_Id">Nível de Certificação: <span class="text-red-500">*</span></label>
                 <p-select
-                          [options]="nivelAbaco"
-                          [(ngModel)]="object.professor_NivelAbaco_Id"
-                          #professor_NivelAbaco_Id="ngModel"
+                        [loading]="loadingNivelCertificacao"
+                          [options]="nivelCertificacao"
+                          [(ngModel)]="object.professor_NivelCertificacao_Id"
+                          #professor_NivelCertificacao_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
-                          name="professor_NivelAbaco_Id"
-                          inputId="professor_NivelAbaco_Id"
+                          name="professor_NivelCertificacao_Id"
+                          inputId="professor_NivelCertificacao_Id"
                           optionLabel="descricao"
                           optionValue="id"
                           [showClear]="true"
                           appendTo="body"
                           [required]="true" />
-                <div *ngIf="professor_NivelAbaco_Id.touched && professor_NivelAbaco_Id.invalid && professor_NivelAbaco_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAbaco_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field sm:col-4 col-12"> <!-- Nível AH -->
-                <label for="professor_NivelAH_Id">Nível AH: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="nivelAH"
-                          [(ngModel)]="object.professor_NivelAH_Id"
-                          #professor_NivelAH_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="professor_NivelAH_Id"
-                          inputId="professor_NivelAH_Id"
-                          optionLabel="descricao"
-                          optionValue="id"
-                          [showClear]="true"
-                          [checkmark]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="professor_NivelAH_Id.touched && professor_NivelAH_Id.invalid && professor_NivelAH_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelAH_Id.errors['required']">Esse campo é obrigatório.</p>
+                <div *ngIf="professor_NivelCertificacao_Id.touched && professor_NivelCertificacao_Id.invalid && professor_NivelCertificacao_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelCertificacao_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12 "> <!-- Legenda -->
@@ -225,7 +228,8 @@
                                        appendTo="body"
                                        styleClass="ml-2"
                                        [required]="true"
-                                       value="#ffffff" />
+                                       value="#ffffff" 
+                                       />
                         <span class="ml-2">{{object.corLegenda}}</span>
                         <span class="ml-2" *ngIf="!object.corLegenda">Selecione uma cor</span>
                     </div>

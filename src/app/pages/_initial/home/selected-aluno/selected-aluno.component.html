@@ -1,0 +1,110 @@
+<p-dialog #selectedAlunoDialog
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="hideAluno()"
+          [style]="{ width: '50rem', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center -mb-3">
+            <span class="p-dialog-title">
+                <i class="fa-solid fa-user-graduate mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span class="ml-2">Dados do Aluno</span>
+            </span>
+        </div>
+    </ng-template>
+    <div *ngIf="selectedAluno" class="p-2 flex flex-column row-gap-1 ">
+        <div class="flex  my-1 mx-2">
+            <div class="w-11rem h-11rem flex-none surface-50 border-circle border-2 border-color-500 overflow-hidden my-auto flex align-items-center justify-content-center ">
+                <img *ngIf="selectedAluno.aluno_Foto" [src]="selectedAluno.aluno_Foto">
+                <i *ngIf="!selectedAluno.aluno_Foto" class="pi pi-user text-primary text-4xl"></i>
+            </div>
+            <p-divider layout="vertical" styleClass="mx-4 py-5" />
+            <div class="pb-2 flex flex-column gap-2 ml-2 col w-min">
+                <table class="">
+                    <tr>
+                        <td colspan="2">
+                            <span class="text-xl font-bold text-overflow-ellipsis white-space-nowrap max-w-10rem pr-2"
+                                  [pTooltip]="selectedAluno.aluno">{{ selectedAluno.aluno }}</span>
+                            <p-badge styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Turma:</b> {{selectedAluno.turma }}</td>
+                    </tr>
+                    <tr>
+                        <td>Apostila Ábaco: Ábaco 123</td>
+                        <td><b>Página:</b> 10</td>
+                    </tr>
+                    <tr>
+                        <td>Apostila AH: AH 123</td>
+                        <td><b>Página:</b> 08</td>
+                    </tr>
+                    <tr>
+                        <td>Perfil Cognitivo:</td>
+                        <td>{{selectedAluno.perfilCognitivo}}</td>
+                    </tr>
+                    <tr>
+                        <td>Etapa da jornada:</td>
+                        <td>
+                            <p-button (onClick)="popoverChecklist.toggle($event)"
+                                      label="1ª Semana"
+                                      [text]="true"
+                                      severity="secondary"
+                                      iconPos="right"
+                                      icon="pi pi-fw pi-angle-down ml-1 text-primary-500"
+                                      size="small"
+                                      styleClass="white-space-nowrap -ml-2 font-bold" />
+                            <p-popover #popoverChecklist appendTo="body">
+                                <div class="flex justify-content-between align-items-center w-full">
+                                    <p-button [disabled]="!prevChecklist"
+                                              [severity]="prevChecklist ? 'primary' : 'secondary'"
+                                              size="large"
+                                              icon="pi pi-angle-left"
+                                              [rounded]="true"
+                                              [text]="true"
+                                              (onClick)="prev()"
+                                              [pTooltip]="prevChecklist ? prevChecklist.nome : ''" />
+                                    <span class="font-bold text-base text-400 px-4 mx-auto">{{currentChecklist.nome}}</span>
+                                    <p-button [disabled]="!nextChecklist"
+                                              [severity]="nextChecklist ? 'primary' : 'secondary'"
+                                              size="large"
+                                              icon="pi pi-angle-right"
+                                              [rounded]="true"
+                                              [text]="true"
+                                              (onClick)="next()"
+                                              [pTooltip]="nextChecklist ? nextChecklist.nome : ''" />
+                                </div>
+                                <div class="w-30rem">
+                                    <ul class="p-0 ml-3"> @for(item of currentChecklist.items; track item) { <li class="flex align-items-center gap-2 py-1">
+                                            <p-checkbox [binary]="true" />
+                                            <div>
+                                                <span class="font-medium">{{ item.nome }}</span>
+                                            </div>
+                                        </li> } </ul>
+                                </div>
+                            </p-popover>
+                        </td>
+                    </tr>
+                </table>
+                <div class="flex align-items-center gap-2 mt-3  ">
+                    <p-button label="Ver aluno"
+                              [rounded]="true"
+                              icon="pi pi-user-edit"
+                              size="small"
+                              (onClick)="goToAluno(selectedAluno)" />
+                    <p-button label="Agendar Reposição"
+                              icon="pi pi-calendar"
+                              [rounded]="true"
+                              severity="secondary"
+                              size="small"
+                              (onClick)="goToReposicao(selectedAluno)" />
+                    <p-button label="Enviar mensagem"
+                              severity="success"
+                              icon="pi pi-whatsapp "
+                              [rounded]="true"
+                              size="small" />
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

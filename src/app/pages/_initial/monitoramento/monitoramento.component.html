@@ -37,8 +37,8 @@
                                     class="p-2 bg-white border-round-md shadow-1 cursor-pointer">
                                     <div class="flex align-items-center">
                                         <div class="border-circle border-2 border-200 w-3rem h-3rem flex overflow-hidden mr-2">
-                                            <img *ngIf="aluno.aluno.foto" [src]="aluno.aluno.foto" class="">
-                                            <i *ngIf="!aluno.aluno.foto" class="pi pi-user m-auto text-primary-500"></i>
+                                            <img *ngIf="aluno.aluno.aluno_Foto" [src]="aluno.aluno.aluno_Foto" class="">
+                                            <i *ngIf="!aluno.aluno.aluno_Foto" class="pi pi-user m-auto text-primary-500"></i>
                                         </div>
                                         <div class="flex-1">
                                             <div class="flex align-items-center justify-content-between">
@@ -49,11 +49,12 @@
                                                 <span class="text-xs font-light text-400 line-height-1">2</span>
                                             </span>
                                         </div>
-                                        <p-tag size="small" [value]="aluno.status" class="ml-auto"
-                                            [severity]="aluno.status == 'Em Andamento' ? 'success' : 'danger' "
+                                        <p-tag size="small" [value]="aluno.dataFinalizacao ? 'Pendente' : 'Atrasado'" class="ml-auto"
+                                            [severity]="aluno.dataFinalizacao || !aluno.dataFinalizacao && aluno.prazo < hoje ? 'success' : !aluno.dataFinalizacao && aluno.prazo == hoje ? 'warn' : 'danger' "
                                             class="ml-2 my-auto flex align-items-center h-full"
-                                            styleClass="white-space-nowrap text-xs font-light my-auto flex {{aluno.status == 'Em Andamento' ? 'bg-green-200' : 'bg-red-200'}}" />
-                                    </div>
+                                            styleClass="white-space-nowrap text-xs font-light my-auto flex " />
+                                            <!-- {{aluno.status == 'Em Andamento' ? 'bg-green-200' : 'bg-red-200'}} -->
+                                        </div>
                             </div>
                         </ng-template>
                     </div>

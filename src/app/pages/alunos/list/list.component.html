@@ -6,7 +6,7 @@
     </ng-template>
 </p-confirmdialog>
 
-<p-toast />
+
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -23,6 +23,10 @@
              stripedRows
              showGridlines
              [rowHover]="list.length > 0">
+             <!-- 
+             scrollHeight="1000px"
+             [virtualScroll]="true"
+             [virtualScrollItemSize]="39" -->
         <ng-template pTemplate="caption">
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
@@ -52,34 +56,56 @@
             </p-toolbar>
         </ng-template>
         <ng-template pTemplate="header">
-            <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
-                <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
-                <th class="surface-900 py-0 border-none text-white white-space-nowrap" *ngFor="let col of tableColumns" [pSortableColumn]="col.field">
-                    <div class="flex align-items-center">
-                        <span>{{ col.label }}</span>
-                        <ng-template [ngIf]="col.filterType != FilterType.none">
-                            <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
-                                <p-sortIcon [field]="col.field" />
-                            </div>
-                        </ng-template>
-                    </div>
-                </th>
-                <th class="surface-900 py-0 border-bottom-none text-white"></th>
-            </tr>
+            <ng-template [ngIf]="(!tableLoading && list.length > 0) || tableLoading">
+                <tr>
+                    <th [colSpan]="tableColumns.length" ></th>
+                    <th [colSpan]="checklistColumns.length+1" class="bg-primary-100 border-bottom-2 border-red-500 text-center">
+                        <span class="sticky right-0 left-0 text-center px-4 text-primary-500">Checklist</span>
+                    </th>
+                </tr>
+                <tr>
+                    <th  *ngFor="let col of tableColumns"
+                        [pSortableColumn]="col.field"  
+                        [ngClass]="{
+                            'surface-900 py-0 border-none text-white white-space-nowrap p-2': true,
+                            'sticky left-0': col.field == 'nome'
+                        }">
+                        <div class="flex align-items-center">
+                            <span>{{ col.label }}</span>
+                            <ng-template [ngIf]="col.filterType != FilterType.none">
+                                <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                                    <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                    <p-sortIcon [field]="col.field" />
+                                </div>
+                            </ng-template>
+                        </div>
+                    </th>
+                    <th *ngFor="let col of checklistColumns" [pSortableColumn]="col.field"  class="surface-900 py-0 border-none text-white white-space-nowrap">
+                        <div class="flex align-items-center">
+                            <span>{{ col.label }}</span>
+                        </div>
+                    </th>
+                    <th class="surface-900 py-0 border-bottom-none text-white"></th>
+                </tr>
+            </ng-template>
+            
         </ng-template>
         <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr [pContextMenuRow]="item"
-                (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);"
                 class="cursor-pointer"
                 [ngClass]="{ 
-                'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
+                'bg-primary-50': item == tableSelectedItem,
                 }">
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="rowIndex"
-                    class="border-none white-space-nowrap"
-                    [class.w-6rem]="col.displayType == DisplayType.options">
+                    
+                    [ngClass]="{
+                        'white-space-nowrap  border-left-none border-right-none': true,
+                        'w-6rem':col.displayType == DisplayType.options,
+                        'sticky left-0': col.field == 'nome'
+                    }"
+                    (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
                     <ng-template [ngIf]="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; 
                             context: { 
@@ -105,14 +131,53 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
 
                 </td>
+
+                <td *ngFor="let col of checklistColumns" 
+                    class="white-space-nowrap p-0 border-left-none border-right-none">
+                   <ng-container *ngTemplateOutlet="checklist; context: { checklist: getCheckList(col, item) }"></ng-container>
+                    <ng-template #checklist let-checklist="checklist">
+                        <div class="p-2 text-center" 
+                            #myDiv
+                            *ngIf="checklist"
+                            (mouseenter)="op.show($event)" 
+                            (mouseleave)="op.hide()">
+                            <p *ngIf="checklist.status == 'Atrasado'" class="text-red-600 font-bold text-sm">
+                                <!-- <i class="pi pi-times-circle text-red-500 fadeout animation-duration-1000 animation-iteration-infinite mr-2" ></i> -->
+                                <span>Atrasado</span>
+                                
+                            </p>
+                            <p *ngIf="checklist.status == 'Finalizado'" class="text-green-600 text-sm">
+                                <span>Finalizado</span>
+                            </p>
+                            <p-popover #op [appendTo]="checklist"  >
+                                <p class="my-2 font-bold text-left">{{checklist.nome}}</p>
+                                <div  *ngIf="checklist">
+    
+                                    <div *ngFor="let item of checklist.items" 
+                                        class=" flex p-2 align-items-center">
+                                        <p-checkbox 
+                                            [inputId]="'checklist-item-' + item.id"
+                                            [name]="'checklist-item-' + item.id"
+                                            [(ngModel)]="item.finalizado" 
+                                            [value]="false"
+                                            [binary]="true"
+                                            class="mr-2" />
+                                            <label  [for]="'checklist-item-' + item.id">{{item.nome}}</label>
+                                    </div>
+                                </div>
+                            </p-popover>
+                        </div>
+                    </ng-template>
+                </td>
                 <td class="border-none px-0">
                 </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
+                <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
+                    <td *ngFor="let col of checklistColumns" class="border-none"><p-skeleton /></td>
                     <td  class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>

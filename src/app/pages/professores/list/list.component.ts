@@ -156,7 +156,7 @@ export class ListComponent implements OnDestroy {
                         }
                     })
                     .catch(res => {
-                        this.showError(res.error.message, e);
+                        this.showError(getError(res), e);
                     })
             },
         });
@@ -184,7 +184,7 @@ export class ListComponent implements OnDestroy {
                         }
                     })
                     .catch(res => {
-                        this.showError(res.error.message, e);
+                        this.showError(getError(res), e);
                     });
             },
         });

@@ -44,135 +44,8 @@
     --surface-800: var(--p-surface-800);
     --surface-900: var(--p-surface-900);
     --surface-950: var(--p-surface-950);
-    /* --blue-50: var(--p-blue-50);
-    --blue-100: var(--p-blue-100);
-    --blue-200: var(--p-blue-200);
-    --blue-300: var(--p-blue-300);
-    --blue-400: var(--p-blue-400);
-    --blue-500: var(--p-blue-500);
-    --blue-600: var(--p-blue-600);
-    --blue-700: var(--p-blue-700);
-    --blue-800: var(--p-blue-800);
-    --blue-900: var(--p-blue-900);
-    --green-50: var(--p-green-50);
-    --green-100: var(--p-green-100);
-    --green-200: var(--p-green-200);
-    --green-300: var(--p-green-300);
-    --green-400: var(--p-green-400);
-    --green-500: var(--p-green-500);
-    --green-600: var(--p-green-600);
-    --green-700: var(--p-green-700);
-    --green-800: var(--p-green-800);
-    --green-900: var(--p-green-900);
-    --yellow-50: var(--p-yellow-50);
-    --yellow-100: var(--p-yellow-100);
-    --yellow-200: var(--p-yellow-200);
-    --yellow-300: var(--p-yellow-300);
-    --yellow-400: var(--p-yellow-400);
-    --yellow-500: var(--p-yellow-500);
-    --yellow-600: var(--p-yellow-600);
-    --yellow-700: var(--p-yellow-700);
-    --yellow-800: var(--p-yellow-800);
-    --yellow-900: var(--p-yellow-900);
-    --cyan-50: var(--p-cyan-50);
-    --cyan-100: var(--p-cyan-100);
-    --cyan-200: var(--p-cyan-200);
-    --cyan-300: var(--p-cyan-300);
-    --cyan-400: var(--p-cyan-400);
-    --cyan-500: var(--p-cyan-500);
-    --cyan-600: var(--p-cyan-600);
-    --cyan-700: var(--p-cyan-700);
-    --cyan-800: var(--p-cyan-800);
-    --cyan-900: var(--p-cyan-900);
-    --pink-50: var(--p-pink-50);
-    --pink-100: var(--p-pink-100);
-    --pink-200: var(--p-pink-200);
-    --pink-300: var(--p-pink-300);
-    --pink-400: var(--p-pink-400);
-    --pink-500: var(--p-pink-500);
-    --pink-600: var(--p-pink-600);
-    --pink-700: var(--p-pink-700);
-    --pink-800: var(--p-pink-800);
-    --pink-900: var(--p-pink-900);
-    --indigo-50: var(--p-indigo-50);
-    --indigo-100: var(--p-indigo-100);
-    --indigo-200: var(--p-indigo-200);
-    --indigo-300: var(--p-indigo-300);
-    --indigo-400: var(--p-indigo-400);
-    --indigo-500: var(--p-indigo-500);
-    --indigo-600: var(--p-indigo-600);
-    --indigo-700: var(--p-indigo-700);
-    --indigo-800: var(--p-indigo-800);
-    --indigo-900: var(--p-indigo-900);
-    --teal-50: var(--p-teal-50);
-    --teal-100: var(--p-teal-100);
-    --teal-200: var(--p-teal-200);
-    --teal-300: var(--p-teal-300);
-    --teal-400: var(--p-teal-400);
-    --teal-500: var(--p-teal-500);
-    --teal-600: var(--p-teal-600);
-    --teal-700: var(--p-teal-700);
-    --teal-800: var(--p-teal-800);
-    --teal-900: var(--p-teal-900);
-    --orange-50: var(--p-orange-50);
-    --orange-100: var(--p-orange-100);
-    --orange-200: var(--p-orange-200);
-    --orange-300: var(--p-orange-300);
-    --orange-400: var(--p-orange-400);
-    --orange-500: var(--p-orange-500);
-    --orange-600: var(--p-orange-600);
-    --orange-700: var(--p-orange-700);
-    --orange-800: var(--p-orange-800);
-    --orange-900: var(--p-orange-900);
-    --bluegray-50: #f7f9f9;
-    --bluegray-100: #d9e0e3;
-    --bluegray-200: #bbc7cd;
-    --bluegray-300: #9caeb7;
-    --bluegray-400: #7e96a1;
-    --bluegray-500: #607d8b;
-    --bluegray-600: #526a76;
-    --bluegray-700: #435861;
-    --bluegray-800: #35454c;
-    --bluegray-900: #263238;
-    --purple-50: var(--p-purple-50);
-    --purple-100: var(--p-purple-100);
-    --purple-200: var(--p-purple-200);
-    --purple-300: var(--p-purple-300);
-    --purple-400: var(--p-purple-400);
-    --purple-500: var(--p-purple-500);
-    --purple-600: var(--p-purple-600);
-    --purple-700: var(--p-purple-700);
-    --purple-800: var(--p-purple-800);
-    --purple-900: var(--p-purple-900);
-    --red-50: var(--p-red-50);
-    --red-100: var(--p-red-100);
-    --red-200: var(--p-red-200);
-    --red-300: var(--p-red-300);
-    --red-400: var(--p-red-400);
-    --red-500: var(--p-red-500);
-    --red-600: var(--p-red-600);
-    --red-700: var(--p-red-700);
-    --red-800: var(--p-red-800);
-    --red-900: var(--p-red-900);
-    
- 
-    --surface-ground: #f8fafc;
-    --surface-section: #ffffff;
-    --surface-card: #ffffff;
-    --surface-overlay: #ffffff;
-    --surface-border: #e2e8f0;
-    --surface-hover: #f1f5f9; */
-    /* --p-stone-50: #fafaf9;
-    --p-stone-100: #f5f5f4;
-    --p-stone-200: #e7e5e4;
-    --p-stone-300: #d6d3d1;
-    --p-stone-400: #a8a29e;
-    --p-stone-500: #78716c;
-    --p-stone-600: #57534e;
-    --p-stone-700: #44403c;
-    --p-stone-800: #292524;
-    --p-stone-900: #1c1917;
-    --p-stone-950: #0c0a09; */
+    --balloon-width: 5px!important; 
+    --balloon-height: 5px!important;
 }
 
 * {
@@ -377,18 +250,6 @@ body {
     border-bottom-color: var(--surface-900) !important;
 }
 
-.surface-900.p-popover:after {
-    /* background-color: var(--surface-900)!important;
-    border-color: var(--surface-900)!important; */
-}
-
-.p-popover.popover-styled::before,
-.p-popover.popover-styled::after {
-    /* left: var(--overlayArrowLeft) */
-    display: none;
-    opacity: 0;
-}
-
 .fc-col-header,
 .fc-timegrid-body {
     width: 100% !important;
@@ -399,51 +260,11 @@ body {
         width: 100% !important;
     }
 }
-/* .fc .fc-toolbar {
-    display: flex!important;
-    gap: 15px;
-    flex-flow: wrap;
-} */
-/* 
-.fc-toolbar-chunk {
-    display: flex;
-}
-.fc-toolbar-chunk:nth-child(1) {
-    flex: none;
-}
-.fc-toolbar-chunk:nth-child(2) {
-    flex: 1 0 auto;
-}
-.fc-toolbar-chunk:nth-child(3) {
-    flex: 1 0 auto;
-}
-.fc-toolbar-chunk .fc-button-group:nth-child(3) {
-    margin: 0 auto
-    justify-content: flex-end!important
-    
-} */
-.fc-button-group {
-    /* display: flex!important; */
-    /* width: 100%; */
-    /* justify-content: center; */
-    /* align-items: center; */
-}
 
 .fc .fc-toolbar-title {
     text-align: center;
 }
 
-.fc .fc-button {
-    /* display: flex; */
-    /* flex: 0 0 auto!important; */
-    /* align-items: center; */
-    /* justify-content: center; */
-}
-
-.fc-today-button  {
-    /* margin-right: auto!important; */
-    
-}
 
 .fc-button {
     padding-block: 10px;
@@ -453,13 +274,7 @@ body {
     align-items: center;
     justify-content: center;
 }
-.fc-timeGridWeek-button {
-    /* margin-left: auto!important; */
-    
-}
-.p-popover:after, .p-popover:before {
-    display: none;
-}
+
 .fc .fc-multimonth-title {
     padding: 0px 0!important;
     background-color: var(--surface-800)!important;
@@ -478,7 +293,48 @@ body {
 .fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
     box-shadow: none;
 }
+
+.p-multiselect-option.p-focus,
 .p-select-option.p-select-option-selected {
     background-color: var(--p-primary-100) !important;
     color: var(--p-primary-500) !important;
+}
+
+.fc-scrollgrid-sync-inner, .fc-col-header-cell-cushion {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.p-datatable-thead > tr > th {
+    white-space: nowrap;
+}
+.p-datatable-thead > tr > th,
+.p-datatable-tbody > tr > td {
+    background-color: inherit;
+}
+
+
+.p-datepicker-day.p-disabled {
+    position: relative;
+    /* text-decoration: line-through; */
+    /* text-decoration-color: red; */
+    overflow: visible;
+    opacity: 1;
+    color: var(--surface-300);
+}
+
+/* .p-datepicker-day.p-disabled:not(.p-datepicker-other-month .p-datepicker-day.p-disabled)::after { */
+.p-datepicker-day.p-disabled::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 0px;
+    width: 100%;
+    height: 2px;
+    background-color: var(--p-red-400);
+    z-index: 2;
+    opacity: 1;
+    /* float: revert; */
+    rotate: 42deg;
 }

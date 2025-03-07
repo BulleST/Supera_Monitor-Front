@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom,  of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { Professor, Professor_NivelApostila, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
+import { Professor, Professor_NivelCertificacao, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
 import { Map } from '../utils/map';
 import moment from 'moment';
 import { Service } from '../helpers/service.service';
+import { getError } from '../utils';
 
 @Injectable({
     providedIn: 'root',
@@ -12,33 +13,32 @@ import { Service } from '../helpers/service.service';
 export class ProfessorService extends Service {
     override list = new BehaviorSubject<Professor[]>([]);
 
-    getNivelAbaco() {
-        return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/abaco/all`)
+    getNivelCertificacao() {
+        return this.http.get<Professor_NivelCertificacao[]>(`${this.url}/professor/certificacao/all`)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar nível ábaco');
+                    this.toastrService.error(`Não foi possível carregar nível de certificação. \n ${getError(err)}`);
                 }
             }));
     }
 
-    getNivelAH() {
-        return this.http.get<Professor_NivelApostila[]>(`${this.url}/professor/nivel/ah/all`)
-            .pipe(tap({
-                error: err => {
-                    this.toastrService.error('Não foi possível carregar nível AH');
-                }
-            }));
-    }
+ 
 
     getList() {
         return this.http.get<Professor[]>(`${this.url}/professor/all/`)
             .pipe(tap({
                 next: list => {
+                    list.map(item => {
+                        if (item.dataNascimento)
+                            item.dataNascimento = new Date(moment(item.dataNascimento).format('YYYY-MM-DD'))
+                        if (item.dataInicio)
+                            item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD'))
+                    })
                     this.list.next(list);
                     return of(list);
                 },
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar professores');
+                    this.toastrService.error(`Não foi possível carregar professores. \n ${getError(err)}`);
                 }
             }));
     }
@@ -50,7 +50,7 @@ export class ProfessorService extends Service {
 
             var item = this.list.value.find(x => x.id == id) as Professor;
             if (!item){
-                this.toastrService.error('Professor não encontrado.');
+                this.toastrService.error(`Professor não encontrado.`);
                return reject('Professor não encontrado.')
             }
 
@@ -66,7 +66,7 @@ export class ProfessorService extends Service {
         return this.http.post<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível cadastrar professor');
+                    this.toastrService.error(`Não foi possível cadastrar professor. \n ${getError(err)}`);
                 }
             }));
     }
@@ -76,7 +76,7 @@ export class ProfessorService extends Service {
         return this.http.put<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível editar professor');
+                    this.toastrService.error(`Não foi possível editar professor. \n ${getError(err)}`);
                 }
             }));
     }
@@ -85,7 +85,7 @@ export class ProfessorService extends Service {
         return this.http.patch<Response>(`${this.url}/professor/${id}/${activated}`, {})
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível habilitar/desabilitar professor');
+                    this.toastrService.error(`Não foi possível habilitar/desabilitar professor. \n ${getError(err)}`);
                 }
             }));
     }

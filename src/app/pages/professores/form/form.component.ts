@@ -5,7 +5,7 @@ import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ProfessorService } from '../../../services/professor.service';
-import { Professor, Professor_NivelApostila } from '../../../models/professor.model';
+import { Professor, Professor_NivelCertificacao } from '../../../models/professor.model';
 import { Account } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,10 +31,8 @@ export class FormComponent implements OnDestroy {
     accountsSelected?: Account;
     loadingAccounts: boolean = true;
 
-    nivelAbaco: Professor_NivelApostila[] = [];
-    loadingNivelAbaco = true;
-    nivelAH: Professor_NivelApostila[] = [];
-    loadingNivelAH = true;
+    nivelCertificacao: Professor_NivelCertificacao[] = [];
+    loadingNivelCertificacao = true;
 
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
@@ -49,19 +47,12 @@ export class FormComponent implements OnDestroy {
         private toastrService: ToastrService,
     ) {
 
-        lastValueFrom(this.service.getNivelAbaco())
+        lastValueFrom(this.service.getNivelCertificacao())
             .then(res => {
-                this.nivelAbaco = res;
-                this.loadingNivelAbaco = false;
+                this.nivelCertificacao = res;
+                this.loadingNivelCertificacao = false;
             })
-            .catch(res => this.loadingNivelAbaco = false);
-
-        lastValueFrom(this.service.getNivelAH())
-            .then(res => {
-                this.nivelAH = res;
-                this.loadingNivelAH = false;
-            })
-            .catch(res => this.loadingNivelAH = false);
+            .catch(res => this.loadingNivelCertificacao = false);
 
         lastValueFrom(this.userService.getList())
             .then(res => {
@@ -126,7 +117,7 @@ export class FormComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Error',
+            header: 'Ocorreu um erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',

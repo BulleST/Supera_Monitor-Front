@@ -1,14 +1,3 @@
-<!-- <div class="surface-50">
-    <main class="main min-h-screen">
-        <app-header></app-header>
-        <div class="relative z-0 flex align-items-start gap-6 p-6 h-full">
-            <app-nav-menu></app-nav-menu>
-            <div class="bg-white shadow-1 p-6 border-round-md w-full">
-                <router-outlet></router-outlet>
-            </div>
-        </div>
-    </main>
-</div> -->
 <main class="surface-50 min-h-screen  ">
     <div style="background-image: url(../../../assets/images/account-bg-1.png);" class="home-bg bg-contain bg-no-repeat opacity-10 left-0 z-0 fixed top-0"></div>
     <div style="background-image: url(../../../assets/images/account-bg-2.png);" class="home-bg bg-contain bg-no-repeat opacity-10 -mb-5 fixed bottom-0 right-0 z-0"></div>
@@ -19,12 +8,15 @@
         </div>
         <div class="flex align-items-strech justify-content-between relative z-1 px-5"
         style="min-height: calc(100vh - 60px)">
-            <div class="sticky pt-5 transition-linear transition-duration-100 transition-all top-0 mr-5"
-                [ngStyle]="{ width: navigationOpen ? '20rem' : '4rem' }">
+            <div *ngIf="[ScreenWidth.xl, ScreenWidth.lg, ScreenWidth.md].includes(screen) "
+                [ngStyle]="{ width: navigationOpen ? '20rem' : '4rem' }"
+                [ngClass]="{
+                    'pt-5 transition-linear transition-duration-100 transition-all mr-5': true,
+                }">
                 <app-nav-menu></app-nav-menu>
             </div>
             <div class="border-round-md mt-5 flex-grow-1 flex-shrink-1 flex-1 overflow-x-auto"
-            [ngStyle]="{ width: navigationOpen ? '55%' : '80%' }">
+                [ngStyle]="{ width: navigationOpen && [ScreenWidth.lg, ScreenWidth.xl, ScreenWidth.md].includes(screen) ? '55%' : '80%' }">
                 <router-outlet></router-outlet>
             </div>
         </div>

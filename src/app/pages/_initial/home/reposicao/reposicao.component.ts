@@ -3,21 +3,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { CalendarOptions, DatesSetArg, EventApi, EventClickArg } from '@fullcalendar/core';
-import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import { CalendarioList, CalendarioRequest, loadingEvents } from '../../../models/calendario.model';
-import { AlunoService } from '../../../services/alunos.service';
-import { Aluno } from '../../../models/alunos.model';
-import { Reposicao, ReposicaoRequest } from '../../../models/reposicao.model';
+import { ReposicaoAluno, ReposicaoAlunoRequest } from '../../../../models/reposicao.model';
+import { CalendarioList, CalendarioRequest, loadingEvents } from '../../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
-import { AulaCreateRequest } from '../../../models/aulas.model';
+import { Aluno } from '../../../../models/alunos.model';
+import { AulaService } from '../../../../services/aulas.service';
+import { AlunoService } from '../../../../services/alunos.service';
+import { TurmaService } from '../../../../services/turma.service';
+import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
+import { ProfessorService } from '../../../../services/professor.service';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto } from '../../../utils';
-import { TurmaService } from '../../../services/turma.service';
-import { ProfessorService } from '../../../services/professor.service';
+import { AulaCreateRequest } from '../../../../models/aulas.model';
+import { getError } from '../../../../utils';
 
 @Component({
     selector: 'app-reposicao',
@@ -28,20 +29,21 @@ import { ProfessorService } from '../../../services/professor.service';
 })
 export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
-    object: Reposicao = new Reposicao;
+    object: ReposicaoAluno = new ReposicaoAluno;
     loading = false;
     error: string = '';
     subscription: Subscription[] = [];
     legenda: { backgroundColor: string, label: string }[] = [];
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
 
+    aluno: Aluno = new Aluno;
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     selectedAula?: EventImpl;
     calendarVisible = signal(true);
     currentEvents = signal<EventApi[]>([]);
     calendarioList: CalendarioList[] = []
     calendarioOptions: CalendarOptions = {
-        initialView: 'dayGridMonth',
+        initialView: 'multiMonthYear',
         themeSystem: 'standard',
         locale: 'pt-BR',
         plugins: [
@@ -98,7 +100,6 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         eventsSet: this.events.bind(this),
     }
 
-    aluno: Aluno = new Aluno;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -107,28 +108,16 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         private changeDetector: ChangeDetectorRef,
         private alunoService: AlunoService,
         private turmaService: TurmaService,
+        private perfilCognitivoService: PerfilCognitivoService,
         private professorService: ProfessorService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
-        private crypto: Crypto
     ) {
 
         var list = this.service.list.subscribe(res => this.calendarioList = res);
         this.subscription.push(list);
 
-        // var reposicao = this.service.reposicao.subscribe(res => {
-        //     if (!res){
-        //         this.visible = false;
-        //         this.visibleChange();
-        //         return;
-        //     }
-
-        //     this.object = res;
-        // });
-        // this.subscription.push(reposicao);
-
         this.activatedRoute.queryParams.subscribe(async res => {
-            console.log(res);
             this.object = {
                 aluno: res['a'],
                 aluno_Id: res['b'],
@@ -136,14 +125,14 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 source_Data: res['d'],
                 source_Turma_Id: res['e'],
                 source_Turma: res['f'],
-                source_Turma_Tipo_Id: res['g'],
-                source_Turma_Tipo: res['h'],
+                aluno_PerfilCognitivo_Id: res['g'],
+                aluno_PerfilCognitivo: res['h'],
                 source_Professor_Id: res['i'],
                 source_Professor: res['j'],
-            } as Reposicao
+            } as ReposicaoAluno
 
             this.visible = true;
-            this.calendarioRequest.turma_Tipo_Id = this.object.source_Turma_Tipo_Id;
+            this.calendarioRequest.perfilCognitivo_Id = this.object.aluno_PerfilCognitivo_Id;
 
             this.alunoService.get(this.object.aluno_Id)
                 .catch(res => {
@@ -163,10 +152,10 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                     this.visibleChange();
                 });
 
-            lastValueFrom(this.turmaService.getTipos())
+            lastValueFrom(this.perfilCognitivoService.getList())
                 .then(res => {
-                    if (!res.find(x => x.id == this.object.source_Turma_Tipo_Id)) {
-                        this.toastrService.error('Faixa etária não encontrada.');
+                    if (!res.find(x => x.id == this.object.aluno_PerfilCognitivo_Id)) {
+                        this.toastrService.error('Perfil cognitivo não encontrado.');
                         this.visible = false;
                         this.visibleChange();
                     }
@@ -237,7 +226,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
-                this.toastrService.error('Não foi possível carregar calendário')
+                this.toastrService.error(`Não foi possível carregar calendário.\n ${getError(res)}`);
             })
 
     }
@@ -249,7 +238,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 id: this.eventRamdomId(),
                 backgroundColor: 'transparent',
                 borderColor: 'transparent',
-                title: item.turma,
+                title: item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
                 data: item,
@@ -360,7 +349,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja marcar reposição do aluno <b>${this.object.aluno} </b> do dia <b>${moment(this.object.source_Data).format('DD/MM/YYYY [às] HH[h]mm')}</b> para o dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.turma}</b> com o professor <b>${target.professor}</b>?`,
+            message: `Tem certeza que deseja marcar reposição do aluno <b>${this.object.aluno} </b> do dia <b>${moment(this.object.source_Data).format('DD/MM/YYYY [às] HH[h]mm')}</b> para o dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.descricao}</b> com o professor <b>${target.professor}</b>?`,
             header: 'Agendar reposição',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
@@ -382,33 +371,35 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
         this.loading = true;
 
-        var reposicaoRequest = new ReposicaoRequest;
+        var reposicaoRequest = new ReposicaoAlunoRequest;
         reposicaoRequest.aluno_Id = this.object.aluno_Id;
 
         // Se a aula source não existir, cria a aula
-        if (!this.object.source_Aula_Id) {
+        if (this.object.source_Aula_Id == -1) {
             var aulaRequest: AulaCreateRequest = {
-                turma_Id: this.object.source_Turma_Id,
+                sala_Id: this.object.source_Sala_Id,
+                turma_Id: this.object.source_Turma_Id ?? 0,
                 data: moment(this.object.source_Data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
                 professor_Id: this.object.source_Professor_Id,
                 observacao: ''
             }
             await lastValueFrom(this.service.create(aulaRequest))
                 .then(res => reposicaoRequest.source_Aula_Id = res.object.id)
-                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${res.error.message}`, e));
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${getError(res)}`, e));
         }
 
         // Se a aula target não existir, cria a aula
         if (!target.aula_Id) {
             var aulaRequest: AulaCreateRequest = {
-                turma_Id: target.turma_Id,
-                data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                sala_Id: target.sala_Id,
                 professor_Id: target.professor_Id,
+                turma_Id: target.turma_Id ?? 0,
+                data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
                 observacao: ''
             }
             await lastValueFrom(this.service.create(aulaRequest))
                 .then(res => reposicaoRequest.dest_Aula_Id = res.object.id)
-                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${res.error.message}`, e));
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${getError(res)}`, e));
 
         }
 
@@ -424,7 +415,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${res.error.message}`, e)
+                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
             })
     }
 

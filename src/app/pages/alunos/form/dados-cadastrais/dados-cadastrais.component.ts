@@ -1,12 +1,14 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
-import { Aluno, Pessoa_FaixaEtaria, Pessoa_Geracao, Pessoa_Sexo } from '../../../../models/alunos.model';
+import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
 import { Turma } from '../../../../models/turma.model';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { TurmaService } from '../../../../services/turma.service';
 import { AlunoService } from '../../../../services/alunos.service';
-// import imageCompression from 'browser-image-compression';
-import { ControlContainer, FormGroupDirective, NgForm } from '@angular/forms';
+import { ControlContainer, NgForm } from '@angular/forms';
+import { Aluno_Restricao } from '../../../../models/aluno-restricao.model';
+import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
+import { Checklist, checklists } from '../../../../models/checklist.model';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -27,8 +29,27 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     selectedTurma?: Turma;
     turmas: Turma[] = [];
     loadingTurmas = true;
+
     sexos: Pessoa_Sexo[] = [];
     loadingSexos = true;
+
+    restricoes: Aluno_Restricao[] = [];
+    loadingRestricoes = true;
+
+    perfisCognitivos: Aluno_Restricao[] = [];
+    loadingPerfisCognitivos = true;
+
+
+    loadingChecklists = false;
+    // checklists: any[] = checklists.map(x => ({
+    //     label: x.nome,
+    //     value: x.id,
+    //     items: x.items.map(y => ({
+    //         label: y.nome,
+    //         value: y.id,
+    //     }))
+    // }));
+    checklists: Checklist[] = checklists;
 
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
@@ -37,14 +58,29 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
         private service: AlunoService,
         private turmaService: TurmaService,
+        private perfilCognitivoService: PerfilCognitivoService
     ) {
-      
+
+        lastValueFrom(this.perfilCognitivoService.getList())
+            .then(res => {
+                this.perfisCognitivos = res;
+                this.loadingPerfisCognitivos = false;
+            })
+            .catch(res => this.loadingPerfisCognitivos = false);
+
         lastValueFrom(this.service.getSexo())
             .then(res => {
                 this.sexos = res;
                 this.loadingSexos = false;
             })
             .catch(res => this.loadingSexos = false);
+
+        lastValueFrom(this.service.getRestricoes())
+            .then(res => {
+                this.restricoes = res;
+                this.loadingRestricoes = false;
+            })
+            .catch(res => this.loadingRestricoes = false);
 
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
@@ -117,17 +153,17 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     loadFoto() {
-        if (this.object.id)  {
+        if (this.object.id) {
             this.loadingFile = true;
-    
+
             lastValueFrom(this.service.getFoto(this.object.id))
-            .then(res => {
-                this.object.aluno_Foto = res;
-                this.loadingFile = false;
-            })
-            .catch(res => {
-                this.loadingFile = false;
-            })
+                .then(res => {
+                    this.object.aluno_Foto = res;
+                    this.loadingFile = false;
+                })
+                .catch(res => {
+                    this.loadingFile = false;
+                })
         }
     }
 

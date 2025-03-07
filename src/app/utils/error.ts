@@ -7,11 +7,17 @@ export function getError(res: HttpErrorResponse) {
     if (res.error && res.error.message) {
         msg = res.error.message
     }
+    else if (typeof res.error == 'string') {
+        msg = res.error
+    }
+    else if (res.message) {
+        msg = res.message
+    } else {
+        msg = 'Ocorreu um erro. \n' + res.toString();
+    }
+
 
     return msg;
-
-
-
 }
 
 function jsonKeyToLowercase(oldObj: any) {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { Apostila, Apostila_Kit } from '../models/apostila.model';
+import { getError } from '../utils';
 
 @Injectable({
     providedIn: 'root',
@@ -19,7 +20,7 @@ export class ApostilaService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar apostilas')
+                    this.toastrService.error(`Não foi possível carregar apostilas. \n ${getError(err)}`)
                 }
             }));
         }
@@ -32,7 +33,7 @@ export class ApostilaService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar kits')
+                    this.toastrService.error(`Não foi possível carregar kits. \n ${getError(err)}`)
                 }
             }));
     }

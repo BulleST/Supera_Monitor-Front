@@ -1,0 +1,206 @@
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
+            <p-button *ngIf="isEditPage"
+                      class="ml-auto"
+                      type="button"
+                      icon="pi pi-exclamation-circle"
+                      size="large"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="secondary"
+                      (onClick)="op.toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                <div class="px-2">
+                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                    <table class="w-full">
+                        <tr *ngIf="object.created">
+                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Cadastrado em</td>
+                            <td class="py-2 px-3 surface-800 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.account_Created">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Cadastrado por</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{ object.account_Created }}</td>
+                        </tr>
+                        <tr *ngIf="object.lastUpdated">
+                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Última atualização</td>
+                            <td class="py-2 px-3 surface-800 text-right">{{object.lastUpdated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.deactivated">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Inativo em</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </p-popover>
+        </div>
+    </ng-template>
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field col-12"> <!-- Tema -->
+                <label for="tema">Tema: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #tema="ngModel"
+                       [(ngModel)]="object.tema"
+                       id="tema"
+                       name="tema"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="tema.touched && tema.invalid && tema.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="tema.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-3 col-12"> <!-- Início -->
+                <label for="dataInicio">Início: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #dataInicio="ngModel"
+                              [(ngModel)]="object.dataInicio"
+                              (ngModelChange)="validateDate(dataInicio)"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              [selectOtherMonths]="true"
+                              [maxDate]="dataFim.value"
+                              inputId="dataInicio"
+                              name="dataInicio"
+                              class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
+                              [required]="true"
+                              appendTo="body" />
+                <div *ngIf="dataInicio.touched && dataInicio.invalid && dataInicio.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['invalid']">{{dataInicio.errors['invalid']}}</p>
+                </div>
+            </div>
+            <div class="field sm:col-3 col-12"> <!-- Fim -->
+                <label for="dataFim">Fim: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #dataFim="ngModel"
+                              [(ngModel)]="object.dataFim"
+                              (ngModelChange)="validateDate(dataInicio)"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              [selectOtherMonths]="true"
+                              [minDate]="dataInicio.value"
+                              inputId="dataFim"
+                              name="dataFim"
+                              class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
+                              [required]="true"
+                              appendTo="body" />
+                <div *ngIf="dataFim.touched && dataFim.invalid && dataFim.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataFim.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field col"> <!-- Semana -->
+                <label for="semana">Semana: <span class="text-red-500">* </span> <small>(calculado automaticamente)</small> </label>
+                <input type="text"
+                       pInputText
+                       #semana="ngModel"
+                       [ngModel]="'Semana ' + object.semana"
+                       id="semana"
+                       name="semana"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="semana.touched && semana.invalid && semana.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="semana.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="px-2 col-12"><p-divider layout="horizontal"/></div>
+            <div class="field col-12 mt-2 "> <!-- Legenda -->
+                <div class="flex align-items-center justify-content-start">
+                    <label for="corLegenda">Legenda:</label>
+                    <!-- <div class="flex align-items-center my-3 mt-2 -ml-2">
+                    </div> -->
+                    <p-colorpicker
+                                   #corLegenda="ngModel"
+                                   [(ngModel)]="object.corLegenda"
+                                   inputId="corLegenda"
+                                   name="corLegenda"
+                                   appendTo="body"
+                                   styleClass="ml-2"
+                                   [required]="true"
+                                   value="#ffffff" />
+                    <span class="ml-2">{{object.corLegenda}}</span>
+                    <span class="ml-2" *ngIf="!object.corLegenda">Selecione uma cor</span>
+                </div>
+                <p class="flex align-items-center text-sm mt-1"><i class="pi pi-exclamation-circle mr-2"></i> Obs.: Esse campo representa a cor utilizada para o professor na visão do calendário de aulas.</p>
+                <div *ngIf="corLegenda.touched && corLegenda.invalid && corLegenda.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="corLegenda.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="px-2 col-12"><p-divider layout="horizontal"/></div>
+            <div class="field col-12 ">
+                <label>Material de Apoio: </label>
+                <p-fileupload 
+                    #fileUpload
+                    name="materialApoio[]" 
+                    [multiple]="true" 
+                    (onSelect)="onSelectedFiles($event)"
+                    styleClass="border-none mx-1 p-0 mt-2">
+                    <ng-template #content let-files let-uploadedFiles="uploadedFiles" let-removeFileCallback="removeFileCallback" let-removeUploadedFileCallback="removeUploadedFileCallback">
+                        <div *ngIf="files?.length > 0">
+                            <h5>Novos arquivos</h5>
+
+
+                            <div class="flex flex-wrap">
+                                <div *ngFor="let file of files; let i = index" class="flex flex-col align-items-center gap-4 p-2 w-full">
+                                    <i class="pi pi-file"></i>
+                                    <span class="font-semibold text-ellipsis flex-none white-space-nowrap overflow-hidden text-overflow-ellipsis" style="max-width: 30vw;" [pTooltip]="file.name">{{ file.name }}</span>
+                                    <div class="ml-auto">{{ formatSize(file.size) }}</div>
+                                    <p-badge value="Pending" severity="warn" />
+                                    <p-button icon="pi pi-times"
+                                            styleClass="w-2rem h-2rem p-1 flex align-items-center justify-content-center "
+                                        (click)="onRemoveTemplatingFile($event, file, removeFileCallback, i)" 
+                                        [rounded]="true" 
+                                        severity="danger"
+                                        size="small" />
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template #file></ng-template>
+                    <ng-template #empty>
+                        <button type="button" (click)="fileUpload.choose()"
+                            class="flex align-items-center justify-content-center flex-column cursor-pointer  text-300 focus:text-600 focus:surface-100 surface-50 -m-4 py-6 px-4">
+                            <i class="pi pi-cloud-upload p-2 text-6xl"></i>
+                            <p class="mt-2 mb-0 text-xl text-500">Solte os arquivos aqui para fazer upload.</p>
+                        </button>
+                    </ng-template>
+                </p-fileupload>
+            </div>
+        </div>
+        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="col">
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          [disabled]="form.invalid || loading"
+                          styleClass="px-3"
+                          label="Salvar"
+                          icon="pi pi-check"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

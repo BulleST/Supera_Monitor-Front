@@ -5,7 +5,9 @@ import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/aluno
 import moment from 'moment';
 import { Map } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { ReposicaoRequest } from '../models/reposicao.model';
+import { ReposicaoAlunoRequest } from '../models/reposicao.model';
+import { Aluno_Restricao } from '../models/aluno-restricao.model';
+import { checklists } from '../models/checklist.model';
 
 @Injectable({
     providedIn: 'root',
@@ -14,10 +16,28 @@ import { ReposicaoRequest } from '../models/reposicao.model';
 export class AlunoService extends Service {
     override list = new BehaviorSubject<Aluno[]>([]);
 
+    getRestricoes() {
+        return this.http.get<Aluno_Restricao[]>(`${this.url}/alunos/restricao/all/`)
+    }
+
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all/`)
             .pipe(tap({
                 next: list => {
+                    // list = list.map(aluno => {
+                    //     aluno.checklist = [];
+                    //     aluno.checklist = checklists;
+                    //     aluno.checklist = aluno.checklist.map(checklist => {
+                    //         checklist.items = checklist.items.map(item => {
+                    //             // item.finalizado = Boolean(Math.ceil(Math.random()));
+                    //             return JSON.parse(JSON.stringify(item));
+                    //         });
+                    //         // checklist.status = checklist.items.find(x => !x.finalizado) ? 'Atrasado' : 'Finalizado';
+                    //         return checklist;
+                    //     });
+                    //     return aluno;
+                    // })
+                    console.log(list)
                     this.list.next(list);
                     return of(list);
                 },
@@ -32,16 +52,21 @@ export class AlunoService extends Service {
         var list = this.list.value;
         var index = list.findIndex(x => x.id == id);
         return this.http.get<Response>(`${this.url}/alunos/image/${id}`)
+        // var randomImgUrl=`https://picsum.photos/id/${Math.round(Math.random() * 1000)}/200/200.jpg`;
+
+        //     return this.http.get<string>(randomImgUrl)
             .pipe(map(
                 res => {
                     if (index != -1) {
                         var aluno = list[index];
                         if (aluno) {
+                            // aluno.aluno_Foto = res;
                             aluno.aluno_Foto = res.object ?? '';
                             list.splice(index, 1, aluno);
                             this.list.next(list);
                         }
                     }
+                    // return res;
                     return res.object;
                 },
             ), tap({
@@ -107,7 +132,7 @@ export class AlunoService extends Service {
             }));
     }
 
-    reposicao(request: ReposicaoRequest) {
+    reposicao(request: ReposicaoAlunoRequest) {
         return this.http.post<Response>(`${this.url}/alunos/reposicao/`, request)
             .pipe(tap({
                 error: err => {

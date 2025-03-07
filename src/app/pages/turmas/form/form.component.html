@@ -64,23 +64,25 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Faixa Etária -->
-                <label for="turma_Tipo_Id">Faixa Etária: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="tipos"
-                          [(ngModel)]="object.turma_Tipo_Id"
-                          [loading]="loadingTurmaTipo"
-                          #turma_Tipo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="turma_Tipo_Id"
-                          inputId="turma_Tipo_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body" />
+            <div class="field sm:col-4 col-12"> <!-- Perfil Cognitivo -->
+                <label for="perfilCognitivo">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+                <p-multiselect 
+                    [options]="perfisCognitivos"
+                    [(ngModel)]="object.perfilCognitivo"
+                    [loading]="loadingPerfisCognitivos"
+                    (ngModelChange)="perfilChange(perfilCognitivo)"
+                    #perfilCognitivo="ngModel"
+                    inputId="perfilCognitivo"
+                    name="perfilCognitivo"
+                    optionLabel="nome" 
+                    placeholder="Selecione"
+                    [filter]="true"
+                    filterBy="nome"
+                    [required]="true"
+                    styleClass="w-full"  />
+                <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Dias de Aula -->
                 <label for="diaSemana">Dias de Aula: <span class="text-red-500">*</span></label>

@@ -1,0 +1,50 @@
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog header="Cadastrar restrição"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '200px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    
+    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <div class="field col-12"> <!-- Restrição -->
+                <label for="nome">Restrição: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #nome="ngModel"
+                       [(ngModel)]="object.nome"
+                       id="nome"
+                       name="nome"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="nome.touched && nome.invalid && nome.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+            <div class="col">
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          [disabled]="form.invalid || loading"
+                          styleClass="px-3"
+                          label="Salvar"
+                          icon="pi pi-check"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

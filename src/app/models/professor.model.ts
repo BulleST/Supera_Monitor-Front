@@ -1,5 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
+import { CalendarioList } from "./calendario.model";
 import { Turma } from "./turma.model";
 
 export class Professor extends Basic_List {
@@ -7,16 +8,16 @@ export class Professor extends Basic_List {
     telefone: string = '';
     email: string = '';
     dataInicio: Date = new Date;
-    professor_NivelAbaco_Id: number = undefined as unknown as number;
-    professor_NivelAbaco: string = '';
-    professor_NivelAH_Id: number = undefined as unknown as number;
-    professor_NivelAH: string = '';
+    dataNascimento: Date = new Date;
+    professor_NivelCertificacao_Id: number = undefined as unknown as number;
+    professor_NivelCertificacao: string = '';
     account_Id: number = undefined as unknown as number;
-    role_Id: number = 0;
-    role: string = '';
-    corLegenda: string = '';
+    corLegenda: string = getRandomColor();
+
+    // Não mapeados
     disponivel?: boolean;
-    disponivelTurma?: Turma;
+    disponivelEvent?: Turma;
+    // const getAge = birthDate => Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e+10)
 }
 
 export class ProfessorCreateRequest {
@@ -25,23 +26,23 @@ export class ProfessorCreateRequest {
     email: string = '';
     telefone: string = '';
     dataInicio: Date = new Date;
-    professor_NivelAbaco_Id: number = undefined as unknown as number;
-    professor_NivelAH_Id: number = undefined as unknown as number;
-    corLegenda: string = '';
+    dataNascimento: Date = new Date;
+    professor_NivelCertificacao_Id: number = undefined as unknown as number;
+    corLegenda: string = getRandomColor();
 }
+
 export class ProfessorEditRequest {
     id: number = 0;
     account_Id: number = 0;
     nome: string = '';
     telefone: string = '';
     dataInicio: Date = new Date;
-    professor_NivelAbaco_Id: number = undefined as unknown as number;
-    professor_NivelAH_Id: number = undefined as unknown as number;
-    corLegenda: string = '';
-
+    dataNascimento: Date = new Date;
+    professor_NivelCertificacao_Id: number = undefined as unknown as number;
+    corLegenda: string = getRandomColor();
 }
 
-export class Professor_NivelApostila {
+export class Professor_NivelCertificacao {
     id: number = 0;
     descricao: string = '';
 }
@@ -85,15 +86,8 @@ export var professorColumns: ColumnTable[] = [
         },
     },
     {
-        field: 'nivelAbaco',
-        label: 'Nível Ábaco',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
-    {
-        field: 'nivelAH',
-        label: 'Nível AH',
+        field: 'professor_NivelCertificacao',
+        label: 'Nível Certificação',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
@@ -111,3 +105,13 @@ export var professorColumns: ColumnTable[] = [
         },
     },
 ];
+
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }

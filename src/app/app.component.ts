@@ -1,5 +1,6 @@
 import { Component, HostListener } from '@angular/core';
 import { MobileService } from './utils';
+import { balloons, textBalloons } from "balloons-js";
 
 @Component({
     selector: 'app-root',
@@ -17,5 +18,35 @@ export class AppComponent {
     @HostListener('window:resize', ['$event'])
     resize() {
         this.mobile.set();
+    }
+
+    async balloon() {
+        console.log('oi')
+
+        balloons()
+
+        // await textBalloons([
+        //     {
+        //         text: '(',color: 'var(--p-primary-500)', fontSize: 80
+        //     },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'blue', fontSize: 16
+        //     // },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'grey', fontSize: 16
+        //     // },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'yellow', fontSize: 16
+        //     // },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'purple', fontSize: 16
+        //     // },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'green', fontSize: 16
+        //     // },
+        //     // {
+        //     //     text: 'paranbéeens',color: 'orange', fontSize: 16
+        //     // },
+        // ])
     }
 }

@@ -5,6 +5,7 @@ import { AccountRole } from '../models/account-perfil.model';
 import { Account, AccountRequest } from '../models/account.model';
 import { Map } from '../utils/map';
 import { Service } from '../helpers/service.service';
+import { getError } from '../utils';
 
 @Injectable({
     providedIn: 'root',
@@ -17,7 +18,7 @@ export class UserService extends Service {
         return this.http.get<AccountRole[]>(`${this.url}/users/roles`)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar perfis');
+                    this.toastrService.error(`Não foi possível carregar perfis. \n ${getError(err)}`);
                 }
             }));
     }
@@ -30,7 +31,7 @@ export class UserService extends Service {
                     return of(list);
                 },
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar usuários');
+                    this.toastrService.error(`Não foi possível carregar usuários. \n ${getError(err)}`);
                 }
             }));
     }
@@ -42,7 +43,7 @@ export class UserService extends Service {
 
             var item = this.list.value.find(x => x.id == id) as Account;
             if (!item) {
-                this.toastrService.error('Usuário não encontrado.');
+                this.toastrService.error(`Usuário não encontrado.`);
                return reject('Usuário não encontrado.')
             }
 
@@ -56,7 +57,7 @@ export class UserService extends Service {
         return this.http.post<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível cadastrar usuário');
+                    this.toastrService.error(`Não foi possível cadastrar usuário. \n ${getError(err)}`);
                 }
             }));
     }
@@ -66,7 +67,7 @@ export class UserService extends Service {
         return this.http.put<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível editar usuário');
+                    this.toastrService.error(`Não foi possível editar usuário. \n ${getError(err)}`);
                 }
             }));
     }
@@ -84,7 +85,7 @@ export class UserService extends Service {
         return this.http.patch<Response>(`${this.url}/users/reset-password/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível alterar senha');
+                    this.toastrService.error(`Não foi possível alterar senha. \n ${getError(err)}`);
                 }
             }));
     }

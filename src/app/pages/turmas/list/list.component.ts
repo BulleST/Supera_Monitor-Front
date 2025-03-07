@@ -50,10 +50,7 @@ export class ListComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(res => {
-            this.list = res;
-            console.log('turmaList', this.list)
-        });
+        var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
 
     }

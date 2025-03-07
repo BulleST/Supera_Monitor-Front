@@ -36,6 +36,7 @@
     "@ngx-translate/http-loader": "^16.0.1",
     "@primeng/themes": "^19.0.5",
     "angular-cli-ghpages": "^2.0.3",
+    "balloons-js": "^0.0.2",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "browser-image-compression": "^2.0.2",

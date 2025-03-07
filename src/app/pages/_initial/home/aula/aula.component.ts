@@ -2,25 +2,26 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AulaService } from '../../../services/aulas.service';
-import { Crypto } from '../../../utils';
-import { Professor } from '../../../models/professor.model';
-import { ProfessorService } from '../../../services/professor.service';
+import { AulaService } from '../../../../services/aulas.service';
+import { Crypto, getError } from '../../../../utils';
+import { Professor } from '../../../../models/professor.model';
+import { ProfessorService } from '../../../../services/professor.service';
 import { Popover } from 'primeng/popover';
-import { CalendarioAlunoList, CalendarioList } from '../../../models/calendario.model';
-import { AlunoService } from '../../../services/alunos.service';
-import { AulaCreateRequest, AulaEditRequest } from '../../../models/aulas.model';
-import { Reposicao } from '../../../models/reposicao.model';
-import { Map } from '../../../utils/map';
-import { ApostilaService } from '../../../services/apostila.service';
-import { Apostila, Apostila_Tipo } from '../../../models/apostila.model';
+import { CalendarioAlunoList, CalendarioList } from '../../../../models/calendario.model';
+import { AlunoService } from '../../../../services/alunos.service';
+import { AulaCreateRequest, AulaEditRequest } from '../../../../models/aulas.model';
+import { AulaId, ReposicaoAluno } from '../../../../models/reposicao.model';
+import { Map } from '../../../../utils/map';
+import { ApostilaService } from '../../../../services/apostila.service';
+import { Apostila, Apostila_Tipo } from '../../../../models/apostila.model';
 import { Select } from 'primeng/select';
 import { NgModel } from '@angular/forms';
-import { ChamadaRequest, ChamadaRequestAlunos } from '../../../models/chamada.model';
-import { LoadingService } from '../../../parts/loading/loading';
+import { ChamadaRequest, ChamadaRequestAlunos } from '../../../../models/chamada.model';
+import { LoadingService } from '../../../../parts/loading/loading';
 import { ToastrService } from 'ngx-toastr';
-import { TurmaService } from '../../../services/turma.service';
+import { TurmaService } from '../../../../services/turma.service';
 import moment from 'moment';
+import { Checklist, Checklist_Item, checklists } from '../../../../models/checklist.model';
 
 @Component({
     selector: 'app-aula',
@@ -54,6 +55,13 @@ export class AulaComponent implements OnDestroy {
     apostilas: Apostila[] = [];
     loadingApostila = false;
 
+
+    checklists: Checklist[] = checklists;
+    currentIndex = 0;
+    currentChecklist: Checklist = checklists[0];
+    prevChecklist?: Checklist = undefined;
+    nextChecklist?: Checklist = checklists[1];
+    
     constructor(
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
@@ -68,32 +76,13 @@ export class AulaComponent implements OnDestroy {
         private toastrService: ToastrService,
     ) {
 
-        // var aula = this.service.aula.subscribe(async res => {
-
-        //     // if (res && !res.aula_Id) {
-        //     //     this.visible = false;
-        //     //     this.visibleChange();
-        //     //     return;
-        //     // }
-
-        //     this.object = res;
-        //     this.object.alunos = this.object.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : x.aluno > y.aluno ? 1 : 0);
-        //     this.horario = `${moment(this.object.data).format('HH[h]mm')} às ${moment(this.object.data).add(2, 'hours').format('HH[h]mm')}`;
-
-        //     this.verificaDisponibilidadeProfessor();
-
-        //     this.loading = false;
-        //     this.visible = true;
-
-        // });
-        // this.subscription.push(aula);
-
+     
         this.activatedRoute.params.subscribe(async res => {
             if (res['aula_id']) {
                 this.object.aula_Id = this.crypto.decrypt(res['aula_id']);
                 var aula = this.service.aula.getValue();
 
-                if (!aula && this.object.aula_Id) {
+                if (!aula && this.object.aula_Id != AulaId.PseudoAula) {
                     if (this.service.list.value.length == 0) {
                         await lastValueFrom(service.getCalendario({}))
                         .catch(res => {
@@ -113,7 +102,7 @@ export class AulaComponent implements OnDestroy {
                 }
 
                 this.object = aula;
-                this.object.alunos = this.object.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : x.aluno > y.aluno ? 1 : 0);
+                this.object.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : x.aluno > y.aluno ? 1 : 0);
                 this.horario = `${moment(this.object.data).format('HH[h]mm')} às ${moment(this.object.data).add(2, 'hours').format('HH[h]mm')}`;
                 this.verificaDisponibilidadeProfessor();
                 this.loading = false;
@@ -199,6 +188,31 @@ export class AulaComponent implements OnDestroy {
     }
 
 
+    prev() {
+        if (this.currentIndex == 0) {
+            this.prevChecklist = undefined;
+            this.nextChecklist = checklists[this.currentIndex+1];
+            return;
+        }
+        this.currentIndex -= 1;
+        this.currentChecklist = checklists[this.currentIndex];
+        this.prevChecklist = checklists[this.currentIndex-1];
+        this.nextChecklist = checklists[this.currentIndex+1];
+
+
+    }
+    
+    next() {
+        if (this.currentIndex == (this.checklists.length-1)) {
+            this.prevChecklist = checklists[this.currentIndex-1];
+            this.nextChecklist = undefined;
+            return
+        }
+        this.currentIndex += 1;
+        this.currentChecklist = checklists[this.currentIndex];
+        this.prevChecklist = checklists[this.currentIndex-1];
+        this.nextChecklist = checklists[this.currentIndex+1];
+    }
 
     async verificaDisponibilidadeProfessor() {
         var valid = true;
@@ -237,7 +251,7 @@ export class AulaComponent implements OnDestroy {
 
                 if (exists) {
                     professor.disponivel = false;
-                    professor.disponivelTurma = exists;
+                    professor.disponivelEvent = exists;
                     if (professor.id == this.object.professor_Id) {
                         valid = false;
                         this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
@@ -246,7 +260,7 @@ export class AulaComponent implements OnDestroy {
                 }
                 else {
                     professor.disponivel = true;
-                    professor.disponivelTurma = undefined;
+                    professor.disponivelEvent = undefined;
                     this.professorSelect.control.setErrors({ indisponivel: null });
                     this.professorSelect.control.updateValueAndValidity();
                 }
@@ -270,7 +284,7 @@ export class AulaComponent implements OnDestroy {
 
         if (this.professorSelected && this.professorSelected.disponivel == false) {
             this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${this.professorSelected.disponivelTurma!.nome}</b> no mesmo dia às <b>${moment(this.professorSelected.disponivelTurma!.horario).format('HH[h]mm')}</b>.`, e);
+            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${this.professorSelected.disponivelEvent!.nome}</b> no mesmo dia às <b>${moment(this.professorSelected.disponivelEvent!.horario).format('HH[h]mm')}</b>.`, e);
             return;
         }
 
@@ -375,11 +389,12 @@ export class AulaComponent implements OnDestroy {
     async goToIniciarChamada(e: any) {
         this.loading = true;
 
-        if (!this.object.aula_Id) {
+        if (this.object.aula_Id == AulaId.PseudoAula) {
             var aulaRequest: AulaCreateRequest = {
-                turma_Id: this.object.turma_Id,
-                data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                sala_Id: this.object.sala_Id,
                 professor_Id: this.object.professor_Id,
+                turma_Id: this.object.turma_Id ?? 0,
+                data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
                 observacao: ''
             };
 
@@ -388,7 +403,7 @@ export class AulaComponent implements OnDestroy {
                     this.object.aula_Id = res.object.id;
                     this.service.calendarioReload.emit(true);
                 })
-                .catch(res => this.showError('Ocorreu um erro', `Não foi possível iniciar chamada. \n (Aula não foi inserida) \n ${res.error.message}`, e));
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível iniciar chamada. \n (Aula não foi inserida).\n ${getError(res)}`, e));
 
         }
         this.loading = false;
@@ -400,17 +415,19 @@ export class AulaComponent implements OnDestroy {
 
     goToReposicao(aluno: CalendarioAlunoList) {
         if (this.object) {
-            var reposicao: Reposicao = {
+            var perfilCognitivo = this.object.perfilCognitivo.find(x => x.id == aluno.perfilCognitivo_Id);
+            var reposicao: ReposicaoAluno = {
                 aluno: aluno.aluno,
                 aluno_Id: aluno.aluno_Id,
+                aluno_PerfilCognitivo: perfilCognitivo!.nome, 
+                aluno_PerfilCognitivo_Id: perfilCognitivo!.id,
                 source_Aula_Id: this.object.aula_Id,
                 source_Data: this.object.data,
                 source_Turma_Id: aluno.turma_Id,
                 source_Turma: aluno.turma,
-                source_Turma_Tipo_Id: this.object.turma_Tipo_Id,
-                source_Turma_Tipo: this.object.turma_Tipo,
                 source_Professor_Id: this.object.professor_Id,
-                source_Professor: this.object.professor
+                source_Professor: this.object.professor,
+                source_Sala_Id: this.object.sala_Id,
             };
 
             this.service.reposicao.next(reposicao)
@@ -438,20 +455,53 @@ export class AulaComponent implements OnDestroy {
                 this.toastrService.success('Dados atualizados com sucesso.')
             })
             .catch(res => {
-                this.showError('Ocorreu um erro', `Não foi possível salvar dados. \n ${res.error.message}`, e)
+                this.showError('Ocorreu um erro', `Não foi possível salvar dados. \n ${getError(res)}`, e)
                 this.loading = false;
             });
 
     }
 
     request(request: any) {
-        if (this.object.aula_Id) {
+        if (this.object.aula_Id != AulaId.PseudoAula) {
             request = Map(request, new AulaEditRequest)
             return lastValueFrom(this.service.edit(request))
         }
         request = Map(request, new AulaCreateRequest)
         return lastValueFrom(this.service.create(request))
     }
+
+
+    checkboxChange(item: Checklist_Item, checked: boolean, e: any) {
+        if (checked) {
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Tem certeza que deseja marcar etapa como realizada?.`,
+                header: 'Finalizar etapa',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Finalizar',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Ainda não',
+                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                accept: async () => {
+                 
+                },
+                reject: () => {
+                }
+            });
+        }
+    }
+
+    togglePopover(popover: Popover, e: any) {
+        popover.toggle(e);
+
+        console.log(popover)
+
+
+        if (popover.container) popover.align();
+    }
+
 
     finalizarAula(e: any) {
 
@@ -484,10 +534,10 @@ export class AulaComponent implements OnDestroy {
             accept: async () => {
                 this.loading = true;
                 var request: ChamadaRequest = {
-                    aula_Id: this.object.aula_Id as number,
+                    aula_Id: this.object.aula_Id,
                     professor_Id: this.object.professor_Id as number,
                     registros: this.object.alunos.map(x => ({
-                        turma_Aula_Aluno_Id: x.id,
+                        aula_Aluno_Id: x.id,
                         presente: x.presente,
                         apostila_Abaco_Id: x.apostila_Abaco_Id,
                         numero_Pagina_Abaco: x.numeroPaginaAbaco,
@@ -508,7 +558,7 @@ export class AulaComponent implements OnDestroy {
                     })
                     .catch(res => {
                         this.error = res.message;
-                        this.showError('Erro', `Não foi possível finalizar aula. \n ${res.error.message}`, e);
+                        this.showError('Erro', `Não foi possível finalizar aula. \n ${getError(res)}`, e);
                         this.loading = false;
                     })
             },

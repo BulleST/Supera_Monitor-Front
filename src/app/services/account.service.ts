@@ -40,12 +40,10 @@ export class AccountService {
     }
 
     setAccount(where: string, value?: AccountResponse) {
-        console.log('setAccount', where, JSON.parse(JSON.stringify(value??{})))
         this.accountSubject.next(value)
     }
 
     public get accountValue() {
-        console.log('accountValue', JSON.parse(JSON.stringify(this.accountSubject.value ?? {})))
         return this.accountSubject.value;
   }
 

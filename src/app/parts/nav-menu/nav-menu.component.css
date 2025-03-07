@@ -11,5 +11,6 @@
 
 ::ng-deep .p-menu-item-link.active-link:hover .p-menu-item-icon,
 ::ng-deep .p-menu-item-link.active-link .p-menu-item-icon {
-    color: var(--p-primary-800);
+    color: white;
 }
+

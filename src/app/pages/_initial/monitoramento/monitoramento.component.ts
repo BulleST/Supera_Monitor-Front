@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { Aluno_CheckList, Checklist, checklists } from '../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist, checklists } from '../../../models/checklist.model';
 import { DragScrollComponent } from 'ngx-drag-scroll';
 import { Header, MobileService } from '../../../utils';
 import $ from 'jquery'
@@ -23,6 +23,9 @@ export class MonitoramentoComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     ScreenWidth:typeof ScreenWidth = ScreenWidth;
     
+
+    hoje = new Date
+
     constructor(
         private header: Header,
         private mobileService: MobileService
@@ -56,7 +59,7 @@ export class MonitoramentoComponent implements OnDestroy {
     moveRight() {
         this.dragScroll.moveRight();
     }
-    drop(event: CdkDragDrop<Aluno_CheckList[]>) {
+    drop(event: CdkDragDrop<Aluno_CheckList_Item[]>) {
       if (event.previousContainer === event.container) {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       } else {
@@ -76,7 +79,7 @@ export class MonitoramentoComponent implements OnDestroy {
       }
     }
 
-    cdkDragMoved(e: CdkDragMove<Aluno_CheckList>) {
+    cdkDragMoved(e: CdkDragMove<Aluno_CheckList_Item>) {
         if (e.pointerPosition.x > 500 &&  e.delta.x == 1) {
             this.dragScroll.disabled = false
             $('.drag-scroll-content').scrollLeft($('.drag-scroll-content')!.scrollLeft()! + 10)
@@ -88,14 +91,14 @@ export class MonitoramentoComponent implements OnDestroy {
     }
     
     private dragStart = false
-    cdkDragStarted(e: CdkDragStart<Aluno_CheckList>) {
+    cdkDragStarted(e: CdkDragStart<Aluno_CheckList_Item>) {
         this.dragStart = true;
         this.disabled = true
         this.dragScroll.dragDisabled = true
         this.dragScroll._contentRef.nativeElement.style.pointerEvents = 'all'
     }
     
-    cdkDragEnded(e: CdkDragEnd<Aluno_CheckList>) {
+    cdkDragEnded(e: CdkDragEnd<Aluno_CheckList_Item>) {
         this.dragStart = false;
         this.disabled = false
         this.dragScroll.dragDisabled = false
@@ -104,7 +107,7 @@ export class MonitoramentoComponent implements OnDestroy {
 
     private start!: Date;
     private interval!: NodeJS.Timeout
-    addClass(div: HTMLDivElement, drag: CdkDrag<Aluno_CheckList>) {
+    addClass(div: HTMLDivElement, drag: CdkDrag<Aluno_CheckList_Item>) {
         this.start = new Date();
         
         this.interval = setInterval(() => {
