@@ -128,10 +128,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
         this.calendarioList = jornadas;
 
-        console.log('jornadas 2', this.calendarioList)
         this.setCalendario();
-
-
         var screen = this.mobileService.get().subscribe(res => {
             if (this.fullCalendar) {
                 setTimeout(() => {

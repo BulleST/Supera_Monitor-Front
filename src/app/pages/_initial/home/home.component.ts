@@ -3,20 +3,18 @@ import { CalendarOptions, DatesSetArg, EventApi, EventHoveringArg } from '@fullc
 import { AulaService } from '../../../services/aulas.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
-import { Crypto, getError, Header, MobileService } from '../../../utils';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Popover } from 'primeng/popover';
+import { getError, Header, MobileService } from '../../../utils';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import listPlugin from '@fullcalendar/list';
-import { CalendarioAlunoList, CalendarioList, CalendarioRequest, CalendarioView, loadingEvents } from '../../../models/calendario.model';
+import { CalendarioAluno, CalendarioAula, CalendarioRequest, CalendarioView, loadingEvents } from '../../../models/calendario.model';
 import { AccountService } from '../../../services/account.service';
 import { AccountResponse } from '../../../models/account.model';
 import { ScreenWidth } from '../../../utils/mobile';
 import $ from 'jquery';
-import {  AulaId, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
+import {  PseudoAula, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import moment from 'moment';
 import 'moment/locale/pt-br'
@@ -27,6 +25,7 @@ import { AulaCreateRequest } from '../../../models/aulas.model';
 import { ToastrService } from 'ngx-toastr';
 import { Jornada, jornadas } from '../../../models/jornada.model';
 import { SelectedAulaComponent } from './selected-aula/selected-aula.component';
+import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
 
 moment.locale('pt-br')
 
@@ -40,8 +39,8 @@ moment.locale('pt-br')
 export class HomeComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
     screen: ScreenWidth = ScreenWidth.lg;
-    selectedAula?: CalendarioList;
-    selectedAluno?: CalendarioAlunoList;
+    selectedAula?: CalendarioAula;
+    selectedAluno?: CalendarioAluno;
     legenda: { backgroundColor: string, label: string }[] = [];
 
     loading = true;
@@ -63,7 +62,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
     calendarioVisible = signal(false);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioList[] = [];
+    calendarioList: CalendarioAula[] = [];
     calendarioOptions: CalendarOptions = {
         initialView: 'timeGridWeek',
         themeSystem: 'standard',
@@ -203,7 +202,6 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         this.getCalendario(this.calendarioRequest, 'subscriber')
     }
 
-
     eventRamdomId() {
         let length = 5;
         let result = '';
@@ -218,22 +216,23 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     getCalendario(request: CalendarioRequest, where: string) {
-
         this.loading = true;
 
         setTimeout(() => {
              lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
-                console.log('getCalendario calendarioList', JSON.parse(JSON.stringify(calendarioList)))
                 calendarioList.forEach(aula => {
                     var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
                     var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
+                    aula.alunos = aula.alunos.filter(x => x.active)
                     if (index == -1)
                         this.calendarioList.push(aula);
                     else
                         this.calendarioList.splice(index, 1, aula);
 
                 })
+
+                this.service.calendario.next(this.calendarioList);
 
                 this.setCalendario();
                 this.setLegenda(this.calendarioList);
@@ -253,18 +252,20 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         this.cdkEventItensId = [];
 
         this.fullCalendar.getApi().removeAllEvents();
-        this.calendarioOptions.events = this.calendarioList.map(item => {
-            var event = {
-                id: this.eventRamdomId(),
-                backgroundColor: 'transparent',
-                borderColor: 'transparent',
-                title: item.turma ?? item.descricao,
-                start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
-                end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                extendedProps: item,
-            }
-            return event;
-        });
+        this.calendarioOptions.events = this.calendarioList
+                    .filter(x => x.active == true)
+                    .map(item => {
+                        var event = {
+                            id: this.eventRamdomId(),
+                            backgroundColor: 'transparent',
+                            borderColor: 'transparent',
+                            title: item.turma ?? item.descricao,
+                            start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
+                            end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
+                            extendedProps: item,
+                        }
+                        return event;
+                    });
 
         this.cdkEventItensId = this.calendarioOptions.events.map(x => 'event-' + x.id)
         this.fullCalendar.getApi().updateSize();
@@ -285,7 +286,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         return (currentDate < nextMonday) ? 52 : (currentDate > nextMonday ? Math.ceil((currentDate.valueOf() - nextMonday.valueOf()) / (24 * 3600 * 1000) / 7) : 1);
     }
 
-    setLegenda(c: CalendarioList[]) {
+    setLegenda(c: CalendarioAula[]) {
         this.legenda = [];
         c.forEach(item => {
             if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {
@@ -313,7 +314,6 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 200 ? '#000' : '#fff';
     }
 
-
     async datesSet(arg: DatesSetArg) {
         this.loading = true;
 
@@ -328,9 +328,6 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 return x
             })
 
-
-
-
         this.calendarioOptions.events = JSON.parse(JSON.stringify(_loadingEvents));
         this.calendarioRequest.intervaloDe = new Date(arg.view.currentStart.getTime());
         this.calendarioRequest.intervaloAte = undefined;
@@ -343,13 +340,19 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         this.selectedAula = undefined;
     }
 
-    // eventClick(e: EventClickArg) {
-    eventClick(item: CalendarioList, e: any) {
+    async selectAula(e: any, item: CalendarioAula) {
+        item = JSON.parse(JSON.stringify(item));
+        if (item.reposicaoDe_Aula_Id && !item.reposicaoDe_Aula) {
+            await lastValueFrom(this.service.get(item.reposicaoDe_Aula_Id))
+            .then(res => {
+                item.reposicaoDe_Aula = res;
+            })
+        }
         this.selectedAula = item;
-        console.log('selectedAula', JSON.parse(JSON.stringify(this.selectedAula)))
-        this.selectedAula.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : x.aluno > y.aluno ? 1 : 0)
         this.selectedAulaComponent.selectedAula = item;
         this.selectedAulaComponent.showPopover(e);
+
+        console.log('selectedAula 1', this.selectedAula)
     }
 
     eventMouseEnter(e: EventHoveringArg) {
@@ -368,17 +371,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         $('.fc-event-hover-placeholder').remove()
     }
 
-
-    calcLen(alunos: any) {
-        if (!alunos) {
-            return 0
-        } else {
-            return alunos.length
-        }
-    }
-
     cdkCancelDrag(where: string) {
-
         this.cdkDragCancel = true;
         this.cdkEventItensId.forEach(id => {
             $('#' + id).removeClass('scalein animation-duration-200 animation-iteration-1')
@@ -386,31 +379,34 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         })
     }
 
-
-
-    cdkDrop(event: CdkDragDrop<CalendarioAlunoList[]>, target: CalendarioList) {
-
-
+    cdkDrop(event: CdkDragDrop<CalendarioAluno[]>, target: CalendarioAula) {
+        
         if (this.cdkDragCancel) {
             return;
         }
-        if (!this.selectedAula)
+
+        if (!this.selectedAula) {
             return;
+        }
 
 
         if (event.previousContainer != event.container) {
 
+            var source = this.selectedAula;
+
             if (target.alunos.length >= target.capacidadeMaximaAlunos) {
                 document.dispatchEvent(new Event('mouseup'));
-                this.cdkCancelDrag('keyup')
+                this.cdkCancelDrag('keyup');
                 return this.showError('Não autorizado', 'Essa aula atingiu o limite permitido de alunos.', event.event);
             }
 
             if (target.perfilCognitivo.map(x => x.id).includes(event.item.data.perfilCognitivo_Id) == false) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup')
-                return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesma faixa etária são permididas.', event.event);
+                return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permididas.', event.event);
             }
+
+
 
             if (target.alunos.find(x => x.aluno_Id == event.item.data.aluno_Id)) {
                 document.dispatchEvent(new Event('mouseup'));
@@ -419,27 +415,9 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             }
 
 
-
-
-            if (target.data != this.selectedAula.data) {
-                this.confirmationService.confirm({
-                    target: event.container.element.nativeElement,
-                    message: `Agendar reposição do aluno <b>${event.item.data.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
-                    header: 'Agendar reposição',
-                    icon: 'pi pi-exclamation-triangle',
-                    acceptIcon: 'pi pi-check',
-                    acceptLabel: 'Agendar',
-                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                    rejectVisible: true,
-                    rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Cancelar',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                    accept: async () => {
-                        this.agendaReposicao(event.item.data.aluno_Id, this.selectedAula as CalendarioList, target, { target: event.container.element.nativeElement });
-                    },
-                    reject: () => {
-                    }
-                });
+            if (target.data != source.data) {
+                
+                this.agendaReposicaoConffirm(event.event, event.item.data, source, target);
             }
         }
     }
@@ -452,12 +430,10 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-
     events(events: EventApi[]) {
         this.currentEvents.set(events);
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
-
 
     showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
@@ -471,25 +447,71 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         })
     }
 
-    async agendaReposicao(aluno_Id: number, source: CalendarioList, target: CalendarioList, e: any) {
+    alunoListaEsperaConffirm(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Inserir aluno(a) <b>${aluno.aluno}</b> na lista de espera da aula no dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
+            header: 'Agendar reposição',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Agendar',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            rejectVisible: true,
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: async () => {
+                this.alunoListaEspera(e, aluno, this.selectedAula as CalendarioAula, target);
+            },
+            reject: () => {
+            }
+        });
+    }
+
+    alunoListaEspera(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+
+    }
+
+    agendaReposicaoConffirm(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Agendar reposição do aluno(a) <b>${aluno.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
+            header: 'Agendar reposição',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Agendar',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            rejectVisible: true,
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: async () => {
+                this.agendaReposicao(e, aluno.aluno_Id, source, target);
+            },
+            reject: () => {
+            }
+        });
+    }
+
+    async agendaReposicao(e: any, aluno_Id: number, source: CalendarioAula, target: CalendarioAula) {
 
         this.loading = true;
         var reposicaoRequest = new ReposicaoAlunoRequest;
         reposicaoRequest.aluno_Id = aluno_Id;
 
-
         // Se a aula source não existir, cria a aula
-        if (source.aula_Id == AulaId.PseudoAula) {
+        if (source.aula_Id == PseudoAula.AulaId) {
             var aulaRequest: AulaCreateRequest = {
                 sala_Id: source.sala_Id,
                 turma_Id: source.turma_Id ?? 0,
                 professor_Id: source.professor_Id,
                 data: moment(source.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                observacao: ''
+                observacao: '',
+                perfilCognitivo: source.perfilCognitivo
             }
 
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.source_Aula_Id = res.object.id)
+                .then(res => reposicaoRequest.source_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${getError(res)}`, e));
 
         }
@@ -498,23 +520,26 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         }
 
         // Se a aula target não existir, cria a aula
-        if (target.aula_Id == AulaId.PseudoAula) {
+        if (target.aula_Id == PseudoAula.AulaId) {
             var aulaRequest: AulaCreateRequest = {
                 sala_Id: target.sala_Id,
                 turma_Id: target.turma_Id ?? 0,
                 professor_Id: target.professor_Id,
                 data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                observacao: ''
+                observacao: '',
+                perfilCognitivo: target.perfilCognitivo
             }
 
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.dest_Aula_Id = res.object.id)
+                .then(res => reposicaoRequest.dest_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${getError(res)}`, e));
 
         } else {
             reposicaoRequest.dest_Aula_Id = target.aula_Id;
         }
 
+        this.getCalendario(this.calendarioRequest, 'agendarReposicao');
+    
         await lastValueFrom(this.alunoService.reposicao(reposicaoRequest))
             .then(res => {
                 this.loading = false;
@@ -526,7 +551,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Ocorreu um erro', `Não foi possível agendar reposição.\n ${getError(res)}`, e)
+                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
             })
     }
 
@@ -544,6 +569,10 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim );
         this.currentJornada = existe;
 
+    }
+
+    getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
+        return perfilCognitivo.map(x => x.nome).join(', ');
     }
 
 }

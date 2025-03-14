@@ -2,7 +2,7 @@ import { Basic_List } from "./_basic.model";
 import { Aula_Aluno_Falta } from "./aulas.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
 import { perfisCognitivos, PerfilCognitivo } from "./perfil-cognitivo.model";
-import { AulaId } from "./reposicao.model";
+import { PseudoAula } from "./reposicao.model";
 
 
 export enum CalendarioView {
@@ -19,15 +19,17 @@ export class CalendarioRequest {
     perfilCognitivo_Id?: number;
 }
 
-export class CalendarioList {
-    aula_Id: number = AulaId.PseudoAula;
+export class CalendarioAula {
+    aula_Id: number = PseudoAula.AulaId;
     data: Date = new Date;
     descricao: string = '';
     capacidadeMaximaAlunos: number = 12;
     sala_Id: number = 0;
     observacao?: string = '';
     finalizada: boolean = false;
+    
     reposicaoDe_Aula_Id?: number;
+    reposicaoDe_Aula?: CalendarioAula;
 
     professor_Id: number = 0;
     professor: string = '';
@@ -36,26 +38,30 @@ export class CalendarioList {
     turma?: string; // Remover futuramente
     turma_Id?: number;
 
-    alunos: CalendarioAlunoList[] = [];
+    alunos: CalendarioAluno[] = [];
     perfilCognitivo: PerfilCognitivo[] = [];
 
-    active?: boolean = false;
+    active?: boolean = !this.deactivated;
     created?: Date = undefined as unknown as Date;
     lastUpdated?: Date;
     deactivated?: Date;
     account_Created_Id?: number;
     account_Created?: string;
+
 }
 
-export class CalendarioAlunoList extends Basic_List {
-    aula_Id: number = AulaId.PseudoAula;
+export class CalendarioAluno extends Basic_List {
+    aula_Id: number = PseudoAula.AulaId;
     reposicaoDe_Aula_Id?: number;
+    reposicaoDe_Aula?: CalendarioAula;
     presente?: boolean;
     observacao?: string;
 
     aluno_Id: number = 0;
     aluno: string = '';
     aluno_Foto?: string;
+    celular?: string;
+
     perfilCognitivo_Id: number = 0;
     perfilCognitivo: string = '';
 
@@ -80,17 +86,34 @@ export class CalendarioAlunoList extends Basic_List {
 
 
     faltaMotivo?: Aula_Aluno_Falta;
-    etapaChecklist?: Aluno_CheckList_Item
+    
+    // from GET checklist/all/aula/aula_id
+    checklists: CalendarioAlunoChecklistView[] = [];
+
+    checklist?: string;
+    checklist_Id?: number;
+    
 
 }
 
+export class CalendarioAlunoChecklistView {
+    id: number = 0;
+    nome: string = '';
+    prazo: Date = new Date;
+    finalizados: Aluno_CheckList_Item[] = [];
+    pendentesDaSemana: Aluno_CheckList_Item[] = [];
+    atrasados: Aluno_CheckList_Item[] = [];
+    items: Aluno_CheckList_Item[] = [];
+}
 
-export var calendarioList: CalendarioList[] = [
+
+export var calendarioList: CalendarioAula[] = [
     {
         "alunos": [
             {
                 "id": 9,
                 "aluno_Id": 1140,
+                "checklists": [],
                 "aula_Id": 24,
                 "aluno": "Aparecida Filomena da Silva Pereira",
                 "aluno_Foto": "",
@@ -149,6 +172,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 8,
                 "aluno_Id": 1141,
+                "checklists": [],
                 "aula_Id": 24,
                 "aluno": "Susana (Susy) Jugend",
                 "aluno_Foto": "",
@@ -207,6 +231,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 1,
                 "aluno_Id": 1173,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Norma Hochgreb",
                 "aluno_Foto": "",
@@ -230,6 +255,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 2,
                 "aluno_Id": 1174,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Danniel Gomes Almeida",
                 "aluno_Foto": "",
@@ -253,6 +279,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 4,
                 "aluno_Id": 1175,
+                "checklists": [],
                 "aula_Id": 29,
                 "aluno": "Vera Garcia Leoni de Cerqueira",
                 "aluno_Foto": "",
@@ -276,6 +303,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 10,
                 "aluno_Id": 1176,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Manoel Fernando Anastacio",
                 "aluno_Foto": "",
@@ -300,6 +328,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 11,
                 "aluno_Id": 1177,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Gabriel Bardella",
                 "aluno_Foto": "",
@@ -359,6 +388,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 9,
                 "aluno_Id": 1140,
+                "checklists": [],
                 "aula_Id": 24,
                 "aluno": "Aparecida Filomena da Silva Pereira",
                 "aluno_Foto": "",
@@ -421,6 +451,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 8,
                 "aluno_Id": 1141,
+                "checklists": [],
                 "aula_Id": 24,
                 "aluno": "Susana (Susy) Jugend",
                 "aluno_Foto": "",
@@ -481,6 +512,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 1,
                 "aluno_Id": 1173,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Norma Hochgreb",
                 "aluno_Foto": "",
@@ -504,6 +536,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 2,
                 "aluno_Id": 1174,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Danniel Gomes Almeida",
                 "aluno_Foto": "",
@@ -527,6 +560,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 4,
                 "aluno_Id": 1175,
+                "checklists": [],
                 "aula_Id": 29,
                 "aluno": "Vera Garcia Leoni de Cerqueira",
                 "aluno_Foto": "",
@@ -550,6 +584,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 10,
                 "aluno_Id": 1176,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Manoel Fernando Anastacio",
                 "aluno_Foto": "",
@@ -573,6 +608,7 @@ export var calendarioList: CalendarioList[] = [
             {
                 "id": 11,
                 "aluno_Id": 1177,
+                "checklists": [],
                 "aula_Id": 28,
                 "aluno": "Gabriel Bardella",
                 "aluno_Foto": "",

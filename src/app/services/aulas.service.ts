@@ -1,13 +1,14 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { calendarioList, CalendarioList, CalendarioRequest, CalendarioView } from '../models/calendario.model';
+import { calendarioList, CalendarioAula, CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import { Service } from '../helpers/service.service';
 import { AulaCreateRequest, AulaEditRequest } from '../models/aulas.model';
 import { ChamadaRequest } from '../models/chamada.model';
 import moment from 'moment';
 import { ReagendarAulaRequest, ReposicaoAluno } from '../models/reposicao.model';
 import { getError } from '../utils';
+import { Aluno_CheckList_Item } from '../models/checklist.model';
 
 
 
@@ -15,9 +16,10 @@ import { getError } from '../utils';
     providedIn: 'root',
 })
 export class AulaService extends Service {
-    override list = new BehaviorSubject<CalendarioList[]>([]);
-
-    aula = new BehaviorSubject<CalendarioList | undefined>(undefined);
+    override list = new BehaviorSubject<CalendarioAula[]>([]);
+    
+    calendario = new BehaviorSubject<CalendarioAula[]>([]);
+    aula = new BehaviorSubject<CalendarioAula | undefined>(undefined);
     reposicao = new BehaviorSubject<ReposicaoAluno | undefined>(undefined);
     calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.MeuCalendario);
 
@@ -25,22 +27,14 @@ export class AulaService extends Service {
 
     getCalendario(request: CalendarioRequest) {
 
-
-        if (!request.intervaloDe) {
-            request.intervaloDe = moment(new Date).add((new Date).getDay() - 6).toDate()
-        }
-        if (!request.intervaloAte) {
-            request.intervaloAte = moment(new Date).add((new Date).getDay() + 6).toDate()
-        }
-
-
-        return this.http.post<CalendarioList[]>(`${this.url}/aulas/calendario/`, request)
+        return this.http.post<CalendarioAula[]>(`${this.url}/aulas/calendario/`, request)
             .pipe(tap({
                 next: list => {
-                    console.log('list', JSON.parse(JSON.stringify(list)))
                     list.map(x => {
-                        x.data = moment(x.data, 'YYYY-MM-DD HH:mm:ss').toDate()
-                        return x
+                        x.data = moment(x.data, 'YYYY-MM-DD HH:mm:ss').toDate(),
+                        x.active = !x.deactivated;
+                        x.alunos.forEach(item => item.active = !item.deactivated );
+                        return x;
                     })
                     this.list.next(list);
                     return of(list);
@@ -51,20 +45,25 @@ export class AulaService extends Service {
             }));
     }
 
-    get(id?: number, data?: Date) {
-        return new Observable<CalendarioList>((observer => {
-            var item = this.list.value.find(x => x.aula_Id == id && x.data == data);
-            if (item) 
-                observer.next(item);
-            else  {
-                this.toastrService.error(`Aula não encontrada.`);
-                observer.error('Aula não encontrada.')
-            }
-            
-            observer.complete();
-            return;
-        }))
+    get(id: number) {
+        return this.http.get<CalendarioAula>(`${this.url}/aulas/${id}`)
     }
+
+
+    // get(id?: number, data?: Date) {
+    //     return new Observable<CalendarioAula>((observer => {
+    //         var item = this.list.value.find(x => x.aula_Id == id && x.data == data);
+    //         if (item)
+    //             observer.next(item);
+    //         else {
+    //             this.toastrService.error(`Aula não encontrada.`);
+    //             observer.error('Aula não encontrada.')
+    //         }
+
+    //         observer.complete();
+    //         return;
+    //     }))
+    // }
 
     create(request: AulaCreateRequest) {
         return this.http.post<Response>(`${this.url}/aulas`, request)
@@ -74,24 +73,25 @@ export class AulaService extends Service {
                 }
             }));
     }
-    
+
     edit(request: AulaEditRequest) {
         return this.http.put<Response>(`${this.url}/aulas`, request)
-        .pipe(tap({
+            .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar aula. \n ${getError(err)}`);
                 }
             }));
-        }
-        
-        deactivated(id: number, activated: boolean = true) {
-            return this.http.patch<Response>(`${this.url}/alunos/${id}/${activated}`, {})
+    }
+
+    deactivated(id: number, activated: boolean = true) {
+        return this.http.patch<Response>(`${this.url}/alunos/${id}/${activated}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar aluno. \n ${getError(err)}`);
                 }
             }));
     }
+    
     chamada(request: ChamadaRequest) {
         return this.http.post<Response>(`${this.url}/aulas/chamada`, request)
             .pipe(tap({

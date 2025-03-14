@@ -338,3 +338,14 @@ body {
     /* float: revert; */
     rotate: 42deg;
 }
+
+.p-popover:after, .p-popover:before {
+    /* bottom: 100%;
+    left: calc(var(--overlayArrowLeft) + 60px);
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none; */
+    display: none;
+}

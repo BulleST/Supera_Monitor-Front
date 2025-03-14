@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, signal, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../models/alunos.model';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { CalendarioList, CalendarioRequest } from '../../../../models/calendario.model';
+import { CalendarioAula, CalendarioRequest } from '../../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { CalendarOptions, DatesSetArg, EventApi } from '@fullcalendar/core';
@@ -33,7 +33,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
 
     calendarVisible = signal(true);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioList[] = []
+    calendarioList: CalendarioAula[] = []
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
@@ -81,7 +81,6 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
         lazyFetching: true,
         eventsSet: this.events.bind(this),
         datesSet: (arg: DatesSetArg) => {
-            console.log('datesSet', this.object.id)
             this.request.intervaloDe = new Date(arg.start.getTime());
             this.request.intervaloAte = undefined;
             if (this.object.id) {
@@ -99,7 +98,6 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
-        console.log('ngOnChanges', changes)
         if (changes['object']) {
             this.object = changes['object'].currentValue;
             if (this.object.id) {
@@ -133,7 +131,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
     async getCalendario(request: CalendarioRequest) {
 
-        this.loading = true;console.log(request)
+        this.loading = true;
 
         await lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
@@ -199,7 +197,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
 
 
-    setLegenda(c: CalendarioList[]) {
+    setLegenda(c: CalendarioAula[]) {
         this.legenda = [];
         c.forEach(item => {
             if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {

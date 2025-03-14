@@ -12,6 +12,7 @@ import { MonitoramentoComponent } from './monitoramento/monitoramento.component'
 import { SelectedAlunoComponent } from './home/selected-aluno/selected-aluno.component';
 import { SelectedAulaComponent } from './home/selected-aula/selected-aula.component';
 import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
     declarations: [
@@ -23,6 +24,7 @@ import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.com
         SelectedAlunoComponent,
         SelectedAulaComponent,
         ReagendarAulaComponent,
+        DashboardComponent,
     ],
     imports: [
         CommonModule,

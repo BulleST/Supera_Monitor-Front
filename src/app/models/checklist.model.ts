@@ -1,7 +1,5 @@
 // import { Aluno_Aula, alunos } from "./aulas.model";
 
-import { Aluno } from "./alunos.model";
-
 export interface Checklist {
     id: number;
     nome: string;
@@ -17,16 +15,20 @@ export interface Checklist_Item {
     alunos: Aluno_CheckList_Item[];
 }
 
-
 export interface Aluno_CheckList_Item {
     id: number;
-    aluno: Aluno;
+    aluno_Id: number;
+    nome: string;
     prazo: Date;
+    finalizado: boolean;
     dataFinalizacao?: Date;
-    account_Finalizacao_Id: number;
-    checklist_Item: Checklist_Item;
-    checklist: Checklist;
+    account_Finalizacao_Id?: number;
+    account_Finalizacao?: string;
+    checklist_Id: number;
+    checklist_Item_Id: number;
+    ordem: number;
 }
+
 
 var id = 1;
 export var checklists: Checklist[] = [
@@ -129,6 +131,7 @@ export var checklists: Checklist[] = [
         ]
     },
     {
+        
         id: id++,
         nome: '3ª Semana',
         ordem: 0,
@@ -188,7 +191,7 @@ export var checklists: Checklist[] = [
                 nome: 'Verificar constância das tarefas semanais',
                 ordem: 0,
                 alunos: [],
-               },
+            },
             {
                 checklist_Id: id,
                 id: id++,

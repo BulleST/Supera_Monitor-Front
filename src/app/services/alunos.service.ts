@@ -8,6 +8,7 @@ import { Service } from '../helpers/service.service';
 import { ReposicaoAlunoRequest } from '../models/reposicao.model';
 import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { checklists } from '../models/checklist.model';
+import { getError } from '../utils';
 
 @Injectable({
     providedIn: 'root',
@@ -21,28 +22,30 @@ export class AlunoService extends Service {
     }
 
     getList() {
-        return this.http.get<Aluno[]>(`${this.url}/alunos/all/`)
+        // return this.http.get<Aluno[]>(`${this.url}/alunos/all/`)
+        return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
             .pipe(tap({
                 next: list => {
-                    // list = list.map(aluno => {
-                    //     aluno.checklist = [];
-                    //     aluno.checklist = checklists;
-                    //     aluno.checklist = aluno.checklist.map(checklist => {
-                    //         checklist.items = checklist.items.map(item => {
-                    //             // item.finalizado = Boolean(Math.ceil(Math.random()));
-                    //             return JSON.parse(JSON.stringify(item));
-                    //         });
-                    //         // checklist.status = checklist.items.find(x => !x.finalizado) ? 'Atrasado' : 'Finalizado';
-                    //         return checklist;
-                    //     });
-                    //     return aluno;
-                    // })
-                    console.log(list)
+                    var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
+                    list = list.map(aluno => {
+                            aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0,5)
+                        // aluno.checklist = [];
+                        // aluno.checklist = checklists;
+                        // aluno.checklist = aluno.checklist.map(checklist => {
+                        //     checklist.items = checklist.items.map(item => {
+                        //         // item.finalizado = Boolean(Math.ceil(Math.random()));
+                        //         return JSON.parse(JSON.stringify(item));
+                        //     });
+                        //     // checklist.status = checklist.items.find(x => !x.finalizado) ? 'Atrasado' : 'Finalizado';
+                        //     return checklist;
+                        // });
+                        return aluno;
+                    })
                     this.list.next(list);
                     return of(list);
                 },
                 error: err => {
-                    this.toastrService.error('Não foi possível carregar alunos')
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
                 }
             }));
     }
@@ -84,7 +87,7 @@ export class AlunoService extends Service {
             
             var item = this.list.value.find(x => x.id == id) as Aluno;
             if (!item) {
-                this.toastrService.error('Aluno não encontrado.');
+                this.toastrService.error(`Aluno não encontrado.'. `);
                 return reject('Aluno não encontrado.')
             }
 
@@ -106,7 +109,7 @@ export class AlunoService extends Service {
         return this.http.post<Response>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível cadastrar aluno')
+                    this.toastrService.error(`Não foi possível cadastrar aluno. \n ${getError(err)}`)
                 }
             }));
     }
@@ -114,11 +117,10 @@ export class AlunoService extends Service {
     edit(model: Aluno) {
         var request = Map(model, new AlunoRequest);
 
-        console.log(request)
         return this.http.put<Response>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível editar aluno')
+                    this.toastrService.error(`Não foi possível editar aluno. \n ${getError(err)}`)
                 }
             }));
     }
@@ -127,7 +129,7 @@ export class AlunoService extends Service {
         return this.http.patch<Response>(`${this.url}/alunos/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível habilitar/desabilitar aluno')
+                    this.toastrService.error(`Não foi possível habilitar/desabilitar aluno. \n ${getError(err)}`)
                 }
             }));
     }
@@ -136,7 +138,7 @@ export class AlunoService extends Service {
         return this.http.post<Response>(`${this.url}/alunos/reposicao/`, request)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error('Não foi possível marcar reposição')
+                    this.toastrService.error(`Não foi possível marcar reposição. \n ${getError(err)}`)
                 }
             }));
     }
@@ -145,14 +147,14 @@ export class AlunoService extends Service {
         return this.http.get<Pessoa_Status[]>(`${this.url}/pessoas/status/all`)
             .pipe(tap({
                 
-                error: err => this.toastrService.error( 'Não foi possível carregar status')
+                error: err => this.toastrService.error(`Não foi possível carregar status. \n ${getError(err)}`)
             }));
     }
 
     getSexo() {
         return this.http.get<Pessoa_Sexo[]>(`${this.url}/pessoas/sexos/all`)
             .pipe(tap({
-                error: err => this.toastrService.error( 'Não foi possível carregar sexo')
+                error: err => this.toastrService.error(`Não foi possível carregar sexo. \n ${getError(err)}`)
             }));
     }
 }

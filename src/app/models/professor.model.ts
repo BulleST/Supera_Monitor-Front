@@ -1,6 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
-import { CalendarioList } from "./calendario.model";
+import { CalendarioAula as CalendarioAula } from "./calendario.model";
 import { Turma } from "./turma.model";
 
 export class Professor extends Basic_List {
@@ -16,7 +16,7 @@ export class Professor extends Basic_List {
 
     // Não mapeados
     disponivel?: boolean;
-    disponivelEvent?: Turma;
+    disponivelEvent?: CalendarioAula;
     // const getAge = birthDate => Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e+10)
 }
 

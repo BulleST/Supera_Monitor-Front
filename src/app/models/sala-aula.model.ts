@@ -1,4 +1,4 @@
-import { CalendarioList } from "./calendario.model";
+import { CalendarioAula } from "./calendario.model";
 
 export class SalaAula {
     id: number = 0;
@@ -8,5 +8,5 @@ export class SalaAula {
 
     // Não mapeados
     disponivel?: boolean;
-    disponivelEvent?: CalendarioList;
+    disponivelEvent?: CalendarioAula;
 }

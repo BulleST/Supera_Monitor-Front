@@ -147,7 +147,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 };
             };
         })
-        console.log(this.object)
         this.object.aluno_Foto = base64;
         this.loadingFile = false;
     }

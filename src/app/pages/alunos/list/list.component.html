@@ -24,7 +24,7 @@
              showGridlines
              [rowHover]="list.length > 0">
              <!-- 
-             scrollHeight="1000px"
+             scrollHeight="1100px"
              [virtualScroll]="true"
              [virtualScrollItemSize]="39" -->
         <ng-template pTemplate="caption">
@@ -57,18 +57,17 @@
         </ng-template>
         <ng-template pTemplate="header">
             <ng-template [ngIf]="(!tableLoading && list.length > 0) || tableLoading">
-                <tr>
+                <!-- <tr>
                     <th [colSpan]="tableColumns.length" ></th>
                     <th [colSpan]="checklistColumns.length+1" class="bg-primary-100 border-bottom-2 border-red-500 text-center">
                         <span class="sticky right-0 left-0 text-center px-4 text-primary-500">Checklist</span>
-                    </th>
-                </tr>
+                    </th> 
+                </tr>-->
                 <tr>
                     <th  *ngFor="let col of tableColumns"
                         [pSortableColumn]="col.field"  
                         [ngClass]="{
-                            'surface-900 py-0 border-none text-white white-space-nowrap p-2': true,
-                            'sticky left-0': col.field == 'nome'
+                            'surface-900 py-0 border-none text-white white-space-nowrap p-3': true,
                         }">
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
@@ -80,11 +79,14 @@
                             </ng-template>
                         </div>
                     </th>
-                    <th *ngFor="let col of checklistColumns" [pSortableColumn]="col.field"  class="surface-900 py-0 border-none text-white white-space-nowrap">
+                    <th *ngFor="let checklist of checklist" class="surface-900 py-0 px-4 border-none text-white text-center white-space-nowrap p-2">
+                        {{checklist.nome}}
+                    </th>
+                    <!-- <th *ngFor="let col of checklistColumns" [pSortableColumn]="col.field"  class="surface-900 py-0 border-none text-white white-space-nowrap">
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
                         </div>
-                    </th>
+                    </th> -->
                     <th class="surface-900 py-0 border-bottom-none text-white"></th>
                 </tr>
             </ng-template>
@@ -93,17 +95,14 @@
         <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr [pContextMenuRow]="item"
                 class="cursor-pointer"
-                [ngClass]="{ 
-                'bg-primary-50': item == tableSelectedItem,
-                }">
+                [ngClass]="{ 'bg-primary-50': item == tableSelectedItem,}">
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="rowIndex"
-                    
                     [ngClass]="{
                         'white-space-nowrap  border-left-none border-right-none': true,
                         'w-6rem':col.displayType == DisplayType.options,
-                        'sticky left-0': col.field == 'nome'
+                        
                     }"
                     (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
                     <ng-template [ngIf]="col.displayType == DisplayType.options">
@@ -131,8 +130,67 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
 
                 </td>
+                <ng-container *ngFor="let checklist of checklist">
+                    <!-- {{checklist.nome}} -->
+                    <ng-container *ngTemplateOutlet="checklistContainer; context: { checklist: getCheckList(item, checklist) }"></ng-container>
+                    <ng-template #checklistContainer let-checklist="checklist">
+                        <td (click)="popoverChecklist.show($event)" 
+                            class="white-space-nowrap  border-left-none border-right-none text-center px-3">
+                            <div class="flex align-items-center justify-content-center gap-2">
 
-                <td *ngFor="let col of checklistColumns" 
+                                <!-- Finalizado -->
+                                <span *ngIf="checklist.finalizados.length == checklist.items.length" >
+                                    <span class="text-green-600 font-medium">Finalizado</span>
+                                    <i class="pi pi-check-circle text-green-500 ml-2 -mr-2 mt-1"></i>
+                                </span>
+
+                                <!-- Atrasado -->
+                                <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length" > 
+                                    <span class="text-red-600 font-bold">Atrasado  {{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite ml-2 -mr-2 mt-1"></i>
+                                </span>
+
+                                <!-- Pendentes da Semana -->
+                                <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length" > 
+                                    <span class="text-orange-500 font-medium">Em Andamento  {{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-hourglass text-orange-500 ml-2 -mr-2 mt-1"></i>
+                                </span>
+
+                                <span *ngIf="checklist.pendentesDaSemana.length == 0 && checklist.atrasados.length == 0 && checklist.finalizados.length == 0">
+                                    <span class="text-blue-400 font-medium">Futuro</span>
+                                </span>
+                            </div>
+                            <p-popover #popoverChecklist  styleClass="-mt-1">
+                             
+                                <div class="w-full">
+                                    <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                                    <ul class="p-0 ml-0">
+                                        <li *ngFor="let checklistItem of checklist.items"
+                                            (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
+                                            (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined"
+                                            class="flex align-items-center gap-2 py-1">
+                                            <p-checkbox #checkbox
+                                                        [inputId]="'checklistitem-' + checklistItem.id"
+                                                        [name]="'checklistitem-' + checklistItem.id"
+                                                        #finalizado="ngModel"
+                                                        [(ngModel)]="checklistItem.finalizado"
+                                                        [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
+                                                        [binary]="true"
+                                                        [readonly]="checklistItem.finalizado || checklist.id > item.checklist_Id"
+                                                        (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                                <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                                            <p-popover #checklistData>
+                                                <p *ngIf="checklistItem.dataFinalizacao">Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</p>
+                                                <p *ngIf="checklistItem.account_Finalizacao">Finalizado por {{checklistItem.account_Finalizacao }}</p>
+                                            </p-popover>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </p-popover>
+                        </td>
+                    </ng-template>
+                </ng-container>
+                <!-- <td *ngFor="let col of checklistColumns" 
                     class="white-space-nowrap p-0 border-left-none border-right-none">
                    <ng-container *ngTemplateOutlet="checklist; context: { checklist: getCheckList(col, item) }"></ng-container>
                     <ng-template #checklist let-checklist="checklist">
@@ -142,7 +200,6 @@
                             (mouseenter)="op.show($event)" 
                             (mouseleave)="op.hide()">
                             <p *ngIf="checklist.status == 'Atrasado'" class="text-red-600 font-bold text-sm">
-                                <!-- <i class="pi pi-times-circle text-red-500 fadeout animation-duration-1000 animation-iteration-infinite mr-2" ></i> -->
                                 <span>Atrasado</span>
                                 
                             </p>
@@ -168,7 +225,7 @@
                             </p-popover>
                         </div>
                     </ng-template>
-                </td>
+                </td> -->
                 <td class="border-none px-0">
                 </td>
             </tr>
@@ -177,7 +234,7 @@
             <ng-container *ngIf="tableLoading; else elseTemplate">
                 <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td *ngFor="let col of checklistColumns" class="border-none"><p-skeleton /></td>
+                    <td *ngFor="let col of checklist" class="border-none"><p-skeleton /></td>
                     <td  class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>

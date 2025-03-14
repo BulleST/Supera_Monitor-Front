@@ -1,5 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
+import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
 
 export class AlunoRequest {
@@ -56,6 +57,9 @@ export class Aluno {
 
     turma_Id: number = 0;
     turma: string = '';
+    turmaDesc: string = '';
+    diaSemana: number = 0;
+    horario: Date = new Date;
 
     professor_Id: number = 0;
     professor: string = '';
@@ -81,9 +85,12 @@ export class Aluno {
     kit?: string;
     apostila_Kit_Id?: number;
 
-    // checklist: Checklist[] = checklists;
-    checklist: Aluno_CheckList_Item[] = [];
+    checklistCompleto: CalendarioAlunoChecklistView[] = [];
+    alunoChecklist: Aluno_CheckList_Item[] = [];
     restricoes: Aluno_Restricao[] = [];
+
+    checklist_Id?: number;
+    checklist?: string;
 }
 
 export interface Pessoa_DropDown {
@@ -117,6 +124,13 @@ export var alunosColumns: ColumnTable[] = [
         options: {
             format: 'dd/MM/yyyy'
         },
+    },
+    {
+        field: 'turmaDesc',
+        label: 'Dias de Aula',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
     },
     {
         field: 'turma',

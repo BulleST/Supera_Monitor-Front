@@ -8,7 +8,13 @@ import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno, alunosColumns } from '../../../models/alunos.model';
-import { Checklist, checklists } from '../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist, checklists } from '../../../models/checklist.model';
+import { ChecklistService } from '../../../services/checklist.service';
+import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
+import moment from 'moment';
+import { NgModel } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { UserService } from '../../../services/user.service';
 
 @Component({
     selector: 'app-list',
@@ -32,7 +38,7 @@ export class ListComponent implements OnDestroy {
     subscription: Subscription[] = [];
 
     checklist: Checklist[] = [];
-    checklistColumns: ColumnTable[] = []
+    loadingChecklist = false;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -41,6 +47,9 @@ export class ListComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private mobileService: MobileService,
+        private checklistService: ChecklistService,
+        private toastrService: ToastrService,
+        private userService: UserService,
     ) {
         this.tableColumns = alunosColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
@@ -53,26 +62,8 @@ export class ListComponent implements OnDestroy {
         var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
 
-
-
-        this.checklist = checklists;
-        this.checklist.forEach(x => {
-            var col = new ColumnTable;
-            col.field = 'status';
-            col.label = x.nome;
-            col.filterType = FilterType.none;
-            col.displayType = DisplayType.options;
-            col.options = {
-                "items": [
-                    { "value": 'Finalizado', "label": "Finalizado", "severity": "success", "icon": "pi pi-check" },
-                    { "value": 'Atrasado', "label": "Atrasado", "severity": "danger", "icon": "pi pi-times" }
-                ]
-            }
-            this.checklistColumns.push(col)
-        })
-
-
-
+        var checklist = this.checklistService.list.subscribe(res => this.checklist = res);
+        this.subscription.push(checklist);
     }
 
 
@@ -84,7 +75,33 @@ export class ListComponent implements OnDestroy {
         this.list = [];
         this.tableLoading = true;
         lastValueFrom(this.service.getList())
-            .then(res => this.tableLoading = false)
+            .then(async alunos => {
+                this.tableLoading = false;
+                this.loadingChecklist = true
+                if (this.checklist.length == 0) {
+                    await lastValueFrom(this.checklistService.getList()).then(res => this.checklist = res);
+                }
+
+                alunos.map(aluno => {
+                    aluno.checklistCompleto = this.checklist.map(checklist => {
+                        var checklistAluno = new CalendarioAlunoChecklistView;
+                        checklistAluno.id = checklist.id;
+                        checklistAluno.nome = checklist.nome;
+                        checklistAluno.items = aluno.alunoChecklist
+                        .filter(x => x.checklist_Id == checklist.id)
+                        .map(x => {
+                            x.finalizado = !!x.dataFinalizacao;
+                            return x
+                        })
+                        checklistAluno.prazo = checklistAluno.items[0].prazo;
+                        checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                        checklistAluno.atrasados = checklistAluno.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
+                        checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                        return checklistAluno;
+                    });
+                    return aluno
+                })
+            })
             .catch(res => {
                 this.tableLoading = false;
 
@@ -186,11 +203,50 @@ export class ListComponent implements OnDestroy {
     }
 
     
-    getCheckList(col: ColumnTable, row: Aluno) {
-        // var checkList = row.checklist.find(x => x.nome == col.label)
-        // return checkList;
-        return {} as any
+    getCheckList(aluno: Aluno, checklist: Checklist) {
+    
+        return aluno.checklistCompleto.find(x => x.id == checklist.id);
+    
     }
+        checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
+            if (model.control.value) {
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: `Tem certeza que deseja marcar etapa como realizada?.`,
+                    header: 'Finalizar etapa',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptIcon: 'pi pi-check',
+                    acceptLabel: 'Finalizar',
+                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                    rejectIcon: 'pi pi-times',
+                    rejectLabel: 'Ainda não',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                    accept: async () => {
+                        this.loadingChecklist = true;
+                        lastValueFrom(this.checklistService.markAsDone(item.id))
+                            .then(res => {
+                                this.loadingChecklist = false;
+                                this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
+                                item.finalizado = true;
+                                item.dataFinalizacao = res.object.dataFinalizacao;
+                                item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
+    
+                                checklist.prazo = checklist.items[0].prazo;
+                                checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
+                                checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
+                                checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+    
+                                this.userService.get(item.account_Finalizacao_Id!)
+                                    .then(res => item.account_Finalizacao = res.name);
+    
+                            })
+                    },
+                    reject: () => {
+                        model.control.setValue(false);
+                    }
+                });
+            }
+        }
 
     
 }

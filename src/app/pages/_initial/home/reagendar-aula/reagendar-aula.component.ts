@@ -4,7 +4,7 @@ import { AulaService } from '../../../../services/aulas.service';
 import { ProfessorService } from '../../../../services/professor.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { AulaId, ReagendarAulaRequest, ReagendarAulaView } from '../../../../models/reposicao.model';
+import { PseudoAula, ReagendarAulaRequest, ReagendarAulaView } from '../../../../models/reposicao.model';
 import { lastValueFrom } from 'rxjs';
 import { Professor } from '../../../../models/professor.model';
 import moment from 'moment';
@@ -14,13 +14,14 @@ import { SelectChangeEvent } from 'primeng/select';
 import { TurmaService } from '../../../../services/turma.service';
 import { AulaCreateRequest } from '../../../../models/aulas.model';
 import { Map } from '../../../../utils/map';
+import { Turma } from '../../../../models/turma.model';
 
 @Component({
     selector: 'app-reagendar-aula',
     standalone: false,
-
     templateUrl: './reagendar-aula.component.html',
-    styleUrl: './reagendar-aula.component.css'
+    styleUrl: './reagendar-aula.component.css',
+    providers: [ConfirmationService]
 })
 export class ReagendarAulaComponent implements AfterViewInit {
     visible: boolean = false;
@@ -28,7 +29,7 @@ export class ReagendarAulaComponent implements AfterViewInit {
     // oldObject: ReagendarAulaView = new ReagendarAulaView;
     loading = false;
 
-
+    turma: Turma = new Turma;
     data = new Date();
     horario = new Date();
 
@@ -65,15 +66,20 @@ export class ReagendarAulaComponent implements AfterViewInit {
             };
 
 
-            console.log(this.object)
             this.data = this.object.data;
             this.horario = this.object.data;
-
 
             this.minDate = this.object.data;
             this.maxDate = moment(this.object.data).add(1, 'month').toDate();
 
             this.visible = true;
+
+            this.turmaService.get(this.object.turma_Id)
+            .then(res => this.turma = res)
+            .catch(res => {
+                this.visible = false;
+                this.visibleChange();
+            });
 
 
             lastValueFrom(this.professorService.getList())
@@ -142,9 +148,20 @@ export class ReagendarAulaComponent implements AfterViewInit {
             return valid;
         }
 
-        var turmas = this.turmaService.list.value;
-        if (turmas.length == 0) {
-            turmas = await lastValueFrom(this.turmaService.getList());
+        // var turmas = this.turmaService.list.value;
+        // if (turmas.length == 0) {
+        //     turmas = await lastValueFrom(this.turmaService.getList());
+        // }
+
+        var calendario = this.service.calendario.value;
+        if (calendario.length == 0) {
+            await lastValueFrom(this.service.getCalendario({
+                professor_Id: this.object.professor_Id,
+                intervaloDe: moment(this.data).add(-1, 'day').format('YYYY-MM-DD') as any,
+                intervaloAte: moment(this.data).add(1, 'day').format('YYYY-MM-DD') as any
+            }))
+            .then(res => calendario = res)
+            .catch(res => this.showError('Erro', 'Não foi possível validar disponibilidade.', e))
         }
 
 
@@ -168,12 +185,16 @@ export class ReagendarAulaComponent implements AfterViewInit {
             // var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
 
             // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
-            var exists = turmas.find(x => x.id != this.object.id
+            var exists = calendario.find(x => x.aula_Id != this.object.id
                 && x.professor_Id == professor.id
-                && x.diaSemana == this.object.data.getDay()
-                && moment(x.horario, 'HH:mm:ss').isAfter(intervaloDe)
-                && moment(x.horario, 'HH:mm:ss').isBefore(intervaloAte));
-
+                && moment(x.data).isBetween(intervaloDe, intervaloAte)
+            /**
+             * 
+                x.data.getDay() == this.object.data.getDay()
+                && moment(x.data, 'HH:mm:ss').isAfter(intervaloDe)
+                && moment(x.data, 'HH:mm:ss').isBefore(intervaloAte)
+             */
+            );
 
             if (exists) {
                 professor.disponivel = false;
@@ -182,7 +203,7 @@ export class ReagendarAulaComponent implements AfterViewInit {
                 if (professor.id == this.object.professor_Id) {
                     valid = false;
                     this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.nome}</b> no mesmo dia às <b>${moment(exists.horario).format('HH[h]mm')}</b>.`, e);
+                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.turma ?? exists.descricao}</b> no mesmo dia às <b>${moment(exists.data).format('HH[h]mm')}</b>.`, e);
                 }
             }
             else {
@@ -200,9 +221,9 @@ export class ReagendarAulaComponent implements AfterViewInit {
     professorChanged(e: SelectChangeEvent) {
         var professor = this.professores.find(x => x.id == e.value);
 
-        if (professor && professor.disponivel == false) {
+        if (professor && professor.disponivel == false && professor.disponivelEvent) {
             this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent!.nome}</b> no mesmo dia às <b>${moment(professor.disponivelEvent!.horario).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         } else {
             this.professorSelect.control.setErrors({ indisponivel: null });
@@ -213,7 +234,6 @@ export class ReagendarAulaComponent implements AfterViewInit {
 
     confirma(e: any) {
         var data = new Date(this.data.toISOString().substring(0, 10) + this.horario.toISOString().substring(10));
-        console.log('data', data)
 
         this.confirmationService.confirm({
             target: e.target,
@@ -227,28 +247,29 @@ export class ReagendarAulaComponent implements AfterViewInit {
             rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
             accept: () => {
-
                 this.send(e)
             },
             reject: () => {
+                this.visible = false;
+                this.visibleChange();
+                this.confirmationService.close();
             }
         });
     }
 
 
     async send(e: any) {
-
         this.loading = true;
-
         var data = new Date(this.data.toISOString().substring(0, 10) + this.horario.toISOString().substring(10));
         // Se a aula não existir, cria a aula
-        if (this.object.id == AulaId.PseudoAula) {
+        if (this.object.id == PseudoAula.AulaId) {
             var aulaRequest: AulaCreateRequest = {
                 professor_Id: this.object.professor_Id,
                 sala_Id: this.object.sala_Id,
                 turma_Id: this.object.turma_Id ?? 0,
                 data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as any,
-                observacao: this.object.observacao
+                observacao: this.object.observacao,
+                perfilCognitivo: this.turma.perfilCognitivo
             }
             await lastValueFrom(this.service.create(aulaRequest))
                 .then(res => this.object.id = res.object.aula_Id)
@@ -268,6 +289,7 @@ export class ReagendarAulaComponent implements AfterViewInit {
                 this.visibleChange();
                 this.toastrService.success(`Aula reagendada para o dia ${moment(this.object.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
                 this.service.calendarioReload.next(true);
+                
             })
             .catch(res => {
                 this.loading = false;

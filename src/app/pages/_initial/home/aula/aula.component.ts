@@ -7,10 +7,10 @@ import { Crypto, getError } from '../../../../utils';
 import { Professor } from '../../../../models/professor.model';
 import { ProfessorService } from '../../../../services/professor.service';
 import { Popover } from 'primeng/popover';
-import { CalendarioAlunoList, CalendarioList } from '../../../../models/calendario.model';
+import { CalendarioAluno, CalendarioAlunoChecklistView, CalendarioAula } from '../../../../models/calendario.model';
 import { AlunoService } from '../../../../services/alunos.service';
 import { AulaCreateRequest, AulaEditRequest } from '../../../../models/aulas.model';
-import { AulaId, ReposicaoAluno } from '../../../../models/reposicao.model';
+import { PseudoAula, ReposicaoAluno } from '../../../../models/reposicao.model';
 import { Map } from '../../../../utils/map';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila, Apostila_Tipo } from '../../../../models/apostila.model';
@@ -21,7 +21,10 @@ import { LoadingService } from '../../../../parts/loading/loading';
 import { ToastrService } from 'ngx-toastr';
 import { TurmaService } from '../../../../services/turma.service';
 import moment from 'moment';
-import { Checklist, Checklist_Item, checklists } from '../../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
+import { ChecklistService } from '../../../../services/checklist.service';
+import { AccountService } from '../../../../services/account.service';
+import { UserService } from '../../../../services/user.service';
 
 @Component({
     selector: 'app-aula',
@@ -32,8 +35,9 @@ import { Checklist, Checklist_Item, checklists } from '../../../../models/checkl
 })
 export class AulaComponent implements OnDestroy {
     visible: boolean = false;
-    object = new CalendarioList;
+    object = new CalendarioAula;
     loading = false;
+    loadingChecklist = true;
     error: string = '';
     subscription: Subscription[] = [];
 
@@ -42,13 +46,13 @@ export class AulaComponent implements OnDestroy {
     professorSelected?: Professor;
 
     @ViewChild('popoverSelectedAluno') popoverSelectedAluno!: Popover;
+    @ViewChild('popoverChecklist') popoverChecklist!: Popover;
     @ViewChild('professor_Id') professorSelect!: NgModel;
     @ViewChild('aulaForm') aulaForm!: HTMLElement;
-    selectedAluno?: CalendarioAlunoList;
+    selectedAluno?: CalendarioAluno;
 
     horario: string = '';
     isChamadaPage: boolean = false;
-
 
     apostilaAbacoAluno: Apostila[] = [];
     apostilaAHAluno: Apostila[] = [];
@@ -56,40 +60,43 @@ export class AulaComponent implements OnDestroy {
     loadingApostila = false;
 
 
-    checklists: Checklist[] = checklists;
+    checklists: Checklist[] = [];
     currentIndex = 0;
-    currentChecklist: Checklist = checklists[0];
+    currentChecklist?: Checklist = undefined;
     prevChecklist?: Checklist = undefined;
-    nextChecklist?: Checklist = checklists[1];
-    
+    nextChecklist?: Checklist = undefined;
+
     constructor(
         private confirmationService: ConfirmationService,
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private crypto: Crypto,
         private service: AulaService,
-        private turmaService: TurmaService,
         private alunoService: AlunoService,
         private professorService: ProfessorService,
         private apostilaService: ApostilaService,
-        private loadingService: LoadingService,
         private toastrService: ToastrService,
+        private checklistService: ChecklistService,
+        private userService: UserService
     ) {
 
-     
+
         this.activatedRoute.params.subscribe(async res => {
             if (res['aula_id']) {
                 this.object.aula_Id = this.crypto.decrypt(res['aula_id']);
+
+                // Inutilizado
+                // Aula sempre vai ter Aula_Id preenchido nessa tela
                 var aula = this.service.aula.getValue();
 
-                if (!aula && this.object.aula_Id != AulaId.PseudoAula) {
+                if (!aula && this.object.aula_Id != PseudoAula.AulaId) {
                     if (this.service.list.value.length == 0) {
                         await lastValueFrom(service.getCalendario({}))
-                        .catch(res => {
-                            this.visible = false;
-                            this.visibleChange();
-                            return;
-                        })
+                            .catch(res => {
+                                this.visible = false;
+                                this.visibleChange();
+                                return;
+                            })
                     }
 
                     aula = service.list.value.find(x => x.aula_Id == this.object.aula_Id);
@@ -107,7 +114,9 @@ export class AulaComponent implements OnDestroy {
                 this.verificaDisponibilidadeProfessor();
                 this.loading = false;
                 this.visible = true;
-        
+
+                this.carregaChecklist();
+
             }
         })
 
@@ -130,6 +139,7 @@ export class AulaComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
+
 
     toDate(horario: string) {
         var stringDate = new Date(2025, 1, 1).toISOString().substring(0, 10) + 'T' + horario;
@@ -161,7 +171,7 @@ export class AulaComponent implements OnDestroy {
     }
 
 
-    displayPopoverAluno(event: any, aluno: CalendarioAlunoList) {
+    displayPopoverAluno(event: any, aluno: CalendarioAluno) {
         if (this.selectedAluno && this.selectedAluno.id === aluno.id) {
             this.popoverSelectedAluno.hide();
             delete this.selectedAluno;
@@ -188,39 +198,19 @@ export class AulaComponent implements OnDestroy {
     }
 
 
-    prev() {
-        if (this.currentIndex == 0) {
-            this.prevChecklist = undefined;
-            this.nextChecklist = checklists[this.currentIndex+1];
-            return;
-        }
-        this.currentIndex -= 1;
-        this.currentChecklist = checklists[this.currentIndex];
-        this.prevChecklist = checklists[this.currentIndex-1];
-        this.nextChecklist = checklists[this.currentIndex+1];
-
-
-    }
-    
-    next() {
-        if (this.currentIndex == (this.checklists.length-1)) {
-            this.prevChecklist = checklists[this.currentIndex-1];
-            this.nextChecklist = undefined;
-            return
-        }
-        this.currentIndex += 1;
-        this.currentChecklist = checklists[this.currentIndex];
-        this.prevChecklist = checklists[this.currentIndex-1];
-        this.nextChecklist = checklists[this.currentIndex+1];
-    }
-
     async verificaDisponibilidadeProfessor() {
         var valid = true;
-        if (!this.object.finalizada) {
+        if (this.object.finalizada == false) {
 
-            var turmas = this.turmaService.list.value;
-            if (turmas.length == 0) {
-                turmas = await lastValueFrom(this.turmaService.getList());
+            var calendario = this.service.calendario.value;
+            if (calendario.length == 0) {
+                await lastValueFrom(this.service.getCalendario({
+                    professor_Id: this.object.professor_Id,
+                    intervaloDe: moment(new Date).startOf('week').toDate(),
+                    intervaloAte: moment(new Date).endOf('week').toDate()
+                }))
+                    .then(res => calendario = res)
+                    .catch(res => this.showError('Erro', 'Não foi possível validar disponibilidade.', { target: this.aulaForm }))
             }
 
             if (this.professores.length == 0) {
@@ -236,18 +226,18 @@ export class AulaComponent implements OnDestroy {
 
             this.professores.map(professor => {
 
-                var intervaloDe = new Date(this.object.data.getTime() - 2 * 60 * 60 * 1000); // Duas horas antes
-                var intervaloAte = new Date(this.object.data.getTime() + 2 * 60 * 60 * 1000); // Duas horas depois
+                var intervaloDe = moment(this.object.data).add(-2, 'hour').toDate();//  new Date(this.object.data.getTime() - 2 * 60 * 60 * 1000); // Duas horas antes
+                var intervaloAte = moment(this.object.data).add(2, 'hour').toDate();// new Date(this.object.data.getTime() + 2 * 60 * 60 * 1000); // Duas horas depois
 
                 var beginningTime = moment({ hour: intervaloDe.getHours(), minute: intervaloDe.getMinutes() });
                 var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
 
                 // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
-                var exists = turmas.find(x => x.id != this.object.turma_Id
+                var exists = calendario.find(x => x.aula_Id != this.object.turma_Id
                     && x.professor_Id == professor.id
-                    && x.diaSemana == this.object.data.getDay()
-                    && moment(x.horario, 'HH:mm:ss').isAfter(beginningTime)
-                    && moment(x.horario, 'HH:mm:ss').isBefore(endTime));
+                    && x.data.getDay() == moment(this.object.data).day()
+                    && moment(x.data, 'HH:mm:ss').isAfter(beginningTime)
+                    && moment(x.data, 'HH:mm:ss').isBefore(endTime));
 
                 if (exists) {
                     professor.disponivel = false;
@@ -255,7 +245,7 @@ export class AulaComponent implements OnDestroy {
                     if (professor.id == this.object.professor_Id) {
                         valid = false;
                         this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-                        this.showError('Professor indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.nome}</b> no mesmo dia às <b>${moment(exists.horario).format('HH[h]mm')}</b>.`, { target: this.aulaForm });
+                        this.showError('Professor indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.turma ?? exists.descricao}</b> no mesmo dia às <b>${moment(exists.data).format('HH[h]mm')}</b>.`, { target: this.aulaForm });
                     }
                 }
                 else {
@@ -282,9 +272,9 @@ export class AulaComponent implements OnDestroy {
             return;
         }
 
-        if (this.professorSelected && this.professorSelected.disponivel == false) {
+        if (this.professorSelected && this.professorSelected.disponivel == false && this.professorSelected.disponivelEvent) {
             this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${this.professorSelected.disponivelEvent!.nome}</b> no mesmo dia às <b>${moment(this.professorSelected.disponivelEvent!.horario).format('HH[h]mm')}</b>.`, e);
+            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${this.professorSelected.disponivelEvent.turma ?? this.professorSelected.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(this.professorSelected.disponivelEvent.data).format('HH[h]mm')}</b>.`, e);
             return;
         }
 
@@ -311,7 +301,7 @@ export class AulaComponent implements OnDestroy {
         });
     }
 
-    loadApostila(aluno: CalendarioAlunoList) {
+    loadApostila(aluno: CalendarioAluno) {
         this.loadingApostila = true;
         this.apostilaAbacoAluno = this.apostilas.filter(x => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == Apostila_Tipo.Abaco);
         this.apostilaAHAluno = this.apostilas.filter(x => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == Apostila_Tipo.AH);
@@ -322,7 +312,7 @@ export class AulaComponent implements OnDestroy {
         this.loadingApostila = false;
     }
 
-    apostilaAbacoChange(value: any, item: CalendarioAlunoList, ngModel: NgModel, el: Select) {
+    apostilaAbacoChange(value: any, item: CalendarioAluno, ngModel: NgModel, el: Select) {
         var newApostila = this.apostilaAbacoAluno.find(x => x.id == value) as Apostila;
         var oldApostila = this.apostilaAbacoAluno.find(x => x.id == item.apostila_Abaco_Id) as Apostila;
         if (value != item.apostila_Abaco_Id && newApostila.ordem < oldApostila.ordem) {
@@ -352,7 +342,7 @@ export class AulaComponent implements OnDestroy {
         }
     }
 
-    apostilaAHChange(value: any, item: CalendarioAlunoList, ngModel: NgModel, el: Select) {
+    apostilaAHChange(value: any, item: CalendarioAluno, ngModel: NgModel, el: Select) {
         var newApostila = this.apostilaAHAluno.find(x => x.id == value) as Apostila;
         var oldApostila = this.apostilaAHAluno.find(x => x.id == item.apostila_AH_Id) as Apostila;
         if (value != item.apostila_AH_Id && newApostila.ordem < oldApostila.ordem) {
@@ -382,20 +372,21 @@ export class AulaComponent implements OnDestroy {
         }
     }
 
-    goToAluno(aluno: CalendarioAlunoList) {
+    goToAluno(aluno: CalendarioAluno) {
         this.router.navigate(['home', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);
     }
 
     async goToIniciarChamada(e: any) {
         this.loading = true;
 
-        if (this.object.aula_Id == AulaId.PseudoAula) {
+        if (this.object.aula_Id == PseudoAula.AulaId) {
             var aulaRequest: AulaCreateRequest = {
                 sala_Id: this.object.sala_Id,
                 professor_Id: this.object.professor_Id,
                 turma_Id: this.object.turma_Id ?? 0,
                 data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                observacao: ''
+                observacao: '',
+                perfilCognitivo: this.object.perfilCognitivo
             };
 
             await lastValueFrom(this.service.create(aulaRequest))
@@ -413,13 +404,13 @@ export class AulaComponent implements OnDestroy {
         this.router.navigate(['home', 'chamada', this.crypto.encrypt(this.object.aula_Id)], { replaceUrl: true });
     }
 
-    goToReposicao(aluno: CalendarioAlunoList) {
+    goToReposicao(aluno: CalendarioAluno) {
         if (this.object) {
             var perfilCognitivo = this.object.perfilCognitivo.find(x => x.id == aluno.perfilCognitivo_Id);
             var reposicao: ReposicaoAluno = {
                 aluno: aluno.aluno,
                 aluno_Id: aluno.aluno_Id,
-                aluno_PerfilCognitivo: perfilCognitivo!.nome, 
+                aluno_PerfilCognitivo: perfilCognitivo!.nome,
                 aluno_PerfilCognitivo_Id: perfilCognitivo!.id,
                 source_Aula_Id: this.object.aula_Id,
                 source_Data: this.object.data,
@@ -462,7 +453,7 @@ export class AulaComponent implements OnDestroy {
     }
 
     request(request: any) {
-        if (this.object.aula_Id != AulaId.PseudoAula) {
+        if (this.object.aula_Id != PseudoAula.AulaId) {
             request = Map(request, new AulaEditRequest)
             return lastValueFrom(this.service.edit(request))
         }
@@ -471,8 +462,8 @@ export class AulaComponent implements OnDestroy {
     }
 
 
-    checkboxChange(item: Checklist_Item, checked: boolean, e: any) {
-        if (checked) {
+    checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
+        if (model.control.value) {
             this.confirmationService.confirm({
                 target: e.target,
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,
@@ -485,9 +476,27 @@ export class AulaComponent implements OnDestroy {
                 rejectLabel: 'Ainda não',
                 rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
                 accept: async () => {
-                 
+                    this.loadingChecklist = true;
+                    lastValueFrom(this.checklistService.markAsDone(item.id))
+                        .then(res => {
+                            this.loadingChecklist = false;
+                            this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
+                            item.finalizado = true;
+                            item.dataFinalizacao = res.object.dataFinalizacao;
+                            item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
+
+                            checklist.prazo = checklist.items[0].prazo;
+                            checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
+                            checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
+                            checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+
+                            this.userService.get(item.account_Finalizacao_Id!)
+                                .then(res => item.account_Finalizacao = res.name);
+
+                        })
                 },
                 reject: () => {
+                    model.control.setValue(false);
                 }
             });
         }
@@ -495,10 +504,6 @@ export class AulaComponent implements OnDestroy {
 
     togglePopover(popover: Popover, e: any) {
         popover.toggle(e);
-
-        console.log(popover)
-
-
         if (popover.container) popover.align();
     }
 
@@ -537,12 +542,13 @@ export class AulaComponent implements OnDestroy {
                     aula_Id: this.object.aula_Id,
                     professor_Id: this.object.professor_Id as number,
                     registros: this.object.alunos.map(x => ({
-                        aula_Aluno_Id: x.id,
+                        aula_Aluno_Id: x.aula_Id,
                         presente: x.presente,
                         apostila_Abaco_Id: x.apostila_Abaco_Id,
                         numero_Pagina_Abaco: x.numeroPaginaAbaco,
                         apostila_Ah_Id: x.apostila_AH_Id,
-                        numero_Pagina_Ah: x.numeroPaginaAH
+                        numero_Pagina_Ah: x.numeroPaginaAH,
+                        observacao: x.observacao
                     }) as ChamadaRequestAlunos)
                 }
                 lastValueFrom(this.service.chamada(request))
@@ -565,5 +571,53 @@ export class AulaComponent implements OnDestroy {
             reject: () => {
             }
         });
+    }
+    
+    async carregaChecklist() {
+        this.loadingChecklist = true;
+
+        await lastValueFrom(this.checklistService.getList())
+            .then(res => {
+                this.checklists = res;
+                this.loadingChecklist = false;
+            })
+            .catch(res => this.loadingChecklist = false);
+
+        this.loadingChecklist = true;
+        lastValueFrom(this.checklistService.getChecklistAula(this.object.aula_Id))
+            .then(res => {
+
+                this.object.alunos = this.object.alunos.map(alunoCalendario => {
+                    var alunoChecklist = res.find(x => x.aluno_Id == alunoCalendario.aluno_Id)
+                    if (alunoChecklist) {
+
+                        alunoCalendario.checklists = this.checklists.map(checklist => {
+                            var checklistAluno = new CalendarioAlunoChecklistView;
+                            checklistAluno.id = checklist.id;
+                            checklistAluno.nome = checklist.nome;
+                            checklistAluno.items = alunoChecklist!.checklist.filter(x => x.checklist_Id == checklist.id);
+                            
+                            checklistAluno.prazo = checklistAluno.items[0].prazo;
+                            checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                            checklistAluno.atrasados = checklistAluno.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado &&  moment(x.prazo).week() != moment(new Date).week()) ;
+                            checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+
+                            return checklistAluno;
+                        });
+                    }
+                    return alunoCalendario;
+                })
+
+                this.loadingChecklist = false;
+            })
+            .catch(res => {
+                this.loadingChecklist = false;
+            })
+    }
+
+    getChecklist(id: number, aluno: CalendarioAluno) {
+        if (aluno.checklists)
+            return aluno.checklists.find(x => x.id == id)
+        return undefined
     }
 }

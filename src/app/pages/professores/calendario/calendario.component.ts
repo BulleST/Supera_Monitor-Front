@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, signal, ViewChild } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { CalendarioList, CalendarioRequest } from '../../../models/calendario.model';
+import { CalendarioAula, CalendarioRequest } from '../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { Popover } from 'primeng/popover';
 import { EventImpl } from '@fullcalendar/core/internal';
@@ -36,7 +36,7 @@ export class CalendarioComponent {
 
     calendarVisible = signal(false);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioList[] = []
+    calendarioList: CalendarioAula[] = []
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
@@ -84,7 +84,6 @@ export class CalendarioComponent {
         lazyFetching: true,
         eventsSet: this.events.bind(this),
         datesSet: (arg: DatesSetArg) => {
-            console.log('datesSet', arg)
             this.request.intervaloDe = arg.start;
             this.request.intervaloAte = arg.end;
             if (this.object.id) {
@@ -158,9 +157,8 @@ export class CalendarioComponent {
         })
     }
     async getCalendario(request: CalendarioRequest) {
-        console.log('getCalendario')
 
-        this.loading = true; console.log(request)
+        this.loading = true;
 
         await lastValueFrom(this.service.getCalendario(request))
             .then(calendarioList => {
@@ -185,7 +183,6 @@ export class CalendarioComponent {
     }
 
     setCalendario() {
-        console.log('setCalendario')
         this.loading = true;
         this.calendarioOptions.events = this.calendarioList.map(item => {
             var event = {

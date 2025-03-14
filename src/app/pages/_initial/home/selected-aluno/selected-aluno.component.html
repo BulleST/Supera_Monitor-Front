@@ -25,7 +25,11 @@
                         <td colspan="2">
                             <span class="text-xl font-bold text-overflow-ellipsis white-space-nowrap max-w-10rem pr-2"
                                   [pTooltip]="selectedAluno.aluno">{{ selectedAluno.aluno }}</span>
-                            <p-badge styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+                            <p-badge *ngIf="selectedAluno.reposicaoDe_Aula_Id"
+                                     [pTooltip]="selectedAluno.reposicaoDe_Aula!.data.toString()"
+                                     styleClass="ml-2 "
+                                     value="Reposição"
+                                     size="small" />
                         </td>
                     </tr>
                     <tr>
@@ -46,16 +50,84 @@
                     <tr>
                         <td>Etapa da jornada:</td>
                         <td>
-                            <p-button (onClick)="popoverChecklist.toggle($event)"
-                                      label="1ª Semana"
-                                      [text]="true"
-                                      severity="secondary"
-                                      iconPos="right"
-                                      icon="pi pi-fw pi-angle-down ml-1 text-primary-500"
-                                      size="small"
-                                      styleClass="white-space-nowrap -ml-2 font-bold" />
+                            <div (click)="popoverChecklist.toggle($event)" class="flex align-items-center gap-2 white-space-nowrap">
+                                <span>{{selectedAluno.checklist}}</span>
+                                <ng-container *ngTemplateOutlet="checklist; context: { checklist: getChecklist(selectedAluno!.checklist_Id!, selectedAluno) }"></ng-container>
+                                <ng-template #checklist let-checklist="checklist">
+                                    <div *ngIf="loadingChecklist" pTooltip="Carregando">
+                                        <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+                                    </div>
+                                    <div *ngIf="checklist" class="font-bold">
+                                        <!-- Finalizado -->
+                                        <span *ngIf="checklist.finalizados.length == checklist.items.length"
+                                              pTooltip="Finalizado">
+                                            <i class="pi pi-check-circle text-green-500"></i>
+                                        </span>
+                                        <!-- Atrasado -->
+                                        <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                                              pTooltip="Atrasado"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                                        </span>
+                                        <!-- Pendentes da Semana -->
+                                        <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                                              pTooltip="Em andamento"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                                        </span>
+                                    </div>
+                                </ng-template>
+                            </div>
                             <p-popover #popoverChecklist appendTo="body">
-                                <div class="flex justify-content-between align-items-center w-full">
+                                <p-tabs [value]="selectedAluno.checklist_Id ?? 1" scrollable>
+                                    <p-tablist style="max-width: 50rem;">
+                                        <p-tab *ngFor="let checklist of selectedAluno.checklists" [value]="checklist.id">
+                                            <div class="flex align-items-center ">
+                                                <span>{{checklist.nome}} </span>
+                                                <div class="ml-2 font-bold">
+                                                    <!-- Finalizado -->
+                                                    <span *ngIf="checklist.finalizados.length == checklist.items.length"
+                                                          pTooltip="Finalizado">
+                                                        <i class="pi pi-check-circle text-green-500"></i>
+                                                    </span>
+                                                    <!-- Atrasado -->
+                                                    <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                                                          pTooltip="Atrasado"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-times-circle text-red-500 ml-2 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                                                    </span>
+                                                    <!-- Pendentes da Semana -->
+                                                    <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                                                          pTooltip="Em andamento"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-hourglass text-orange-500 ml-2"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </p-tab>
+                                    </p-tablist>
+                                    <p-tabpanels>
+                                        <p-tabpanel *ngFor="let checklist of selectedAluno.checklists" [value]="checklist.id">
+                                            <div class="w-full">
+                                                <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                                                <ul class="p-0 ml-0">
+                                                    <li *ngFor="let checklistItem of checklist.items"
+                                                        (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
+                                                        (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined"
+                                                        class="flex align-items-center gap-2 py-1">
+                                                        <p-checkbox #checkbox
+                                                                    [inputId]="'checklistitem-' + checklistItem.id"
+                                                                    [name]="'checklistitem-' + checklistItem.id"
+                                                                    #finalizado="ngModel"
+                                                                    [(ngModel)]="checklistItem.finalizado"
+                                                                    [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
+                                                                    [binary]="true"
+                                                                    [readonly]="checklistItem.finalizado || checklist.id > selectedAluno!.checklist_Id!"
+                                                                    (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                                            <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                                                        <p-popover #checklistData>
+                                                            <p *ngIf="checklistItem.dataFinalizacao">Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</p>
+                                                            <p *ngIf="checklistItem.account_Finalizacao">Finalizado por {{checklistItem.account_Finalizacao }}</p>
+                                                        </p-popover>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </p-tabpanel>
+                                    </p-tabpanels>
+                                </p-tabs>
+                                <!-- <div class="flex justify-content-between align-items-center w-full">
                                     <p-button [disabled]="!prevChecklist"
                                               [severity]="prevChecklist ? 'primary' : 'secondary'"
                                               size="large"
@@ -81,7 +153,7 @@
                                                 <span class="font-medium">{{ item.nome }}</span>
                                             </div>
                                         </li> } </ul>
-                                </div>
+                                </div> -->
                             </p-popover>
                         </td>
                     </tr>
@@ -92,7 +164,8 @@
                               icon="pi pi-user-edit"
                               size="small"
                               (onClick)="goToAluno(selectedAluno)" />
-                    <p-button label="Agendar Reposição"
+                    <p-button *ngIf="!selectedAula!.finalizada || (selectedAula!.finalizada && selectedAluno.presente == false)"
+                              label="Agendar Reposição"
                               icon="pi pi-calendar"
                               [rounded]="true"
                               severity="secondary"
@@ -102,7 +175,8 @@
                               severity="success"
                               icon="pi pi-whatsapp "
                               [rounded]="true"
-                              size="small" />
+                              size="small"
+                              (onClick)="enviarMensagem()" />
                 </div>
             </div>
         </div>

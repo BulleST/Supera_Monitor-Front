@@ -79,7 +79,6 @@ export class FormComponent implements OnDestroy {
 
     onSelectedFiles(event: FileSelectEvent) {
         var files = event.currentFiles;
-        console.log(files)
         files.forEach((file) => {
             this.totalSize += parseInt(this.formatSize(file.size));
         });
@@ -130,8 +129,6 @@ export class FormComponent implements OnDestroy {
         list = list.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
         var data = moment(ngModel.value).toDate()
         var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim);
-        
-        console.log(list)
         
         if (existe) {
             this.toastrService.error('Essa data já está em um tema existente');

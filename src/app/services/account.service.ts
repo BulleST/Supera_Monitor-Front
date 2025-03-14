@@ -50,7 +50,6 @@ export class AccountService {
     login(model: Login) {
         return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
             tap(async (account) => {
-                console.log('login', JSON.parse(JSON.stringify(account)))
                 this.setAccount('login', account);
                 const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
                 this.router.navigateByUrl(returnUrl);

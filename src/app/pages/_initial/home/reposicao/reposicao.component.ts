@@ -7,7 +7,7 @@ import moment from 'moment';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import { ReposicaoAluno, ReposicaoAlunoRequest } from '../../../../models/reposicao.model';
-import { CalendarioList, CalendarioRequest, loadingEvents } from '../../../../models/calendario.model';
+import { CalendarioAula, CalendarioRequest, loadingEvents } from '../../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { Aluno } from '../../../../models/alunos.model';
@@ -19,6 +19,7 @@ import { ProfessorService } from '../../../../services/professor.service';
 import { ToastrService } from 'ngx-toastr';
 import { AulaCreateRequest } from '../../../../models/aulas.model';
 import { getError } from '../../../../utils';
+import { Turma } from '../../../../models/turma.model';
 
 @Component({
     selector: 'app-reposicao',
@@ -36,12 +37,15 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     legenda: { backgroundColor: string, label: string }[] = [];
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
 
+    turma: Turma = new Turma;
     aluno: Aluno = new Aluno;
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     selectedAula?: EventImpl;
     calendarVisible = signal(true);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioList[] = []
+    calendarioList: CalendarioAula[] = [];
+
+
     calendarioOptions: CalendarOptions = {
         initialView: 'multiMonthYear',
         themeSystem: 'standard',
@@ -119,17 +123,18 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
         this.activatedRoute.queryParams.subscribe(async res => {
             this.object = {
-                aluno: res['a'],
-                aluno_Id: res['b'],
-                source_Aula_Id: res['c'],
-                source_Data: res['d'],
-                source_Turma_Id: res['e'],
-                source_Turma: res['f'],
-                aluno_PerfilCognitivo_Id: res['g'],
-                aluno_PerfilCognitivo: res['h'],
-                source_Professor_Id: res['i'],
-                source_Professor: res['j'],
+                aluno: res['aluno'],
+                aluno_Id: res['aluno_Id'],
+                source_Aula_Id: res['source_Aula_Id'],
+                source_Data: res['source_Data'],
+                source_Turma_Id: res['source_Turma_Id'],
+                source_Turma: res['source_Turma'],
+                aluno_PerfilCognitivo_Id: res['aluno_PerfilCognitivo_Id'],
+                aluno_PerfilCognitivo: res['aluno_PerfilCognitivo'],
+                source_Professor_Id: res['source_Professor_Id'],
+                source_Professor: res['source_Professor'],
             } as ReposicaoAluno
+      
 
             this.visible = true;
             this.calendarioRequest.perfilCognitivo_Id = this.object.aluno_PerfilCognitivo_Id;
@@ -141,6 +146,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 });
 
             this.turmaService.get(this.object.source_Turma_Id)
+                .then(res => this.turma = res)
                 .catch(res => {
                     this.visible = false;
                     this.visibleChange();
@@ -267,7 +273,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         return result;
     }
 
-    setLegenda(c: CalendarioList[]) {
+    setLegenda(c: CalendarioAula[]) {
         this.legenda = [];
         c.forEach(item => {
             if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {
@@ -286,7 +292,6 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
         this.changeDetector.detectChanges();
     }
     async datesSet(arg: DatesSetArg) {
-        console.log(arg)
         let _loadingEvents: any[] = [];
         var month = arg.view.currentStart.getMonth();
         
@@ -345,7 +350,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
     confirmaReposicao(e: any) {
 
-        var target = this.selectedAula!.extendedProps['data'] as CalendarioList;
+        var target = this.selectedAula!.extendedProps['data'] as CalendarioAula;
 
         this.confirmationService.confirm({
             target: e.target,
@@ -367,7 +372,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
     }
 
 
-    async send(target: CalendarioList, e: any) {
+    async send(target: CalendarioAula, e: any) {
 
         this.loading = true;
 
@@ -381,10 +386,11 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 turma_Id: this.object.source_Turma_Id ?? 0,
                 data: moment(this.object.source_Data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
                 professor_Id: this.object.source_Professor_Id,
-                observacao: ''
+                observacao: '',
+                perfilCognitivo: this.turma.perfilCognitivo, 
             }
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.source_Aula_Id = res.object.id)
+                .then(res => reposicaoRequest.source_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${getError(res)}`, e));
         }
 
@@ -395,10 +401,11 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 professor_Id: target.professor_Id,
                 turma_Id: target.turma_Id ?? 0,
                 data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                observacao: ''
+                observacao: '',
+                perfilCognitivo: target.perfilCognitivo, 
             }
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.dest_Aula_Id = res.object.id)
+                .then(res => reposicaoRequest.dest_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${getError(res)}`, e));
 
         }

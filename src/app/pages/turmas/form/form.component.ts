@@ -1,4 +1,4 @@
-import { Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Crypto, insertOrReplace } from '../../../utils';
@@ -14,6 +14,7 @@ import moment from 'moment';
 import { SelectChangeEvent } from 'primeng/select';
 import { PerfilCognitivoService } from '../../../services/perfil-cognitivo.services';
 import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
+import { AulaService } from '../../../services/aulas.service';
 
 @Component({
     selector: 'app-form',
@@ -22,7 +23,7 @@ import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
     providers: [ConfirmationService],
     standalone: false
 })
-export class FormComponent implements OnDestroy {
+export class FormComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
     injector = inject(Injector);
     object = new Turma;
@@ -35,7 +36,7 @@ export class FormComponent implements OnDestroy {
     @ViewChild('divForm') divForm!: HTMLElement;
 
     diasSemana = [
-        { id: 0, label: 'Domingo' },
+        // { id: 0, label: 'Domingo' },
         { id: 1, label: 'Segunda-feira' },
         { id: 2, label: 'Terça-feira' },
         { id: 3, label: 'Quarta-feira' },
@@ -55,25 +56,27 @@ export class FormComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private service: TurmaService,
+        private aulaService: AulaService,
         private professorService: ProfessorService,
         private perfilCognitivoService: PerfilCognitivoService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
     ) {
 
-        this.loadPage();
         lastValueFrom(this.perfilCognitivoService.getList())
             .then(res => {
                 this.loadingPerfisCognitivos = false;
                 this.perfisCognitivos = res
             })
             .catch(res => this.loadingPerfisCognitivos = false);
-
-
     }
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
+    }
+
+    ngAfterViewInit(): void {
+        this.loadPage();
     }
 
     loadPage() {
@@ -90,7 +93,7 @@ export class FormComponent implements OnDestroy {
                         this.loading = false;
                         this.visible = true;
 
-                        this.verificaDisponibilidadeProfessor();
+                        this.verificaDisponibilidadeProfessor({target: this.divForm});
                     })
                     .catch(res => {
                         this.visible = false;
@@ -111,19 +114,24 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    async verificaDisponibilidadeProfessor() {
+    async verificaDisponibilidadeProfessor(e: any) {
         var valid = true;
 
         if (!this.object.diaSemana || !this.object.horario) {
             return valid;
         }
 
-        var turmas = this.service.list.value;
-        if (turmas.length == 0) {
-            turmas = await lastValueFrom(this.service.getList());
+        var calendario = this.aulaService.calendario.value;
+        if (calendario.length == 0) {
+            await lastValueFrom(this.aulaService.getCalendario({
+                professor_Id: this.object.professor_Id,
+                intervaloDe: moment(new Date).startOf('week').toDate(),
+                intervaloAte: moment(new Date).endOf('week').toDate()
+            }))
+            .then(res => calendario = res)
+            .catch(res => this.showError('Erro', 'Não foi possível validar disponibilidade.', e))
         }
-
-        console.log(this.professores)
+        
 
         if (this.professores.length == 0) {
 
@@ -145,11 +153,12 @@ export class FormComponent implements OnDestroy {
             // var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
 
             // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
-            var exists = turmas.find(x => x.id != this.object.id
+            var exists = calendario.find(x => x.aula_Id != this.object.id
                 && x.professor_Id == professor.id
-                && x.diaSemana == this.object.diaSemana
-                && moment(x.horario, 'HH:mm:ss').isAfter(intervaloDe)
-                && moment(x.horario, 'HH:mm:ss').isBefore(intervaloAte));
+                && x.data.getDay() == this.object.diaSemana
+                && moment(x.data, 'HH:mm:ss').isAfter(intervaloDe)
+                && moment(x.data, 'HH:mm:ss').isBefore(intervaloAte)
+            );
 
 
             if (exists) {
@@ -159,7 +168,7 @@ export class FormComponent implements OnDestroy {
                 if (professor.id == this.object.professor_Id) {
                     valid = false;
                     this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.nome}</b> no mesmo dia às <b>${moment(exists.horario).format('HH[h]mm')}</b>.`, { target: this.divForm });
+                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.turma ?? exists.descricao}</b> no mesmo dia às <b>${moment(exists.data).format('HH[h]mm')}</b>.`, { target: this.divForm });
                 }
             }
             else {
@@ -178,9 +187,9 @@ export class FormComponent implements OnDestroy {
     professorChanged(e: SelectChangeEvent) {
         var professor = this.professores.find(x => x.id == e.value);
 
-        if (professor && professor.disponivel == false) {
+        if (professor && professor.disponivel == false && professor.disponivelEvent) {
             this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent!.nome}</b> no mesmo dia às <b>${moment(professor.disponivelEvent!.horario).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma??professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         } else {
             this.professorSelect.control.setErrors({ indisponivel: null });
@@ -192,7 +201,7 @@ export class FormComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Erro',
+            header: header,
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
@@ -202,20 +211,16 @@ export class FormComponent implements OnDestroy {
 
 
     perfilChange(model: NgModel) {
-        console.log(model)
+        console.log(model.value)
     }
 
 
     async send(form: NgForm, e: any) {
 
-        console.log(this.object)
-        var professorValido = await this.verificaDisponibilidadeProfessor();
-
-
+        var professorValido = await this.verificaDisponibilidadeProfessor(e);
         if (form.invalid || this.professorSelect.invalid || professorValido == false) {
             return;
         }
-
 
         this.loading = true;
         this.request()
@@ -248,6 +253,7 @@ export class FormComponent implements OnDestroy {
         }
         return lastValueFrom(this.service.create(this.object));
     }
+
     goToCalendario() {
         this.router.navigate(['turmas', 'calendario', this.crypto.encrypt(this.object.id)]);
     }

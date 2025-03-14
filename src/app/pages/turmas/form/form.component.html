@@ -74,12 +74,13 @@
                     #perfilCognitivo="ngModel"
                     inputId="perfilCognitivo"
                     name="perfilCognitivo"
-                    optionLabel="nome" 
                     placeholder="Selecione"
+                    optionLabel="nome"
                     [filter]="true"
                     filterBy="nome"
                     [required]="true"
-                    styleClass="w-full"  />
+                    styleClass="w-full" 
+                    appendTo="body" />
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -89,7 +90,7 @@
                 <p-select
                           [options]="diasSemana"
                           [(ngModel)]="object.diaSemana"
-                          (ngModelChange)="verificaDisponibilidadeProfessor()"
+                          (ngModelChange)="verificaDisponibilidadeProfessor($event)"
                           #diaSemana="ngModel"
                           #diaSemanaEl
                           styleClass="w-full"
@@ -109,7 +110,7 @@
                 <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               [(ngModel)]="object.horario"
-                              (onBlur)="verificaDisponibilidadeProfessor()"
+                              (onBlur)="verificaDisponibilidadeProfessor($event)"
                               #horario="ngModel"
                               styleClass="w-full"
                               class="w-full"

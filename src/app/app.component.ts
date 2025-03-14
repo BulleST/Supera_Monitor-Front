@@ -21,7 +21,6 @@ export class AppComponent {
     }
 
     async balloon() {
-        console.log('oi')
 
         balloons()
 
