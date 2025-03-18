@@ -8,7 +8,7 @@ import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno, alunosColumns } from '../../../models/alunos.model';
-import { Aluno_CheckList_Item, Checklist, checklists } from '../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { ChecklistService } from '../../../services/checklist.service';
 import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
 import moment from 'moment';
@@ -37,7 +37,7 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
-    checklist: Checklist[] = [];
+    checklists: Checklist[] = [];
     loadingChecklist = false;
 
     constructor(
@@ -62,7 +62,7 @@ export class ListComponent implements OnDestroy {
         var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
 
-        var checklist = this.checklistService.list.subscribe(res => this.checklist = res);
+        var checklist = this.checklistService.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklist);
     }
 
@@ -78,21 +78,16 @@ export class ListComponent implements OnDestroy {
             .then(async alunos => {
                 this.tableLoading = false;
                 this.loadingChecklist = true
-                if (this.checklist.length == 0) {
-                    await lastValueFrom(this.checklistService.getList()).then(res => this.checklist = res);
+                if (this.checklists.length == 0) {
+                    await lastValueFrom(this.checklistService.getList()).then(res => this.checklists = res);
                 }
 
-                alunos.map(aluno => {
-                    aluno.checklistCompleto = this.checklist.map(checklist => {
+                alunos = alunos.map(aluno => {
+                    aluno.checklistCompleto = this.checklists.map(checklist => {
                         var checklistAluno = new CalendarioAlunoChecklistView;
                         checklistAluno.id = checklist.id;
                         checklistAluno.nome = checklist.nome;
-                        checklistAluno.items = aluno.alunoChecklist
-                        .filter(x => x.checklist_Id == checklist.id)
-                        .map(x => {
-                            x.finalizado = !!x.dataFinalizacao;
-                            return x
-                        })
+                        checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
                         checklistAluno.prazo = checklistAluno.items[0].prazo;
                         checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                         checklistAluno.atrasados = checklistAluno.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
@@ -101,6 +96,7 @@ export class ListComponent implements OnDestroy {
                     });
                     return aluno
                 })
+                this.service.list.next(alunos);
             })
             .catch(res => {
                 this.tableLoading = false;
@@ -174,22 +170,22 @@ export class ListComponent implements OnDestroy {
                             item = res.object;
                         } else {
                             setTimeout(() => {
-                                this.showError(res.message, e);
+                                this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
                             }, 300);
                         }
                     })
                     .catch(res => {
-                        this.showError(getError(res), e);
+                        this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, getError(res), e);
                     })
             },
         });
     }
 
-    showError(message: string, e: any) {
+    showError(title: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Erro',
+            header: title,
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
@@ -202,51 +198,72 @@ export class ListComponent implements OnDestroy {
         return item;
     }
 
-    
-    getCheckList(aluno: Aluno, checklist: Checklist) {
-    
-        return aluno.checklistCompleto.find(x => x.id == checklist.id);
-    
-    }
-        checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
-            if (model.control.value) {
-                this.confirmationService.confirm({
-                    target: e.target,
-                    message: `Tem certeza que deseja marcar etapa como realizada?.`,
-                    header: 'Finalizar etapa',
-                    icon: 'pi pi-exclamation-triangle',
-                    acceptIcon: 'pi pi-check',
-                    acceptLabel: 'Finalizar',
-                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
-                    rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Ainda não',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                    accept: async () => {
-                        this.loadingChecklist = true;
-                        lastValueFrom(this.checklistService.markAsDone(item.id))
-                            .then(res => {
-                                this.loadingChecklist = false;
-                                this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
-                                item.finalizado = true;
-                                item.dataFinalizacao = res.object.dataFinalizacao;
-                                item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
-    
-                                checklist.prazo = checklist.items[0].prazo;
-                                checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
-                                checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-                                checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-    
-                                this.userService.get(item.account_Finalizacao_Id!)
-                                    .then(res => item.account_Finalizacao = res.name);
-    
-                            })
-                    },
-                    reject: () => {
-                        model.control.setValue(false);
-                    }
-                });
-            }
-        }
 
-    
+    getCheckList(aluno: Aluno, checklist: Checklist) {
+        if (!aluno.checklistCompleto)
+            return undefined;
+        return aluno.checklistCompleto.find(x => x.id == checklist.id);
+    }
+
+    checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
+        
+        if (model.control.value) {
+            if (moment(item.prazo).week() > moment(new Date).week()) {
+                this.showError('Checklist indisponível', `Você não pode finalizar esse checklist ainda. \n Prazo inicial a partir do dia ${moment(item.prazo).add(-7, 'day').format('DD/MM/YY')}`, e);
+                model.control.setValue(false); 
+                return;
+            }
+            
+            if(!item.prazo) {   
+                this.showError('Checklist indisponível', `O aluno não possui data de vigência`, e);
+                model.control.setValue(false); 
+                return;
+            }
+            
+            model.control.setValue(false);
+
+            var a = this.confirmationService.confirm({
+                target: e.target,
+                message: `Tem certeza que deseja marcar etapa como realizada?.`,
+                header: 'Finalizar etapa',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Finalizar',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Ainda não',
+                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                accept: async () => {
+                    this.loadingChecklist = true;
+                    lastValueFrom(this.checklistService.markAsDone(item.id))
+                        .then(res => {
+                            
+                            model.control.setValue(true);
+                            this.loadingChecklist = false;
+                            this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
+                            item.finalizado = true;
+                            item.dataFinalizacao = res.object.dataFinalizacao;
+                            item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
+
+                            checklist.prazo = checklist.items[0].prazo;
+                            checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
+                            checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
+                            checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+
+                            this.userService.get(item.account_Finalizacao_Id!)
+                                .then(res => item.account_Finalizacao = res.name);
+
+                        })
+                },
+                reject: () => {
+                    console.log('reject')
+                    
+                    model.control.setValue(false);
+                },
+                
+            });
+        }
+    }
+
+
 }

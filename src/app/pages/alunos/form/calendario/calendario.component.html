@@ -4,14 +4,14 @@
     <ng-template #eventContent let-arg>
         <div class="cursor-pointer w-full overflow-hidden p-1 border-round-sm  flex flex-column "
                 [ngStyle]="{
-                backgroundColor: arg.event.extendedProps.data.corLegenda,
+                backgroundColor: arg.event.extendedProps.corLegenda,
                 border: selectedAula && selectedAula.id == arg.event.id ? '2px red solid' : '' ,
             }">
             <div class="flex align-items-center">
-                <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data.data | date : 'HH:mm'}}</span>
+                <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data | date : 'HH:mm'}}</span>
                 <span class="text-xs overflow-hidden text-white text-overflow-ellipsis w-12rem white-space-nowrap">{{ arg.event.title }}</span>
             </div>
-            <div class="text-white">{{arg.event.extendedProps.data.professor}}</div>
+            <div class="text-white">{{arg.event.extendedProps.professor}}</div>
         </div>
     </ng-template>
 </full-calendar>

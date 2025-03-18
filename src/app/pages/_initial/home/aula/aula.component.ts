@@ -464,6 +464,12 @@ export class AulaComponent implements OnDestroy {
 
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
         if (model.control.value) {
+            if (moment(item.prazo).week() > moment(new Date).week()) {
+                this.showError('Checklist indisponível', 'Você não pode finalizar esse checklist ainda.', e);
+                model.control.setValue(false); 
+                return;
+            }
+        
             this.confirmationService.confirm({
                 target: e.target,
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,

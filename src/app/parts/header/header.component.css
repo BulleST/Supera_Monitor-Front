@@ -1,0 +1,56 @@
+::ng-deep .p-megamenu-menu-mobile-hidden.p-megamenu-mobile .p-megamenu-button {
+    display: none;
+}
+
+.navigation {
+    padding: 6px 0;
+    display: flex;
+    flex-flow: column;
+    background: rgb(243 116 53);
+    height: 100vh;
+    box-shadow: -2px 0px 7px -5px black;
+    max-width: 250px;
+    width: 85vw;
+}
+
+.navigation-link {
+    color: white;
+    padding: 7px 15px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.navigation-container {
+    position: absolute;
+    display: flex;
+    top: 0;
+    right: 0;
+    align-items: start;
+    justify-content: start;
+    transform: translateX(calc(100% - 47px));
+    transition: .3s;
+}
+
+::ng-deep .navigation-toggler {
+    width: 4rem!important;
+    height: 4.3rem!important;
+    background-color: var(--purple-500)!important;
+    border-bottom-right-radius: 0px!important;
+    border-top-right-radius: 0px!important;
+    flex: none;
+    display: flex;
+    border-color: var(--purple-500);
+}
+
+.navigation-container.navigation-container-open {
+    transform: translateX(0);
+}
+
+.navigation-link:hover {
+    background-color: #ffffff30;
+}
+.navigation-link.active-link {
+    background-color: var(--orange-600);
+}

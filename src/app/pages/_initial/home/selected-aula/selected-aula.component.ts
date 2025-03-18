@@ -46,6 +46,9 @@ export class SelectedAulaComponent implements OnChanges {
 
         if (changes['selectedAula']) {
             this.selectedAula = changes['selectedAula'].currentValue;
+            if (!this.selectedAula) {
+                this.hidePopover();
+            }
             console.log('selectedAula 2', this.selectedAula)
         }
 
@@ -93,10 +96,13 @@ export class SelectedAulaComponent implements OnChanges {
     }
 
     hidePopover() {
-        this.popoverSelectedAula.hide();
+        console.log('hidePopover', this.popoverSelectedAula)
+        if (this.popoverSelectedAula)
+            this.popoverSelectedAula.hide();
     }
 
     onHide() {
+        console.log('onHide')
         this.aluno.emit(undefined);
     }
 

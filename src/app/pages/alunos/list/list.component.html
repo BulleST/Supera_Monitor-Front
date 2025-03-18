@@ -73,13 +73,13 @@
                             <span>{{ col.label }}</span>
                             <ng-template [ngIf]="col.filterType != FilterType.none">
                                 <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                    <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                    <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu" />
                                     <p-sortIcon [field]="col.field" />
                                 </div>
                             </ng-template>
                         </div>
                     </th>
-                    <th *ngFor="let checklist of checklist" class="surface-900 py-0 px-4 border-none text-white text-center white-space-nowrap p-2">
+                    <th *ngFor="let checklist of checklists" class="surface-900 py-0 px-4 border-none text-white text-center white-space-nowrap p-2">
                         {{checklist.nome}}
                     </th>
                     <!-- <th *ngFor="let col of checklistColumns" [pSortableColumn]="col.field"  class="surface-900 py-0 border-none text-white white-space-nowrap">
@@ -130,13 +130,12 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
 
                 </td>
-                <ng-container *ngFor="let checklist of checklist">
-                    <!-- {{checklist.nome}} -->
+                <ng-container *ngFor="let checklist of checklists">
                     <ng-container *ngTemplateOutlet="checklistContainer; context: { checklist: getCheckList(item, checklist) }"></ng-container>
                     <ng-template #checklistContainer let-checklist="checklist">
-                        <td (click)="popoverChecklist.show($event)" 
+                        <td (click)="checklist ? popoverChecklist.show($event) : undefined" 
                             class="white-space-nowrap  border-left-none border-right-none text-center px-3">
-                            <div class="flex align-items-center justify-content-center gap-2">
+                            <div *ngIf="checklist" class="flex align-items-center justify-content-center gap-2">
 
                                 <!-- Finalizado -->
                                 <span *ngIf="checklist.finalizados.length == checklist.items.length" >
@@ -159,10 +158,14 @@
                                 <span *ngIf="checklist.pendentesDaSemana.length == 0 && checklist.atrasados.length == 0 && checklist.finalizados.length == 0">
                                     <span class="text-blue-400 font-medium">Futuro</span>
                                 </span>
+
+                                <!-- <p class="w-full">atrasados {{checklist.atrasados.length}}</p>
+                                <p class="w-full">finalizados {{checklist.finalizados.length}}</p>
+                                <p class="w-full">pendentesDaSemana {{checklist.pendentesDaSemana.length}}</p> -->
                             </div>
                             <p-popover #popoverChecklist  styleClass="-mt-1">
                              
-                                <div class="w-full">
+                                <div class="w-full" *ngIf="checklist">
                                     <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
                                     <ul class="p-0 ml-0">
                                         <li *ngFor="let checklistItem of checklist.items"
@@ -176,12 +179,13 @@
                                                         [(ngModel)]="checklistItem.finalizado"
                                                         [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
                                                         [binary]="true"
-                                                        [readonly]="checklistItem.finalizado || checklist.id > item.checklist_Id"
-                                                        (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                                        (onChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
                                                 <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
                                             <p-popover #checklistData>
-                                                <p *ngIf="checklistItem.dataFinalizacao">Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</p>
-                                                <p *ngIf="checklistItem.account_Finalizacao">Finalizado por {{checklistItem.account_Finalizacao }}</p>
+                                                <p>
+                                                    <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
+                                                    <span *ngIf="checklistItem.account_Finalizacao"> por <b>{{checklistItem.account_Finalizacao }}</b></span>
+                                                </p>
                                             </p-popover>
                                         </li>
                                     </ul>
@@ -234,7 +238,7 @@
             <ng-container *ngIf="tableLoading; else elseTemplate">
                 <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td *ngFor="let col of checklist" class="border-none"><p-skeleton /></td>
+                    <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
                     <td  class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>

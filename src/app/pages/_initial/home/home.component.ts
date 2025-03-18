@@ -1,4 +1,4 @@
-import { Component, OnDestroy, AfterViewInit, signal, ChangeDetectorRef, ViewChild, ViewChildren, QueryList, HostListener } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, signal, ChangeDetectorRef, ViewChild,  HostListener } from '@angular/core';
 import { CalendarOptions, DatesSetArg, EventApi, EventHoveringArg } from '@fullcalendar/core';
 import { AulaService } from '../../../services/aulas.service';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -397,13 +397,15 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             if (target.alunos.length >= target.capacidadeMaximaAlunos) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup');
-                return this.showError('Não autorizado', 'Essa aula atingiu o limite permitido de alunos.', event.event);
+                return this.alunoListaEsperaConffirm(event.event, event.item.data, source, target);
+                // return this.showError('Não autorizado', 'Essa aula atingiu o limite permitido de alunos.', event.event);
             }
 
             if (target.perfilCognitivo.map(x => x.id).includes(event.item.data.perfilCognitivo_Id) == false) {
                 document.dispatchEvent(new Event('mouseup'));
                 this.cdkCancelDrag('keyup')
                 return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permididas.', event.event);
+
             }
 
 
@@ -450,8 +452,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     alunoListaEsperaConffirm(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
         this.confirmationService.confirm({
             target: e.target,
-            message: `Inserir aluno(a) <b>${aluno.aluno}</b> na lista de espera da aula no dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
-            header: 'Agendar reposição',
+            message: `Essa aula atingiu o limite permitido de alunos.\n Deseja inserir o aluno(a) <b>${aluno.aluno}</b> na lista de espera da aula no dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
+            header: 'Aula cheia',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Agendar',
@@ -473,6 +475,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     agendaReposicaoConffirm(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+        console.log('source', source)
+        console.log('target', target)
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendar reposição do aluno(a) <b>${aluno.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,

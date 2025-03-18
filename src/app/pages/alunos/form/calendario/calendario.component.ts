@@ -166,7 +166,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
                 title: item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                data: item,
+                extendedProps: item,
             }
             return event;
         });

@@ -1,14 +1,14 @@
-
-    <p-menubar #menuBar 
+<!-- <p-megamenu #megaMenu 
         [model]="[ ScreenWidth.sm].includes(screen) ? items : []  "  
-        styleClass="w-full h-5rem bg-primary-500 border-none shadow-1 border-noround p-2 px-6 flex align-items-center justify-content-between  ">
+        styleClass="p-megamenu-menu-mobile-hidden bg-primary-500 border-none shadow-1 border-noround p-2 px-6 flex align-items-center justify-content-between  ">
         <ng-template #start>
             <div class="flex align-items-center">
                 <img src="assets/images/logo-supera-white.png" class=" w-6rem my-1" />
             </div>
         </ng-template>
         <ng-template #item let-item let-root="root">
-            <a pRipple class="flex items-center p-menubar-item-link">
+            <a pRipple [routerLink]="item.routerLink"
+                class="flex items-center p-megamenu-item-link">
                 <span>{{ item.label }}</span>
                 <p-badge *ngIf="item.badge" [ngClass]="{ 'ml-auto': !root, 'ml-2': root }" [value]="item.badge" />
                 <span *ngIf="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
@@ -16,69 +16,50 @@
             </a>
         </ng-template>
         <ng-template #end>
-            <p-button *ngIf="[ ScreenWidth.sm].includes(screen)" 
-            
+            <p-button #b *ngIf="[ ScreenWidth.sm].includes(screen)" 
                 severity="primary"  
                 #menuButton
                 class="ml-auto "
+                styleClass="absolute align-items-center bg-purple-600 border-bottom-top border-noround-right border-purple-600 flex h-5rem justify-content-center p-button p-button-icon-only p-button-primary p-button-rounded p-component p-ripple right-0 static top-0 w-5rem z-3"
                 [rounded]="true"
-                icon="pi pi-bars"
-                (onClick)="menuBar.toggle($event); " />
+                icon="pi pi-bars text-white text-2xl"
+                (onClick)="menuClick($event, megaMenu) " />
         
         </ng-template>
-    </p-menubar>
-
-   <!--  <div class="flex align-items-center">
-        <img src="assets/images/logo-supera-white.png" class=" w-6rem my-1" />
-    </div>
-    <div class="mx-auto">
-        <p-select *ngIf="showCalendarView"
-                  [options]="viewMenu"
-                  [(ngModel)]="view"
-                  (ngModelChange)="calendarViewChanged()"
-                  optionValue="value"
-                  styleClass="bg-primary-400 text-white border-0 border-primary-400">
-            <ng-template let-selectedOption #selectedItem>
-                <div class="text-white">
-                    <span class="{{selectedOption.icon}}"></span>
-                    <span class="ml-2">{{ selectedOption.label }}</span>
-                </div>
-            </ng-template>
-            <ng-template let-item #item>
-                <span class="{{item.icon}}"></span>
-                <span class="ml-2">{{ item.label }}</span>
-            </ng-template>
-            <ng-template #dropdownicon>
-                <i class="pi pi-sort-down-fill  text-xs text-white"></i>
-            </ng-template>
-        </p-select> 
-    </div>-->
-    <!-- <p-menubar styleClass="bg-primary-500 border-none shadow-1 border-noround"
-               #menuBig>
-        <ng-template #start>
-            <div class="ml-4 mr-4 flex align-items-center">
-                <img src="assets/images/logo-supera-white.png" class="ml-4 w-6rem my-1" />
+        <ng-template #buttonTemplate></ng-template>
+    </p-megamenu> -->
+    <div class="">
+        <header #header class="relative bg-primary-500 border-none shadow-1 border-noround p-2 px-6 flex align-items-center justify-content-between">
+            <div class="flex align-items-center">
+                <img src="assets/images/logo-supera-white.png" class=" w-6rem my-1" />
             </div>
-        </ng-template>
-        <ng-template #end>
-            <p-select *ngIf="showCalendarView"
-                      [options]="viewMenu"
-                      [(ngModel)]="view"
-                      optionValue="value"
-                      styleClass="bg-primary-400 text-white border-0 border-primary-400">
-                <ng-template let-selectedOption #selectedItem>
-                    <div class="text-white">
-                        <span class="{{selectedOption.icon}}"></span>
-                        <span class="ml-2">{{ selectedOption.label }}</span>
-                    </div>
-                </ng-template>
-                <ng-template let-item #item>
-                    <span class="{{item.icon}}"></span>
-                    <span class="ml-2">{{ item.label }}</span>
-                </ng-template>
-                <ng-template #dropdownicon>
-                    <i class="pi pi-sort-down-fill  text-xs text-white"></i>
-                </ng-template>
-            </p-select>
-        </ng-template>
-    </p-menubar> -->
+            <ng-container *ngIf="[ScreenWidth.sm].includes(screen)">
+                <div class="navigation-container" [ngClass]="{ 'navigation-container-open': menuMobileOpen }">
+                    <p-button #menuButton
+                              severity="primary"
+                              class="ml-auto "
+                              styleClass="navigation-toggler"
+                              [rounded]="true"
+                              severity="help"
+                              [icon]="'pi text-white text-2xl ml-2 '  + (menuMobileOpen ? 'pi-times' : 'pi-bars')"
+                              (onClick)="toggleMenuMobile(menuButton, navigation) " />
+                    <nav #navigation class="navigation">
+                        <ng-container *ngFor="let item of items">
+                            <a pRipple [routerLink]="item.routerLink" [routerLinkActive]="item['routerLinkActive']"
+                               class="navigation-link white-space-nowrap flex align-items-center">
+                               <div class="mr-2 w-2rem">
+                                   <fa-icon *ngIf="item['iconFontawesome']" [icon]="item['iconFontawesome']"></fa-icon>
+                                   <i *ngIf="item['icon']" [class]="item['icon']"></i>
+                               </div>
+                                <span>{{ item.label }}</span>
+                                <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" />
+                                <i *ngIf="item.items" [ngClass]="['ml-auto pi', 'pi-angle-down']"></i>
+                            </a>
+                        </ng-container>
+                    </nav>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+            </ng-template>
+        </header>
+    </div>

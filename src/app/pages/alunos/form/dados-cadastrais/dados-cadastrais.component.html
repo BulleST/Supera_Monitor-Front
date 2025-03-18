@@ -1,3 +1,11 @@
+
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+
+
 <div class="formgrid grid">
     <div class="lg:col-3 md:col-3 col-12 px-0 flex overflow-hidden">
         <p-fileupload
@@ -161,56 +169,55 @@
                 <label for="etapaChecklist">Etapa Checklist: </label>
                 <input type="text"
                        pInputText
-                       [value]="'1ª Semana'"
+                       [value]="object.checklist"
                        class="w-full"
                        [required]="true"
                        (onBlur)="checklistPopover.hide()"
                        (click)="checklistPopover.show($event) ">
                        <p-popover #checklistPopover appendTo="body">
-                            <p-virtualscroller [items]="checklists" [itemSize]="26"  [style]="{ maxHeight: '50vh', height: '50vh', width: '350px' }">
-                                <ng-template #item let-checklist >
-                                    <div class="my-2">
+                        <div [style]="{ maxHeight: '50vh', height: '50vh', width: '350px' }" class="overflow-auto">
+                            <ng-container *ngFor="let checklist of object.checklistCompleto">
+                                <div class="my-2" *ngIf="checklist">
+                                    <div class="flex p-2 " 
+                                    [ngClass]="{
+                                        'bg-orange-100': checklist.id == object.checklist_Id,
+                                        'surface-50': checklist.id != object.checklist_Id,
+                                    }">
                                         <p ><b>{{checklist.nome}}</b></p>
-                                    <div *ngFor="let item of checklist.items" class="flex align-items-center gap-2 my-1">
-                                        <p-checkbox [binary]="true" name="checkedItem"  />
-                                        <label>{{ item.nome }}</label>
+                                        <p class="ml-2"> - Prazo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                                        <p class="pl-2 ml-auto text-orange-500" *ngIf="checklist.id == object.checklist_Id"> Em Andamento <i class="pi pi-hourglass ml-2"></i> </p>
+                                        <p class="pl-2 ml-auto text-danger-500" *ngIf="checklist.atrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times ml-2"></i> </p>
+                                        <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.finalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
                                     </div>
-                                    </div>
-                                </ng-template>
-                            </p-virtualscroller>
-                            <!-- <ul *ngFor="let checklist of checklists">
-                                <p><b>{{checklist.nome}}</b></p>
-                                <li *ngFor="let item of checklist.items">
-                                    <div class="flex align-items-center gap-2">
-                                        <p-checkbox [binary]="true" name="checkedItem"  />
-                                        <span>{{ item.nome }}</span>
-                                    </div>
-                                </li>
-                            </ul> -->
-                       </p-popover>
-                <!-- <p-select
-                          [options]="checklists"
-                          [(ngModel)]="object.checklist"
-                          [loading]="loadingChecklists"
-                          #etapaChecklist="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="etapaChecklist"
-                          inputId="etapaChecklist"
-                          [showClear]="true"
-                          appendTo="body"
-                          [required]="true"  
-                          [group]="true" >
-                    <ng-template let-group #group>
-                        <span class="font-bold">{{ group.label }}</span>
-                    </ng-template>
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center gap-2">
-                            <p-checkbox [binary]="true" name="checkedItem" [(ngModel)]="item.value" />
-                            <span>{{ item.label }}</span>
+                                    <ng-container *ngFor="let checklistItem of checklist.items">
+                                        <div class="flex flex-column align-items-start">
+                                            <div class="inline-flex align-items-center gap-2 my-1 w-min-content pr-3" [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined">
+                                                
+                                                <p-checkbox #checkbox
+                                                  [inputId]="'checklistitem-' + checklistItem.id"
+                                                  [name]="'checklistitem-' + checklistItem.id"
+                                                  #finalizado="ngModel"
+                                                  [(ngModel)]="checklistItem.finalizado"
+                                                  [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
+                                                  [binary]="true"
+                                                  [readonly]="checklistItem.finalizado || checklist.id > checklistItem.checklist_Id"
+                                                  (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                                <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                                                
+                                              <ng-template #finalizadoTooltip>
+                                                  <p class="ml-auto pl-2" *ngIf="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao" >Finalizado por <b>{{checklistItem.account_Finalizacao}}</b> em <b>{{checklistItem.dataFinalizacao | date : 'dd/mm/yy'}}</b></p>
+                                              </ng-template>
+      
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    
+                                </div>
+                            </ng-container>
+                            
+
                         </div>
-                    </ng-template>
-                </p-select> -->
+                       </p-popover>
             </div>
 
             <div class="field lg:col-3 sm:col-3 xs:col-6 col-12"> <!-- Telefone -->
@@ -316,8 +323,9 @@
                     placeholder="Selecione"
                     [filter]="true"
                     filterBy="nome"
-                    [required]="true"
                     styleClass="w-full"  />
+                    <!-- 
+                    [required]="true" -->
                 <div *ngIf="_restricoes.touched && _restricoes.invalid && _restricoes.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_restricoes.errors['required']">Esse campo é obrigatório.</p>
                 </div>

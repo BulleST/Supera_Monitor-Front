@@ -1,9 +1,16 @@
 <!-- <div class="bg"></div> -->
 
-<!-- <drag-scroll #dragScroll
+<p-confirmDialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmDialog>
+
+<drag-scroll #dragScroll
              [style]="{
-       width: width ? width + 'px' : '100%',
+       width: '100%',
        minHeight: 'calc(100vh - 80px)',
+       height: '500vh',
        overflowY: 'visible',
        cursor: 'pointer'
      }"
@@ -11,57 +18,109 @@
              (dragEnd)="scrollDragEnd(dragScroll)"
              class="w-full "
              cdkDropListGroup>
-    <div class="flex p-4 pt-0 gap-2 align-items-start">
-        <div *ngFor="let checklist of checklists"
-             cdkDropListGroup
-             id="dragContainer"
-             class="p-2 bg-transparent w-20rem border-round-md ">
-            <p-tag [value]="checklist.nome"
-            severity="contrast"
-                   styleClass="white-space-normal text-center surface-700"
-                   class="mb-2 sticky top-0" />
-            <div class="flex flex-column gap-2">
-                <div *ngFor="let item of checklist.items"
-                     class="bg-white p-3 w-full flex flex-column border-round-lg shadow-1">
-                    <span [pTooltip]="item.nome"
-                          class="bg-primary-200  mb-2 flex w-17rem border-round-md px-3 py-1">
-                        <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{item.nome}} </span>
-                    </span>
-                    <div class="flex flex-column gap-2 overflow-auto">
-                        <ng-template #empty>
-                            <p class="text-400 ml-2">Nenhum aluno nessa etapa...</p>
-                        </ng-template>
-                        <ng-template [ngIf]="item.alunos.length" [ngIfElse]="empty">
-                        
-                            <div *ngFor="let aluno of item.alunos"
-                                    class="p-2 bg-white border-round-md shadow-1 cursor-pointer">
-                                    <div class="flex align-items-center">
-                                        <div class="border-circle border-2 border-200 w-3rem h-3rem flex overflow-hidden mr-2">
-                                            <img *ngIf="aluno.aluno.aluno_Foto" [src]="aluno.aluno.aluno_Foto" class="">
-                                            <i *ngIf="!aluno.aluno.aluno_Foto" class="pi pi-user m-auto text-primary-500"></i>
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="flex align-items-center justify-content-between">
-                                                <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis">{{aluno.aluno.nome}}</span>
-                                            </div>
-                                            <span class="flex mx-auto w-full mt-1">
-                                                <i class="pi pi-paperclip text-xs font-light text-400  mr-1"></i>
-                                                <span class="text-xs font-light text-400 line-height-1">2</span>
-                                            </span>
-                                        </div>
-                                        <p-tag size="small" [value]="aluno.dataFinalizacao ? 'Pendente' : 'Atrasado'" class="ml-auto"
-                                            [severity]="aluno.dataFinalizacao || !aluno.dataFinalizacao && aluno.prazo < hoje ? 'success' : !aluno.dataFinalizacao && aluno.prazo == hoje ? 'warn' : 'danger' "
-                                            class="ml-2 my-auto flex align-items-center h-full"
-                                            styleClass="white-space-nowrap text-xs font-light my-auto flex " />
-                                        </div>
-                            </div>
-                        </ng-template>
+    <div *ngIf="checklists.length" class="flex gap-4 align-items-start">
+        <ng-container *ngIf="loadingChecklist; then checklistLoadingTemplate; else checklistTemplate">
+            
+        </ng-container>
+        <!-- Loading Checklist -->
+        <ng-template #checklistLoadingTemplate>
+            <div *ngFor="let item of [1,2,3,4]" class="p-2 bg-transparent w-20rem border-round-md flex-none ">
+                <p-skeleton width="6rem" height="1.5rem" styleClass="mb-2" />
+                <div class="flex flex-column gap-2 max-h-25rem">
+                    <div *ngFor="let item of [1,2]" class="bg-white py-3 w-full flex flex-column border-round-lg shadow-1">
+                        <div class="mb-2 mx-3">
+                            <p-skeleton width="100%" height="1.5rem" />
+                        </div>
+                        <div class="flex flex-column gap-2 overflow-auto max-h-25rem overflow-x-hidden px-3 py-1">
+                                <ng-container *ngTemplateOutlet="loadingAlunosTemplate"></ng-container>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ng-template>
+        
+        <!-- Loading Aluno -->
+        <ng-template #loadingAlunosTemplate>
+            <div *ngFor="let item of [1,2,3,4]" class="p-2 px-3 bg-white border-round-md shadow-1 flex align-items-center">
+                <p-skeleton shape="circle" size="2rem" />
+                <div class="flex-1 ml-2">
+                    <p-skeleton width="100%" height=".9rem" styleClass="mb-2"  />
+                    <p-skeleton width="5rem" height=".9rem" styleClass=""  />
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #checklistTemplate>
+            <div *ngFor="let checklist of checklists"
+                 cdkDropListGroup
+                 id="dragContainer"
+                 class=" bg-transparent w-23rem border-round-md ">
+                <p-tag [value]="checklist.nome"
+                       severity="contrast"
+                       styleClass="white-space-normal text-center surface-700"
+                       class="mb-2 sticky top-0" />
+                <div class="flex flex-column gap-4 max-h-25rem flex-none">
+                    <div *ngFor="let item of checklist.items"
+                         class="bg-white w-full flex flex-column border-round-lg shadow-1 flex-none">
+                         <div class="mx-3 mb-2 mt-3">
+
+                            <span *ngIf="item.nome"
+                                [pTooltip]="item.nome"
+                                class="bg-primary-200 mb-2 flex w-full border-round-md px-3 py-1">
+                                <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{item.nome}} </span>
+                            </span>
+                         </div>
+                        <div class="flex flex-column gap-2 overflow-auto max-h-25rem overflow-x-hidden px-3 py-1">
+                            <ng-template #empty>
+                                <ng-container *ngIf="!loadingAlunos; else loadingAlunosTemplate">
+                                    <p class="text-400 ml-2 mb-2" *ngIf="!loadingAlunos" >Nenhum aluno nessa etapa...</p>
+                                </ng-container>
+                            </ng-template>
+                            <ng-container *ngIf="item.alunos && item.alunos.length; else empty">
+                                <div *ngFor="let aluno of item.alunos"
+                                    (click)="finalizarChecklist($event, aluno)"
+                                     class="p-2 bg-white border-round-md shadow-1 cursor-pointer"
+                                     pTooltip="Clique para marcar como feito">
+                                    <div class="flex align-items-center">
+                                        <div class="flex-none w-2rem h-2rem border-circle border-2 border-200 flex overflow-hidden mr-2">
+                                            <img *ngIf="aluno.aluno.aluno_Foto" [src]="aluno.aluno.aluno_Foto" class="">
+                                            <i *ngIf="!aluno.aluno.aluno_Foto" class="pi pi-user m-auto text-primary-500 text-xs"></i>
+                                        </div>
+                                        <div class="flex-1 flex flex-column w-full overflow-hidden">
+                                            <p class="overflow-hidden white-space-nowrap text-overflow-ellipsis w-full flex-none overflow-hidden">{{aluno.aluno.nome}}</p>
+                                            <span class="flex justify-content-between mx-auto w-full mt-1">
+                                                <span pTooltip="Prazo"><b>{{aluno.prazo | date : 'dd/MM/yy'}}</b></span>
+                                                <!-- Atrasado -->
+                                                <span *ngIf="aluno.status == 'Atrasado'">
+                                                    <span class="text-red-600 font-bold">Atrasado</span>
+                                                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite ml-2 mt-1"></i>
+                                                </span>    
+                                                <!-- Pendentes da Semana -->
+                                                <span *ngIf="aluno.status == 'Pendente'">
+                                                    <span class="text-orange-500 font-medium">Em Andamento</span>
+                                                    <i class="pi pi-hourglass text-orange-500 ml-2 mt-1"></i>
+                                                </span>   
+                                                <!-- Finalizado -->
+                                                <span *ngIf="aluno.status == 'Finalizado'">
+                                                    <span class="text-green-500 ">Finalizado</span>
+                                                    <i class="pi pi-check-circle text-green-500 ml-2 mt-1"></i>
+                                                </span>    
+                                            </span>
+                                        </div>
+                                        <!-- <p-tag size="small" [value]="aluno.dataFinalizacao ? 'Pendente' : 'Atrasado'" class="ml-auto"
+                                                [severity]="aluno.dataFinalizacao || !aluno.dataFinalizacao && aluno.prazo < hoje ? 'success' : !aluno.dataFinalizacao && aluno.prazo == hoje ? 'warn' : 'danger' "
+                                                class="ml-2 my-auto flex align-items-center h-full"
+                                                styleClass="white-space-nowrap text-xs font-light my-auto flex " /> -->
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
     </div>
-</drag-scroll> -->
+</drag-scroll>
 <!-- <div class="flex flex-column justify-content-start align-items-start flex-wrap gap-3 overflow-y-auto" style="font-size: 10px">
     <div *ngFor="let checklist of checklists"
          class="border-round-md w-full flex flex-column justify-content-start align-items-start ">

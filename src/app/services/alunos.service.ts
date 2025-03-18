@@ -7,7 +7,6 @@ import { Map } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { ReposicaoAlunoRequest } from '../models/reposicao.model';
 import { Aluno_Restricao } from '../models/aluno-restricao.model';
-import { checklists } from '../models/checklist.model';
 import { getError } from '../utils';
 
 @Injectable({
@@ -22,23 +21,19 @@ export class AlunoService extends Service {
     }
 
     getList() {
-        // return this.http.get<Aluno[]>(`${this.url}/alunos/all/`)
         return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
             .pipe(tap({
                 next: list => {
                     var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
                     list = list.map(aluno => {
-                            aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0,5)
-                        // aluno.checklist = [];
-                        // aluno.checklist = checklists;
-                        // aluno.checklist = aluno.checklist.map(checklist => {
-                        //     checklist.items = checklist.items.map(item => {
-                        //         // item.finalizado = Boolean(Math.ceil(Math.random()));
-                        //         return JSON.parse(JSON.stringify(item));
-                        //     });
-                        //     // checklist.status = checklist.items.find(x => !x.finalizado) ? 'Atrasado' : 'Finalizado';
-                        //     return checklist;
-                        // });
+                        aluno.dataInicioVigencia = new Date(aluno.dataInicioVigencia);
+                        aluno.dataNascimento = new Date(aluno.dataNascimento);
+                        aluno.dataFimVigencia = aluno.dataFimVigencia ? new Date(aluno.dataFimVigencia) : undefined;
+                        aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0,5)
+                        aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
+                            checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
+                            return checklistAluno
+                        })
                         return aluno;
                     })
                     this.list.next(list);

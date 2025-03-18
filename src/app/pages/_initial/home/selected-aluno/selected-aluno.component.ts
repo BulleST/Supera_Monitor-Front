@@ -5,7 +5,7 @@ import { ReposicaoAluno } from '../../../../models/reposicao.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Crypto } from '../../../../utils';
 import { AulaService } from '../../../../services/aulas.service';
-import { Aluno_CheckList_Item, Checklist, Checklist_Item, checklists } from '../../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../../models/checklist.model';
 import { lastValueFrom } from 'rxjs';
 import { ChecklistService } from '../../../../services/checklist.service';
 import { UserService } from '../../../../services/user.service';
@@ -25,11 +25,11 @@ export class SelectedAlunoComponent implements OnChanges {
     itemChecklists: Checklist_Item[] = [];
     loadingChecklist = true;
 
-    checklists: Checklist[] = checklists;
-    currentIndex = 0;
-    currentChecklist: Checklist = checklists[0];
-    prevChecklist?: Checklist = undefined;
-    nextChecklist?: Checklist = checklists[1];
+    checklists: Checklist[] = [];
+    // currentIndex = 0;
+    // currentChecklist: Checklist = checklists[0];
+    // prevChecklist?: Checklist = undefined;
+    // nextChecklist?: Checklist = checklists[1];
 
     @Input() selectedAluno?: CalendarioAluno;
     @Input() selectedAula: CalendarioAula = new CalendarioAula;
@@ -65,7 +65,7 @@ export class SelectedAlunoComponent implements OnChanges {
             this.visible = false;
         }
 
-        this.itemChecklists = checklists.find(x => x.nome == '1ª Semana')?.items as Checklist_Item[];
+        this.itemChecklists = this.checklists.find(x => x.nome == '1ª Semana')?.items as Checklist_Item[];
     }
 
     hideAluno() {
@@ -182,8 +182,26 @@ export class SelectedAlunoComponent implements OnChanges {
         }
     }
 
+    showError(title: string, message: string, e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: message,
+            header: title,
+            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            acceptLabel: 'OK',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            rejectVisible: false,
+        })
+    }
+
+
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
         if (model.control.value) {
+            if (moment(item.prazo).week() > moment(new Date).week()) {
+                this.showError('Checklist indisponível', 'Você não pode finalizar esse checklist ainda.', e);
+                model.control.setValue(false); 
+                return;
+            }
             this.confirmationService.confirm({
                 target: e.target,
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,

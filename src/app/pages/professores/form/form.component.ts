@@ -34,7 +34,7 @@ export class FormComponent implements OnDestroy {
     nivelCertificacao: Professor_NivelCertificacao[] = [];
     loadingNivelCertificacao = true;
 
-    minDate: Date = new Date(1900, 1, 1);
+    minDate: Date = new Date(1950, 1, 1);
     maxDate: Date = new Date();
 
     constructor(

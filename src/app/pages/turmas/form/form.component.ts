@@ -153,13 +153,12 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             // var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
 
             // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
-            var exists = calendario.find(x => x.aula_Id != this.object.id
+            var exists = calendario.find(x => x.turma_Id != this.object.id
                 && x.professor_Id == professor.id
                 && x.data.getDay() == this.object.diaSemana
                 && moment(x.data, 'HH:mm:ss').isAfter(intervaloDe)
                 && moment(x.data, 'HH:mm:ss').isBefore(intervaloAte)
             );
-
 
             if (exists) {
                 professor.disponivel = false;
@@ -211,7 +210,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
 
     perfilChange(model: NgModel) {
-        console.log(model.value)
     }
 
 
@@ -229,6 +227,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 if (res.success) {
 
                     res.object.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + res.object.horario);
+                    res.object.perfilCognitivoString =  res.object.perfilCognitivo.map((x: PerfilCognitivo) => x.nome).join(', ')
 
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);

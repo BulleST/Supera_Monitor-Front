@@ -60,7 +60,7 @@
                         <span>{{ col.label }}</span>
                         <ng-template [ngIf]="col.filterType != FilterType.none">
                             <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                <p-columnFilter [type]="col.filterType" [field]="col.label" display="menu" />
+                                <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu" />
                                 <p-sortIcon [field]="col.field" />
                             </div>
                         </ng-template>

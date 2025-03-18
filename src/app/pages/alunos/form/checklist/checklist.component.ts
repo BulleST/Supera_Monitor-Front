@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Checklist, checklists } from '../../../../models/checklist.model';
+import { Checklist } from '../../../../models/checklist.model';
 import { DragScrollComponent } from 'ngx-drag-scroll';
 
 @Component({
@@ -10,7 +10,7 @@ import { DragScrollComponent } from 'ngx-drag-scroll';
 })
 export class ChecklistComponent {
     @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
-    checklists: Checklist[] = checklists;
+    checklists: Checklist[] = [];
     
         scrollDragStart(e: DragScrollComponent) {
             this.dragScroll._contentRef.nativeElement.style.cursor = 'grab'

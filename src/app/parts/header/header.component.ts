@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { faBell, faCalendar, faHome, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { MenuItem } from 'primeng/api';
+import { MegaMenuItem, MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { Header } from '../../utils/header';
 import { ThemeService } from '../../utils/theme';
@@ -11,6 +11,8 @@ import { Role } from '../../models/account-perfil.model';
 import { NavigationEnd, Router } from '@angular/router';
 import { AulaService } from '../../services/aulas.service';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
+import { MegaMenu } from 'primeng/megamenu';
+import { Button } from 'primeng/button';
 
 @Component({
     selector: 'app-header',
@@ -37,6 +39,9 @@ export class HeaderComponent implements OnDestroy {
     ScreenWidth: typeof ScreenWidth = ScreenWidth;
     items: MenuItem[] | undefined;
 
+
+    menuMobileOpen = false;
+
     constructor(
         private theme: ThemeService,
         private accountService: AccountService,
@@ -59,7 +64,7 @@ export class HeaderComponent implements OnDestroy {
                                         label: 'Calendário de Aulas',
                                         tooltip: 'Calendário de Aulas',
                                         iconFontawesome: faCalendar,
-                                        routerLink: '/home',
+                                        routerLink: ['home'],
                                         routerLinkActiveOptions: { exact: false },
                                         routerLinkActive: 'active-link'
                                     },
@@ -67,7 +72,7 @@ export class HeaderComponent implements OnDestroy {
                                         label: 'Monitoramento de Checklist',
                                         tooltip: 'Monitoramento de Checklist',
                                         iconFontawesome: faHome,
-                                        routerLink: '/checklist',
+                                        routerLink: ['checklist'],
                                         routerLinkActiveOptions: { exact: false },
                                         routerLinkActive: 'active-link'
                                     },
@@ -113,7 +118,8 @@ export class HeaderComponent implements OnDestroy {
                                     },
                 
                             {
-                                label: 'Minha conta'
+                                label: 'Minha conta',
+                                routerLink: [],
                             },
             ]
 
@@ -124,8 +130,6 @@ export class HeaderComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
-
-
     
 
     setModal() {
@@ -148,6 +152,26 @@ export class HeaderComponent implements OnDestroy {
 
     toggleThemeAside() {
         this.theme.toggleThemeAside();
+    }
+
+
+    menuClick(e: any, menuBar: MegaMenu) {
+        console.log(e, menuBar)
+        menuBar.toggle(e);
+    }
+
+    toggleMenuMobile(button: Button, navigation: HTMLElement) {
+        console.log(button)
+        this.menuMobileOpen = !this.menuMobileOpen;
+
+        if (this.menuMobileOpen) {
+
+
+        }
+        else {
+
+        }
+        
     }
 
 }
