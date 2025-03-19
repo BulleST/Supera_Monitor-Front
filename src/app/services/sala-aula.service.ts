@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
-import moment from 'moment';
 import { SalaAula } from '../models/sala-aula.model';
 import { Map } from '../utils/map';
 import { getError } from '../utils';
@@ -15,7 +14,7 @@ export class SalaAulaService extends Service {
     override list = new BehaviorSubject<SalaAula[]>([]);
 
     getList() {
-        return this.http.get<SalaAula[]>(`${this.url}/sala/all/`)
+        return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)
             .pipe(tap({
                 next: list => {
                     this.list.next(list);
@@ -45,7 +44,7 @@ export class SalaAulaService extends Service {
     create(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
         var request = Map(model, new SalaAula);
-        return this.http.post<Response>(`${this.url}/sala`, request)
+        return this.http.post<Response>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar sala. \n ${getError(err)}`);
@@ -56,7 +55,7 @@ export class SalaAulaService extends Service {
     edit(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
         var request = Map(model, new SalaAula);
-        return this.http.put<Response>(`${this.url}/sala`, request)
+        return this.http.put<Response>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar sala. \n ${getError(err)}`);
@@ -65,7 +64,7 @@ export class SalaAulaService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/sala/toggle-active/${id}`, {})
+        return this.http.patch<Response>(`${this.url}/salas/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar sala. \n ${getError(err)}`);

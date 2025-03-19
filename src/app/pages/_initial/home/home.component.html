@@ -134,23 +134,30 @@
                                         <i class="pi pi-clock mr-1 text-xs"></i>
                                         <span class="text-xs">{{aula.data | date : 'HH:mm'}}</span>
                                     </div>
-                                    <p class="flex align-items-center mb-0 ml-2">
+                                    <p class="flex align-items-center ml-2">
                                         <span class="text-xs">{{aula.alunos.length}}/{{aula.capacidadeMaximaAlunos}}</span>
                                         <i class="pi pi-exclamation-circle text-xs ml-2 -mt-1 fadeout animation-duration-500 animation-iteration-infinite" *ngIf="aula.alunos.length > aula.capacidadeMaximaAlunos"></i>
                                     </p>
                                 </div>
-                                <p class="overflow-hidden text-overflow-ellipsis w-full white-space-nowrap text-xl font-bold my-auto"
-                                   [pTooltip]="arg.event.title">
-                                   <span *ngIf="aula.reposicaoDe_Aula_Id"  
-                                    [pTooltip]="aula.reposicaoDe_Aula ? 'Reagendamento de {{aula.reposicaoDe_Aula.data | date }}' : undefined"
-                                    class=" ml-auto mr-2 border-circle border-2 border-white text-white text-xs   inline-flex align-items-center justify-content-center" style="width: 1.4rem; height: 1.4rem;">R</span>
+                                <p [pTooltip]="arg.event.title" class="overflow-hidden text-overflow-ellipsis white-space-nowrap text-xl font-bold my-auto flex align-items-center">
+                                   <span *ngIf="aula.reposicaoDe_Aula_Id" [pTooltip]="'Reagendamento: clique para ver mais'" 
+                                   class="mr-2 border-circle border-2 border-white text-white text-xs inline-flex align-items-center justify-content-center" style="width: 1.5rem; height: 1.5rem;">R</span>
+                                   
                                    <span>{{ arg.event.title }}</span>
+                                   
+                                   <span *ngIf="aula.finalizada" [pTooltip]="'Aula finalizada'" class="ml-auto text-white flex" >
+                                        <i class="pi pi-check-circle"></i>
+                                   </span>
                                 </p>
                                 <div class="flex align-items-center justify-content-between flex-wrap w-full">
                                     <p class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0"
-                                       [pTooltip]="aula.professor"> {{ aula.professor}} </p>
-                                    <p [pTooltip]="aula.perfilCognitivo.length ? aula.perfilCognitivo.nome : ''"
-                                        class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0 text-right"> {{ getPerfilCognitivo(aula.perfilCognitivo) }} </p>
+                                       [pTooltip]="'Professor(a) ' + aula.professor"> {{ aula.professor}} </p>
+
+                                    <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(aula.perfilCognitivo) }"></ng-container>
+                                    <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                                        <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="flex-1 max-w-50 overflow-hidden text-overflow-ellipsis white-space-nowrap mb-0 text-right">{{ perfilCognitivo }} </p>
+                                    </ng-template>
+                                    
                                 </div>
                             </div>
                         </ng-template>

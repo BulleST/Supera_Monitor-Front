@@ -26,6 +26,8 @@ export class Turma extends Basic_List {
     capacidadeMaximaAlunos: number = 12;
     perfilCognitivo: PerfilCognitivo[] = [];
     perfilCognitivoString: string = '';
+    diasDeAulaString: string = '';
+    salaDeAulaString: string = '';
 }
 
 export var turmaColumns: ColumnTable[] = [
@@ -50,33 +52,47 @@ export var turmaColumns: ColumnTable[] = [
         options: undefined,
     },
     {
-        field: 'diaSemana',
+        field: 'diasDeAulaString',
         label: 'Dias de Aula',
         filterType: FilterType.text,
-        displayType: DisplayType.options,
-        options: {
-            "items": [
-                { "value": 0, "label": "Domingo" },
-                { "value": 1, "label": "Segunda-feira" },
-                { "value": 2, "label": "Terça-feira" },
-                { "value": 3, "label": "Quarta-feira" },
-                { "value": 4, "label": "Quinta-feira" },
-                { "value": 5, "label": "Sexta-feira" },
-                { "value": 6, "label": "Sábado" },
-            ]
-
-        },
+        displayType: DisplayType.text,
+        options: undefined,
     },
     {
-        field: 'horario',
-        label: 'Horário',
-        filterType: FilterType.time,
-        displayType: DisplayType.time,
-        options: {
-            format: 'HH\'h\'mm',
-            width: '15px'
-        },
+        field: 'salaDeAulaString',
+        label: 'Sala',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
     },
+    // {
+    //     field: 'diaSemana',
+    //     label: 'Dias de Aula',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.options,
+    //     options: {
+    //         "items": [
+    //             { "value": 0, "label": "Domingo" },
+    //             { "value": 1, "label": "Segunda-feira" },
+    //             { "value": 2, "label": "Terça-feira" },
+    //             { "value": 3, "label": "Quarta-feira" },
+    //             { "value": 4, "label": "Quinta-feira" },
+    //             { "value": 5, "label": "Sexta-feira" },
+    //             { "value": 6, "label": "Sábado" },
+    //         ]
+
+    //     },
+    // },
+    // {
+    //     field: 'horario',
+    //     label: 'Horário',
+    //     filterType: FilterType.time,
+    //     displayType: DisplayType.time,
+    //     options: {
+    //         format: 'HH\'h\'mm',
+    //         width: '15px'
+    //     },
+    // },
     {
         field: 'perfilCognitivoString',
         label: 'Perfil Cognitivo',

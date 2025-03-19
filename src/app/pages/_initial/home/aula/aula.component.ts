@@ -377,27 +377,27 @@ export class AulaComponent implements OnDestroy {
     }
 
     async goToIniciarChamada(e: any) {
-        this.loading = true;
+        // this.loading = true;
 
-        if (this.object.aula_Id == PseudoAula.AulaId) {
-            var aulaRequest: AulaCreateRequest = {
-                sala_Id: this.object.sala_Id,
-                professor_Id: this.object.professor_Id,
-                turma_Id: this.object.turma_Id ?? 0,
-                data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
-                observacao: '',
-                perfilCognitivo: this.object.perfilCognitivo
-            };
+        // if (this.object.aula_Id == PseudoAula.AulaId) {
+        //     var aulaRequest: AulaCreateRequest = {
+        //         sala_Id: this.object.sala_Id,
+        //         professor_Id: this.object.professor_Id,
+        //         turma_Id: this.object.turma_Id ?? 0,
+        //         data: moment(this.object.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+        //         observacao: '',
+        //         perfilCognitivo: this.object.perfilCognitivo
+        //     };
 
-            await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => {
-                    this.object.aula_Id = res.object.id;
-                    this.service.calendarioReload.emit(true);
-                })
-                .catch(res => this.showError('Ocorreu um erro', `Não foi possível iniciar chamada. \n (Aula não foi inserida).\n ${getError(res)}`, e));
+        //     await lastValueFrom(this.service.create(aulaRequest))
+        //         .then(res => {
+        //             this.object.aula_Id = res.object.id;
+        //             this.service.calendarioReload.emit(true);
+        //         })
+        //         .catch(res => this.showError('Ocorreu um erro', `Não foi possível iniciar chamada. \n (Aula não foi inserida).\n ${getError(res)}`, e));
 
-        }
-        this.loading = false;
+        // }
+        // this.loading = false;
         this.isChamadaPage = true;
 
         this.service.aula.next(this.object)
@@ -548,7 +548,7 @@ export class AulaComponent implements OnDestroy {
                     aula_Id: this.object.aula_Id,
                     professor_Id: this.object.professor_Id as number,
                     registros: this.object.alunos.map(x => ({
-                        aula_Aluno_Id: x.aula_Id,
+                        aula_Aluno_Id: x.id,
                         presente: x.presente,
                         apostila_Abaco_Id: x.apostila_Abaco_Id,
                         numero_Pagina_Abaco: x.numeroPaginaAbaco,
@@ -619,6 +619,11 @@ export class AulaComponent implements OnDestroy {
             .catch(res => {
                 this.loadingChecklist = false;
             })
+    }
+
+
+    inputFocus(e: any) {
+        e.target.select()
     }
 
     getChecklist(id: number, aluno: CalendarioAluno) {

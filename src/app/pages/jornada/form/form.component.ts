@@ -30,6 +30,11 @@ export class FormComponent implements OnDestroy {
     totalSize : number = 0;
     totalSizePercent : number = 0;
 
+    jornadas: Jornada[] = [];
+    loadingJornada: boolean = false;
+
+    invalidDates: Date[] = [];
+
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -39,7 +44,13 @@ export class FormComponent implements OnDestroy {
         private toastrService: ToastrService,
         private config: PrimeNG
     ) {
+
+        var list = this.service.list.subscribe(res => this.jornadas = res);
+        this.subscription.push(list);
+
         this.loadPage();
+
+        this.getInvalidDates();
 
     }
     ngOnDestroy(): void {
@@ -116,17 +127,39 @@ export class FormComponent implements OnDestroy {
         })
     }
 
-    async validateDate(ngModel: NgModel) {
-        if (this.service.list.value.length == 0) {
-            await this.service.getList().subscribe()
+
+    async getInvalidDates() {
+        console.log('getInvalidDates', this.isEditPage)
+        if(this.isEditPage == false) {
+            if (this.jornadas.length == 0) {
+                this.loadingJornada = true;
+                await lastValueFrom(this.service.getList()).then(res => this.jornadas = res);
+                this.loadingJornada = false;
+            }
+    
+            this.jornadas.forEach(jornada => {
+                var data = new Date(jornada.dataInicio);
+                console.log('jornada', jornada)
+                console.log(data, '<= ', jornada.dataFim, data <= jornada.dataFim)
+    
+                while(moment(data).isSameOrBefore(jornada.dataFim, 'date') ) {
+                    console.log('data', data)
+                    this.invalidDates.push(data);
+                    data = moment(data).add(1, 'day').toDate();
+                }
+            })
         }
 
-        var list = this.service.list.value.map(x => {
-            x.dataInicio = new Date(x.dataInicio.toDateString());
-            x.dataFim = new Date(x.dataFim.toDateString());
-            return x
-        });
-        list = list.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
+    }
+
+    async validateDate(ngModel: NgModel) {
+        if (this.jornadas.length == 0) {
+            this.loadingJornada = true;
+            await lastValueFrom(this.service.getList()).then(res => this.jornadas = res);
+            this.loadingJornada = false;
+        }
+
+        var list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
         var data = moment(ngModel.value).toDate()
         var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim);
         
@@ -172,6 +205,7 @@ export class FormComponent implements OnDestroy {
                 this.loading = false;
                 if (res.success) {
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
+                    res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();

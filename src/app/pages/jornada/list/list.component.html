@@ -5,8 +5,6 @@
             <span class="text-xl font-normal">Jornada Supera <span *ngIf="currentTitle" class="font-bold text-xl"> - {{currentTitle}}</span></span>
         </h2>
     </div>
-    <!-- <div class="p-toolbar-group-center"></div>
-     -->
     <div class="p-toolbar-group-end items-stretch">
         <p-button icon="pi pi-angle-left text-sm" (onClick)="prev()" severity="secondary" tooltip="Próximo" class="mr-2" size="small" />
         <p-button icon="pi pi-angle-right text-sm" (onClick)="next()" severity="secondary" tooltip="Anterior" class="mr-2" size="small" />
@@ -21,22 +19,16 @@
                #fullCalendar
                class="p-1 "
                [ngStyle]="{height: '30rem'}">
-    <!-- <ng-template #dayHeaderContent let-arg> 
-        
-        <div>
-            <p>{{arg.date | date : 'EEE dd/MMM' : 'pt-BR'}}</p>
-        </div>
-        
-    </ng-template> -->
     <ng-template #eventContent let-arg>
         <ng-container *ngIf="!loading; else loadingEvent">
-            <a (contextmenu)="contextMenuShow(contextMenu, arg.event.extendedProps, $event)">
+            <!-- (click)="contextMenuShow(contextMenu, arg.event.extendedProps, $event)" -->
+            <a class="cursor-pointer" (click)="edit(arg.event.extendedProps)" title="Clique para ver mais" >
                 <div class="border-round-md  p-2 h-full w-full -mt-2 -mb-3 m-1 mr-2" 
                         [style]="{ 
                         height: 'calc(3rem + 10vh)',
-                        backgroundColor: arg.event.extendedProps.corLegenda, 
-                        borderColor: arg.event.extendedProps.corLegenda,
-                        color: getForeColor(arg.event.extendedProps.corLegenda)
+                        backgroundColor: arg.event.extendedProps.corLegenda ?? '#000', 
+                        borderColor: arg.event.extendedProps.corLegenda ?? '#000',
+                        color: getForeColor(arg.event.extendedProps.corLegenda ?? '#000')
                     }">
                     <p class="text-sm ">
                         <i class="pi pi-calendar mr-2 text-sm"></i>

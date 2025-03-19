@@ -126,7 +126,6 @@ export class ListComponent implements OnDestroy {
         ];
     }
 
-
     clear(dt: Table) {
         this.tableSearch = '';
         dt.clear();

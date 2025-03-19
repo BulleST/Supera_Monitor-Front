@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
-import { Jornada, jornadas } from '../../../models/jornada.model';
+import { Jornada } from '../../../models/jornada.model';
 import { JornadaService } from '../../../services/jornada.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import 'moment/locale/pt-br'
@@ -41,38 +41,14 @@ export class ListComponent implements OnDestroy, AfterViewInit {
             dayGridPlugin,
             multiMonthPlugin
         ],
-        startParam: '2025-01-01',
         dayHeaders: true,
         weekends: false,
-        // weekNumberCalculation: (m: Date) => {
-        //     const weekNumber = this.getDateWeek(m, new Date(2025, 1, 10));
-        //     return weekNumber;
-        // },
         height: '438px',
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
         defaultAllDay: false,
-        allDaySlot: false,
         dayHeaderFormat: {weekday: 'long'},
-        customButtons: {
-            // atualizar: {
-            //     text: 'atualizar',
-            //     hint: 'atualizar',
-            //     click: () => {
-            //         this.update();
-            //         // this.getCalendario({}, 'atualizar')
-            //     }
-            // },
-            // cadastrar: {
-            //     text: 'cadastrar',
-            //     hint: 'cadastrar',
-            //     click: () => {
-            //         this.router.navigate(['jornada', 'cadastrar'])
-            //     }
-            // }
-
-        },
         headerToolbar: {
             left: '',
             center: '',
@@ -93,19 +69,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
             day: 'dia',
             list: 'lista'
         },
-        // titleFormat: (arg: VerboseFormattingArg) => {
-        //     // const weekNumber = this.getDateWeek(arg.start.marker, new Date(2025, 1, 10));
-        //     return [`Jornada Superaaaaa <b></b>`]
-        // },
         weekNumbers: false,
-        // weekNumberContent: (arg) => {
-
-        //     var date = moment(arg.date).add(1, 'day').toDate()
-        //     var jornada = this.calendarioList.find(x => x.dataInicio.toLocaleDateString() == date.toLocaleDateString())
-        //     console.log('jornada', jornada)
-
-        //     return  jornada ? 'Semana ' + jornada.semana : '';
-        // },
         lazyFetching: true,
         datesSet: this.datesSet.bind(this),
         // dateClick: this.dateClick.bind(this),
@@ -126,7 +90,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         private crypto: Crypto,
     ) {
 
-        this.calendarioList = jornadas;
+        this.calendarioList = [];
 
         this.setCalendario();
         var screen = this.mobileService.get().subscribe(res => {
@@ -174,15 +138,13 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
     update() {
         this.loading = true;
-        this.service.getList().subscribe({
-            next: res => {
-                this.loading = false;
-                this.calendarioList = res;
-                this.setCalendario();
-            },
-            error: res => {
-                this.loading = false;
-            },
+        lastValueFrom(this.service.getList())
+        .then(res => {
+            this.loading = false;
+            this.calendarioList = res;
+            this.setCalendario();
+        }).catch(res => {
+            this.loading = false;
         })
     }
 
@@ -273,7 +235,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1)
         this.fullCalendar.getApi().updateSize();
         this.loading = true;
-        this.calendarioList = jornadas;
+        this.calendarioList = [];
         this.setCalendario();
         this.loading = false;
 

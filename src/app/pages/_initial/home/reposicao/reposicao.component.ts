@@ -47,7 +47,7 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
 
     calendarioOptions: CalendarOptions = {
-        initialView: 'multiMonthYear',
+        initialView: 'dayGridMonth',
         themeSystem: 'standard',
         locale: 'pt-BR',
         plugins: [
@@ -55,13 +55,13 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
             multiMonthPlugin
         ],
         dayMaxEvents: 3,
-        multiMonthMaxColumns: 1,// force a single column,
-        views: {
-            multiMonthFourMonth: {
-                type: 'multiMonth',
-                duration: { months: 4 }
-            }
-        },
+        // multiMonthMaxColumns: 1,// force a single column,
+        // views: {
+        //     multiMonthFourMonth: {
+        //         type: 'multiMonth',
+        //         duration: { months: 4 }
+        //     }
+        // },
         dayHeaders: true,
         weekends: false,
         expandRows: true,
@@ -244,10 +244,10 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
                 id: this.eventRamdomId(),
                 backgroundColor: 'transparent',
                 borderColor: 'transparent',
-                title: item.descricao,
+                title: item.turma ?? item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                data: item,
+                extendedProps: item,
             }
             return event;
         });
@@ -317,9 +317,11 @@ export class ReposicaoComponent implements OnDestroy, AfterViewInit {
 
 
     eventClick(e: EventClickArg) {
+        var item = e.event.extendedProps as CalendarioAula;
+
         this.confirmationService.confirm({
             target: e.jsEvent.target ?? undefined,
-            message: `Selecionar aula do dia <b class="text-primary-500">${moment(e.event.start).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${e.event.extendedProps['data'].turma}</b> com o professor <b>${e.event.extendedProps['data'].professor}</b>?`,
+            message: `Selecionar aula do dia <b class="text-primary-500">${moment(e.event.start).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${item.turma}</b> com o professor <b>${item.professor}</b>?`,
             header: 'Selecionar aula',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',

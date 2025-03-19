@@ -17,10 +17,14 @@ export class TurmaService extends Service {
     getList() {
         return this.http.get<Turma[]>(`${this.url}/turmas/all/`)
             .pipe(tap({
-                next: list => {
+                next: list => {                    
+                    
+                    var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
                     list.map(x => {
                         x.perfilCognitivoString = x.perfilCognitivo.map(x => x.nome).join(', ');
                         x.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + x.horario);
+                        x.diasDeAulaString = semana[x.diaSemana] + ' às ' + moment(x.horario).format('HH[h]mm')
+                        x.salaDeAulaString = (x.numeroSala ?? 0) + ' ' + (x.andar ?? 0) + 'º andar'
                         return x;
                     })
 

@@ -1,15 +1,13 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
-import { calendarioList, CalendarioAula, CalendarioRequest, CalendarioView } from '../models/calendario.model';
+import { CalendarioAula, CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import { Service } from '../helpers/service.service';
 import { AulaCreateRequest, AulaEditRequest } from '../models/aulas.model';
 import { ChamadaRequest } from '../models/chamada.model';
 import moment from 'moment';
 import { ReagendarAulaRequest, ReposicaoAluno } from '../models/reposicao.model';
 import { getError } from '../utils';
-import { Aluno_CheckList_Item } from '../models/checklist.model';
-
 
 
 @Injectable({

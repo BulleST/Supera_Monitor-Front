@@ -146,11 +146,12 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-12"> <!-- Professor -->
+            <div class="field sm:col-8 col-12"> <!-- Professor -->
                 <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
                           [(ngModel)]="object.professor_Id"
+                          [loading]="loadingProfessores"
                           (onChange)="professorChanged($event)"
                           #professor_Id="ngModel"
                           styleClass="w-full"
@@ -186,6 +187,48 @@
                 <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Professor indisponível.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Sala de Aula -->
+                <label for="sala_Id">Sala de Aula: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="salaAula"
+                          [(ngModel)]="object.sala_Id"
+                          [loading]="loadingSalaAula"
+                          (onChange)="salaAulaChanged($event)"
+                          #sala_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="sala_Id"
+                          inputId="sala_Id"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                          <ng-template #selectedItem let-selectedOption>
+                           {{selectedOption.numeroSala}} - {{selectedOption.andar}}º andar
+                        </ng-template>
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1">
+                                    <span class="mr-2">{{ item.numeroSala }} - {{ item.andar }}º andar</span>
+                                    <p-badge *ngIf="item.disponivel == false" value="Indisponível" severity="danger" />
+                                </p>
+                            </div>
+                            <!-- <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" /> -->
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Professor indisponível.</p>
                 </div>
             </div>
         </div>

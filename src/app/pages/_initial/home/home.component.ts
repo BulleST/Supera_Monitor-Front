@@ -23,9 +23,12 @@ import { FullCalendarComponent } from '@fullcalendar/angular';
 import { AlunoService } from '../../../services/alunos.service';
 import { AulaCreateRequest } from '../../../models/aulas.model';
 import { ToastrService } from 'ngx-toastr';
-import { Jornada, jornadas } from '../../../models/jornada.model';
+import { Jornada } from '../../../models/jornada.model';
 import { SelectedAulaComponent } from './selected-aula/selected-aula.component';
 import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
+import { ListaEsperaRequest } from '../../../models/lista-espera.model';
+import { ListaEsperaService } from '../../../services/lista-espera.service';
+import { JornadaService } from '../../../services/jornada.service';
 
 moment.locale('pt-br')
 
@@ -55,6 +58,9 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     viewMenu: MenuItem[] = [];
     // view: 'meuCalendario' | 'calendarioGeral' = 'calendarioGeral';
     view: CalendarioView = CalendarioView.MeuCalendario;
+
+    jornadas: Jornada[] = [];
+    loadingJornada = false;
 
     currentJornada?: Jornada;
     currentTitle = '';
@@ -112,6 +118,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         private service: AulaService,
         private alunoService: AlunoService,
         private accountService: AccountService,
+        private listaEsperaService: ListaEsperaService,
+        private jornadaService: JornadaService,
         private mobileService: MobileService,
         private toastrService: ToastrService,
     ) {
@@ -136,6 +144,9 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
 
         var account = this.accountService.account.subscribe(res => this.account = res);
         this.subscription.push(account);
+
+        var jornadas = this.jornadaService.list.subscribe(res => this.jornadas = res);
+        this.subscription.push(jornadas);
 
         var calendarioReload = this.service.calendarioReload.subscribe(res => {
             this.getCalendario(this.calendarioRequest, 'calendarioReload');
@@ -162,6 +173,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
 
 
     update() {
+        this.unselectAula();
         this.getCalendario(this.calendarioRequest, 'atualizar');
     }
 
@@ -315,6 +327,8 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     async datesSet(arg: DatesSetArg) {
+        this.unselectAula();
+        
         this.loading = true;
 
         this.currentTitle = moment(arg.start).locale('pt').format('MMMM [de] YYYY');
@@ -348,11 +362,23 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 item.reposicaoDe_Aula = res;
             })
         }
+
+        if (item.aula_Id != PseudoAula.AulaId) {
+            await lastValueFrom(this.listaEsperaService.getList(item.aula_Id))
+        }
+
+
         this.selectedAula = item;
         this.selectedAulaComponent.selectedAula = item;
         this.selectedAulaComponent.showPopover(e);
 
         console.log('selectedAula 1', this.selectedAula)
+    }
+
+    unselectAula() {
+        this.selectedAula = undefined;
+        this.selectedAulaComponent.selectedAula = undefined;
+        this.selectedAulaComponent.hidePopover();
     }
 
     eventMouseEnter(e: EventHoveringArg) {
@@ -372,6 +398,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     cdkCancelDrag(where: string) {
+        console.log('cdkCancelDrag', where)
         this.cdkDragCancel = true;
         this.cdkEventItensId.forEach(id => {
             $('#' + id).removeClass('scalein animation-duration-200 animation-iteration-1')
@@ -380,7 +407,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
     }
 
     cdkDrop(event: CdkDragDrop<CalendarioAluno[]>, target: CalendarioAula) {
-        
+        console.log('cdkDrop', this.cdkDragCancel, this.selectedAula)
         if (this.cdkDragCancel) {
             return;
         }
@@ -388,7 +415,11 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         if (!this.selectedAula) {
             return;
         }
-
+        if (target.finalizada) {
+            document.dispatchEvent(new Event('mouseup'));
+            this.cdkCancelDrag('keyup');
+            return this.showError('Não autorizado', 'Essa aula já foi finalizada.', event.event);
+        }
 
         if (event.previousContainer != event.container) {
 
@@ -421,6 +452,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 
                 this.agendaReposicaoConffirm(event.event, event.item.data, source, target);
             }
+            this.cdkCancelDrag('keyup')
         }
     }
 
@@ -456,7 +488,7 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             header: 'Aula cheia',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
-            acceptLabel: 'Agendar',
+            acceptLabel: 'Lista de espera',
             acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
@@ -470,13 +502,62 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
         });
     }
 
-    alunoListaEspera(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+    async alunoListaEspera(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
+        this.loading = true;
+        var request: ListaEsperaRequest = new ListaEsperaRequest;
+        request.aluno_Id = aluno.aluno_Id;
 
+        // Se a aula source não existir, cria a aula
+        if (source.aula_Id == PseudoAula.AulaId) {
+            var aulaRequest: AulaCreateRequest = {
+                sala_Id: source.sala_Id,
+                turma_Id: source.turma_Id ?? 0,
+                professor_Id: source.professor_Id,
+                data: moment(source.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                observacao: '',
+                perfilCognitivo: source.perfilCognitivo
+            }
+            await lastValueFrom(this.service.create(aulaRequest))
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível inserir aluno na lista de espera. \n (Aula source não foi inserida). \n ${getError(res)}`, e));
+        }
+
+        // Se a aula target não existir, cria a aula
+        if (target.aula_Id == PseudoAula.AulaId) {
+            var aulaRequest: AulaCreateRequest = {
+                sala_Id: target.sala_Id,
+                turma_Id: target.turma_Id ?? 0,
+                professor_Id: target.professor_Id,
+                data: moment(target.data).format('YYYY-MM-DD[T]HH:mm:ss') as unknown as Date,
+                observacao: '',
+                perfilCognitivo: target.perfilCognitivo
+            }
+
+            await lastValueFrom(this.service.create(aulaRequest))
+                .then(res => request.aula_Id = res.object.aula_Id)
+                .catch(res => this.showError('Ocorreu um erro', `Não foi possível inserir aluno na lista de espera. \n (Aula target não foi inserida). \n ${getError(res)}`, e));
+
+        } else {
+            request.aula_Id = target.aula_Id;
+        }
+
+        
+        await lastValueFrom(this.listaEsperaService.inserirAlunoListaEspera(request))
+            .then(res => {
+                this.loading = false;
+                this.selectedAulaComponent.hidePopover();
+                this.selectedAula = undefined;
+
+                // this.getCalendario(this.calendarioRequest, 'agendarReposicao');
+                // this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
+            })
+            .catch(res => {
+                this.loading = false;
+                this.showError('Ocorreu um erro', `Não foi possível inserir aluno na lista de espera. \n ${getError(res)}`, e)
+            })
     }
 
     agendaReposicaoConffirm(e: any, aluno: CalendarioAluno, source: CalendarioAula, target: CalendarioAula) {
-        console.log('source', source)
-        console.log('target', target)
+      
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendar reposição do aluno(a) <b>${aluno.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
@@ -493,15 +574,17 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
                 this.agendaReposicao(e, aluno.aluno_Id, source, target);
             },
             reject: () => {
+                this.cdkCancelDrag('keyup')
             }
         });
+        this.cdkCancelDrag('keyup')
     }
 
     async agendaReposicao(e: any, aluno_Id: number, source: CalendarioAula, target: CalendarioAula) {
 
         this.loading = true;
-        var reposicaoRequest = new ReposicaoAlunoRequest;
-        reposicaoRequest.aluno_Id = aluno_Id;
+        var request = new ReposicaoAlunoRequest;
+        request.aluno_Id = aluno_Id;
 
         // Se a aula source não existir, cria a aula
         if (source.aula_Id == PseudoAula.AulaId) {
@@ -515,12 +598,12 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             }
 
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.source_Aula_Id = res.object.aula_Id)
+                .then(res => request.source_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula source não foi inserida). \n ${getError(res)}`, e));
 
         }
         else {
-            reposicaoRequest.source_Aula_Id = source.aula_Id;
+            request.source_Aula_Id = source.aula_Id;
         }
 
         // Se a aula target não existir, cria a aula
@@ -535,16 +618,16 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             }
 
             await lastValueFrom(this.service.create(aulaRequest))
-                .then(res => reposicaoRequest.dest_Aula_Id = res.object.aula_Id)
+                .then(res => request.dest_Aula_Id = res.object.aula_Id)
                 .catch(res => this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n (Aula target não foi inserida). \n ${getError(res)}`, e));
 
         } else {
-            reposicaoRequest.dest_Aula_Id = target.aula_Id;
+            request.dest_Aula_Id = target.aula_Id;
         }
 
         this.getCalendario(this.calendarioRequest, 'agendarReposicao');
     
-        await lastValueFrom(this.alunoService.reposicao(reposicaoRequest))
+        await lastValueFrom(this.alunoService.reposicao(request))
             .then(res => {
                 this.loading = false;
                 this.selectedAulaComponent.hidePopover();
@@ -559,23 +642,30 @@ export class HomeComponent implements OnDestroy, AfterViewInit {
             })
     }
 
-    getTemaSemana(arg: any) {
-
-        var list: Jornada[] = JSON.parse(JSON.stringify(jornadas));
-        list = list.map(x => {
+    async getTemaSemana(arg: any) {
+        if (this.jornadas.length == 0) {
+            this.loadingJornada = true;
+            await lastValueFrom(this.jornadaService.getList())
+            .then(res => this.jornadas = res);
+            this.loadingJornada = false;
+        }
+        // var list: Jornada[] = JSON.parse(JSON.stringify(this.jornadas));
+        this.jornadas = this.jornadas.map(x => {
             x.dataInicio = new Date(new Date(x.dataInicio).toDateString());
             x.dataFim = new Date(new Date(x.dataFim).toDateString());
             return x
         })
-        list.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0);
+        this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0);
         var data = moment(arg.start, 'YYYY-MM-DD').toDate();
 
-        var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim );
+        var existe = this.jornadas.find(x => data >= x.dataInicio && data <= x.dataFim );
         this.currentJornada = existe;
 
     }
 
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
+        if (!perfilCognitivo || perfilCognitivo.length == 0)
+            return '';
         return perfilCognitivo.map(x => x.nome).join(', ');
     }
 

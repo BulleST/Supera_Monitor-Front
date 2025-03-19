@@ -9,7 +9,7 @@
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '1000px', maxWidth: '95vw', maxHeight: '95vh' }"
+          [style]="{ width: '1200px', maxWidth: '95vw', maxHeight: '95vh' }"
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
@@ -166,6 +166,7 @@
                             <th class="w-10rem"><span class="pl-2">Apostila AH</span></th>
                             <th class="w-5rem">Página</th>
                             <th class="w-4rem">Presença</th>
+                            <th class="w-4rem">Observação</th>
                         </tr>
                     </ng-template>
                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
@@ -253,7 +254,7 @@
                                     <p class="text-lg font-medium mt-1 mb-0"><b>Turma: </b>{{ item.turma }} </p>
                                     <p *ngIf="item.apostila_Abaco" class="text-lg font-medium mt-1 mb-0"><b>Apostila Ábaco: </b>{{ item.apostila_Abaco }} / <b>Página: </b>{{ item.numeroPaginaAbaco }}</p>
                                     <p *ngIf="item.apostila_AH" class="text-lg font-medium mt-1 mb-0"><b>Apostila AH: </b>{{ item.apostila_AH }} / <b>Página: </b>{{ item.numeroPaginaAH }}</p>
-                                    <div>
+                                    <!-- <div>
                                         <p class="text-lg font-medium mt-1 mb-0"><b>Observações: </b></p>
                                         <ng-template #observacaoEditavel>
                                             <textarea
@@ -264,12 +265,13 @@
                                                       id="observacao"
                                                       name="observacao"
                                                       class="w-full"
-                                                      rows="3"></textarea></ng-template>
+                                                      rows="3"></textarea>
+                                            </ng-template>
                                         <ng-template [ngIf]="item.finalizada" [ngIfElse]="observacaoEditavel">
                                             <p class="text-base my-2 text-400" *ngIf=" item.observacao">{{ item.observacao  }}</p>
                                             <p class="text-base my-2 text-400" *ngIf="!item.observacao">Nenhuma observação...</p>
                                         </ng-template>
-                                    </div>
+                                    </div> -->
                                     <div class="flex align-items-center gap-2 mt-2 ">
                                         <p-button label="Ver aluno"
                                                   [rounded]="true"
@@ -298,6 +300,7 @@
                                     <img [src]="item.aluno_Foto" *ngIf="item.aluno_Foto">
                                 </span>
                             </td>
+                            <!-- Nome -->
                             <td (click)="displayPopoverAluno($event, item)" class="cursor-pointer">
                                 <div class="flex w-full p-button-link">
                                     <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.aluno">{{ item.aluno }}</span>
@@ -305,6 +308,7 @@
                                     <p-badge *ngIf="item.flagNovo" styleClass="ml-2 " value="Aula 1" size="small"></p-badge>
                                 </div>
                             </td>
+                            <!-- checklist -->
                             <td (click)="loadingChecklist ? undefined : popoverChecklist.show($event)" class="cursor-pointer">
                                 <div class="flex align-items-center gap-2 white-space-nowrap">
                                     <span >{{item.checklist }}</span>
@@ -336,6 +340,7 @@
                                     </ng-template>
                                 </div>
                             </td>
+                            <!-- apostila_Abaco -->
                             <td [pEditableColumn]="item.apostila_Abaco"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="apostila_Abaco"
@@ -365,6 +370,7 @@
                                     <ng-template #output> <span class="pl-2"> {{ item.apostila_Abaco }}</span> </ng-template>
                                 </p-cellEditor>
                             </td>
+                            <!-- numeroPaginaAbaco -->
                             <td [pEditableColumn]="item.numeroPaginaAbaco"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="numeroPaginaAbaco"
@@ -376,6 +382,7 @@
                                                pInputText
                                                type="text"
                                                [(ngModel)]="item.numeroPaginaAbaco"
+                                               (focus)="inputFocus($event)"
                                                id="numeroPaginaAbaco"
                                                name="numeroPaginaAbaco"
                                                #numeroPaginaAbaco="ngModel"
@@ -385,6 +392,7 @@
                                     <ng-template #output> <span class="pl-2"> {{ item.numeroPaginaAbaco }}</span> </ng-template>
                                 </p-cellEditor>
                             </td>
+                            <!-- apostila_AH -->
                             <td [pEditableColumn]="item.apostila_AH"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="apostila_AH"
@@ -414,6 +422,7 @@
                                     <ng-template #output> <span class="pl-2"> {{ item.apostila_AH }}</span> </ng-template>
                                 </p-cellEditor>
                             </td>
+                            <!-- numeroPaginaAH -->
                             <td [pEditableColumn]="item.numeroPaginaAH"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="numeroPaginaAH"
@@ -427,12 +436,14 @@
                                                [(ngModel)]="item.numeroPaginaAH"
                                                id="numeroPaginaAH"
                                                name="numeroPaginaAH"
+                                               (focus)="inputFocus($event)"
                                                #numeroPaginaAH="ngModel"
                                                class="w-full  text-center" />
                                     </ng-template>
                                     <ng-template #output> {{ item.numeroPaginaAH }} </ng-template>
                                 </p-cellEditor>
                             </td>
+                            <!-- Presente -->
                             <td [pEditableColumn]="item.presente"
                                 [pEditableColumnDisabled]="!isChamadaPage"
                                 pEditableColumnField="presente"
@@ -458,6 +469,32 @@
                                                   [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
                                                   size="small"
                                                   styleClass="py-1 line-height-2" />
+                                    </ng-template>
+                                </p-cellEditor>
+                            </td>
+                            <!-- Observações -->
+                            <td [pEditableColumn]="item.observacao"
+                                [pEditableColumnDisabled]="!isChamadaPage"
+                                pEditableColumnField="observacao"
+                                class="w-5rem white-space-nowrap text-overflow-ellipsis"
+                                [class.cursor-default]="object.finalizada">
+                                <p-cellEditor>
+                                    <ng-template #input>
+                                        <textarea pTextarea
+                                                [autoResize]="true"
+                                                placeholder="Insira as observações..."
+                                                [(ngModel)]="item.observacao"
+                                                (focus)="inputFocus($event)"
+                                                id="observacao"
+                                                name="observacao"
+                                                class="w-full"
+                                                rows="1"></textarea>
+                                    </ng-template>
+                                    <ng-template #output> 
+                                        <span class="flex w-full white-space-nowrap text-overflow-ellipsis">
+                                            <span *ngIf="!item.observacao" class="text-400">Nenhuma observação</span> 
+                                            <span *ngIf="item.observacao">{{ item.observacao }}</span> 
+                                        </span>
                                     </ng-template>
                                 </p-cellEditor>
                             </td>

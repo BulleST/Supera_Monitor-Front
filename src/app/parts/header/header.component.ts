@@ -26,8 +26,8 @@ export class HeaderComponent implements OnDestroy {
 
     headerItem: MenuItem[] = [];
     subscription: Subscription[] = [];
-   
-    accountData:{name: string, abreviacao: string, email: string} | undefined;
+
+    accountData: { name: string, abreviacao: string, email: string } | undefined;
 
     Role: typeof Role = Role;
     @ViewChild('menuBig') menuBig?: Menubar;
@@ -60,68 +60,76 @@ export class HeaderComponent implements OnDestroy {
         // var navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
         // this.subscription.push(navigationItems);
         this.items = [
-                                    {
-                                        label: 'Calendário de Aulas',
-                                        tooltip: 'Calendário de Aulas',
-                                        iconFontawesome: faCalendar,
-                                        routerLink: ['home'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Monitoramento de Checklist',
-                                        tooltip: 'Monitoramento de Checklist',
-                                        iconFontawesome: faHome,
-                                        routerLink: ['checklist'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Jornada',
-                                        tooltip: 'Jornada',
-                                        icon: 'bi bi-calendar-range',
-                                        routerLink: ['jornada'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Alunos',
-                                        tooltip: 'Alunos',
-                                        iconFontawesome: faUserGraduate,
-                                        routerLink: ['alunos'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Professores',
-                                        tooltip: 'Professores',
-                                        iconFontawesome: faPersonChalkboard,
-                                        routerLink: ['professores'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Turmas',
-                                        tooltip: 'Turmas',
-                                        iconFontawesome: faUsersBetweenLines,
-                                        routerLink: ['turmas'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                                    {
-                                        label: 'Usuários',
-                                        tooltip: 'Usuários',
-                                        iconFontawesome: faUsers,
-                                        routerLink: ['usuarios'],
-                                        routerLinkActiveOptions: { exact: false },
-                                        routerLinkActive: 'active-link'
-                                    },
-                
-                            {
-                                label: 'Minha conta',
-                                routerLink: [],
-                            },
-            ]
+            {
+                label: 'Calendário de Aulas',
+                tooltip: 'Calendário de Aulas',
+                iconFontawesome: faCalendar,
+                routerLink: ['home'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Dashboard',
+                tooltip: 'Dashboard',
+                iconFontawesome: faCalendar,
+                routerLink: ['dashboard'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Monitoramento de Checklist',
+                tooltip: 'Monitoramento de Checklist',
+                iconFontawesome: faHome,
+                routerLink: ['checklist'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Jornada',
+                tooltip: 'Jornada',
+                icon: 'bi bi-calendar-range',
+                routerLink: ['jornada'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Alunos',
+                tooltip: 'Alunos',
+                iconFontawesome: faUserGraduate,
+                routerLink: ['alunos'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Professores',
+                tooltip: 'Professores',
+                iconFontawesome: faPersonChalkboard,
+                routerLink: ['professores'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Turmas',
+                tooltip: 'Turmas',
+                iconFontawesome: faUsersBetweenLines,
+                routerLink: ['turmas'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+            {
+                label: 'Usuários',
+                tooltip: 'Usuários',
+                iconFontawesome: faUsers,
+                routerLink: ['usuarios'],
+                routerLinkActiveOptions: { exact: false },
+                routerLinkActive: 'active-link'
+            },
+
+            {
+                label: 'Minha conta',
+                routerLink: [],
+            },
+        ]
 
         this.setModal();
     }
@@ -130,7 +138,7 @@ export class HeaderComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
-    
+
 
     setModal() {
 
@@ -171,7 +179,7 @@ export class HeaderComponent implements OnDestroy {
         else {
 
         }
-        
+
     }
 
 }

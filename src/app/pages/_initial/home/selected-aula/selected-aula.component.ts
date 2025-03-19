@@ -62,18 +62,21 @@ export class SelectedAulaComponent implements OnChanges {
     }
 
     cdkDragStarted(e: CdkDragStart) {
+        console.log('cdkDropListExited')
         this.cdkDragCancel = false;
         this.cdkDragCancelChange.emit(false);
         this.popoverSelectedAula.hide();
     }
 
     cdkDropListExited(e: CdkDragExit) {
+        console.log('cdkDropListExited')
         this.cdkDragCancelChange.emit(false);
         this.cdkDragCancel = false;
     }
 
     cdkDragEntered(e: CdkDragEnter) {
         this.cdkDragCancelChange.emit(false);
+        console.log('cdkDragEntered')
         this.cdkDragCancel = false;
         $(e.container.element.nativeElement).not('#alunos').addClass('scalein animation-duration-200 animation-iteration-1')
         $(e.container.element.nativeElement).not('#alunos').addClass('shadow-2 border-3 border-red-500')
@@ -81,6 +84,7 @@ export class SelectedAulaComponent implements OnChanges {
 
     cdkDragExited(e: CdkDragExit) {
         this.cdkDragCancelChange.emit(false);
+        console.log('cdkDragExited')
         this.cdkDragCancel = false;
         $(e.container.element.nativeElement).removeClass('scalein animation-duration-200 animation-iteration-1')
         $(e.container.element.nativeElement).removeClass('shadow-2 border-3 border-red-500')
@@ -141,15 +145,10 @@ export class SelectedAulaComponent implements OnChanges {
 
                 await lastValueFrom(this.service.create(aulaRequest))
                     .then(res => {
-                        this.selectedAula!.aula_Id = res.object.aula_Id
-                        this.selectedAula!.alunos = this.selectedAula!.alunos.map(aluno => {
-                            aluno.aula_Id = this.selectedAula!.aula_Id;
-                            return aluno;
-                        })
+                        this.selectedAula = res.object;
                         console.log('selectedAula 3', this.selectedAula)
                     })
                     .catch(res => this.showError('Ocorreu um erro', `Não foi possível visualizar detalhes \n ${getError(res)}`, e));
-
             }
 
 
