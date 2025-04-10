@@ -53,10 +53,12 @@ export var userColumns: ColumnTable[] = [
     },
     {
         field: 'phone',
-        label: 'Telefone/Celular',
+        label: 'Celular',
         filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
+        displayType: DisplayType.mask,
+        options: {
+            format: '+99 (99) 9.9999-9999'
+        },
     },
     {
         field: 'role',

@@ -1,8 +1,4 @@
-<p-confirmdialog styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
-    </ng-template>
-</p-confirmdialog>
+<app-confirm-dialog></app-confirm-dialog>
 <p-menu [model]="items"
         styleClass="border-none bg-white shadow-1  border-round-md min-w-0 ">
     <ng-template #start>
@@ -24,7 +20,7 @@
     </ng-template>
     <ng-template #item let-item>
         <a pRipple [routerLink]="item.routerLink" [routerLinkActive]="item.routerLinkActive"
-           class="p-menu-item-link flex align-items-center justify-content-center" [pTooltip]="item.tooltip">
+           class="p-menu-item-link flex align-items-center justify-content-center" [pTooltip]="item.pTooltip">
             <span class="p-menu-item-icon">
                 <ng-template [ngIf]="item.iconImage">
                     <img src="./../../.assets/images/{{item.iconImage}}" alt="{{item.iconImage}}">

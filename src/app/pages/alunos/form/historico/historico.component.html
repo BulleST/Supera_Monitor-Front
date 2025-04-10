@@ -1,0 +1,42 @@
+<div class="flex align-items-center gap-2">
+    <h3 class="text-primary-500 text-xl font-bold">Histórico do aluno</h3>
+    <p-button icon="pi pi-sync text-sm" 
+        (onClick)="update()" 
+        [text]="true" 
+        pTooltip="Atualizar histórico"
+        size="small"  />
+</div>
+
+<table class="mt-2 w-full">
+    <ng-template [ngIf]="!loading && list.length > 0">
+        <tr *ngFor="let item of list" class="flex mb-2 shadow-1">
+            <td class="p-3 pr-1 bg-white ">
+                <div class="pl-2 text-primary-500"><i class="pi pi-clock"></i> <!--•--></div>
+            </td>
+            <td class="p-3 bg-white ">
+                <div class="font-bold white-space-nowrap">{{item.data | date : 'dd/MM/yyyy HH:mm'}}</div>
+            </td>
+            <!-- <td clp-3 ass="bg-white font-bold px-2 white-space-nowrap">{{getFormating(item.data)}}</td> -->
+            <td class="p-3 bg-white flex-1">
+                <div class="mx-2">{{item.descricao}}</div>
+            </td>
+            <td class="p-3 bg-white ml-auto">
+                <div class="pr-2 white-space-nowrap">Realizado por {{item.account_Created}}</div>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template [ngIf]="!loading && list.length == 0">
+        <tr>
+            <td class="text-400 font-medium">Nenhum histórico.</td>
+        </tr>
+    </ng-template>
+    <ng-template [ngIf]="loading">
+        <tr>
+            <td class="text-primary-500 font-bold">
+                <span class="fadeout animation-duration-300 animation-iteration-infinite">Carregando...</span>
+            </td>
+        </tr>
+    </ng-template>
+    
+
+</table>

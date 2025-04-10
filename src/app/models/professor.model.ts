@@ -1,7 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
-import { CalendarioAula as CalendarioAula } from "./calendario.model";
-import { Turma } from "./turma.model";
+import { Evento } from "./evento.model";
 
 export class Professor extends Basic_List {
     nome: string = '';
@@ -16,7 +15,7 @@ export class Professor extends Basic_List {
 
     // Não mapeados
     disponivel?: boolean;
-    disponivelEvent?: CalendarioAula;
+    disponivelEvent?: Evento;
     // const getAge = birthDate => Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e+10)
 }
 
@@ -71,10 +70,12 @@ export var professorColumns: ColumnTable[] = [
     },
     {
         field: 'telefone',
-        label: 'Telefone/Celular',
+        label: 'Celular',
         filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
+        displayType: DisplayType.mask,
+        options: {
+            format: '+99 (99) 9.9999-9999'
+        },
     },
     {
         field: 'dataInicio',

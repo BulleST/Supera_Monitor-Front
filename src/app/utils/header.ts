@@ -3,15 +3,12 @@ import { faCalendar, faHome, faPersonChalkboard, faUserGraduate, faUsers, faUser
 import { MenuItem } from "primeng/api";
 import { BehaviorSubject } from "rxjs";
 import { AccountService } from "../services/account.service";
-// import * as $ from 'jquery';
-// import { Crypto } from "./crypto";
-// import { Table } from "./table";
 
 @Injectable({
     providedIn: 'root'
 })
 export class Header {
-    menuAsideOpen = new BehaviorSubject<boolean>(true);
+    menuAsideOpen = new BehaviorSubject<boolean>(false);
     minhaContaOpen = new BehaviorSubject<boolean>(false);
     sidebarWidth = new BehaviorSubject<any>(undefined);    
     accountData = new BehaviorSubject<{name: string, abreviacao: string, email: string} | undefined>(undefined);    
@@ -23,25 +20,45 @@ export class Header {
                                 label: 'Calendário de Aulas',
                                 tooltip: 'Calendário de Aulas',
                                 iconFontawesome: faCalendar,
-                                routerLink: '/home',
+                                routerLink: '/calendario',
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                             {
-                                label: 'Monitoramento de Checklist',
-                                tooltip: 'Monitoramento de Checklist',
-                                iconFontawesome: faHome,
-                                routerLink: '/checklist',
+                                label: 'Dashboard',
+                                tooltip: 'Dashboard',
+                                iconFontawesome: faCalendar,
+                                routerLink: ['dashboard'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                             {
-                                label: 'Jornada',
-                                tooltip: 'Jornada',
+                                label: 'Jornada Supera',
+                                tooltip: 'Jornada Supera',
+                                icon: 'pi pi-check-square',
+                                routerLink: '/jornada-supera',
+                                routerLinkActiveOptions: { exact: false },
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
+                            },
+                            {
+                                label: 'Roteiro',
+                                tooltip: 'Roteiro',
                                 icon: 'bi bi-calendar-range',
-                                routerLink: ['jornada'],
+                                routerLink: ['roteiro'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                         ]
                     },
@@ -54,15 +71,21 @@ export class Header {
                                 iconFontawesome: faUserGraduate,
                                 routerLink: ['alunos'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                             {
-                                label: 'Professores',
-                                tooltip: 'Professores',
+                                label: 'Educadores',
+                                tooltip: 'Educadores',
                                 iconFontawesome: faPersonChalkboard,
-                                routerLink: ['professores'],
+                                routerLink: ['educadores'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                             {
                                 label: 'Turmas',
@@ -70,7 +93,10 @@ export class Header {
                                 iconFontawesome: faUsersBetweenLines,
                                 routerLink: ['turmas'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
                             {
                                 label: 'Usuários',
@@ -78,7 +104,10 @@ export class Header {
                                 iconFontawesome: faUsers,
                                 routerLink: ['usuarios'],
                                 routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link'
+                                routerLinkActive: 'active-link',
+                                command: e => {
+                                    this.menuAsideOpen.next(false);
+                                }
                             },
         
                         ]

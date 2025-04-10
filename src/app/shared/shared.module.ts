@@ -18,11 +18,14 @@ import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.c
 import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
 import { ChecklistComponent as AlunoChecklistComponent } from '../pages/alunos/form/checklist/checklist.component';
 import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-import { ReposicaoComponent } from '../pages/_initial/home/reposicao/reposicao.component';
-import { AulaComponent } from '../pages/_initial/home/aula/aula.component';
 import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos/form/restricoes/restricoes.component';
+import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/form/historico/historico.component';
+import { FaltasComponent as AlunoFaltasComponent } from '../pages/alunos/form/faltas/faltas.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 // End Alunos
-
+import { RouterModule } from '@angular/router';
+import { AgendarReposicaoAlunoComponent } from '../pages/calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
+import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 
 
 @NgModule({
@@ -36,10 +39,16 @@ import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos
         AlunoChecklistComponent,
         AlunoCalendarioComponent,
         AlunoRestricoesComponent,
+        AlunoHistoricoComponent,
+        AlunoFaltasComponent,
         // End Alunos
 
-        ReposicaoComponent,
-        AulaComponent,
+        // ReposicaoComponent,
+        // AulaComponent,
+
+        AgendarReposicaoAlunoComponent,
+        ConfirmDialogComponent,
+        SalaAulaComponent,
     ],
     exports: [
         FormsModule,
@@ -63,12 +72,15 @@ import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos
         AlunoCalendarioComponent,
         AlunoRestricoesComponent,
         // End Alunos
+        
+        AgendarReposicaoAlunoComponent,
+        ConfirmDialogComponent,
+        SalaAulaComponent,
 
-        ReposicaoComponent,
-        AulaComponent,
     ],
     imports: [
         CommonModule,
+        RouterModule,
         PrimengModule,
         FormsModule,
         ToastrModule.forRoot({ enableHtml: true }),
@@ -80,7 +92,7 @@ import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos
         DragDropModule,
         DragScrollComponent, 
         DragScrollItemDirective,
-        FullCalendarModule
+        FullCalendarModule,
     ],
     providers: [
         provideHttpClient(withFetch()),

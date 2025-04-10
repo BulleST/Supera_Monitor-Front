@@ -4,9 +4,7 @@ import { ContextMenu } from 'primeng/contextmenu';
 import { Sidebar } from 'primeng/sidebar';
 import { Subscription } from 'rxjs';
 import { Header } from '../../utils/header';
-import { faCalendar, faHome, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines, } from '@fortawesome/free-solid-svg-icons';
 import { AccountService } from '../../services/account.service';
-import { AccountResponse } from '../../models/account.model';
 
 @Component({
     selector: 'app-nav-menu',
@@ -34,6 +32,11 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
         private confirmationService: ConfirmationService,
     ) {
 
+        this.menuOpen = this.header.menuAsideOpen.value;
+
+        var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => this.menuOpen = res)
+        this.subscription.push(menuAsideOpen);
+
         var accountData = this.header.accountData.subscribe(res => this.accountData = res)
         this.subscription.push(accountData);
 
@@ -50,8 +53,7 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     }
 
     setMenu() {
-        this.menuOpen = !this.menuOpen;
-        this.header.menuAsideOpen.next(this.menuOpen);
+        this.header.menuAsideOpen.next(!this.menuOpen);
     }
 
 

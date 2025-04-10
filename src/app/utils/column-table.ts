@@ -26,6 +26,7 @@ export enum DisplayType {
     options = 'options',
     color = 'color',
     time = 'time',
+    mask = 'mask',
 }
 
 export enum FilterType {

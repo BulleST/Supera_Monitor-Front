@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Crypto, insertOrReplace } from '../../../utils';
@@ -14,9 +14,14 @@ import moment from 'moment';
 import { SelectChangeEvent } from 'primeng/select';
 import { PerfilCognitivoService } from '../../../services/perfil-cognitivo.services';
 import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
-import { AulaService } from '../../../services/aulas.service';
 import { SalaAulaService } from '../../../services/sala-aula.service';
-import { SalaAula } from '../../../models/sala-aula.model';
+import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
+import {  CalendarioRequest } from '../../../models/calendario.model';
+import { Evento } from '../../../models/evento.model';
+import { EventoService } from '../../../services/evento.service';
+import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
+import { validaProfessores, validaSalaAulas } from '../../../utils/validacao';
+import { PseudoEvento } from '../../../models/reposicao.model';
 
 @Component({
     selector: 'app-form',
@@ -27,15 +32,12 @@ import { SalaAula } from '../../../models/sala-aula.model';
 })
 export class FormComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
-    injector = inject(Injector);
-    object = new Turma;
+    object: Turma = new Turma;
     loading = false;
     error: string = '';
     isEditPage = false;
     subscription: Subscription[] = [];
-
-    @ViewChild('professor_Id') professorSelect!: NgModel;
-    @ViewChild('divForm') divForm!: HTMLElement;
+    SalaAulaId = SalaAulaId;
 
     diasSemana = [
         // { id: 0, label: 'Domingo' },
@@ -47,41 +49,75 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         { id: 6, label: 'Sábado' },
     ];
 
+    selectedPerfil?: PerfilCognitivo;
     perfisCognitivos: PerfilCognitivo[] = [];
-    loadingPerfisCognitivos = true;
+    loadingPerfisCognitivos = false;
 
     professores: Professor[] = [];
-    loadingProfessores = true;
+    loadingProfessores = false;
 
-    salaAula: SalaAula[] = [];
-    loadingSalaAula = true;
+    salaAulas: SalaAula[] = [];
+    loadingSalaAulas = false;
+
+    eventos: Evento[] = [];
+    loadingEventos = false;
+    
 
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private service: TurmaService,
-        private aulaService: AulaService,
         private professorService: ProfessorService,
         private perfilCognitivoService: PerfilCognitivoService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
         private salaAulaService: SalaAulaService,
+        private eventoService: EventoService,
+        private mensagemWhatsapp: MensagemWhatsapp
     ) {
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAula = res);
+        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        this.subscription.push(professores);
+
+        if (this.professores.length == 0){
+            this.loadingProfessores = true;
+            lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
+        }
+
+        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
-        lastValueFrom(this.salaAulaService.getList())
-        .then(res => this.loadingSalaAula = false)
-        .catch(res => this.loadingSalaAula = false);
+        if (this.salaAulas.length == 0) {
+            this.loadingSalaAulas = true;
+            lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
+        }
 
         var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos);
 
-        lastValueFrom(this.perfilCognitivoService.getList())
-        .then(res => this.loadingPerfisCognitivos = false)
-        .catch(res => this.loadingPerfisCognitivos = false);
+        if (this.perfisCognitivos.length == 0) {
+            this.loadingPerfisCognitivos = true;
+            lastValueFrom(this.perfilCognitivoService.getList())
+            .then(res => this.loadingPerfisCognitivos = false)
+            .catch(res => this.loadingPerfisCognitivos = false);
+        }
+        
+        this.loadingEventos = true;
+        var request: CalendarioRequest = {
+            intervaloDe: moment(new Date).startOf('week').toDate(),
+            intervaloAte: moment(new Date).endOf('week').toDate()
+        };
+        lastValueFrom(this.eventoService.calendario(request))
+            .then(res => {
+                this.loadingEventos = false;
+                this.eventos = res;
+            })
+            .catch(res => this.loadingEventos = false);
     }
 
     ngOnDestroy(): void {
@@ -106,7 +142,12 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                         this.loading = false;
                         this.visible = true;
 
-                        this.verificaDisponibilidadeProfessor({ target: this.divForm });
+                        if(this.object.perfilCognitivo.length > 0) {
+                            var perfilId = this.object.perfilCognitivo[0].id;
+                            this.selectedPerfil = this.perfisCognitivos.find(x => x.id == perfilId)
+                        }
+
+                        this.verificaDisponibilidade();
                     })
                     .catch(res => {
                         this.visible = false;
@@ -127,98 +168,126 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    async verificaDisponibilidadeProfessor(e: any) {
+    async verificaDisponibilidade() {
         var valid = true;
 
         if (!this.object.diaSemana || !this.object.horario) {
             return valid;
         }
 
-        var calendario = this.aulaService.calendario.value;
-        if (calendario.length == 0) {
-            await lastValueFrom(this.aulaService.getCalendario({
-                professor_Id: this.object.professor_Id,
-                intervaloDe: moment(new Date).startOf('week').toDate(),
-                intervaloAte: moment(new Date).endOf('week').toDate()
-            }))
-                .then(res => calendario = res)
-                .catch(res => this.showError('Erro', 'Não foi possível validar disponibilidade.', e))
-        }
-
-
-        if (this.professores.length == 0) {
-
-            this.loadingProfessores = true;
-            await lastValueFrom(this.professorService.getList())
-                .then(res => {
-                    this.loadingProfessores = false;
-                    this.professores = res.sort((x, y) => Number(x.deactivated) - Number(y.deactivated))
-                })
-                .catch(res => this.loadingProfessores = false);
-        }
-
-        this.professores.map(professor => {
-
-            var intervaloDe = moment(this.object.horario).add(-2, 'hour'); // Duas horas antes
-            var intervaloAte = moment(this.object.horario).add(2, 'hour'); // Duas horas depois
-
-            // var beginningTime = moment({ hour: intervaloDe.getHours(), minute: intervaloDe.getMinutes() });            
-            // var endTime = moment({ hour: intervaloAte.getHours(), minute: intervaloAte.getMinutes() });
-
-            // Procura outra turma com o mesmo professor que tenha aula no mesmo dia e horário
-            var exists = calendario.find(x => x.turma_Id != this.object.id
-                && x.professor_Id == professor.id
-                && x.data.getDay() == this.object.diaSemana
-                && moment(x.data, 'HH:mm:ss').isAfter(intervaloDe)
-                && moment(x.data, 'HH:mm:ss').isBefore(intervaloAte)
-            );
-
-            if (exists) {
-                professor.disponivel = false;
-                professor.disponivelEvent = exists;
-
-                if (professor.id == this.object.professor_Id) {
-                    valid = false;
-                    this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-                    this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${exists.turma ?? exists.descricao}</b> no mesmo dia às <b>${moment(exists.data).format('HH[h]mm')}</b>.`, { target: this.divForm });
-                }
-            }
-            else {
-                professor.disponivel = true;
-                professor.disponivelEvent = undefined;
-                this.professorSelect.control.setErrors({ indisponivel: null });
-                this.professorSelect.control.updateValueAndValidity();
-            }
-            return professor;
-        });
+        this.validaProfessores();
+        this.validaSalaAulas();
 
         return valid
 
     }
 
-    professorChanged(e: SelectChangeEvent) {
-        var professor = this.professores.find(x => x.id == e.value);
+    validaSalaAulas(){
+        var data = moment(new Date).set({
+            day: this.object.diaSemana,
+            hours: this.object.horario.getHours(),
+            minutes: this.object.horario.getMinutes(),
+            seconds: 0
+        }).toDate();
+        this.salaAulas = validaSalaAulas(data, 120, this.salaAulas, this.eventos, this.object.id, PseudoEvento.EventoId);
+        // var intervaloDe = moment(new Date).set({
+        //                                     day: this.object.diaSemana,
+        //                                     hours: this.object.horario.getHours(),
+        //                                     minutes: this.object.horario.getMinutes(),
+        //                                     seconds: 0
+        //                                 })
+        // var intervaloAte = moment(intervaloDe).add(120-1, 'minutes');
+        // var turmaIntervalo = [intervaloDe, intervaloAte]
 
-        if (professor && professor.disponivel == false && professor.disponivelEvent) {
-            this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
-        } else {
-            this.professorSelect.control.setErrors({ indisponivel: null });
-        }
-        this.professorSelect.control.updateValueAndValidity();
+
+
+        // this.salaAulas.forEach(item => {
+        //     if (item.id == SalaAulaId.online) {
+        //         return;
+        //     }
+            
+        //     var evento = this.eventos.find(e => {
+        //         var eventoIntervalo = [moment(e.data), moment(e.data).add(e.duracaoMinutos, 'minutes')]
+
+        //         var c1 = turmaIntervalo[0].isAfter(eventoIntervalo[0]) 
+        //         var c2 = turmaIntervalo[0].isBefore(eventoIntervalo[1]) 
+        //         var c3 = turmaIntervalo[1].isAfter(eventoIntervalo[0]) 
+        //         var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1]) 
+
+        //         if (((c1 && c2) || (c3 && c4)) && e.sala_Id == item.id && e.turma_Id != this.object.id)
+        //             return e;
+        //         return false
+        //     })
+        //     item.disponivel = !evento;
+        //     item.disponivelEvent = evento;
+        // });
     }
-    salaAulaChanged(e: SelectChangeEvent) {
+
+    validaProfessores() {
+        
+        var data = moment(new Date).set({
+            day: this.object.diaSemana,
+            hours: this.object.horario.getHours(),
+            minutes: this.object.horario.getMinutes(),
+            seconds: 0
+        }).toDate();
+        this.professores = validaProfessores(data, 120, this.professores, this.eventos, this.object.id, PseudoEvento.EventoId);
+
+        console.log(this.professores)
+
+        // var intervaloDe = moment(new Date).set({
+        //     day: this.object.diaSemana,
+        //     hours: this.object.horario.getHours(),
+        //     minutes: this.object.horario.getMinutes(),
+        //     seconds: 0
+        // });
+        // var intervaloAte = moment(intervaloDe).add(120-1, 'minutes');
+        // var turmaIntervalo = [intervaloDe, intervaloAte]
+        
+        // this.professores.forEach(item => {
+        //     var evento = this.eventos.find(e => {
+        //         var eventoIntervalo = [moment(e.data), moment(e.data).add(e.duracaoMinutos, 'minutes')]
+
+        //         var c1 = turmaIntervalo[0].isAfter(eventoIntervalo[0]) 
+        //         var c2 = turmaIntervalo[0].isBefore(eventoIntervalo[1]) 
+        //         var c3 = turmaIntervalo[1].isAfter(eventoIntervalo[0]) 
+        //         var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1]) 
+
+        //         if (((c1 && c2) || (c3 && c4)) 
+        //             && (e.professor_Id == item.id || e.professores.findIndex(x => x.id == item.id) != -1 )
+        //             && e.turma_Id != this.object.id)
+        //             return e;
+        //         return false
+        //     })
+        //     item.disponivel = !evento;
+        //     item.disponivelEvent = evento;
+        // });
+    }
+
+    professorChanged(e: SelectChangeEvent, model: NgModel) {
         var professor = this.professores.find(x => x.id == e.value);
 
         if (professor && professor.disponivel == false && professor.disponivelEvent) {
-            this.professorSelect.control.setErrors({ indisponivel: 'Professor indisponível' });
+            model.control.setErrors({ indisponivel: 'Professor indisponível' });
             this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         } else {
-            this.professorSelect.control.setErrors({ indisponivel: null });
+            model.control.setErrors({ indisponivel: null });
         }
-        this.professorSelect.control.updateValueAndValidity();
+        model.control.updateValueAndValidity();
+    }
+
+    salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
+        var salaAula = this.salaAulas.find(x => x.id == e.value);
+        console.log(salaAula)
+        if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
+            model.control.setErrors({ indisponivel: 'Sala indisponível' });
+            this.showError('Sala Indisponível', `Essa sala está atribuído para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            return;
+        } else {
+            model.control.setErrors({ indisponivel: null });
+        }
+        model.control.updateValueAndValidity();
     }
 
     showError(header: string, message: string, e: any) {
@@ -226,7 +295,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             target: e.target,
             message: message,
             header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
@@ -235,16 +304,36 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
 
     perfilChange(model: NgModel) {
+        if (this.selectedPerfil)
+            this.object.perfilCognitivo = [this.selectedPerfil];
+        else 
+            this.object.perfilCognitivo = [];
     }
 
+    sendConffirmation(form: NgForm, e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: 'Tem certeza que deseja salvar os dados da turma?',
+            header: 'Salvar turma',
+            acceptLabel: 'Salvar',
+            acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            accept: () => {
+                this.send(form, e)
+            }
+        })
+    }
 
     async send(form: NgForm, e: any) {
 
-        var professorValido = await this.verificaDisponibilidadeProfessor(e);
-        if (form.invalid || this.professorSelect.invalid || professorValido == false) {
+        var professorValido = await this.verificaDisponibilidade();
+        if (form.invalid ||  professorValido == false) {
             return;
         }
-
+        
         this.loading = true;
         this.request()
             .then(res => {
@@ -252,9 +341,13 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 if (res.success) {
                     var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
                     res.object.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + res.object.horario);
-                    res.object.perfilCognitivoString = res.object.perfilCognitivo.map((x: PerfilCognitivo) => x.nome).join(', ')
-                    res.object.diasDeAulaString = semana[res.object.diaSemana] + ' às ' + moment(res.object.horario).format('HH[h]mm')
-                    res.object.salaDeAulaString = (res.object.numeroSala ?? 0) + ' ' + (res.object.andar ?? 0) + 'º andar'
+                    res.object.perfilCognitivoString = this.object.perfilCognitivo.map((x: PerfilCognitivo) => x.nome).join(', ')
+                    res.object.diasDeAulaString = semana[this.object.diaSemana] + ' às ' + moment(res.object.horario).format('HH[h]mm')
+                    
+                    if (res.object.numeroSala != 0 && res.object.andar != 0)
+                        res.object.salaDeAulaString = `${res.object.numeroSala} ${res.object.andar} º andar`
+                    else
+                        res.object.salaDeAulaString = 'ONLINE'
                     
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
@@ -274,14 +367,17 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     request() {
-        if (this.isEditPage) {
+        if (this.isEditPage) 
             return lastValueFrom(this.service.edit(this.object));
-        }
         return lastValueFrom(this.service.create(this.object));
     }
 
     goToCalendario() {
         this.router.navigate(['turmas', 'calendario', this.crypto.encrypt(this.object.id)]);
+    }
+
+    getTipo(e: Evento) {
+        return this.mensagemWhatsapp.getEventoTipo(e)
     }
 
 }

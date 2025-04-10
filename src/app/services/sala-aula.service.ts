@@ -3,7 +3,7 @@ import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { SalaAula } from '../models/sala-aula.model';
-import { Map } from '../utils/map';
+import { MyMap } from '../utils/map';
 import { getError } from '../utils';
 
 @Injectable({
@@ -17,6 +17,10 @@ export class SalaAulaService extends Service {
         return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)
             .pipe(tap({
                 next: list => {
+                    list = list.map(x => {
+                        x.active = !x.deactivated
+                        return x;
+                    })
                     this.list.next(list);
                     return of(list);
                 },
@@ -43,7 +47,7 @@ export class SalaAulaService extends Service {
 
     create(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
-        var request = Map(model, new SalaAula);
+        var request = MyMap(model, new SalaAula);
         return this.http.post<Response>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {
@@ -54,7 +58,7 @@ export class SalaAulaService extends Service {
 
     edit(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
-        var request = Map(model, new SalaAula);
+        var request = MyMap(model, new SalaAula);
         return this.http.put<Response>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {

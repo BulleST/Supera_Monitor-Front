@@ -3,7 +3,7 @@ import {  tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
-import { ListaEsperaRequest } from '../models/lista-espera.model';
+import { ListaEspera, ListaEsperaRequest } from '../models/lista-espera.model';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +12,7 @@ import { ListaEsperaRequest } from '../models/lista-espera.model';
 export class ListaEsperaService extends Service {
 
     getList(aula_Id: number) {
-        return this.http.get<Response>(`${this.url}/lista-espera/all/${aula_Id}`);
+        return this.http.get<ListaEspera[]>(`${this.url}/lista-espera/all/${aula_Id}`);
     }
 
     inserirAlunoListaEspera(model: ListaEsperaRequest) {

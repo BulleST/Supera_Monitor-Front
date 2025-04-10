@@ -10,7 +10,7 @@ export class TurmaRequest {
     professor_Id: number = undefined as unknown as number;
     sala_Id: number = undefined as unknown as number;
     capacidadeMaximaAlunos: number = 12;
-    perfilCognitivo: PerfilCognitivo[] = [];
+    perfilCognitivo: number[] = [];
 }
 
 export class Turma extends Basic_List {
@@ -28,6 +28,7 @@ export class Turma extends Basic_List {
     perfilCognitivoString: string = '';
     diasDeAulaString: string = '';
     salaDeAulaString: string = '';
+    alunosAtivos: number = 0
 }
 
 export var turmaColumns: ColumnTable[] = [

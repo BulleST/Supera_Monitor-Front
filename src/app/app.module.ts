@@ -41,6 +41,7 @@ registerLocaleData(localeBr , 'pt-BR');
         provideNgxMask(),
         provideEnvironmentNgxMask(),
         provideHttpClient(withFetch()),
+        provideEnvironmentNgxMask(),
         ConfirmationService,
         CurrencyPipe,
         DatePipe,

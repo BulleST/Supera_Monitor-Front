@@ -6,8 +6,8 @@ const account = () => import('./pages/account/account.module').then(res => res.A
 const initial = () => import('./pages/_initial/initial.module').then(res => res.InitialModule);
 
 const routes: Routes = [
-    { path: '', redirectTo: 'home', pathMatch: 'full'},
-    { path: '', loadChildren: initial, canActivate: [AuthGuard] /* , canActivate: [AuthGuard] */ },
+    { path: '', redirectTo: 'calendario', pathMatch: 'full'},
+    { path: '', loadChildren: initial , canActivate: [AuthGuard]/* , canActivate: [AuthGuard] */ },
     { path: 'accounts', loadChildren: account },
     // { path: '**', redirectTo: '', pathMatch: 'full'},
 ];

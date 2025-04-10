@@ -112,8 +112,8 @@ export class RequestInterceptor implements HttpInterceptor {
 
                         if (res.status == 401) {
                             var returnUrl = window.location.pathname;
-                            returnUrl = returnUrl.includes('account/login') ? '' : returnUrl;
-                            this.router.navigate(['account', 'login'], { queryParams: { returnUrl } });
+                            returnUrl = returnUrl.includes('accounts/login') ? '' : returnUrl;
+                            this.router.navigate(['accounts', 'login'], { queryParams: { returnUrl } });
                             localStorage.clear();
                             message = 'Unauthorized. Please, login.';
                         }

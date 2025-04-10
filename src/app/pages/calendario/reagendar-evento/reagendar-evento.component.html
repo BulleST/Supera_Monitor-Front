@@ -1,0 +1,299 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="enviarMensagemReagendamento" styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div class="flex align-items-start gap-2 ">
+            <span class="mt-1">
+                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
+                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
+            </span>
+            <div>
+                <div [innerHTML]="message.message"></div>
+                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
+                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
+                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
+                    <div *ngFor="let aluno of mensagensEnviadasAlunos">
+                        <a *ngIf="aluno.celular"
+                           (auxclick)="removerAlunoLista(aluno, $event)"
+                           [href]="enviarMensagemReagendamento(aluno.aluno, aluno.celular)"
+                           pTooltip="Enviar mensagem"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
+                            <span class="p-button-label">{{aluno.aluno}}</span>
+                        </a>
+                        <p-button *ngIf="!aluno.celular"
+                                  icon="pi pi-whatsapp opacity-0"
+                                  severity="secondary"
+                                  styleClass="white-space-nowrap -ml-1 "
+                                  pTooltip="Nenhum celular cadastrado"
+                                  [label]="aluno.aluno"
+                                  [text]="true"
+                                  size="small"
+                                  [disabled]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog [header]="'Reagendar ' + tipoString"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '700px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Reagendar {{tipoString}}</span>
+            </span>
+        </div>
+    </ng-template>
+    <form #formDiv #form="ngForm" (submit)="sendConfirmation(form, $event)">
+        <div class="formgrid grid">
+            <div class="field sm:col-4 col-6"> <!-- Nova data -->
+                <label for="data">Nova Data: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #dataNgModel="ngModel"
+                              [(ngModel)]="data"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              (ngModelChange)="verificaDisponibilidade()"
+                              [minDate]="minDate"
+                              [maxDate]="maxDate"
+                              inputId="data"
+                              name="data"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              [selectOtherMonths]="true"
+                              [keepInvalid]="true"
+                              [disabledDays]="[0]"
+                              appendTo="body" />
+                <div *ngIf="dataNgModel.touched && dataNgModel.invalid && dataNgModel.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataNgModel.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-6"> <!-- Horário -->
+                <label for="data">Horário: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              inputId="data"
+                              name="data"
+                              #horaNgModel="ngModel"
+                              [(ngModel)]="horario"
+                              (onBlur)="verificaDisponibilidade()"
+                              [showIcon]="true"
+                              icon="pi pi-clock"
+                              [iconDisplay]="'input'"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              appendTo="body"
+                              [timeOnly]="true">
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
+                <div *ngIf="horaNgModel.touched && horaNgModel.invalid && horaNgModel.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="horaNgModel.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Sala -->
+                <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="salaAulas"
+                          [(ngModel)]="evento.sala_Id"
+                          [loading]="loadingSalaAulas"
+                          (onChange)="salaAulaChanged($event, sala_Id)"
+                          #sala_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="sala_Id"
+                          inputId="sala_Id"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                    <ng-template #selectedItem let-selectedOption>
+                        <app-sala-aula [numeroSala]="selectedOption.numeroSala"
+                                       [andar]="selectedOption.andar"
+                                       [sala_Id]="selectedOption.id"></app-sala-aula>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <span class="mr-2">
+                            <app-sala-aula [numeroSala]="item.numeroSala"
+                                           [andar]="item.andar"
+                                           [sala_Id]="item.id"></app-sala-aula>
+                        </span>
+                        <p-badge *ngIf="item.disponivel == false"
+                                 value="Indisponível"
+                                 severity="danger"
+                                 [pTooltip]="indisponivelTemplate" />
+                        <ng-template #indisponivelTemplate>
+                            <div class="w-25rem">
+                                <p>
+                                    <span>Evento: </span>
+                                    <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                                    <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+                                </p>
+                                <p>{{item.disponivelEvent.descricao}}</p>
+                                <p *ngIf="item.disponivelEvent.professor">
+                                    <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                    <span>{{item.disponivelEvent.professor}}</span>
+                                </p>
+                                <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+                                <p *ngIf="item.disponivelEvent.sala_Id">
+                                    <span>Sala: </span>
+                                    <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                   [andar]="item.disponivelEvent.andar"
+                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
+                </div>
+            </div>
+            <ng-template [ngIf]="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                <div class="field col-6" *ngIf="alunos.length == 1">
+                    <label for="aluno">Aluno: </label>
+                    <p-iconfield>
+                        <input type="text"
+                               pInputText
+                               [value]="alunos[0].nome"
+                               styleClass="w-full"
+                               class="w-full"
+                               id="aluno"
+                               readonly />
+                        <p-inputicon styleClass="fa-solid fa-user-graduate" />
+                    </p-iconfield>
+                    <ng-container *ngTemplateOutlet="indisponivel; context: { item: alunos[0] }"></ng-container>
+                </div>
+                <div class="field col-6" *ngIf="professores.length > 0">
+                    <label for="educador">Educador: </label>
+                    <p-iconfield>
+                        <input type="text"
+                               pInputText
+                               [value]="professores[0].nome"
+                               styleClass="w-full"
+                               class="w-full"
+                               id="aluno"
+                               readonly />
+                        <p-inputicon styleClass="fa-solid fa-user-graduate" />
+                    </p-iconfield>
+                    <ng-container *ngTemplateOutlet="indisponivel; context: { item: professores[0] }"></ng-container>
+                </div>
+            </ng-template>
+            <div class="field col-12"> <!-- Observações -->
+                <label for="observacao">Observações: <small class="text-400">(motivo do reagendamento)</small></label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="observacao"
+                          id="observacao"
+                          [(ngModel)]="evento.observacao"
+                          placeholder="Aproveite para contar o motivo do reagendamento"
+                          [rows]="3"></textarea>
+            </div>
+        </div>
+        <div class="formgrid grid">
+            <!-- Alunos -->
+            <div class="field col" *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                <p class="font-bold text-primary-500" *ngIf="evento.alunos.length != 1">Alunos</p>
+                <p class="font-bold text-primary-500" *ngIf="evento.alunos.length == 1">Aluno</p>
+                <hr class="mb-2 border-orange-500 border-1">
+                <p class="text-400 p-2" *ngIf="evento.alunos.length == 0">Nenhum aluno inscrito</p>
+                <div *ngFor="let item of alunos; let i = index"
+                     class=" border-100 border-left-none border-right-none border-top-none border-1"
+                     [ngClass]="{
+                    'bg-white': i % 2 != 0,
+                    'surface-50': i % 2 == 0 
+                }">
+                    <div class="flex align-items-center w-full p-2">
+                        <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
+                            <a *ngIf="item.celular"
+                               [href]="enviarMensagem(item.nome, item.celular)"
+                               pTooltip="Enviar mensagem"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
+                            </a>
+                        </div>
+                        <p class="mr-2">{{ item.nome }}</p>
+                        <ng-container *ngTemplateOutlet="indisponivel; context: { item: item }"></ng-container>
+                    </div>
+                </div>
+            </div>
+            <!-- Educadores -->
+            <div class="field col" *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+                <p class="font-bold text-primary-500">
+                    <span *ngIf="evento.professores.length > 1">Educadores</span>
+                    <span *ngIf="evento.professores.length == 1">Educador</span>
+                </p>
+                <hr class="mb-2 border-orange-500 border-1">
+                <div *ngFor="let item of professores; let i = index"
+                     class="flex align-items-center justify-content-between w-full gap-2 p-2 border-100 border-left-none border-right-none border-top-none border-1"
+                     [ngClass]="{
+                        'bg-white': i % 2 != 0,
+                        'surface-50': i % 2 == 0 
+                    }">
+                    <div class="font-bold mb-1 flex align-items-center ">
+                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                        <span class="mr-2">{{ item.nome }}</span>
+                        <ng-container *ngTemplateOutlet="indisponivel; context: { item: item }"></ng-container>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 flex">
+                <p-button type="submit"
+                          styleClass="px-3"
+                          class=" ml-auto"
+                          label="Reagendar {{tipoString}}"
+                          [icon]="'pi pi-check'"
+                          [loading]="loading"
+                          [rounded]="true"
+                          [disabled]="loading || form.invalid"
+                          size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>
+<ng-template #indisponivel let-item="item">
+    <p-badge *ngIf="item.disponivel == false"
+             value="Indisponível"
+             severity="danger"
+             [pTooltip]="indisponivelTemplate" />
+    <ng-template #indisponivelTemplate>
+        <div class="w-25rem" *ngIf="item.disponivelEvent">
+            <p>
+                <span>Evento: </span>
+                <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+            </p>
+            <p>{{item.disponivelEvent.descricao}}</p>
+            <p *ngIf="item.disponivelEvent.professor">
+                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                <span>{{item.disponivelEvent.professor}}</span>
+            </p>
+            <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+            <p>
+                <ng-container *ngIf="item.disponivelEvent.numeroSala == 0 && item.disponivelEvent.andar == 0; then onlineTemplate; else elseTemplate"></ng-container>
+                <ng-template #onlineTemplate>Online</ng-template>
+                <ng-template #elseTemplate>
+                    <span>{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
+                </ng-template>
+            </p>
+        </div>
+    </ng-template>
+</ng-template>

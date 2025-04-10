@@ -4,10 +4,11 @@ import { Response } from '../helpers/request-response.interface';
 import { CalendarioAula, CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import { Service } from '../helpers/service.service';
 import { AulaCreateRequest, AulaEditRequest } from '../models/aulas.model';
-import { ChamadaRequest } from '../models/chamada.model';
+import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import moment from 'moment';
 import { ReagendarAulaRequest, ReposicaoAluno } from '../models/reposicao.model';
 import { getError } from '../utils';
+import { Evento } from '../models/evento.model';
 
 
 @Injectable({
@@ -16,16 +17,20 @@ import { getError } from '../utils';
 export class AulaService extends Service {
     override list = new BehaviorSubject<CalendarioAula[]>([]);
     
-    calendario = new BehaviorSubject<CalendarioAula[]>([]);
     aula = new BehaviorSubject<CalendarioAula | undefined>(undefined);
     reposicao = new BehaviorSubject<ReposicaoAluno | undefined>(undefined);
-    calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.MeuCalendario);
+    calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.Geral);
+    
+    evento = new BehaviorSubject<Evento | undefined>(undefined);
+    eventos = new BehaviorSubject<Evento[]>([]);
+    calendario = new BehaviorSubject<Evento[]>([]);
+    
 
     calendarioReload = new EventEmitter<boolean>();
 
     getCalendario(request: CalendarioRequest) {
 
-        return this.http.post<CalendarioAula[]>(`${this.url}/aulas/calendario/`, request)
+        return this.http.post<Evento[]>(`${this.url}/aulas/calendario/`, request)
             .pipe(tap({
                 next: list => {
                     list.map(x => {
@@ -34,7 +39,7 @@ export class AulaService extends Service {
                         x.alunos.forEach(item => item.active = !item.deactivated );
                         return x;
                     })
-                    this.list.next(list);
+                    this.eventos.next(list);
                     return of(list);
                 },
                 error: err => {
@@ -44,7 +49,7 @@ export class AulaService extends Service {
     }
 
     get(id: number) {
-        return this.http.get<CalendarioAula>(`${this.url}/aulas/${id}`)
+            return this.http.get<Evento>(`${this.url}/evento/aula/${id}`)
     }
 
 
@@ -90,7 +95,7 @@ export class AulaService extends Service {
             }));
     }
     
-    chamada(request: ChamadaRequest) {
+    chamada(request: EventoChamadaRequest) {
         return this.http.post<Response>(`${this.url}/aulas/chamada`, request)
             .pipe(tap({
                 error: err => {

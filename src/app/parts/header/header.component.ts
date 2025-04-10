@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { faBell, faCalendar, faHome, faPersonChalkboard, faUserGraduate, faUsers, faUsersBetweenLines } from '@fortawesome/free-solid-svg-icons';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
-import { MegaMenuItem, MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import { Header } from '../../utils/header';
 import { ThemeService } from '../../utils/theme';
@@ -18,7 +18,8 @@ import { Button } from 'primeng/button';
     selector: 'app-header',
     templateUrl: './header.component.html',
     styleUrl: './header.component.css',
-    standalone: false
+    standalone: false,
+    providers: [ConfirmationService],
 })
 export class HeaderComponent implements OnDestroy {
     faRegularBell = faBell;
@@ -49,87 +50,21 @@ export class HeaderComponent implements OnDestroy {
         private aulaService: AulaService,
         private mobileService: MobileService,
         private header: Header,
+        private confirmationService: ConfirmationService,
     ) {
 
+        var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => this.menuMobileOpen = res)
+        this.subscription.push(menuAsideOpen);
         var screen = this.mobileService.get().subscribe(res => this.screen = res)
         this.subscription.push(screen);
 
         var accountData = this.header.accountData.subscribe(res => this.accountData = res)
         this.subscription.push(accountData);
 
-        // var navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
-        // this.subscription.push(navigationItems);
-        this.items = [
-            {
-                label: 'Calendário de Aulas',
-                tooltip: 'Calendário de Aulas',
-                iconFontawesome: faCalendar,
-                routerLink: ['home'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Dashboard',
-                tooltip: 'Dashboard',
-                iconFontawesome: faCalendar,
-                routerLink: ['dashboard'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Monitoramento de Checklist',
-                tooltip: 'Monitoramento de Checklist',
-                iconFontawesome: faHome,
-                routerLink: ['checklist'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Jornada',
-                tooltip: 'Jornada',
-                icon: 'bi bi-calendar-range',
-                routerLink: ['jornada'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Alunos',
-                tooltip: 'Alunos',
-                iconFontawesome: faUserGraduate,
-                routerLink: ['alunos'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Professores',
-                tooltip: 'Professores',
-                iconFontawesome: faPersonChalkboard,
-                routerLink: ['professores'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Turmas',
-                tooltip: 'Turmas',
-                iconFontawesome: faUsersBetweenLines,
-                routerLink: ['turmas'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-            {
-                label: 'Usuários',
-                tooltip: 'Usuários',
-                iconFontawesome: faUsers,
-                routerLink: ['usuarios'],
-                routerLinkActiveOptions: { exact: false },
-                routerLinkActive: 'active-link'
-            },
-
-            {
-                label: 'Minha conta',
-                routerLink: [],
-            },
-        ]
+        var navigationItems = this.header.navigationItems.subscribe(res => {
+            this.items = res.filter(x => x.items && x.items.length > 0).flatMap(x => x.items) as MenuItem[];
+        });
+        this.subscription.push(navigationItems);
 
         this.setModal();
     }
@@ -164,21 +99,28 @@ export class HeaderComponent implements OnDestroy {
 
 
     menuClick(e: any, menuBar: MegaMenu) {
-        console.log(e, menuBar)
         menuBar.toggle(e);
     }
 
-    toggleMenuMobile(button: Button, navigation: HTMLElement) {
-        console.log(button)
-        this.menuMobileOpen = !this.menuMobileOpen;
+    toggleMenuMobile() {
+        this.header.setMenuAside(!this.menuMobileOpen)
+    }
 
-        if (this.menuMobileOpen) {
-
-
-        }
-        else {
-
-        }
+    logout(e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja sair?`,
+            header: 'Sair',
+            icon: 'pi pi-exclamation-triangle',
+            closeOnEscape: true,
+            acceptLabel: `Sair`,
+            acceptButtonStyleClass: 'text-center',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-outlined text-center',
+            accept: () => {
+                this.accountService.logout();
+            },
+        });
 
     }
 

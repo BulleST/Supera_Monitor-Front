@@ -29,9 +29,7 @@ export class RestricoesComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
     ) {
-        this.loading = false;
         this.visible = true;
-
     }
 
 
@@ -71,6 +69,7 @@ export class RestricoesComponent implements OnDestroy {
                     this.toastrService.success(`Registro cadastrado com sucesso.`);
                     this.visible = false;
                     this.visibleChange();
+                    this.service.restricaoCreated.emit(res.object)
                 }
                 else {
                     this.error = res.message;

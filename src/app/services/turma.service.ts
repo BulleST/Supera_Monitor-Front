@@ -3,7 +3,7 @@ import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { TurmaRequest, Turma } from '../models/turma.model';
 import moment from 'moment';
-import { Map } from '../utils/map';
+import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 
@@ -20,12 +20,17 @@ export class TurmaService extends Service {
                 next: list => {                    
                     
                     var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
-                    list.map(x => {
-                        x.perfilCognitivoString = x.perfilCognitivo.map(x => x.nome).join(', ');
-                        x.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + x.horario);
-                        x.diasDeAulaString = semana[x.diaSemana] + ' às ' + moment(x.horario).format('HH[h]mm')
-                        x.salaDeAulaString = (x.numeroSala ?? 0) + ' ' + (x.andar ?? 0) + 'º andar'
-                        return x;
+                    list.map(turma => {
+                        turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
+                        turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
+                        turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
+                        turma.active = !turma.deactivated;
+                        
+                        if (turma.numeroSala != 0 && turma.andar != 0)
+                             turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
+                        else turma.salaDeAulaString = 'ONLINE'
+
+                        return turma;
                     })
 
                     this.list.next(list);
@@ -53,9 +58,11 @@ export class TurmaService extends Service {
     }
 
     create(model: Turma) {
-        // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
-        var request = Map(model, new TurmaRequest);
+        var request = MyMap(model, new TurmaRequest);
+
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
+        request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
+
         return this.http.post<Response>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {
@@ -65,9 +72,11 @@ export class TurmaService extends Service {
     }
 
     edit(model: Turma) {
-        // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
-        var request = Map(model, new TurmaRequest);
+        var request = MyMap(model, new TurmaRequest) as TurmaRequest;
+        
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
+        request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
+
         return this.http.put<Response>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom,  of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { Professor, Professor_NivelCertificacao, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
-import { Map } from '../utils/map';
+import { MyMap } from '../utils/map';
 import moment from 'moment';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
@@ -62,7 +62,7 @@ export class ProfessorService extends Service {
     }
 
     create(model: Professor) {
-        var request = Map(model, new ProfessorCreateRequest);
+        var request = MyMap(model, new ProfessorCreateRequest);
         return this.http.post<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
@@ -72,7 +72,7 @@ export class ProfessorService extends Service {
     }
 
     edit(model: Professor) {
-        var request = Map(model, new ProfessorEditRequest);
+        var request = MyMap(model, new ProfessorEditRequest);
         return this.http.put<Response>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {

@@ -1,0 +1,157 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="enviarMensagemCancelamento" styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div class="flex align-items-start gap-2 ">
+            <span class="mt-1">
+                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
+                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
+            </span>
+            <div>
+                <div [innerHTML]="message.message"></div>
+                <!-- Alunos -->
+                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length"> Alunos </p>
+                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
+                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
+                    <div *ngFor="let participacao of mensagensEnviadasAlunos">
+                        <a *ngIf="participacao.celular"
+                           (auxclick)="removerAlunoLista(participacao, $event)"
+                           [href]="enviarMensagemCancelamento(participacao.aluno, participacao.celular)"
+                           pTooltip="Enviar mensagem"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
+                            <span class="p-button-label">{{participacao.aluno}}</span>
+                        </a>
+                        <p-button *ngIf="!participacao.celular"
+                                  icon="pi pi-whatsapp opacity-0"
+                                  severity="secondary"
+                                  styleClass="white-space-nowrap -ml-1 "
+                                  pTooltip="Nenhum celular cadastrado"
+                                  [label]="participacao.aluno"
+                                  [text]="true"
+                                  size="small"
+                                  [disabled]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog [header]="'Cancelar ' + tipoEventoString"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '700px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Cancelar {{tipoEventoString}}</span>
+            </span>
+        </div>
+    </ng-template>
+    <form #form="ngForm" (submit)="sendConfirmation( $event)">
+        <p class="text-lg mb-1">Tem certeza que deseja cancelar essa {{tipoEventoString}}? Talvez você queira reagendar. </p>
+        <p class="text-lg my-2 flex flex-wrap gap-2 align-items-center">
+            <span class="col p-0 white-space-nowrap">
+                <span class="font-bold">Data:</span> 
+                <span>{{evento.data | date : 'dd/MM/yy'}} </span>
+            </span>
+            <span class="col p-0 white-space-nowrap">
+                <span class="font-bold">Horário:</span> 
+                <span>{{evento.data | date : 'HH:mm'}}</span>
+            </span>
+            <span class="col p-0 white-space-nowrap">
+                <span class="font-bold">Sala: </span>
+                <span *ngIf="evento.sala_Id == SalaAulaId.online">Online</span>
+                <span *ngIf="evento.sala_Id == SalaAulaId.professores">Sala dos Professores</span>
+                <span *ngIf="[SalaAulaId.online, SalaAulaId.professores].includes(evento.sala_Id) == false">
+                    <span> {{evento.numeroSala}} {{evento.andar}}º andar</span>
+                </span>
+            </span>
+            <span class="col p-0 white-space-nowrap" *ngIf="evento.turma">
+                <span class="font-bold">Turma: </span>
+                <span>{{evento.turma}}</span>
+            </span>
+            <span class="col p-0 white-space-nowrap" *ngIf="evento.professor">
+                <span class="font-bold">Educador: </span>
+                <span class="inline-flex w-1rem h-1rem border-circle mr-2 " [style]="{ backgroundColor: evento.corLegenda }"></span>
+                <span>{{evento.professor}}</span>
+            </span>
+        </p>
+        <div class="formgrid grid">
+            <div class="field col-12"> <!-- Observações -->
+                <label for="observacao" class="font-bold text-lg">Observações: <span class="text-400 text-sm">(motivo do cancelamento)</span></label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="observacao"
+                          id="observacao"
+                          [(ngModel)]="evento.observacao"
+                          placeholder="Aproveite para contar o motivo do cancelamento"
+                          [rows]="3"></textarea>
+            </div>
+        </div>
+        <div class="formgrid grid">
+            <div class="field col" *ngIf="evento.alunos && evento.alunos.length > 0">
+                <p class="font-bold text-primary-500">
+                    <span *ngIf="evento.alunos.length > 1">Alunos</span>
+                    <span *ngIf="evento.alunos.length == 1">Aluno</span>
+                </p>
+                <hr class="mb-2 border-orange-500 border-1">
+                <div *ngFor="let item of alunos; let i = index">
+                    <div class="flex align-items-center w-full" [ngClass]="{
+                        'bg-white': i % 2 == 0,
+                        'surface-50': i % 2 != 0 
+                    }">
+                        <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
+                            <a *ngIf="item.celular"
+                               [href]="enviarMensagem(item.nome, item.celular)"
+                               pTooltip="Enviar mensagem"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
+                            </a>
+                        </div>
+                        <p class="mr-2">{{ item.nome }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="field col" *ngIf="evento.professores && evento.professores.length > 1">
+                <p class="font-bold text-primary-500">Educadores</p>
+                <hr class="mb-2 border-orange-500 border-1">
+                <div class="flex flex-wrap gap-2 pl-1">
+                    <div *ngFor="let item of professores; let i = index"
+                         class="flex align-items-center justify-content-between gap-2 ">
+                        <div class="font-bold flex align-items-center ">
+                            <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                            <span class="mr-2">{{ item.nome }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 flex">
+                <p-button type="submit"
+                          styleClass="px-3"
+                          class=" ml-auto"
+                          label="Cancelar {{tipoEventoString}}"
+                          [loading]="loading"
+                          [rounded]="true"
+                          [text]="true"
+                          size="small" />
+                <p-button type="button"
+                          (onClick)="goToReagendamento()"
+                          styleClass="px-3"
+                          label="Reagendar"
+                          [icon]="'pi pi-calendar'"
+                          [loading]="loading"
+                          [rounded]="true"
+                          size="small" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

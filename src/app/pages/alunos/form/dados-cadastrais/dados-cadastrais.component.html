@@ -181,12 +181,13 @@
                                     <div class="flex p-2 " 
                                     [ngClass]="{
                                         'bg-orange-100': checklist.id == object.checklist_Id,
+                                        'bg-red-200': checklist.atrasados.length > 0 && checklist.id != object.checklist_Id,
                                         'surface-50': checklist.id != object.checklist_Id,
                                     }">
                                         <p ><b>{{checklist.nome}}</b></p>
                                         <p class="ml-2"> - Prazo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
                                         <p class="pl-2 ml-auto text-orange-500" *ngIf="checklist.id == object.checklist_Id"> Em Andamento <i class="pi pi-hourglass ml-2"></i> </p>
-                                        <p class="pl-2 ml-auto text-danger-500" *ngIf="checklist.atrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times ml-2"></i> </p>
+                                        <p class="pl-2 ml-auto text-red-500" *ngIf="checklist.atrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times ml-2"></i> </p>
                                         <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.finalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
                                     </div>
                                     <ng-container *ngFor="let checklistItem of checklist.items">
@@ -311,38 +312,85 @@
                 </div>
             </div>
             <div class="field sm:col-4 col-12"> <!-- Restrições -->
-                <label for="restricoes">Restrições: <span class="text-red-500">*</span></label>
+                <label for="restricoes">Restrições: </label>
                 <p-multiselect 
                     [options]="restricoes"
                     [(ngModel)]="object.restricoes"
                     [loading]="loadingRestricoes"
+                    (onChange)="restricaoChanged($event)"
                     #_restricoes="ngModel"
+                    #restricoesMultiselect
                     inputId="restricoes"
                     name="restricoes"
-                    optionLabel="nome" 
+                    optionLabel="descricao" 
                     placeholder="Selecione"
                     [filter]="true"
-                    filterBy="nome"
-                    styleClass="w-full"  />
-                    <!-- 
-                    [required]="true" -->
+                    filterBy="descricao"
+                    styleClass="w-full"
+                    appendTo="body" >
+                    <ng-template #selectedItems let-selectedOption>
+                        <div class="flex items-center gap-2" *ngIf="selectedOption">
+                            {{selectedOption|json}}
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
+                        <a [routerLink]="['./restricao/cadastrar']"
+                            class="text-primary-500 font-bold flex align-items-center p-3 hover:underline">
+                            <i class="pi pi-plus mr-2 text-sm"></i>
+                            <span>Inserir Restrição</span>
+                        </a>
+                    </ng-template>
+                </p-multiselect>
                 <div *ngIf="_restricoes.touched && _restricoes.invalid && _restricoes.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_restricoes.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field col-12"> <!-- Endereço -->
-                <label for="endereco">Endereço: <span class="text-red-500">*</span></label>
+                <label for="endereco">Endereço: </label>
                 <input type="text"
                        pInputText
                        #endereco="ngModel"
                        [(ngModel)]="object.endereco"
                        id="endereco"
                        name="endereco"
-                       class="w-full"
-                       [required]="true">
+                       class="w-full">
                 <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
                 </div>
+            </div>
+            
+            <div class="field sm:col-4 col-4"> <!-- RM -->
+                <label for="rm">RM <small class="text-400">(Registro de Matrícula)</small>: </label>
+                <input type="text"
+                       pInputText
+                       #rm="ngModel"
+                       [(ngModel)]="object.rm"
+                       id="rm"
+                       name="rm"
+                       class="w-full"
+                       readonly>
+            </div>
+            <div class="field sm:col-4 col-4"> <!-- Login -->
+                <label for="loginApp">Login <small class="text-400">(Sensirial Moove App)</small>: </label>
+                <input type="text"
+                       pInputText
+                       #loginApp="ngModel"
+                       [(ngModel)]="object.loginApp"
+                       id="loginApp"
+                       name="loginApp"
+                       class="w-full"
+                       >
+            </div>
+            <div class="field sm:col-4 col-4"> <!-- Senha -->
+                <label for="senhaApp">Senha <small class="text-400">(Sensirial Moove App)</small>: </label>
+                <input type="text"
+                       pInputText
+                       #senhaApp="ngModel"
+                       [(ngModel)]="object.senhaApp"
+                       id="senhaApp"
+                       name="senhaApp"
+                       class="w-full"
+                       >
             </div>
             <div class="field sm:col-6 col-12"> <!-- Turma -->
                 <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
@@ -356,17 +404,17 @@
                           name="turma_Id"
                           inputId="turma_Id"
                           optionLabel="nome"
-                          [showClear]="true"
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
                           optionDisabled="deactivated"
-                          (ngModelChange)="turmaChanged()">
+                          (onChange)="turmaChanged(turma_Id, $event)"
+                          [required]="true">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
                                 <p class="font-bold">{{ item.nome }}</p>
-                                <p class="text-sm">{{ item.professor }}</p>
+                                <p class="text-sm">{{ item.professor }} - {{item.alunosAtivos}}/{{ item.capacidadeMaximaAlunos }}</p>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                    [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"

@@ -3,28 +3,30 @@ import { CommonModule } from '@angular/common';
 
 import { InitialRoutingModule } from './initial.routing';
 import { InitialComponent } from './initial.component';
-import { HomeComponent } from './home/home.component';
+// import { HomeComponent } from './home/home.component';
 
 import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
 import { MonitoramentoComponent } from './monitoramento/monitoramento.component';
-import { SelectedAlunoComponent } from './home/selected-aluno/selected-aluno.component';
-import { SelectedAulaComponent } from './home/selected-aula/selected-aula.component';
-import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.component';
+// import { SelectedAlunoComponent } from './home/selected-aluno/selected-aluno.component';
+// import { SelectedAulaComponent } from './home/selected-aula/selected-aula.component';
+// import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+// import { CadastrarAulaComponent } from './home/cadastrar-aula/cadastrar-aula.component';
 
 @NgModule({
     declarations: [
         InitialComponent,
         HeaderComponent,
-        HomeComponent,
+        // HomeComponent,
         NavMenuComponent,
         MonitoramentoComponent,
-        SelectedAlunoComponent,
-        SelectedAulaComponent,
-        ReagendarAulaComponent,
+        // SelectedAlunoComponent,
+        // SelectedAulaComponent,
+        // ReagendarAulaComponent,
         DashboardComponent,
+        // CadastrarAulaComponent,
     ],
     imports: [
         CommonModule,

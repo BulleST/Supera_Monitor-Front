@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
 import { Turma } from '../../../../models/turma.model';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
@@ -15,6 +15,9 @@ import { ToastrService } from 'ngx-toastr';
 import moment from 'moment';
 import { UserService } from '../../../../services/user.service';
 import { CalendarioAlunoChecklistView } from '../../../../models/calendario.model';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
+import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
+import { MultiSelect, MultiSelectChangeEvent } from 'primeng/multiselect';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -40,12 +43,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     sexos: Pessoa_Sexo[] = [];
     loadingSexos = true;
 
+    @ViewChild('_restricoes') _restricoes!: NgModel;
+    @ViewChild('restricoesMultiselect') restricoesMultiselect!: MultiSelect;
     restricoes: Aluno_Restricao[] = [];
     loadingRestricoes = true;
 
-    perfisCognitivos: Aluno_Restricao[] = [];
+    perfisCognitivos: PerfilCognitivo[] = [];
     loadingPerfisCognitivos = true;
-
 
     loadingChecklists = false;
     checklists: Checklist[] = [];
@@ -56,6 +60,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     constructor(
 
         private service: AlunoService,
+        private restricaoService: AlunoRestricaoService,
         private turmaService: TurmaService,
         private perfilCognitivoService: PerfilCognitivoService,
         private checklistService: ChecklistService,
@@ -64,12 +69,16 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private userService: UserService,
     ) {
 
-        lastValueFrom(this.perfilCognitivoService.getList())
-            .then(res => {
-                this.perfisCognitivos = res;
-                this.loadingPerfisCognitivos = false;
-            })
-            .catch(res => this.loadingPerfisCognitivos = false);
+        var restricaoCreated = this.service.restricaoCreated.subscribe(res => this.restricoes.push(res));
+        this.subscription.push(restricaoCreated)
+
+        var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
+        this.subscription.push(perfisCognitivos)
+
+        if (this.perfisCognitivos.length == 0)
+            lastValueFrom(this.perfilCognitivoService.getList())
+                .then(res => this.loadingPerfisCognitivos = false)
+                .catch(res => this.loadingPerfisCognitivos = false);
 
         lastValueFrom(this.service.getSexo())
             .then(res => {
@@ -78,14 +87,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             })
             .catch(res => this.loadingSexos = false);
 
-        lastValueFrom(this.service.getRestricoes())
-            .then(res => {
-                this.restricoes = res;
-                this.loadingRestricoes = false;
+        var turmas = this.turmaService.list.subscribe(res => {
+            this.turmas = res.map(x => {
+                // x.alunosAtivos = 30;
+                return x
             })
-            .catch(res => this.loadingRestricoes = false);
-
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        });
         this.subscription.push(turmas);
 
         var checklists = this.checklistService.list.subscribe(res => this.checklists = res);
@@ -97,9 +104,21 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (changes['object']) {
             this.object = changes['object'].currentValue;
             this.loadFoto();
-            this.loadChecklist();
+
             if (this.turmas.length == 0)
                 await this.loadTurmas();
+
+
+            if (this.object.id) {
+                this.loadingRestricoes = true;
+                lastValueFrom(this.restricaoService.getList(this.object.id))
+                    .then(res => {
+                        this.restricoes = res;
+                        this.loadingRestricoes = false;
+                        this.object.restricoes = res;
+                    })
+                    .catch(res => this.loadingRestricoes = false);
+            }
 
             this.loadingTurmas = false
             this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
@@ -108,31 +127,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
-    }
-
-    async loadChecklist() {
-
-        console.log('loadChecklist', this.object.id)
-        if (!this.object.id) {
-            return;
-        }
-
-        if (this.checklists.length == 0) {
-            await lastValueFrom(this.checklistService.getList());
-        }
-
-         this.object.checklistCompleto = this.checklists.map(checklist => {
-            var checklistAluno = new CalendarioAlunoChecklistView;
-            checklistAluno.id = checklist.id;
-            checklistAluno.nome = checklist.nome;
-            checklistAluno.items = this.object.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-            checklistAluno.prazo = checklistAluno.items[0].prazo;
-            checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-            checklistAluno.atrasados = checklistAluno.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-            checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-            return checklistAluno;
-        });
-
     }
 
     async loadTurmas() {
@@ -197,12 +191,43 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    turmaChanged() {
+    turmaChanged(model: NgModel, e: any) {
+
         if (this.selectedTurma) {
-            this.object.turma = this.selectedTurma.nome;
-            this.object.turma_Id = this.selectedTurma.id;
-            this.object.professor_Id = this.selectedTurma.professor_Id;
-            this.object.professor = this.selectedTurma.professor;
+            if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
+                var turma = this.turmas.find(x => x.id == this.object.turma_Id) as Turma;
+                this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> por que o limite de alunos foi alcançado.`, e);
+                model.control.setValue(turma);
+                this.selectedTurma = turma;
+                return;
+            }
+            else if (this.object.restricoes.length > 0) {
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: `
+                        <p>O aluno apresenta uma ou mais restrições:</p>
+                        <ul>
+                        ${this.object.restricoes.map(x => `<li>${x.descricao}</li>`)}
+                        </ul>
+                        <p>Continuar com transferência de turma?</p>
+                    `,
+                    header: 'Transferência de turma',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptIcon: 'pi pi-check',
+                    acceptLabel: 'Sim',
+                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                    rejectIcon: 'pi pi-times',
+                    rejectLabel: 'Não',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+
+                })
+            }
+            else {
+                this.object.turma = this.selectedTurma.nome;
+                this.object.turma_Id = this.selectedTurma.id;
+                this.object.professor_Id = this.selectedTurma.professor_Id;
+                this.object.professor = this.selectedTurma.professor;
+            }
         } else {
             this.object.turma = '';
             this.object.turma_Id = 1;
@@ -224,12 +249,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
 
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
-        
+
         if (model.control.value) {
 
             if (moment(item.prazo).week() > moment(new Date).week()) {
                 this.showError('Checklist indisponível', 'Você não pode finalizar esse checklist ainda.', e);
-                model.control.setValue(false); 
+                model.control.setValue(false);
                 return;
             }
 
@@ -272,4 +297,33 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
+    restricaoChanged(e: MultiSelectChangeEvent) {
+        var inserted = e.value.find((x: Aluno_Restricao) => x.id == e.itemValue.id);
+        if (!inserted) {
+            this.confirmationService.confirm({
+                target: e.originalEvent.target as any,
+                message: `Tem certeza que deseja remover essa restrição?. \n Não haverá mais notificações referente a essa restrição em futuras atualizações do aluno. \n Restrição: ${e.itemValue.descricao}`,
+                header: 'Remover restrição',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Contrinuar',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Cancelar',
+                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                accept: async () => {
+
+                },
+                reject: () => {
+                    this.object.restricoes.push(e.itemValue);
+                    // this._restricoes.control.setValue(this.object.restricoes);
+                    // this._restricoes.update.emit(this.object.restricoes);
+                    // this.restricoesMultiselect.updateModel(this.object.restricoes)
+                    // this.restricoesMultiselect.selectedOptions = this.object.restricoes
+                    // this.restricoesMultiselect.writeValue(this.object.restricoes);
+                }
+            });
+        }
+        console.log(e)
+    }
 }

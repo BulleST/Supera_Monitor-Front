@@ -51,18 +51,22 @@
             <p-tabs [value]="0">
                 <p-tablist>
                     <p-tab [value]="0">Dados Cadastrais</p-tab>
-                    <!-- <p-tab [value]="1">Checklist</p-tab> -->
-                    <p-tab [value]="2">Calendário</p-tab>
+                    <p-tab [value]="1" *ngIf="isEditPage">Calendário</p-tab>
+                    <p-tab [value]="2" *ngIf="isEditPage">Histórico</p-tab>
+                    <p-tab [value]="3" *ngIf="isEditPage">Faltas</p-tab>
                 </p-tablist>
                 <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
                     <p-tabpanel [value]="0">
                         <app-dados-cadastrais [object]="object"></app-dados-cadastrais>
                     </p-tabpanel>
-                    <!-- <p-tabpanel [value]="1">
-                        <app-checklist></app-checklist>
-                    </p-tabpanel> -->
-                    <p-tabpanel [value]="2">
+                    <p-tabpanel [value]="1" *ngIf="isEditPage">
                         <app-calendario [object]="object"></app-calendario>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="2" *ngIf="isEditPage">
+                        <app-historico [object]="object"></app-historico>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="3" *ngIf="isEditPage">
+                        <app-faltas></app-faltas>
                     </p-tabpanel>
                 </p-tabpanels>
             </p-tabs>
@@ -88,3 +92,4 @@
         </div>
     </form>
 </p-dialog>
+<router-outlet></router-outlet>

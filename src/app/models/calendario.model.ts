@@ -1,8 +1,9 @@
 import { Basic_List } from "./_basic.model";
 import { Aula_Aluno_Falta } from "./aulas.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
-import { perfisCognitivos, PerfilCognitivo } from "./perfil-cognitivo.model";
-import { PseudoAula } from "./reposicao.model";
+import { ListaEspera } from "./lista-espera.model";
+import { PerfilCognitivo } from "./perfil-cognitivo.model";
+import { PseudoEvento } from "./reposicao.model";
 
 
 export enum CalendarioView {
@@ -16,11 +17,11 @@ export class CalendarioRequest {
     turma_Id?: number;
     professor_Id?: number;
     aluno_Id?: number;
-    perfilCognitivo_Id?: number;
+    perfil_Cognitivo_Id?: number;
 }
 
 export class CalendarioAula {
-    aula_Id: number = PseudoAula.AulaId;
+    aula_Id: number = PseudoEvento.EventoId;
     data: Date = new Date;
     descricao: string = '';
     capacidadeMaximaAlunos: number = 12;
@@ -43,6 +44,7 @@ export class CalendarioAula {
 
     alunos: CalendarioAluno[] = [];
     perfilCognitivo: PerfilCognitivo[] = [];
+    listaEspera: ListaEspera[] = [];
 
     active?: boolean = !this.deactivated;
     created?: Date = undefined as unknown as Date;
@@ -54,7 +56,7 @@ export class CalendarioAula {
 }
 
 export class CalendarioAluno extends Basic_List {
-    aula_Id: number = PseudoAula.AulaId;
+    aula_Id: number = PseudoEvento.EventoId;
     reposicaoDe_Aula_Id?: number;
     reposicaoDe_Aula?: CalendarioAula;
     presente?: boolean;

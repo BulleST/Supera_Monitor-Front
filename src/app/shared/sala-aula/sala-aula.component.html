@@ -1,0 +1,3 @@
+<ng-container *ngIf="sala_Id == SalaAulaId.online; then onlineTemplate; else elseTemplate"></ng-container>
+<ng-template #elseTemplate> {{numeroSala}} - {{andar}}º andar</ng-template>
+<ng-template #onlineTemplate>Online</ng-template>

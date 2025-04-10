@@ -23,6 +23,7 @@ export interface Aluno_CheckList_Item {
     id: number;
     aluno_Id: number;
     nome: string;
+    observacoes: string;
     prazo: Date;
     finalizado: boolean;
     dataFinalizacao?: Date;

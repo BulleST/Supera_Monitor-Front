@@ -1,7 +1,7 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MenuItem } from 'primeng/api';
+import { ConfirmationService,  MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
@@ -15,6 +15,10 @@ import moment from 'moment';
 import { NgModel } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../services/user.service';
+import { Popover } from 'primeng/popover';
+import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
+import { ProfessorService } from '../../../services/professor.service';
+import { Professor } from '../../../models/professor.model';
 
 @Component({
     selector: 'app-list',
@@ -37,8 +41,15 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
+    professores: Professor[] = [];
     checklists: Checklist[] = [];
     loadingChecklist = false;
+    checklistObservacao = '';
+
+    selectedChecklist?: CalendarioAlunoChecklistView;
+    @ViewChild('popoverChecklist') popoverChecklist!: Popover;
+
+    
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -50,6 +61,9 @@ export class ListComponent implements OnDestroy {
         private checklistService: ChecklistService,
         private toastrService: ToastrService,
         private userService: UserService,
+        private mensagemWhatsapp: MensagemWhatsapp,
+        private professorService: ProfessorService,
+
     ) {
         this.tableColumns = alunosColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
@@ -59,7 +73,18 @@ export class ListComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(res => this.list = res);
+        var list = this.service.list.subscribe(alunos => {
+            this.list = alunos.map(aluno => {
+                aluno.created = moment(aluno.created).toDate();
+                aluno.lastUpdated = moment(aluno.lastUpdated).toDate();
+                aluno.deactivated = moment(aluno.deactivated).toDate();
+                aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
+                aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
+                aluno.dataFimVigencia = moment(aluno.dataFimVigencia).toDate();
+                aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
+                return aluno;
+            });
+        });
         this.subscription.push(list);
 
         var checklist = this.checklistService.list.subscribe(res => this.checklists = res);
@@ -71,32 +96,26 @@ export class ListComponent implements OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    update() {
+    async update() {
         this.list = [];
         this.tableLoading = true;
+        if (this.checklists.length == 0) {
+            await lastValueFrom(this.checklistService.getList()).then(res => this.checklists = res);
+        }
+
+        if (this.professores.length == 0) {
+            await lastValueFrom(this.professorService.getList()).then(res => this.professores = res);
+        }
+
+        if (!this.checklistService.list.value.length)
+            await lastValueFrom(this.checklistService.getList())
+
+
         lastValueFrom(this.service.getList())
             .then(async alunos => {
                 this.tableLoading = false;
                 this.loadingChecklist = true
-                if (this.checklists.length == 0) {
-                    await lastValueFrom(this.checklistService.getList()).then(res => this.checklists = res);
-                }
-
-                alunos = alunos.map(aluno => {
-                    aluno.checklistCompleto = this.checklists.map(checklist => {
-                        var checklistAluno = new CalendarioAlunoChecklistView;
-                        checklistAluno.id = checklist.id;
-                        checklistAluno.nome = checklist.nome;
-                        checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-                        checklistAluno.prazo = checklistAluno.items[0].prazo;
-                        checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                        checklistAluno.atrasados = checklistAluno.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-                        checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-                        return checklistAluno;
-                    });
-                    return aluno
-                })
-                this.service.list.next(alunos);
+                this.list = alunos
             })
             .catch(res => {
                 this.tableLoading = false;
@@ -107,13 +126,14 @@ export class ListComponent implements OnDestroy {
     contextMenuSelectionChange(item: any) {
         this.tableMenu = [
             {
+                
                 label: 'Menu',
                 disabled: true,
                 styleClass: 'text-500 font-bold opacity-100',
             },
             { separator: true },
             {
-                label: 'Editar',
+                label: 'Detalhes',
                 icon: 'fa-solid fa-pen text-orange-500',
                 command: () => this.edit(item)
             },
@@ -141,6 +161,14 @@ export class ListComponent implements OnDestroy {
 
     unselectItems() {
         this.tableSelectedItem = undefined;
+    }
+
+
+    getCorLegenda(professor_Id: number) {
+        var professor = this.professores.find(x => x.id == professor_Id);
+        if (professor)
+            return professor.corLegenda;
+        return ''
     }
 
     edit(item: any) {
@@ -207,43 +235,45 @@ export class ListComponent implements OnDestroy {
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
         
         if (model.control.value) {
-            if (moment(item.prazo).week() > moment(new Date).week()) {
-                this.showError('Checklist indisponível', `Você não pode finalizar esse checklist ainda. \n Prazo inicial a partir do dia ${moment(item.prazo).add(-7, 'day').format('DD/MM/YY')}`, e);
-                model.control.setValue(false); 
-                return;
-            }
+            // if (moment(item.prazo).week() > moment(new Date).week()) {
+            //     this.showError('Checklist indisponível', `Você não pode finalizar esse checklist ainda. \n Prazo inicial a partir do dia ${moment(item.prazo).add(-7, 'day').format('DD/MM/YY')}`, e);
+            //     model.control.setValue(false); 
+            //     return;
+            // }
             
-            if(!item.prazo) {   
-                this.showError('Checklist indisponível', `O aluno não possui data de vigência`, e);
-                model.control.setValue(false); 
-                return;
-            }
+            // if(!item.prazo) {   
+            //     this.showError('Checklist indisponível', `O aluno não possui data de vigência`, e);
+            //     model.control.setValue(false); 
+            //     return;
+            // }
             
             model.control.setValue(false);
 
-            var a = this.confirmationService.confirm({
-                target: e.target,
-                message: `Tem certeza que deseja marcar etapa como realizada?.`,
-                header: 'Finalizar etapa',
+            this.confirmationService.confirm({
+                // target: e.target,
+                key: 'checklistConfirmation',
+                message: `Tem certeza que deseja marcar item da jornada como realizada?.`,
+                header: 'Finalizar item da jornada',
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
                 acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
-                rejectLabel: 'Ainda não',
+                rejectLabel: 'Cancelar',
                 rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
                 accept: async () => {
                     this.loadingChecklist = true;
-                    lastValueFrom(this.checklistService.markAsDone(item.id))
+                    item.observacoes = this.checklistObservacao
+                    lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
                         .then(res => {
-                            
+                            this.checklistObservacao = '';
                             model.control.setValue(true);
                             this.loadingChecklist = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
                             item.finalizado = true;
                             item.dataFinalizacao = res.object.dataFinalizacao;
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
-
+                            
                             checklist.prazo = checklist.items[0].prazo;
                             checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
                             checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
@@ -252,6 +282,9 @@ export class ListComponent implements OnDestroy {
                             this.userService.get(item.account_Finalizacao_Id!)
                                 .then(res => item.account_Finalizacao = res.name);
 
+                        })
+                        .catch(res => {
+                            this.showError('Erro', getError(res), e);
                         })
                 },
                 reject: () => {
@@ -264,5 +297,98 @@ export class ListComponent implements OnDestroy {
         }
     }
 
+
+    // itemsMenuChecklist(checklist: CalendarioAlunoChecklistView) {
+    //     var array: MenuItem[] = [];
+    //     array.push({
+    //         icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //         label: 'Lembrete de oficina',
+    //         styleClass: 'mx-0 pl-0',
+    //         command: () => {
+    //             console.log(this.tableSelectedItem)
+    //             if (this.tableSelectedItem && this.tableSelectedItem.celular) {
+    //                 var celular = this.tableSelectedItem.celular.replace(/\D/g, '')
+    //                 var mensagem = `
+    //                     Olá ${this.tableSelectedItem.nome},
+    //                     Espero que esteja bem.
+    //                     Estamos com a oficina xyz`;
+    //                 window.open(`https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`)
+    //             }
+    //         }
+    //     })
+    //     array.push({
+    //         icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //         label: 'Lembrete de superação',
+    //         styleClass: 'mx-0 pl-0',
+    //         command: () => {
+
+    //         }
+    //     })
+        
+    //     // Agendamento Aula 0 
+    //     if (checklist.items.find(x => x.checklist_Item_Id == 31) != undefined) {
+    //         array.push({ 
+    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //             label: 'Agendar Aula 0',
+    //             styleClass: 'mx-0 pl-0',
+    //             command: () => {
+
+    //             }
+    //         })
+    //     }
+        
+    //     // Apresentação do diretor franqueado
+    //     if (checklist.items.find(x => x.checklist_Item_Id == 8) != undefined) {
+    //         array.push({ 
+    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //             label: 'Enviar mensagem de apresentação',
+    //             styleClass: 'mx-0 pl-0',
+    //             command: () => {
+
+    //             }
+    //         })
+    //     }
+    //     // Feedback pós-venda
+    //     if (checklist.items.find(x => x.checklist_Item_Id == 13) != undefined) {
+    //         array.push({ 
+    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //             label: 'Enviar mensagem de feedback pós-venda',
+    //             styleClass: 'mx-0 pl-0',
+    //             command: () => {
+
+    //             }
+    //         })
+    //     }
+        
+    //     // Confirmação de preenchimento do feedback pós-venda
+    //     if (checklist.items.find(x => x.checklist_Item_Id == 32) != undefined) {
+    //         array.push({ 
+    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
+    //             label: 'Confirmar resposta ao feedback pós-venda',
+    //             styleClass: 'mx-0 pl-0',
+    //             command: () => {
+
+    //             }
+    //         })
+    //     }
+
+    //     return array
+    // }
+
+    enviarMensagem(aluno: Aluno) {
+       return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    }
+    
+    popoverChecklistOpen(e:any, item: CalendarioAlunoChecklistView, aluno: Aluno) {
+        this.popoverChecklist.show(e)
+        this.selectedChecklist = item;
+        this.tableSelectedItem = aluno
+        if (this.popoverChecklist.container) this.popoverChecklist.align()
+    }
+
+    popoverChecklistClosed() {
+        this.selectedChecklist = undefined;
+        this.tableSelectedItem = undefined;
+    }
 
 }

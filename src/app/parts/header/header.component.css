@@ -23,31 +23,36 @@
 }
 
 .navigation-container {
-    position: absolute;
+    position: fixed;
     display: flex;
     top: 0;
     right: 0;
     align-items: start;
     justify-content: start;
-    transform: translateX(calc(100% - 47px));
+    transform: translateX(100%);
     transition: .3s;
 }
 
 ::ng-deep .navigation-toggler {
     width: 4rem!important;
     height: 4.3rem!important;
-    background-color: var(--purple-500)!important;
+     /*var(--pink-400)!important;*/
+     /*var(--pink-400);*/
     border-bottom-right-radius: 0px!important;
     border-top-right-radius: 0px!important;
     flex: none;
     display: flex;
-    border-color: var(--purple-500);
+    transform: translateX(-100%);
 }
 
 .navigation-container.navigation-container-open {
     transform: translateX(0);
 }
 
+::ng-deep .navigation-container.navigation-container-open  .navigation-toggler {
+    
+    transform: translateX(0%);
+}
 .navigation-link:hover {
     background-color: #ffffff30;
 }

@@ -19,7 +19,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 })
 export class FormComponent implements OnDestroy {
     visible: boolean = true;
-    injector = inject(Injector);
     object: Aluno = new Aluno;
     loading = false;
     error: string = '';
@@ -35,6 +34,7 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
     ) {
 
+        console.log('oi')
         this.loadPage();
     }
 
@@ -45,12 +45,13 @@ export class FormComponent implements OnDestroy {
 
     loadPage() {
         var params = this.activatedRoute.params.subscribe(res => {
-            this.isEditPage = !!res['id'];
-            if (res['id']) {
+            console.log(res)
+            this.isEditPage = !!res['aluno_id'];
+            if (res['aluno_id']) {
                 this.loading = true;
-                var id = this.crypto.decrypt(res['id'])
+                var aluno_id = this.crypto.decrypt(res['aluno_id'])
 
-                this.service.get(id)
+                this.service.get(aluno_id)
                     .then(res => {
                         this.object = res;
                         this.loading = false;
@@ -59,9 +60,11 @@ export class FormComponent implements OnDestroy {
                     .catch(res => {
                         this.visible = false;
                     });
+
             } else {
-                this.visible = false;
-                this.visibleChange()
+                // this.visible = false;
+                // this.visibleChange()
+                // console.log(res)
             }
         })
         this.subscription.push(params);
@@ -78,7 +81,7 @@ export class FormComponent implements OnDestroy {
             target: e.target,
             message: message,
             header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,

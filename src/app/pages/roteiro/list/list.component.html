@@ -1,0 +1,46 @@
+<p-toolbar styleClass="border-none bg-white p-3    ">
+    <div class="p-toolbar-group-start flex-1">
+        <h2 class="flex align-items-center ">
+            <i class="bi bi-calendar-range mr-3 text-primary text-2xl"></i>
+            <span class="text-xl font-normal">Roteiro Supera <span *ngIf="currentTitle" class="font-bold text-xl"> - {{currentTitle}}</span></span>
+        </h2>
+    </div>
+    <div class="p-toolbar-group-end items-stretch">
+        <p-button icon="pi pi-angle-left text-sm" (onClick)="prev()" severity="secondary" pTooltip="Próximo" class="mr-2" size="small" />
+        <p-button icon="pi pi-angle-right text-sm" (onClick)="next()" severity="secondary" pTooltip="Anterior" class="mr-2" size="small" />
+        <p-button (onClick)="today()" severity="secondary" pTooltip="Hoje" class="mr-2" size="small" label="hoje" styleClass="bg-black-alpha-50 text-white" />
+        <p-button icon="pi pi-sync text-sm" (onClick)="update()" severity="secondary" label="atualizar" pTooltip="Atualizar roteiro" class="mr-2" size="small"  />
+        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true" size="small" styleClass="px-3" />
+    </div>
+</p-toolbar>
+<p-contextmenu #contextMenu [model]="items" appendTo="body" />
+<full-calendar
+               [options]="calendarioOptions"
+               #fullCalendar
+               class="p-1 "
+               [ngStyle]="{height: '30rem'}">
+    <ng-template #eventContent let-arg>
+        <ng-container *ngIf="!loading; else loadingEvent">
+            <!-- (click)="contextMenuShow(contextMenu, arg.event.extendedProps, $event)" -->
+            <a class="cursor-pointer" (click)="edit(arg.event.extendedProps)" title="Clique para ver mais" >
+                <div class="border-round-md  p-2 h-full w-full -mt-2 -mb-3 m-1 mr-2" 
+                        [style]="{ 
+                        height: 'calc(3rem + 10vh)',
+                        backgroundColor: arg.event.extendedProps.corLegenda ?? '#000', 
+                        borderColor: arg.event.extendedProps.corLegenda ?? '#000',
+                        color: getForeColor(arg.event.extendedProps.corLegenda ?? '#000')
+                    }">
+                    <p class="text-sm ">
+                        <i class="pi pi-calendar mr-2 text-sm"></i>
+                        <span>Semana {{arg.event.extendedProps.semana}}</span>
+                    </p>
+                    <p class="text-xl font-bold">{{arg.event.title}}</p>
+                </div>
+            </a>
+        </ng-container>
+        <ng-template #loadingEvent>
+            <p-skeleton width="100%" height="calc(3rem + 10vh)" />
+        </ng-template>
+    </ng-template>
+</full-calendar>
+<router-outlet></router-outlet>

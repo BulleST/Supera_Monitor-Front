@@ -1,0 +1,164 @@
+<p-popover #popoverSelectedAula styleClass="z-2 -mt-1" (onHide)="onHide()" [dismissable]="false">
+    
+    <div *ngIf="selectedAula" class="p-2 flex flex-column row-gap-1 -m-2">
+        <div class="p-2 white-space-normal">
+            <div class="flex">
+                <p>
+                    <b>Professor: </b>
+                    <span>{{selectedAula.professor }}</span>
+                    <span class="inline-flex w-1rem h-1rem border-circle ml-2 " [style]="{backgroundColor: selectedAula.corLegenda}"></span>
+                </p>
+                <span *ngIf="selectedAula.reposicaoDe_Aula_Id" 
+                    [pTooltip]="selectedAula.reposicaoDe_Aula?.turma + ' - ' + (selectedAula.reposicaoDe_Aula?.data |date:'dd/MM/yyyy \'às\' HH:mm')"
+                    class="ml-auto flex align-items-center">
+                    <span class="mr-2 ml-auto text-primary-500 text-base font-bold border-circle border-2 border-primary-500 w-2rem h-2rem flex align-items-center justify-content-center mr-1">R</span>
+                    <!-- {{ selectedAula.reposicaoDe_Aula?.data |date:'dd/MM/yyyy \'às\' HH:mm' }} -->
+                </span>
+            </div>
+            <p>
+                <b>Turma: </b>
+                <span>{{ selectedAula.turma ?? selectedAula.descricao }}</span>
+            </p>
+            <p *ngIf="selectedAula.perfilCognitivo && selectedAula.perfilCognitivo.length">
+                <b>Perfil Cognitivo: </b>
+                <span>{{ getPerfilCognitivo(selectedAula.perfilCognitivo) }}</span>
+            </p>
+            <p>
+                <b>Data: </b>
+                <span>{{selectedAula.data | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</span>
+            </p>
+            <p *ngIf="selectedAula.numeroSala && selectedAula.andar">
+                <b>Sala: </b>
+                <span>{{selectedAula.numeroSala }} - {{selectedAula.andar}}º andar </span>
+            </p>
+        </div>
+        <!-- Alunos -->
+        <div class="flex align-items-center justify-content-between px-2">
+            <span class="font-bold block mt-2 text-primary">Alunos</span>
+            <span class="font-bold block mt-2" [class.text-red-500]="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos">
+                <i class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite" 
+                *ngIf="selectedAula.alunos.length > selectedAula.capacidadeMaximaAlunos"></i>
+                <span> {{selectedAula.alunos.length}}/{{selectedAula.capacidadeMaximaAlunos}} </span>
+            </span>
+        </div>
+        <div class="h-10rem overflow-auto w-25rem">
+            <div *ngFor="let aluno of selectedAula.alunos" 
+                cdkDrag
+                [cdkDragDisabled]="aluno.presente && selectedAula.finalizada"
+                [cdkDragData]="aluno"
+                (cdkDragStarted)="cdkDragStarted($event)"
+                (cdkDragEntered)="cdkDragEntered($event)"
+                (cdkDragExited)="cdkDragExited($event)"
+                [ngClass]="{ 'cursor-disabled' : aluno.presente && selectedAula.finalizada}"
+                class="p-0 m-0">
+                <div *cdkDragPlaceholder></div>
+                <div *cdkDragPreview class="p-2">
+                    <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
+                    <div class="shadow-2">
+                        <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
+                    </div>
+                </div>
+                <a class="cursor-pointer">
+                    <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
+                </a>
+                <ng-template #alunoItem let-aluno="aluno">
+                    <div class="w-full flex align-items-center justify-content-start p-1 bg-white border-round-md">
+                        <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center ">
+                            <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                            <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                        </div>
+                        <span>
+                            <span class="font-bold hover:underline hover:text-primary-500" (click)="showAluno($event, aluno)">{{ aluno.aluno }}</span>
+                            <p-badge *ngIf="aluno.reposicaoDe_Aula_Id"
+                                styleClass="ml-2 "
+                                value="Reposição"
+                                size="small" />
+                            <span *ngIf="selectedAula.finalizada" class="ml-2">
+                                <span *ngIf="aluno.presente == true" class="pi pi-check text-green-500" pTooltip="Presente"></span>
+                                <span *ngIf="aluno.presente == false" class="pi pi-thumbs-down-fill text-red-500" pTooltip="Faltou"></span>
+                            </span>
+                        </span>
+                        <p class="ml-auto pl-2">
+                            <p-button *ngIf="aluno.celular"
+                                    (onClick)="enviarMensagem(aluno)"
+                                    severity="success"
+                                    icon="pi pi-whatsapp text-white text-xs"
+                                    styleClass="w-2rem h-2rem flex align-items-center justify-content-center"
+                                    [rounded]="true"
+                                    size="small"
+                                    pTooltip="Falar com {{aluno.aluno}}" />
+                            <p-badge *ngIf="aluno.reposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+                        </p>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+        <!-- Lista de Espera -->
+         <ng-container *ngIf="selectedAula.listaEspera && selectedAula.listaEspera.length">
+             <div class="flex align-items-center justify-content-between px-2">
+                 <span class="font-bold block mt-2 text-primary">Lista de Espera</span>
+                 <span class="font-bold block mt-2" >
+                     <span> {{ selectedAula.listaEspera.length }} </span>
+                 </span>
+             </div>
+             <div class="overflow-auto w-25rem pr-3" style="max-height: 10rem;" >
+                 <div *ngFor="let aluno of selectedAula.listaEspera"
+                    cdkDrag
+                    [cdkDragDisabled]="selectedAula.alunos.length >= selectedAula.capacidadeMaximaAlunos"
+                    [cdkDragData]="aluno"
+                    (cdkDragStarted)="cdkDragStarted($event)"
+                    (cdkDragEntered)="cdkDragEntered($event)"
+                    (cdkDragExited)="cdkDragExited($event)">
+                    
+                     <a class="cursor-pointer">
+                         <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
+                     </a>
+                     <ng-template #alunoItem let-aluno="aluno">
+                         <div class="w-full flex align-items-center justify-content-start p-1 bg-white border-round-md">
+                             <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center ">
+                                 <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                                 <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                             </div>
+                             <span>
+                                 <span class="font-bold hover:underline hover:text-primary-500" (click)="showAluno($event, aluno)">{{ aluno.nome }}</span>
+                             </span>
+                             <p class="ml-auto pl-2">
+                                 <p-button *ngIf="aluno.celular"
+                                         (onClick)="enviarMensagem(aluno)"
+                                         severity="success"
+                                         icon="pi pi-whatsapp text-white text-xs"
+                                         styleClass="w-2rem h-2rem flex align-items-center justify-content-center"
+                                         [rounded]="true"
+                                         size="small"
+                                         pTooltip="Falar com {{aluno.nome}}" />
+                             </p>
+                         </div>
+                     </ng-template>
+                 </div>
+             </div>
+         </ng-container>
+         
+        <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
+        <div class="p-2 flex align-items-center gap-2">
+            <p-button *ngIf="selectedAula.finalizada == false" 
+                    severity="secondary"
+                      icon="pi pi-calendar"
+                      label="Reagendar aula"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="goToReagendamento()" />
+            <p-button
+                      label="Ver aula"
+                      icon="pi pi-plus text-xs"
+                      [rounded]="true"
+                      size="small"
+                      (onClick)="goToAula($event)" />
+
+            <span *ngIf="selectedAula.finalizada" 
+                class="ml-auto gap-2 flex align-items-center">
+                <span class="font-bold ">Aula Finalizada</span>
+                <i class="pi pi-check-circle text-green-500 text-2xl"></i>
+            </span>
+        </div>
+    </div>
+</p-popover>

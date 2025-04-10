@@ -1,21 +1,24 @@
 import { PerfilCognitivo } from "./perfil-cognitivo.model";
-import { PseudoAula } from "./reposicao.model";
+import { PseudoEvento } from "./reposicao.model";
 
 export class AulaCreateRequest {
-    turma_Id?: number = 0;
-    sala_Id: number = 0;
+    turma_Id?: number = undefined as unknown as number;
+    descricao: string = '';
+    sala_Id: number = undefined as unknown as number;
     data: Date = new Date;
-    professor_Id: number = 0;
-    observacao: string = '';
+    professor_Id: number = undefined as unknown as number;
+    roteiro_Id: number = undefined as unknown as number;
+    observacao?: string;
     perfilCognitivo: PerfilCognitivo[] = []
 }
 
 export class AulaEditRequest {
-    id: number = PseudoAula.AulaId;
+    id: number = PseudoEvento.EventoId;
+    descricao: string = '';
     data: Date = new Date;
     professor_Id: number = 0;
     sala_Id: number = 0;
-    observacao: string = '';
+    observacao?: string;
     perfilCognitivo: PerfilCognitivo[] = []
 }
 

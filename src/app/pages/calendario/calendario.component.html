@@ -1,0 +1,241 @@
+<app-confirm-dialog></app-confirm-dialog>
+<section id="home" #home>
+    <div>
+        <div id="alunos"
+             cdkDropList
+             [cdkDropListData]="selectedEvento ? selectedEvento.alunos : undefined"
+             [cdkDropListConnectedTo]="cdkEventItensId"
+             [cdkDropListSortingDisabled]="true"
+             #alunos="cdkDropList">
+            <app-selected-evento
+                                 #popoverComponent
+                                 [evento]="selectedEvento"
+                                 [cdkEventItensId]="cdkEventItensId"
+                                 [cdkDragCancel]="cdkDragCancel"
+                                 (cdkDragCancelChange)="cdkDragCancel = $event"
+                                 (aluno)="selectedAluno = $event"></app-selected-evento>
+        </div>
+        <p-toolbar styleClass="border-none bg-white p-3 shadow-1">
+            <div class="p-toolbar-group-start flex-1">
+                <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+                    <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
+                    <span class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
+                        <span>Calendário</span>
+                        <span class="font-bold text-xl"> - {{currentTitle}}</span>
+                    </span>
+                </h2>
+            </div>
+            <div class="p-toolbar-group-end flex align-items-stretch gap-2 flex-wrap">
+                <p-button icon="pi pi-sync text-sm" (onClick)="update('button')" severity="secondary" label="atualizar" pTooltip="Atualizar calendário" size="small" />
+                <p-select
+                          [options]="viewMenu"
+                          [(ngModel)]="view"
+                          optionValue="value"
+                          styleClass="border-none surface-800 hover:surface-700 text-white flex align-items-center py-0"
+                          size="small"
+                          appendTo="body">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2">
+                            <span class="{{selectedOption.icon}} text-xs"></span>
+                            <span class="ml-2">{{ selectedOption.label }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <span class="{{item.icon}}"></span>
+                        <span class="ml-2">{{ item.label }}</span>
+                    </ng-template>
+                    <ng-template #dropdownicon>
+                        <i class="pi pi-sort-down-fill text-xs text-white -mt-1"></i>
+                    </ng-template>
+                </p-select>
+                <p-select
+                          value="'Cadastrar'"
+                          [options]="agendarMenuItem"
+                          styleClass="border-none bg-primary-500 hover:bg-primary-600 text-white flex align-items-center py-0"
+                          appendTo="body"
+                          size="small">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2">
+                            <span class="ml-2">Agendar</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="w-10rem" (click)="agendarEvento(item, $event)">
+                            <a class="ml-2">{{ item.label }}</a>
+                        </div>
+                    </ng-template>
+                    <ng-template #dropdownicon>
+                        <i class="pi pi-sort-down-fill text-xs text-white -mt-1"></i>
+                    </ng-template>
+                </p-select>
+            </div>
+        </p-toolbar>
+        <div>
+            <!-- SEMANA -->
+            <div class="flex align-items-center justify-content-between flex-wrap  mt-4 -mb-4 py-3  ">
+                <div class="flex align-items-center " *ngIf="currentRoteiro">
+                    <i class="pi pi-star-fill text-2xl mx-2" [style]="{ color: currentRoteiro.corLegenda }"></i>
+                    <span class="font-bold text-xl">Semana {{currentRoteiro.semana}} - {{currentRoteiro.tema}} </span>
+                    <i class="pi pi-star-fill text-2xl mx-2" [style]="{ color: currentRoteiro.corLegenda }"></i>
+                </div>
+                <div class="flex gap-1 flex align-items-stretch " style="height: 2.4rem">
+                    <p-button
+                              [label]="checked ? 'Ver semana' : 'Ver dia'"
+                              [severity]="checked ? 'primary' : 'secondary'"
+                              [styleClass]="checked ? 'h-full mr-2' : 'surface-800 border-800 text-white h-full mr-2'"
+                              size="small"
+                              (onClick)="calendarChanged()" />
+                    <p-button icon="pi pi-angle-left text-lg"
+                              styleClass="w-full h-full surface-100 border-100"
+                              [style]="{width: '2.4rem', overflow: 'hidden',}"
+                              (onClick)="prev()"
+                              severity="secondary"
+                              iconPos="right"
+                              pTooltip="Anterior"
+                              size="small" />
+                    <p-button
+                              styleClass="h-full surface-800 border-800"
+                              (onClick)="today()"
+                              severity="help"
+                              pTooltip="Hoje"
+                              label="hoje"
+                              size="small" />
+                    <p-button icon="pi pi-angle-right text-lg"
+                              styleClass="w-full h-full surface-100 border-100"
+                              [style]="{width: '2.4rem', overflow: 'hidden',}"
+                              (onClick)="next()"
+                              severity="secondary"
+                              pTooltip="Próximo"
+                              size="small" />
+                </div>
+            </div>
+            <!-- FIM SEMANA -->
+            <!-- CALENDARIO -->
+            <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)" *ngIf="calendarVisible()">
+                <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar style="max-height: 40rem;">
+                    <ng-template #dayHeaderContent let-arg>
+                        <p class="text-sm uppercase font-light">{{arg.date | date : 'EE'}}</p>
+                        <p class=" p-4 border-circle  mx-auto inline-flex align-items-center justify-content-center text-xl " style="width: 1.5rem; height: 1.5rem;"
+                           [ngClass]="{ 'bg-primary-500 text-white font-light': arg.isToday }"> {{arg.date | date : 'dd'}} </p>
+                    </ng-template>
+                    <ng-template #eventContent let-arg>
+                        <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
+                    </ng-template>
+                </full-calendar>
+                <ng-template #eventCalendar let-arg="arg" let-evento="evento">
+                    <ng-template #eventHeader>
+                        <div class="flex align-items-center justify-content-start gap-1 white-space-nowrap text-overflow-ellipsis overflow-hidden">
+                            <i class="pi pi-clock text-xs"></i>
+                            <span class="text-xs">{{evento.data | date : 'HH:mm'}}</span>
+                            <ng-template [ngIf]="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+                                <span class="ml-auto pl-3 text-xs ">
+                                    <span>{{evento.alunos.length}}</span>
+                                    <span>/{{evento.capacidadeMaximaAlunos}}</span>
+                                </span>
+                                <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="pi pi-exclamation-circle text-xs  -mt-1 fadeout animation-duration-500 animation-iteration-infinite"></i>
+                            </ng-template>
+                            <ng-template [ngIf]="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.id != PseudoEvento.EventoId">
+                                <span class="ml-auto pl-3 text-xs">
+                                    <span *ngIf="evento.alunos.length == 0" class="">Nenhuma inscrição</span>
+                                    <span *ngIf="evento.alunos.length == 1">1 inscrição</span>
+                                    <span *ngIf="evento.alunos.length > 1">{{evento.alunos.length}} inscrições</span>
+                                </span>
+                            </ng-template>
+                        </div>
+                    </ng-template>
+                    <ng-template #eventBody>
+                        <div class="flex align-items-center my-auto gap-2 w-full " style="height: 3rem;">
+                            <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
+                                <span class="p-1 px-2 border-circle border-2 text-xs flex-none font-bold text-center ml-1" [pTooltip]="'Reagendamento: clique para ver mais'" [style]="{ borderColor: evento.foreColor }">R</span>
+                            </ng-template>
+                            <div class="text-base font-bold overflow-hidden w-full h-full  mb-auto flex ">
+                                <p *ngIf="evento.descricao" [pTooltip]="evento.descricao" class="my-auto">{{evento.descricao}}</p>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template #eventFooter>
+                        <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
+                            <ng-template #professorTemplate let-professor="professor">
+                                <p [pTooltip]="professor" class="col p-0 white-space-nowrap text-overflow-ellipsis overflow-hidden text-xs text-left">
+                                    <span>{{professor}}</span>
+                                </p>
+                            </ng-template>
+                            <ng-template [ngIf]="evento.evento_Tipo_Id != EventoTipo.Reuniao">
+                                <ng-template [ngIf]="evento.professor">
+                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
+                                </ng-template>
+                                <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
+                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
+                                </ng-template>
+                            </ng-template>
+                            <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
+                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
+                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                                    <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="col p-0 text-xs Soverflow-hidden text-overflow-ellipsis white-space-nowrap text-right">{{ perfilCognitivo }} </p>
+                                </ng-template>
+                            </ng-template>
+                        </div>
+                    </ng-template>
+                    <!-- O evento está iniciando dessa forma: {}, então só exibo as informações quando ele ganhar propriedades de um objeto, como o id -->
+                    <ng-template [ngIf]="evento.id">
+                        <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id); 
+                                                then dragDropTemplate; 
+                                                else notDragDropTemplate"></ng-container>
+                        <ng-template #dragDropTemplate>
+                            <div cdkDropList
+                                 [cdkDropListSortingDisabled]="true"
+                                 [cdkDropListData]="evento.alunos"
+                                 (cdkDropListDropped)="cdkDrop($event, evento)"
+                                 [cdkDropListConnectedTo]="['alunos']"
+                                 [id]="'event-' + arg.event.id"
+                                 (click)="selectEvento($event, evento)"
+                                 class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer"
+                                 [style]="{
+                                     backgroundColor: arg.backgroundColor, 
+                                     borderColor: arg.backgroundColor, 
+                                     color: evento.foreColor 
+                                     }">
+                                <p class="text-red-500">{{evento.backgroundColor}}</p>
+                                <header [pTooltip]="eventHeader">
+                                    <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                                </header>
+                                <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                                <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                            </div>
+                        </ng-template>
+                        <ng-template #notDragDropTemplate>
+                            <div (click)="selectEvento($event, evento)"
+                                 class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer"
+                                 [style]="{
+                                    backgroundColor: arg.backgroundColor, 
+                                    borderColor: arg.backgroundColor, 
+                                    color: evento.foreColor 
+                                }">
+                                <header [pTooltip]="eventHeader">
+                                    <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                                </header>
+                                <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                                <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                            </div>
+                        </ng-template>
+                    </ng-template>
+                </ng-template>
+            </div>
+            <!-- FIM CALENDARIO -->
+            <!-- LEGENDA -->
+            <div class="flex mt-2" *ngIf="!loading">
+                <div class="border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3" style="background-color: #f1f0f0 !important;">
+                    <div *ngFor="let item of legenda" 
+                        (click)="item.ativo = !item.ativo"
+                        [ngClass]="{ 'line-through': !item.ativo }"
+                        class="my-1 flex align-items-center cursor-pointer">
+                        <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
+                        <span class="ml-2 hover:font-bold hover:text-primary-500 hover:underline">{{item.label}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- FIM LEGENDA -->
+        </div>
+    </div>
+</section>
+<router-outlet></router-outlet>

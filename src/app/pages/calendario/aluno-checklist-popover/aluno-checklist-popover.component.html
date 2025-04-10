@@ -1,0 +1,63 @@
+<p-popover #popover styleClass="-mt-1" [dismissable]="true">
+    <p-tabs [value]="aluno.checklist_Id ?? 0" scrollable #tabs >
+        <p-tablist style="max-width: 50rem;">
+            <p-tab *ngFor="let checklist of aluno.checklistCompleto" 
+                [value]="checklist.id"> 
+                <div class="flex align-items-center ">
+                    <span>{{checklist.nome}} </span>
+                    
+                    <div *ngIf="!loading" class="ml-2 font-bold">
+                        <!-- Finalizado -->
+                        <i *ngIf="checklist.finalizados.length == checklist.items.length"
+                           pTooltip="Finalizado"
+                           class="pi pi-check-circle text-green-500"></i>
+                        <!-- Atrasado -->
+                        <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                              pTooltip="Atrasado"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-times-circle text-red-500 ml-2 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                        </span>
+                        <!-- Pendentes da Semana -->
+                        <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                              pTooltip="Em andamento"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-hourglass text-orange-500 ml-2"></i>
+                        </span>
+                    </div>
+                </div>
+            </p-tab>
+        </p-tablist>
+        <p-tabpanels>
+            <p-tabpanel *ngFor="let checklist of aluno.checklistCompleto" [value]="checklist.id">
+                <div class="w-full">
+                    <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                    <ul class="p-0 ml-0">
+                        <li *ngFor="let checklistItem of checklist.items"
+                            (mouseenter)="checklistData.show($event)"
+                            (mouseleave)="checklistData.hide()"
+                            class="flex align-items-center gap-2 py-1">
+                            <p-checkbox #checkbox
+                                        [inputId]="'checklistitem-' + checklistItem.id"
+                                        [name]="'checklistitem-' + checklistItem.id"
+                                        #finalizado="ngModel"
+                                        [(ngModel)]="checklistItem.finalizado"
+                                        [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
+                                        [binary]="true"
+                                        [readonly]="checklistItem.finalizado"
+                                        (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                            <div>
+                                <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                            </div>
+                            <p-popover #checklistData styleClass="-mt-1">
+                                <p>Prazo máximo: {{checklistItem.prazo | date : 'dd/MM/yyyy' }}</p>
+                                <ng-template [ngIf]="checklistItem.finalizado">
+                                    <p *ngIf="checklistItem.dataFinalizacao">Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</p>
+                                    <p *ngIf="checklistItem.account_Finalizacao">Finalizado por {{checklistItem.account_Finalizacao }}</p>
+                                </ng-template>
+                                <p class="mt-2">Observações: </p>
+                                <p *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</p>
+                                <p *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</p>
+                            </p-popover>
+                        </li>
+                    </ul>
+                </div>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</p-popover>

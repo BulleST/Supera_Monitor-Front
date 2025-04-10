@@ -1,0 +1,81 @@
+<p-dialog [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="hide()"
+          [style]="{ width: '50rem', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center -mb-3">
+            <span class="p-dialog-title">
+                <i class="fa-solid fa-user-graduate mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span class="ml-2">Dados do Aluno</span>
+            </span>
+        </div>
+    </ng-template>
+    <div *ngIf="aluno" class="p-2 flex flex-column row-gap-1 ">
+        <div class="flex  my-1 mx-2">
+            <div class="w-11rem h-11rem flex-none surface-50 border-circle border-2 border-color-500 overflow-hidden my-auto flex align-items-center justify-content-center ">
+                 <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
+                <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-4xl"></i> 
+            </div>
+            <p-divider layout="vertical" styleClass="mx-4 py-5" />
+            <div class="pb-2 flex flex-column gap-2 ml-2 col w-min">
+                <table class="">
+                    <tr>
+                        <td colspan="2">
+                            <span class="text-xl font-bold text-overflow-ellipsis white-space-nowrap max-w-10rem pr-2"
+                                  [pTooltip]="aluno.aluno">{{ aluno.aluno }}</span>
+                            <p-badge *ngIf="aluno.reposicaoDe_Evento_Id && aluno.reposicaoDe_Evento"
+                                     [pTooltip]="aluno.reposicaoDe_Evento!.data.toString()"
+                                     styleClass="ml-2 "
+                                     value="Reposição"
+                                     size="small" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Turma:</b> {{aluno.turma }}</td>
+                    </tr>
+                    <tr>
+                        <td>Apostila Ábaco: Ábaco 123</td>
+                        <td><b>Página:</b> 10</td>
+                    </tr>
+                    <tr>
+                        <td>Apostila AH: AH 123</td>
+                        <td><b>Página:</b> 08</td>
+                    </tr>
+                    <tr>
+                        <td>Perfil Cognitivo:</td>
+                        <td>{{aluno.perfilCognitivo}}</td>
+                    </tr>
+                    <tr>
+                        <td>Etapa da jornada:</td>
+                        <td (click)="popoverComponent.show($event)" > 
+                            <app-aluno-checklist-status [aluno]="aluno"></app-aluno-checklist-status>
+                            <app-aluno-checklist-popover #popoverComponent [aluno]="aluno"></app-aluno-checklist-popover>
+                        </td>
+                    </tr>
+                </table>
+                <div class="flex align-items-center gap-2 mt-3  ">
+                    <p-button label="Ver aluno"
+                              [rounded]="true"
+                              icon="pi pi-user-edit"
+                              size="small"
+                              (onClick)="goToAluno(aluno)" />
+                    <p-button *ngIf="!evento!.finalizado || (evento!.finalizado && aluno.presente == false)"
+                              label="Agendar Reposição"
+                              icon="pi pi-calendar"
+                              [rounded]="true"
+                              severity="secondary"
+                              size="small"
+                              (onClick)="goToReposicao(aluno)" />
+                    <p-button *ngIf="aluno && aluno.celular" 
+                            label="Enviar mensagem"
+                              severity="success"
+                              icon="pi pi-whatsapp "
+                              [rounded]="true"
+                              size="small"
+                              (onClick)="enviarMensagem(aluno.aluno, aluno.celular)" />
+                </div>
+            </div>
+        </div>
+    </div>
+</p-dialog>

@@ -2,6 +2,8 @@
     margin: 0 7px
 }
 
+::ng-deep .p-menu-item-link.active-link:focus,
+::ng-deep .p-menu-item-link.active-link:active,
 ::ng-deep .p-menu-item-link.active-link:hover,
 ::ng-deep .p-menu-item-link.active-link {
     background: var(--p-primary-500);
@@ -9,6 +11,13 @@
     border-radius: 5px;
 }
 
+::ng-deep .p-menu-item-content .p-menu-item-link.active-link:focus .p-menu-item-icon,
+::ng-deep .p-menu-item-content .p-menu-item-link.active-link:active .p-menu-item-icon,
+::ng-deep .p-menu-item-content .p-menu-item-link.active-link:hover .p-menu-item-icon,
+::ng-deep .p-menu-item-content .p-menu-item-link.active-link .p-menu-item-icon,
+
+::ng-deep .p-menu-item-link.active-link:focus .p-menu-item-icon,
+::ng-deep .p-menu-item-link.active-link:active .p-menu-item-icon,
 ::ng-deep .p-menu-item-link.active-link:hover .p-menu-item-icon,
 ::ng-deep .p-menu-item-link.active-link .p-menu-item-icon {
     color: white;

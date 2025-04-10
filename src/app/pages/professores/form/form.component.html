@@ -13,7 +13,7 @@
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
-            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}} educador</span>
             <p-button *ngIf="isEditPage"
                       class="ml-auto"
                       type="button"
@@ -94,8 +94,8 @@
                     <p-divider layout="horizontal" align="left"> <span class="font-bold text-primary">Cadastrar um novo</span> </p-divider>
                 </div>
             </ng-template>
-            <div class="field col-12"> <!-- Nome -->
-                <label for="nome">Nome: <span class="text-red-500">*</span></label>
+            <div class="field sm:col-8 col-8"> <!-- Nome do educador -->
+                <label for="nome">Nome do educador: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
                        #nome="ngModel"
@@ -108,24 +108,22 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Telefone/Celular -->
-                <label for="telefone">Telefone/Celular: <span class="text-red-500">*</span></label>
-                <p-inputmask
-                             #telefone="ngModel"
-                             [(ngModel)]="object.telefone"
-                             mask="(99) ?9.9999-9999"
-                             placeholder="(99) *9.9999-9999"
-                             [autoClear]="true"
-                             id="telefone"
-                             name="telefone"
-                             class="w-full"
-                             styleClass="w-full"
-                             [required]="true" />
+            <div class="field sm:col-4 col-4"> <!-- Celular -->
+                <label for="telefone">Celular: <span class="text-red-500">*</span></label>
+                <p-inputmask type="text"
+                        #telefone="ngModel"
+                        [(ngModel)]="object.telefone"
+                        id="telefone"
+                        name="telefone"
+                        styleClass="w-full"
+                        [required]="true" 
+                        mask="+55 (99) 9.9999-9999" 
+                        placeholder="+55 (99) 9.9999-9999" />
                 <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-8 col-12"> <!-- E-mail -->
+            <div class="field col-12"> <!-- E-mail -->
                 <label for="email">E-mail: <span class="text-red-500" *ngIf="!isEditPage && !accountsSelected">* <small class="text-black">(Não é possível alterar o e-mail após o primeiro cadastro)</small></span> </label>
                 <ng-template [ngIf]="!isEditPage && !accountsSelected">
                     <input type="email"
@@ -154,7 +152,7 @@
                            readonly>
                 </ng-template>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Data de Nascimento -->
+            <div class="field sm:col-4 col-4"> <!-- Data de Nascimento -->
                 <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
                 <p-datepicker
                 #dataNascimento="ngModel"
@@ -175,7 +173,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Data de Início -->
+            <div class="field sm:col-4 col-4"> <!-- Data de Início -->
                 <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
@@ -196,7 +194,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Nível Certificação -->
+            <div class="field sm:col-4 col-4"> <!-- Nível Certificação -->
                 <label for="professor_NivelCertificacao_Id">Nível de Certificação: <span class="text-red-500">*</span></label>
                 <p-select
                         [loading]="loadingNivelCertificacao"

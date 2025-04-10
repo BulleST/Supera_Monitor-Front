@@ -14,12 +14,12 @@ export class AlunoRestricaoService extends Service {
     restricaoCreated = new EventEmitter<Aluno_Restricao>();
 
 
-    getList() {
-        return this.http.get<Aluno_Restricao[]>(`${this.url}/alunos/restricao/all/`)
+    getList(aluno_Id: number) {
+        return this.http.get<Aluno_Restricao[]>(`${this.url}/restricoes/all/${aluno_Id}`)
     }
 
     create(model: Aluno_Restricao) {
-        return this.http.post<Response>(`${this.url}/alunos/restricao/`, Aluno_Restricao)
+        return this.http.post<Response>(`${this.url}/restricoes/`, Aluno_Restricao)
             .pipe(tap({
                 next: (res: Response) => {
                     insertOrReplace(this, res.object, 'list');

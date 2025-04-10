@@ -1,0 +1,85 @@
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, of, tap } from 'rxjs';
+import { Response } from '../helpers/request-response.interface';
+import { MyMap } from '../utils/map';
+import moment from 'moment';
+import { Service } from '../helpers/service.service';
+import { getError } from '../utils';
+import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class RoteiroService extends Service {
+    override list = new BehaviorSubject<Roteiro[]>([]);
+ 
+
+    getList() {
+        return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(x => {
+                        x.dataFim = moment(x.dataFim).add(23, 'hour').toDate();
+                        x.dataInicio = new Date(x.dataInicio);
+                        x.corLegenda =  x.corLegenda ?? this.getRandomColor();
+                        x.active = !x.deactivated;
+                        return x
+                    })
+                    this.list.next(list);
+                    return of(list);
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar roteiro supera. \n ${getError(err)}`);
+                }
+            }));
+    }
+    getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      }
+
+    get(id: number) {
+        return new Promise<Roteiro>(async (resolve, reject) => {
+            if (this.list.value.length == 0)
+                this.getList().subscribe();
+
+            var item = this.list.value.find(x => x.id == id) as Roteiro;
+            if (!item){
+                this.toastrService.error(`Roteiro não encontrado.`);
+               return reject('Roteiro não encontrado.')
+            }
+
+            if (item.dataInicio)
+                item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD[T]HH:mm:ss'))
+            if (item.dataFim)
+                item.dataFim = new Date(moment(item.dataFim).format('YYYY-MM-DD[T]HH:mm:ss'))
+
+            return resolve(item);
+        })
+    }
+
+    create(model: Roteiro) {
+        var request = MyMap(model, new RoteiroRequest);
+        return this.http.post<Response>(`${this.url}/roteiros`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível cadastrar roteiro. \n ${getError(err)}`);
+                }
+            }));
+    }
+
+    edit(model: Roteiro) {
+        var request = MyMap(model, new RoteiroRequest);
+        return this.http.put<Response>(`${this.url}/roteiros`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível editar roteiro. \n ${getError(err)}`);
+                }
+            }));
+    }
+
+}

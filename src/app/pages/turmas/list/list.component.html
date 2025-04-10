@@ -45,8 +45,8 @@
                                    (input)="dt.filterGlobal(tableSearch, 'contains')"
                                    placeholder="Pesquisar" />
                         </p-iconfield>
-                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" tooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" tooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" pTooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar turmas" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
                         <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" />
                     </div>
                 </div>
@@ -64,7 +64,10 @@
                         <span>{{ col.label }}</span>
                         <ng-template [ngIf]="col.filterType != FilterType.none">
                             <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                <p-columnFilter [type]="col.filterType" [field]="col.field" display="menu" />
+                                <p-columnFilter 
+                                [type]="col.filterType" 
+                                [field]="col.field" 
+                                display="menu" />                       
                                 <p-sortIcon [field]="col.field" />
                             </div>
                         </ng-template>
@@ -89,12 +92,7 @@
                     }"
                    >
                     <ng-template [ngIf]="col.displayType == DisplayType.options">
-                        <ng-container *ngTemplateOutlet="tag; 
-                            context: { 
-                                item: item,
-                                option: getOption(col, item)
-                            }">
-                        </ng-container>
+                        <ng-container *ngTemplateOutlet="tag; context: { item: item, option: getOption(col, item) }"></ng-container>
                         <ng-template #tag let-item="item" let-option="option">
                             <p-tag *ngIf="option"
                                    styleClass="font-normal"
@@ -111,7 +109,6 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-
                 </td>
                 <td class="border-none px-0">
                 </td>

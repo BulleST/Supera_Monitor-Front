@@ -3,7 +3,7 @@ import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { AccountRole } from '../models/account-perfil.model';
 import { Account, AccountRequest } from '../models/account.model';
-import { Map } from '../utils/map';
+import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 
@@ -53,7 +53,7 @@ export class UserService extends Service {
     }
 
     create(model: Account) {
-        var request = Map(model, new AccountRequest)
+        var request = MyMap(model, new AccountRequest)
         return this.http.post<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
@@ -63,7 +63,7 @@ export class UserService extends Service {
     }
 
     edit(model: Account) {
-        var request = Map(model, new AccountRequest)
+        var request = MyMap(model, new AccountRequest)
         return this.http.put<Response>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {

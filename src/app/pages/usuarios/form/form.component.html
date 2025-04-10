@@ -50,7 +50,7 @@
           </ng-template>
     <form (ngSubmit)="send(form, $event)" #form="ngForm">
         <div class="formgrid grid">
-            <div class="field md:col-4 col-12"> <!-- Nome -->
+            <div class="field sm:col-4 col-12"> <!-- Nome -->
                 <label for="name">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                         pInputText
@@ -64,21 +64,21 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="name.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-4 col-12"> <!-- Telefone/Celular -->
-                <label for="phone">Telefone/Celular: <span class="text-red-500">*</span></label>
-                <input type="text"
-                        pInputText
+            <div class="field sm:col-4 col-6"> <!-- Celular -->
+                <label for="phone">Celular: <span class="text-red-500">*</span></label>
+                <p-inputmask type="text"
                         #phone="ngModel"
                         [(ngModel)]="object.phone"
                         id="phone"
                         name="phone"
-                        class="w-full"
-                        [required]="true">
+                        [required]="true" 
+                        mask="+55 (99) 9.9999-9999" 
+                        placeholder="+55 (99) 9.9999-9999" />
                 <div *ngIf="phone.touched && phone.invalid && phone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-4 col-12"> <!-- Perfil -->
+            <div class="field sm:col-4 col-6"> <!-- Perfil -->
                 <label for="role">Perfil: </label>
                     <input type="text"
                         pInputText

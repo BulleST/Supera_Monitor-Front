@@ -5,7 +5,7 @@ export class Apostila {
     nome: string = '';
     numeroTotalPaginas: number = 0;
     ordem: number = 0;
-    apostila_Tipo_Id: Apostila_Tipo = Apostila_Tipo.Undefined;
+    apostila_Tipo_Id: ApostilaTipo = ApostilaTipo.Undefined;
 }
 
 export class Apostila_Kit {
@@ -15,7 +15,7 @@ export class Apostila_Kit {
 }
 
 
-export enum Apostila_Tipo {
+export enum ApostilaTipo {
     Undefined = 0,
     Abaco = 1,
     AH = 2

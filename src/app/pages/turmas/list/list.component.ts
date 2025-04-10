@@ -50,7 +50,18 @@ export class ListComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(res => this.list = res);
+        var list = this.service.list.subscribe(res => {
+            this.list = res.map(turma => {
+                turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
+                turma.active = !turma.deactivated;
+                        
+                if (turma.numeroSala != 0 && turma.andar != 0)
+                     turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
+                else turma.salaDeAulaString = 'ONLINE'
+                
+                return turma
+            })
+        });
         this.subscription.push(list);
 
     }

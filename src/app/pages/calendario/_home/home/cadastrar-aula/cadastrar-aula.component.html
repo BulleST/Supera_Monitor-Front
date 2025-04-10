@@ -1,0 +1,265 @@
+<p-confirmdialog styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div [innerHTML]="message.message"></div>
+    </ng-template>
+</p-confirmdialog>
+<p-dialog [header]="'Cadastrar Aula'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '1000px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> 
+                <span>Cadastrar aula <span class="text-sm font-normal">(não recorrente)</span></span>
+            </span>
+        </div>
+    </ng-template>
+    <form #form="ngForm" class="px-2" (submit)="send(form)">
+        <div class="formgrid grid">
+            <div class="field md:col-5 sm:col-12 col-12"> <!-- Descrição -->
+                <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #descricao="ngModel"
+                       [(ngModel)]="object.descricao"
+                       id="descricao"
+                       name="descricao"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-2 sm:col-4 col-12"> <!-- Data -->
+                <label for="data">Data: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #dataNgModel="ngModel"
+                              [(ngModel)]="data"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              inputId="data"
+                              name="data"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              [selectOtherMonths]="true"
+                              [keepInvalid]="true"
+                              [disabledDays]="[0]"
+                              appendTo="body" />
+                <div *ngIf="dataNgModel.touched && dataNgModel.invalid && dataNgModel.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataNgModel.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-2 sm:col-4 col-12"> <!-- Horário -->
+                <label for="data">Horário: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              inputId="data"
+                              name="data"
+                              #horaNgModel="ngModel"
+                              [(ngModel)]="horario"
+                              [showIcon]="true"
+                              icon="pi pi-clock"
+                              [iconDisplay]="'input'"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="true"
+                              appendTo="body"
+                              [timeOnly]="true">
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
+                <div *ngIf="horaNgModel.touched && horaNgModel.invalid && horaNgModel.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="horaNgModel.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field md:col-3 sm:col-4 col-12"> <!-- Sala de Aula -->
+                <label for="sala_Id">Sala de Aula: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="salaAula"
+                          [(ngModel)]="object.sala_Id"
+                          [loading]="loadingSalaAula"
+                          #sala_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="sala_Id"
+                          inputId="sala_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                          
+                          <ng-template #selectedItem let-selectedOption>
+                            {{selectedOption.numeroSala}} - {{selectedOption.andar}}º andar
+                         </ng-template>
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1">
+                                    <span class="mr-2">{{ item.numeroSala }} - {{item.andar}}º Andar</span>
+                                    <p-badge *ngIf="item.disponivel == false" value="Indisponível" severity="danger" />
+                                </p>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Turma indisponível.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 sm:col-4 col-12"> <!-- Professor -->
+                <label for="professor_Id">Professor: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="professores"
+                          [(ngModel)]="object.professor_Id"
+                          [loading]="loadingProfessores"
+                          #professor_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_Id"
+                          inputId="professor_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1">
+                                    <span class="mr-2">{{ item.nome }}</span>
+                                    <p-badge *ngIf="item.disponivel == false" value="Indisponível" severity="danger" />
+                                </p>
+                                <p class="text-sm">
+                                    <{{ item.email }}>
+                                </p>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Professor indisponível.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 sm:col-4 col-12"> <!-- Turma -->
+                <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="turmas"
+                          [loading]="loadingTurmas"
+                          [(ngModel)]="object.turma_Id"
+                          #turma_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="turma_Id"
+                          inputId="turma_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1 flex align-items-center ">
+                                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                    <span class="mr-2">{{ item.nome }} - <span class="font-normal">Professor(a) {{item.professor}}</span></span>
+                                    <p-badge *ngIf="item.disponivel == false" value="Indisponível" severity="danger" />
+                                </p>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="turma_Id.touched && turma_Id.invalid && turma_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['indisponivel']">Turma indisponível.</p>
+                </div>
+            </div>
+            <div class="field md:col-4 sm:col-4 col-12"> <!-- Perfil Cognitivo -->
+                <label for="perfilCognitivo">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+                <p-multiselect 
+                    [options]="perfisCognitivos"
+                    [(ngModel)]="object.perfilCognitivo"
+                    [loading]="loadingPerfisCognitivos"
+                    #perfilCognitivo="ngModel"
+                    inputId="perfilCognitivo"
+                    name="perfilCognitivo"
+                    placeholder="Selecione"
+                    optionLabel="nome"
+                    [filter]="true"
+                    filterBy="nome"
+                    [required]="true"
+                    styleClass="w-full" 
+                    appendTo="body" />
+                <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <div class="field col-12">
+                <label class="text-orange-500 font-bold">Alunos</label>
+                <!-- <p-divider layout="horizontal" /> -->
+                 <hr class="mb-4 border-orange-500 border-1">
+                <p-picklist 
+                    [source]="alunos" 
+                    [target]="alunosSelected" 
+                    [dragdrop]="true" 
+                    [sourceStyle]="{ height: '30rem' }" 
+                    [targetStyle]="{ height: '30rem' }" 
+                    filterBy="nome, turma"
+                    sourceFilterPlaceholder="Procure por nome ou turma"
+                    targetFilterPlaceholder="Procure por nome ou turma"
+                    [showSourceControls]="false"
+                    [showTargetControls]="false">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center w-full">
+                            <p>{{ item.nome }}</p>
+                            <p class="ml-auto">{{ item.turma }}</p>
+                            <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
+                            <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
+                                <span class="w-1rem h-1rem border-circle flex ml-2" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                            </ng-template>
+                            
+                        </div>
+                    </ng-template>
+                </p-picklist>
+            </div>
+            <div class="col-12 px-1 flex align-items-center justify-content-end">
+         
+                <p-button type="submit"
+                            styleClass="w-full px-3"
+                            label="Salvar Aula"
+                            icon="pi pi-check"
+                            [loading]="loading"
+                            [rounded]="true"
+                            size="small"
+                            [disabled]="form.invalid || loading" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

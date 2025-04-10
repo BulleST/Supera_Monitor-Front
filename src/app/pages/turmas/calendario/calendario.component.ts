@@ -14,6 +14,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Crypto } from '../../../utils';
 import { Turma } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
+import { Evento } from '../../../models/evento.model';
+import { EventoService } from '../../../services/evento.service';
 
 @Component({
     selector: 'app-calendario',
@@ -28,7 +30,7 @@ export class CalendarioComponent {
     loading = false;
     object: Turma = new Turma;
 
-    legenda: { backgroundColor: string, label: string }[] = [];
+    legenda: { corLegenda: string, label: string }[] = [];
     request: CalendarioRequest = new CalendarioRequest;
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover;
@@ -37,7 +39,7 @@ export class CalendarioComponent {
 
     calendarVisible = signal(false);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioAula[] = []
+    calendarioList: Evento[] = [];
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
@@ -49,33 +51,17 @@ export class CalendarioComponent {
         dayMaxEvents: 3,
         multiMonthMaxColumns: 1,// force a single column,
         dayHeaders: true,
-        weekends: false,
+        weekends: true,
+        hiddenDays: [0],
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
         defaultAllDay: false,
         allDaySlot: false,
         headerToolbar: {
-            left: 'title',
+            left: '',
             center: '',
-            right: 'atualizar today prev next'
-        },
-        customButtons: {
-            atualizar: {
-                text: 'atualizar',
-                hint: 'atualizar',
-                click: () => {
-                    this.getCalendario(this.request)
-                }
-            }
-        },
-        buttonText: {
-            today: 'hoje',
-            year: 'meses',
-            month: 'mês',
-            week: 'semana',
-            day: 'dia',
-            list: 'lista'
+            right: ''
         },
         events: [],
         scrollTime: '10:00:00',
@@ -98,7 +84,7 @@ export class CalendarioComponent {
         private changeDetector: ChangeDetectorRef,
         private router: Router,
         private activatedRoute: ActivatedRoute,
-        private service: AulaService,
+        private service: EventoService,
         private turmaService: TurmaService,
         private crypto: Crypto,
     ) {
@@ -144,8 +130,6 @@ export class CalendarioComponent {
         this.changeDetector.detectChanges();
     }
 
-
-
     showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
@@ -161,20 +145,9 @@ export class CalendarioComponent {
 
         this.loading = true; 
 
-        await lastValueFrom(this.service.getCalendario(request))
+        await lastValueFrom(this.service.calendario(request))
             .then(calendarioList => {
-
-                calendarioList.forEach(aula => {
-                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
-                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
-                    if (index == -1) {
-                        this.calendarioList.push(aula);
-                    }
-                    else {
-                        this.calendarioList.splice(index, 1, aula);
-                    }
-                });
-
+                this.calendarioList = calendarioList.filter(x => x.active == true);
                 this.setCalendario();
                 this.setLegenda(this.calendarioList);
             })
@@ -191,10 +164,10 @@ export class CalendarioComponent {
                 id: this.eventRamdomId(),
                 backgroundColor: item.corLegenda,
                 borderColor: item.corLegenda,
-                title: item.descricao,
+                title: item.descricao ?? item.turma,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                data: item,
+                extendedProps: item,
             }
             return event;
         });
@@ -224,13 +197,13 @@ export class CalendarioComponent {
     }
 
 
-    setLegenda(c: CalendarioAula[]) {
+    setLegenda(evento: Evento[]) {
         this.legenda = [];
-        c.forEach(item => {
-            if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {
+        evento.forEach(item => {
+            if (!this.legenda.find(x => x.corLegenda == item.corLegenda && x.label == item.professor)) {
                 this.legenda.push({
-                    label: item.professor,
-                    backgroundColor: item.corLegenda,
+                    label: item.professor ?? '',
+                    corLegenda: item.corLegenda ?? '',
                 });
             }
         })

@@ -5,7 +5,7 @@ export class ReposicaoAluno {
     aluno_PerfilCognitivo: string = '';
     aluno_PerfilCognitivo_Id: number = 0;
 
-    source_Aula_Id: number = PseudoAula.AulaId; // -1 aula não existe
+    source_Aula_Id: number = PseudoEvento.EventoId; // -1 aula não existe
     source_Data: Date = new Date;
     source_Sala_Id: number = 0;
     source_Turma_Id: number = 0;
@@ -21,7 +21,7 @@ export class ReposicaoAlunoRequest {
 }
 
 export class ReagendarAulaView {
-    id: number = PseudoAula.AulaId;
+    id: number = PseudoEvento.EventoId;
     professor_Id: number = 0;
     sala_Id: number = 0;
     turma_Id: number = 0;
@@ -31,12 +31,12 @@ export class ReagendarAulaView {
 }
 
 export class ReagendarAulaRequest {
-    id: number = PseudoAula.AulaId;
+    id: number = PseudoEvento.EventoId;
     professor_Id: number = 0;
     data: Date = new Date;
     observacao: string = '';
 }
 
-export enum PseudoAula {
-    AulaId = -1,
+export enum PseudoEvento {
+    EventoId = -1,
 }

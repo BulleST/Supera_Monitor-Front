@@ -1,0 +1,30 @@
+<div class="flex align-items-center gap-2 white-space-nowrap">
+    <span>{{aluno.checklist }}</span>
+    <ng-container *ngTemplateOutlet="checklist; context: { checklist: getChecklist(aluno.checklist_Id, aluno) }"></ng-container>
+    <ng-template #checklist let-checklist="checklist">
+        <div *ngIf="loading" pTooltip="Carregando">
+            <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+        </div>
+        <div *ngIf="atrasado">
+            <!-- Atrasado -->
+            <span pTooltip="Esse aluno está atrasado na jornada">
+                 <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+          </span>
+        </div>
+        
+        <div *ngIf="checklist && !atrasado" class="font-bold">
+            <!-- Finalizado -->
+            <i *ngIf="checklist.finalizados.length == checklist.items.length"
+               pTooltip="Finalizado"
+               class="pi pi-check-circle text-green-500"></i>
+            <!-- Atrasado -->
+            <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                  pTooltip="Atrasado"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+            </span>
+            <!-- Pendentes da Semana -->
+            <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                  pTooltip="Em andamento"> {{checklist.finalizados.length}}/{{checklist.items.length}} <i class="pi pi-exclamation-triangle text-orange-500"></i>
+            </span>
+        </div>
+    </ng-template>
+</div>

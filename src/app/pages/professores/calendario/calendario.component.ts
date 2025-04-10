@@ -14,6 +14,7 @@ import { Professor } from '../../../models/professor.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessorService } from '../../../services/professor.service';
 import { Crypto } from '../../../utils';
+import { Evento } from '../../../models/evento.model';
 
 @Component({
     selector: 'app-calendario',
@@ -36,7 +37,7 @@ export class CalendarioComponent {
 
     calendarVisible = signal(false);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioAula[] = []
+    calendarioList: Evento[] = []
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',

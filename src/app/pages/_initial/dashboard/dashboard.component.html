@@ -1,159 +1,264 @@
-
-<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
-
-<div class="px-3 pb-4 bg-white">
-    <p-table
-             #dt
-             [value]="list"
-             [rows]="50"
-             [rowsPerPageOptions]="[50, 100, 1000]"
-             [paginator]="list.length > 50"
-             [columns]="tableColumns"
-             [globalFilterFields]="tableGlobalFilterFields"
-             [(contextMenuSelection)]="tableSelectedItem"
-             dataKey="id"
-             stripedRows
-             showGridlines
-             [rowHover]="list.length > 0"
-             [contextMenu]="cm"
-             (contextMenuSelectionChange)="contextMenuSelectionChange($event)">
-        <ng-template pTemplate="caption">
-            <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
-                <div class="p-toolbar-group-start">
-                    <h2 class="flex align-items-center ">
-                        <i class="fa-solid fa-user-graduate mr-3 text-primary text-2xl"></i>
-                        <span class="text-2xl font-normal my-0">Diário de bordo</span>
-                    </h2>
+<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
+<div class="p-1">
+    <p-toolbar styleClass="border-none bg-white py-3 px-3 mb-4 shadow-1">
+        <div class="p-toolbar-group-start">
+            <h2 class="flex align-items-center ">
+                <i class="pi pi-calendar mr-3 text-primary text-2xl"></i>
+                <span class="text-2xl font-normal my-0">Dashboard</span>
+            </h2>
+        </div>
+        <div class="p-toolbar-group-center"></div>
+        <div class="p-toolbar-group-end">
+            <div class="flex align-items-center gap-2">
+                <div class="flex align-items-center gap-2">
+                    <label for="ano">Selecione o ano: </label>
+                    <p-select inputId="ano"
+                              name="ano"
+                              [(ngModel)]="selectedAno"
+                              [options]="anos"></p-select>
                 </div>
-                <div class="p-toolbar-group-center"></div>
-                <div class="p-toolbar-group-end items-stretch">
-                    <div class="flex align-items-strech">
-                        <p-iconfield class="mr-2">
-                            <p-inputicon styleClass="pi pi-search" />
-                            <input type="text"
-                                   pInputText
-                                   #_tableSearch="ngModel"
-                                   [(ngModel)]="tableSearch"
-                                   id="search"
-                                   name="search"
-                                   (input)="dt.filterGlobal(tableSearch, 'contains')"
-                                   placeholder="Pesquisar" />
-                        </p-iconfield>
-                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" tooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" tooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                    </div>
-                </div>
-            </p-toolbar>
-        </ng-template>
-        <ng-template pTemplate="header">
-            <tr>
-                <ng-container *ngTemplateOutlet="headerTemplate; context: { item: dates[0] }"></ng-container>
-                <ng-template #headerTemplate let-item="item">
-                    <th class="surface-50 font-normal" colspan="2" *ngIf="item" >
-                        <span>{{item.jornada.dataInicio | date : 'dd'}} </span>
-                        
-                        <span *ngIf="item.jornada.dataInicio.getMonth() != item.jornada.dataFim.getMonth()"> de {{item.jornada.dataInicio | date : 'MMMM'}} </span>
-                        <span *ngIf="item.jornada.dataInicio.getFullYear() != item.jornada.dataFim.getFullYear()"> de {{item.jornada.dataInicio | date : 'yyyy'}} </span>
-                        
-                        <span> à </span>
-                        
-                        <span>{{item.jornada.dataFim | date : 'dd'}} </span>
-                        <span > de {{item.jornada.dataFim | date : 'MMMM'}} </span>
-                        <span > de {{item.jornada.dataFim | date : 'yyyy'}} </span>
-                    </th>
-
-                </ng-template>
-                
-                
-                <ng-container *ngFor="let item of dates">
-                    
-                    <th *ngIf="item.jornada.id > 0" [colSpan]="item.datas.length" class="text-white text-center" [style]="{ backgroundColor: item.jornada.corLegenda  }">
-                        {{item.jornada.tema}}
-                    </th>
-                    <th *ngIf="item.jornada.id == 0" [colSpan]="item.datas.length" class="text-center" [style]="{ backgroundColor: 'var(--surface-50)' }">
-                    </th>
-                </ng-container>
-                <th class="surface-50"></th>
-            </tr>
-            <tr>
-                <th class="surface-900 border-none text-400 text-white text-light white-space-nowrap"> Aluno</th>
-                <th class="surface-900 text-white" (click)="prev()"><</th>
-                <ng-container *ngFor="let jornada of dates">
-                    <th *ngFor="let data of jornada.datas" class="surface-900 border-none text-400 text-white text-light white-space-nowrap" >
-                        <span>{{ data | date : 'dd/MM' }}</span>
-                    </th>
-                </ng-container>
-                <th class="surface-900 text-white" (click)="next()">></th>
-            </tr>
-            
-            <tr>
-                <!-- <th  *ngFor="let date of dates"
-                    class="surface-900 border-none text-400 text-white text-light white-space-nowrap">
-                    <div class="flex align-items-center">
-                        <span>{{ date | date : 'dd/MM' }}</span>
-                    </div>
-                </th>
-                <th class="surface-900  border-bottom-none text-white"></th> -->
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr [pContextMenuRow]="item"
-                class="cursor-pointer"
-                [ngClass]="{ 'bg-primary-50': item == tableSelectedItem,}">
-                <td *ngFor="let col of tableColumns"
-                    [pSelectableRow]="item"
-                    [pSelectableRowIndex]="rowIndex"
-                    [ngClass]="{
-                        'white-space-nowrap  border-left-none border-right-none': true,
-                        'w-6rem':col.displayType == DisplayType.options,
-                        
-                    }"
-                    (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
-                    <ng-template [ngIf]="col.displayType == DisplayType.options">
-                        <ng-container *ngTemplateOutlet="tag; 
-                            context: { 
-                                item: item,
-                                option: getOption(col, item)
-                            }">
-                        </ng-container>
-                        <ng-template #tag let-item="item" let-option="option">
-                            <p-tag *ngIf="option"
-                                   styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
-                                   [value]="option.label"
-                                   [severity]="option.severity ? option.severity : 'secondary'"
-                                   [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                        </ng-template>
-                    </ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.color">
-                        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
-                    </ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-
+                <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar dashboard" class="mr-2" size="small" styleClass="bg-black-alpha-80" />
+            </div>
+        </div>
+    </p-toolbar>
+    <drag-scroll #dragScroll
+                 [style]="{
+                    width: '100%',
+                    overflowY: 'visible',
+                    cursor: 'pointer'
+                }"
+                 (dragStart)="scrollDragStart(dragScroll)"
+                 (dragEnd)="scrollDragEnd(dragScroll)"
+                 class="w-full ">
+        <table class="border-none overflow-auto">
+            <tr class="sticky top-0">
+                <td class="border-none border-bottom-2 border-primary-500 bg-primary-500 text-center p-0 sticky left-0 top-0 z-2">
+                    <!-- border-100 surface-100 text-600-->
+                    <p class="py-2 text-white px-2 font-bold ">Alunos</p>
                 </td>
-                <td class="border-none px-0"></td>
+                <td *ngFor="let item of aulas" class="border-bottom-2  border-primary-500 bg-primary-500  text-center p-0 relative sticky top-0" style="padding-right: 2px;">
+                    <!-- border-100 surface-100 text-600-->
+                    <p class="py-2 text-white font-bold ">{{item.mesString}}</p>
+                    <table class="w-full">
+                        <tr>
+                            <td *ngFor="let roteiro of item.roteiros" drag-scroll-item class="border-2  border-orange-200  bg-primary-200 text-center p-0 px-3 w-8rem ">
+                                <p class="white-space-nowrap px-2 py-1 text-orange-600 font-bold text-xs" [pTooltip]="roteiro.tema">Semana {{roteiro.semana}}</p>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="absolute right-0 top-0  h-full bg-primary-500" style="width: 2px;"></div>
+                </td>
+                
             </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <ng-container *ngIf="tableLoading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
-                    <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td  class="border-none"><p-skeleton /></td>
-                </tr>
-            </ng-container>
-            <ng-template #elseTemplate>
-                <tr class="p-datatable-empty-text">
-                    <td [attr.colspan]="tableColumns.length + 1">
-                        <div class="flex align-items-center" *ngIf="!tableSearch">
-                            <span>Nenhum item registrado.</span>
-                        </div>
-                        <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
+            <ng-container *ngIf="alunos.length == 0 && tableLoading; else notLoading">
+                <tr *ngFor="let i of [1,2,3,4,5]">
+                    <td class="white-space-nowrap px-2 py-1 border-2 border-left-none border-right-none sticky left-0 z-2"
+                        [ngClass]="{
+                                'bg-white border-white': i % 2 != 0, 
+                                'surface-100 border-100': i % 2 == 0, 
+                            }">
+                        <p-skeleton width="8rem" />
+                    </td>
+                    <td *ngFor="let item of mesesAno" class=" p-3 border-2 "
+                        [ngClass]="{
+                        'bg-white border-white': i % 2 != 0, 
+                        'surface-100 border-100': i % 2 == 0, 
+                    }">
+                        <table class="w-full border-none">
+                            <tr>
+                                <td *ngFor="let roteiro of item.roteiros"
+                                    class="">
+                                    <p-skeleton width="6rem" />
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
+            </ng-container>
+            <ng-template #notLoading>
+                <tr *ngFor="let aluno of alunos; let i = index">
+                    <td class="white-space-nowrap px-2 py-1 border-2 border-left-none border-right-none border-top-none  sticky left-0 z-2"
+                    [ngClass]="{
+                        'bg-white border-white': i % 2 == 0, 
+                        'surface-100 border-100': i % 2 != 0, 
+                    }">
+                        <div class="flex align-items-center">
+                            <span class="flex w-2rem h-2rem mr-2">
+                                <p-button *ngIf="aluno && aluno.celular;"
+                                    icon="pi pi-whatsapp"
+                                    severity="success"
+                                    pTooltip="Enviar mensagem"
+                                    [text]="true"
+                                    size="small"
+                                    (onClick)="enviarMensagem(aluno)" />
+                            </span>
+                            <span class="text-base">{{aluno.id}} - {{aluno.nome}}</span>
+                        </div>
+                    </td>
+                    <td *ngFor="let mes of aluno.mesesAula" class=" border-2 border-left-none border-right-none border-top-none " [ngClass]="{
+                        'bg-white border-white': i % 2 == 0, 
+                        'surface-100 border-100': i % 2 != 0, 
+                    }">
+                        <table class="w-full border-none">
+                            <tr>
+                                <ng-container *ngFor="let roteiro of mes.roteiros">
+                                    
+                                    <ng-template #emptyCell>
+                                        <td class="border-none p-0 w-8rem "><span class="h-3rem flex align-items-center justify-content-center "></span></td>
+                                    </ng-template>
+
+                                    <ng-container *ngIf="roteiro.aulas.length > 0 && roteiro.aulas[0].aluno_Id == aluno.id; else emptyCell">
+                                        
+                                        <ng-container *ngTemplateOutlet="aulaTemplate; context: { aula: roteiro.aulas[0] }"></ng-container>
+                                        <ng-template #aulaTemplate let-aula="aula">
+                                        
+                                            <td (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)" 
+                                                class="border-none p-0 w-8rem ">
+                                                <p-popover #popoverSelectedAlunoAula
+                                                    id="roteiro-aula-{{aula.id}}" 
+                                                    (onHide)="unselectAlunoAula(popoverSelectedAlunoAula)" 
+                                                    [dismissable]="true" 
+                                                    appendTo="body" 
+                                                    styleClass="-mt-1">
+                                                    <ng-template [ngIf]="roteiro.id != -1">
+                                                        <p class="flex gap-2">
+                                                            <span><span class="font-bold">Data:</span> {{aula.data | date:'dd/mm/yy '}}</span>
+                                                            <span><span class="font-bold">Horário:</span> {{aula.data | date:'HH:mm'}}</span>
+                                                        </p>
+                                                        <p *ngIf="aula.turma"><span class="font-bold">Turma</span> {{aula.turma}}</p>
+                                                        <p *ngIf="aula.professor"><span class="font-bold">Professor</span> {{aula.professor}}</p>
+                                                        <p class="font-bold mt-2">Observações: </p>
+                                                        <p class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis">
+                                                            {{aula.observacao}}
+                                                        </p>
+                                                    </ng-template>
+                                                </p-popover>
+                                                <div class="flex cursor-pointer w-full white-space-normal">
+                                                    <div *ngIf="[true, false].includes(aula.presente) == false" class="w-full ">
+                                                        <div *ngIf="!aula.finalizada" class="px-2 py-1 w-full h-3rem bg-blue-100 flex align-items-center justify-content-center text-blue-900 font-bold text-xs">Aula não finalizada</div>
+                                                    </div>   
+                                                    <div *ngIf="aula.presente == false" class="px-2 py-1 w-full h-3rem bg-red-100 flex align-items-start">
+                                                            <p style="height: 2.5rem" class=" text-red-600 font-bold text-xs text-overflow-ellipsis overflow-hidden white-space-normal ">
+                                                                <span *ngIf="aula.observacao">{{ aula.observacao}}</span>
+                                                                <span *ngIf="!aula.observacao">Faltou</span>
+                                                            </p>
+                                                            <span *ngIf="aluno && aluno.celular;"
+                                                                class="pi pi-whatsapp text-green-400 cursor-pointer hover:bg-green-500 hover:text-white border-circle"
+                                                                pTooltip="Enviar mensagem"
+                                                                (click)="enviarMensagemFalta(aluno, aula)"></span>
+                                                    </div>
+                                                    <div *ngIf="aula.presente == true"
+                                                        class="px-2 py-1 w-full h-3rem flex justify-content-center text-xs flex-column bg-green-100 text-green-600 ">
+                                                        <div class="flex align-items-center gap-1">
+                                                            <span>{{aula.apostila_Abaco}}</span>
+                                                            <span class="ml-auto"> P. {{aula.numeroPaginaAbaco}}</span>
+                                                        </div>
+                                                        <div class="flex align-items-center gap-1" >
+                                                            <span>{{aula.apostila_AH}}</span>
+                                                            <span class="ml-auto"> P. {{aula.numeroPaginaAH}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #faltaContatos>
+                                                        <div>
+                                                            <p><span class="font-bold">25/06/2025 15h30</span> - <span class="font-bold">João</span> realizou contato</p>
+                                                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Necessitatibus tenetur in minus accusantium sunt aut neque a reiciendis atque ipsa, aperiam repellat, saepe culpa. Porro animi non distinctio aperiam aliquam.</p>
+                                                        </div>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                        </ng-template>
+                                    </ng-container>
+                                </ng-container>
+                            </tr>
+                        </table>
+                    </td>
+                    
+                    <!-- <td *ngFor="let mes of aluno.mesesAula" 
+                        class=" border-none bg-white p-0">
+                        <table class="w-full border-none">
+                            <tr>
+                                <ng-container *ngFor="let roteiro of mes.roteiros">
+                                    <ng-template [ngIf]="roteiro.aulas.length == 0">
+                                        <td style="border-bottom-style: inset"
+                                        [ngClass]="{
+                                            'bg-white border-white': i % 2 == 0, 
+                                            'surface-100 border-100': i % 2 != 0, 
+                                        }"
+                                        
+                                        class="border-2 border-top-none border-left-none border-right-none p-0 w-8rem "><span class="h-3rem flex"></span></td>
+                                    </ng-template>
+                                    <ng-template [ngIf]="roteiro.aulas.length > 0">
+                                        <ng-container *ngTemplateOutlet="aulaTemplate; context: { aula: roteiro.aulas[0] }"></ng-container>
+                                        <ng-template #aulaTemplate let-aula="aula">
+                                            <td *ngIf="aula.aluno_Id != aluno.id" style="border-bottom-style: inset" 
+                                            [ngClass]="{
+                                                'bg-white border-white': i % 2 == 0, 
+                                                'surface-100 border-100': i % 2 != 0, 
+                                            }"
+                                            class=" border-2  border-top-none border-left-none border-right-none p-0 w-8rem "><span class="h-3rem flex"></span></td>
+
+                                            <td *ngIf="aula.aluno_Id == aluno.id"
+                                                (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)" 
+                                                class="border-white border-2 bg-white p-0 w-8rem ">
+                                                <p-popover #popoverSelectedAlunoAula
+                                                    id="roteiro-aula-{{aula.id}}" 
+                                                    (onHide)="unselectAlunoAula(popoverSelectedAlunoAula)" 
+                                                    [dismissable]="true" 
+                                                    appendTo="body" 
+                                                    styleClass="-mt-1">
+                                                    <ng-template [ngIf]="roteiro">
+                                                        <p class="flex gap-2">
+                                                            <span><span class="font-bold">Data:</span> {{aula.data | date:'dd/mm/yy '}}</span>
+                                                            <span><span class="font-bold">Horário:</span> {{aula.data | date:'HH:mm'}}</span>
+                                                        </p>
+                                                        <p *ngIf="aula.turma"><span class="font-bold">Turma</span> {{aula.turma}}</p>
+                                                        <p *ngIf="aula.professor"><span class="font-bold">Professor</span> {{aula.professor}}</p>
+                                                        <p class="font-bold mt-2">Observações: </p>
+                                                        <p class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis">
+                                                            {{aula.observacao}}
+                                                        </p>
+                                                    </ng-template>
+                                                </p-popover>
+                                                <div class="flex cursor-pointer w-full white-space-normal">
+                                                    <div *ngIf="aula.presente == false" class="px-2 py-1 w-full h-3rem bg-red-100 flex align-items-start">
+                                                            <p style="height: 2.5rem" class=" text-red-600 font-bold text-xs text-overflow-ellipsis overflow-hidden white-space-normal ">
+                                                                <span *ngIf="aula.observacao">{{ aula.observacao}}</span>
+                                                                <span *ngIf="!aula.observacao">Faltou</span>
+                                                            </p>
+                                                        
+                                                            <span *ngIf="aluno && aluno.celular;"
+                                                                class="pi pi-whatsapp text-green-400 cursor-pointer hover:bg-green-500 hover:text-white border-circle"
+                                                                pTooltip="Enviar mensagem"
+                                                                (click)="enviarMensagemFalta(aluno, aula)"></span>
+                                                    </div>
+                                                    <div *ngIf="aula.presente == true"
+                                                        class="px-2 py-1 w-full h-3rem flex justify-content-center text-xs flex-column bg-green-100 text-green-600 ">
+                                                        <div class="flex align-items-center gap-1">
+                                                            <span>{{aula.apostila_Abaco}}</span>
+                                                            <span class="ml-auto"> P. {{aula.numeroPaginaAbaco}}</span>
+                                                        </div>
+                                                        <div class="flex align-items-center gap-1" >
+                                                            <span>{{aula.apostila_AH}}</span>
+                                                            <span class="ml-auto"> P. {{aula.numeroPaginaAH}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <ng-template #faltaContatos>
+                                                        <div>
+                                                            <p><span class="font-bold">25/06/2025 15h30</span> - <span class="font-bold">João</span> realizou contato</p>
+                                                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Necessitatibus tenetur in minus accusantium sunt aut neque a reiciendis atque ipsa, aperiam repellat, saepe culpa. Porro animi non distinctio aperiam aliquam.</p>
+                                                        </div>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+
+                                        </ng-template>
+                                    </ng-template>
+                                </ng-container>
+                            </tr>
+                        </table>
+                    </td> -->
+                </tr>
             </ng-template>
-        </ng-template>
-    </p-table>
+        </table>
+    </drag-scroll>
 </div>

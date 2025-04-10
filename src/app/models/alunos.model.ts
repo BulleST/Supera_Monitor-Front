@@ -2,9 +2,14 @@ import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
+import { Evento_Mes } from "./evento-aula-aluno.model";
+import { Evento } from "./evento.model";
 
 export class AlunoRequest {
-    id: number = 0
+    id: number = 0;
+    rm: string = '';    
+    loginApp: string = '';    
+    senhaApp: string = '';
     pessoa_Id: number = 0
     nome: string = '';
     dataNascimento: Date = new Date;
@@ -30,10 +35,16 @@ export class AlunoRequest {
     professor_Id: number = 0;
     pessoa_Sexo_Id?: number;
     apostila_Kit_Id?: number;
+
+    restricoes: Aluno_Restricao[] = [];
+
 }
 
 export class Aluno {
-    id: number = 0
+    id: number = 0;
+    rm: string = '';    
+    loginApp: string = '';    
+    senhaApp: string = '';
     pessoa_Id: number = 0
     nome: string = '';
     dataNascimento: Date = new Date;
@@ -91,6 +102,10 @@ export class Aluno {
 
     checklist_Id?: number;
     checklist?: string;
+
+    mesesAula: Evento_Mes[] = [];
+    disponivel?: boolean;
+    disponivelEvent?: Evento;
 }
 
 export interface Pessoa_DropDown {
@@ -109,21 +124,18 @@ export interface Pessoa_Status extends Pessoa_DropDown { }
 
 export var alunosColumns: ColumnTable[] = [
     {
+        field: 'rm',
+        label: 'Matrícula',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
         field: 'nome',
         label: 'Nome',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
-    },
-
-    {
-        field: 'created',
-        label: 'Matrícula',
-        filterType: FilterType.date,
-        displayType: DisplayType.date,
-        options: {
-            format: 'dd/MM/yyyy'
-        },
     },
     {
         field: 'turmaDesc',
@@ -142,6 +154,13 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'professor',
         label: 'Educador',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
+    {
+        field: 'perfilCognitivo',
+        label: 'Perfil Cognitivo',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,

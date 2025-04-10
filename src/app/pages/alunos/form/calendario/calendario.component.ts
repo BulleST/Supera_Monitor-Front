@@ -11,6 +11,7 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
 import { AulaService } from '../../../../services/aulas.service';
+import { Evento } from '../../../../models/evento.model';
 
 @Component({
     selector: 'app-calendario',
@@ -24,7 +25,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
     loading = false;
 
-    legenda: { backgroundColor: string, label: string }[] = [];
+    legenda: { corLegenda: string, label: string }[] = [];
     request: CalendarioRequest = new CalendarioRequest;
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover;
@@ -33,7 +34,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
 
     calendarVisible = signal(true);
     currentEvents = signal<EventApi[]>([]);
-    calendarioList: CalendarioAula[] = []
+    calendarioList: Evento[] = []
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
@@ -163,7 +164,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
                 id: this.eventRamdomId(),
                 backgroundColor: item.corLegenda,
                 borderColor: item.corLegenda,
-                title: item.descricao,
+                title: item.descricao ?? item.turma,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
                 extendedProps: item,
@@ -197,13 +198,13 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     }
 
 
-    setLegenda(c: CalendarioAula[]) {
+    setLegenda(calendario: Evento[]) {
         this.legenda = [];
-        c.forEach(item => {
-            if (!this.legenda.find(x => x.backgroundColor == item.corLegenda && x.label == item.professor)) {
+        calendario.forEach(item => {
+            if (!this.legenda.find(x => x.corLegenda == item.corLegenda && x.label == item.professor)) {
                 this.legenda.push({
-                    label: item.professor,
-                    backgroundColor: item.corLegenda,
+                    label: item.professor ?? '',
+                    corLegenda: item.corLegenda ?? '',
                 });
             }
         })
