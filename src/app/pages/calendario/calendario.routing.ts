@@ -13,7 +13,6 @@ import { CalendarioComponent } from './calendario.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
-import { AlunoReposicaoDialogComponent } from './aluno-reposicao-dialog/aluno-reposicao-dialog.component';
 
 const routes: Routes = [{
     path: '', component: CalendarioComponent, children: [

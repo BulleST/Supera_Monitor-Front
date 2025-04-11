@@ -8,7 +8,7 @@ import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
 import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { Evento_Mes } from '../models/evento-aula-aluno.model';
+import { CalendarioParticipacaoAluno, Evento_Mes } from '../models/evento-aula-aluno.model';
 import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -195,7 +195,7 @@ export class EventoService extends Service {
     }
     
     getAlunoAulas(ano: number) {
-        return this.http.get<Evento_Mes[]>(`${this.url}/eventos/aulas/alunos/${ano}`)
+        return this.http.get<CalendarioParticipacaoAluno[]>(`${this.url}/eventos/aulas/alunos/${ano}`)
     }
 
     inscrever(aluno_Id: number, evento_Id: number) {

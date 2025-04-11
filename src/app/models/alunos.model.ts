@@ -48,7 +48,7 @@ export class Aluno {
     pessoa_Id: number = 0
     nome: string = '';
     dataNascimento: Date = new Date;
-    celular: string = '';
+    celular: string='';
     telefone: string = '';
     email: string = '';
     observacao: string = '';

@@ -119,9 +119,12 @@
                                                 <span>{{item.disponivelEvent.professor}}</span>
                                             </p>
                                             <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                            <p>
-                                                <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                                <ng-template #onlineTemplate>Online</ng-template>
+                                            
+                                            <p *ngIf="item.disponivelEvent.sala_Id">
+                                                <span>Sala: </span>
+                                                <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                                [andar]="item.disponivelEvent.andar"
+                                                                [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                             </p>
                                         </div>
                                     </ng-template>
@@ -164,15 +167,18 @@
                           optionDisabled="deactivated"
                           [readonly]="evento.finalizado"
                           [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
-                    <ng-template #selectedItem let-selectedOption>
-                        <app-sala-aula [numeroSala]="selectedOption.numeroSala"
-                                       [andar]="selectedOption.andar"
-                                       [sala_Id]="selectedOption.id"></app-sala-aula>
-                    </ng-template>
-                    <ng-template let-item #item>
-                        <ng-container *ngIf="item.id == SalaAulaId.online; then onlineTemplate; else elseTemplate"></ng-container>
-                        <ng-template #elseTemplate>
-                            <span class="mr-2">{{ item.numeroSala }} - {{ item.andar }}º andar</span>
+                  
+                          <ng-template #selectedItem let-selectedOption>
+                            <app-sala-aula [numeroSala]="selectedOption.numeroSala"
+                                           [andar]="selectedOption.andar"
+                                           [sala_Id]="selectedOption.id"></app-sala-aula>
+                        </ng-template>
+                        <ng-template let-item #item>
+                            <span class="mr-2">
+                                <app-sala-aula [numeroSala]="item.numeroSala"
+                                               [andar]="item.andar"
+                                               [sala_Id]="item.id"></app-sala-aula>
+                            </span>
                             <p-badge *ngIf="item.disponivel == false"
                                      value="Indisponível"
                                      severity="danger"
@@ -199,8 +205,6 @@
                                 </div>
                             </ng-template>
                         </ng-template>
-                        <ng-template #onlineTemplate>Online</ng-template>
-                    </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
@@ -288,20 +292,20 @@
             </ng-template>
             <ng-template #header>
                 <tr *ngIf="evento.alunos.length > 0">
-                    <th class="sticky left-0">Nome</th>
-                    <th>Jornada Supera</th>
-                    <th class="w-10rem"><span class="pl-2">Apostila Ábaco</span></th>
-                    <th class="w-5rem">Página</th>
-                    <th class="w-10rem"><span class="pl-2">Apostila AH</span></th>
-                    <th class="w-5rem">Página</th>
-                    <th class="w-4rem">Presença</th>
-                    <th class="w-4rem">Observação</th>
+                    <th class="z-2 sticky left-0 ">Nome</th>
+                    <th class="z-0">Jornada Supera</th>
+                    <th class="z-0 w-10rem"><span class="pl-2">Apostila Ábaco</span></th>
+                    <th class="z-0 w-5rem">Página</th>
+                    <th class="z-0 w-10rem"><span class="pl-2">Apostila AH</span></th>
+                    <th class="z-0 w-5rem">Página</th>
+                    <th class="z-0 w-4rem">Presença</th>
+                    <th class="z-0 w-4rem">Observação</th>
                 </tr>
             </ng-template>
             <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                 <app-aluno-popover #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover>
                 <tr>
-                    <td class="sticky left-0 cursor-pointer">
+                    <td class="sticky left-0 z-2 cursor-pointer">
                         <div class="flex align-items-center">
                             <div class="inline-flex w-2rem h-2rem mr-1 flex-none align-items-center">
                                 <a *ngIf="item.celular"
@@ -320,14 +324,14 @@
                         </div>
                     </td>
                     <!-- checklist -->
-                    <td class="cursor-pointer" (click)="popoverChecklistComponent.show($event)">
+                    <td class="cursor-pointer z-0" (click)="popoverChecklistComponent.show($event)">
                         <app-aluno-checklist-status [aluno]="popoverChecklistComponent.aluno" [loading]="popoverChecklistComponent.loading"></app-aluno-checklist-status>
                         <app-aluno-checklist-popover #popoverChecklistComponent [aluno]="item"></app-aluno-checklist-popover>
                     </td>
                     <td [pEditableColumn]="item.apostila_Abaco_Id"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="apostila_Abaco_Id"
-                        class="w-10rem"
+                        class="w-10rem z-0"
                         (click)="loadApostila(item)"
                         [class.cursor-default]="evento.finalizado">
                         <p-cellEditor>
@@ -354,9 +358,9 @@
                         </p-cellEditor>
                     </td>
                     <td [pEditableColumn]="item.numeroPaginaAbaco"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="numeroPaginaAbaco"
-                        class="w-5rem text-center"
+                        class="w-5rem text-center z-0"
                         [class.cursor-default]="evento.finalizado">
                         <p-cellEditor>
                             <ng-template #input>
@@ -375,9 +379,9 @@
                         </p-cellEditor>
                     </td>
                     <td [pEditableColumn]="item.apostila_AH_Id"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="apostila_AH_Id"
-                        class="w-10rem "
+                        class="w-10rem z-0"
                         (click)="loadApostila(item)"
                         [class.cursor-default]="evento.finalizado">
                         <p-cellEditor>
@@ -404,9 +408,9 @@
                         </p-cellEditor>
                     </td>
                     <td [pEditableColumn]="item.numeroPaginaAH"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="numeroPaginaAH"
-                        class="w-5rem text-center"
+                        class="w-5rem text-center z-0"
                         [class.cursor-default]="evento.finalizado">
                         <p-cellEditor>
                             <ng-template #input>
@@ -427,10 +431,10 @@
                     <td [pEditableColumn]="item.presente"
                         [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="presente"
-                        class="w-4rem text-center"
+                        class="w-4rem text-center z-0"
                         [class.cursor-pointer]="isChamadaPage || !evento.finalizado"
                         [class.cursor-default]="!isChamadaPage || evento.finalizado"
-                        (click)="evento.finalizado ? undefined : presenteClick(item, $event)">
+                        (click)="!isChamadaPage && !evento.finalizado ? undefined : presenteClick(item, $event)">
                         <p-cellEditor #button>
                             <ng-template #input>
                                 <p-button [label]="item.presente ? 'Presente': 'Faltou'"
@@ -451,9 +455,9 @@
                         </p-cellEditor>
                     </td>
                     <td [pEditableColumn]="item.observacao"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="observacao"
-                        class="w-5rem white-space-nowrap text-overflow-ellipsis"
+                        class="w-5rem white-space-nowrap text-overflow-ellipsis z-0"
                         [class.cursor-default]="evento.finalizado">
                         <p-cellEditor>
                             <ng-template #input>

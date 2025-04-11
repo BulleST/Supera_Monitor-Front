@@ -86,9 +86,8 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
             model.control.setErrors({ indisponivel: 'Professor indisponível' });
             this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
         }
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
@@ -100,9 +99,8 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuído para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
         }
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 

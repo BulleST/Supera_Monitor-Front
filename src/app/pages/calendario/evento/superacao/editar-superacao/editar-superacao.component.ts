@@ -102,30 +102,27 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var professor = this.professores.find(x => x.id == e.value) as Professor;
-        this.validaProfessor.emit(professor);
+        var item = this.professores.find(x => x.id == e.value);
+        this.validaProfessor.emit(item);
 
-        if (professor && professor.disponivel == false && professor.disponivelEvent) {
+        if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
         }
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        var salaAula = this.salaAulas.find(x => x.id == e.value) as SalaAula;
-        this.validaSala.emit(salaAula);
-
-        if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
+        var item = this.salaAulas.find(x => x.id == e.value);
+        this.validaSala.emit(item);
+        if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
         }
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
@@ -137,17 +134,13 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
     }
 
-
     presenteClick(e: any) {
-            
         if (this.alunoSelected.presente == undefined || this.alunoSelected.presente == null) {
             this.alunoSelected.presente = true;
         }
         else {
             this.alunoSelected.presente = !this.alunoSelected.presente;
         }
-        
-
 
         if (!this.alunoSelected.presente && this.alunoSelected.celular) {
             var nome = this.alunoSelected.aluno.split(' ')[0];

@@ -127,10 +127,6 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
-        var hoje = new Date;
-        this.data = hoje;
-        this.horario = hoje;
-        this.horario.setHours(8, 0);
 
         this.verificaDisponibilidade();
 

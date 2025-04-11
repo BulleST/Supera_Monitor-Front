@@ -1,6 +1,10 @@
-export class Evento_Aulas { 
+export class CalendarioParticipacaoAluno { 
     id: number = 0; 
     aluno_Id: number = 0; 
+    aluno: string = ''; 
+    celular?: string;
+    checklist?: string;
+    checklist_Id?: number;
     evento_Id: number = 0; 
     evento_Tipo_Id: number = 0; 
     data: Date = new Date; 
@@ -16,6 +20,7 @@ export class Evento_Aulas {
     turma_Id?: number = 0; 
     professor: string = ''; 
     professor_Id: number = 0; 
+    corLegenda: string = ''; 
     reposicaoDe_Evento_Id?: number = 0; 
     reagendamentoDe_Evento_Id?: number = 0; 
     presente?: boolean;
@@ -40,7 +45,7 @@ export class Evento_Roteiro {
     created: Date = new Date;
     lastUpdated?: Date;
     deactivated?: Date;
-    aulas: Evento_Aulas[] = []
+    aulas: CalendarioParticipacaoAluno[] = []
 }
 
 export class Evento_Mes {

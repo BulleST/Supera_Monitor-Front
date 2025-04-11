@@ -63,7 +63,7 @@
                               [(ngModel)]="data"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
-                              (ngModelChange)="verificaDisponibilidade()"
+                              (onBlur)="verificaDisponibilidade()"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
                               inputId="data"

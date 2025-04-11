@@ -69,6 +69,7 @@
                   [(ngModel)]="evento.professor_Id"
                   [loading]="loadingProfessores"
                   (onChange)="professorChanged($event, professor_Id)"
+                  placeholder="Selecione"
                   #professor_Id="ngModel"
                   styleClass="w-full"
                   class="w-full"
@@ -106,9 +107,11 @@
                                         <span>{{item.disponivelEvent.professor}}</span>
                                     </p>
                                     <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                    <p>
-                                        <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                        <ng-template #onlineTemplate>Online</ng-template>
+                                    <p *ngIf="item.disponivelEvent.sala_Id">
+                                        <span>Sala: </span>
+                                        <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                       [andar]="item.disponivelEvent.andar"
+                                                       [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                     </p>
                                 </div>
                             </ng-template>
@@ -143,7 +146,6 @@
                   class="w-full"
                   name="sala_Id"
                   inputId="sala_Id"
-                  optionLabel="nome"
                   optionValue="id"
                   [required]="true"
                   [filter]="true"
@@ -153,47 +155,46 @@
                   [readonly]="evento.finalizado"
                   [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
             <ng-template #selectedItem let-selectedOption>
-                <ng-container *ngIf="selectedOption && selectedOption.numeroSala == 0 && selectedOption.andar == 0; then onlineTemplate; else salaTemplate"></ng-container>
-                <ng-template #salaTemplate> {{selectedOption.numeroSala}} - {{selectedOption.andar}}º andar </ng-template>
-                <ng-template #onlineTemplate>Online</ng-template>
+                <app-sala-aula [numeroSala]="selectedOption.numeroSala"
+                               [andar]="selectedOption.andar"
+                               [sala_Id]="selectedOption.id"></app-sala-aula>
             </ng-template>
             <ng-template let-item #item>
-                <div *ngIf="item.numeroSala != 0 && item.andar != 0; else onlineTemplate">
-                    <p class="font-bold mb-1">
-                        <span class="mr-2">{{ item.numeroSala }} - {{ item.andar }}º andar</span>
-                        <p-badge *ngIf="item.disponivel == false"
-                                 value="Indisponível"
-                                 severity="danger"
-                                 [pTooltip]="indisponivelTemplate" />
-                        <ng-template #indisponivelTemplate>
-                            <div class="w-25rem">
-                                <p>
-                                    <span>Evento: </span>
-                                    <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
-                                    <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
-                                </p>
-                                <p>{{item.disponivelEvent.descricao}}</p>
-                                <p *ngIf="item.disponivelEvent.professor">
-                                    <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
-                                    <span>{{item.disponivelEvent.professor}}</span>
-                                </p>
-                                <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                <p>
-                                    <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                    <ng-template #onlineTemplate>Online</ng-template>
-                                </p>
-                            </div>
-                        </ng-template>
-                    </p>
-                </div>
-                <ng-template #onlineTemplate>
-                    <p class="font-bold mb-1">Online</p>
+                <span class="mr-2">
+                    <app-sala-aula [numeroSala]="item.numeroSala"
+                                   [andar]="item.andar"
+                                   [sala_Id]="item.id"></app-sala-aula>
+                </span>
+                <p-badge *ngIf="item.disponivel == false"
+                         value="Indisponível"
+                         severity="danger"
+                         [pTooltip]="indisponivelTemplate" />
+                <ng-template #indisponivelTemplate>
+                    <div class="w-25rem">
+                        <p>
+                            <span>Evento: </span>
+                            <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                            <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+                        </p>
+                        <p>{{item.disponivelEvent.descricao}}</p>
+                        <p *ngIf="item.disponivelEvent.professor">
+                            <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                            <span>{{item.disponivelEvent.professor}}</span>
+                        </p>
+                        <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+                        <p *ngIf="item.disponivelEvent.sala_Id">
+                            <span>Sala: </span>
+                            <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                           [andar]="item.disponivelEvent.andar"
+                                           [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                        </p>
+                    </div>
                 </ng-template>
             </ng-template>
         </p-select>
         <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
-            <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Turma indisponível.</p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
         </div>
     </div>
     <div class="field flex" *ngIf="isChamadaPage || evento.finalizado">
@@ -203,7 +204,7 @@
                   size="small"
                   styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
                   class="ml-auto mt-auto"
-                  (click)="evento.finalizado ? undefined : presenteClick( $event)" />
+                  (click)="isChamadaPage && !evento.finalizado ? undefined : presenteClick( $event)" />
     </div>
     <!-- Observações -->
     <div class="field col-12">
@@ -213,6 +214,7 @@
                   name="observacao"
                   id="observacao"
                   [(ngModel)]="evento.observacao"
-                  [rows]="3"></textarea>
+                  [rows]="3"
+                  [readonly]="evento.finalizado"></textarea>
     </div>
 </div>

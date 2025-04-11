@@ -2,7 +2,7 @@
 <div class="formgrid grid">
     <!-- Descrição -->
     <div class="field col-12">
-        <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
+        <label for="descricao">Descrição: <span  *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <input type="text"
                 pInputText
                 #descricao="ngModel"
@@ -59,7 +59,7 @@
     </div>
     <!-- Educador -->
     <div class="field col-6">
-        <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
+        <label for="professor_Id">Educador: <span  *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                     [options]="professores"
                     [(ngModel)]="evento.professor_Id"
@@ -76,7 +76,9 @@
                     [filter]="true"
                     filterBy="nome"
                     appendTo="body"
-                    optionDisabled="deactivated">
+                    optionDisabled="deactivated"
+                    [readonly]="evento.finalizado"
+                    [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
             <ng-template let-item #item>
                 <div class="flex align-items-center justify-content-between w-full gap-2">
                     <div>
@@ -100,9 +102,11 @@
                                         <span>{{item.disponivelEvent.professor}}</span>
                                     </p>
                                     <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                    <p>
-                                        <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                        <ng-template #onlineTemplate>Online</ng-template>
+                                    <p *ngIf="item.disponivelEvent.sala_Id">
+                                        <span>Sala: </span>
+                                        <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                       [andar]="item.disponivelEvent.andar"
+                                                       [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                     </p>
                                 </div>
                             </ng-template>
@@ -126,7 +130,7 @@
     </div>
     <!-- Sala -->
     <div class="field col-6">
-        <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
+        <label for="sala_Id">Sala: <span  *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select [options]="salaAulas"
                     [(ngModel)]="evento.sala_Id"
                     [loading]="loadingSalaAulas"
@@ -141,21 +145,24 @@
                     [filter]="true"
                     filterBy="nome"
                     appendTo="body"
-                    optionDisabled="deactivated">
-            <ng-template #selectedItem let-selectedOption>
-                <ng-container *ngIf="selectedOption.numeroSala == 0 && selectedOption.andar == 0; then onlineTemplate; else salaTemplate"></ng-container>
-                <ng-template #salaTemplate> {{selectedOption.numeroSala}} - {{selectedOption.andar}}º andar </ng-template>
-                <ng-template #onlineTemplate>Online</ng-template>
-            </ng-template>
-            <ng-template let-item #item>
-                <ng-container *ngIf="item.numeroSala == 0 && item.andar == 0; then onlineTemplate; else elseTemplate"></ng-container>
-                <ng-template #elseTemplate>
-                    <p class="font-bold mb-1">
-                        <span class="mr-2">{{ item.numeroSala }} - {{ item.andar }}º andar</span>
+                    optionDisabled="deactivated"
+                    [readonly]="evento.finalizado"
+                    [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                    <ng-template #selectedItem let-selectedOption>
+                        <app-sala-aula [numeroSala]="selectedOption.numeroSala"
+                                       [andar]="selectedOption.andar"
+                                       [sala_Id]="selectedOption.id"></app-sala-aula>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <span class="mr-2">
+                            <app-sala-aula [numeroSala]="item.numeroSala"
+                                           [andar]="item.andar"
+                                           [sala_Id]="item.id"></app-sala-aula>
+                        </span>
                         <p-badge *ngIf="item.disponivel == false"
-                                    value="Indisponível"
-                                    severity="danger"
-                                    [pTooltip]="indisponivelTemplate" />
+                                 value="Indisponível"
+                                 severity="danger"
+                                 [pTooltip]="indisponivelTemplate" />
                         <ng-template #indisponivelTemplate>
                             <div class="w-25rem">
                                 <p>
@@ -169,18 +176,15 @@
                                     <span>{{item.disponivelEvent.professor}}</span>
                                 </p>
                                 <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                <p>
-                                    <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                    <ng-template #onlineTemplate>Online</ng-template>
+                                <p *ngIf="item.disponivelEvent.sala_Id">
+                                    <span>Sala: </span>
+                                    <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                   [andar]="item.disponivelEvent.andar"
+                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                 </p>
                             </div>
                         </ng-template>
-                    </p>
-                </ng-template>
-                <ng-template #onlineTemplate>
-                    <p class="font-bold mb-1">Online</p>
-                </ng-template>
-            </ng-template>
+                    </ng-template>
         </p-select>
         <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
@@ -198,7 +202,7 @@
                     [rows]="3"></textarea>
     </div>
     <!-- Alunos -->
-    <div class="field col-12" *ngIf="evento.id != PseudoEvento.EventoId">
+    <div class="field col-12" *ngIf="isChamadaPage || evento.finalizado">
         <p class="text-orange-500 font-bold">Alunos</p>
         <hr class="mb-2 border-orange-500 border-1">
         <p-table [value]="evento.alunos"
@@ -246,12 +250,12 @@
                     </td>
                     <!-- Presente -->
                     <td [pEditableColumn]="item.presente"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="presente"
                         class="w-4rem text-center"
                         [class.cursor-pointer]="isChamadaPage"
                         [class.cursor-default]="!isChamadaPage"
-                        (click)="isChamadaPage ? (item.presente = item.presente ?? true) : undefined ">
+                        (click)="isChamadaPage && !evento.finalizado ? (item.presente = item.presente ?? true) : undefined ">
                         <p-cellEditor>
                             <ng-template #input>
                                 <p-button (onClick)="item.presente = !item.presente"
@@ -275,7 +279,7 @@
                     </td>
                     <!-- Observações -->
                     <td [pEditableColumn]="item.observacao"
-                        [pEditableColumnDisabled]="!isChamadaPage"
+                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
                         pEditableColumnField="observacao"
                         class="w-5rem white-space-nowrap text-overflow-ellipsis"
                         [class.cursor-default]="evento.finalizado">

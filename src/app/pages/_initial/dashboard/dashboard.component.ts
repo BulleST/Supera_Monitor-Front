@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import moment from 'moment';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { ConfirmationService, MenuItem } from 'primeng/api';
@@ -15,7 +15,11 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Evento } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Evento_Mes } from '../../../models/evento-aula-aluno.model';
+import { CalendarioParticipacaoAluno, Evento_Mes, Evento_Roteiro } from '../../../models/evento-aula-aluno.model';
+import { MyMap } from '../../../utils/map';
+import { PseudoEvento } from '../../../models/reposicao.model';
+import $ from 'jquery';
+
 
 @Component({
     selector: 'app-dashboard',
@@ -27,32 +31,31 @@ import { Evento_Mes } from '../../../models/evento-aula-aluno.model';
 export class DashboardComponent implements OnDestroy, AfterViewInit {
     jornadasDatas: { jornada: Roteiro, datas: Date[] }[] = [];
     request: CalendarioRequest = new CalendarioRequest;
+    
+    roteiros: Roteiro[] = [];
+    // alunos: Aluno[] = [];
+    alunos: any[] = [];
+    aulas: CalendarioParticipacaoAluno[] = [];
+    mesesAno: Evento_Mes[] = [];
 
-    jornadas: Roteiro[] = [];
-
-    alunos: Aluno[] = [];
-    aulas: Evento_Mes[] = [];
-
-    list: any[] = [];
     tableLoading = false;
     tableSelectedItem: any;
     tableMenu: MenuItem[] = [];
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
-    mesesAno: any[] = [];
     @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
-
+    visible = signal(false);
     anos: number[] = Array.from({ length: 3 }, (a, i) => (new Date).getFullYear() - i)
     selectedAno: number = (new Date).getFullYear();
 
     constructor(
-        private jornadaService: RoteiroService,
         private alunoService: AlunoService,
         private aulaService: AulaService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private service: EventoService
+        private service: EventoService,
+        private roteiroService: RoteiroService,
     ) {
         
         /* 
@@ -186,13 +189,11 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
         */
 
+        var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res);
+        this.subscription.push(roteiros);
 
-
-        var jornadas = this.jornadaService.list.subscribe(res => this.jornadas = res);
-        this.subscription.push(jornadas);
-
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
-        this.subscription.push(alunos);
+        // var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
+        // this.subscription.push(alunos);
         this.update();
 
 
@@ -213,25 +214,29 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
     async update() {
         this.tableLoading = true;
+        this.visible.update(() => false)
         var ano = this.selectedAno;
 
 
-        lastValueFrom(this.alunoService.getList())
+        // if (this.alunos.length == 0) {
+        //     lastValueFrom(this.alunoService.getList())
+        //     .then(res => {
+        //         this.alunos = res;
+        //         this.setTableView();
+        //     })
+        // }
+        
+        await lastValueFrom(this.roteiroService.getList())
         .then(res => {
-            this.alunos = res;
-            this.setTableView();
+            this.roteiros = res;
         })
-        lastValueFrom(this.service.getAlunoAulas(ano))
+        
+        await lastValueFrom(this.service.getAlunoAulas(ano))
         .then(async res => {
-            var meses = ['Nenhum', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            this.aulas = res.map(x => {
-                x.mesString = meses[x.mes];
-                return x;
-            });
-
-            this.setTableView();
+            this.aulas = res;
         })
-
+        
+        this.setTableView();
         
         /*
         // if (!this.jornadas.length) {
@@ -282,22 +287,46 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
     setTableView(){
 
-        // Preenche os meses com as semanas incompletas
-        if (this.aulas.length > 0) {
-            var roteiros = this.aulas.flatMap(x => x.roteiros).sort((x,y) => x.semana - y.semana);
-            var lastRoteiro = roteiros[roteiros.length-1];
-            var lastSemana = lastRoteiro.semana;
-            var lastIntervalo = [lastRoteiro.dataInicio, lastRoteiro.dataFim]
-            this.aulas = this.aulas.map(aula => {
-                if (aula.roteiros.length < 4) {
-                    var diff = 4 - aula.roteiros.length;
-                    for (let index = 1; index <= diff; index++) {
-                        
+        if(this.roteiros.length > 0 && this.aulas.length > 0) {
+            var meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            var semanaCount = 0;
+            this.mesesAno = meses.map((mesString, index) => {
+                var mes = new Evento_Mes;
+                mes.mes = index;
+                mes.mesString = mesString;
+                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.selectedAno)
+                                .map(roteiro => {
+                                    var eventoRoteiro = MyMap(roteiro, new Evento_Roteiro);
+                                    eventoRoteiro.aulas = [];
+                                    semanaCount = roteiro.semana;
+                                    return eventoRoteiro;
+                                })
+                                .sort((x,y) => x.dataInicio - y.dataInicio);
+    
+                                
+                var lastRoteiro: Evento_Roteiro;
+                var lastSemana: number;
+                var lastIntervalo: Date[] = [];
+    
+                if (mes.roteiros.length > 0) {
+                    lastRoteiro =  mes.roteiros[ mes.roteiros.length-1];
+                    lastSemana = lastRoteiro.semana;
+                    lastIntervalo = [lastRoteiro.dataInicio, lastRoteiro.dataFim];
+    
+                } else {
+                    var inicio = moment(new Date).month(index).startOf('month')
+                    var fim = inicio.add(7, 'days');
+                    lastIntervalo = [inicio.toDate(), fim.toDate()];
+                    lastSemana = semanaCount;
+                }
+                if(mes.roteiros.length < 4 ) {
+                    var diff = 4 - mes.roteiros.length;
+                    for (let i = 1; i <= diff; i++) {
+    
                         lastIntervalo[0] = moment(lastIntervalo[0]).add(7, 'days').toDate();
                         lastIntervalo[1] = moment(lastIntervalo[1]).add(7, 'days').toDate();
-
-                        aula.roteiros.push({
-                            id: -1,
+                        mes.roteiros.push({
+                            id: PseudoEvento.EventoId,
                             account_Created_Id: -1,
                             account_Created: '',
                             corLegenda: 'black',
@@ -310,33 +339,100 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
                             dataFim: lastIntervalo[1],
                             aulas: []
                         })
-                        
                     }
+    
                 }
-                return aula
-            })
-        }
-        if (this.alunos.length > 0 && this.aulas.length > 0) {
+    
+                return mes
+            });
 
-            var meses = JSON.parse(JSON.stringify(this.aulas)) as  Evento_Mes[]
-            this.alunos = this.alunos.map(aluno => { 
-                console.groupCollapsed(aluno.id, aluno.nome)
-                aluno.mesesAula = meses.map(mes => {
+
+            var alunosIds = [...new Set(this.aulas.map(x => x.aluno_Id))];
+        //     alunosIds.forEach(aluno_Id => {
+
+        //         var mesesAno = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
+        //         var aulaAlunos = this.aulas.filter(x => x.aluno_Id == aluno_Id);
+        //         var aluno = aulaAlunos[0];
+        //         var obj = {
+        //             aluno_Id: aluno.aluno_Id,
+        //             aluno: aluno.aluno,
+        //             checklist: aluno.checklist,
+        //             checklist_Id: aluno.checklist_Id,
+        //             mesesAula: mesesAno.map(mes => {
+        //                 mes.roteiros.map(roteiro => {
+        //                     roteiro.aulas = aulaAlunos.filter(x => x.roteiro_Id == roteiro.id)
+        //                     return roteiro;
+        //                 })
+        //                 return mes
+        //             })
+        //         }
+
+        //         if (this.visible() == false) {
+        //             this.visible.update(() => true)
+        //         }
+        //         this.alunos.push(obj)
+
+
+        //         console.groupEnd();
+        // })
+
+
+            // this.alunos = alunosIds.map(aluno_Id => {
+            //     var aulaAlunos = this.aulas.filter(x => x.aluno_Id == aluno_Id);
+            //     var aluno = aulaAlunos[0];
+            //     var mesesAno = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
+            //     var obj = {
+            //         ...aluno,
+            //         mesesAula: mesesAno.map(mes => {
+            //             mes.roteiros.map(roteiro => {
+            //                 roteiro.aulas = aulaAlunos.filter(x => x.roteiro_Id == roteiro.id)
+            //                 return roteiro;
+            //             })
+            //             return mes
+            //         })
+            //     }
+            //     return obj;
+            // })
+
+            // console.log(this.alunos);
+            this.visible.update(() => true)
+
+
+         
+    
+            this.alunos = alunosIds.map(id => {
+                var a = this.aulas.find(x => x.aluno_Id == id) as CalendarioParticipacaoAluno;
+                var aluno = MyMap(a, new Aluno) as Aluno;
+                aluno.id = a.aluno_Id;
+                aluno.nome = a.aluno,
+                aluno.checklist = a.checklist;
+                aluno.checklist_Id = a.checklist_Id;
+                aluno.celular = a.celular ?? '';
+                aluno.mesesAula = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
+                aluno.mesesAula = aluno.mesesAula.map(mes => {
                     mes.roteiros = mes.roteiros.map(roteiro => {
-                        console.log(mes.mesString, roteiro.id, roteiro.tema, roteiro.aulas)
-                        // console.log(aluno.id, aluno.nome, roteiro.aulas.map(x => x.aluno_Id))
-                        // roteiro.aulas = roteiro.aulas.filter(x => x.aluno_Id == aluno.id);
+                        roteiro.aulas = this.aulas.filter(x => x.roteiro_Id == roteiro.id && x.aluno_Id == aluno.id) ;
                         return roteiro;
                     })
-                    return mes
+                    return mes;
                 })
-                console.groupEnd()
+    
                 return aluno
             })
 
-            
-        
+            setTimeout(() => {
+                var container = $('.drag-scroll-content');
+                var tr = $(`th[data-mes="${(new Date().getMonth())}"]`)
+                console.log('left', (tr.offset()?.left ?? 0) - (tr.width() ?? 0))
+                $(container).animate({
+                    scrollLeft: (tr.offset()?.left ?? 0) - (tr.width() ?? 0)
+                }, 300)
+            }, 500);
         }
+
+
+        // this.dragScroll.moveTo((new Date).getMonth())
+
     }
 
     contextMenuSelectionChange(item: any) {
@@ -355,12 +451,12 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.dragScroll._contentRef.nativeElement.style.cursor = 'pointer'
     }
 
-    enviarMensagem(aluno: Aluno) {
-        this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    enviarMensagem(nome:string, celular:string) {
+        return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
 
-    enviarMensagemFalta(aluno: Aluno, evento: Evento | any) {
-        this.mensagemWhatsapp.enviarMensagemFalta(aluno.nome, aluno.celular, evento);
+    enviarMensagemFalta(nome:string, celular:string, evento: Evento | any) {
+        return this.mensagemWhatsapp.enviarMensagemFalta(nome, celular, evento);
     }
 
     selectAlunoAula(e: any, popoverSelectedAlunoAula: Popover) {

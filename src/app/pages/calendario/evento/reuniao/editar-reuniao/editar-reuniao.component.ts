@@ -95,31 +95,15 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     }
 
 
-    professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var professor = this.professores.find(x => x.id == e.value) as Professor;
-        this.validaProfessor.emit(professor);
-
-        if (professor && professor.disponivel == false && professor.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
-        }
-        model.control.updateValueAndValidity();
-    }
-
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        var salaAula = this.salaAulas.find(x => x.id == e.value) as SalaAula;
-        this.validaSala.emit(salaAula);
-
-        if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
+        var item = this.salaAulas.find(x => x.id == e.value);
+        this.validaSala.emit(item);
+        if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
         }
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
@@ -135,36 +119,23 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         e.target.select()
     }
 
+
     onMoveToSource(e: any) {
-        var professoresIds = this.target.map(x => x.id);
-        this.evento.professores = this.selected.filter(x => professoresIds.includes(x.professor_Id))
     }
 
     onMoveToTarget(e: PickListMoveAllToTargetEvent) {
         var item = e.items[0] as Professor;
         if (!item.disponivel) {
             this.showError('Educador indisponível', 'Você não pode mover um educador indisponível.', { target: this.picklist.el.nativeElement });
-            var index = this.source.findIndex(x => x.id == item.id);
+            var index = this.target.findIndex(x => x.id == item.id);
             if (index != -1) {
-                this.source.splice(index, 1)
+                this.target.splice(index, 1)
                 this.professores.push(item);
             };
-        } else {
-            this.evento.professores.push({
-                id: -1,
-                corLegenda: item.corLegenda,
-                evento_Id: this.evento.id,
-                nome: item.nome,
-                professor_Id: item.id,
-                observacao: '',
-                presente: undefined,
-            });
         }
     }
 
     onMoveAllToSource(e: any) {
-        var professoresIds = this.target.map(x => x.id);
-        this.evento.professores = this.selected.filter(x => professoresIds.includes(x.professor_Id))
 
     }
 
@@ -173,20 +144,8 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         if (items.find(x => !x.disponivel)) {
             this.showError('Educador indisponível', 'Você não pode mover educadores indisponíveis.', { target: this.picklist.el.nativeElement });
             this.professores = items.filter(x => !x.disponivel);
-            this.source = items.filter(x => x.disponivel);
-        } else {
-            this.evento.professores.push(...items.map(item => ({
-                id: -1,
-                corLegenda: item.corLegenda,
-                evento_Id: this.evento.id,
-                nome: item.nome,
-                professor_Id: item.id,
-                observacao: '',
-                presente: undefined,
-            })));
-
+            this.target = items.filter(x => x.disponivel);
         }
     }
-
 
 }

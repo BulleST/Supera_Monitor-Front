@@ -24,7 +24,7 @@
                 <p-datepicker
                               #_data="ngModel"
                               [(ngModel)]="data"
-                              (ngModelChange)="verificaDisponibilidade()"
+                              (onBlur)="verificaDisponibilidade()"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               [minDate]="minData"
@@ -48,7 +48,7 @@
                               name="horario"
                               #_horario="ngModel"
                               [(ngModel)]="horario"
-                              (blur)="verificaDisponibilidade()"
+                              (onBlur)="verificaDisponibilidade()"
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
@@ -117,9 +117,11 @@
                                                     <span>{{item.disponivelEvent.professor}}</span>
                                                 </p>
                                                 <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                                <p>
-                                                    <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                                    <ng-template #onlineTemplate>Online</ng-template>
+                                                <p *ngIf="item.disponivelEvent.sala_Id">
+                                                    <span>Sala: </span>
+                                                    <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                                   [andar]="item.disponivelEvent.andar"
+                                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                                 </p>
                                             </div>
                                         </ng-template>
@@ -183,9 +185,11 @@
                                                 <span>{{item.disponivelEvent.professor}}</span>
                                             </p>
                                             <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                            <p>
-                                                <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                                <ng-template #onlineTemplate>Online</ng-template>
+                                            <p *ngIf="item.disponivelEvent.sala_Id">
+                                                <span>Sala: </span>
+                                                <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                               [andar]="item.disponivelEvent.andar"
+                                                               [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
                                             </p>
                                         </div>
                                     </ng-template>

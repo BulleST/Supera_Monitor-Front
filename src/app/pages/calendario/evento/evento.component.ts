@@ -34,6 +34,7 @@ import { EventoAula0Request } from '../../../models/evento-aula-0.model';
 import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model';
 import { Response } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
+import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 
 @Component({
     selector: 'app-evento',
@@ -56,6 +57,7 @@ export class EventoComponent implements OnDestroy {
     width = '1000px';
     loadingChecklist = false;
     tipo = EventoTipo;
+    encryptedId = '';
 
     @ViewChild('popoverSelectedAluno') popoverSelectedAluno!: Popover;
     @ViewChild('popoverChecklist') popoverChecklist!: Popover;
@@ -107,6 +109,7 @@ export class EventoComponent implements OnDestroy {
             return
         }
 
+        this.encryptedId=params['evento_id'];
         var url = this.activatedRoute.url.subscribe(res => {
             this.isChamadaPage = res.find(x => x.path == 'chamada') ? true : false
         })
@@ -262,49 +265,37 @@ export class EventoComponent implements OnDestroy {
 
         this.validaProfessores();
         this.validaSalaAulas();
+        this.validaAlunos();
 
         return valid
 
     }
 
-
-    validaSalaAulas() {
-        var dataInicio = this.evento.data;
-        var dataFim = moment(dataInicio).add(this.evento.duracaoMinutos, 'minutes').toDate();
-
-        this.salaAulas.forEach(item => {
-            if (item.id == SalaAulaId.online) {
-                return;
-            }
-
-            var evento = this.eventos.find(e =>
-                e.id != this.evento.id
-                && e.sala_Id == item.id
-                && moment(e.data).isBetween(dataInicio, dataFim));
-
-            item.disponivel = !evento;
-            item.disponivelEvent = evento
-        });
+  validaSalaAulas() {
+        var data = this.evento.data;
+        this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
 
     validaProfessores() {
-                var dataInicio = this.evento.data;
-                var dataFim = moment(dataInicio).add(this.evento.duracaoMinutos, 'minutes').toDate();
-        
-        this.professores.forEach(item => {
-            var evento = this.eventos.find(e =>
-                e.id != this.evento.id
-                && (e.professor_Id == item.id || e.professores.findIndex(x => x.id == item.id) != -1)
-                && moment(e.data).isBetween(dataInicio, dataFim));
-
-            item.disponivel = !evento;
-            item.disponivelEvent = evento
-        });
+        var data = this.evento.data;
+        this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
     }
+
+    validaAlunos() {
+        var data = this.evento.data;
+        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
+    }
+
     professorChanged(professor: Professor) {
+        this.validaProfessores()
     }
-
+    
     salaAulaChanged(salaAula: SalaAula) {
+        this.validaSalaAulas()
+    }
+    
+    alunoChanged(aluno: Aluno) {
+        this.validaAlunos()
     }
 
     getTipo(e: Evento) {
@@ -314,11 +305,6 @@ export class EventoComponent implements OnDestroy {
     goToAluno(aluno: Evento_Participacao_Aluno) {
         this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);
     }
-
-
-    goToReposicao(aluno: Evento_Participacao_Aluno) {
-    }
-
 
 
     async goToIniciarChamada(e: any) {
@@ -336,7 +322,7 @@ export class EventoComponent implements OnDestroy {
             default: route = 'aula'; break;
         }
 
-        this.router.navigate(['calendario', route, 'chamada', this.crypto.encrypt(this.evento.id)], { replaceUrl: true, skipLocationChange: true });
+        this.router.navigate(['calendario', route, 'chamada', this.encryptedId], { replaceUrl: true, skipLocationChange: true });
     }
 
     finalizarConfirmation(e: any) {

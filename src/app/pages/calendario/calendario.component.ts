@@ -33,6 +33,7 @@ import { MyMap } from '../../utils/map';
 import { Response } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
+import { ThemeService } from '@primeng/themes';
 
 @Component({
     selector: 'app-calendario',
@@ -56,7 +57,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     loading = false;
     headerOpen = true;
     account?: AccountResponse;
-
+    data = new Date;
+    minData = new Date(2025,1,1);
+    
     agendarMenuItem: MenuItem[] = [
         {
             label: 'Aula 0',
@@ -111,7 +114,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     currentRoteiro?: Roteiro;
     roteiros: Roteiro[] = [];
     loadingRoteiro = false;
-    checked = false;
+    dayView = false;
     currentTitle = '';
     cdkDragCancel = false;
     viewMenu: MenuItem[] = [];
@@ -253,16 +256,19 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     prev() {
         this.fullCalendar.getApi().prev();
         this.unselectAula();
+        this.data = this.fullCalendar.getApi().getDate();
     }
 
     next() {
         this.fullCalendar.getApi().next();
         this.unselectAula();
+        this.data = this.fullCalendar.getApi().getDate();
     }
-
+    
     today() {
         this.fullCalendar.getApi().today();
         this.unselectAula();
+        this.data = new Date();
     }
 
     setView() {
@@ -288,6 +294,31 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             this.calendarioRequest.professor_Id = undefined
         }
         this.getCalendario(this.calendarioRequest, 'calendarViewChanged')
+    }
+
+    dataSelect() {
+        if (this.dayView) {
+            this.calendarioRequest.intervaloDe = this.data;
+            this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
+            this.currentRoteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim))
+        } else {
+            if (moment(this.data).week() != moment(this.calendarioRequest.intervaloDe).week()) {
+                this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
+                this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
+                this.currentRoteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim))
+            }
+        }
+        console.log('intervaloDe', this.calendarioRequest.intervaloDe)
+    }
+
+    roteiroChanged() {
+        if (this.currentRoteiro) {
+            if (moment(this.currentRoteiro.dataInicio).week() != moment(this.calendarioRequest.intervaloDe).week()) {
+                this.data = this.currentRoteiro.dataInicio;
+                this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
+                this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
+            }
+        }
     }
 
     eventRamdomId() {
@@ -720,8 +751,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     calendarChanged() {
-        this.checked = !this.checked;
-        if (this.checked) {
+        this.dayView = !this.dayView;
+        if (this.dayView) {
             this.fullCalendar.getApi().changeView('dayGridDay')
         } else {
             this.fullCalendar.getApi().changeView('timeGridWeek')
