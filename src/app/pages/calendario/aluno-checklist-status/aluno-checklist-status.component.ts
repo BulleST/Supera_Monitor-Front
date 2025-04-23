@@ -17,7 +17,7 @@ export class AlunoChecklistStatusComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            if (this.aluno.checklistCompleto) {
+            if (this.aluno.checklistCompleto && this.aluno.checklistCompleto.length) {
                 var atrasados = this.aluno.checklistCompleto.filter(x => x.atrasados.length > 0);
                 this.atrasado = atrasados.length > 0;
             }

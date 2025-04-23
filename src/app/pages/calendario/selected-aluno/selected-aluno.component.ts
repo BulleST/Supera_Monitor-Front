@@ -8,6 +8,7 @@ import { Evento } from '../../../models/evento.model';
 import { Crypto } from '../../../utils';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../services/evento.service';
+import moment from 'moment';
 
 @Component({
     selector: 'app-selected-aluno',
@@ -86,5 +87,8 @@ export class SelectedAlunoComponent implements OnChanges, OnDestroy {
         })
     }
 
+    primeiraAula(aluno: Evento_Participacao_Aluno, evento:Evento) {
+        return moment(aluno.primeiraAula).isSame(evento.data)
+    }
 
 }

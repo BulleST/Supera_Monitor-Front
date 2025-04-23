@@ -3,6 +3,7 @@ import { BehaviorSubject, of, tap } from 'rxjs';
 import { Response } from '../helpers/request-response.interface';
 import { MyMap } from '../utils/map';
 import moment from 'moment';
+import 'moment/locale/pt-br'
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
@@ -14,13 +15,14 @@ export class RoteiroService extends Service {
     override list = new BehaviorSubject<Roteiro[]>([]);
  
 
-    getList() {
+    getList(where: string = 'não sei') {
+        console.log('roteiro getList', where)
         return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/`)
             .pipe(tap({
                 next: list => {
                     list = list.map(x => {
-                        x.dataFim = moment(x.dataFim).add(23, 'hour').toDate();
-                        x.dataInicio = new Date(x.dataInicio);
+                        x.dataInicio = moment(x.dataInicio, 'YYYY-MM-DD').toDate();
+                        x.dataFim = moment(x.dataFim, 'YYYY-MM-DD').set({ hours: 23, minute: 59}).toDate();
                         x.corLegenda =  x.corLegenda ?? this.getRandomColor();
                         x.active = !x.deactivated;
                         return x
@@ -33,6 +35,7 @@ export class RoteiroService extends Service {
                 }
             }));
     }
+
     getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '#';
@@ -45,7 +48,7 @@ export class RoteiroService extends Service {
     get(id: number) {
         return new Promise<Roteiro>(async (resolve, reject) => {
             if (this.list.value.length == 0)
-                this.getList().subscribe();
+                this.getList('get ' + id).subscribe();
 
             var item = this.list.value.find(x => x.id == id) as Roteiro;
             if (!item){

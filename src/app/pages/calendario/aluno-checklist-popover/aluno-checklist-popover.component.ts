@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
@@ -21,6 +21,7 @@ import $ from 'jquery';
 })
 export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , AfterViewInit {
     @Input() aluno: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
+    @Output() alunoChanged = new EventEmitter<Evento_Participacao_Aluno>();
     loading: boolean = false;
     checklists: Checklist[] = [];
     subscription: Subscription[] = [];
@@ -41,7 +42,7 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            if(!changes['aluno'].previousValue )
+            if(!this.aluno.alunoChecklist || !this.aluno.alunoChecklist.length )
                 this.loadChecklistAluno();
         }
     }
@@ -77,6 +78,7 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
                         return checklistAluno;
                     });
                 this.loading = false;
+                this.alunoChanged.emit(this.aluno)
             })
 
     }

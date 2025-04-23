@@ -113,7 +113,7 @@
                                         </div>
                                         <div class="flex-1 flex flex-column w-full overflow-hidden">
                                             <p class=" w-full flex-none flex align-items-center">
-                                                <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis flex-1">{{aluno.aluno.nome}}</span>
+                                                <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis flex-1">{{aluno.aluno.nome | nameAbv}}</span>
                                                 
                                                 <!-- Apresentação do Diretor Franqueado -->
                                                 <ng-container *ngIf="item.id == 8">

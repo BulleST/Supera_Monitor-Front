@@ -322,7 +322,7 @@ export class EventoComponent implements OnDestroy {
             default: route = 'aula'; break;
         }
 
-        this.router.navigate(['calendario', route, 'chamada', this.encryptedId], { replaceUrl: true, skipLocationChange: true });
+        this.router.navigate(['calendario', route, 'chamada', this.encryptedId], { replaceUrl: true, skipLocationChange: true  });
     }
 
     finalizarConfirmation(e: any) {
@@ -353,6 +353,7 @@ export class EventoComponent implements OnDestroy {
                 var participacao = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
                 item.id = participacao.id;
                 item.evento_Id = participacao.evento_Id;
+                item.presente = item.presente ?? false;
                 return item;
             });
             this.evento.professores = this.evento.professores.map(item => {

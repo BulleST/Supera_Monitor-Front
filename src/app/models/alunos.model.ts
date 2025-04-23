@@ -2,7 +2,7 @@ import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
-import { Evento_Mes } from "./evento-aula-aluno.model";
+import { Dashboard, /*Dashboard_Aulas, Dashboard_Mes*/ } from "./dashboard.model";
 import { Evento } from "./evento.model";
 
 export class AlunoRequest {
@@ -103,7 +103,10 @@ export class Aluno {
     checklist_Id?: number;
     checklist?: string;
 
-    mesesAula: Evento_Mes[] = [];
+    aulas: Dashboard[] = [];
+    primeiraAula?: Dashboard;
+    // aulas: Dashboard_Aulas[] = [];
+    // mesesAula: Evento_Mes[] = [];
     disponivel?: boolean;
     disponivelEvent?: Evento;
 }
@@ -123,13 +126,13 @@ export interface Pessoa_Origem_Categoria extends Pessoa_DropDown { }
 export interface Pessoa_Status extends Pessoa_DropDown { }
 
 export var alunosColumns: ColumnTable[] = [
-    {
-        field: 'rm',
-        label: 'Matrícula',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
+    // {
+    //     field: 'rm',
+    //     label: 'Matrícula',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
     {
         field: 'nome',
         label: 'Nome',

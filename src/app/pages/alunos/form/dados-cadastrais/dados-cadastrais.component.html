@@ -398,6 +398,7 @@
                           [options]="turmas"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
+                          (ngModelChange)="turmaChanged(turma_Id, $event)"
                           #turma_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
@@ -412,15 +413,22 @@
                           [required]="true">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div>
+                            <div class="w-full">
                                 <p class="font-bold">{{ item.nome }}</p>
-                                <p class="text-sm">{{ item.professor }} - {{item.alunosAtivos}}/{{ item.capacidadeMaximaAlunos }}</p>
+                                <div class="flex align-items-center justify-content-between">
+                                    <p class="text-sm">
+                                        <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                        <span>{{ item.professor }}</span>
+                                    </p>
+                                    <span><b>Vagas: </b>{{item.alunosAtivos}}/{{ item.capacidadeMaximaAlunos }}</span>
+                                    <p class="text-sm">{{item.perfilCognitivo[0].nome}}</p>
+                                </div>
                             </div>
-                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                            <!-- <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                    [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
                                    [value]="item.active ? 'Ativo': 'Inativo'"
                                    [severity]="item.active ? 'success': 'danger'"
-                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" /> -->
                         </div>
                     </ng-template>
                 </p-select>

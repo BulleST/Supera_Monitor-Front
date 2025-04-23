@@ -27,6 +27,8 @@ import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import { Feriado } from '../../../../../models/feriado.model';
+import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 
 @Component({
     selector: 'app-cadastrar-aula-extra',
@@ -74,6 +76,10 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
 
     @ViewChild('picklist') picklist!: PickList;
 
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    feriadoDates: Date[] = [];
+    ano: number = new Date().getFullYear();
 
     constructor(
         private router: Router,
@@ -94,7 +100,7 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
 
         if (this.roteiros.length == 0) {
             this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList())
+            lastValueFrom(this.roteiroService.getList('cadastrar aula extra'))
                 .then(res => this.loadingRoteiros = false)
                 .catch(res => this.loadingRoteiros = false);
         }
@@ -150,6 +156,8 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
                 .catch(res => this.loadingAlunos = false);
         }
 
+        this.loadFeriados();
+
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
@@ -185,6 +193,25 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
     setDiaSemana(i: number) {
         return moment().day(i).format('dddd')
     }
+    
+    dateNavigatorChanged(e: DatePickerYearChangeEvent) {
+        if (e.year != this.ano) {
+            this.ano = e.year ?? new Date().getFullYear();
+            this.loadFeriados()
+        }
+    }
+
+    async loadFeriados() {
+        this.loadingFeriados = true;
+        await lastValueFrom(this.service.getFeriados(this.ano))
+            .then(res => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+                this.feriadoDates = res.map(x => moment(x.date).toDate());
+            })
+            .catch(res => this.loadingFeriados = false);
+    }
+
 
     turmaChanged() {
         if (this.object.turma_Id) {
@@ -340,7 +367,7 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
-    
+
     getTipo(e: Evento) {
         return this.mensagemWhatsapp.getEventoTipo(e)
     }

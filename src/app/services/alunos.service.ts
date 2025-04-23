@@ -49,11 +49,16 @@ export class AlunoService extends Service {
                     var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
                     list = list.map(aluno => {
                         aluno.active = !aluno.deactivated;
+
                         aluno.created = moment(aluno.created).toDate();
                         aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                        aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                        aluno.dataFimVigencia = moment(aluno.dataFimVigencia).toDate();
                         aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
+                        // Nuláveis
+                        aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
+                        aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
+                        aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
+
+
                         aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
                         aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
                             checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
@@ -132,15 +137,16 @@ export class AlunoService extends Service {
                 return reject('Aluno não encontrado.')
             }
 
-            if (item.dataNascimento)
-                item.dataNascimento = new Date(moment(item.dataNascimento).format('YYYY-MM-DD[T]HH:mm:ss'))
-            if (item.created)
-                item.created = new Date(moment(item.created).format('YYYY-MM-DD[T]HH:mm:ss'))
-            if (item.lastUpdated)
-                item.lastUpdated = new Date(moment(item.lastUpdated).format('YYYY-MM-DD[T]HH:mm:ss'))
-            if (item.deactivated)
-                item.deactivated = new Date(moment(item.deactivated).format('YYYY-MM-DD[T]HH:mm:ss'))
+            // if (item.dataNascimento)
+            //     item.dataNascimento = item.dataNascimento ? new Date(moment(item.dataNascimento).format('YYYY-MM-DD[T]HH:mm:ss')) : new Date();
+            // if (item.created)
+            //     item.created = new Date(moment(item.created).format('YYYY-MM-DD[T]HH:mm:ss'))
+            // if (item.lastUpdated)
+            //     item.lastUpdated = item.lastUpdated ? new Date(moment(item.lastUpdated).format('YYYY-MM-DD[T]HH:mm:ss')) : undefined
+            // if (item.deactivated)
+            //     item.deactivated = item.deactivated ? new Date(moment(item.deactivated).format('YYYY-MM-DD[T]HH:mm:ss')) : undefined
 
+            console.log('aluno service', item)
             return resolve(item);
         })
     }

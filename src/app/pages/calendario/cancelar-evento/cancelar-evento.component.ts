@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Evento, EventoQueryParams, EventoTipo } from '../../../models/evento.model';
+import { Evento, EventoCancelamentoRequest, EventoQueryParams, EventoReagendamentoRequest, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno } from '../../../models/alunos.model';
@@ -39,8 +39,9 @@ export class CancelarEventoComponent implements OnDestroy {
     tipoEventoString = '';
 
     mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
-    alunos: Aluno[] = [];
-    loadingAlunos = false;
+    alunos: Evento_Participacao_Aluno[] = [];
+    // alunos: Aluno[] = [];
+    // loadingAlunos = false;
 
     professores: Professor[] = [];
     loadingProfessores = false;
@@ -48,7 +49,7 @@ export class CancelarEventoComponent implements OnDestroy {
     turmas: Turma[] = [];
     loadingTurmas = false;
     SalaAulaId = SalaAulaId;
-    
+
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
@@ -75,18 +76,18 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active == true);
-            this.setAlunosProfessores();
-        });
-        this.subscription.push(alunos);
+        // var alunos = this.alunoService.list.subscribe(res => {
+        //     this.alunos = res.filter(x => x.active == true);
+        //     this.setAlunosProfessores();
+        // });
+        // this.subscription.push(alunos);
 
-        if (this.alunos.length == 0) {
-            this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
-                .then(res => this.loadingAlunos = false)
-                .catch(res => this.loadingAlunos = false);
-        }
+        // if (this.alunos.length == 0) {
+        //     this.loadingAlunos = true;
+        //     lastValueFrom(this.alunoService.getList())
+        //         .then(res => this.loadingAlunos = false)
+        //         .catch(res => this.loadingAlunos = false);
+        // }
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
         this.subscription.push(turmas);
 
@@ -143,16 +144,16 @@ export class CancelarEventoComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
         }
     }
 
     setAlunosProfessores() {
-        if (this.alunos.length > 0 && this.evento.alunos.length > 0) {
+        // if (this.alunos.length > 0 && this.evento.alunos.length > 0) {
 
-            var alunosIds = this.evento.alunos.map(x => x.aluno_Id);
-            this.alunos = this.alunos.filter(x => alunosIds.includes(x.id));
-        }
+        //     var alunosIds = this.evento.alunos.map(x => x.aluno_Id);
+        //     this.alunos = this.alunos.filter(x => alunosIds.includes(x.id));
+        // }
 
         if (this.professores.length > 0 && this.evento.professores.length > 0) {
 
@@ -233,7 +234,7 @@ export class CancelarEventoComponent implements OnDestroy {
         var response: Response = { success: true, message: '', object: null };
 
         if (this.evento.id == PseudoEvento.EventoId) {
-             await this.request()
+            await this.request()
                 .then(res => {
                     this.evento.id = res.object.id;
                     response = res;
@@ -241,15 +242,17 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => this.showError('Erro', getError(res), e))
         }
 
-        console.log(response)
-
         if (response.success) {
-                lastValueFrom(this.service.cancelarEvento(this.evento.id))
+            var request: EventoCancelamentoRequest = {
+                id: this.evento.id,
+                observacao: this.evento.observacao
+            };
+            lastValueFrom(this.service.cancelar(request))
                 .then(res => {
                     this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado');
                     this.service.calendarioReload.emit(res.object.id);
-
                     this.loading = false;
+
                     if (this.evento.alunos.length > 0)
                         this.sendMensagemAlunos();
                     else {
@@ -261,8 +264,6 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.showError('Erro', `Não foi possível cancelar a ${this.tipoEventoString}. \n ${getError(res)}`, e);
                 })
         }
-
-
     }
 
 
@@ -285,7 +286,7 @@ export class CancelarEventoComponent implements OnDestroy {
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
         request.perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id);
-        
+
         if (this.evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createAulaTurma(request));
         return lastValueFrom(this.service.editAulaTurma(request));

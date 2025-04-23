@@ -1,4 +1,4 @@
-<p-popover #popover styleClass="-mt-1" [dismissable]="true">
+<p-popover #popover styleClass="-mt-1 mx-w-screen" [dismissable]="true">
     <p-tabs [value]="aluno.checklist_Id ?? 0" scrollable #tabs >
         <p-tablist style="max-width: 50rem;">
             <p-tab *ngFor="let checklist of aluno.checklistCompleto" 

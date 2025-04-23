@@ -25,6 +25,8 @@
                               #_data="ngModel"
                               [(ngModel)]="data"
                               (onBlur)="verificaDisponibilidade()"
+                              (onMonthChange)="dateNavigatorChanged($event)"
+                              (onYearChange)="dateNavigatorChanged($event)"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               [minDate]="minData"
@@ -37,6 +39,7 @@
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
+                              [disabledDates]="feriadoDates"
                               appendTo="body" />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>

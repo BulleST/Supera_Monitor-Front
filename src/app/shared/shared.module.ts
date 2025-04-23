@@ -26,6 +26,7 @@ import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.componen
 import { RouterModule } from '@angular/router';
 import { AgendarReposicaoAlunoComponent } from '../pages/calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 import { SalaAulaComponent } from './sala-aula/sala-aula.component';
+import { NameAbvPipe } from '../utils/name.pipe';
 
 
 @NgModule({
@@ -58,6 +59,9 @@ import { SalaAulaComponent } from './sala-aula/sala-aula.component';
         NgxMaskDirective,
         FormsModule,
         NgxMaskPipe,
+        NameAbvPipe,
+
+
         ProfileComponent,
         ChangePasswordComponent,
         DragDropModule,
@@ -93,10 +97,13 @@ import { SalaAulaComponent } from './sala-aula/sala-aula.component';
         DragScrollComponent, 
         DragScrollItemDirective,
         FullCalendarModule,
+        NameAbvPipe,
     ],
     providers: [
         provideHttpClient(withFetch()),
         provideHttpClient(withInterceptorsFromDi()),
+        NameAbvPipe,
+        
     ]
 })
 export class SharedModule { }

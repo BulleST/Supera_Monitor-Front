@@ -24,6 +24,8 @@ import { ChecklistService } from '../../../../../services/checklist.service';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import { Feriado } from '../../../../../models/feriado.model';
+import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -59,6 +61,11 @@ export class CadastrarAula0Component implements OnDestroy {
 
     eventos: Evento[] = [];
     loadingEventos = false;
+
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    feriadoDates: Date[] = [];
+    ano: number = new Date().getFullYear();
 
     @ViewChild('form') form!: NgForm;
     @ViewChild('formDiv') formDiv!: HTMLFormElement;
@@ -126,6 +133,8 @@ export class CadastrarAula0Component implements OnDestroy {
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
+        this.loadFeriados();
+
         this.verificaDisponibilidade();
 
 
@@ -165,6 +174,25 @@ export class CadastrarAula0Component implements OnDestroy {
             rejectVisible: false,
         })
     }
+    
+    dateNavigatorChanged(e: DatePickerYearChangeEvent) {
+        if (e.year != this.ano) {
+            this.ano = e.year ?? new Date().getFullYear();
+            this.loadFeriados()
+        }
+    }
+
+    async loadFeriados() {
+        this.loadingFeriados = true;
+        await lastValueFrom(this.service.getFeriados(this.ano))
+        .then(res => {
+            this.feriados = res;
+            this.loadingFeriados = false;
+            this.feriadoDates = res.map(x => moment(x.date).toDate());
+        })
+        .catch(res => this.loadingFeriados = false);
+    }
+    
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }

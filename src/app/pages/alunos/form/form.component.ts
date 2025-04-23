@@ -34,7 +34,6 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
     ) {
 
-        console.log('oi')
         this.loadPage();
     }
 
@@ -45,7 +44,6 @@ export class FormComponent implements OnDestroy {
 
     loadPage() {
         var params = this.activatedRoute.params.subscribe(res => {
-            console.log(res)
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.loading = true;
@@ -56,6 +54,7 @@ export class FormComponent implements OnDestroy {
                         this.object = res;
                         this.loading = false;
                         this.visible = true;
+                        console.log('aluno', this.object)
                     })
                     .catch(res => {
                         this.visible = false;

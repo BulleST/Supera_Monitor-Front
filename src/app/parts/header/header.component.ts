@@ -8,11 +8,9 @@ import { ThemeService } from '../../utils/theme';
 import { Menubar } from 'primeng/menubar';
 import { AccountService } from '../../services/account.service';
 import { Role } from '../../models/account-perfil.model';
-import { NavigationEnd, Router } from '@angular/router';
-import { AulaService } from '../../services/aulas.service';
+import { Router } from '@angular/router';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
 import { MegaMenu } from 'primeng/megamenu';
-import { Button } from 'primeng/button';
 
 @Component({
     selector: 'app-header',
@@ -47,7 +45,6 @@ export class HeaderComponent implements OnDestroy {
         private theme: ThemeService,
         private accountService: AccountService,
         private router: Router,
-        private aulaService: AulaService,
         private mobileService: MobileService,
         private header: Header,
         private confirmationService: ConfirmationService,

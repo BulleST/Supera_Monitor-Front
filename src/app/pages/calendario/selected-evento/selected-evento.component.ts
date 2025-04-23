@@ -17,6 +17,7 @@ import $ from 'jquery';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { SalaAulaId } from '../../../models/sala-aula.model';
 import { AlunoPopoverComponent } from '../aluno-popover/aluno-popover.component';
+import moment from 'moment';
 
 @Component({
     selector: 'app-selected-evento',
@@ -123,18 +124,18 @@ export class SelectedEventoComponent implements OnChanges {
     onHide() {
         this.aluno.emit(undefined);
     }
-    
+
     goToAluno(aluno: Evento_Participacao_Aluno) {
         this.service.setEvento(this.evento);
         this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);
     }
 
     async showAluno(e: MouseEvent, aluno: Evento_Participacao_Aluno, popoverComponent: AlunoPopoverComponent) {
-         if (aluno.reposicaoDe_Evento_Id) {
+        if (aluno.reposicaoDe_Evento_Id) {
             await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
-            .then(res => {
-                this.aluno.emit(aluno)
-            })
+                .then(res => {
+                    this.aluno.emit(aluno)
+                })
         }
         aluno.loadingFoto = true;
         lastValueFrom(this.alunoService.getFoto(aluno.aluno_Id))
@@ -175,7 +176,7 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
     goToInscricaoOficina() {
-        if(this.evento) {
+        if (this.evento) {
             this.service.setEvento(this.evento)
             this.router.navigate(['calendario', 'oficina', 'inscrever', this.crypto.encrypt(this.evento.id)])
         }
@@ -184,7 +185,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToReagendamento() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-            
+
             var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
@@ -195,7 +196,7 @@ export class SelectedEventoComponent implements OnChanges {
                 case EventoTipo.Oficina: route = 'oficina'; break;
                 default: route = 'aula'; break;
             }
-    
+
             this.router.navigate(['calendario', route, 'reagendar', this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
@@ -204,7 +205,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToCancelamento() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-           
+
             var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
@@ -223,46 +224,58 @@ export class SelectedEventoComponent implements OnChanges {
 
     async goToEvento() {
         if (this.evento) {
-            this.evento.data = new Date(this.evento.data)
-            this.service.setEvento(this.evento)
+            this.evento.data = new Date(this.evento.data);
+
+            var alunos = this.alunoService.list.value;
+            if (!alunos.length)
+                await lastValueFrom(this.alunoService.getList()).then(res => alunos = res);
+
+            this.evento.alunos = this.evento.alunos.map(participacao => {
+                var aluno = alunos.find(x => x.id == participacao.aluno_Id);
+                if (aluno) {
+                    participacao.alunoChecklist = aluno.alunoChecklist;
+                    participacao.checklistCompleto = aluno.checklistCompleto;
+                    participacao.checklist_Id = aluno.checklist_Id;
+                    participacao.checklist = aluno.checklist;
+                }
+                return participacao;
+            });
+
+
+            this.service.setEvento(this.evento);
             var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
 
             switch (this.evento.evento_Tipo_Id) {
-                case EventoTipo.Aula: route = 'aula'
-                    break;
-                case EventoTipo.AulaZero: route = 'aula-zero'
-                    break;
-                case EventoTipo.AulaExtra: route = 'aula'
-                    break;
-                case EventoTipo.Superacao: route = 'superacao'
-                    break;
-                case EventoTipo.Reuniao: route = 'reuniao'
-                    break;
-                case EventoTipo.Oficina: route = 'oficina'
-                    break;
-                default: route = 'aula'
-                    break;
+                case EventoTipo.Aula: route = 'aula'; break;
+                case EventoTipo.AulaZero: route = 'aula-zero'; break;
+                case EventoTipo.AulaExtra: route = 'aula'; break;
+                case EventoTipo.Superacao: route = 'superacao'; break;
+                case EventoTipo.Reuniao: route = 'reuniao'; break;
+                case EventoTipo.Oficina: route = 'oficina'; break;
+                default: route = 'aula'; break;
             }
-            
-            this.router.navigate([route, this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute/**, queryParams  */})
-            this.hidePopover();
 
+            this.router.navigate([route, this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute })
+            this.hidePopover();
         }
     }
 
     loadReposicoes() {
         if (this.evento) {
             this.evento.alunos.forEach(async item => {
-                if (item.reposicaoDe_Evento_Id && !item.reposicaoDe_Evento ) {
+                if (item.reposicaoDe_Evento_Id && !item.reposicaoDe_Evento) {
                     item.loadingReposicaoDe_Evento = true;
                     lastValueFrom(this.service.get(item.reposicaoDe_Evento_Id))
-                    .then(res => {
-                        item.reposicaoDe_Evento = res;
-                        item.loadingReposicaoDe_Evento = false;
-                    }).catch(res => item.loadingReposicaoDe_Evento = false);
+                        .then(res => {
+                            item.reposicaoDe_Evento = res;
+                            item.loadingReposicaoDe_Evento = false;
+                        }).catch(res => item.loadingReposicaoDe_Evento = false);
                 }
             })
 
         }
+    }
+    primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
+        return moment(aluno.primeiraAula).isSame(evento.data)
     }
 }

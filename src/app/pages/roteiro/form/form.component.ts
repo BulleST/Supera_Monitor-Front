@@ -157,7 +157,7 @@ export class FormComponent implements OnDestroy {
 
         var list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
         var data = moment(ngModel.value).toDate()
-        var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim);
+        var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim && x.id != this.object.id);
         
         if (existe) {
             this.toastrService.error('Essa data já está em um tema existente');
@@ -169,17 +169,17 @@ export class FormComponent implements OnDestroy {
             ngModel.control.updateValueAndValidity();
 
 
-            var newList: Roteiro[] = JSON.parse(JSON.stringify(list));
-            newList.push(this.object)
-            newList.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
+            // var newList: Roteiro[] = JSON.parse(JSON.stringify(list));
+            // newList.push(this.object)
+            // newList.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
 
-            var semana = 1;
-            newList.map(x => {
-                x.semana = semana++;
-                if (this.object.dataInicio == x.dataInicio || this.object.dataFim == x.dataFim) {
-                    this.object.semana = x.semana
-                }
-            })
+            // var semana = 1;
+            // newList.map(x => {
+            //     x.semana = semana++;
+            //     if (this.object.dataInicio == x.dataInicio || this.object.dataFim == x.dataFim) {
+            //         this.object.semana = x.semana
+            //     }
+            // })
 
 
             

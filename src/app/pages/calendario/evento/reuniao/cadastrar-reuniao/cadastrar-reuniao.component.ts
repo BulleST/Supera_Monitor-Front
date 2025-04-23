@@ -18,6 +18,8 @@ import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
 import { validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import { Feriado } from '../../../../../models/feriado.model';
+import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 
 @Component({
     selector: 'app-cadastrar-reuniao',
@@ -52,6 +54,11 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
     eventos: Evento[] = [];
     loadingEventos = false;
+            
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    feriadoDates: Date[] = [];
+    ano: number = new Date().getFullYear();
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -87,6 +94,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
+        this.loadFeriados();
 
         this.verificaDisponibilidade();
         this.visible = true;
@@ -135,6 +143,24 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             this.horario.setHours(12, 0, 0);
             this._horario.control.setValue(this.horario)
         }
+    }
+    
+    dateNavigatorChanged(e: DatePickerYearChangeEvent) {
+        if (e.year != this.ano) {
+            this.ano = e.year ?? new Date().getFullYear();
+            this.loadFeriados()
+        }
+    }
+
+    loadFeriados() {
+        this.loadingFeriados = true;
+        lastValueFrom(this.service.getFeriados(this.ano))
+        .then(res => {
+            this.feriados = res;
+            this.loadingFeriados = false;
+            this.feriadoDates = res.map(x => moment(x.date).toDate());
+        })
+        .catch(res => this.loadingFeriados = false);
     }
 
     async verificaDisponibilidade() {

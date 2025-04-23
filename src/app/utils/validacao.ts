@@ -51,7 +51,7 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
             var c7 = e.id != evento_Id;
 
             if (((c1 && c2) || (c3 && c4)) && !c5 && c6 && c7  &&  item.id == 33) {
-                console.log('oi',e.professor_Id, e.professores)
+                // console.log('oi',e.professor_Id, e.professores)
             } 
             
             if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {

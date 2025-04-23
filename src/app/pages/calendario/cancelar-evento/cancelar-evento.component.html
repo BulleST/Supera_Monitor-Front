@@ -86,14 +86,20 @@
         </p>
         <div class="formgrid grid">
             <div class="field col-12"> <!-- Observações -->
-                <label for="observacao" class="font-bold text-lg">Observações: <span class="text-400 text-sm">(motivo do cancelamento)</span></label>
+                <label for="observacao" class="font-bold text-lg">Observações:<span class="text-red-500">*</span> <span class="text-400 text-sm">(motivo do cancelamento)</span></label>
                 <textarea pTextarea
                           class="w-full"
                           name="observacao"
                           id="observacao"
+                          #observacao="ngModel"
                           [(ngModel)]="evento.observacao"
                           placeholder="Aproveite para contar o motivo do cancelamento"
+                          [rows]="3"
+                          [required]="true"
                           [rows]="3"></textarea>
+                <div *ngIf="observacao.touched && observacao.invalid && observacao.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="observacao.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
         </div>
         <div class="formgrid grid">
@@ -103,21 +109,23 @@
                     <span *ngIf="evento.alunos.length == 1">Aluno</span>
                 </p>
                 <hr class="mb-2 border-orange-500 border-1">
-                <div *ngFor="let item of alunos; let i = index">
-                    <div class="flex align-items-center w-full" [ngClass]="{
+                <div *ngFor="let item of evento.alunos; let i = index">
+                    <div class="flex align-items-center w-full p-2" [ngClass]="{
                         'bg-white': i % 2 == 0,
                         'surface-50': i % 2 != 0 
                     }">
                         <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
                             <a *ngIf="item.celular"
-                               [href]="enviarMensagem(item.nome, item.celular)"
+                               [href]="enviarMensagem(item.aluno, item.celular)"
                                pTooltip="Enviar mensagem"
                                target="_blank"
                                rel="noopener noreferrer"
                                class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
                             </a>
                         </div>
-                        <p class="mr-2">{{ item.nome }}</p>
+                        <p class="mr-2">{{ item.aluno }}</p>
+                        <p-badge *ngIf="item.reposicaoDe_Evento_Id" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
+
                     </div>
                 </div>
             </div>
@@ -142,7 +150,8 @@
                           [loading]="loading"
                           [rounded]="true"
                           [text]="true"
-                          size="small" />
+                          size="small"
+                          [disabled]="form.invalid || loading" />
                 <p-button type="button"
                           (onClick)="goToReagendamento()"
                           styleClass="px-3"
@@ -150,6 +159,7 @@
                           [icon]="'pi pi-calendar'"
                           [loading]="loading"
                           [rounded]="true"
+                          [disabled]="form.invalid || loading"
                           size="small" />
             </div>
         </div>

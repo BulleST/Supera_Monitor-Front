@@ -58,6 +58,9 @@ export class AlunoPopoverComponent implements OnChanges {
         })
     }
 
+    toggle(e: any) {
+        this.popover.toggle(e)
+    }
     show(e: any) {
         this.popover.show(e)
     }

@@ -17,6 +17,8 @@ import { Evento } from '../../../../../models/evento.model';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import { Feriado } from '../../../../../models/feriado.model';
+import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 
 @Component({
     selector: 'app-cadastrar-oficina',
@@ -46,6 +48,11 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
     eventos: Evento[] = [];
     loadingEventos = false;
+        
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    feriadoDates: Date[] = [];
+    ano: number = new Date().getFullYear();
 
     @ViewChild('form') form!: NgForm;
     @ViewChild('formDiv') formDiv!: HTMLFormElement;
@@ -88,6 +95,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
+        this.loadFeriados();
 
         this.verificaDisponibilidade();
 
@@ -97,6 +105,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
+    
     visibleChange() {
         if (!this.visible) {
             this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
@@ -114,6 +123,27 @@ export class CadastrarOficinaComponent implements OnDestroy {
             rejectVisible: false,
         })
     }
+
+    
+    dateNavigatorChanged(e: DatePickerYearChangeEvent) {
+        if (e.year != this.ano) {
+            this.ano = e.year ?? new Date().getFullYear();
+            this.loadFeriados()
+        }
+    }
+
+
+    loadFeriados() {
+        this.loadingFeriados = true;
+        lastValueFrom(this.service.getFeriados(this.ano))
+        .then(res => {
+            this.feriados = res;
+            this.loadingFeriados = false;
+            this.feriadoDates = res.map(x => moment(x.date).toDate());
+        })
+        .catch(res => this.loadingFeriados = false);
+    }
+    
     async verificaDisponibilidade() {
         var valid = true;
 

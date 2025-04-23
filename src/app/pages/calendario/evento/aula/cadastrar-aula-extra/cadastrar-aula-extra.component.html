@@ -76,6 +76,8 @@
             <div class="field md:col-2 sm:col-3 col-6"> <!-- Data -->
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker (onBlur)="verificaDisponibilidade()"
+                            (onMonthChange)="dateNavigatorChanged($event)"
+                            (onYearChange)="dateNavigatorChanged($event)"
                               #dataNgModel="ngModel"
                               [(ngModel)]="data"
                               [showIcon]="true"
@@ -90,6 +92,7 @@
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
+                              [disabledDates]="feriadoDates"
                               appendTo="body" />
                 <div *ngIf="dataNgModel.touched && dataNgModel.invalid && dataNgModel.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNgModel.errors['required']">Esse campo é obrigatório.</p>

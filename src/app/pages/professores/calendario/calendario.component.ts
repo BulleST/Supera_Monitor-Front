@@ -1,20 +1,20 @@
 import { ChangeDetectorRef, Component, signal, ViewChild } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { CalendarioAula, CalendarioRequest } from '../../../models/calendario.model';
+import { CalendarioRequest } from '../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { Popover } from 'primeng/popover';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { CalendarOptions, DatesSetArg, EventApi } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
 import { Professor } from '../../../models/professor.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProfessorService } from '../../../services/professor.service';
 import { Crypto } from '../../../utils';
 import { Evento } from '../../../models/evento.model';
+import { EventoService } from '../../../services/evento.service';
 
 @Component({
     selector: 'app-calendario',
@@ -96,7 +96,7 @@ export class CalendarioComponent {
     constructor(
         private confirmationService: ConfirmationService,
         private changeDetector: ChangeDetectorRef,
-        private service: AulaService,
+        private service: EventoService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private professorService: ProfessorService,
@@ -161,20 +161,10 @@ export class CalendarioComponent {
 
         this.loading = true;
 
-        await lastValueFrom(this.service.getCalendario(request))
+        await lastValueFrom(this.service.calendario(request))
             .then(calendarioList => {
 
-                calendarioList.forEach(aula => {
-                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
-                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
-                    if (index == -1) {
-                        this.calendarioList.push(aula);
-                    }
-                    else {
-                        this.calendarioList.splice(index, 1, aula);
-                    }
-                });
-
+                this.calendarioList = calendarioList.filter(x => x.active == true);
                 this.setCalendario();
             })
             .catch(res => {

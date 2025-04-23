@@ -90,6 +90,11 @@
                           <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
                           <span>A reposição deve ser agendada para até 30 dias da aula</span>
                       </li>
+                      <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
+                      <li class="mb-2 white-space-normal">
+                          <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
+                          <span>A reposição não pode ser agendada em um feriado</span>
+                      </li>
                   </ul>
               </div>
           </p-popover>
@@ -118,81 +123,95 @@
                 </div>
             </div>
             <!-- END TOOLBAR -->
-            <full-calendar [options]="calendarioOptions" #fullCalendar *ngIf="calendarVisible()">
+            <full-calendar [options]="calendarioOptions" #fullCalendar >
                 <ng-template #eventContent let-arg>
 
                     <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
 
                     <ng-template #eventoTemplate let-evento="evento" let-arg="arg" >
                         <ng-container *ngIf="!loading && evento; else loadingEvent">
-                            <div [pTooltip]="eventoTooltip"
-                            tooltipStyleClass="bg-transparent"
-                                class="cursor-pointer w-full overflow-hidden p-1 border-round-sm flex flex-column border-2 "
-                                 [ngStyle]="{
-                                    backgroundColor: evento.corLegenda,
-                                    borderColor: selectedAula && selectedAula.id == arg.event.id ? 'red' : evento.corLegenda,
-                                    color: evento.foreColor,
-                                }">
-                                <div class="flex align-items-center">
-                                    <span class="text-sm mr-2">{{evento.data | date : 'HH:mm'}}</span>
-                                    <span class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">{{evento.descricao }}</span>
-                                </div>
-                            </div>
-                            <ng-template #eventoTooltip>
-                                <ng-template #eventHeader>
-                                    <div class="flex align-items-center justify-content-start gap-1 white-space-nowrap text-overflow-ellipsis overflow-hidden">
-                                        <i class="pi pi-clock text-xs"></i>
-                                        <span class="text-xs">{{evento.data | date : 'HH:mm'}}</span>
-                                        <span class="ml-auto pl-3 text-xs ">
-                                            <span>{{evento.alunos.length}}</span>
-                                            <span>/{{evento.capacidadeMaximaAlunos}}</span>
-                                        </span>
-                                        <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="pi pi-exclamation-circle text-xs  -mt-1 fadeout animation-duration-500 animation-iteration-infinite"></i>
-                                    </div>
-                                </ng-template>
-                                <ng-template #eventBody>
-                                    <div class="flex align-items-center my-auto gap-2 w-full " style="height: 3rem;">
-                                        <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
-                                            <span class="p-1 px-2 border-circle border-2 text-xs flex-none font-bold text-center ml-1" [pTooltip]="'Reagendamento: clique para ver mais'" [style]="{ borderColor: evento.foreColor }">R</span>
-                                        </ng-template>
-                                        <div class="text-base font-bold overflow-hidden w-full h-full  mb-auto flex ">
-                                            <p *ngIf="evento.descricao" [pTooltip]="evento.descricao" class="my-auto">{{evento.descricao}}</p>
-                                        </div>
-                                    </div>
-                                </ng-template>
-                                <ng-template #eventFooter>
-                                    <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
-                                        <ng-template [ngIf]="evento.professor">
-                                            <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
-                                        </ng-template>
-                                        <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
-                                            <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
-                                        </ng-template>
-                                        <ng-template #professorTemplate let-professor="professor">
-                                            <p [pTooltip]="professor" class="col p-0 white-space-nowrap text-overflow-ellipsis overflow-hidden text-xs text-left">
-                                                <span>{{professor}}</span>
-                                            </p>
-                                        </ng-template>
-                                        <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
-                                            <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
-                                            <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                                                <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="col p-0 text-xs Soverflow-hidden text-overflow-ellipsis white-space-nowrap text-right">{{ perfilCognitivo }} </p>
-                                            </ng-template>
-                                        </ng-template>
-                                    </div>
-                                </ng-template>
-                                <div class="w-16rem h-max flex flex-column flex-1 p-1 border-2 cursor-pointer"
-                                    [style]="{
-                                        backgroundColor: arg.backgroundColor, 
-                                        borderColor: arg.backgroundColor, 
-                                        color: evento.foreColor 
+                            <ng-container *ngIf="!evento.feriado; else feriadoTemplate">
+                                <div [pTooltip]="eventoTooltip" 
+                                    tooltipStyleClass="bg-transparent"
+                                    class="cursor-pointer w-full overflow-hidden p-1 border-round-sm flex flex-column border-2 "
+                                     [ngStyle]="{
+                                        backgroundColor: evento.corLegenda,
+                                        borderColor: selectedAula && selectedAula.id == arg.event.id ? 'red' : evento.corLegenda,
+                                        color: evento.foreColor,
                                     }">
-                                    <header [pTooltip]="eventHeader">
-                                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                                    </header>
-                                    <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                                    <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                                    <div class="flex align-items-center">
+                                        <span class="text-sm mr-2">{{evento.data | date : 'HH:mm'}}</span>
+                                        <span class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">{{evento.descricao }}</span>
+                                    </div>
                                 </div>
+                                <ng-template #eventoTooltip>
+                                    <ng-template #eventHeader>
+                                        <div class="flex align-items-center justify-content-start gap-1 white-space-nowrap text-overflow-ellipsis overflow-hidden">
+                                            <i class="pi pi-clock text-xs"></i>
+                                            <span class="text-xs">{{evento.data | date : 'HH:mm'}}</span>
+                                            <span class="ml-auto pl-3 text-xs ">
+                                                <span>{{evento.alunos.length}}</span>
+                                                <span>/{{evento.capacidadeMaximaAlunos}}</span>
+                                            </span>
+                                            <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="pi pi-exclamation-circle text-xs  -mt-1 fadeout animation-duration-500 animation-iteration-infinite"></i>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #eventBody>
+                                        <div class="flex align-items-center my-auto gap-2 w-full " style="height: 3rem;">
+                                            <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
+                                                <span class="p-1 px-2 border-circle border-2 text-xs flex-none font-bold text-center ml-1" [pTooltip]="'Reagendamento: clique para ver mais'" [style]="{ borderColor: evento.foreColor }">R</span>
+                                            </ng-template>
+                                            <div class="text-base font-bold overflow-hidden w-full h-full  mb-auto flex ">
+                                                <p *ngIf="evento.descricao" [pTooltip]="evento.descricao" class="my-auto">{{evento.descricao}}</p>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #eventFooter>
+                                        <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
+                                            <ng-template [ngIf]="evento.professor">
+                                                <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
+                                            </ng-template>
+                                            <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
+                                                <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
+                                            </ng-template>
+                                            <ng-template #professorTemplate let-professor="professor">
+                                                <p [pTooltip]="professor" class="col p-0 white-space-nowrap text-overflow-ellipsis overflow-hidden text-xs text-left">
+                                                    <span>{{professor}}</span>
+                                                </p>
+                                            </ng-template>
+                                            <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
+                                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
+                                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                                                    <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="col p-0 text-xs Soverflow-hidden text-overflow-ellipsis white-space-nowrap text-right">{{ perfilCognitivo }} </p>
+                                                </ng-template>
+                                            </ng-template>
+                                        </div>
+                                    </ng-template>
+                                    <div class="w-16rem h-max flex flex-column flex-1 p-1 border-2 cursor-pointer"
+                                        [style]="{
+                                            backgroundColor: arg.backgroundColor, 
+                                            borderColor: arg.backgroundColor, 
+                                            color: evento.foreColor 
+                                        }">
+                                        <header [pTooltip]="eventHeader">
+                                            <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                                        </header>
+                                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                                    </div>
+                                </ng-template>
+                            </ng-container>
+                            <ng-template #feriadoTemplate>
+                                <div class="w-full h-full flex flex-column flex-1 p-1 border-2"
+                                [style]="{
+                                    backgroundColor: arg.backgroundColor, 
+                                    borderColor: arg.backgroundColor, 
+                                    color: evento.foreColor 
+                                }">
+                               
+                                <p>Feriado</p>
+                                <p>{{arg.event.title}}</p>
+                            </div>
                             </ng-template>
                         </ng-container>
                         <ng-template #loadingEvent>

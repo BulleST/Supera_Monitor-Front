@@ -17,6 +17,10 @@ export class Evento_Participacao_Aluno {
     reposicaoDe_Evento?: Evento;
     loadingReposicaoDe_Evento?: boolean;
 
+    reposicaoPara_Evento_Id?: number = 0;
+    reposicaoPara_Evento?: Evento;
+    loadingReposicaoPara_Evento?: boolean;
+
     presente?: boolean;
     observacao?: string;
 
@@ -43,14 +47,15 @@ export class Evento_Participacao_Aluno {
 
     // Não mapeado
     loadingFoto?: boolean = false;
-
+    
     // from GET checklist/all/aula/aula_id
     checklistCompleto: CalendarioAlunoChecklistView[] = [];
     alunoChecklist: Aluno_CheckList_Item[] = [];
-
+    
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;
+    primeiraAula?: Date;
 
 }
 

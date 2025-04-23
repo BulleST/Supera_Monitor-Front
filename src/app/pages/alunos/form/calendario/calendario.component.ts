@@ -10,8 +10,8 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
-import { AulaService } from '../../../../services/aulas.service';
 import { Evento } from '../../../../models/evento.model';
+import { EventoService } from '../../../../services/evento.service';
 
 @Component({
     selector: 'app-calendario',
@@ -93,7 +93,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
     constructor(
         private confirmationService: ConfirmationService,
         private changeDetector: ChangeDetectorRef,
-        private service: AulaService,
+        private service: EventoService,
     ) {
 
     }
@@ -134,20 +134,8 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
 
         this.loading = true;
 
-        await lastValueFrom(this.service.getCalendario(request))
+        await lastValueFrom(this.service.calendario(request))
             .then(calendarioList => {
-
-                calendarioList.forEach(aula => {
-                    var f = moment(aula.data).format('DD/MM/YYYY HH:mm');
-                    var index = this.calendarioList.findIndex(x => x.turma_Id == aula.turma_Id && moment(x.data).format('DD/MM/YYYY HH:mm') == f);
-                    if (index == -1){
-                        this.calendarioList.push(aula);
-                    }
-                    else {
-                        this.calendarioList.splice(index, 1, aula);
-                    }
-                });
-                    
                 this.setCalendario();
                 this.setLegenda(this.calendarioList);
             })

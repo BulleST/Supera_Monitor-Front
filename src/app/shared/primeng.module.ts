@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { AccordionModule } from 'primeng/accordion';
+// import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
@@ -77,6 +78,7 @@ import { SelectModule } from 'primeng/select';
     imports: [
         CommonModule,
         AccordionModule,
+        // AnimateOnScrollModule,
         AvatarModule,
         BadgeModule,
         ButtonModule,
@@ -151,6 +153,7 @@ import { SelectModule } from 'primeng/select';
     exports: [
         CommonModule,
         AccordionModule,
+        // AnimateOnScrollModule,
         AvatarModule,
         BadgeModule,
         ButtonModule,

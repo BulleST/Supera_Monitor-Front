@@ -30,6 +30,8 @@ import { AccountService } from '../../../services/account.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { Aluno_CheckList_Item } from '../../../models/checklist.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
+import { Feriado } from '../../../models/feriado.model';
+import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 
 @Component({
     selector: 'app-reagendar-evento',
@@ -39,7 +41,7 @@ import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils
     providers: [ConfirmationService]
 })
 export class ReagendarEventoComponent implements OnDestroy {
-
+    observacao = '';
     evento: Evento = new Evento;
     SalaAulaId = SalaAulaId;
 
@@ -72,6 +74,12 @@ export class ReagendarEventoComponent implements OnDestroy {
     eventos: Evento[] = [];
     loadingEventos = false;
 
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    feriadoDates: Date[] = [];
+    ano: number = new Date().getFullYear();
+
+
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
@@ -87,8 +95,6 @@ export class ReagendarEventoComponent implements OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
     ) {
-
-
 
         var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
         this.subscription.push(salaAula);
@@ -109,6 +115,8 @@ export class ReagendarEventoComponent implements OnDestroy {
                 .then(res => this.loadingTurmas = false)
                 .catch(res => this.loadingTurmas = false);
         }
+
+        this.loadFeriados();
 
         var eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
@@ -212,7 +220,7 @@ export class ReagendarEventoComponent implements OnDestroy {
 
         this.loadingEventos = true;
         var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes())
+        data.setHours(this.horario.getHours(), this.horario.getMinutes());
 
         var request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
@@ -247,6 +255,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
+
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
@@ -266,6 +275,26 @@ export class ReagendarEventoComponent implements OnDestroy {
 
     getCorTurma(turma_Id: number) {
         return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
+    }
+
+
+    dateNavigatorChanged(e: DatePickerYearChangeEvent) {
+        if (e.year != this.ano) {
+            this.ano = e.year ?? new Date().getFullYear();
+            this.loadFeriados()
+        }
+    }
+
+    async loadFeriados() {
+        this.loadingFeriados = true;
+        await lastValueFrom(this.service.getFeriados(this.ano))
+        .then(res => {
+            this.feriados = res;
+            this.loadingFeriados = false;
+            var feriadoDates = res.map(x => moment(x.date, 'YYYY-MM-DD').toDate());
+            this.feriadoDates.push(...feriadoDates);
+        })
+        .catch(res => this.loadingFeriados = false);
     }
 
     sendMensagemAlunos() {
@@ -364,16 +393,10 @@ export class ReagendarEventoComponent implements OnDestroy {
             }
         }
 
-        this.evento.data = new Date(this.data);
-        this.evento.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.evento.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
-
-        console.log('sendConfirmation', this.evento)
-
         this.confirmationService.confirm({
             target: e.target,
             header: `Reagendar ${this.tipoString}`,
-            message: `Tem certeza que deseja reagendar a ${this.tipoString} para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
+            message: `Tem certeza que deseja reagendar a ${this.tipoString} para o dia ${moment(this.data).format('DD/MM')} às ${moment(this.horario).format('HH[h]mm')}?.`,
             acceptLabel: `Reagendar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
@@ -400,12 +423,14 @@ export class ReagendarEventoComponent implements OnDestroy {
                 .catch(res => this.showError('Erro', getError(res), e))
         }
         if (response.success) {
+            
+            this.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
 
             var request: EventoReagendamentoRequest = {
                 evento_Id: this.evento.id,
                 sala_Id: this.evento.sala_Id,
-                data: this.evento.data,
-                observacao: this.evento.observacao
+                data: new Date(this.data),
+                observacao: this.observacao
             }
 
             lastValueFrom(this.service.reagendar(request))
@@ -440,23 +465,30 @@ export class ReagendarEventoComponent implements OnDestroy {
             var mensagem = '';
             var alunoChecklist!: Aluno_CheckList_Item;
 
+            // Agendar Aula 0
             if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 31) as Aluno_CheckList_Item;
-            } else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
+            } 
+            // Agendar Superacao
+            else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 22) as Aluno_CheckList_Item;
-            } else if (this.evento.evento_Tipo_Id == EventoTipo.Oficina) {
+            } 
+            // Agendar 1/2ª Oficina
+            else if (this.evento.evento_Tipo_Id == EventoTipo.Oficina) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) as Aluno_CheckList_Item;
             }
+
+            console.log('alunoChecklist', alunoChecklist)
 
             if (alunoChecklist) {
                 mensagem = alunoChecklist.observacoes + `\n\n`;
                 mensagem += `${tipo} reagendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}.
                             \n Reagendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
-            }
-
-            alunoChecklist.observacoes = mensagem;
-            if (checklist_Item_Id && mensagem) {
-                lastValueFrom(this.checklistService.markAsDone(checklist_Item_Id, mensagem))
+                
+                            alunoChecklist.observacoes = mensagem;
+                if (checklist_Item_Id && mensagem) {
+                    lastValueFrom(this.checklistService.markAsDone(checklist_Item_Id, mensagem))
+                }
             }
         })
 

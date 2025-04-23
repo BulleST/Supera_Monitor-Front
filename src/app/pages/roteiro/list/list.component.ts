@@ -13,7 +13,6 @@ import { Crypto, Header, MobileService } from '../../../utils';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
-import $ from 'jquery';
 import { ContextMenu } from 'primeng/contextmenu';
 
 @Component({
@@ -47,12 +46,8 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         editable: false,
         showNonCurrentDates: true,
         defaultAllDay: false,
-        dayHeaderFormat: {weekday: 'long'},
-        headerToolbar: {
-            left: '',
-            center: '',
-            right: ''
-        },
+        dayHeaderFormat: { weekday: 'long' },
+        headerToolbar: { left: '', center: '', right: '' },
         nowIndicator: true,
         dayMaxEvents: true,
         events: [],
@@ -60,22 +55,10 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
-        buttonText: {
-            today: 'hoje',
-            year: 'meses',
-            month: 'mês',
-            week: 'semana',
-            day: 'dia',
-            list: 'lista'
-        },
         weekNumbers: false,
         lazyFetching: true,
         datesSet: this.datesSet.bind(this),
-        // dateClick: this.dateClick.bind(this),
         eventsSet: this.events.bind(this),
-        // eventMouseEnter: this.eventMouseEnter.bind(this),
-        // eventMouseLeave: this.eventMouseLeave.bind(this),
-
     }
     items: MenuItem[] = []
     constructor(

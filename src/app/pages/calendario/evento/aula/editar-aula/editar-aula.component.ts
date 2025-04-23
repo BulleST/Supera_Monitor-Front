@@ -13,6 +13,9 @@ import { Apostila, ApostilaTipo } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { Roteiro } from '../../../../../models/roteiro.model';
 import { Button } from 'primeng/button';
+import { MobileService } from '../../../../../utils';
+import { ScreenWidth } from '../../../../../utils/mobile';
+import { CalendarioAluno } from '../../../../../models/calendario.model';
 
 @Component({
     selector: 'app-editar-aula',
@@ -52,12 +55,18 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     apostilas: Apostila[] = [];
     loadingApostila = false;
 
+    ScreenWidth = ScreenWidth;
+    screen = ScreenWidth.lg;
 
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private apostilaService: ApostilaService,
+        private mobileService: MobileService
     ) {
+
+        var screen = this.mobileService.get().subscribe(res => this.screen = res);
+        this.subscription.push(screen);
 
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
@@ -160,7 +169,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     apostilaAbacoChange(value: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
         var newApostila = this.apostilaAbacoAluno.find(x => x.id == value) as Apostila;
         var oldApostila = this.apostilaAbacoAluno.find(x => x.id == item.apostila_Abaco_Id) as Apostila;
-        if (value != item.apostila_Abaco_Id && newApostila.ordem < oldApostila.ordem) {
+        if (value != item.apostila_Abaco_Id && oldApostila && newApostila && newApostila.ordem < oldApostila.ordem) {
 
             this.confirmationService.confirm({
                 target: el.el.nativeElement,
@@ -184,13 +193,17 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                     item.apostila_Abaco = oldApostila.nome;
                 }
             });
+        } else {
+            item.apostila_Abaco = newApostila.nome;
+            item.apostila_Abaco_Id = newApostila.id;
         }
     }
 
     apostilaAHChange(value: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
         var newApostila = this.apostilaAHAluno.find(x => x.id == value) as Apostila;
         var oldApostila = this.apostilaAHAluno.find(x => x.id == item.apostila_AH_Id) as Apostila;
-        if (value != item.apostila_AH_Id && newApostila.ordem < oldApostila.ordem) {
+
+        if (value != item.apostila_Abaco_Id && oldApostila && newApostila && newApostila.ordem < oldApostila.ordem) {
 
             this.confirmationService.confirm({
                 target: el.el.nativeElement,
@@ -214,11 +227,39 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                     item.apostila_AH = oldApostila.nome;
                 }
             });
+        } else {
+            item.apostila_AH = newApostila.nome;
+            item.apostila_AH_Id = newApostila.id;
         }
     }
 
     inputFocus(e: any) {
         e.target.select()
+    }
+    presente(item: Evento_Participacao_Aluno, e: any) {
+        item.presente = true;
+    }
+
+    faltou(item: Evento_Participacao_Aluno, e: any) {
+        item.presente = false;
+        if (item.celular) {
+            var nome = item.aluno.split(' ')[0];
+            this.confirmationService.confirm({
+                target: e.targer,
+                message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
+                header: 'Enviar whatsapp',
+                icon: 'pi pi-whatsapp text-green-500 text-4xl',
+                acceptLabel: `Enviar mensagem`,
+                acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+                acceptIcon: 'pi pi-whatsapp',
+                rejectLabel: 'Não enviar',
+                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                accept: () => {
+                    var url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
+                    window.open(url, '_blank')
+                },
+            });
+        }
     }
 
     presenteClick(item: Evento_Participacao_Aluno, e: any, button?: Button) {
@@ -238,7 +279,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
 
 
-        if (!item.presente && item.celular) {
+        if (item.presente == false && item.celular) {
             var nome = item.aluno.split(' ')[0];
             this.confirmationService.confirm({
                 target: e.targer,
@@ -260,4 +301,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         return item;
     }
 
+    primeiraAula(aluno: Evento_Participacao_Aluno, evento:Evento) {
+        return moment(aluno.primeiraAula).isSame(evento.data)
+    }
 }

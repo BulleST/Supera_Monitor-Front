@@ -36,6 +36,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     totalSizePercent: number = 0;
     loadingFile = false;
 
+    oldTurmaId?: number;
     selectedTurma?: Turma;
     turmas: Turma[] = [];
     loadingTurmas = true;
@@ -87,12 +88,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             })
             .catch(res => this.loadingSexos = false);
 
-        var turmas = this.turmaService.list.subscribe(res => {
-            this.turmas = res.map(x => {
-                // x.alunosAtivos = 30;
-                return x
-            })
-        });
+        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
         var checklists = this.checklistService.list.subscribe(res => this.checklists = res);
@@ -122,6 +118,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
             this.loadingTurmas = false
             this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
+            this.oldTurmaId = this.selectedTurma?.id;
         }
     }
 
@@ -192,49 +189,97 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChanged(model: NgModel, e: any) {
-
         if (this.selectedTurma) {
             if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
-                var turma = this.turmas.find(x => x.id == this.object.turma_Id) as Turma;
                 this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> por que o limite de alunos foi alcançado.`, e);
-                model.control.setValue(turma);
-                this.selectedTurma = turma;
+                this.turmaReject(model);
                 return;
             }
-            else if (this.object.restricoes.length > 0) {
-                this.confirmationService.confirm({
-                    target: e.target,
-                    message: `
-                        <p>O aluno apresenta uma ou mais restrições:</p>
-                        <ul>
-                        ${this.object.restricoes.map(x => `<li>${x.descricao}</li>`)}
-                        </ul>
-                        <p>Continuar com transferência de turma?</p>
-                    `,
-                    header: 'Transferência de turma',
-                    icon: 'pi pi-exclamation-triangle',
-                    acceptIcon: 'pi pi-check',
-                    acceptLabel: 'Sim',
-                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
-                    rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Não',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-
-                })
+            
+            if (this.object.restricoes.length > 0) {
+                this.turmaChangedRestricaoConffirm(e, model);
             }
             else {
-                this.object.turma = this.selectedTurma.nome;
-                this.object.turma_Id = this.selectedTurma.id;
-                this.object.professor_Id = this.selectedTurma.professor_Id;
-                this.object.professor = this.selectedTurma.professor;
+                this.turmaChangedConffirm(e, model);
             }
+
         } else {
             this.object.turma = '';
-            this.object.turma_Id = 1;
-            this.object.professor_Id = 0;
+            this.object.turma_Id = undefined as any;
+            this.object.professor_Id = undefined as any;
             this.object.professor = '';
         }
     }
+
+    turmaChangedRestricaoConffirm(e: any, model: NgModel) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `
+                <p>O aluno apresenta uma ou mais restrições:</p>
+                <ul>${this.object.restricoes.map(x => `<li>${x.descricao}</li>`)}</ul>
+                <p>Continuar com transferência de turma?</p>
+            `,
+            header: 'Transferência de turma',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Sim',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: () => {
+                this.turmaChangedConffirm(e, model);
+            },
+            reject: () => {
+                this.turmaReject(model);
+            },
+        })
+    }
+
+    turmaChangedConffirm(e: any, model: NgModel) {
+        var mensagem = 'Continuar com transferência de turma?';
+        var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
+        if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
+            mensagem = 'O perfil dessa turma é diferente desse aluno. <br>' + mensagem
+        }
+        this.confirmationService.confirm({
+            target: e.target,
+            message: mensagem,
+            header: 'Transferência de turma',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Sim',
+            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            accept: () => {
+                this.turmaAccept();
+            },
+            reject: () => {
+                this.turmaReject(model);
+            },
+        })
+    }
+
+    turmaReject(model: NgModel) {
+        var turma = this.turmas.find(x => x.id == this.oldTurmaId);
+        this.object.turma = turma?.nome as any;
+        this.object.turma_Id = turma?.id as any;
+        this.object.professor_Id = turma?.professor_Id as any;
+        this.object.professor = turma?.professor as any;
+        this.selectedTurma = turma;
+        model.control.setValue(turma);
+    }
+
+    turmaAccept() {
+        var turma = this.selectedTurma as Turma;
+        this.object.turma = turma.nome;
+        this.object.turma_Id = turma.id;
+        this.object.professor_Id = turma.professor_Id;
+        this.object.professor = turma.professor;
+    }
+
     showError(title: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,

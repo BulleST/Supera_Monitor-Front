@@ -75,13 +75,17 @@ export class ListComponent implements OnDestroy {
 
         var list = this.service.list.subscribe(alunos => {
             this.list = alunos.map(aluno => {
+                var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+                aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
+
                 aluno.created = moment(aluno.created).toDate();
-                aluno.lastUpdated = moment(aluno.lastUpdated).toDate();
-                aluno.deactivated = moment(aluno.deactivated).toDate();
                 aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                aluno.dataFimVigencia = moment(aluno.dataFimVigencia).toDate();
                 aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
+                // Nuláveis
+                aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
+                aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
+                aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
+            
                 return aluno;
             });
         });

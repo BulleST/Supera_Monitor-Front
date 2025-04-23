@@ -1,25 +1,23 @@
 import { AfterViewInit, Component, HostListener, OnDestroy, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
-import moment from 'moment';
-import { CalendarioRequest } from '../../../models/calendario.model';
 import { ConfirmationService, MenuItem } from 'primeng/api';
-import { Role } from '../../../models/account-perfil.model';
-import { ScreenWidth } from '../../../utils/mobile';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
-import { AlunoService } from '../../../services/alunos.service';
-import { AulaService } from '../../../services/aulas.service';
 import { Aluno } from '../../../models/alunos.model';
-import { DragScrollComponent } from 'ngx-drag-scroll';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Evento } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { CalendarioParticipacaoAluno, Evento_Mes, Evento_Roteiro } from '../../../models/evento-aula-aluno.model';
-import { MyMap } from '../../../utils/map';
+import { Dashboard, Dashboard_Mes } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
+import moment from 'moment';
+import 'moment/locale/pt-br';
+import { ProfessorService } from '../../../services/professor.service';
+import { Professor } from '../../../models/professor.model';
+import { AlunoService } from '../../../services/alunos.service';
+import { ToastrService } from 'ngx-toastr';
 import $ from 'jquery';
-
+import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 
 @Component({
     selector: 'app-dashboard',
@@ -29,179 +27,65 @@ import $ from 'jquery';
     providers: [ConfirmationService],
 })
 export class DashboardComponent implements OnDestroy, AfterViewInit {
-    jornadasDatas: { jornada: Roteiro, datas: Date[] }[] = [];
-    request: CalendarioRequest = new CalendarioRequest;
     
     roteiros: Roteiro[] = [];
-    // alunos: Aluno[] = [];
-    alunos: any[] = [];
-    aulas: CalendarioParticipacaoAluno[] = [];
-    mesesAno: Evento_Mes[] = [];
+    loadingRoteiros = false;
+    
+    alunos: Aluno[] = [];
+    loadingAlunos = false;
+    
+    dashboard: Dashboard[] = [];
+    loadingDashboard = false;
+    mesesAno: Dashboard_Mes[] = [];
+    meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    tableLoading = false;
-    tableSelectedItem: any;
-    tableMenu: MenuItem[] = [];
-    Role: typeof Role = Role;
-    screen: ScreenWidth = ScreenWidth.lg;
-    subscription: Subscription[] = [];
-    @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
+    
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
-    visible = signal(false);
+    subscription: Subscription[] = [];
     anos: number[] = Array.from({ length: 3 }, (a, i) => (new Date).getFullYear() - i)
-    selectedAno: number = (new Date).getFullYear();
+    ano: number = (new Date).getFullYear();
+    expandedRowsKeys = {};
+
+    professores: Professor[] = [];
+    loadingProfessores = false;
+
+
 
     constructor(
-        private alunoService: AlunoService,
-        private aulaService: AulaService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
         private roteiroService: RoteiroService,
+        private professorService: ProfessorService,
+        private alunoService: AlunoService,
+        private toastr: ToastrService,
     ) {
-        
-        /* 
-        var mes = 0;
-        var semana = 0;
-        var aulasIndex = 0;
-        this.mesesAno = [
-            {
-                mesId: mes++,
-                mes: 'Janeiro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Fevereiro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Março',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Abril',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Maio',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Junho',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Julho',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Agosto',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Setembro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Outubro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Novembro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-            {
-                mesId: mes++,
-                mes: 'Dezembro',
-                roteiros: [
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                    { tema: 'Tema', semana: ++semana },
-                ]
-            },
-        ]
-        this.request.intervaloDe = moment().startOf('year').toDate();
-        this.request.intervaloAte = moment().endOf('week').toDate();
+        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        this.subscription.push(professores);
 
-        */
+        if (this.professores.length == 0) {
+            this.loadingProfessores = true;
+             lastValueFrom(this.professorService.getList())
+             .then(res => {
+                this.professores = res;
+                this.loadingProfessores = false;
+            });
+        }
 
-        var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res);
-        this.subscription.push(roteiros);
-
-        // var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
-        // this.subscription.push(alunos);
-        this.update();
-
+        // var dashboard = this.service.dashboard.subscribe(res => this.dashboard = res);
+        // this.subscription.push(dashboard);
 
     }
+
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
+
     ngAfterViewInit(): void {
+        this.update();
+
+        setTimeout(() => {
+            $('.p-virtualscroller').height('calc(100vh - 150px)')
+        }, 500);
     }
 
     @HostListener('keydown.escape', ['$event'])
@@ -212,245 +96,185 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     }
 
-    async update() {
-        this.tableLoading = true;
-        this.visible.update(() => false)
-        var ano = this.selectedAno;
-
-
-        // if (this.alunos.length == 0) {
-        //     lastValueFrom(this.alunoService.getList())
-        //     .then(res => {
-        //         this.alunos = res;
-        //         this.setTableView();
-        //     })
-        // }
-        
-        await lastValueFrom(this.roteiroService.getList())
-        .then(res => {
-            this.roteiros = res;
+    onLoading() {
+        this.loadingRoteiros = true;
+        var index = -1;
+        this.mesesAno = Array.from({ length: 12 }, (v, i) => {
+            index++;
+            return {
+                mes: i,
+                mesString: moment().month(i).format('MMMM'),
+                roteiros: Array.from({ length: 4 }, (vv,ii) => {
+                    return {
+                        id: -1,
+                        semana: ii+1,
+                        tema: 'Carregando...',
+                        dataInicio: moment().set({
+                            month: i,
+                            year: this.ano,
+                            day: 1,
+                            week: index
+                        }).toDate(),
+                        dataFim: moment().set({
+                            month: i,
+                            year: this.ano,
+                            day: 6,
+                            week: index
+                        }).toDate(),
+                    } as Roteiro;
+                })
+            } as Dashboard_Mes;
         })
-        
-        await lastValueFrom(this.service.getAlunoAulas(ano))
-        .then(async res => {
-            this.aulas = res;
-        })
-        
-        this.setTableView();
-        
-        /*
-        // if (!this.jornadas.length) {
-        //     try { await lastValueFrom(this.jornadaService.getList()) }
-        //     catch (e) { }
-        // }
-
-        // var hoje = new Date;
-        // var roteiroIndex = this.jornadas.findIndex(x => moment(hoje).isBetween(x.dataInicio, x.dataFim))
-        // console.log(roteiroIndex)
-
-        // var aulasIndex = 0;
-        // lastValueFrom(this.alunoService.getList())
-        //     .then(res => {
-        //         this.alunos = res.map(aluno => {
-        //             aluno.mesesAula = this.mesesAno.map(mes => {
-        //                 mes.roteiros = mes.roteiros.map((roteiro: any) => {
-        //                     roteiro.aula = {
-        //                         aula_Id: aulasIndex++,
-        //                         data: this.randomDate(new Date(2025, 0, 1), new Date(2025, 11, 30)),
-        //                         descricao: 'Turma XPTO',
-        //                         presente: Math.random() < 0.5,
-        //                         turma: 'Turma X',
-        //                         professor: 'Professor X',
-        //                         apostila_Abaco: 'Abaco II',
-        //                         numeroPaginaAbaco: 1,
-        //                         apostila_AH: 'AH III',
-        //                         numeroPaginaAH: 1,
-        //                         reposicaoDe_Evento_Id: undefined,
-        //                         reposicaoDe_Evento: undefined,
-
-        //                     }
-        //                     roteiro.aula.observacao = roteiro.aula.presente ? '' : 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Necessitatibus tenetur in minus accusantium sunt aut neque a reiciendis atque ipsa, aperiam repellat, saepe culpa. Porro animi non distinctio aperiam aliquam.'
-        //                     return roteiro;
-        //                 })
-        //                 return mes
-        //             })
-        //             return aluno;
-        //         })
-        //         this.tableLoading = false;
-        //     })
-        //     .catch(res => {
-        //         this.tableLoading = false;
-        //     })
-
-        */
+        this.alunos = [];
     }
 
-    setTableView(){
+    async update() {
+        this.onLoading();
 
-        if(this.roteiros.length > 0 && this.aulas.length > 0) {
-            var meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            var semanaCount = 0;
-            this.mesesAno = meses.map((mesString, index) => {
-                var mes = new Evento_Mes;
+        this.setRoteiros();
+        await this.setAlunos();
+        this.setDashboard();
+    }
+
+    
+    setRoteiros() {
+        console.log('setRoteiros init')
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList('dashboard setRoteiros'))
+        .then(res => {
+            this.roteiros = res;
+
+                                
+            var lastRoteiro: Roteiro;
+            var lastSemana: number = 0;
+            var intervaloDe: Date;
+            var intervaloAte: Date;
+
+            this.mesesAno = this.meses.map((mesString, index) => {
+                var mes = new Dashboard_Mes;
                 mes.mes = index;
                 mes.mesString = mesString;
-                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.selectedAno)
-                                .map(roteiro => {
-                                    var eventoRoteiro = MyMap(roteiro, new Evento_Roteiro);
-                                    eventoRoteiro.aulas = [];
-                                    semanaCount = roteiro.semana;
-                                    return eventoRoteiro;
-                                })
-                                .sort((x,y) => x.dataInicio - y.dataInicio);
-    
-                                
-                var lastRoteiro: Evento_Roteiro;
-                var lastSemana: number;
-                var lastIntervalo: Date[] = [];
-    
+
+                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.ano)
+                mes.roteiros.forEach(roteiro => { lastSemana = roteiro.semana });
+
                 if (mes.roteiros.length > 0) {
-                    lastRoteiro =  mes.roteiros[ mes.roteiros.length-1];
+                    lastRoteiro =  mes.roteiros[ mes.roteiros.length - 1];
                     lastSemana = lastRoteiro.semana;
-                    lastIntervalo = [lastRoteiro.dataInicio, lastRoteiro.dataFim];
+                    intervaloDe = lastRoteiro.dataInicio;
+                    intervaloAte = lastRoteiro.dataFim;
     
                 } else {
-                    var inicio = moment(new Date).month(index).startOf('month')
-                    var fim = inicio.add(7, 'days');
-                    lastIntervalo = [inicio.toDate(), fim.toDate()];
-                    lastSemana = semanaCount;
+                    intervaloDe = moment(new Date(this.ano, index, 1)).subtract(7, 'days').toDate();
+                    intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
                 }
+
                 if(mes.roteiros.length < 4 ) {
                     var diff = 4 - mes.roteiros.length;
                     for (let i = 1; i <= diff; i++) {
     
-                        lastIntervalo[0] = moment(lastIntervalo[0]).add(7, 'days').toDate();
-                        lastIntervalo[1] = moment(lastIntervalo[1]).add(7, 'days').toDate();
-                        mes.roteiros.push({
+                        intervaloDe = moment(intervaloDe).add(1, 'week').toDate();
+                        intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
+
+                        if (intervaloAte.getMonth() != mes.mes) {
+                            intervaloAte = moment(intervaloDe).endOf('month').toDate();
+                        }
+
+                        var pseudoRoteiro: Roteiro = {
                             id: PseudoEvento.EventoId,
-                            account_Created_Id: -1,
-                            account_Created: '',
-                            corLegenda: 'black',
                             semana: ++lastSemana,
                             tema: 'Tema indefinido',
-                            created: undefined as unknown as Date,
-                            lastUpdated: undefined,
-                            deactivated: undefined,
-                            dataInicio: lastIntervalo[0],
-                            dataFim: lastIntervalo[1],
-                            aulas: []
-                        })
+                            dataInicio: intervaloDe,
+                            dataFim: intervaloAte,
+                        }
+                        mes.roteiros.push(pseudoRoteiro)
                     }
     
                 }
     
                 return mes
             });
+            
+            this.loadingRoteiros = false;
 
-
-            var alunosIds = [...new Set(this.aulas.map(x => x.aluno_Id))];
-        //     alunosIds.forEach(aluno_Id => {
-
-        //         var mesesAno = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
-        //         var aulaAlunos = this.aulas.filter(x => x.aluno_Id == aluno_Id);
-        //         var aluno = aulaAlunos[0];
-        //         var obj = {
-        //             aluno_Id: aluno.aluno_Id,
-        //             aluno: aluno.aluno,
-        //             checklist: aluno.checklist,
-        //             checklist_Id: aluno.checklist_Id,
-        //             mesesAula: mesesAno.map(mes => {
-        //                 mes.roteiros.map(roteiro => {
-        //                     roteiro.aulas = aulaAlunos.filter(x => x.roteiro_Id == roteiro.id)
-        //                     return roteiro;
-        //                 })
-        //                 return mes
-        //             })
-        //         }
-
-        //         if (this.visible() == false) {
-        //             this.visible.update(() => true)
-        //         }
-        //         this.alunos.push(obj)
-
-
-        //         console.groupEnd();
-        // })
-
-
-            // this.alunos = alunosIds.map(aluno_Id => {
-            //     var aulaAlunos = this.aulas.filter(x => x.aluno_Id == aluno_Id);
-            //     var aluno = aulaAlunos[0];
-            //     var mesesAno = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
-            //     var obj = {
-            //         ...aluno,
-            //         mesesAula: mesesAno.map(mes => {
-            //             mes.roteiros.map(roteiro => {
-            //                 roteiro.aulas = aulaAlunos.filter(x => x.roteiro_Id == roteiro.id)
-            //                 return roteiro;
-            //             })
-            //             return mes
-            //         })
-            //     }
-            //     return obj;
-            // })
-
-            // console.log(this.alunos);
-            this.visible.update(() => true)
-
-
-         
-    
-            this.alunos = alunosIds.map(id => {
-                var a = this.aulas.find(x => x.aluno_Id == id) as CalendarioParticipacaoAluno;
-                var aluno = MyMap(a, new Aluno) as Aluno;
-                aluno.id = a.aluno_Id;
-                aluno.nome = a.aluno,
-                aluno.checklist = a.checklist;
-                aluno.checklist_Id = a.checklist_Id;
-                aluno.celular = a.celular ?? '';
-                aluno.mesesAula = JSON.parse(JSON.stringify(this.mesesAno)) as Evento_Mes[];
-                aluno.mesesAula = aluno.mesesAula.map(mes => {
-                    mes.roteiros = mes.roteiros.map(roteiro => {
-                        roteiro.aulas = this.aulas.filter(x => x.roteiro_Id == roteiro.id && x.aluno_Id == aluno.id) ;
-                        return roteiro;
-                    })
-                    return mes;
-                })
-    
-                return aluno
-            })
-
+            
             setTimeout(() => {
-                var container = $('.drag-scroll-content');
-                var tr = $(`th[data-mes="${(new Date().getMonth())}"]`)
-                console.log('left', (tr.offset()?.left ?? 0) - (tr.width() ?? 0))
-                $(container).animate({
-                    scrollLeft: (tr.offset()?.left ?? 0) - (tr.width() ?? 0)
-                }, 300)
-            }, 500);
-        }
+                var container = document.querySelectorAll('.p-virtualscroller')[0] as HTMLElement;
+                var tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
+                container.scrollLeft = tr.offsetLeft - tr.offsetWidth;
+            }, 2000);
 
 
-        // this.dragScroll.moveTo((new Date).getMonth())
+        })
+        .catch(res => this.loadingRoteiros = false);
 
     }
 
-    contextMenuSelectionChange(item: any) {
-        this.tableMenu = [
-        ];
+
+    async setAlunos() {
+        console.log('setAlunos init')
+        this.loadingAlunos = true;
+        await lastValueFrom(this.alunoService.getList())
+        .then(res => {
+            this.alunos = res.filter(x => x.active).sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
+            this.loadingAlunos = false;
+        })
+        .catch(res => this.loadingAlunos = false);
+        console.log('setAlunos end')
     }
 
-    scrollDragStart(e: DragScrollComponent) {
-        this.dragScroll._contentRef.nativeElement.style.cursor = 'grab'
-        this.dragScroll._contentRef.nativeElement.style.pointerEvents = 'auto';
-        this.popoverSelectedAlunoAula.forEach(item => item.hide())
 
+    async setDashboard() {
+        console.log('setDashboard init', this.alunos)
+        this.loadingDashboard = true;
+        this.dashboard = [];
+        var done: number[] = [];
+        // await lastValueFrom(this.service.getDashboard(this.ano, 1)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 2)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 3)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 4)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 5)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 6)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 7)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 8)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 9)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 10)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 11)).then(res => this.dashboard.push(...res))
+        // await lastValueFrom(this.service.getDashboard(this.ano, 12)).then(res => this.dashboard.push(...res))
+        await new Promise<boolean>((resolve, reject) => {
+            this.meses.forEach((mes: string, i: number) => {
+                lastValueFrom(this.service.getDashboard(this.ano, i+1))
+                .then(async res => {
+                    done.push(i);
+                    this.dashboard.push(...res);
+                    if (done.length == 12) {
+                            resolve(true);
+                    }
+                })
+                .catch(res => {
+                    this.toastr.error('Não foi possível carregar ' + mes);
+                });
+                
+            });
+        })
+
+        this.alunos = this.alunos.map(aluno => {
+            var aulas: Dashboard[] = this.dashboard.filter(x => x.aluno_Id == aluno.id).sort((x,y) => x.aula.data.getTime() - y.aula.data.getTime());
+            aulas = aulas.map(aula => {
+                aula.primeiraAula = this.primeiraAula(aula.participacao, aula.aula)
+                return aula;
+            })
+            aluno.aulas = aulas;
+            return aluno;
+        })
+
+        console.log(this.dashboard);
+        console.log(this.alunos);
+        
+        this.expandedRowsKeys = this.alunos.reduce((acc: any, p :any) => (acc[p.turma_Id] = true) && acc, {});
+        this.loadingDashboard = false;
     }
-
-    scrollDragEnd(e: DragScrollComponent) {
-        this.dragScroll._contentRef.nativeElement.style.cursor = 'pointer'
-    }
-
+    
     enviarMensagem(nome:string, celular:string) {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
@@ -468,9 +292,33 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         popoverSelectedAlunoAula.show(e);
     }
 
-
     unselectAlunoAula(popoverSelectedAlunoAula: Popover) {
         popoverSelectedAlunoAula.hide();
     }
 
+
+    getCorLegenda(professor_Id: number) {
+        var professor = this.professores.find(x => x.id == professor_Id);
+        if (professor)
+            return professor.corLegenda;
+        return ''
+    }
+
+    calculateCustomerTotal(turma: string) {
+        let total = 0;
+
+        if (this.alunos) {
+            for (let customer of this.alunos) {
+                if (customer.turma === turma) {
+                    total++;
+                }
+            }
+        }
+
+        return total;
+    }
+
+    primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
+        return moment(aluno.primeiraAula).isSame(evento.data)
+    }
 }

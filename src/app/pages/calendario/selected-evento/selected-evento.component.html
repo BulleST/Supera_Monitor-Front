@@ -1,14 +1,11 @@
-
 <app-confirm-dialog></app-confirm-dialog>
-
 <p-popover #popover
            styleClass="z-2 -mt-1"
            (onHide)="onHide()"
-           [dismissable]="false"
-           >
+           [dismissable]="false">
     <div *ngIf="evento" class="p-2 flex flex-column row-gap-1 -m-2 w-30rem max-w-fit">
         <div class="p-2 white-space-normal">
-            <p class="text-400"> <span  class="text-pink-500 font-bold uppercase">{{tipoEventoString}}</span></p>
+            <p class="text-400"> <span class="text-pink-500 font-bold uppercase">{{tipoEventoString}}</span></p>
             <p class="font-medium text-400 text-lg">
                 <span>{{evento.descricao}}</span>
             </p>
@@ -20,7 +17,7 @@
                 <span>{{evento.data | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</span>
             </p>
             <!-- Sala -->
-            <p  class="col p-0 mt-1">
+            <p class="col p-0 mt-1">
                 <b>Sala: </b>
                 <span *ngIf="evento.sala_Id && evento.sala_Id == SalaAulaId.online">Online</span>
                 <span *ngIf="evento.sala_Id && evento.sala_Id == SalaAulaId.professores">Sala dos Professores</span>
@@ -42,7 +39,6 @@
             </div>
             <div class="flex justify-content-between">
                 <div class="flex col p-0 mt-1">
-                    
                     <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento">
                         <span [pTooltip]="evento.reagendamentoDe_Evento.turma + ' - ' + (evento.reagendamentoDe_Evento.data |date:'dd/MM/yyyy \'às\' HH:mm')">
                             <span class="ml-auto flex align-items-center"></span>
@@ -63,29 +59,27 @@
             </p>
         </div>
         <!-- Alunos -->
-        <ng-template [ngIf]="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false " >
+        <ng-template [ngIf]="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false ">
             <div class="flex align-items-center justify-content-between px-2 w-full">
                 <span class="font-bold block text-primary">
-                    <span *ngIf="evento.alunos.length != 1">Alunos</span> 
-                    <span *ngIf="evento.alunos.length == 1">Aluno</span> 
+                    <span *ngIf="evento.alunos.length != 1">Alunos</span>
+                    <span *ngIf="evento.alunos.length == 1">Aluno</span>
                     <span *ngIf="evento.evento_Tipo_Id == EventoTipo.Oficina"> inscritos</span>
                 </span>
-
                 <span class="font-bold block ml-auto">
-                    <a  *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) "
-                        (auxclick)="goToInscricaoOficina()"
-                        (click)="goToInscricaoOficina()"
-                        pTooltip="Inscrever aluno"
-                        class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap font-normal text-600 hover:text-primary-500  hover:underline hover:bg-primary-100">
-                        <span >Inscrever aluno</span>
+                    <a *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) "
+                       (auxclick)="goToInscricaoOficina()"
+                       (click)="goToInscricaoOficina()"
+                       pTooltip="Inscrever aluno"
+                       class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap font-normal text-600 hover:text-primary-500  hover:underline hover:bg-primary-100">
+                        <span>Inscrever aluno</span>
                     </a>
-                
                     <ng-template [ngIf]="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) ">
                         <span [ngClass]="{ 'text-red-500': evento.alunos.length > evento.capacidadeMaximaAlunos }">
                             <span>{{evento.alunos.length}}</span>
                             <span>/{{evento.capacidadeMaximaAlunos}}</span>
                         </span>
-                        <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite"></i>
+                        <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="fa-solid fa-circle-exclamation fadeout animation-duration-200 animation-iteration-infinite ml-2 text-red-500 inline-flex"></i>
                     </ng-template>
                     <ng-template [ngIf]="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
                         <span>{{evento.alunos.length}}</span>
@@ -96,7 +90,7 @@
             <div class="max-h-10rem overflow-auto w-full">
                 <p class="text-400 p-2" *ngIf="evento.alunos.length == 0">Nenhum aluno inscrito</p>
                 <div *ngFor="let aluno of evento.alunos; let i = index"
-                    cdkDrag
+                     cdkDrag
                      [cdkDragDisabled]="aluno.presente && evento.finalizado"
                      [cdkDragData]="aluno"
                      (cdkDragStarted)="cdkDragStarted($event)"
@@ -126,12 +120,22 @@
                                 <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
                             </div>
                             <span>
-                                <span class="font-bold hover:underline hover:text-primary-500" (click)="showAluno($event, aluno, popoverAluno)">{{ aluno.aluno }}</span>
+                                <span class="hover:underline hover:text-primary-500"
+                                      [pTooltip]="aluno.nome"
+                                      (click)="showAluno($event, aluno, popoverAluno)">
+                                    <span class="font-bold">{{ aluno.aluno | nameAbv }}</span>
+                                </span>
                                 <p-badge *ngIf="aluno.reposicaoDe_Evento_Id"
                                          styleClass="ml-2 "
                                          value="Reposição"
                                          size="small"
                                          [pTooltip]="reposicaoDe_Evento" />
+                                <p-badge *ngIf="primeiraAula(aluno, evento)"
+                                        styleClass="ml-2 bg-pink-500"
+                                        value="Aula 1"
+                                        size="small"
+                                        severity="danger"
+                                        [pTooltip]="'Primeira aula'" />
                                 <span *ngIf="evento.finalizado" class="ml-2">
                                     <span *ngIf="aluno.presente == true" class="pi pi-check text-green-500" pTooltip="Presente"></span>
                                     <span *ngIf="aluno.presente == false" class="pi pi-thumbs-down-fill text-red-500" pTooltip="Faltou"></span>
@@ -143,11 +147,10 @@
                                         <p *ngIf="aluno.reposicaoDe_Evento.turma">Turma: {{aluno.reposicaoDe_Evento.turma }}</p>
                                         <p *ngIf="aluno.reposicaoDe_Evento.professor">
                                             <span class="inline-flex w-1rem h-1rem border-circle mr-2 " [style]="{ backgroundColor: aluno.reposicaoDe_Evento.corLegenda }"></span>
-                                            <span>Educador: {{aluno.reposicaoDe_Evento.professor }}</span>    
+                                            <span>Educador: {{aluno.reposicaoDe_Evento.professor }}</span>
                                         </p>
                                     </div>
                                 </ng-template>
-                                
                             </span>
                             <p class="ml-auto pl-2">
                                 <a *ngIf="aluno.celular"
@@ -155,7 +158,6 @@
                                    target="_blank"
                                    class="pi pi-whatsapp border-circle text-green-500 hover:bg-green-500 hover:text-white p-1"
                                    pTooltip="Falar com {{aluno.aluno}}"></a>
-                                <p-badge *ngIf="aluno.reposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
                             </p>
                         </div>
                     </ng-template>
@@ -172,7 +174,7 @@
             <div class="h-10rem overflow-auto w-full">
                 <div *ngFor="let professor of evento.professores; let i = index">
                     <div class="w-full flex align-items-center justify-content-start p-1"
-                    [ngClass]="{
+                         [ngClass]="{
                        'bg-white': i % 2 == 0,
                        'surface-50': i % 2 != 0 
                    }">

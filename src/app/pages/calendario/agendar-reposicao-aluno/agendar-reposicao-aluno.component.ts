@@ -26,12 +26,13 @@ import { EventoAulaRequest } from '../../../models/evento-aula.model';
 import { MyMap } from '../../../utils/map';
 import { Response } from '../../../helpers/request-response.interface';
 import { AlunoRestricaoService } from '../../../services/aluno-restricao.service';
+import { Feriado } from '../../../models/feriado.model';
 
 @Component({
-  selector: 'app-agendar-reposicao-aluno',
-  standalone: false,
-  templateUrl: './agendar-reposicao-aluno.component.html',
-  styleUrl: './agendar-reposicao-aluno.component.css'
+    selector: 'app-agendar-reposicao-aluno',
+    standalone: false,
+    templateUrl: './agendar-reposicao-aluno.component.html',
+    styleUrl: './agendar-reposicao-aluno.component.css'
 })
 export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
@@ -39,18 +40,22 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     error: string = '';
     subscription: Subscription[] = [];
     legenda: { corLegenda: string, label: string }[] = [];
-    
+
     selectedAula?: EventImpl;
-    
+
     aluno: Aluno = new Aluno;
     participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
     evento: Evento = new Evento;
     eventos: Evento[] = [];
     tipoString = '';
-    
+
     currentTitle: string = '';
     roteiros: Roteiro[] = [];
     loadingRoteiro = false;
+
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+
 
     calendarVisible = signal(false);
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
@@ -71,8 +76,8 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
-        defaultAllDay: false,
-        allDaySlot: false,
+        // defaultAllDay: false,
+        // allDaySlot: false,
         headerToolbar: {
             left: '',
             center: '',
@@ -100,14 +105,14 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         private toastrService: ToastrService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
-                private professorService: ProfessorService,
+        private professorService: ProfessorService,
     ) {
 
-      var params = this.activatedRoute.params.subscribe(res => {
+        var params = this.activatedRoute.params.subscribe(res => {
             if (!res['aluno_id']) {
                 this.visible = false;
                 this.visibleChange();
-            }else {
+            } else {
                 this.participacao.aluno_Id = this.crypto.decrypt(res['aluno_id']);
                 this.aluno.id = this.participacao.aluno_Id;
                 this.loadAluno();
@@ -121,7 +126,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                     var evento = JSON.parse(localStorage.getItem('evento') ?? '')
                     this.service.setEvento(evento)
                 }
-                catch(e) {
+                catch (e) {
                     this.visible = false;
                     this.visibleChange();
                 }
@@ -135,6 +140,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             }
         });
         this.subscription.push(evento);
+
 
         setTimeout(() => {
             if (!this.evento) {
@@ -168,9 +174,9 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             this.visible = false;
             this.visibleChange();
         }
-        
+
         this.aluno.restricoes = await lastValueFrom(this.alunoRestricaoService.getList(this.participacao.aluno_Id));
-        this.aluno.restricoes = this.aluno.restricoes.filter(x => !!x.deactivated )
+        this.aluno.restricoes = this.aluno.restricoes.filter(x => !!x.deactivated)
 
         this.calendarioRequest.perfil_Cognitivo_Id = this.aluno.perfilCognitivo_Id;
 
@@ -186,8 +192,15 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         this.fullCalendar.getApi().next();
     }
 
-    today() {
+    async today() {
         this.fullCalendar.getApi().today();
+
+        this.calendarioRequest.intervaloDe = moment(new Date()).startOf('week').toDate();
+        this.calendarioRequest.intervaloAte = moment(new Date()).endOf('week').toDate();
+
+        await this.getCalendario('datesSet');
+        this.setCalendario();
+
     }
 
     getTipo(e: Evento) {
@@ -202,11 +215,12 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         await lastValueFrom(this.service.calendario(this.calendarioRequest))
             .then(calendarioList => {
                 this.eventos = calendarioList
-                    .filter(x => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(x.evento_Tipo_Id) 
-                                && x.active == true
-                                && x.finalizado == false
-                                && moment(x.data).isSameOrAfter(new Date))
-                if(this.calendarioRequest.perfil_Cognitivo_Id)
+                    .filter(x => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(x.evento_Tipo_Id)
+                        && x.active == true
+                        && x.finalizado == false
+                        && moment(x.data).isSameOrAfter(new Date))
+
+                if (this.calendarioRequest.perfil_Cognitivo_Id)
                     this.eventos = this.eventos.filter(x => x.perfilCognitivo.map(perfil => perfil.id).includes(this.calendarioRequest.perfil_Cognitivo_Id!));
 
                 this.setCalendario();
@@ -222,30 +236,52 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     setCalendario() {
         this.loading = true;
 
-        this.calendarioOptions.events = this.eventos
-            .map(item => {
-                var backgroundColor = '#2e2e2e';
-                if (item.corLegenda) {
-                    backgroundColor = item.corLegenda
-                } else if (item.professores && item.professores.length > 0) {
-                    backgroundColor = item.professores[0].corLegenda;
-                }
-                var color = this.getForeColor(backgroundColor)
-                var event = {
-                    id: this.eventRamdomId(),
-                    backgroundColor: backgroundColor,
-                    borderColor: backgroundColor,
-                    foreColor: color,
-                    title: item.turma ?? item.descricao,
-                    start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
-                    end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                    extendedProps: item,
-                }
-                return event;
-            });
+        var calendar = this.fullCalendar.getApi();
+        calendar.removeAllEvents();
 
-            this.fullCalendar.getApi().updateSize();
-            this.loading = false;
+        var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
+        var eventos = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
+
+        var events = eventos.map(item => {
+            var backgroundColor = '#2e2e2e';
+            if (item.corLegenda) {
+                backgroundColor = item.corLegenda;
+            } else if (item.professores && item.professores.length > 0) {
+                backgroundColor = item.professores[0].corLegenda;
+            }
+            var color = this.getForeColor(backgroundColor)
+            var event: any = {
+                id: this.eventRamdomId(),
+                backgroundColor: backgroundColor,
+                borderColor: backgroundColor,
+                foreColor: color,
+                title: item.turma ?? item.descricao,
+                start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
+                end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
+                extendedProps: item,
+            }
+            return event;
+        });
+
+        this.feriados.forEach(item => {
+            var event = {
+                id: this.eventRamdomId(),
+                foreColor: 'white',
+                backgroundColor: 'red',
+                borderColor: 'red',
+                title: item.name,
+                start: moment(item.date).toDate(),
+                end: moment(item.date).toDate(),
+                allDay: true,
+                extendedProps: item,
+                feriado: true,
+            }
+            events.push(event)
+        })
+        this.calendarioOptions.events = events;
+
+        this.fullCalendar.getApi().updateSize();
+        this.loading = false;
     }
 
     addHours(data: Date, h: number) {
@@ -268,7 +304,8 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
     getForeColor(hex: string) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        var rgb = result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16),
+        var rgb = result ? {
+            r: parseInt(result[1], 16), g: parseInt(result[2], 16),
             b: parseInt(result[3], 16)
         } : {
             r: 0,
@@ -277,6 +314,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         };
         return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 180 ? '#2e2e2e' : '#fff';
     }
+
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
         if (!perfilCognitivo || perfilCognitivo.length == 0)
             return '';
@@ -286,7 +324,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     async setLegenda() {
         this.legenda = [];
         var professores = this.professorService.list.value;
-        if(professores.length == 0)
+        if (professores.length == 0)
             await lastValueFrom(this.professorService.getList()).then(res => professores = res);
 
         this.legenda = professores.map(item => ({
@@ -301,53 +339,67 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
         this.calendarioRequest.intervaloDe = arg.view.currentStart;
         this.calendarioRequest.intervaloAte = arg.view.currentEnd;
-        this.getCalendario('datesSet');
+
+        await this.getCalendario('datesset');
+        await this.loadFeriados();
+        this.setCalendario();
     }
 
 
     eventClick(e: EventClickArg) {
         var target = e.event.extendedProps as Evento;
+        if (!target.feriado) {
 
-        if (target.alunos.length >= target.capacidadeMaximaAlunos) {
-            return this.showError('Não autorizado', 'Selecione uma aula com vagas disponíveis.', e.jsEvent)
+            if (target.alunos.length >= target.capacidadeMaximaAlunos) {
+                return this.showError('Não autorizado', 'Selecione uma aula com vagas disponíveis.', e.jsEvent)
+            }
+
+            if (target.alunos.map(x => x.aluno_Id).includes(this.aluno.id)) {
+                return this.showError('Não autorizado', 'Esse aluno já está atribuído a essa aula', e.jsEvent)
+            }
+
+            if (target.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id) == false) {
+                return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permididas.', e.jsEvent);
+
+            }
+            if (this.aluno.restricoes.length > 0) {
+                var message = `Este aluno possui algumas restrições.<ul class="my-2">`
+                this.aluno.restricoes.forEach(item => message += ` <li>    • ${item.descricao}</li>`)
+                message += ` </ul>Deseja continuar?`
+                this.confirmationService.confirm({
+                    target: e.jsEvent.target as EventTarget,
+                    message: message,
+                    header: 'Atenção',
+                    acceptIcon: 'pi pi-check',
+                    acceptLabel: 'Continuar',
+                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                    rejectVisible: true,
+                    rejectIcon: 'pi pi-times',
+                    rejectLabel: 'Cancelar',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                    accept: async () => {
+                        setTimeout(() => {
+                            this.selecionarEvento(e, target);
+                        }, 200);
+                    },
+                });
+            } else {
+                setTimeout(() => {
+                    this.selecionarEvento(e, target);
+                }, 200);
+            }
         }
+    }
 
-        if (target.alunos.map(x => x.aluno_Id).includes(this.aluno.id) ) {
-            return this.showError('Não autorizado', 'Esse aluno já está atribuído a essa aula', e.jsEvent)
-        }
-
-        if (target.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id) == false ) {
-            return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permididas.', e.jsEvent);
-
-        }
-        if (this.aluno.restricoes.length > 0) {
-            var message = `Este aluno possui algumas restrições.<ul class="my-2">`
-            this.aluno.restricoes.forEach(item => message += ` <li>    • ${item.descricao}</li>`  )
-            message += ` </ul>Deseja continuar?`
-            this.confirmationService.confirm({
-                target: e.jsEvent.target as EventTarget,
-                message: message,
-                header: 'Atenção',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: 'Continuar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                rejectVisible: true,
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                accept: async () => {
-                    setTimeout(() => {
-                        this.selecionarEvento(e, target);
-                    }, 200);
-                },
-            });
-        } else {
-            setTimeout(() => {
-                this.selecionarEvento(e, target);
-            }, 200);
-        }
-
-
+    async loadFeriados() {
+        this.loadingFeriados = true;
+        var ano = this.calendarioRequest.intervaloDe?.getFullYear();
+        await lastValueFrom(this.service.getFeriados(ano))
+            .then(res => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+            })
+            .catch(res => this.loadingFeriados = false);
     }
 
     selecionarEvento(e: any, target: Evento) {
@@ -416,16 +468,16 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
 
         // Se a aula source não existir, cria a aula
-        if (request.source_Aula_Id == PseudoEvento.EventoId) { 
+        if (request.source_Aula_Id == PseudoEvento.EventoId) {
             response = await this.requestAulaTurma(this.evento)
             request.source_Aula_Id = response.object.id;
             if (!response.success) {
                 return this.showError('Reposição não agendada', `Ocorreu um erro ao agendar reposição. <br> ${response.message}`, e);
             }
         }
-        
+
         // Se a aula target não existir, cria a aula
-        if (request.dest_Aula_Id == PseudoEvento.EventoId) { 
+        if (request.dest_Aula_Id == PseudoEvento.EventoId) {
             response = await this.requestAulaTurma(target)
             request.dest_Aula_Id = response.object.id;
             if (!response.success) {
@@ -441,7 +493,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                 this.visible = false;
                 this.visibleChange();
 
-                if(this.aluno.celular) {
+                if (this.aluno.celular) {
                     this.sendMensagemAluno(e, target);
                 }
 
@@ -459,7 +511,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         request.professores = evento.professor_Id ? [evento.professor_Id] : [];
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id);
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm') as any;
-                
+
         return lastValueFrom(this.service.createAulaTurma(request));
     }
 

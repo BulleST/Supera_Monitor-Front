@@ -19,6 +19,9 @@ export class Evento {
 
     reagendamentoDe_Evento_Id?: number;
     reagendamentoDe_Evento?: Evento;
+    
+    reagendamentoPara_Evento_Id?: number;
+    reagendamentoPara_Evento?: Evento;
 
     alunos: Evento_Participacao_Aluno[] = [];
     professores: Evento_Participacao_Professor[] = [];
@@ -36,6 +39,7 @@ export class Evento {
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;
+    feriado: boolean = true;
 }
 
 export enum EventoTipo {
@@ -54,6 +58,11 @@ export class EventoReagendamentoRequest {
     data: Date = new Date;
     observacao: string = ''
 }
+export class EventoCancelamentoRequest {
+    id: number = PseudoEvento.EventoId;
+    observacao: string = ''
+}
+
 
 export class EventoQueryParams {
     evento_Id: number = PseudoEvento.EventoId;

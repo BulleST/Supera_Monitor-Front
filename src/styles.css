@@ -46,6 +46,17 @@
     --surface-950: var(--p-surface-950);
     --balloon-width: 5px!important; 
     --balloon-height: 5px!important;
+    
+    --yellow-50: #fffcf3;
+    --yellow-100: #fff0c3;
+    --yellow-200: #ffe494;
+    --yellow-300: #ffd965;
+    --yellow-400: #ffcd36;
+    --yellow-500: #ffc107;
+    --yellow-600: #d9a406;
+    --yellow-700: #b38705;
+    --yellow-800: #8c6a04;
+    --yellow-900: #664d03;
 }
 
 * {
@@ -356,4 +367,10 @@ body {
 }
 .p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(odd) td {
     background: var(--p-datatable-row-striped-background);
+}
+
+th.p-datatable-frozen-column,
+td.p-datatable-frozen-column {
+    position: sticky;
+    margin-top: 1px;
 }

@@ -1,14 +1,13 @@
 import { ChangeDetectorRef, Component, signal, ViewChild } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { CalendarioAula, CalendarioRequest } from '../../../models/calendario.model';
+import { CalendarioRequest } from '../../../models/calendario.model';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { Popover } from 'primeng/popover';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { CalendarOptions, DatesSetArg, EventApi } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
-import { AulaService } from '../../../services/aulas.service';
 import moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Crypto } from '../../../utils';

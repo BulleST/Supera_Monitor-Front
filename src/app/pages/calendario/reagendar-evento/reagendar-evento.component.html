@@ -64,6 +64,8 @@
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               (onBlur)="verificaDisponibilidade()"
+                              (onMonthChange)="dateNavigatorChanged($event)"
+                              (onYearChange)="dateNavigatorChanged($event)"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
                               inputId="data"
@@ -75,6 +77,7 @@
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
+                              [disabledDates]="feriadoDates"
                               appendTo="body" />
                 <div *ngIf="dataNgModel.touched && dataNgModel.invalid && dataNgModel.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNgModel.errors['required']">Esse campo é obrigatório.</p>
@@ -197,14 +200,19 @@
                 </div>
             </ng-template>
             <div class="field col-12"> <!-- Observações -->
-                <label for="observacao">Observações: <small class="text-400">(motivo do reagendamento)</small></label>
+                <label for="observacao">Observações:<span class="text-red-500">*</span> <small class="text-400">(motivo do reagendamento)</small></label>
                 <textarea pTextarea
                           class="w-full"
                           name="observacao"
                           id="observacao"
-                          [(ngModel)]="evento.observacao"
+                          #_observacao="ngModel"
+                          [(ngModel)]="observacao"
                           placeholder="Aproveite para contar o motivo do reagendamento"
+                          [required]="true"
                           [rows]="3"></textarea>
+                <div *ngIf="_observacao.touched && _observacao.invalid && _observacao.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="_observacao.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
         </div>
         <div class="formgrid grid">
