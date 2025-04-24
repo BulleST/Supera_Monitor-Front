@@ -13,10 +13,8 @@ import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 })
 export class RoteiroService extends Service {
     override list = new BehaviorSubject<Roteiro[]>([]);
- 
 
     getList(where: string = 'não sei') {
-        console.log('roteiro getList', where)
         return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/`)
             .pipe(tap({
                 next: list => {

@@ -1,12 +1,13 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
+import { Role } from "./account-perfil.model";
 
 export class Account extends Basic_List {
     name: string = '';
     email: string = '';
     phone: string = '';
-    role: string = '';
-    role_Id: number = 0;
+    role: string = 'Assistant';
+    role_Id: number = Role.Assistant;
     verified?: Date;
     isVerified: boolean = false;
     passwordReset?: Date;

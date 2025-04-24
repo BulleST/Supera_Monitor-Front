@@ -125,11 +125,6 @@ export class SelectedEventoComponent implements OnChanges {
         this.aluno.emit(undefined);
     }
 
-    goToAluno(aluno: Evento_Participacao_Aluno) {
-        this.service.setEvento(this.evento);
-        this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);
-    }
-
     async showAluno(e: MouseEvent, aluno: Evento_Participacao_Aluno, popoverComponent: AlunoPopoverComponent) {
         if (aluno.reposicaoDe_Evento_Id) {
             await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))

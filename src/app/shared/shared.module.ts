@@ -44,9 +44,6 @@ import { NameAbvPipe } from '../utils/name.pipe';
         AlunoFaltasComponent,
         // End Alunos
 
-        // ReposicaoComponent,
-        // AulaComponent,
-
         AgendarReposicaoAlunoComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,

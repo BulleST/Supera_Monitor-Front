@@ -7,7 +7,7 @@ export function remove(service: any, objeto: any, property = 'list') {
     service[property].next(list);
 }
 
-export function insertOrReplace(service: Service, object: any, property = 'list') {
+export function insertOrReplace(service: Service, object: any, property: string = 'list') {
    try {
     var list = service.list.value as any[];
     if (object.id) {

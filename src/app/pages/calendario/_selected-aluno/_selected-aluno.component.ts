@@ -16,7 +16,7 @@ import moment from 'moment';
     templateUrl: './selected-aluno.component.html',
     styleUrl: './selected-aluno.component.css',
 })
-export class SelectedAlunoComponent implements OnChanges, OnDestroy {
+export class _SelectedAlunoComponent implements OnChanges, OnDestroy {
     visible = false;
     itemChecklists: Checklist_Item[] = [];
     subscription: Subscription[] = [];
@@ -62,7 +62,9 @@ export class SelectedAlunoComponent implements OnChanges, OnDestroy {
     }
 
     goToAluno(aluno: Evento_Participacao_Aluno) {
-        this.router.navigate(['aluno', this.crypto.encrypt(aluno.aluno_Id)], { relativeTo: this.activatedRoute });
+        console.log('goToAluno', aluno)
+        this.service.setEvento(this.evento);
+        this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);    
     }
 
     goToReposicao(aluno: Evento_Participacao_Aluno) {

@@ -19,7 +19,7 @@ export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[]
             var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1])
             var c5 =  e.alunos.findIndex(x => x.aluno_Id == item.id) != -1
             var c6 = e.turma_Id != turma_Id;
-            var c7 = e.id != evento_Id;
+            var c7 = evento_Id ? e.id != evento_Id : true;
 
             if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {
                 return e;
@@ -48,7 +48,7 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
             var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1])
             var c5 = (e.professor_Id == item.id || e.professores.findIndex(x => x.professor_Id == item.id) != -1)
             var c6 = e.turma_Id != turma_Id;
-            var c7 = e.id != evento_Id;
+            var c7 = evento_Id ? e.id != evento_Id : true;
 
             if (((c1 && c2) || (c3 && c4)) && !c5 && c6 && c7  &&  item.id == 33) {
                 // console.log('oi',e.professor_Id, e.professores)
@@ -85,8 +85,7 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
             var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1])
             var c5 = e.sala_Id == item.id;
             var c6 = e.turma_Id != turma_Id;
-            var c7 = e.id != evento_Id;
-
+            var c7 = evento_Id ? e.id != evento_Id : true;
 
             if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {
                 return e;

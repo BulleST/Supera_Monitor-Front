@@ -7,11 +7,11 @@ export class AccountRole {
 export enum Role {
     Admin = 3,
     Teacher = 2,
-    Assistant = 3,
+    Assistant = 1,
 }
 
 export var roles: AccountRole[] = [
-    { id: 1, role: 'Admin', isDisabled: false },
+    { id: 3, role: 'Admin', isDisabled: false },
     { id: 2, role: 'Master', isDisabled: false },
-    { id: 3, role: 'Consultant', isDisabled: false },
+    { id: 1, role: 'Assistant', isDisabled: false },
 ]

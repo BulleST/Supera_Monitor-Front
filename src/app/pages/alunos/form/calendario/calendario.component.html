@@ -1,22 +1,68 @@
 
 
-<full-calendar [options]="calendarioOptions" #fullCalendar>
-    <ng-template #eventContent let-arg>
-        <div class="cursor-pointer w-full overflow-hidden p-1 border-round-sm  flex flex-column "
-                [ngStyle]="{
-                backgroundColor: arg.event.extendedProps.corLegenda,
-                border: selectedAula && selectedAula.id == arg.event.id ? '2px red solid' : '' ,
-            }">
-            <div class="flex align-items-center">
-                <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data | date : 'HH:mm'}}</span>
-                <span class="text-xs overflow-hidden text-white text-overflow-ellipsis w-12rem white-space-nowrap">{{ arg.event.title }}</span>
-            </div>
-            <div class="text-white">{{arg.event.extendedProps.professor}}</div>
+<div class="flex-1 p-2">
+    <p-toolbar styleClass="border-none bg-transparent p-0 px-2">
+        <div class="p-toolbar-group-start flex-1">
+            <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+                <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
+                <span class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
+                    <span class="font-bold text-xl">{{currentTitle}}</span>
+                </span>
+            </h2>
         </div>
-    </ng-template>
-</full-calendar>
-<div class="flex mt-2" *ngIf="!loading">
-    <div class="bg-white border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+        <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
+            <!-- Prev -->
+            <p-button icon="pi pi-angle-left text-sm"
+                      styleClass="w-full h-full surface-100 border-100"
+                      [style]="{width: '2.4rem', overflow: 'hidden',}"
+                      (onClick)="prev()"
+                      severity="secondary"
+                      iconPos="right"
+                      pTooltip="Anterior"
+                      size="small" />
+            <!-- Hoje -->
+            <p-button label="hoje"
+                      styleClass="h-full surface-800 border-800"
+                      (onClick)="today()"
+                      severity="help"
+                      pTooltip="Hoje"
+                      size="small" />
+            <!-- Next -->
+            <p-button icon="pi pi-angle-right text-sm"
+                      styleClass="w-full h-full surface-100 border-100"
+                      [style]="{width: '2.4rem', overflow: 'hidden',}"
+                      (onClick)="next()"
+                      severity="secondary"
+                      pTooltip="Próximo"
+                      size="small" />
+            <!-- Atualizar -->
+            <p-button icon="pi pi-sync text-sm" 
+                styleClass="w-full h-full surface-100 border-100"
+                (onClick)="update('button')"
+                 severity="secondary" 
+                 label="atualizar" 
+                 pTooltip="Atualizar calendário" 
+                 size="small" />
+        </div>
+    </p-toolbar>
+    <full-calendar [options]="calendarioOptions" #fullCalendar  class="relative z-0" style="max-height: 40rem;">
+        <ng-template #eventContent let-arg>
+            <div class="cursor-pointer w-full overflow-hidden p-1 border-round-sm  flex flex-column "
+                 [ngStyle]="{
+                    backgroundColor: arg.event.extendedProps.corLegenda,
+                    border: selectedAula && selectedAula.id == arg.event.id ? '2px red solid' : '' ,
+                }">
+                <div class="flex align-items-center">
+                    <span class="text-xs mr-2 text-white">{{arg.event.extendedProps.data | date : 'HH:mm'}}</span>
+                    <span class="text-xs overflow-hidden text-white text-overflow-ellipsis w-12rem white-space-nowrap">{{ arg.event.title }}</span>
+                </div>
+                <div class="text-white">{{arg.event.extendedProps.professor}}</div>
+            </div>
+        </ng-template>
+    </full-calendar>
+</div>
+<div class="flex" *ngIf="!loading">
+    <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
         <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
             <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
             <span class="ml-2">{{item.label}}</span>

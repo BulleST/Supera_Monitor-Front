@@ -16,7 +16,7 @@ import { EditarAulaComponent } from './evento/aula/editar-aula/editar-aula.compo
 import { CadastrarReuniaoComponent } from './evento/reuniao/cadastrar-reuniao/cadastrar-reuniao.component';
 import { CadastrarInscricaoComponent } from './evento/oficina/cadastrar-inscricao/cadastrar-inscricao.component';
 import { EditarReuniaoComponent } from './evento/reuniao/editar-reuniao/editar-reuniao.component';
-import { SelectedAlunoComponent } from './selected-aluno/selected-aluno.component';
+// import { SelectedAlunoComponent } from './_selected-aluno/selected-aluno.component';
 import { SelectedEventoComponent } from './selected-evento/selected-evento.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
@@ -29,8 +29,8 @@ import { AlunoChecklistStatusComponent } from './aluno-checklist-status/aluno-ch
 @NgModule({
     declarations: [
         AlunoChecklistPopoverComponent,
-        AlunoPopoverComponent,
         AlunoChecklistStatusComponent,
+        AlunoPopoverComponent,
         CalendarioComponent,
         CadastrarSuperacaoComponent,
         CadastrarOficinaComponent,
@@ -46,8 +46,7 @@ import { AlunoChecklistStatusComponent } from './aluno-checklist-status/aluno-ch
         EditarSuperacaoComponent,
         EditarReuniaoComponent,
         ReagendarEventoComponent,
-        SelectedAlunoComponent,
-        SelectedEventoComponent,
+        // SelectedAlunoComponent,
         SelectedEventoComponent,
     ],
     imports: [

@@ -1,0 +1,231 @@
+<div class="bg">
+    <div style="background-image: url(assets/images/account-bg-1.png);" class="inner-bg absolute bg-contain bg-no-repeat top-0   right-0 z-0 -mb-5 rotate-90"></div>
+    <div style="background-image: url(assets/images/account-bg-2.png);" class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
+    <!-- <div style="background-image: url(assets/images/account-bg-3.jpg);" class="absolute top-0 left-0 bg-cover bg-no-repeat  z-0 w-full h-full opacity-10"></div> -->
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>
+
+<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
+    <ng-template #message let-message>
+        <div>
+            <div [innerHTML]="message.message"></div>
+            <div class="w-full flex-1 col-12 px-0">
+                <label for="checklistObservacao">Inserir observação: </label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="checklistObservacao"
+                          id="checklistObservacao"
+                          [(ngModel)]="checklistObservacao"
+                          [rows]="2"></textarea>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+
+
+<div *ngIf="loadingChecklist" class="fixed top-0 left-0 w-full h-full flex align-items-center justity-content-center">
+    <div class="text-white fadeout animation-duration-300 animation-iteration-infinite text-xl">Carregando...</div>
+</div>
+<drag-scroll #dragScroll
+             [style]="{
+                width: '100%',
+                minHeight: 'calc(100vh - 80px)',
+                height: '500vh',
+                overflowY: 'visible',
+                cursor: 'pointer'
+            }"
+             (dragStart)="scrollDragStart(dragScroll)"
+             (dragEnd)="scrollDragEnd(dragScroll)"
+             class="w-full">
+    <div *ngIf="checklists.length" class="flex gap-4 align-items-start">
+        
+        <ng-container *ngIf="loadingChecklist; then checklistLoadingTemplate; else checklistTemplate"></ng-container>
+
+        <!-- Loading Checklist -->
+        <ng-template #checklistLoadingTemplate>
+            <div *ngFor="let item of [1,2,3,4]" class="p-2 bg-transparent w-20rem border-round-md flex-none ">
+                <p-skeleton width="6rem" height="1.5rem" styleClass="mb-2" />
+                <div class="flex flex-column gap-2 max-h-25rem">
+                    <div *ngFor="let item of [1,2]" class="bg-white py-3 w-full flex flex-column border-round-lg shadow-1">
+                        <div class="mb-2 mx-3">
+                            <p-skeleton width="100%" height="1.5rem" />
+                        </div>
+                        <div class="flex flex-column gap-2 overflow-auto max-h-25rem overflow-x-hidden px-3 py-1">
+                                <ng-container *ngTemplateOutlet="loadingAlunosTemplate"></ng-container>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <!-- End Loading -->
+        
+        <!-- Loading Aluno -->
+        <ng-template #loadingAlunosTemplate>
+            <div *ngFor="let item of [1,2,3,4]" class="p-2 px-3 bg-white border-round-md shadow-1 flex align-items-center">
+                <p-skeleton shape="circle" size="2rem" />
+                <div class="flex-1 ml-2">
+                    <p-skeleton width="100%" height=".9rem" styleClass="mb-2"  />
+                    <p-skeleton width="5rem" height=".9rem" styleClass=""  />
+                </div>
+            </div>
+        </ng-template>
+        <!-- End Loading -->
+
+        <!-- Checklist -->
+        <ng-template #checklistTemplate>
+            <div *ngFor="let checklist of checklists"
+                 id="dragContainer"
+                 class=" bg-transparent w-21rem border-round-md ">
+                <p-tag [value]="checklist.nome"
+                       severity="contrast"
+                       styleClass="white-space-normal text-center surface-700"
+                       class="mb-2 sticky top-0" />
+                <div class="flex flex-column gap-4 max-h-25rem flex-none">
+                    <!-- Checklist Item -->
+                    <div *ngFor="let item of checklist.items"
+                         class="bg-white-alpha-40 bg-transparent  shadow-1 w-full flex flex-column border-round-lg flex-none">
+                         <div class=" mt-3 mx-3">
+                            <span *ngIf="item.nome"
+                                [pTooltip]="item.nome"
+                                class="bg-white flex border-round-md px-3 py-1 w-auto mr-3">
+                                <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{item.nome}} </span>
+                            </span>
+                         </div>
+
+                         <!-- Alunos -->
+                        <div class="flex flex-column gap-2 overflow-auto max-h-22rem overflow-x-hidden my-scroll mt-2 py-2 px-3">
+                            
+                            <ng-template #empty>
+                                <ng-container *ngIf="!loadingAlunos; else loadingAlunosTemplate">
+                                    <p class="text-primary-600 ml-2 mb-2" *ngIf="!loadingAlunos" >Nenhum aluno nessa etapa...</p>
+                                </ng-container>
+                            </ng-template>
+                            
+                            <ng-container *ngIf="item.alunos && item.alunos.length; else empty">
+                                <div *ngFor="let aluno of item.alunos"
+                                     class="p-2 bg-white border-round-md shadow-1 ">
+                                    <div class="flex align-items-center">
+                                        <div class="flex-none pr-2">
+                                            <p-button pTooltip="Finalizar item"
+                                            icon="pi pi-check text-xl text-primary-500 font-bold" 
+                                            (onClick)="finalizarChecklist($event, aluno)" 
+                                            size="small"
+                                            severity="primary"
+                                            styleClass="h-3rem w-3rem bg-primary-100 border-primary-100 hover:bg-primary-200 hover:border-primary-200"/>
+                                        </div>
+                                        <div class="flex-1 flex flex-column w-full overflow-hidden">
+                                            <p class=" w-full flex-none flex align-items-center">
+                                                <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis flex-1">{{aluno.aluno.nome | nameAbv}}</span>
+                                                
+                                                <!-- Apresentação do Diretor Franqueado -->
+                                                <ng-container *ngIf="item.id == 8">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemApresentacaoDiretorFranqueado(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar apresentação"></a>
+                                                </ng-container>
+                                                <!-- Confirmação da adequação do aluno ao perfil da turma -->
+                                                <ng-container *ngIf="item.id == 9">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemAdequacaoTurma(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de confirmação"></a>
+                                                </ng-container>
+                                                <!-- Agendar 1ª Oficina -->
+                                                <ng-container *ngIf="item.id == 12">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemLembreteOficina(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de lembrete"></a>
+                                                </ng-container>
+                                                <!-- Feedback pós venda -->
+                                                <ng-container *ngIf="item.id == 13">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemFeedbackPosVenda(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de feedback"></a>
+                                                </ng-container>
+                                                <!-- Confirmação de preeechimento do feedback pós venda -->
+                                                <ng-container *ngIf="item.id == 32">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de lembrete de preenchimento"></a>
+                                                </ng-container>
+                                                <!-- Mensagem de boas-vindas -->
+                                                <ng-container *ngIf="item.id == 37">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemBoasVindas(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar boas-vindas"></a>
+                                                </ng-container>
+                                                <!-- Agendar Superação -->
+                                                <ng-container *ngIf="item.id == 22">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemLembreteSuperacao(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de lembrete"></a>
+                                                </ng-container>
+                                                <!-- Agendar 2ª Superação -->
+                                                <ng-container *ngIf="item.id == 29">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemLembreteSuperacao(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de lembrete"></a>
+                                                </ng-container>
+                                                <!-- Agendar 2ª Oficina -->
+                                                <ng-container *ngIf="item.id == 23">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagemLembreteOficina(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem de lembrete"></a>
+                                                </ng-container>
+                                                <!-- MENSAGEM PADRÃO -->
+                                                <ng-container *ngIf="[8, 9, 12, 13, 32, 37, 22, 29, 23].includes(item.id) == false">
+                                                    <a *ngIf="aluno.aluno.celular" 
+                                                        target="_blank" 
+                                                        [href]="enviarMensagem(aluno.aluno)" 
+                                                        class="text-green-500 pi pi-whatsapp hover:bg-green-200" 
+                                                        pTooltip="Enviar mensagem"></a>
+                                                </ng-container>
+                                            </p>
+                                            <span class="flex justify-content-between mx-auto w-full mt-1">
+                                                <span pTooltip="Prazo"><b>{{aluno.prazo | date : 'dd/MM/yy'}}</b></span>
+                                                <!-- Atrasado -->
+                                                <span *ngIf="aluno.status == 'Atrasado'">
+                                                    <span class="text-red-600 font-bold">Atrasado</span>
+                                                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite ml-2 mt-1"></i>
+                                                </span>    
+                                                <!-- Pendentes da Semana -->
+                                                <span *ngIf="aluno.status == 'Pendente'">
+                                                    <span class="text-orange-500 font-medium">Em Andamento</span>
+                                                    <i class="pi pi-hourglass text-orange-500 ml-2 mt-1"></i>
+                                                </span>   
+                                                <!-- Finalizado -->
+                                                <span *ngIf="aluno.status == 'Finalizado'">
+                                                    <span class="text-green-500 ">Finalizado</span>
+                                                    <i class="pi pi-check-circle text-green-500 ml-2 mt-1"></i>
+                                                </span>    
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <!-- End Alunos -->
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+    </div>
+</drag-scroll>

@@ -144,7 +144,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
                         if(this.object.perfilCognitivo.length > 0) {
                             var perfilId = this.object.perfilCognitivo[0].id;
-                            this.selectedPerfil = this.perfisCognitivos.find(x => x.id == perfilId)
+                            this.selectedPerfil = this.perfisCognitivos.find(x => x.id == perfilId) ?? this.object.perfilCognitivo[0]
                         }
 
                         this.verificaDisponibilidade();
@@ -189,38 +189,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             minutes: this.object.horario.getMinutes(),
             seconds: 0
         }).toDate();
-        this.salaAulas = validaSalaAulas(data, 120, this.salaAulas, this.eventos, this.object.id, PseudoEvento.EventoId);
-        // var intervaloDe = moment(new Date).set({
-        //                                     day: this.object.diaSemana,
-        //                                     hours: this.object.horario.getHours(),
-        //                                     minutes: this.object.horario.getMinutes(),
-        //                                     seconds: 0
-        //                                 })
-        // var intervaloAte = moment(intervaloDe).add(120-1, 'minutes');
-        // var turmaIntervalo = [intervaloDe, intervaloAte]
-
-
-
-        // this.salaAulas.forEach(item => {
-        //     if (item.id == SalaAulaId.online) {
-        //         return;
-        //     }
-            
-        //     var evento = this.eventos.find(e => {
-        //         var eventoIntervalo = [moment(e.data), moment(e.data).add(e.duracaoMinutos, 'minutes')]
-
-        //         var c1 = turmaIntervalo[0].isAfter(eventoIntervalo[0]) 
-        //         var c2 = turmaIntervalo[0].isBefore(eventoIntervalo[1]) 
-        //         var c3 = turmaIntervalo[1].isAfter(eventoIntervalo[0]) 
-        //         var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1]) 
-
-        //         if (((c1 && c2) || (c3 && c4)) && e.sala_Id == item.id && e.turma_Id != this.object.id)
-        //             return e;
-        //         return false
-        //     })
-        //     item.disponivel = !evento;
-        //     item.disponivelEvent = evento;
-        // });
+        this.salaAulas = validaSalaAulas(data, 120, this.salaAulas, this.eventos, this.object.id);
     }
 
     validaProfessores() {
@@ -231,37 +200,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             minutes: this.object.horario.getMinutes(),
             seconds: 0
         }).toDate();
-        this.professores = validaProfessores(data, 120, this.professores, this.eventos, this.object.id, PseudoEvento.EventoId);
+        this.professores = validaProfessores(data, 120, this.professores, this.eventos, this.object.id);
 
-        console.log(this.professores)
-
-        // var intervaloDe = moment(new Date).set({
-        //     day: this.object.diaSemana,
-        //     hours: this.object.horario.getHours(),
-        //     minutes: this.object.horario.getMinutes(),
-        //     seconds: 0
-        // });
-        // var intervaloAte = moment(intervaloDe).add(120-1, 'minutes');
-        // var turmaIntervalo = [intervaloDe, intervaloAte]
-        
-        // this.professores.forEach(item => {
-        //     var evento = this.eventos.find(e => {
-        //         var eventoIntervalo = [moment(e.data), moment(e.data).add(e.duracaoMinutos, 'minutes')]
-
-        //         var c1 = turmaIntervalo[0].isAfter(eventoIntervalo[0]) 
-        //         var c2 = turmaIntervalo[0].isBefore(eventoIntervalo[1]) 
-        //         var c3 = turmaIntervalo[1].isAfter(eventoIntervalo[0]) 
-        //         var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1]) 
-
-        //         if (((c1 && c2) || (c3 && c4)) 
-        //             && (e.professor_Id == item.id || e.professores.findIndex(x => x.id == item.id) != -1 )
-        //             && e.turma_Id != this.object.id)
-        //             return e;
-        //         return false
-        //     })
-        //     item.disponivel = !evento;
-        //     item.disponivelEvent = evento;
-        // });
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
@@ -279,7 +219,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         var salaAula = this.salaAulas.find(x => x.id == e.value);
-        console.log(salaAula)
         if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuído para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);

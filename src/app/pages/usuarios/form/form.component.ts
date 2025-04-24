@@ -29,6 +29,7 @@ export class FormComponent implements OnDestroy {
     subscription: Subscription[] = [];
     account?: AccountResponse;
     Role: typeof Role = Role;
+    
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,

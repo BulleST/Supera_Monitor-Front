@@ -23,6 +23,8 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 })
 export class MonitoramentoComponent implements OnDestroy {
     checklists: Checklist[] = []; 
+    items: Checklist_Item[] = [];
+    
     alunos: Aluno[] = [];
     checklistObservacao = '';
     subscription: Subscription[] = [];
@@ -66,8 +68,9 @@ export class MonitoramentoComponent implements OnDestroy {
         this.subscription.forEach(e => e.unsubscribe());
     }
     async update() {
-        if (!this.checklists.length) await this.getChecklists();
-        this.loadingChecklist = false
+        if (!this.checklists.length) 
+            await this.getChecklists();
+
         this.getChecklistAlunos();
     }
 
@@ -76,21 +79,7 @@ export class MonitoramentoComponent implements OnDestroy {
         await lastValueFrom(this.service.getList())
             .then(res => {
                 this.checklists = res;
-                this.checklists.push({
-                    id: -1,
-                    nome: '',
-                    ordem: 999999,
-                    items: [
-                        {
-                            id: -1,
-                            ordem: 999,
-                            nome: 'Finalizados',
-                            alunos: [],
-                            checklist_Id: -1
-                        }
-                    ],
-                    checklistAlunosItens: []
-                });
+                this.items = res.flatMap(x => x.items);
             })
         this.loadingChecklist = false;
     }
@@ -101,24 +90,24 @@ export class MonitoramentoComponent implements OnDestroy {
             .then(alunos => {
                 var alunosChecklistItem: Aluno_CheckList_Item[] = alunos.flatMap(x => x.alunoChecklist);
                 this.checklists = this.checklists.map(checklist => {
-                    checklist.items.map(checklistItem => {
-                        var naoFinalizados = alunosChecklistItem.filter(x => x.checklist_Item_Id == checklistItem.id && x.finalizado == false && moment(x.prazo).week() <= moment(new Date).week() );
+                        checklist.items.map(checklistItem => {
+                            var naoFinalizados = alunosChecklistItem.filter(x => x.checklist_Item_Id == checklistItem.id && x.finalizado == false && moment(x.prazo).week() <= moment(new Date).week() );
 
-                        checklistItem.alunos = naoFinalizados
-                            .filter(x => !x.prazo || moment(x.prazo).isSameOrBefore(new Date, 'dates'))
-                            .map(x => {
-                                var aluno = alunos.find(aluno => aluno.id == x.aluno_Id) as Aluno;
-                                x.aluno = aluno;
-                                if (!x.finalizado && moment(x.prazo).week() < moment(new Date).week())
-                                    x.status = 'Atrasado';
-                                else if (moment(x.prazo).week() == moment(new Date).week() && !x.finalizado)
-                                    x.status = 'Pendente'
-                                else if (x.finalizado)
-                                    x.status = 'Finalizado'
-                                return x;
-                            });
-                    })
-                    return checklist;
+                            checklistItem.alunos = naoFinalizados
+                                .filter(x => !x.prazo || moment(x.prazo).isSameOrBefore(new Date, 'dates'))
+                                .map(x => {
+                                    var aluno = alunos.find(aluno => aluno.id == x.aluno_Id) as Aluno;
+                                    x.aluno = aluno;
+                                    if (!x.finalizado && moment(x.prazo).week() < moment(new Date).week())
+                                        x.status = 'Atrasado';
+                                    else if (moment(x.prazo).week() == moment(new Date).week() && !x.finalizado)
+                                        x.status = 'Pendente'
+                                    else if (x.finalizado)
+                                        x.status = 'Finalizado'
+                                    return x;
+                                });
+                        })
+                        return checklist;
                 })
                 this.alunos = alunos;
               
@@ -219,13 +208,13 @@ export class MonitoramentoComponent implements OnDestroy {
                         // this.getChecklistAlunos();
                         this.toastr.success('Checkelist finalizado.');
 
-                        var checklist = this.checklists.find(x => x.id == item.checklist_Id) as Checklist; 
-                        var checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id) as Checklist_Item;
-                        var index = checklistItem?.alunos.findIndex(x => x.id == item.id);
-                        console.log('checklist', checklist)
-                        console.log('checklistItem', checklistItem)
-                        console.log('index', index)
-                        if (index != -1) checklistItem?.alunos.splice(index, 1)
+                        // var checklist = this.checklists.find(x => x.id == item.checklist_Id) as Checklist; 
+                        // var checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id) as Checklist_Item;
+                        // var index = checklistItem?.alunos.findIndex(x => x.id == item.id);
+                        // console.log('checklist', checklist)
+                        // console.log('checklistItem', checklistItem)
+                        // console.log('index', index)
+                        // if (index != -1) checklistItem?.alunos.splice(index, 1)
 
 
                     })

@@ -358,6 +358,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         await lastValueFrom(this.service.calendario(this.calendarioRequest))
         .then(list => {
                 this.eventos = list;
+                this.loading = false;
             })
             .catch(res => {
                 this.loading = false;
@@ -380,7 +381,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                                 var backgroundColor = '#2e2e2e';
                                 if (item.corLegenda) {
                                     backgroundColor = item.corLegenda
-                                } else if (item.professores && item.professores.length > 0) {
+                                } 
+                                else if (item.evento_Tipo_Id == EventoTipo.Reuniao) {
+                                    backgroundColor = '#f37435' // primary color
+                                }
+                                else if (item.professores && item.professores.length > 0) {
                                     backgroundColor = item.professores[0].corLegenda;
                                 }
                                 var color = this.getForeColor(backgroundColor)
@@ -780,7 +785,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     loadRoteiros(where: string) {
-        console.log('loadRoteiros', where)
         this.loadingRoteiro = true;
         lastValueFrom(this.roteiroService.getList('loadRoteiros'))
             .then(res => {

@@ -17,9 +17,12 @@
         </div>
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+        <p-divider layout="horizontal" *ngIf="object.id == PseudoEvento.EventoId" >
+            <p class="text-primary-500 font-medium">Defina o tema e outros dados da oficina para salvar inscrição</p>
+        </p-divider>
         <div class="formgrid grid">
             <!-- Aluno -->
-            <div class="field col-12"> 
+            <div class="field md:col-12 sm:col-6 col-12"> 
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-select [options]="alunos"
                           [loading]="loadingAlunos"
@@ -94,13 +97,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
                 </div>
             </div>
-        </div>
-        <p-divider layout="horizontal" *ngIf="object.id == PseudoEvento.EventoId" >
-            <p class="text-primary-500 font-medium">Defina o tema e outros dados da oficina para salvar inscrição</p>
-        </p-divider>
-        <div class="formgrid grid">
             <!-- Descrição -->
-            <div class="field lg:col-3 md:col-4 sm:col-6 col-12"> 
+            <div class="field lg:col-5 md:col-4 sm:col-6 col-12"> 
                 <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -116,7 +114,7 @@
                 </div>
             </div>
             <!-- Data -->
-            <div class="field lg:col-2 md:col-3 sm:col-4 col-12">
+            <div class="field lg:col-3 md:col-3 sm:col-4 col-12">
                 <label for="dataInicio">Data:</label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-calendar" />
@@ -144,7 +142,7 @@
                 </p-iconfield>
             </div>
             <!-- Duração -->
-            <div class="field lg:col-1 md:col-2 sm:col-4 col-12">
+            <div class="field lg:col-2 md:col-2 sm:col-4 col-12">
                 <label for="duracaoEvento">Duração:</label>
                 <p-iconfield>
                     <input type="text"

@@ -63,10 +63,9 @@
                               class="w-full"
                               name="account_id"
                               inputId="account_id"
-                              optionLabel="name"
                               [showClear]="true"
                               [filter]="true"
-                              filterBy="name"
+                              [filterBy]="'name,email'"
                               appendTo="body"
                               optionDisabled="deactivated"
                               (ngModelChange)="accountSelectedChange($event)">

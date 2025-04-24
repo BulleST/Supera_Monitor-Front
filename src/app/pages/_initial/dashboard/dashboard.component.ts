@@ -138,7 +138,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
     
     setRoteiros() {
-        console.log('setRoteiros init')
         this.loadingRoteiros = true;
         lastValueFrom(this.roteiroService.getList('dashboard setRoteiros'))
         .then(res => {
@@ -212,7 +211,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
 
     async setAlunos() {
-        console.log('setAlunos init')
         this.loadingAlunos = true;
         await lastValueFrom(this.alunoService.getList())
         .then(res => {
@@ -220,12 +218,10 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
             this.loadingAlunos = false;
         })
         .catch(res => this.loadingAlunos = false);
-        console.log('setAlunos end')
     }
 
 
     async setDashboard() {
-        console.log('setDashboard init', this.alunos)
         this.loadingDashboard = true;
         this.dashboard = [];
         var done: number[] = [];
@@ -268,9 +264,6 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
             return aluno;
         })
 
-        console.log(this.dashboard);
-        console.log(this.alunos);
-        
         this.expandedRowsKeys = this.alunos.reduce((acc: any, p :any) => (acc[p.turma_Id] = true) && acc, {});
         this.loadingDashboard = false;
     }

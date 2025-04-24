@@ -1,7 +1,7 @@
-import { Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, getError, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { Aluno } from '../../../models/alunos.model';
@@ -18,7 +18,7 @@ import { HttpErrorResponse } from '@angular/common/http';
     standalone: false
 })
 export class FormComponent implements OnDestroy {
-    visible: boolean = true;
+    visible: boolean = false;
     object: Aluno = new Aluno;
     loading = false;
     error: string = '';
@@ -34,16 +34,21 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
     ) {
 
+        console.log('constructor')
         this.loadPage();
+
     }
 
     ngOnDestroy(): void {
+        console.log('ngOnDestroy')
         this.subscription.forEach(item => item.unsubscribe());
     }
 
 
     loadPage() {
+        console.log('loadPage')
         var params = this.activatedRoute.params.subscribe(res => {
+            console.log('res', res)
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.loading = true;
@@ -57,19 +62,23 @@ export class FormComponent implements OnDestroy {
                         console.log('aluno', this.object)
                     })
                     .catch(res => {
+                        console.log('catch', res)
                         this.visible = false;
+                        this.visibleChange()
                     });
 
             } else {
-                // this.visible = false;
-                // this.visibleChange()
-                // console.log(res)
+                this.visible = false;
+                this.visibleChange()
+                console.log(res)
             }
         })
         this.subscription.push(params);
     }
 
     visibleChange() {
+        console.log('visibleChange', this.visible)
+
         if (!this.visible) {
             this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
