@@ -104,8 +104,7 @@
                         [readonly]="isEditPage">
                 <div *ngIf="email.touched && email.invalid && email.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email'] || email.errors['pattern']">E-mail inválido.</p>
                 </div>
             </div>
         </div>

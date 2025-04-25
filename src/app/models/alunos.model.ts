@@ -81,27 +81,27 @@ export class Aluno {
     aspNetUsers_Created_Id?: number;
     aspNetUsers_Created?: string = '';
 
-    apostila_Abaco_Id?: number;
-    apostila_AH_Id?: number;
+    apostila_Abaco_Id?: number = '' as any;
+    apostila_AH_Id?: number = '' as any;
     
-    apostila_Abaco?: string;
-    apostila_AH?: string;
+    apostila_Abaco?: string = '';
+    apostila_AH?: string = '';
     
-    numeroPaginaAH?: number;
-    numeroPaginaAbaco?: number;
+    numeroPaginaAH?: number = '' as any;
+    numeroPaginaAbaco?: number = '' as any;
     
-    apostila_Abaco_Kit_Id?: number;
-    apostila_AH_Kit_Id?: number;
+    // apostila_Abaco_Kit_Id?: number;
+    // apostila_AH_Kit_Id?: number;
     
-    kit?: string;
-    apostila_Kit_Id?: number;
+    kit?: string = '' as any;
+    apostila_Kit_Id?: number = undefined as any;
 
     checklistCompleto: CalendarioAlunoChecklistView[] = [];
     alunoChecklist: Aluno_CheckList_Item[] = [];
     restricoes: Aluno_Restricao[] = [];
 
-    checklist_Id?: number;
-    checklist?: string;
+    checklist_Id: number = '' as any;
+    checklist: string = '';
 
     aulas: Dashboard[] = [];
     primeiraAula?: Dashboard;

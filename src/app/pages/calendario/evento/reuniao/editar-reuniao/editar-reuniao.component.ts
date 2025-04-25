@@ -121,6 +121,15 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
 
 
     onMoveToSource(e: any) {
+        this.evento.professores = this.target.map(x => ({
+            id: null as any,
+            professor_Id: x.id,
+            corLegenda: x.corLegenda,
+            evento_Id: this.evento.id,
+            observacao: '',
+            nome: x.nome,
+            presente: null as any,
+        }))
     }
 
     onMoveToTarget(e: PickListMoveAllToTargetEvent) {
@@ -131,11 +140,30 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
             if (index != -1) {
                 this.target.splice(index, 1)
                 this.professores.push(item);
+
             };
         }
+        this.evento.professores = this.target.map(x => ({
+            id: null as any,
+            professor_Id: x.id,
+            corLegenda: x.corLegenda,
+            evento_Id: this.evento.id,
+            observacao: '',
+            nome: x.nome,
+            presente: null as any,
+        }))
     }
 
     onMoveAllToSource(e: any) {
+        this.evento.professores = this.target.map(x => ({
+            id: null as any,
+            professor_Id: x.id,
+            corLegenda: x.corLegenda,
+            evento_Id: this.evento.id,
+            observacao: '',
+            nome: x.nome,
+            presente: null as any,
+        }))
 
     }
 
@@ -146,6 +174,15 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
             this.professores = items.filter(x => !x.disponivel);
             this.target = items.filter(x => x.disponivel);
         }
+        this.evento.professores = this.target.map(x => ({
+            id: null as any,
+            professor_Id: x.id,
+            corLegenda: x.corLegenda,
+            evento_Id: this.evento.id,
+            observacao: '',
+            nome: x.nome,
+            presente: null as any,
+        }))
     }
 
 }

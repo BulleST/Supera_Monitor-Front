@@ -217,7 +217,9 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
+
     onMoveToSource(e: any) {
+        this.object.professores = this.selected.map(x => x.id);
     }
 
     onMoveToTarget(e: PickListMoveAllToTargetEvent) {
@@ -230,10 +232,11 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 this.professores.push(item);
             };
         }
+        this.object.professores = this.selected.map(x => x.id);
     }
 
     onMoveAllToSource(e: any) {
-
+        this.object.professores = this.selected.map(x => x.id);
     }
 
     onMoveAllToTarget(e: any) {
@@ -243,8 +246,8 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             this.professores = items.filter(x => !x.disponivel);
             this.selected = items.filter(x => x.disponivel);
         }
+        this.object.professores = this.selected.map(x => x.id);
     }
-
 
     sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
@@ -252,6 +255,11 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         }
         if (this.selected.length < 2)
             return this.showError('Não foi possível salvar', 'Selecione pelo menos 2 educadores para salvar', e);
+
+
+
+        console.log('selected', this.selected)
+        console.log('professores', this.professores)
 
         this.object.professores = this.selected.map(x => x.id);
 

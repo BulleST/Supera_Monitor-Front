@@ -98,7 +98,11 @@ export class AlunoService extends Service {
                 return x
             })
         }))
+    }
 
+
+    getResumo(id: number) {
+        return this.http.get<any[]>(`${this.url}/alunos/resumo/${id}`)
     }
 
     getFoto(id: number): Observable<string> {
@@ -137,16 +141,6 @@ export class AlunoService extends Service {
                 return reject('Aluno não encontrado.')
             }
 
-            // if (item.dataNascimento)
-            //     item.dataNascimento = item.dataNascimento ? new Date(moment(item.dataNascimento).format('YYYY-MM-DD[T]HH:mm:ss')) : new Date();
-            // if (item.created)
-            //     item.created = new Date(moment(item.created).format('YYYY-MM-DD[T]HH:mm:ss'))
-            // if (item.lastUpdated)
-            //     item.lastUpdated = item.lastUpdated ? new Date(moment(item.lastUpdated).format('YYYY-MM-DD[T]HH:mm:ss')) : undefined
-            // if (item.deactivated)
-            //     item.deactivated = item.deactivated ? new Date(moment(item.deactivated).format('YYYY-MM-DD[T]HH:mm:ss')) : undefined
-
-            console.log('aluno service', item)
             return resolve(item);
         })
     }
@@ -163,7 +157,6 @@ export class AlunoService extends Service {
 
     edit(model: Aluno) {
         var request = MyMap(model, new AlunoRequest);
-
         return this.http.put<Response>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {

@@ -171,10 +171,12 @@
                        pInputText
                        [value]="object.checklist"
                        class="w-full"
+                       readonly
                        [required]="true"
+                       [disabled]="!isEditPage"
                        (onBlur)="checklistPopover.hide()"
                        (click)="checklistPopover.show($event) ">
-                       <p-popover #checklistPopover appendTo="body">
+                    <p-popover #checklistPopover appendTo="body">
                         <div [style]="{ maxHeight: '50vh', height: '50vh', width: '350px' }" class="overflow-auto">
                             <ng-container *ngFor="let checklist of object.checklistCompleto">
                                 <div class="my-2" *ngIf="checklist">
@@ -212,7 +214,6 @@
                                             </div>
                                         </div>
                                     </ng-container>
-                                    
                                 </div>
                             </ng-container>
                             
@@ -392,13 +393,12 @@
                        class="w-full"
                        >
             </div>
-            <div class="field sm:col-6 col-12"> <!-- Turma -->
+            <div class="field sm:col-4 col-12"> <!-- Turma -->
                 <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="turmas"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
-                          (ngModelChange)="turmaChanged(turma_Id, $event)"
                           #turma_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
@@ -424,11 +424,6 @@
                                     <p class="text-sm">{{item.perfilCognitivo[0].nome}}</p>
                                 </div>
                             </div>
-                            <!-- <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                                   [value]="item.active ? 'Ativo': 'Inativo'"
-                                   [severity]="item.active ? 'success': 'danger'"
-                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" /> -->
                         </div>
                     </ng-template>
                 </p-select>
@@ -436,7 +431,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-6 col-12"> <!-- Professor -->
+            <div class="field sm:col-4 col-12"> <!-- Professor -->
                 <label for="professor">Professor: </label>
                 <input type="text"
                        pInputText
@@ -445,6 +440,38 @@
                        name="professor"
                        class="w-full"
                        readonly>
+            </div>
+            <div class="field sm:col-4 col-12"> <!-- Turma -->
+                <label for="apostila_Kit_Id">Kit Apostila</label>
+                <p-select
+                          [options]="kits"
+                          [(ngModel)]="selectedKit"
+                          (onChange)="kitChanged(apostila_Kit_Id, $event)"
+                          [loading]="loadingKits"
+                          #apostila_Kit_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="apostila_Kit_Id"
+                          inputId="apostila_Kit_Id"
+                          optionLabel="nome"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          [required]="true">
+                    <ng-template let-item #item>
+                        <p>{{ item.nome }}</p>
+                        <div class="flex flex-column">
+                            <p class="font-bold">Apostilas:</p>
+                            <p *ngFor="let apostila of item.apostilas">
+                                <span>{{apostila.nome}} - <b>Total de Páginas </b>{{apostila.numeroTotalPaginas}}</span>
+                            </p>
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="apostila_Kit_Id.touched && apostila_Kit_Id.invalid && apostila_Kit_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="apostila_Kit_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
             <div class="field md:col-3 sm:col-6 col-12"> <!-- Apostila Ábaco -->
                 <label for="apostila_Abaco">Apostila Ábaco: </label>

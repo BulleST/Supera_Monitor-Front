@@ -34,21 +34,17 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
     ) {
 
-        console.log('constructor')
         this.loadPage();
 
     }
 
     ngOnDestroy(): void {
-        console.log('ngOnDestroy')
         this.subscription.forEach(item => item.unsubscribe());
     }
 
 
     loadPage() {
-        console.log('loadPage')
         var params = this.activatedRoute.params.subscribe(res => {
-            console.log('res', res)
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.loading = true;
@@ -59,26 +55,22 @@ export class FormComponent implements OnDestroy {
                         this.object = res;
                         this.loading = false;
                         this.visible = true;
-                        console.log('aluno', this.object)
                     })
                     .catch(res => {
-                        console.log('catch', res)
                         this.visible = false;
-                        this.visibleChange()
+                        this.visibleChange();
                     });
 
             } else {
+                // this.visible = true;
                 this.visible = false;
-                this.visibleChange()
-                console.log(res)
+                this.visibleChange();
             }
         })
         this.subscription.push(params);
     }
 
     visibleChange() {
-        console.log('visibleChange', this.visible)
-
         if (!this.visible) {
             this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
@@ -102,7 +94,7 @@ export class FormComponent implements OnDestroy {
         }
         this.loading = true;
 
-        lastValueFrom(this.service.edit(this.object))
+        this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
@@ -120,6 +112,12 @@ export class FormComponent implements OnDestroy {
                 this.loading = false;
                 this.showError(this.error, e);
             })
+    }
+
+    request() {
+        if (this.isEditPage)
+            return lastValueFrom(this.service.edit(this.object))
+        return lastValueFrom(this.service.create(this.object))
     }
 
 }

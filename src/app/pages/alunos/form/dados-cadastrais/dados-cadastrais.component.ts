@@ -18,6 +18,9 @@ import { CalendarioAlunoChecklistView } from '../../../../models/calendario.mode
 import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { MultiSelect, MultiSelectChangeEvent } from 'primeng/multiselect';
+import { ApostilaService } from '../../../../services/apostila.service';
+import { Apostila_Kit } from '../../../../models/apostila.model';
+import { SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -29,6 +32,7 @@ import { MultiSelect, MultiSelectChangeEvent } from 'primeng/multiselect';
 })
 export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     @Input() object = new Aluno;
+    @Input() isEditPage = false;
     subscription: Subscription[] = [];
 
     file?: File;
@@ -47,13 +51,17 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     @ViewChild('_restricoes') _restricoes!: NgModel;
     @ViewChild('restricoesMultiselect') restricoesMultiselect!: MultiSelect;
     restricoes: Aluno_Restricao[] = [];
-    loadingRestricoes = true;
+    loadingRestricoes = false;
 
     perfisCognitivos: PerfilCognitivo[] = [];
     loadingPerfisCognitivos = true;
 
     loadingChecklists = false;
     checklists: Checklist[] = [];
+
+    selectedKit?: Apostila_Kit;
+    loadingKits = false;
+    kits: Apostila_Kit[] = [];
 
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
@@ -68,6 +76,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
         private userService: UserService,
+        private apostilaService: ApostilaService,
     ) {
 
         var restricaoCreated = this.service.restricaoCreated.subscribe(res => this.restricoes.push(res));
@@ -88,6 +97,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             })
             .catch(res => this.loadingSexos = false);
 
+            
+        this.loadingKits = true;
+        lastValueFrom(this.apostilaService.getKit())
+        .then(res => {
+            this.kits = res;
+            this.loadingKits = false;
+        })
+        .catch(res => this.loadingKits = false);
+
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
@@ -97,6 +115,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
+        if (changes['isEditPage']) {
+            this.isEditPage = changes['isEditPage'].currentValue;
+        }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
             this.loadFoto();
@@ -104,6 +125,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             if (this.turmas.length == 0)
                 await this.loadTurmas();
 
+            this.loadingTurmas = false
+            this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
+            this.oldTurmaId = this.selectedTurma?.id;
 
             if (this.object.id) {
                 this.loadingRestricoes = true;
@@ -114,11 +138,14 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                         this.object.restricoes = res;
                     })
                     .catch(res => this.loadingRestricoes = false);
+
+                this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
+
+                if(!this.object.rm) {
+                    this.object.rm = this.generateRM()
+                }
             }
 
-            this.loadingTurmas = false
-            this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
-            this.oldTurmaId = this.selectedTurma?.id;
         }
     }
 
@@ -188,7 +215,31 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    turmaChanged(model: NgModel, e: any) {
+    kitChanged(model: NgModel, e: SelectChangeEvent) {
+        if (this.selectedKit) {
+            this.object.apostila_Kit_Id = this.selectedKit.id;
+            
+            var ah = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 2 && x.ordem == 1);
+            this.object.apostila_AH_Id = ah?.id;
+            this.object.apostila_AH = ah?.nome;
+            this.object.numeroPaginaAH = 0;
+
+            var abaco = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 1 && x.ordem == 1);
+            this.object.apostila_Abaco_Id = abaco?.id;
+            this.object.apostila_Abaco = abaco?.nome;
+            this.object.numeroPaginaAbaco = 0;
+        } else {
+            delete this.object.apostila_Kit_Id;
+            delete this.object.apostila_AH_Id;
+            delete this.object.apostila_AH;
+            delete this.object.numeroPaginaAH;
+            delete this.object.apostila_Abaco_Id;
+            delete this.object.apostila_Abaco;
+            delete this.object.numeroPaginaAbaco;
+        }
+    }
+
+    turmaChanged(model: NgModel, e: SelectChangeEvent) {
         if (this.selectedTurma) {
             if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
                 this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> por que o limite de alunos foi alcançado.`, e);
@@ -371,4 +422,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         console.log(e)
     }
+
+
+    generateRM() {
+        const min = 100000;
+        const max = 999999;
+        var rm = Math.floor(Math.random() * (max - min + 1)) + min
+        return rm.toString();
+      }
+      
 }

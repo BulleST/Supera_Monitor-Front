@@ -19,18 +19,18 @@
             
             <div *ngIf="showChecklist" (click)="popoverChecklistComponent.show($event)" class="text-lg mt-1 gap-1 flex align-items-center">
                 <b>Jornada Supera: </b>
-                <app-aluno-checklist-status [aluno]="popoverChecklistComponent.aluno" [loading]="popoverChecklistComponent.loading"></app-aluno-checklist-status>
                 <app-aluno-checklist-popover #popoverChecklistComponent [aluno]="aluno"></app-aluno-checklist-popover>
+                <app-aluno-checklist-status [aluno]="popoverChecklistComponent.aluno" [loading]="popoverChecklistComponent.loading"></app-aluno-checklist-status>
             </div>
 
 
             <div class="flex align-items-center gap-2 mt-2 ">
-                <p-button label="Ver aluno"
+                <!-- <p-button label="Ver aluno"
                           [rounded]="true"
                           icon="pi pi-user-edit"
                           size="small"
                           styleClass="white-space-nowrap"
-                          (onClick)="goToAluno(aluno)" />
+                          [routerLink]="goToAluno(aluno)" /> -->
                 <p-button *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)" 
                     label="Agendar Reposição"
                           icon="pi pi-calendar"

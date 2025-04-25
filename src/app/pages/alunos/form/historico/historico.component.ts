@@ -9,7 +9,6 @@ import { AlunoService } from '../../../../services/alunos.service';
 @Component({
     selector: 'app-historico',
     standalone: false,
-
     templateUrl: './historico.component.html',
     styleUrl: './historico.component.css'
 })

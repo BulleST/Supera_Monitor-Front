@@ -74,9 +74,10 @@ export class AlunoPopoverComponent implements OnChanges {
     }
     
     goToAluno(aluno: Evento_Participacao_Aluno) {
-        this.service.setEvento(this.evento);
+        // this.service.setEvento(this.evento);
         var encrypted = this.crypto.encrypt(aluno.aluno_Id)
-        this.router.navigate(['calendario', 'aluno', encrypted])
+        // this.router.navigate([ 'aluno', encrypted], { relativeTo: this.activatedRoute })
+        return ['aluno', encrypted];
     }
 
     goToReposicao(aluno: Evento_Participacao_Aluno) {

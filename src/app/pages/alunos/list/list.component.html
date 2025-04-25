@@ -60,6 +60,7 @@
                         </p-iconfield>
                         <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" pTooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
                         <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar alunos" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
+                        <!-- <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" /> -->
                     </div>
                 </div>
             </p-toolbar>
@@ -140,7 +141,9 @@
                             <span class="w-1rem h-1rem inline-flex border-circle mr-2" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
                         </ng-template>
                     </ng-template>
-                    <span>{{ item[col.field] }}</span>
+
+                    <span *ngIf="col.field != 'nome'">{{ item[col.field] }}</span>
+                    <span *ngIf="col.field == 'nome'" pTooltip="{{item.nome}}">{{ item.nome | nameAbv }}</span>
                 </ng-template>
                 <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
                 <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
