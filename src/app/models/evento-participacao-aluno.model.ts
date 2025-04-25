@@ -13,11 +13,11 @@ export class Evento_Participacao_Aluno {
 
     evento_Id: number = PseudoEvento.EventoId;
 
-    reposicaoDe_Evento_Id?: number = 0;
+    reposicaoDe_Evento_Id?: number = undefined as any;
     reposicaoDe_Evento?: Evento;
     loadingReposicaoDe_Evento?: boolean;
 
-    reposicaoPara_Evento_Id?: number = 0;
+    reposicaoPara_Evento_Id?: number = undefined as any;
     reposicaoPara_Evento?: Evento;
     loadingReposicaoPara_Evento?: boolean;
 
@@ -25,12 +25,12 @@ export class Evento_Participacao_Aluno {
     observacao?: string;
 
     apostila_Abaco?: string;
-    apostila_Abaco_Id?: number = 0;
-    numeroPaginaAbaco?: number = 0;
+    apostila_Abaco_Id?: number = undefined as any;
+    numeroPaginaAbaco?: number = undefined as any;
 
     apostila_AH?: string;
-    apostila_AH_Id?: number = 0;
-    numeroPaginaAH?: number = 0;
+    apostila_AH_Id?: number = undefined as any;
+    numeroPaginaAH?: number = undefined as any;
 
 
     apostila_Kit?: string;

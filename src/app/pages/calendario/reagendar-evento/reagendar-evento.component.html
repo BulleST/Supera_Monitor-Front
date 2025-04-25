@@ -246,8 +246,7 @@
             <!-- Educadores -->
             <div class="field col" *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
                 <p class="font-bold text-primary-500">
-                    <span *ngIf="evento.professores.length > 1">Educadores</span>
-                    <span *ngIf="evento.professores.length == 1">Educador</span>
+                    <span>Educadores</span>
                 </p>
                 <hr class="mb-2 border-orange-500 border-1">
                 <div *ngFor="let item of professores; let i = index"

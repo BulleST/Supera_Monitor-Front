@@ -154,15 +154,16 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         nowIndicator: true,
         dayMaxEvents: true,
         events: [],
-        scrollTime: '08:00:00',
+        scrollTime: '09:00:00',
+        scrollTimeReset: false,
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
+        height: 'calc(100vh - 260px)',
         buttonText: {
             today: 'hoje'
         },
         slotDuration: '00:30:00',
-        // scrollTime: '00:30:00',
         slotLabelFormat: {
             hour: 'numeric',
             minute: '2-digit',

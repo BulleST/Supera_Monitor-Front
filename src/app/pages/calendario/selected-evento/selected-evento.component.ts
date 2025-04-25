@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoQueryParams, EventoTipo } from '../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
@@ -44,6 +44,8 @@ export class SelectedEventoComponent implements OnChanges {
     mensagensEnviadasProfessor: Evento_Participacao_Professor[] = [];
 
     tipoEventoString = '';
+    mouse: any = {x:0, y:0};
+
 
     constructor(
         private alunoService: AlunoService,
@@ -272,5 +274,20 @@ export class SelectedEventoComponent implements OnChanges {
     }
     primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
         return moment(aluno.primeiraAula).isSame(evento.data)
+    }
+
+    @HostListener('mousemove', ['$event'])
+    onMouseMove(event: MouseEvent): void {
+        const x = event.clientX;
+        const y = event.clientY;
+        this.mouse = {x,y};
+        console.log(`Mouse X: ${x}, Mouse Y: ${y}`);
+    }
+
+    tooltipPosition() {
+        var width = window.innerWidth;
+        if (this.mouse.x >= (width / 2))
+            return 'right'
+        return 'left'
     }
 }

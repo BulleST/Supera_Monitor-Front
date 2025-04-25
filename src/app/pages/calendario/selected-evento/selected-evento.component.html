@@ -2,13 +2,26 @@
 <p-popover #popover
            styleClass="z-2 -mt-1"
            (onHide)="onHide()"
-           [dismissable]="false">
-    <div *ngIf="evento" class="p-2 flex flex-column row-gap-1 -m-2 w-30rem max-w-fit">
+           [dismissable]="true">
+    <div *ngIf="evento" class="p-2 flex flex-column row-gap-1 -m-2 w-30rem max-w-fit" >
         <div class="p-2 white-space-normal">
-            <p class="text-400"> <span class="text-pink-500 font-bold uppercase">{{tipoEventoString}}</span></p>
-            <p class="font-medium text-400 text-lg">
-                <span>{{evento.descricao}}</span>
-            </p>
+            
+            <div class="flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-400"> <span class="text-pink-500 font-bold uppercase">{{tipoEventoString}}</span></p>
+                    <p class="font-medium text-400 text-lg">
+                        <span>{{evento.descricao}}</span>
+                    </p>
+                </div>
+                <ng-container *ngIf="evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento">
+                    <div [tooltipPosition]="tooltipPosition()" [pTooltip]="tooltipTemplate">
+                        <span class="text-primary-500 text-base font-bold border-circle border-2 border-primary-500 w-2rem h-2rem flex align-items-center justify-content-center">R</span>
+                    </div>
+                    <ng-template #tooltipTemplate>
+                        <p>{{evento.reagendamentoDe_Evento.turma}} - {{evento.reagendamentoDe_Evento.data |date:'dd/MM/yyyy \'às\' HH:mm'}}</p>
+                    </ng-template>
+                </ng-container>
+            </div>
             <!-- <div class="flex justify-content-between">
             </div> -->
             <!-- Data -->
@@ -36,16 +49,6 @@
                     <span>{{evento.professores[0].nome }}</span>
                     <span class="inline-flex w-1rem h-1rem border-circle ml-2 " [style]="{ backgroundColor: evento.professores[0].corLegenda }"></span>
                 </p>
-            </div>
-            <div class="flex justify-content-between">
-                <div class="flex col p-0 mt-1">
-                    <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento">
-                        <span [pTooltip]="evento.reagendamentoDe_Evento.turma + ' - ' + (evento.reagendamentoDe_Evento.data |date:'dd/MM/yyyy \'às\' HH:mm')">
-                            <span class="ml-auto flex align-items-center"></span>
-                            <span class="mr-2 ml-auto text-primary-500 text-base font-bold border-circle border-2 border-primary-500 w-2rem h-2rem flex align-items-center justify-content-center mr-1">R</span>
-                        </span>
-                    </ng-template>
-                </div>
             </div>
             <!-- Turma -->
             <p *ngIf="evento.turma" class="col p-0 mt-1">

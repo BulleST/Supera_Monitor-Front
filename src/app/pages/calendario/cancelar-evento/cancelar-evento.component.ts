@@ -271,9 +271,6 @@ export class CancelarEventoComponent implements OnDestroy {
     request() {
         this.evento.data = new Date(this.evento.data)
         switch (this.evento.evento_Tipo_Id) {
-            // case EventoTipo.AulaZero: return this.requestAula0();
-            // case EventoTipo.AulaExtra: return this.requestAulaExtra();
-            // case EventoTipo.Superacao: return this.requestSuperacao();
             case EventoTipo.Aula: return this.requestAulaTurma();
             case EventoTipo.Reuniao: return this.requestReuniao();
             case EventoTipo.Oficina: return this.requestOficina();
@@ -286,6 +283,7 @@ export class CancelarEventoComponent implements OnDestroy {
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
         request.perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id);
+        request.sala_Id = request.sala_Id ?? 13 // online; 
 
         if (this.evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createAulaTurma(request));
@@ -296,7 +294,8 @@ export class CancelarEventoComponent implements OnDestroy {
         var request = MyMap(this.evento, new EventoReuniaoRequest);
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = this.evento.professores.map(x => x.professor_Id);
-        request.sala_Id = 14;
+        request.sala_Id = request.sala_Id ?? 14; // professores; 
+
         if (this.evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createReuniao(request));
         return lastValueFrom(this.service.editReuniao(request));
@@ -305,7 +304,8 @@ export class CancelarEventoComponent implements OnDestroy {
     requestOficina() {
         var request = MyMap(this.evento, new EventoOficinaRequest);
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-        request.professores = [this.evento.professor_Id];
+        request.professores = this.evento.professores.map(x => x.professor_Id);
+        request.sala_Id = request.sala_Id ?? 13 // online; 
         if (this.evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request));
         return lastValueFrom(this.service.editOficina(request));

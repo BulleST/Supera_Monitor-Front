@@ -278,7 +278,9 @@
             <!-- CALENDARIO -->
              <!--  *ngIf="calendarVisible()" -->
             <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)">
-                <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar style="min-height: 500px; height: calc(100vh - 280px)">
+                <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar [ngStyle]="{
+                    height: 'calc(100vh - 260px)'
+                }">
                     <ng-template #allDayContent>
                         <span>Feriados</span>
                     </ng-template>
