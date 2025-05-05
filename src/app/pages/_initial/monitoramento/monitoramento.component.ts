@@ -86,7 +86,7 @@ export class MonitoramentoComponent implements OnDestroy {
 
      getChecklistAlunos() {
         this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.getList())
+        lastValueFrom(this.alunoService.getListWithChecklist())
             .then(alunos => {
                 var alunosChecklistItem: Aluno_CheckList_Item[] = alunos.flatMap(x => x.alunoChecklist);
                 this.checklists = this.checklists.map(checklist => {

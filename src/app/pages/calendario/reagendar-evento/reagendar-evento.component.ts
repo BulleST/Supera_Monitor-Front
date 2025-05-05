@@ -196,7 +196,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         this.alunos = this.alunoService.list.value;
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            this.alunos = await lastValueFrom(this.alunoService.getList())
+            this.alunos = await lastValueFrom(this.alunoService.getListWithChecklist())
             this.loadingAlunos = false;
         }
 

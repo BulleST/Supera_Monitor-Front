@@ -212,7 +212,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
     async setAlunos() {
         this.loadingAlunos = true;
-        await lastValueFrom(this.alunoService.getList())
+        await lastValueFrom(this.alunoService.getListWithChecklist())
         .then(res => {
             this.alunos = res.filter(x => x.active).sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
             this.loadingAlunos = false;

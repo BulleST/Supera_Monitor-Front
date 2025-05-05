@@ -115,7 +115,7 @@ export class ListComponent implements OnDestroy {
             await lastValueFrom(this.checklistService.getList())
 
 
-        lastValueFrom(this.service.getList())
+        lastValueFrom(this.service.getListWithChecklist())
             .then(async alunos => {
                 this.tableLoading = false;
                 this.loadingChecklist = true

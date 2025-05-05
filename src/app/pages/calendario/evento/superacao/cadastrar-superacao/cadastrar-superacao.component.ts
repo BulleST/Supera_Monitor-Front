@@ -132,35 +132,31 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             this.alunos = res.filter(x => x.active == true);
             var grouped = groupBy(this.alunos, 'turma_Id');
 
-                this.groupedAlunos = [];
-                for(let turma_Id in grouped) {
-                    var alunosTurma = grouped[turma_Id] as Aluno[];
-                    var turma = {
-                        nome: alunosTurma[0].turma,
-                        turmaDesc: alunosTurma[0].turmaDesc,
-                        turma_Id: alunosTurma[0].turma_Id,
-                        diaSemana: alunosTurma[0].diaSemana,
-                        horario: alunosTurma[0].horario,
-                        professor_Id: alunosTurma[0].professor_Id,
-                        professor: alunosTurma[0].professor,
-                        corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
-                    }
-                    this.groupedAlunos.push({
-                        label: turma.nome,
-                        value: turma,
-                        items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
-                    });
+            this.groupedAlunos = [];
+            for(let turma_Id in grouped) {
+                var alunosTurma = grouped[turma_Id] as Aluno[];
+                var turma = {
+                    nome: alunosTurma[0].turma,
+                    turmaDesc: alunosTurma[0].turmaDesc,
+                    turma_Id: alunosTurma[0].turma_Id,
+                    diaSemana: alunosTurma[0].diaSemana,
+                    horario: alunosTurma[0].horario,
+                    professor_Id: alunosTurma[0].professor_Id,
+                    professor: alunosTurma[0].professor,
+                    corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
                 }
-                console.log('groupedAlunos', this.groupedAlunos)
-            // }
-            
-
+                this.groupedAlunos.push({
+                    label: turma.nome,
+                    value: turma,
+                    items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
+                });
+            }
         });
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
+            lastValueFrom(this.alunoService.getListWithChecklist())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }

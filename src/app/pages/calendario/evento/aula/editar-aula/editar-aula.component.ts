@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Professor } from '../../../../../models/professor.model';
@@ -12,10 +12,11 @@ import { Evento_Participacao_Aluno } from '../../../../../models/evento-particip
 import { Apostila, ApostilaTipo } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { Roteiro } from '../../../../../models/roteiro.model';
-import { Button } from 'primeng/button';
 import { MobileService } from '../../../../../utils';
 import { ScreenWidth } from '../../../../../utils/mobile';
-import { CalendarioAluno } from '../../../../../models/calendario.model';
+import { Aluno } from '../../../../../models/alunos.model';
+import { AlunoService } from '../../../../../services/alunos.service';
+import $ from 'jquery';
 
 @Component({
     selector: 'app-editar-aula',
@@ -50,10 +51,15 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     perfilCognitivo = '';
     EventoTipo = EventoTipo;
     SalaAulaId = SalaAulaId;
+    
     apostilaAbacoAluno: Apostila[] = [];
     apostilaAHAluno: Apostila[] = [];
     apostilas: Apostila[] = [];
     loadingApostila = false;
+    @ViewChildren('select') apostilasDropdown!: QueryList<Select>; 
+    
+    alunos: Aluno[] = [];
+    loadingAluno = false;
 
     ScreenWidth = ScreenWidth;
     screen = ScreenWidth.lg;
@@ -62,7 +68,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private apostilaService: ApostilaService,
-        private mobileService: MobileService
+        private mobileService: MobileService,
+        private alunoService: AlunoService
     ) {
 
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
@@ -76,6 +83,19 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
             lastValueFrom(this.apostilaService.getApostilas())
                 .then(res => this.loadingApostila = false)
                 .catch(res => this.loadingApostila = false)
+        }
+
+        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        this.subscription.push(alunos);
+
+        if (this.alunos.length == 0) {
+            this.loadingAluno = true;
+            lastValueFrom(this.alunoService.getList())
+                .then(res => {
+                    this.alunos = res;
+                    this.loadingAluno = false;
+                })
+                .catch(res => this.loadingAluno = false)
         }
 
     }
@@ -155,6 +175,16 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
     }
 
+    
+    loadApostilasSelect(select: Select, participacao: Evento_Participacao_Aluno) {
+        var tipo = select.inputId!.toLowerCase().includes('apostila_abaco_id') ? ApostilaTipo.Abaco : ApostilaTipo.AH;
+        var apostilas = this.apostilas.filter(x => x.apostila_Kit_Id == participacao.apostila_Kit_Id && x.apostila_Tipo_Id == tipo);
+        select.options = apostilas.sort((x,y) => x.ordem - y.ordem);
+        select.updateModel(tipo == ApostilaTipo.Abaco ? participacao.apostila_Abaco_Id : participacao.apostila_AH_Id)
+
+        select.loading = false;
+    }
+    
     loadApostila(aluno: Evento_Participacao_Aluno) {
         this.loadingApostila = true;
         this.apostilaAbacoAluno = this.apostilas.filter(x => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == ApostilaTipo.Abaco);
@@ -166,72 +196,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         this.loadingApostila = false;
     }
 
-    apostilaAbacoChange(value: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
-        var newApostila = this.apostilaAbacoAluno.find(x => x.id == value) as Apostila;
-        var oldApostila = this.apostilaAbacoAluno.find(x => x.id == item.apostila_Abaco_Id) as Apostila;
-        if (value != item.apostila_Abaco_Id && oldApostila && newApostila && newApostila.ordem < oldApostila.ordem) {
-
-            this.confirmationService.confirm({
-                target: el.el.nativeElement,
-                message: `Tem certeza que deseja retornar o nível da apostila desse aluno?.`,
-                header: 'Alterar apostila',
-                icon: 'pi pi-exclamation-triangle',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                accept: async () => {
-                    item.apostila_Abaco_Id = value;
-                    item.apostila_Abaco = newApostila.nome
-                },
-                reject: () => {
-                    ngModel.control.setValue(oldApostila.id)
-                    value = oldApostila.id;
-                    item.apostila_Abaco_Id = oldApostila.id;
-                    item.apostila_Abaco = oldApostila.nome;
-                }
-            });
-        } else {
-            item.apostila_Abaco = newApostila.nome;
-            item.apostila_Abaco_Id = newApostila.id;
-        }
-    }
-
-    apostilaAHChange(value: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
-        var newApostila = this.apostilaAHAluno.find(x => x.id == value) as Apostila;
-        var oldApostila = this.apostilaAHAluno.find(x => x.id == item.apostila_AH_Id) as Apostila;
-
-        if (value != item.apostila_Abaco_Id && oldApostila && newApostila && newApostila.ordem < oldApostila.ordem) {
-
-            this.confirmationService.confirm({
-                target: el.el.nativeElement,
-                message: `Tem certeza que deseja retornar o nível da apostila desse aluno?.`,
-                header: 'Alterar apostila',
-                icon: 'pi pi-exclamation-triangle',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                accept: async () => {
-                    item.apostila_AH_Id = value;
-                    item.apostila_AH = newApostila.nome
-                },
-                reject: () => {
-                    ngModel.control.setValue(oldApostila.id)
-                    value = oldApostila.id;
-                    item.apostila_AH_Id = oldApostila.id;
-                    item.apostila_AH = oldApostila.nome;
-                }
-            });
-        } else {
-            item.apostila_AH = newApostila.nome;
-            item.apostila_AH_Id = newApostila.id;
-        }
-    }
 
     inputFocus(e: any) {
         e.target.select()
@@ -262,27 +226,13 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
     }
 
-    presenteClick(item: Evento_Participacao_Aluno, e: any, button?: Button) {
-
-        if (item.presente == undefined || item.presente == null) {
-            item.presente = true;
-        }
-        else {
-            item.presente = !item.presente;
-        }
-
-
-        if (button) {
-            button.label = item.presente ? 'Presente' : 'Faltou';
-            button.severity = item.presente ? 'success' : 'danger';
-            button.icon = item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill';
-        }
-
+    presenteClick(item: Evento_Participacao_Aluno, e: any) {
+        item.presente = !item.presente;
 
         if (item.presente == false && item.celular) {
             var nome = item.aluno.split(' ')[0];
             this.confirmationService.confirm({
-                target: e.targer,
+                target: e.target,
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
@@ -300,7 +250,128 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
         return item;
     }
+    
+    numeroPaginaAHChange(current: any, participacao: Evento_Participacao_Aluno, model: NgModel, el: HTMLInputElement) {
+        var aluno = this.alunos.find(x => x.id == participacao.aluno_Id) as Aluno;
+        var prev = participacao.numeroPaginaAH ?? 0;
+        if (current <= prev && participacao.apostila_AH_Id == aluno.apostila_AH_Id) {
 
+            this.confirmationService.confirm({
+                target: el,
+                message: `O aluno está regredindo a página da apostila "${participacao.apostila_AH}"?`,
+                header: 'Regredir página?',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não, foi um engano',
+                rejectButtonStyleClass: 'p-button-sm p-button-rounded p-button-text',
+                accept: () => {
+                    participacao.numeroPaginaAH = current;
+                    model.control.setValue(current);
+                    model.control.updateValueAndValidity();
+                },
+                reject: () => {
+                    model.control.setValue(participacao.numeroPaginaAH);
+                    model.control.updateValueAndValidity();
+                }
+            });
+
+        }
+    }
+    
+    numeroPaginaAbacoChange(current: any, participacao: Evento_Participacao_Aluno, model: NgModel, el: HTMLInputElement) {
+        var aluno = this.alunos.find(x => x.id == participacao.aluno_Id) as Aluno;
+        var prev = participacao.numeroPaginaAbaco ?? 0;
+        if (current <= prev && participacao.apostila_Abaco_Id == aluno.apostila_Abaco_Id) {
+
+            this.confirmationService.confirm({
+                target: el,
+                message: `O aluno está regredindo a página da apostila "${participacao.apostila_Abaco}"?`,
+                header: 'Regredir página?',
+                acceptLabel: `Sim, regredir página`,
+                acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não, foi um engano',
+                rejectButtonStyleClass: 'p-button-sm p-button-rounded p-button-text',
+                accept: () => {
+                    participacao.numeroPaginaAbaco = current;
+                    model.control.setValue(current);
+                    model.control.updateValueAndValidity();
+                },
+                reject: () => {
+                    model.control.setValue(participacao.numeroPaginaAbaco);
+                    model.control.updateValueAndValidity();
+                }
+            });
+
+        }
+    }
+    
+    apostilaAbacoChange(id: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
+        var aluno = this.alunos.find(x => x.id == item.aluno_Id) as Aluno;
+        var newApostila = this.apostilas.find(x => x.id == id) as Apostila;
+        var oldApostila = this.apostilas.find(x => x.id == aluno.apostila_Abaco_Id) as Apostila;
+        if (id != item.apostila_Abaco_Id && newApostila.ordem < oldApostila.ordem) {
+
+            this.confirmationService.confirm({
+                target: el.el.nativeElement,
+                message: `Tem certeza que deseja regredir a apostila desse aluno?.`,
+                header: 'Regredir apostila?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Sim',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                accept: async () => {
+                    item.apostila_Abaco_Id = id;
+                    item.apostila_Abaco = newApostila.nome
+                },
+                reject: () => {
+                    ngModel.control.setValue(oldApostila.id)
+                    id = oldApostila.id;
+                    item.apostila_Abaco_Id = oldApostila.id;
+                    item.apostila_Abaco = oldApostila.nome;
+                }
+            });
+        } else {
+            item.apostila_Abaco = newApostila.nome;
+            item.apostila_Abaco_Id = newApostila.id;
+        }
+    }
+
+    apostilaAHChange(id: any, item: Evento_Participacao_Aluno, ngModel: NgModel, el: Select) {
+        var aluno = this.alunos.find(x => x.id == item.aluno_Id) as Aluno;
+        var newApostila = this.apostilaAHAluno.find(x => x.id == id) as Apostila;
+        var oldApostila = this.apostilaAHAluno.find(x => x.id == aluno.apostila_AH_Id) as Apostila;
+
+        if (id != item.apostila_Abaco_Id && newApostila.ordem < oldApostila.ordem) {
+            this.confirmationService.confirm({
+                target: el.el.nativeElement,
+                message: `Tem certeza que deseja regredir a apostila desse aluno?.`,
+                header: 'Regredir apostila?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Sim',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                accept: async () => {
+                    item.apostila_AH_Id = id;
+                    item.apostila_AH = newApostila.nome
+                },
+                reject: () => {
+                    ngModel.control.setValue(oldApostila.id)
+                    item.apostila_AH_Id = oldApostila.id;
+                    item.apostila_AH = oldApostila.nome;
+                }
+            });
+        } else {
+            item.apostila_AH = newApostila.nome;
+            item.apostila_AH_Id = newApostila.id;
+        }
+    }
+    
     primeiraAula(aluno: Evento_Participacao_Aluno, evento:Evento) {
         return moment(aluno.primeiraAula).isSame(evento.data)
     }

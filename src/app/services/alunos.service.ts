@@ -41,8 +41,17 @@ export class AlunoService extends Service {
         })
 
     }
-
+    
     getList() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getListWithChecklist() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
             .pipe(tap({
                 next: list => {
@@ -132,7 +141,7 @@ export class AlunoService extends Service {
     get(id: number) {
         return new Promise<Aluno>(async (resolve, reject) => {
             if (this.list.value.length == 0) {
-                await lastValueFrom(this.getList());
+                await lastValueFrom(this.getListWithChecklist());
             }
 
             var item = this.list.value.find(x => x.id == id) as Aluno;

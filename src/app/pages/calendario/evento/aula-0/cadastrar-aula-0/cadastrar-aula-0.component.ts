@@ -5,7 +5,7 @@ import { Aluno } from '../../../../../models/alunos.model';
 import { Professor } from '../../../../../models/professor.model';
 import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SelectItemGroup } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { Crypto, getError } from '../../../../../utils';
 import moment from 'moment';
@@ -33,6 +33,7 @@ import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MyMap } from '../../../../../utils/map';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { NameAbvPipe } from '../../../../../utils/name.pipe';
+import { groupBy } from 'lodash';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -55,6 +56,7 @@ export class CadastrarAula0Component implements OnDestroy {
 
     mensagensEnviadasAlunos: Aluno[] = [];
     alunosSelected: Aluno[] = [];
+    groupedAlunos: SelectItemGroup[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -130,14 +132,35 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch((res) => (this.loadingTurmas = false));
         }
 
-        var alunos = this.alunoService.list.subscribe(
-            (res) => (this.alunos = res.filter((x) => x.active == true))
-        );
+        var alunos = this.alunoService.list.subscribe(res => {
+            this.alunos = res.filter(x => x.active == true);
+            var grouped = groupBy(this.alunos, 'turma_Id');
+
+            this.groupedAlunos = [];
+            for(let turma_Id in grouped) {
+                var alunosTurma = grouped[turma_Id] as Aluno[];
+                var turma = {
+                    nome: alunosTurma[0].turma,
+                    turmaDesc: alunosTurma[0].turmaDesc,
+                    turma_Id: alunosTurma[0].turma_Id,
+                    diaSemana: alunosTurma[0].diaSemana,
+                    horario: alunosTurma[0].horario,
+                    professor_Id: alunosTurma[0].professor_Id,
+                    professor: alunosTurma[0].professor,
+                    corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
+                }
+                this.groupedAlunos.push({
+                    label: turma.nome,
+                    value: turma,
+                    items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
+                });
+            }
+        });
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
+            lastValueFrom(this.alunoService.getListWithChecklist())
                 .then((res) => (this.loadingAlunos = false))
                 .catch((res) => (this.loadingAlunos = false));
         }

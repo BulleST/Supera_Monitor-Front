@@ -150,7 +150,7 @@ export class EventoComponent implements OnDestroy {
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
+            lastValueFrom(this.alunoService.getListWithChecklist())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }
@@ -309,6 +309,20 @@ export class EventoComponent implements OnDestroy {
 
     async goToIniciarChamada(e: any) {
         this.isChamadaPage = true;
+        this.evento.alunos
+        .filter(x => x.active)
+        .map(item => {
+            item.presente = true;
+            return item;
+        });
+
+        this.evento.professores
+        .map(item => {
+            item.presente = true;
+            return item;
+        });
+
+
         this.service.setEvento(this.evento)
 
         var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
@@ -322,7 +336,7 @@ export class EventoComponent implements OnDestroy {
             default: route = 'aula'; break;
         }
 
-        this.router.navigate(['calendario', route, 'chamada', this.encryptedId], { replaceUrl: true, skipLocationChange: true  });
+        this.router.navigate(['calendario', route, 'chamada', this.encryptedId]);
     }
 
     finalizarConfirmation(e: any) {

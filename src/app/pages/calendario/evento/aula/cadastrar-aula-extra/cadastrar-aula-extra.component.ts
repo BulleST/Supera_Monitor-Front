@@ -151,7 +151,7 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
+            lastValueFrom(this.alunoService.getListWithChecklist())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }
