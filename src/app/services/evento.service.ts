@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject,  lastValueFrom,  map,  of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest, EventoTipo } from '../models/evento.model';
 import { EventoAulaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
@@ -189,90 +189,90 @@ export class EventoService extends Service {
     createAulaTurma(model: EventoAulaRequest ) {
         var request = MyMap(model, new EventoAulaRequest) as EventoAulaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/aulas/turma`, request)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/turma`, request)
     }
     
     editAulaTurma(model: EventoAulaRequest ) {
         var request = MyMap(model, new EventoAulaRequest) as EventoAulaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/aulas`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model)
     }
   
     createAula0(model: EventoAula0Request ) {
         var request = MyMap(model, new EventoAula0Request) as EventoAula0Request;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/aulas/zero`, model)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, model)
     }
     editAula0(model: EventoAula0Request ) {
         var request = MyMap(model, new EventoAula0Request) as EventoAula0Request;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/aulas`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model)
     }
   
     createAulaExtra(model: EventoAulaExtraRequest ) {
         var request = MyMap(model, new EventoAulaExtraRequest) as EventoAulaExtraRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/aulas/extra`, model)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, model)
     }
     editAulaExtra(model: EventoAulaExtraRequest ) {
         var request = MyMap(model, new EventoAulaExtraRequest) as EventoAulaExtraRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/aulas`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model)
     }
 
     createSuperacao(model: EventoSuperacaoRequest ) {
         var request = MyMap(model, new EventoSuperacaoRequest) as EventoSuperacaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/superacao`, model)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/superacao`, model)
     }
     editSuperacao(model: EventoSuperacaoRequest ) {
         var request = MyMap(model, new EventoSuperacaoRequest) as EventoSuperacaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/superacao`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/superacao`, model)
     }
     createOficina(model: EventoOficinaRequest ) {
         var request = MyMap(model, new EventoOficinaRequest) as EventoOficinaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/oficinas`, model)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/oficinas`, model)
     }
     editOficina(model: EventoOficinaRequest ) {
         var request = MyMap(model, new EventoOficinaRequest) as EventoOficinaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/oficinas`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/oficinas`, model)
     }
     createReuniao(model: EventoReuniaoRequest ) {
         var request = MyMap(model, new EventoReuniaoRequest) as EventoReuniaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/reunioes`, model)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reunioes`, model)
     }
 
     editReuniao(model: EventoReuniaoRequest ) {
         var request = MyMap(model, new EventoReuniaoRequest) as EventoReuniaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<Response>(`${this.url}/eventos/reunioes`, model)
+        return this.http.put<RequestResponse>(`${this.url}/eventos/reunioes`, model)
     }
 
     cancelar(request: EventoCancelamentoRequest) {
-        return this.http.post<Response>(`${this.url}/eventos/cancelar`, request)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar`, request)
     }
     
     inscrever(aluno_Id: number, evento_Id: number) {
         var request = { aluno_Id, evento_Id };
-        return this.http.post<Response>(`${this.url}/eventos/inscrever`, request);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/inscrever`, request);
     }
 
     reagendar(model: EventoReagendamentoRequest) {
         var request = MyMap(model, new EventoReagendamentoRequest) as EventoReagendamentoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<Response>(`${this.url}/eventos/reagendar`, request);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reagendar`, request);
     }
     
     finalizar(request: EventoChamadaRequest) {
-        return this.http.post<Response>(`${this.url}/eventos/finalizar`, request);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/finalizar`, request);
     }
     
     oficinasFuturas() {
-        return this.http.get<Response>(`${this.url}/eventos/oficinas/all`);
+        return this.http.get<RequestResponse>(`${this.url}/eventos/oficinas/all`);
     }
 
 }

@@ -1,11 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 
 @Component({
-  selector: 'app-aluno-checklist-status',
-  standalone: false,
-  templateUrl: './aluno-checklist-status.component.html',
-  styleUrl: './aluno-checklist-status.component.css'
+    selector: 'app-aluno-checklist-status',
+    standalone: false,
+    templateUrl: './aluno-checklist-status.component.html',
+    styleUrl: './aluno-checklist-status.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlunoChecklistStatusComponent implements OnChanges {
     @Input() aluno: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
@@ -34,5 +35,5 @@ export class AlunoChecklistStatusComponent implements OnChanges {
             return aluno.checklistCompleto.find(x => x.id == id)
         return undefined
     }
-    
+
 }

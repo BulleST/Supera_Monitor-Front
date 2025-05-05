@@ -1,4 +1,4 @@
-export interface Response {
+export interface RequestResponse {
     success: boolean;
     message: string;
     object: any;

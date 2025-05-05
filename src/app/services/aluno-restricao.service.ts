@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject,  tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { getError, insertOrReplace } from '../utils';
@@ -19,9 +19,9 @@ export class AlunoRestricaoService extends Service {
     }
 
     create(model: Aluno_Restricao) {
-        return this.http.post<Response>(`${this.url}/restricoes/`, Aluno_Restricao)
+        return this.http.post<RequestResponse>(`${this.url}/restricoes/`, Aluno_Restricao)
             .pipe(tap({
-                next: (res: Response) => {
+                next: (res: RequestResponse) => {
                     insertOrReplace(this, res.object, 'list');
                     this.restricaoCreated.emit(res.object);
                 },

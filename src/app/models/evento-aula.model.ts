@@ -13,6 +13,7 @@ export class EventoAulaRequest {
     perfilCognitivo: number[] = [];
     alunos: number[] = [];
     professores: number[] = [];
+    capacidadeMaximaAlunos = 12
 }
 
 export class EventoAulaExtraRequest {

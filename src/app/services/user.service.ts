@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, Observable, of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { AccountRole } from '../models/account-perfil.model';
 import { Account, AccountRequest } from '../models/account.model';
 import { MyMap } from '../utils/map';
@@ -54,7 +54,7 @@ export class UserService extends Service {
 
     create(model: Account) {
         var request = MyMap(model, new AccountRequest)
-        return this.http.post<Response>(`${this.url}/users`, request)
+        return this.http.post<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar usuário. \n ${getError(err)}`);
@@ -64,7 +64,7 @@ export class UserService extends Service {
 
     edit(model: Account) {
         var request = MyMap(model, new AccountRequest)
-        return this.http.put<Response>(`${this.url}/users`, request)
+        return this.http.put<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar usuário. \n ${getError(err)}`);
@@ -73,7 +73,7 @@ export class UserService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/users/toggle-active/${id}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/users/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível ${(activated ? 'desabilitar' : 'habilitar')}  usuário`);
@@ -82,7 +82,7 @@ export class UserService extends Service {
     }
 
     resetPassword(id: number) {
-        return this.http.patch<Response>(`${this.url}/users/reset-password/${id}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/users/reset-password/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível alterar senha. \n ${getError(err)}`);

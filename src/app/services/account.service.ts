@@ -5,8 +5,8 @@ import { BehaviorSubject, Observable, lastValueFrom, of, throwError } from 'rxjs
 import { ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/accounts.model';
 import { catchError, tap } from 'rxjs/operators';
 import { getError } from '../utils';
-import { Response } from '../helpers/request-response.interface';
-import { environment } from '../../environments/environment.prod';
+import { RequestResponse } from '../helpers/request-response.interface';
+import { environment } from '../../environments/environment';
 import { AccountResponse } from '../models/account.model';
 
 @Injectable({
@@ -88,27 +88,27 @@ export class AccountService {
     }
 
     register(model: Register) {
-        return this.http.post<Response>(`${this.url}/accounts/register`, model);
+        return this.http.post<RequestResponse>(`${this.url}/accounts/register`, model);
     }
 
     forgotPassword(email: string) {
-        return this.http.post<Response>(`${this.url}/accounts/forgot-password`, { email: email });
+        return this.http.post<RequestResponse>(`${this.url}/accounts/forgot-password`, { email: email });
     }
 
     resetPassword(object: ResetPassword) {
-        return this.http.post<Response>(`${this.url}/accounts/reset-password`, object);
+        return this.http.post<RequestResponse>(`${this.url}/accounts/reset-password`, object);
     }
 
     verifyEmail(token: string) {
-        return this.http.post<Response>(`${this.url}/accounts/verify-email`, { token: token });
+        return this.http.post<RequestResponse>(`${this.url}/accounts/verify-email`, { token: token });
     }
 
     changePassword(object: ChangePassword) {
-        return this.http.post<Response>(`${this.url}/accounts/change-password`, object);
+        return this.http.post<RequestResponse>(`${this.url}/accounts/change-password`, object);
     }
 
     updateAccount(object: UpdateAccount) {
-        return this.http.post<Response>(`${this.url}/accounts/update-account`, object);
+        return this.http.post<RequestResponse>(`${this.url}/accounts/update-account`, object);
     }
 
     private refreshTokenTimeout: any;

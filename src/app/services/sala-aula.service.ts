@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { SalaAula } from '../models/sala-aula.model';
 import { MyMap } from '../utils/map';
@@ -48,7 +48,7 @@ export class SalaAulaService extends Service {
     create(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
         var request = MyMap(model, new SalaAula);
-        return this.http.post<Response>(`${this.url}/salas`, request)
+        return this.http.post<RequestResponse>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar sala. \n ${getError(err)}`);
@@ -59,7 +59,7 @@ export class SalaAulaService extends Service {
     edit(model: SalaAula) {
         // model.perfilCognitivo = model.perfilCognitivo.map(x => x.id) as any;
         var request = MyMap(model, new SalaAula);
-        return this.http.put<Response>(`${this.url}/salas`, request)
+        return this.http.put<RequestResponse>(`${this.url}/salas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar sala. \n ${getError(err)}`);
@@ -68,7 +68,7 @@ export class SalaAulaService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/salas/toggle-active/${id}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/salas/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar sala. \n ${getError(err)}`);

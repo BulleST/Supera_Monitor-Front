@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { MyMap } from '../utils/map';
 import moment from 'moment';
 import 'moment/locale/pt-br'
@@ -65,7 +65,7 @@ export class RoteiroService extends Service {
 
     create(model: Roteiro) {
         var request = MyMap(model, new RoteiroRequest);
-        return this.http.post<Response>(`${this.url}/roteiros`, request)
+        return this.http.post<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar roteiro. \n ${getError(err)}`);
@@ -75,7 +75,7 @@ export class RoteiroService extends Service {
 
     edit(model: Roteiro) {
         var request = MyMap(model, new RoteiroRequest);
-        return this.http.put<Response>(`${this.url}/roteiros`, request)
+        return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar roteiro. \n ${getError(err)}`);

@@ -15,7 +15,7 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import moment from 'moment';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { EventoAulaRequest } from '../../../models/evento-aula.model';
-import { Response } from '../../../helpers/request-response.interface';
+import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model';
 import { TurmaService } from '../../../services/turma.service';
@@ -231,7 +231,7 @@ export class CancelarEventoComponent implements OnDestroy {
 
     async send(e: any) {
         this.loading = true;
-        var response: Response = { success: true, message: '', object: null };
+        var response: RequestResponse = { success: true, message: '', object: null };
 
         if (this.evento.id == PseudoEvento.EventoId) {
             await this.request()

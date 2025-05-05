@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom,  of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { Professor, Professor_NivelCertificacao, ProfessorCreateRequest, ProfessorEditRequest } from '../models/professor.model';
 import { MyMap } from '../utils/map';
 import moment from 'moment';
@@ -63,7 +63,7 @@ export class ProfessorService extends Service {
 
     create(model: Professor) {
         var request = MyMap(model, new ProfessorCreateRequest);
-        return this.http.post<Response>(`${this.url}/professor`, request)
+        return this.http.post<RequestResponse>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar professor. \n ${getError(err)}`);
@@ -73,7 +73,7 @@ export class ProfessorService extends Service {
 
     edit(model: Professor) {
         var request = MyMap(model, new ProfessorEditRequest);
-        return this.http.put<Response>(`${this.url}/professor`, request)
+        return this.http.put<RequestResponse>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar professor. \n ${getError(err)}`);
@@ -82,7 +82,7 @@ export class ProfessorService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/professor/${id}/${activated}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/professor/${id}/${activated}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar professor. \n ${getError(err)}`);

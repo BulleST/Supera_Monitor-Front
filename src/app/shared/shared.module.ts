@@ -10,7 +10,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { TranslateModule } from '@ngx-translate/core';
-import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
+// import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
 // Alunos
@@ -63,8 +63,8 @@ import { NameAbvPipe } from '../utils/name.pipe';
         ChangePasswordComponent,
         DragDropModule,
         FullCalendarModule,
-        DragScrollComponent, 
-        DragScrollItemDirective,
+        // DragScrollComponent, 
+        // DragScrollItemDirective,
         
         // Alunos
         AlunoFormComponent,
@@ -91,8 +91,8 @@ import { NameAbvPipe } from '../utils/name.pipe';
         NgxMaskPipe,
         TranslateModule,
         DragDropModule,
-        DragScrollComponent, 
-        DragScrollItemDirective,
+        // DragScrollComponent, 
+        // DragScrollItemDirective,
         FullCalendarModule,
         NameAbvPipe,
     ],

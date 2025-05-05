@@ -24,7 +24,7 @@ import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
 import { Roteiro } from '../../../models/roteiro.model';
 import { EventoAulaRequest } from '../../../models/evento-aula.model';
 import { MyMap } from '../../../utils/map';
-import { Response } from '../../../helpers/request-response.interface';
+import { RequestResponse } from '../../../helpers/request-response.interface';
 import { AlunoRestricaoService } from '../../../services/aluno-restricao.service';
 import { Feriado } from '../../../models/feriado.model';
 
@@ -464,7 +464,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         request.aluno_Id = this.aluno.id;
         request.source_Aula_Id = this.evento.id;
         request.dest_Aula_Id = target.id;
-        var response: Response = { success: true, message: '', object: undefined };
+        var response: RequestResponse = { success: true, message: '', object: undefined };
 
 
         // Se a aula source não existir, cria a aula

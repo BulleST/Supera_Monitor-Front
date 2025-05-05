@@ -24,7 +24,7 @@ import { Turma } from '../../../models/turma.model';
 import { EventoAulaRequest } from '../../../models/evento-aula.model';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model';
-import { Response } from '../../../helpers/request-response.interface';
+import { RequestResponse } from '../../../helpers/request-response.interface';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { AccountService } from '../../../services/account.service';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -412,7 +412,7 @@ export class ReagendarEventoComponent implements OnDestroy {
     async send(e: any) {
         this.loading = true;
 
-        var response: Response = { success: true, message: '', object: null };
+        var response: RequestResponse = { success: true, message: '', object: null };
 
         if (this.evento.id == PseudoEvento.EventoId) {
             await this.request()

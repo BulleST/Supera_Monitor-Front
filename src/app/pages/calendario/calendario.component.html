@@ -1,12 +1,8 @@
 <app-confirm-dialog></app-confirm-dialog>
-
-<p-confirmdialog key="agendarReposicao" >
+<p-confirmdialog key="agendarReposicao">
     <ng-template #message let-message>
         <div class="flex align-items-start gap-2 ">
-            <span class="mt-1">
-                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
-                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-5xl text-primary-500"></i>
-            </span>
+            <span class="mt-1"> @if (message.icon) { <i [ngClass]="message.icon" class="text-4xl "></i> } @else { <i class="pi pi-exclamation-triangle text-5xl text-primary-500"></i> } </span>
             <div>
                 <div [innerHTML]="message.message"></div>
                 <div class="formgrid grid">
@@ -20,18 +16,13 @@
                                   [(ngModel)]="observacaoReposicao"
                                   placeholder="Aproveite para contar o motivo do agendamento dessa reposição"
                                   [rows]="3"
-                                  [required]="true"></textarea>
-                        <div *ngIf="_observacaoReposicao.touched && _observacaoReposicao.invalid && _observacaoReposicao.errors">
-                            <p class="text-red-500 mt-2 mb-0" *ngIf="_observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>
-                        </div>
+                                  [required]="true"></textarea> @if(_observacaoReposicao.touched && _observacaoReposicao.invalid && _observacaoReposicao.errors) { <div> @if(_observacaoReposicao.errors['required']) { <p class="text-red-500 mt-2 mb-0">Esse campo é obrigatório.</p> } </div> }
                     </div>
                 </div>
-
             </div>
         </div>
     </ng-template>
 </p-confirmdialog>
-
 <section id="home" #home>
     <div>
         <div id="alunos"
@@ -60,7 +51,7 @@
             </div>
             <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
                 <p-button icon="pi pi-sync text-sm" (onClick)="update('button')" severity="secondary" label="atualizar" pTooltip="Atualizar calendário" size="small" />
-               <!-- Meu Calendário -->
+                <!-- Meu Calendário -->
                 <p-select
                           [options]="viewMenu"
                           [(ngModel)]="view"
@@ -108,21 +99,21 @@
         <div>
             <!-- SEMANA -->
             <div class="flex align-items-center justify-content-between flex-wrap  mt-4 -mb-4 py-3  ">
-                <div  *ngIf="currentRoteiro" class="flex align-items-center cursor-pointer">
+                <div *ngIf="currentRoteiro" class="flex align-items-center cursor-pointer">
                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
                     <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center p-1 px-2 mx-1" (click)="popoverSemana.toggle($event)"
-                    [ngClass]="{
+                         [ngClass]="{
                         'text-white bg-primary-500': popoverSemana.overlayVisible
-                    }" >
+                    }">
                         <span class="font-bold text-base">Semana {{currentRoteiro.semana}} - {{currentRoteiro.tema}} </span>
                     </div>
                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
                 </div>
-                <div  *ngIf="!currentRoteiro" class="flex align-items-center cursor-pointer">
+                <div *ngIf="!currentRoteiro" class="flex align-items-center cursor-pointer">
                     <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center p-1 px-2 mx-1" (click)="popoverSemana.toggle($event)"
-                    [ngClass]="{
+                         [ngClass]="{
                         'text-white bg-primary-500': popoverSemana.overlayVisible
-                    }" >
+                    }">
                         <span class="font-bold text-base">Roteiro Indefinido</span>
                     </div>
                 </div>
@@ -130,10 +121,10 @@
                     <p class="text-500 mb-2 ml-2">Roteiros</p>
                     <ul class="max-h-15rem overflow-auto w-20rem">
                         <ng-container *ngFor="let item of roteiros">
-                            <li class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer" 
-                                (click)="currentRoteiro = item; roteiroChanged()" 
+                            <li class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer"
+                                (click)="currentRoteiro = item; roteiroChanged()"
                                 title="Clique para carregar semana">
-                                <div class="flex align-items-center gap-2 w-max"  pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
+                                <div class="flex align-items-center gap-2 w-max" pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
                                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
                                     <span>Semana {{item.semana}} - {{ item.tema }}</span>
                                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
@@ -172,8 +163,9 @@
                                   (onClick)="calendarChanged()" />
                         <!-- Prev -->
                         <p-button icon="pi pi-angle-left text-lg"
-                                  styleClass="w-full h-full surface-100 border-100"
-                                  [style]="{width: '2.4rem', overflow: 'hidden',}"
+                                  styleClass="w-full h-full surface-100 border-100 overflow-hidden"
+                                  class="overflow-hidden"
+                                  [style]="{ width : '2.4rem' }"
                                   (onClick)="prev()"
                                   severity="secondary"
                                   iconPos="right"
@@ -194,56 +186,51 @@
                                   severity="secondary"
                                   pTooltip="Próximo"
                                   size="small" />
-
                     </ng-container>
-
                     <ng-container *ngIf="[ScreenWidth.md, ScreenWidth.sm].includes(screen)">
                         <!-- Menu -->
                         <p-button icon="pi pi-bars"
-                                iconPos="right"
-                                (onClick)="popoverActions.toggle($event)"
-                                severity="primary"
-                                pTooltip="Ações"
-                                label="Menu"
-                                size="small" />
-    
+                                  iconPos="right"
+                                  (onClick)="popoverActions.toggle($event)"
+                                  severity="primary"
+                                  pTooltip="Ações"
+                                  label="Menu"
+                                  size="small" />
                         <p-popover #popoverActions styleClass="-mt-1">
                             <div class="max-w-20rem w-full min-w-15rem">
-                                
                                 <div class="col-12 flex align-items-stretch justify-content-center gap-2 mb-2" style="height: 3.4rem;">
-                                    
                                     <!-- Ver Semana -->
                                     <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
-                                    [severity]="dayView ? 'primary' : 'secondary'"
-                                    [styleClass]="dayView ? 'h-full ' : 'surface-800 border-800 text-white h-full mr-auto'"
-                                    class="mr-auto"
-                                    size="small"
-                                    (onClick)="calendarChanged()" />
-                          <!-- Prev -->
-                          <p-button icon="pi pi-angle-left text-lg"
-                                    styleClass="w-full h-full surface-100 border-100"
-                                    [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                    (onClick)="prev()"
-                                    severity="secondary"
-                                    iconPos="right"
-                                    pTooltip="Anterior"
-                                    size="small" />
-                          <!-- Hoje -->
-                          <p-button label="hoje"
-                                    styleClass="h-full surface-800 border-800"
-                                    (onClick)="today()"
-                                    severity="help"
-                                    pTooltip="Hoje"
-                                    size="small" />
-                          <!-- Next -->
-                          <p-button icon="pi pi-angle-right text-lg"
-                                    styleClass="w-full h-full surface-100 border-100"
-                                    [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                    (onClick)="next()"
-                                    severity="secondary"
-                                    pTooltip="Próximo"
-                                    size="small" />
-                                            </div>
+                                              [severity]="dayView ? 'primary' : 'secondary'"
+                                              [styleClass]="dayView ? 'h-full ' : 'surface-800 border-800 text-white h-full mr-auto'"
+                                              class="mr-auto"
+                                              size="small"
+                                              (onClick)="calendarChanged()" />
+                                    <!-- Prev -->
+                                    <p-button icon="pi pi-angle-left text-lg"
+                                              styleClass="w-full h-full surface-100 border-100"
+                                              [style]="{width: '2.4rem', overflow: 'hidden',}"
+                                              (onClick)="prev()"
+                                              severity="secondary"
+                                              iconPos="right"
+                                              pTooltip="Anterior"
+                                              size="small" />
+                                    <!-- Hoje -->
+                                    <p-button label="hoje"
+                                              styleClass="h-full surface-800 border-800"
+                                              (onClick)="today()"
+                                              severity="help"
+                                              pTooltip="Hoje"
+                                              size="small" />
+                                    <!-- Next -->
+                                    <p-button icon="pi pi-angle-right text-lg"
+                                              styleClass="w-full h-full surface-100 border-100"
+                                              [style]="{width: '2.4rem', overflow: 'hidden',}"
+                                              (onClick)="next()"
+                                              severity="secondary"
+                                              pTooltip="Próximo"
+                                              size="small" />
+                                </div>
                                 <!-- Data -->
                                 <div class="col-12 surface-50 shadow-1">
                                     <div class="flex align-items-center mx-2">
@@ -267,16 +254,12 @@
                                     </div>
                                 </div>
                             </div>
-    
                         </p-popover>
                     </ng-container>
-                    
-                    
                 </div>
             </div>
             <!-- FIM SEMANA -->
             <!-- CALENDARIO -->
-             <!--  *ngIf="calendarVisible()" -->
             <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)">
                 <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar [ngStyle]="{
                     height: 'calc(100vh - 260px)'
@@ -284,144 +267,135 @@
                     <ng-template #allDayContent>
                         <span>Feriados</span>
                     </ng-template>
-                    
                     <ng-template #dayHeaderContent let-arg>
-                        <p class="text-sm uppercase font-light">{{arg.date | date : 'EE'}}</p>
+                        <!-- <p class="text-sm uppercase font-light">{{arg.date | date : 'EE'}}</p> 
                         <p class=" p-4 border-circle  mx-auto inline-flex align-items-center justify-content-center text-xl " style="width: 1.5rem; height: 1.5rem;"
-                           [ngClass]="{ 'bg-primary-500 text-white font-light': arg.isToday }"> {{arg.date | date : 'dd'}} </p>
+                        [ngClass]="{ 'bg-primary-500 text-white font-light': arg.isToday }"> {{arg.date | date : 'dd'}} </p> -->
+                        <p>{{arg.date | date : 'EE'}}</p>
+                        <p>{{arg.date | date : 'dd'}}</p>
                     </ng-template>
                     <ng-template #eventContent let-arg>
-                        <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
+                        <p-popover #popoverTooltip styleClass="bg-transparent border-none p-0 popover-event-hover ">
+                            <div class="w-15rem h-8rem shadow-8" style="margin-top: -5px;">
+                                <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
+                            </div>
+                        </p-popover>
+                        <!-- -->
+                        <div (mouseenter)="popoverTooltip.show($event)"(mouseleave)="popoverTooltip.hide()"   class="w-full h-full">
+                            <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
+                        </div>
                     </ng-template>
                 </full-calendar>
-                <ng-template #eventCalendar let-arg="arg" let-evento="evento">
-                    <ng-container *ngIf="!evento.feriado; else feriadoTemplate">
-                        <ng-template #eventHeader>
-                            <div class="flex align-items-center justify-content-start gap-1 white-space-nowrap text-overflow-ellipsis overflow-hidden">
-                                <i class="pi pi-clock text-xs"></i>
-                                <span class="text-xs">{{evento.data | date : 'HH:mm'}}</span>
-                                <ng-template [ngIf]="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
-                                    <span class="ml-auto pl-3 text-xs ">
-                                        <span>{{evento.alunos.length}}</span>
-                                        <span>/{{evento.capacidadeMaximaAlunos}}</span>
-                                    </span>
-                                    <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="pi pi-exclamation-circle text-xs  -mt-1 fadeout animation-duration-500 animation-iteration-infinite"></i>
-                                </ng-template>
-                                <ng-template [ngIf]="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.id != PseudoEvento.EventoId">
-                                    <span class="ml-auto pl-3 text-xs">
-                                        <span *ngIf="evento.alunos.length == 0" class="">Nenhuma inscrição</span>
-                                        <span *ngIf="evento.alunos.length == 1">1 inscrição</span>
-                                        <span *ngIf="evento.alunos.length > 1">{{evento.alunos.length}} inscrições</span>
-                                    </span>
-                                </ng-template>
-                            </div>
-                        </ng-template>
-                        <ng-template #eventBody>
-                            <div class="flex align-items-center my-auto gap-2 w-full " style="height: 3rem;">
-                                <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
-                                    <span class="p-1 px-2 border-circle border-2 text-xs flex-none font-bold text-center ml-1" [pTooltip]="'Reagendamento: clique para ver mais'" [style]="{ borderColor: evento.foreColor }">R</span>
-                                </ng-template>
-                                <div class="text-base font-bold overflow-hidden w-full h-full  mb-auto flex ">
-                                    <p *ngIf="evento.descricao" [pTooltip]="evento.descricao" class="my-auto">{{evento.descricao}}</p>
-                                </div>
-                            </div>
-                        </ng-template>
-                        <ng-template #eventFooter>
-                            <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
-                                <ng-template #professorTemplate let-professor="professor">
-                                    <p [pTooltip]="professor" class="col p-0 white-space-nowrap text-overflow-ellipsis overflow-hidden text-xs text-left">
-                                        <span>{{professor}}</span>
-                                    </p>
-                                </ng-template>
-                                <ng-template [ngIf]="evento.evento_Tipo_Id != EventoTipo.Reuniao">
-                                    <ng-template [ngIf]="evento.professor">
-                                        <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
-                                    </ng-template>
-                                    <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
-                                        <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
-                                    </ng-template>
-                                </ng-template>
-                                <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
-                                    <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
-                                    <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                                        <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="col p-0 text-xs Soverflow-hidden text-overflow-ellipsis white-space-nowrap text-right">{{ perfilCognitivo }} </p>
-                                    </ng-template>
-                                </ng-template>
-                            </div>
-                        </ng-template>
-                        <!-- O evento está iniciando dessa forma: {}, então só exibo as informações quando ele ganhar propriedades de um objeto, como o id -->
-                        <ng-container *ngIf="evento.id">
-                            <!-- Se for aula ou aula extra, pode usar o drag drop para reposição -->
-                            <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id); 
-                                                    then dragDropTemplate; 
-                                                    else notDragDropTemplate"></ng-container>
-                            <ng-template #dragDropTemplate>
-                                <div cdkDropList
-                                     [cdkDropListSortingDisabled]="true"
-                                     [cdkDropListData]="evento.alunos"
-                                     (cdkDropListDropped)="cdkDrop($event, evento)"
-                                     [cdkDropListConnectedTo]="['alunos']"
-                                     [id]="'event-' + arg.event.id"
-                                     (click)="selectEvento($event, evento)"
-                                     class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer"
-                                     [style]="{
-                                         backgroundColor: arg.backgroundColor, 
-                                         borderColor: arg.backgroundColor, 
-                                         color: evento.foreColor 
-                                         }">
-                                    <p class="text-red-500">{{evento.backgroundColor}}</p>
-                                    <header [pTooltip]="eventHeader">
-                                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                                    </header>
-                                    <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                                    <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-                                </div>
-                            </ng-template>
-                            <ng-template #notDragDropTemplate>
-                                <div (click)="selectEvento($event, evento)"
-                                     class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer"
-                                     [style]="{
-                                        backgroundColor: arg.backgroundColor, 
-                                        borderColor: arg.backgroundColor, 
-                                        color: evento.foreColor 
-                                    }">
-                                    <header [pTooltip]="eventHeader">
-                                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                                    </header>
-                                    <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                                    <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-                                </div>
-                            </ng-template>
-                        </ng-container>
-                    </ng-container>
-                    <ng-template #feriadoTemplate>
-                        <div class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer"
-                        [style]="{
-                           backgroundColor: arg.backgroundColor, 
-                           borderColor: arg.backgroundColor, 
-                           color: evento.foreColor 
-                       }">
-                       
+                <ng-template #eventCalendar let-arg="arg" let-evento="evento"> @if(evento.feriado) { <div class="event" [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: evento.foreColor }">
                         <p>{{arg.event.title}}</p>
-                    </div>
+                    </div> } @else { <ng-template #eventHeader>
+                        <div class="event-header">
+                            <i class="pi pi-clock text-xs"></i>
+                            <span class="text-xs mr-auto">{{setHorario(evento.data)}}</span>
+                            <ng-template [ngIf]="evento.evento_Tipo_Id != EventoTipo.Reuniao">
+                                <ng-template #professorTemplate let-professor="professor">
+                                    <p class="text-xs">{{professor}}</p>
+                                </ng-template>
+                                <ng-template [ngIf]="evento.professor">
+                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
+                                </ng-template>
+                                <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
+                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
+                                </ng-template>
+                            </ng-template>
+                        </div>
                     </ng-template>
-
-                    
-                </ng-template>
+                    <ng-template #eventBody>
+                        <div class="event-body">
+                            <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
+                                <span class="event-reagendamento-icon" [pTooltip]="'Reagendamento: clique para ver mais'">R</span>
+                            </ng-template>
+                            <div class="w-full">
+                                <p class="event-description">{{evento.descricao}}</p> @if(evento.sala_Id) { <p class="event-description text-xs">
+                                    <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
+                                </p>
+                                <ng-template #salaTemplate>
+                                    <span class="pr-2">Sala: </span>
+                                    <app-sala-aula [numeroSala]="evento.numeroSala"
+                                                   [andar]="evento.andar"
+                                                   [sala_Id]="evento.sala_Id"></app-sala-aula>
+                                </ng-template> 
+                            }  
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template #eventFooter>
+                        <div class="event-footer flex-column">
+                            
+                            @if([EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)) { 
+                                <p class="event-description text-sm">
+                                    <span class="pr-2">
+                                        <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
+                                        <span>:</span>
+                                    </span>
+                                    <ng-container *ngFor="let aluno of evento.alunos">
+                                        <span>{{aluno.aluno | nameAbv }}</span>
+                                    </ng-container>
+                                </p>
+                            }
+                            <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
+                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
+                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                                    <p class="text-xs">{{ perfilCognitivo }} </p>
+                                </ng-template>
+                            </ng-template>
+                            <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
+                                <p class="text-xs">
+                                    <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
+                                        <span *ngSwitchCase="0">Não há vagas</span>
+                                        <span *ngSwitchCase="1">1 vaga / {{evento.capacidadeMaximaAlunos}} total</span>
+                                        <span *ngSwitchDefault>{{evento.capacidadeMaximaAlunos - evento.alunos.length}} vagas / {{evento.capacidadeMaximaAlunos}} total</span>
+                                    </span>
+                                </p>
+                            </ng-container>
+                        </div>
+                    </ng-template> @if(evento.id) { @if([EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)) { <div cdkDropList
+                         [cdkDropListSortingDisabled]="true"
+                         [cdkDropListData]="evento.alunos"
+                         (cdkDropListDropped)="cdkDrop($event, evento)"
+                         [cdkDropListConnectedTo]="['alunos']"
+                         [id]="'event-' + arg.event.id"
+                         (click)="selectEvento($event, evento)"
+                         class="event"
+                         [style]="{
+                                            backgroundColor: arg.backgroundColor, 
+                                            borderColor: arg.backgroundColor, 
+                                            color: evento.foreColor 
+                                            }">
+                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                    </div> } @else { <div (click)="selectEvento($event, evento)"
+                         class="event"
+                         [style]="{
+                                            backgroundColor: arg.backgroundColor, 
+                                            borderColor: arg.backgroundColor, 
+                                            color: evento.foreColor 
+                                        }">
+                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+                    </div> } } } </ng-template>
             </div>
             <!-- FIM CALENDARIO -->
-            <!-- LEGENDA -->
-            <div class="flex mt-2" *ngIf="!loading">
+            <!-- LEGENDA --> @if(!loading) { <!--  -->
+            <div class="flex mt-2">
                 <div class="border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3" style="background-color: #f1f0f0 !important;">
-                    <div *ngFor="let item of legenda" 
-                        (click)="item.ativo = !item.ativo"
-                        [ngClass]="{ 'line-through': !item.ativo }"
-                        class="my-1 flex align-items-center cursor-pointer">
+                    <div *ngFor="let item of legenda"
+                         (click)="item.ativo = !item.ativo"
+                         [ngClass]="{ 'line-through': !item.ativo }"
+                         class="my-1 flex align-items-center cursor-pointer">
                         <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
                         <span class="ml-2 hover:font-bold hover:text-primary-500 hover:underline">{{item.label}}</span>
                     </div>
                 </div>
             </div>
+            <!--  --> } <!--  -->
             <!-- FIM LEGENDA -->
         </div>
     </div>

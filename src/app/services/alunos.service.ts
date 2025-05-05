@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, map, Observable, of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/alunos.model';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
@@ -109,7 +109,7 @@ export class AlunoService extends Service {
 
         var list = this.list.value;
         var index = list.findIndex(x => x.id == id);
-        return this.http.get<Response>(`${this.url}/alunos/image/${id}`)
+        return this.http.get<RequestResponse>(`${this.url}/alunos/image/${id}`)
             .pipe(map(
                 res => {
                     if (index != -1) {
@@ -147,7 +147,7 @@ export class AlunoService extends Service {
 
     create(model: Aluno) {
         var request = MyMap(model, new AlunoRequest);
-        return this.http.post<Response>(`${this.url}/alunos`, request)
+        return this.http.post<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar aluno. \n ${getError(err)}`)
@@ -157,7 +157,7 @@ export class AlunoService extends Service {
 
     edit(model: Aluno) {
         var request = MyMap(model, new AlunoRequest);
-        return this.http.put<Response>(`${this.url}/alunos`, request)
+        return this.http.put<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar aluno. \n ${getError(err)}`)
@@ -166,7 +166,7 @@ export class AlunoService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/alunos/toggle-active/${id}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/alunos/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar aluno. \n ${getError(err)}`)
@@ -175,7 +175,7 @@ export class AlunoService extends Service {
     }
 
     reposicao(request: ReposicaoAlunoRequest) {
-        return this.http.post<Response>(`${this.url}/alunos/reposicao/`, request)
+        return this.http.post<RequestResponse>(`${this.url}/alunos/reposicao/`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível marcar reposição. \n ${getError(err)}`)

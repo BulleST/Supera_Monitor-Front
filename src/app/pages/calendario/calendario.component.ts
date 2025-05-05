@@ -1,15 +1,9 @@
-import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../models/evento.model';
 import { CalendarOptions, DatesSetArg, EventAddArg, EventApi, EventHoveringArg, EventSourceInput } from '@fullcalendar/core';
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import multiMonthPlugin from '@fullcalendar/multimonth';
-import listPlugin from '@fullcalendar/list';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { CalendarioRequest, CalendarioView, loadingEvents } from '../../models/calendario.model';
-import moment from 'moment';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { Router } from '@angular/router';
@@ -25,22 +19,36 @@ import { AccountResponse } from '../../models/account.model';
 import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
-import $ from 'jquery'
 import { ProfessorService } from '../../services/professor.service';
 import { PseudoEvento, ReposicaoAlunoRequest } from '../../models/reposicao.model';
 import { EventoAulaRequest } from '../../models/evento-aula.model';
 import { MyMap } from '../../utils/map';
-import { Response } from '../../helpers/request-response.interface';
+import { RequestResponse } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
 import { Feriado } from '../../models/feriado.model';
+
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import multiMonthPlugin from '@fullcalendar/multimonth';
+import listPlugin from '@fullcalendar/list';
+import moment from 'moment';
+import 'moment/locale/pt-br';
+import $ from 'jquery'
+import html2canvas from 'html2canvas';
+import domtoimage from 'dom-to-image';
+import fitty from 'fitty';
+
 
 @Component({
     selector: 'app-calendario',
     standalone: false,
     templateUrl: './calendario.component.html',
     styleUrl: './calendario.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService],
+    // changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class CalendarioComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
@@ -58,7 +66,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     headerOpen = true;
     account?: AccountResponse;
     data = new Date;
-    minData = new Date(2025,0,1);
+    minData = new Date(2025, 0, 1);
     observacaoReposicao: string = '';
     agendarMenuItem: MenuItem[] = [
         {
@@ -143,6 +151,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         weekNumbers: false,
         expandRows: true,
         editable: false,
+        selectable: false,
         showNonCurrentDates: true,
         // defaultAllDay: false,
         // allDaySlot: false,
@@ -159,7 +168,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
-        height: 'calc(100vh - 260px)',
+        // height: 'calc(100vh - 260px)',
+        // height: 'calc(100vh - 160px)',
         buttonText: {
             today: 'hoje'
         },
@@ -174,8 +184,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         datesSet: this.datesSet.bind(this),
         dateClick: this.dateClick.bind(this),
         eventsSet: this.events.bind(this),
-        eventMouseEnter: this.eventMouseEnter.bind(this),
-        eventMouseLeave: this.eventMouseLeave.bind(this),
+        // eventMouseEnter: this.eventMouseEnter.bind(this),
+        // eventMouseLeave: this.eventMouseLeave.bind(this),
 
     }
 
@@ -254,7 +264,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.unselectAula();
 
         this.loadRoteiros('update');
-        await this.getCalendario( 'update');
+        await this.getCalendario('update');
         await this.loadFeriados();
         this.setCalendario();
     }
@@ -270,16 +280,16 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.unselectAula();
         this.data = this.fullCalendar.getApi().getDate();
     }
-    
+
     async today() {
         this.fullCalendar.getApi().today();
         this.unselectAula();
         this.data = new Date();
-        
+
         this.calendarioRequest.intervaloDe = moment(this.data).startOf('week').toDate();
         this.calendarioRequest.intervaloAte = moment(this.data).endOf('week').toDate();
 
-        await this.getCalendario( 'datesSet');
+        await this.getCalendario('datesSet');
         this.setCalendario();
     }
 
@@ -289,7 +299,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 label: 'Meu Calendário',
                 value: CalendarioView.MeuCalendario,
                 icon: 'pi pi-user',
-            }, 
+            },
             {
                 label: 'Calendário Geral',
                 value: CalendarioView.Geral,
@@ -306,7 +316,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         } else {
             this.calendarioRequest.professor_Id = undefined
         }
-        await this.getCalendario( 'calendarViewChanged');
+        await this.getCalendario('calendarViewChanged');
         this.setCalendario();
     }
 
@@ -316,7 +326,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             this.calendarioRequest.intervaloDe = this.data;
             this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
             this.currentRoteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim))
-        } 
+        }
         // Se for exibição da semana
         else {
             if (moment(this.data).week() != moment(this.calendarioRequest.intervaloDe).week()) {
@@ -357,7 +367,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.calendarVisible.update(() => true);
 
         await lastValueFrom(this.service.calendario(this.calendarioRequest))
-        .then(list => {
+            .then(list => {
                 this.eventos = list;
                 this.loading = false;
             })
@@ -374,34 +384,34 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         var calendar = this.fullCalendar.getApi();
         calendar.removeAllEvents();
 
-        
+
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
         var eventos = this.eventos.filter(x => x.active == true /*&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false  */);
 
         var events = eventos.map(item => {
-                                var backgroundColor = '#2e2e2e';
-                                if (item.corLegenda) {
-                                    backgroundColor = item.corLegenda
-                                } 
-                                else if (item.evento_Tipo_Id == EventoTipo.Reuniao) {
-                                    backgroundColor = '#f37435' // primary color
-                                }
-                                else if (item.professores && item.professores.length > 0) {
-                                    backgroundColor = item.professores[0].corLegenda;
-                                }
-                                var color = this.getForeColor(backgroundColor)
-                                var event: any = {
-                                    id: this.eventRamdomId(),
-                                    backgroundColor: backgroundColor,
-                                    borderColor: backgroundColor,
-                                    foreColor: color,
-                                    title: item.turma ?? item.descricao,
-                                    start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
-                                    end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
-                                    extendedProps: item,
-                                }
-                                return event;
-                            });
+            var backgroundColor = '#2e2e2e';
+            if (item.corLegenda) {
+                backgroundColor = item.corLegenda
+            }
+            else if (item.evento_Tipo_Id == EventoTipo.Reuniao) {
+                backgroundColor = '#f37435' // primary color
+            }
+            else if (item.professores && item.professores.length > 0) {
+                backgroundColor = item.professores[0].corLegenda;
+            }
+            var color = this.getForeColor(backgroundColor)
+            var event: any = {
+                id: this.eventRamdomId(),
+                backgroundColor: backgroundColor,
+                borderColor: backgroundColor,
+                foreColor: color,
+                title: item.turma ?? item.descricao,
+                start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
+                end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
+                extendedProps: item,
+            }
+            return event;
+        });
 
         this.feriados.forEach(item => {
             var event = {
@@ -425,6 +435,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             .map(x => 'event-' + x.id)
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
+
+        // this.htmlToImage();
     }
 
     addHours(data: Date, h: number) {
@@ -466,11 +478,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.calendarioRequest.intervaloDe = arg.view.currentStart;
         this.calendarioRequest.intervaloAte = arg.view.currentEnd;
-        await this.getCalendario( 'datesset');
+        await this.getCalendario('datesset');
         await this.loadFeriados();
         this.setCalendario();
 
-    
+
     }
 
     dateClick(e: DateClickArg) {
@@ -558,7 +570,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             if (target.data != source.data) {
 
                 var restricoes = await lastValueFrom(this.alunoRestricaoService.getList(aluno.aluno_Id));
-                restricoes = restricoes.filter(x => !x.deactivated )
+                restricoes = restricoes.filter(x => !x.deactivated)
                 if (restricoes.length > 0) {
                     this.confirmationService.confirm({
                         target: event.event.target as EventTarget,
@@ -648,7 +660,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         request.source_Aula_Id = source.id;
         request.dest_Aula_Id = target.id;
         request.observacoes = this.observacaoReposicao;
-        var response: Response = { success: true, message: '', object: undefined };
+        var response: RequestResponse = { success: true, message: '', object: undefined };
 
         // Se a aula source não existir, cria a aula
         if (request.source_Aula_Id == PseudoEvento.EventoId) {
@@ -800,10 +812,107 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.loadingFeriados = true;
         var ano = this.calendarioRequest.intervaloDe?.getFullYear();
         await lastValueFrom(this.service.getFeriados(ano))
-        .then(res => {
-            this.feriados = res;
-            this.loadingFeriados = false;
-        })
-        .catch(res => this.loadingFeriados = false);
+            .then(res => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+            })
+            .catch(res => this.loadingFeriados = false);
     }
+
+    event(evento: Evento) {
+        var html = ``;
+        switch (evento.evento_Tipo_Id) {
+            case EventoTipo.Aula:
+                html = this.eventAula(evento);
+                break;
+        }
+    }
+    eventAula(evento: Evento): string {
+        return '';
+    }
+    eventSuperacao(evento: Evento): string {
+        return '';
+    }
+    eventAula0(evento: Evento): string {
+        return '';
+    }
+    eventReuniao(evento: Evento): string {
+        return `
+            
+                <div class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer" style="background-color: rgb(243, 116, 53); border-color: rgb(243, 116, 53); color: rgb(255, 255, 255);">
+                    <header>
+                        <div class="event-header">
+                            <i class="pi pi-clock text-xs"></i>
+                            <span class="text-xs">12:00</span>
+                        </div>
+                    </header>
+                    <div class="flex align-items-center my-auto gap-2 w-full" style="height: 3rem;">
+                        <div class="text-base font-bold overflow-hidden w-full h-full mb-auto flex">
+                            <p class="my-auto">Reunião Geral</p>
+                        </div>
+                    </div>
+                    <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
+                    </div>
+                </div>
+        
+        `;
+    }
+    eventOficina(evento: Evento): string {
+        return '';
+    }
+    async htmlToImage() {
+        var div = document.createElement('div');
+        $(div).append(`
+                <div class="event" style="background-color: rgb(243, 116, 53); border-color: rgb(243, 116, 53); color: rgb(255, 255, 255);">
+                    <header>
+                        <div class="event-header">
+                            <i class="pi pi-clock text-xs"></i>
+                            <span class="text-xs">12:00</span>
+                        </div>
+                    </header>
+                    <div class="event-body" style="height: 3rem;">
+                        <div class="text-base font-bold overflow-hidden w-full h-full mb-auto flex">
+                            <p class="my-auto">Reunião Geral</p>
+                        </div>
+                    </div>
+                    <div class="event-footer"></div>
+                </div>`)
+
+        console.log(div)
+
+        document.body.appendChild(div)
+
+
+        // domtoimage.toPng(div)
+        // .then(function (dataUrl: any) {
+        //     console.log('dataUrl', dataUrl)
+        //     var img = new Image();
+        //     img.src = dataUrl;
+        //     document.body.appendChild(img);
+        // })
+        // .catch(function (error: any) {
+        //     console.error('oops, something went wrong!', error);
+        // });
+
+        await html2canvas(div, { scale: 3 })
+            .then(canvas => {
+                console.log('canvas', canvas);
+                const imagem = canvas.toDataURL('image/jpeg');
+                console.log('imagem', imagem);
+                const novaAba = window.open();
+                if (novaAba) novaAba.document.write(`<img src="${imagem}" />`);
+            })
+    }
+
+
+    setHorario(evento: Evento) {
+        var data = moment(evento.data).toDate();
+        if (data.getMinutes() == 0)
+            return data.getHours() + 'h';
+        else
+            return moment(data).format('HH:mm');
+    }
+
+
 }
+

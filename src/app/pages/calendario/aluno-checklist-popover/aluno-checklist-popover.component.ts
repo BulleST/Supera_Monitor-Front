@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
@@ -17,7 +17,8 @@ import $ from 'jquery';
     selector: 'app-aluno-checklist-popover',
     standalone: false,
     templateUrl: './aluno-checklist-popover.component.html',
-    styleUrl: './aluno-checklist-popover.component.css'
+    styleUrl: './aluno-checklist-popover.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , AfterViewInit {
     @Input() aluno: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;

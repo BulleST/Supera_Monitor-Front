@@ -3,7 +3,7 @@ import { BehaviorSubject, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Aluno_CheckList_Item, Checklist } from '../models/checklist.model';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -94,7 +94,7 @@ export class ChecklistService extends Service {
             aluno_Checklist_Item_Id: id,
             observacoes: observacoes
         }
-        return this.http.patch<Response>(`${this.url}/checklist/toggle-item`, request)
+        return this.http.patch<RequestResponse>(`${this.url}/checklist/toggle-item`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível finalizar item da jornada. \n ${getError(err)}`);

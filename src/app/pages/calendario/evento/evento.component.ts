@@ -32,7 +32,7 @@ import { RoteiroService } from '../../../services/roteiro.service';
 import { Roteiro } from '../../../models/roteiro.model';
 import { EventoAula0Request } from '../../../models/evento-aula-0.model';
 import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model';
-import { Response } from '../../../helpers/request-response.interface';
+import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 
@@ -345,7 +345,7 @@ export class EventoComponent implements OnDestroy {
     async finalizar(e: any) {
         this.loading = true;
 
-        var response: Response = await lastValueFrom(this.request())
+        var response: RequestResponse = await lastValueFrom(this.request())
         if (response.success) {
 
             this.evento.id = response.object.id;

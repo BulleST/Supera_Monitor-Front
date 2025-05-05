@@ -22,7 +22,7 @@ import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { MyMap } from '../../../../../utils/map';
 import { EventoOficinaRequest } from '../../../../../models/evento-oficina.model';
-import { Response } from '../../../../../helpers/request-response.interface';
+import { RequestResponse } from '../../../../../helpers/request-response.interface';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
@@ -318,7 +318,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     async send(e: any) {
 
         this.loading = true;
-        var response: Response = { success: false, message: '', object: undefined };
+        var response: RequestResponse = { success: false, message: '', object: undefined };
 
         if (this.object.id == PseudoEvento.EventoId) {
             response = await lastValueFrom(this.requestOficina());

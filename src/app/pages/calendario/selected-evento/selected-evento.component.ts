@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoQueryParams, EventoTipo } from '../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
@@ -24,7 +24,8 @@ import moment from 'moment';
     standalone: false,
     templateUrl: './selected-evento.component.html',
     styleUrl: './selected-evento.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectedEventoComponent implements OnChanges {
     @Input() evento?: Evento;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
-import { Response } from '../helpers/request-response.interface';
+import { RequestResponse } from '../helpers/request-response.interface';
 import { TurmaRequest, Turma } from '../models/turma.model';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
@@ -63,7 +63,7 @@ export class TurmaService extends Service {
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
 
-        return this.http.post<Response>(`${this.url}/turmas`, request)
+        return this.http.post<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar turma. \n ${getError(err)}`);
@@ -77,7 +77,7 @@ export class TurmaService extends Service {
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
 
-        return this.http.put<Response>(`${this.url}/turmas`, request)
+        return this.http.put<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar turma. \n ${getError(err)}`);
@@ -86,7 +86,7 @@ export class TurmaService extends Service {
     }
 
     deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<Response>(`${this.url}/turmas/toggle-active/${id}`, {})
+        return this.http.patch<RequestResponse>(`${this.url}/turmas/toggle-active/${id}`, {})
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar turma. \n ${getError(err)}`);

@@ -38,7 +38,7 @@
                 <span *ngIf="!evento.sala_Id">Indefinido</span>
             </p>
             <!-- Educador -->
-            <div>
+            <div *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
                 <p *ngIf="evento.professor" class="col p-0 mt-1">
                     <b>Educador(a): </b>
                     <span>{{evento.professor }}</span>

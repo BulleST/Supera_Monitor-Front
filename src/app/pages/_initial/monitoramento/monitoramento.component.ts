@@ -1,6 +1,6 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../models/checklist.model';
-import { DragScrollComponent } from 'ngx-drag-scroll';
+// import { DragScrollComponent } from 'ngx-drag-scroll';
 import { getError, Header, MobileService } from '../../../utils';
 import $ from 'jquery'
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -28,7 +28,7 @@ export class MonitoramentoComponent implements OnDestroy {
     alunos: Aluno[] = [];
     checklistObservacao = '';
     subscription: Subscription[] = [];
-    @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
+    // @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
     width: string = ''
     height: string = ''
     disabled = false
@@ -50,13 +50,13 @@ export class MonitoramentoComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res)
         this.subscription.push(screen);
         var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => {
-            if (this.dragScroll) {
-                this.width = $('#dragContainer').width()?.toString() as string;
-                setTimeout(() => {
-                    this.dragScroll.scrollbarWidth = $('#dragContainer').width()?.toString() ?? null;
-                    this.dragScroll.elWidth = $('#dragContainer').width()?.toString() ?? null;
-                }, 200);
-            }
+            // if (this.dragScroll) {
+            //     this.width = $('#dragContainer').width()?.toString() as string;
+            //     setTimeout(() => {
+            //         this.dragScroll.scrollbarWidth = $('#dragContainer').width()?.toString() ?? null;
+            //         this.dragScroll.elWidth = $('#dragContainer').width()?.toString() ?? null;
+            //     }, 200);
+            // }
         })
         this.subscription.push(menuAsideOpen);
 
@@ -130,7 +130,7 @@ export class MonitoramentoComponent implements OnDestroy {
             );
 
             this.height = ($('#dragContainer')!.height()! + 50 + 20).toString()
-            this.dragScroll.elHeight = this.height
+            // this.dragScroll.elHeight = this.height
 
 
             event.item.data.status = 'Pendente'
@@ -138,15 +138,15 @@ export class MonitoramentoComponent implements OnDestroy {
         }
     }
 
-    scrollDragStart(e: DragScrollComponent) {
-        this.dragScroll._contentRef.nativeElement.style.cursor = 'grab'
-        this.dragScroll._contentRef.nativeElement.style.pointerEvents = 'auto'
+    // scrollDragStart(e: DragScrollComponent) {
+    //     this.dragScroll._contentRef.nativeElement.style.cursor = 'grab'
+    //     this.dragScroll._contentRef.nativeElement.style.pointerEvents = 'auto'
 
-    }
+    // }
 
-    scrollDragEnd(e: DragScrollComponent) {
-        this.dragScroll._contentRef.nativeElement.style.cursor = 'pointer'
-    }
+    // scrollDragEnd(e: DragScrollComponent) {
+    //     this.dragScroll._contentRef.nativeElement.style.cursor = 'pointer'
+    // }
     
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
