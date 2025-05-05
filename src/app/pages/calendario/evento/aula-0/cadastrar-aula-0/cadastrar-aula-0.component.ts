@@ -18,35 +18,43 @@ import { EventoService } from '../../../../../services/evento.service';
 import { NgForm, NgModel } from '@angular/forms';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { SelectChangeEvent } from 'primeng/select';
-import { Evento } from '../../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
-import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import {
+    validaAlunos,
+    validaProfessores,
+    validaSalaAulas,
+} from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
+import { MyMap } from '../../../../../utils/map';
+import { MultiSelectChangeEvent } from 'primeng/multiselect';
+import { NameAbvPipe } from '../../../../../utils/name.pipe';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
     standalone: false,
     templateUrl: './cadastrar-aula-0.component.html',
     styleUrl: './cadastrar-aula-0.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService],
 })
 export class CadastrarAula0Component implements OnDestroy {
     visible: boolean = false;
     loading = false;
     error: string = '';
     subscription: Subscription[] = [];
-    object: EventoAula0Request = new EventoAula0Request;
+    object: EventoAula0Request = new EventoAula0Request();
     data: Date = undefined as unknown as Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
     blockAlunoField = false;
 
-    alunoSelected?: Aluno;
+    mensagensEnviadasAlunos: Aluno[] = [];
+    alunosSelected: Aluno[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -86,71 +94,73 @@ export class CadastrarAula0Component implements OnDestroy {
         private checklistService: ChecklistService,
         private accountService: AccountService,
     ) {
-
         this.object.descricao = 'Aula 0';
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        var professores = this.professorService.list.subscribe(
+            (res) => (this.professores = res)
+        );
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
             lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+                .then((res) => (this.loadingProfessores = false))
+                .catch((res) => (this.loadingProfessores = false));
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        var salaAula = this.salaAulaService.list.subscribe(
+            (res) => (this.salaAulas = res)
+        );
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
             this.loadingSalaAulas = true;
             lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
+                .then((res) => (this.loadingSalaAulas = false))
+                .catch((res) => (this.loadingSalaAulas = false));
         }
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        var turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
             this.loadingTurmas = true;
             lastValueFrom(this.turmaService.getList())
-                .then(res => this.loadingTurmas = false)
-                .catch(res => this.loadingTurmas = false);
+                .then((res) => (this.loadingTurmas = false))
+                .catch((res) => (this.loadingTurmas = false));
         }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
+        var alunos = this.alunoService.list.subscribe(
+            (res) => (this.alunos = res.filter((x) => x.active == true))
+        );
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
             lastValueFrom(this.alunoService.getList())
-                .then(res => this.loadingAlunos = false)
-                .catch(res => this.loadingAlunos = false);
+                .then((res) => (this.loadingAlunos = false))
+                .catch((res) => (this.loadingAlunos = false));
         }
 
-
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res);
+        var eventos = this.service.eventos.subscribe((res) => (this.eventos = res));
         this.subscription.push(eventos);
 
         this.loadFeriados();
 
         this.verificaDisponibilidade();
 
-
-        this.activatedRoute.params.subscribe(res => {
+        this.activatedRoute.params.subscribe((res) => {
             if (res['aluno_Id']) {
                 this.object.aluno_Id = this.crypto.decrypt(res['aluno_Id']);
                 this.blockAlunoField = true;
             }
         });
 
-
         this.visible = true;
     }
 
     ngOnDestroy(): void {
-        this.subscription.forEach(e => e.unsubscribe());
+        this.subscription.forEach((e) => e.unsubscribe());
     }
 
     visibleChange() {
@@ -160,7 +170,7 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     getCorTurma(turma_Id: number) {
-        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
+        return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
     }
 
     showError(header: string, message: string, e: any) {
@@ -172,27 +182,27 @@ export class CadastrarAula0Component implements OnDestroy {
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
-        })
+        });
     }
-    
+
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
         if (e.year != this.ano) {
             this.ano = e.year ?? new Date().getFullYear();
-            this.loadFeriados()
+            this.loadFeriados();
         }
     }
 
     async loadFeriados() {
         this.loadingFeriados = true;
         await lastValueFrom(this.service.getFeriados(this.ano))
-        .then(res => {
-            this.feriados = res;
-            this.loadingFeriados = false;
-            this.feriadoDates = res.map(x => moment(x.date).toDate());
-        })
-        .catch(res => this.loadingFeriados = false);
+            .then((res) => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+                this.feriadoDates = res.map((x) => moment(x.date).toDate());
+            })
+            .catch((res) => (this.loadingFeriados = false));
     }
-    
+
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
@@ -206,53 +216,79 @@ export class CadastrarAula0Component implements OnDestroy {
 
         this.loadingEventos = true;
         var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes())
+        data.setHours(this.horario.getHours(), this.horario.getMinutes());
 
-        var request: CalendarioRequest = new CalendarioRequest;
+        var request: CalendarioRequest = new CalendarioRequest();
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
         await lastValueFrom(this.service.calendario(request))
-            .then(res => this.loadingEventos = false)
-            .catch(res => this.loadingEventos = false);
+            .then((res) => (this.loadingEventos = false))
+            .catch((res) => (this.loadingEventos = false));
 
         this.validaProfessores();
         this.validaSalaAulas();
         this.validaAlunos();
 
-        return valid
-
+        return valid;
     }
 
-
-  
     validaSalaAulas() {
         var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
+        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
+        this.salaAulas = validaSalaAulas(
+            data,
+            this.object.duracaoMinutos,
+            this.salaAulas,
+            this.eventos,
+            undefined,
+            undefined
+        );
     }
 
     validaProfessores() {
         var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
+        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
+        this.professores = validaProfessores(
+            data,
+            this.object.duracaoMinutos,
+            this.professores,
+            this.eventos,
+            undefined,
+            undefined
+        );
     }
 
     validaAlunos() {
         var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
+        data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
+        this.alunos = validaAlunos(
+            data,
+            this.object.duracaoMinutos,
+            this.alunos,
+            this.eventos,
+            undefined,
+            undefined
+        );
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaProfessores();
 
-        var item = this.professores.find(x => x.id == e.value);
+        var item = this.professores.find((x) => x.id == e.value);
 
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError(
+                'Professor Indisponível',
+                `Esse professor está atribuído a outra ${this.getTipo(
+                    item.disponivelEvent
+                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
+                    'HH[h]mm'
+                )}</b>.`,
+                e.originalEvent
+            );
             return;
         }
         model.control.setErrors({ indisponivel: null });
@@ -262,50 +298,102 @@ export class CadastrarAula0Component implements OnDestroy {
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
-        var item = this.salaAulas.find(x => x.id == e.value);
+        var item = this.salaAulas.find((x) => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError(
+                'Sala Indisponível',
+                `Essa sala está atribuída a outra ${this.getTipo(
+                    item.disponivelEvent
+                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
+                    'HH[h]mm'
+                )}</b>.`,
+                e.originalEvent
+            );
             return;
         }
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
-    alunoChanged(e: SelectChangeEvent, model: NgModel) {
-        var aluno = e.value as Aluno;
+    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+        var alunos = e.value as Aluno[];
+        var aluno = (e.originalEvent as any).option as Aluno;
+
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Aluno indisponível' });
-            this.showError('Aluno Indisponível', `Esse aluno tem outra ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
+            if (index) this.alunosSelected.splice(index, 1);
+
+            this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
+
+        }
+        else if (alunos.length > 1) {
+            this.confirmationService.confirm({
+                target: e.originalEvent.target as EventTarget,
+                header: `Selecionar ${alunos.length} alunos?`,
+                message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                reject: () => {
+                    this.alunosSelected = [this.alunosSelected[0]]
+                },
+            });
         }
 
-        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.mensagemWhatsapp.getEventoTipo(e);
     }
 
     sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
-            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
+            return this.showError(
+                'Não foi possível salvar',
+                'Preencha todos os dados corretamente para salvar',
+                e
+            );
         }
-        if (!this.alunoSelected) {
-            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
+        if (this.alunosSelected.length == 0) {
+            return this.showError(
+                'Não foi possível salvar',
+                'Preencha todos os dados corretamente para salvar',
+                e
+            );
         }
 
-        this.object.aluno_Id = this.alunoSelected.id;
+        this.object.aluno_Id = this.alunosSelected.map((x) => x.id);
 
         this.object.data = new Date(this.data);
-        this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
+        this.object.data.setHours(
+            this.horario.getHours(),
+            this.horario.getMinutes(),
+            0
+        );
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
+
+        var mensagem = ``;
+        if (this.alunosSelected.length == 1) {
+            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${this.alunosSelected[0].nome
+                } para o dia ${moment(this.object.data).format(
+                    'DD/MM/YY [às] HH[h]mm'
+                )}?.`;
+        } else if (this.alunosSelected.length > 1) {
+            mensagem = `Tem certeza que deseja agendar a aula 0 dos alunos ${this.alunosSelected
+                .map((x) => x.nome)
+                .join(', ')} para o dia ${moment(this.object.data).format(
+                    'DD/MM/YY [às] HH[h]mm'
+                )}?.`;
+        }
 
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula 0',
-            message: `Tem certeza que deseja agendar a aula 0 do aluno ${this.alunoSelected.nome} para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
+            message: mensagem,
             acceptLabel: `Agendar aula 0`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
@@ -313,73 +401,133 @@ export class CadastrarAula0Component implements OnDestroy {
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
                 this.send(e);
-            }
-
-        })
-
+            },
+        });
     }
 
     send(e: any) {
-
         this.loading = true;
 
         lastValueFrom(this.service.createAula0(this.object))
-            .then(res => {
+            .then((res) => {
                 this.loading = false;
                 this.object = res.object;
                 this.service.calendarioReload.emit(res.object.id);
-                if (this.alunoSelected?.celular) {
-                    this.sendMensagemAlunos(e, res.object);
-                }
-                this.markChecklistAsDone();
-                this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado');
-            })
-            .catch(res => {
-                this.loading = false;
-                this.showError('Agendamento falhou', `Não foi possível agendar aula 0. <br> ${getError(res)}`, e);
-            })
 
+                if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
+                    this.sendMensagemAluno(e, res.object);
+                } else {
+                    this.sendMensagemAlunos();
+                }
+
+                this.markChecklistAsDone();
+                this.toastrService.success(
+                    'Aula 0 cadastrada com sucesso.',
+                    'Agendamento finalizado'
+                );
+            })
+            .catch((res) => {
+                this.loading = false;
+                this.showError(
+                    'Agendamento falhou',
+                    `Não foi possível agendar aula 0. <br> ${getError(res)}`,
+                    e
+                );
+            });
     }
 
-
-    sendMensagemAlunos(e: any, evento: any) {
+    sendMensagemAluno(e: any, evento: any) {
+        var aluno = this.alunosSelected[0] as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+            acceptButtonStyleClass:
+                'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                this.visible = false
+                this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(this.alunoSelected!.nome, this.alunoSelected!.celular, evento);
+                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(
+                    aluno.nome,
+                    aluno.celular,
+                    evento
+                );
                 window.open(url, '_target');
             },
             reject: () => {
-                this.visible = false
+                this.visible = false;
                 this.visibleChange();
-            }
+            },
+        });
+    }
+    sendMensagemAlunos() {
+        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.confirmationService.confirm({
+            key: 'enviarMensagem',
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            header: 'Enviar whatsapp',
+            icon: 'pi pi-whatsapp text-green-500',
+            acceptLabel: `Concluir`,
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            accept: () => {
+                this.visible = false;
+                this.visibleChange();
+            },
         });
     }
 
+    removerAlunoLista(aluno: Aluno, e: any) {
+        if (e.which == 2) {
+            var index = this.mensagensEnviadasAlunos.findIndex(
+                (x) => x.id == aluno.id
+            );
+            if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
+        }
+    }
+    enviarMensagemAgendamento(aluno: Aluno) {
+        var evento = MyMap(this.object, new Evento());
+        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+        return this.mensagemWhatsapp.enviarMensagemAgendamento(
+            aluno.nome,
+            aluno.celular,
+            evento
+        );
+    }
     markChecklistAsDone() {
         // Agendamento na aula 0
-        if (this.alunoSelected) {
+        if (this.alunosSelected) {
             var id = 31;
-            var alunoChecklist = this.alunoSelected.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            var professor = this.professores.find(x => x.id == this.object.professor_Id) as Professor;
+            this.alunosSelected.forEach((aluno) => {
+                var alunoChecklist = aluno.alunoChecklist.find(
+                    (x) => x.checklist_Item_Id == id
+                ) as Aluno_CheckList_Item;
+                var professor = this.professores.find(
+                    (x) => x.id == this.object.professor_Id
+                ) as Professor;
 
-            if (!alunoChecklist.finalizado) {
-                var mensagem = `Aula 0 agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                                Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+                if (!alunoChecklist.finalizado) {
+                    var mensagem = `Aula 0 agendada para o dia ${moment(
+                        this.object.data
+                    ).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome
+                        }.\n
+                                    Agendamento realizado por ${this.accountService.accountValue?.name
+                        } no dia ${moment(new Date()).format(
+                            'DD/MM/YY [aproximadamente às] HHH[h]mm'
+                        )}}`;
+                    if (alunoChecklist && !alunoChecklist.finalizado) {
+                        lastValueFrom(
+                            this.checklistService.markAsDone(alunoChecklist.id, mensagem)
+                        );
+                    }
                 }
-            }
+            });
         }
     }
 

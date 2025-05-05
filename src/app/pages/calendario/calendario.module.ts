@@ -23,9 +23,6 @@ import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.compo
 import { AlunoChecklistPopoverComponent } from './aluno-checklist-popover/aluno-checklist-popover.component';
 import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
 import { AlunoChecklistStatusComponent } from './aluno-checklist-status/aluno-checklist-status.component';
-import { EventContentComponent } from './event-content/event-content.component';
-
-
 
 @NgModule({
     declarations: [
@@ -49,7 +46,6 @@ import { EventContentComponent } from './event-content/event-content.component';
         ReagendarEventoComponent,
         // SelectedAlunoComponent,
         SelectedEventoComponent,
-        EventContentComponent,
     ],
     imports: [
         CommonModule,

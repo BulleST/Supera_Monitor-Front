@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, SelectItemGroup } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { Crypto, getError } from '../../../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
 import { EventoService } from '../../../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
-import { Evento } from '../../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
@@ -26,6 +26,10 @@ import { ChecklistService } from '../../../../../services/checklist.service';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
+import { MultiSelectChangeEvent } from 'primeng/multiselect';
+import { MyMap } from '../../../../../utils/map';
+import { groupBy } from 'lodash'
+import { NameAbvPipe } from '../../../../../utils/name.pipe';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -47,8 +51,10 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     minData = new Date();
 
     blockAlunoField = false;
-    alunoSelected?: Aluno;
+    alunosSelected: Aluno[] = [];
+    mensagensEnviadasAlunos: Aluno[] = [];
     alunos: Aluno[] = [];
+    groupedAlunos: SelectItemGroup[] = [];
     loadingAlunos = false;
 
     professorSelected?: Professor;
@@ -86,6 +92,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         public mensagemWhatsapp: MensagemWhatsapp,
         private accountService: AccountService,
         private checklistService: ChecklistService,
+        private nameAbvPipe: NameAbvPipe,
     ) {
 
         this.object.descricao = 'Superação';
@@ -121,7 +128,34 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
+        var alunos = this.alunoService.list.subscribe(res => {
+            this.alunos = res.filter(x => x.active == true);
+            var grouped = groupBy(this.alunos, 'turma_Id');
+
+                this.groupedAlunos = [];
+                for(let turma_Id in grouped) {
+                    var alunosTurma = grouped[turma_Id] as Aluno[];
+                    var turma = {
+                        nome: alunosTurma[0].turma,
+                        turmaDesc: alunosTurma[0].turmaDesc,
+                        turma_Id: alunosTurma[0].turma_Id,
+                        diaSemana: alunosTurma[0].diaSemana,
+                        horario: alunosTurma[0].horario,
+                        professor_Id: alunosTurma[0].professor_Id,
+                        professor: alunosTurma[0].professor,
+                        corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
+                    }
+                    this.groupedAlunos.push({
+                        label: turma.nome,
+                        value: turma,
+                        items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
+                    });
+                }
+                console.log('groupedAlunos', this.groupedAlunos)
+            // }
+            
+
+        });
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -142,9 +176,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         this.activatedRoute.params.subscribe(res => {
             if (res['aluno_Id']) {
                 var aluno_Id = this.crypto.decrypt(res['aluno_Id']);
-                this.alunoSelected = this.alunos.find(x => x.id = aluno_Id);
-                if (this.alunoSelected)
-                    this.blockAlunoField = true;
+                this.alunosSelected = this.alunos.filter(x => x.id = aluno_Id) 
+                if (this.alunosSelected.length > 0) this.blockAlunoField = true;
             }
         })
 
@@ -268,15 +301,33 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         model.control.updateValueAndValidity();
     }
 
-    alunoChanged(e: SelectChangeEvent, model: NgModel) {
-        var aluno = e.value as Aluno;
+    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+        var alunos = e.value as Aluno[];
+        var aluno = (e.originalEvent as any).option as Aluno;
+        if (alunos.length )
+
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Aluno indisponível' });
-            this.showError('Aluno Indisponível', `Esse aluno tem outra ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
+            if (index) this.alunosSelected.splice(index, 1);
+            
+            this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
+        else if (alunos.length > 1) {
+            this.confirmationService.confirm({
+                target: e.originalEvent.target as EventTarget,
+                header: `Selecionar ${alunos.length} alunos?`,
+                message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                reject: () => {
+                    this.alunosSelected = [this.alunosSelected[0]]
+                },
+            });
+        }
 
-        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
@@ -291,13 +342,13 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         if (form.invalid) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
-        if (!this.alunoSelected)
+        if (!this.alunosSelected)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
         if (!this.professorSelected)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
-        this.object.alunos = [this.alunoSelected.id];
+        this.object.alunos = this.alunosSelected.map(x => x.id);
         this.object.professores = [this.professorSelected.id];
 
         this.object.data = new Date(this.data);
@@ -330,11 +381,11 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
-                if (this.alunoSelected?.celular) {
-                    this.sendMensagemAlunos(e, res.object);
+                
+                if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
+                    this.sendMensagemAluno(e, res.object);
                 } else {
-                    this.visible = false
-                    this.visibleChange();
+                    this.sendMensagemAlunos();
                 }
             })
             .catch(res => {
@@ -344,7 +395,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     }
 
-    sendMensagemAlunos(e: any, evento: any) {
+    sendMensagemAluno(e: any, evento: any) {
+        var aluno = this.alunosSelected[0] as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -356,16 +408,55 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-text p-button-sm',
             accept: () => {
-                this.visible = false
+                this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(this.alunoSelected!.nome, this.alunoSelected!.celular, evento);
+                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(
+                    aluno.nome,
+                    aluno.celular,
+                    evento
+                );
                 window.open(url, '_target');
             },
             reject: () => {
                 this.visible = false;
                 this.visibleChange();
-            }
+            },
         });
+    }
+    sendMensagemAlunos() {
+        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.confirmationService.confirm({
+            key: 'enviarMensagem',
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            header: 'Enviar whatsapp',
+            icon: 'pi pi-whatsapp text-green-500',
+            acceptLabel: `Concluir`,
+            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            accept: () => {
+                this.visible = false;
+                this.visibleChange();
+            },
+        });
+    }
+
+    removerAlunoLista(aluno: Aluno, e: any) {
+        if (e.which == 2) {
+            var index = this.mensagensEnviadasAlunos.findIndex(
+                (x) => x.id == aluno.id
+            );
+            if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
+        }
+    }
+    enviarMensagemAgendamento(aluno: Aluno) {
+        var evento = MyMap(this.object, new Evento());
+        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+        return this.mensagemWhatsapp.enviarMensagemAgendamento(
+            aluno.nome,
+            aluno.celular,
+            evento
+        );
     }
 
     enviarMensagem(aluno: Aluno) {
@@ -375,18 +466,18 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     markChecklistAsDone() {
         // Agendar superação
         // Id 22 ou 29
-        var aluno = this.alunoSelected as Aluno;
-
-        var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
-        var professor = this.professorSelected as Professor;
-
-        if (alunoChecklist) {
-            var mensagem = `Superação agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                            Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        this.alunosSelected.forEach(aluno => {
+            var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+            var professor = this.professorSelected as Professor;
+    
+            if (alunoChecklist) {
+                var mensagem = `Superação agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
+                                Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+                if (alunoChecklist && !alunoChecklist.finalizado) {
+                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+                }
             }
-        }
+        })
     }
 
 

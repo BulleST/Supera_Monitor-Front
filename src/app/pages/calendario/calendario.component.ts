@@ -905,8 +905,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
 
-    setHorario(evento: Evento) {
-        var data = moment(evento.data).toDate();
+    setHorario(data: Date) {
+        data = moment(data).toDate();
+        // console.log('data', data)
         if (data.getMinutes() == 0)
             return data.getHours() + 'h';
         else

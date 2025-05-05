@@ -433,7 +433,7 @@ export class CadastrarAulaExtraComponent implements OnDestroy {
         this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Clique nos alunos que participarão da aula para enviar mensagem de confirmação.`,
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,

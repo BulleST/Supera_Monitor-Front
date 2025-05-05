@@ -276,9 +276,16 @@
                     </ng-template>
                     <ng-template #eventContent let-arg>
                         <p-popover #popoverTooltip styleClass="bg-transparent border-none p-0 popover-event-hover ">
-                            <div class="w-15rem h-8rem shadow-8" style="margin-top: -5px;">
-                                <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
-                            </div>
+                            @if (arg.event.extendedProps.id) 
+                            {
+                                <div class="w-15rem h-8rem shadow-8" style="margin-top: -5px;">
+                                    <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
+                                </div>
+                            }
+                            @else
+                            {
+                              <span class="text-black">Carregando...</span>
+                            }
                         </p-popover>
                         <!-- -->
                         <div (mouseenter)="popoverTooltip.show($event)"(mouseleave)="popoverTooltip.hide()"   class="w-full h-full">
@@ -286,9 +293,14 @@
                         </div>
                     </ng-template>
                 </full-calendar>
-                <ng-template #eventCalendar let-arg="arg" let-evento="evento"> @if(evento.feriado) { <div class="event" [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: evento.foreColor }">
+                <ng-template #eventCalendar let-arg="arg" let-evento="evento"> 
+                    
+                    
+                    
+                    @if(evento.feriado) { <div class="event" [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: evento.foreColor }">
                         <p>{{arg.event.title}}</p>
-                    </div> } @else { <ng-template #eventHeader>
+                    </div> } @else { 
+                        <ng-template #eventHeader>
                         <div class="event-header">
                             <i class="pi pi-clock text-xs"></i>
                             <span class="text-xs mr-auto">{{setHorario(evento.data)}}</span>

@@ -1,4 +1,43 @@
 <app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
+    <ng-template #message let-message>
+        <div class="flex align-items-start gap-2 ">
+            <span class="mt-1">
+                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
+                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
+            </span>
+            <div>
+                <div [innerHTML]="message.message"></div>
+                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
+                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
+                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
+                    <div *ngFor="let aluno of mensagensEnviadasAlunos">
+                        <a *ngIf="aluno.celular"
+                           title="Clique para enviar"
+                           (auxclick)="removerAlunoLista(aluno, $event)"
+                           [href]="enviarMensagemAgendamento(aluno)"
+                           pTooltip="Enviar mensagem"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
+                            <span class="p-button-label">{{aluno.nome}}</span>
+                        </a>
+                        <p-button *ngIf="!aluno.celular"
+                                  icon="pi pi-whatsapp opacity-0"
+                                  severity="secondary"
+                                  styleClass="white-space-nowrap -ml-1 "
+                                  pTooltip="Nenhum celular cadastrado"
+                                  [label]="aluno.nome"
+                                  [text]="true"
+                                  size="small"
+                                  [disabled]="true" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
 <p-dialog [header]="'Agendar Aula 0'"
           [maximizable]="true"
           [draggable]="true"
@@ -71,23 +110,23 @@
             </div>
             <div class="field md:col-6 sm:col-6 col-12"> <!-- Aluno -->
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
-                <p-select [options]="alunos"
-                          [loading]="loadingAlunos"
-                          [(ngModel)]="alunoSelected"
-                          [readonly]="blockAlunoField"
-                          [disabled]="blockAlunoField"
-                          (onChange)="alunoChanged($event, aluno_Id)"
-                          optionLabel="nome"
-                          #aluno_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="aluno_Id"
-                          inputId="aluno_Id"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
-                          optionDisabled="deactivated, disponivel">
+                <p-multiselect [options]="alunos"
+                               [loading]="loadingAlunos"
+                               [(ngModel)]="alunosSelected"
+                               [readonly]="blockAlunoField"
+                               [disabled]="blockAlunoField"
+                               (onChange)="alunoChanged($event, aluno_Id)"
+                               optionLabel="nome"
+                               #aluno_Id="ngModel"
+                               styleClass="w-full"
+                               class="w-full"
+                               name="aluno_Id"
+                               inputId="aluno_Id"
+                               [required]="true"
+                               [filter]="true"
+                               [filterBy]="'nome, turma, professor'"
+                               appendTo="body"
+                               optionDisabled="deactivated, disponivel">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
@@ -130,17 +169,21 @@
                                         </ng-template>
                                     </p>
                                 </div>
-                                <p class="mb-1 flex align-items-center ">
-                                    <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
-                                    <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                                        <span class="w-1rem h-1rem border-circle flex mr-3 ml-1" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                                    </ng-template>
-                                    <span class="font-normal">Educador(a) {{item.professor}}</span>
-                                </p>
+                                <!-- <div class="flex align-items-center">
+                                    <p class="mb-1">Turma: {{item.turma}}</p> -->
+                                    <p class="mb-1 flex align-items-center gap-2">
+                                        <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
+                                        <span >Turma: {{item.turma}}</span>
+                                        <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
+                                            <span class="w-1rem h-1rem border-circle flex " [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                                        </ng-template>
+                                        <!-- <span class="font-normal">Educador(a) {{item.professor}}</span> -->
+                                    </p>
+                                <!-- </div> -->
                             </div>
                         </div>
                     </ng-template>
-                </p-select>
+                </p-multiselect>
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
