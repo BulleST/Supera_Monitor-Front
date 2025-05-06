@@ -26,7 +26,7 @@
                    readonly>
         </div>
         <!-- Turma -->
-        <div class="field lg:col-2 sm:col-3 col-6">
+        <div class="field lg:col-4 sm:col-3 col-6">
             <label for="turma">Turma:</label>
             <input type="text"
                    pInputText
@@ -36,16 +36,19 @@
                    class="w-full"
                    readonly>
         </div>
-        <!-- Professor -->
+        <!-- Educador(a) -->
         <div class="field lg:col-2 sm:col-3 col-6">
-            <label for="professor">Professor:</label>
-            <input type="text"
-                   pInputText
-                   [value]="aluno.professor"
-                   id="professor"
-                   name="professor"
-                   class="w-full"
-                   readonly>
+            <label for="professor">Educador(a):</label>
+            <p-iconfield>
+                <p-inputicon styleClass="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }" />
+                <input type="text"
+                       pInputText
+                       [value]="aluno.professor"
+                       id="professor"
+                       name="professor"
+                       class="w-full"
+                       readonly>
+            </p-iconfield>
         </div>
         <!-- Perfil Cognitivo -->
         <div class="field lg:col-2 sm:col-2 col-12">
@@ -59,8 +62,7 @@
                    readonly>
         </div>
         <!-- Calendario -->
-        <div class="field sm:col-12 col-12">
-           
+        <div class="field col-12">
             <!-- TOOLBAR -->
             <div class="flex align-items-center justify-content-between flex-wrap  -mb-4 pb-3  ">
                 <div class="flex align-items-center " *ngIf="currentTitle">
@@ -68,36 +70,36 @@
                 </div>
                 <div class="flex gap-1 flex align-items-stretch " style="height: 2.4rem">
                     <p-button class="ml-auto"
-                    type="button"
-                    icon="pi pi-exclamation-circle"
-                    size="large"
-                    [text]="true"
-                    [rounded]="true"
-                    severity="secondary"
-                    styleClass="ml-auto"
-                    class="ml-auto"
-                    (onClick)="op.toggle($event)" />
-          <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white max-w-20rem">
-              <div class="px-2">
-                  <h3 class="text-base mb-2">Regras para agendar reposição: </h3>
-                  <ul>
-                      <li class="mb-2 white-space-normal">
-                          <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
-                          <span>A reposição deve ser agendada entre turmas de mesma faixa etária</span>
-                      </li>
-                      <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
-                      <li class="mb-2 white-space-normal">
-                          <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
-                          <span>A reposição deve ser agendada para até 30 dias da aula</span>
-                      </li>
-                      <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
-                      <li class="mb-2 white-space-normal">
-                          <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
-                          <span>A reposição não pode ser agendada em um feriado</span>
-                      </li>
-                  </ul>
-              </div>
-          </p-popover>
+                              type="button"
+                              icon="pi pi-exclamation-circle"
+                              size="large"
+                              [text]="true"
+                              [rounded]="true"
+                              severity="secondary"
+                              styleClass="ml-auto"
+                              class="ml-auto"
+                              (onClick)="op.toggle($event)" />
+                    <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white max-w-20rem">
+                        <div class="px-2">
+                            <h3 class="text-base mb-2">Regras para agendar reposição: </h3>
+                            <ul>
+                                <li class="mb-2 white-space-normal">
+                                    <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
+                                    <span>A reposição deve ser agendada entre turmas de mesma faixa etária</span>
+                                </li>
+                                <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
+                                <li class="mb-2 white-space-normal">
+                                    <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
+                                    <span>A reposição deve ser agendada para até 30 dias da aula</span>
+                                </li>
+                                <!-- <p-divider  layout="horizontal" class="opacity-50"/> -->
+                                <li class="mb-2 white-space-normal">
+                                    <i class="pi pi-check-circle text-green-500 mr-2 text-xl p-1"></i>
+                                    <span>A reposição não pode ser agendada em um feriado</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </p-popover>
                     <p-button icon="pi pi-angle-left text-lg"
                               styleClass="w-full h-full surface-100 border-100"
                               [style]="{width: '2.4rem', overflow: 'hidden',}"
@@ -123,108 +125,43 @@
                 </div>
             </div>
             <!-- END TOOLBAR -->
-            <full-calendar [options]="calendarioOptions" #fullCalendar >
+            <full-calendar [options]="calendarioOptions" #fullCalendar>
                 <ng-template #eventContent let-arg>
-
                     <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
-
-                    <ng-template #eventoTemplate let-evento="evento" let-arg="arg" >
-                        <ng-container *ngIf="!loading && evento; else loadingEvent">
-                            <ng-container *ngIf="!evento.feriado; else feriadoTemplate">
-                                <div [pTooltip]="eventoTooltip" 
-                                    tooltipStyleClass="bg-transparent"
-                                    class="cursor-pointer w-full overflow-hidden p-1 border-round-sm flex flex-column border-2 "
-                                     [ngStyle]="{
-                                        backgroundColor: evento.corLegenda,
-                                        borderColor: selectedAula && selectedAula.id == arg.event.id ? 'red' : evento.corLegenda,
-                                        color: evento.foreColor,
-                                    }">
-                                    <div class="flex align-items-center">
-                                        <span class="text-sm mr-2">{{evento.data | date : 'HH:mm'}}</span>
-                                        <span class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">{{evento.descricao }}</span>
-                                    </div>
-                                </div>
-                                <ng-template #eventoTooltip>
-                                    <ng-template #eventHeader>
-                                        <div class="flex align-items-center justify-content-start gap-1 white-space-nowrap text-overflow-ellipsis overflow-hidden">
-                                            <i class="pi pi-clock text-xs"></i>
-                                            <span class="text-xs">{{evento.data | date : 'HH:mm'}}</span>
-                                            <span class="ml-auto pl-3 text-xs ">
-                                                <span>{{evento.alunos.length}}</span>
-                                                <span>/{{evento.capacidadeMaximaAlunos}}</span>
-                                            </span>
-                                            <i *ngIf="evento.alunos.length > evento.capacidadeMaximaAlunos" class="pi pi-exclamation-circle text-xs  -mt-1 fadeout animation-duration-500 animation-iteration-infinite"></i>
-                                        </div>
-                                    </ng-template>
-                                    <ng-template #eventBody>
-                                        <div class="flex align-items-center my-auto gap-2 w-full " style="height: 3rem;">
-                                            <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
-                                                <span class="p-1 px-2 border-circle border-2 text-xs flex-none font-bold text-center ml-1" [pTooltip]="'Reagendamento: clique para ver mais'" [style]="{ borderColor: evento.foreColor }">R</span>
-                                            </ng-template>
-                                            <div class="text-base font-bold overflow-hidden w-full h-full  mb-auto flex ">
-                                                <p *ngIf="evento.descricao" [pTooltip]="evento.descricao" class="my-auto">{{evento.descricao}}</p>
-                                            </div>
-                                        </div>
-                                    </ng-template>
-                                    <ng-template #eventFooter>
-                                        <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
-                                            <ng-template [ngIf]="evento.professor">
-                                                <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
-                                            </ng-template>
-                                            <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
-                                                <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
-                                            </ng-template>
-                                            <ng-template #professorTemplate let-professor="professor">
-                                                <p [pTooltip]="professor" class="col p-0 white-space-nowrap text-overflow-ellipsis overflow-hidden text-xs text-left">
-                                                    <span>{{professor}}</span>
-                                                </p>
-                                            </ng-template>
-                                            <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
-                                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
-                                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                                                    <p [pTooltip]="'Perfil(is) Cognitivo(s)  ' + perfilCognitivo" class="col p-0 text-xs Soverflow-hidden text-overflow-ellipsis white-space-nowrap text-right">{{ perfilCognitivo }} </p>
-                                                </ng-template>
-                                            </ng-template>
-                                        </div>
-                                    </ng-template>
-                                    <div class="w-16rem h-max flex flex-column flex-1 p-1 border-2 cursor-pointer"
-                                        [style]="{
-                                            backgroundColor: arg.backgroundColor, 
-                                            borderColor: arg.backgroundColor, 
-                                            color: evento.foreColor 
-                                        }">
-                                        <header [pTooltip]="eventHeader">
-                                            <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                                        </header>
-                                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-                                    </div>
-                                </ng-template>
-                            </ng-container>
-                            <ng-template #feriadoTemplate>
-                                <div class="w-full h-full flex flex-column flex-1 p-1 border-2"
-                                [style]="{
-                                    backgroundColor: arg.backgroundColor, 
-                                    borderColor: arg.backgroundColor, 
-                                    color: evento.foreColor 
+                    <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
+                        <ng-container *ngIf="!loading && evento">
+                            <app-evento-item-hover #eventoPopover [evento]="evento" [arg]="arg"></app-evento-item-hover>
+                            <div class="w-full flex flex-column  p-1 overflow-hidden border-2 border-round-sm  " 
+                                (mouseenter)="eventoPopover.show($event)"
+                                 (mouseleave)="eventoPopover.hide()"
+                                 [ngStyle]="{
+                                    backgroundColor: arg.backgroundColor,
+                                    borderColor: selectedAula && selectedAula.id == arg.event.id ? 'red' :  arg.backgroundColor,
+                                    color: arg.textColor,
                                 }">
-                               
-                                <p>Feriado</p>
-                                <p>{{arg.event.title}}</p>
+                                <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado; else feriadoTemplate">
+                                        <div class="flex align-items-center cursor-pointer">
+                                            <span class="text-sm mr-2">{{evento.data | date : 'HH:mm'}}</span>
+                                            <span class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">{{evento.descricao }}</span>
+                                        </div>
+                                </ng-container>
+                                <ng-template #feriadoTemplate>
+                                        <p class="text-sm">Feriado</p>
+                                        <p class="text-sm">{{evento.descricao}}</p>
+                                </ng-template>
                             </div>
-                            </ng-template>
                         </ng-container>
-                        <ng-template #loadingEvent>
-                            <div class="w-full">
-                                <p-skeleton width="100%" height="1.5rem" />
-                            </div>
-                        </ng-template>
                     </ng-template>
-                    
                 </ng-template>
             </full-calendar>
-            <div class="flex" *ngIf="!loading">
-                <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
+            <div class="flex justify-content-between" *ngIf="!loading">
+                <ng-container *ngIf="selectedEvento && selectedAula">
+                    <div>
+                        <p class="font-bold my-2">Aula selecionada: </p>
+                        <app-evento-item [evento]="selectedEvento" [arg]="selectedAula"></app-evento-item>
+                    </div>
+                </ng-container>
+                <div class="ml-auto surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
                     <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
                         <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
                         <span class="ml-2">{{item.label}}</span>
@@ -232,6 +169,7 @@
                 </div>
             </div>
         </div>
+        <!--  -->
         <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center flex-wrap justify-content-between">
             <div class="sm:col-9 col-12">
             </div>

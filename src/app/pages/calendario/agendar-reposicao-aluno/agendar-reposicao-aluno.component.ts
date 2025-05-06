@@ -9,10 +9,9 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { EventImpl } from '@fullcalendar/core/internal';
 import { ToastrService } from 'ngx-toastr';
-import { PseudoEvento, ReposicaoAluno, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
+import { PseudoEvento, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { Evento, EventoTipo } from '../../../models/evento.model';
-import { Turma } from '../../../models/turma.model';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Crypto, getError } from '../../../utils';
@@ -27,12 +26,14 @@ import { MyMap } from '../../../utils/map';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { AlunoRestricaoService } from '../../../services/aluno-restricao.service';
 import { Feriado } from '../../../models/feriado.model';
+import { TurmaService } from '../../../services/turma.service';
 
 @Component({
     selector: 'app-agendar-reposicao-aluno',
     standalone: false,
     templateUrl: './agendar-reposicao-aluno.component.html',
-    styleUrl: './agendar-reposicao-aluno.component.css'
+    styleUrl: './agendar-reposicao-aluno.component.css',
+    providers: [ConfirmationService]
 })
 export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
@@ -41,13 +42,16 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     subscription: Subscription[] = [];
     legenda: { corLegenda: string, label: string }[] = [];
 
-    selectedAula?: EventImpl;
-
+    selectedAula?: any;
+    selectedEvento?: Evento;
+    EventoTipo = EventoTipo;
+    
     aluno: Aluno = new Aluno;
     participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
     evento: Evento = new Evento;
     eventos: Evento[] = [];
     tipoString = '';
+    corLegenda: string = '';
 
     currentTitle: string = '';
     roteiros: Roteiro[] = [];
@@ -69,15 +73,14 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             multiMonthPlugin
         ],
         hiddenDays: [0],
-        dayMaxEvents: 3,
+        // dayMaxEvents: 3,
+        // eventLimit: false,
         height: '600px',
         dayHeaders: true,
         weekends: true,
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
-        // defaultAllDay: false,
-        // allDaySlot: false,
         headerToolbar: {
             left: '',
             center: '',
@@ -90,7 +93,6 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         lazyFetching: true,
         datesSet: this.datesSet.bind(this),
         eventClick: this.eventClick.bind(this),
-        // eventsSet: this.events.bind(this),
     }
 
 
@@ -100,6 +102,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         private crypto: Crypto,
         private changeDetector: ChangeDetectorRef,
         private alunoService: AlunoService,
+        private turmaService: TurmaService,
         private alunoRestricaoService: AlunoRestricaoService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
@@ -180,7 +183,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
         this.calendarioRequest.perfil_Cognitivo_Id = this.aluno.perfilCognitivo_Id;
 
+        this.corLegenda = (await this.turmaService.get(this.aluno.turma_Id)).corLegenda;
+
+
         this.getCalendario('reposicao aluno')
+
         this.calendarVisible.update(() => true);
     }
 
@@ -240,7 +247,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         calendar.removeAllEvents();
 
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        var eventos = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
+        var eventos = this.eventos.filter(x => x.active == true 
+        /* não é feriado */           && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false
+        /* tem vagas disponíveis */   && x.capacidadeMaximaAlunos > x.alunos.length
+        /* mesmo perfil do aluno */   && x.perfilCognitivo.map(y => y.id).includes(this.aluno.perfilCognitivo_Id)
+        /* aluno não está na aula */  && x.alunos.map(x => x.aluno_Id).includes(this.aluno.id) == false);
 
         var events = eventos.map(item => {
             var backgroundColor = '#2e2e2e';
@@ -249,12 +260,12 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             } else if (item.professores && item.professores.length > 0) {
                 backgroundColor = item.professores[0].corLegenda;
             }
-            var color = this.getForeColor(backgroundColor)
+            var color = this.getTextColor(backgroundColor)
             var event: any = {
                 id: this.eventRamdomId(),
                 backgroundColor: backgroundColor,
                 borderColor: backgroundColor,
-                foreColor: color,
+                textColor: color,
                 title: item.turma ?? item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
@@ -264,17 +275,24 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         });
 
         this.feriados.forEach(item => {
+            var evento: any = {
+                id: PseudoEvento.EventoId,
+                data: moment(item.date).toDate(),
+                descricao: item.name,
+                evento_Tipo_Id: EventoTipo.Feriado,
+                ...item
+            };
+
             var event = {
                 id: this.eventRamdomId(),
-                foreColor: 'white',
+                textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
                 title: item.name,
                 start: moment(item.date).toDate(),
                 end: moment(item.date).toDate(),
                 allDay: true,
-                extendedProps: item,
-                feriado: true,
+                extendedProps: evento
             }
             events.push(event)
         })
@@ -302,7 +320,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         return result;
     }
 
-    getForeColor(hex: string) {
+    getTextColor(hex: string) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         var rgb = result ? {
             r: parseInt(result[1], 16), g: parseInt(result[2], 16),
@@ -402,9 +420,9 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             .catch(res => this.loadingFeriados = false);
     }
 
-    selecionarEvento(e: any, target: Evento) {
+    selecionarEvento(e: EventClickArg, target: Evento) {
         this.confirmationService.confirm({
-            target: e.jsEvent.target,
+            target: e.jsEvent.target as EventTarget,
             message: `Selecionar aula do dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.turma}</b> com o professor <b>${target.professor}</b>?`,
             header: 'Selecionar aula',
             acceptIcon: 'pi pi-check',
@@ -415,8 +433,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
             accept: async () => {
                 this.selectedAula = e.event;
+                this.selectedEvento = target;
             },
             reject: () => {
+                delete this.selectedAula;
+                delete this.selectedEvento;
             }
         });
     }
@@ -435,7 +456,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
     confirmaReposicao(e: any) {
 
-        var target = this.selectedAula!.extendedProps as Evento;
+        var target = this.selectedEvento as Evento;
 
         this.confirmationService.confirm({
             target: e.target,

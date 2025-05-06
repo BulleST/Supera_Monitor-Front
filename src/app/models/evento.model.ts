@@ -49,6 +49,7 @@ export enum EventoTipo {
     Superacao = 3,
     Oficina = 2,
     Reuniao = 4,
+    Feriado = 8,
 }
 
 

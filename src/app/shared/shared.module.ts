@@ -27,6 +27,8 @@ import { RouterModule } from '@angular/router';
 import { AgendarReposicaoAlunoComponent } from '../pages/calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { NameAbvPipe } from '../utils/name.pipe';
+import { EventoItemComponent } from '../pages/calendario/evento-item/evento-item.component';
+import { EventoItemHoverComponent } from '../pages/calendario/evento-item-hover/evento-item-hover.component';
 
 
 @NgModule({
@@ -47,6 +49,8 @@ import { NameAbvPipe } from '../utils/name.pipe';
         AgendarReposicaoAlunoComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
+        EventoItemComponent,
+        EventoItemHoverComponent,
     ],
     exports: [
         FormsModule,
@@ -77,6 +81,8 @@ import { NameAbvPipe } from '../utils/name.pipe';
         AgendarReposicaoAlunoComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
+        EventoItemComponent,
+        EventoItemHoverComponent,
 
     ],
     imports: [

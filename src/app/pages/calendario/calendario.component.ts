@@ -80,7 +80,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         },
         {
             label: 'Aula Extra',
-            routerLink: 'calendario/aula-extra/agendar',
+            routerLink: 'calendario/turma-extra/agendar',
             command: () => {
                 var evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.AulaExtra;
@@ -130,7 +130,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     currentTitle = '';
     cdkDragCancel = false;
     viewMenu: MenuItem[] = [];
-    view: CalendarioView = CalendarioView.MeuCalendario;
+    view: CalendarioView = CalendarioView.CalendarioGeral;
     currentEvents = signal<EventApi[]>([]);
     calendarVisible = signal(false);
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
@@ -233,11 +233,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.subscription.push(calendarioReload);
 
         var calendarView = this.service.calendarView.subscribe(async view => {
+            console.log('view', view)
             if (view == CalendarioView.MeuCalendario) {
                 this.calendarioRequest.professor_Id = this.account?.professor_Id;
                 this.eventos = [];
             } else {
-                this.calendarioRequest.professor_Id = undefined
+                this.calendarioRequest.professor_Id = undefined;
             }
         })
         this.subscription.push(calendarView);
@@ -264,8 +265,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.unselectAula();
 
         this.loadRoteiros('update');
-        await this.getCalendario('update');
         await this.loadFeriados();
+        await this.getCalendario('update');
         this.setCalendario();
     }
 
@@ -302,7 +303,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             },
             {
                 label: 'Calendário Geral',
-                value: CalendarioView.Geral,
+                value: CalendarioView.CalendarioGeral,
                 icon: 'pi pi-calendar',
             }
         ]
@@ -310,14 +311,16 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     async calendarViewChanged() {
         this.service.calendarView.next(this.view);
+
         if (this.view == CalendarioView.MeuCalendario) {
             this.calendarioRequest.professor_Id = this.account?.professor_Id;
             this.eventos = [];
         } else {
             this.calendarioRequest.professor_Id = undefined
         }
-        await this.getCalendario('calendarViewChanged');
-        this.setCalendario();
+
+        this.service.calendarioReload.emit(1);
+        
     }
 
     dataSelect() {
@@ -368,6 +371,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         await lastValueFrom(this.service.calendario(this.calendarioRequest))
             .then(list => {
+
                 this.eventos = list;
                 this.loading = false;
             })
@@ -389,22 +393,22 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         var eventos = this.eventos.filter(x => x.active == true /*&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false  */);
 
         var events = eventos.map(item => {
-            var backgroundColor = '#2e2e2e';
-            if (item.corLegenda) {
-                backgroundColor = item.corLegenda
+            var backgroundColor = item.evento_Tipo_Id == EventoTipo.Reuniao ? '#F37435' 
+                            : item.corLegenda ? item.corLegenda 
+                            : item.professores && item.professores.length > 0 ? item.professores[0].corLegenda 
+                            : '#2e2e2e';
+            var textColor = this.getTextColor(backgroundColor);
+            var id = 'event-' +  this.eventRamdomId();
+
+            if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(item.evento_Tipo_Id)) {
+                this.cdkEventItensId.push(id);
             }
-            else if (item.evento_Tipo_Id == EventoTipo.Reuniao) {
-                backgroundColor = '#f37435' // primary color
-            }
-            else if (item.professores && item.professores.length > 0) {
-                backgroundColor = item.professores[0].corLegenda;
-            }
-            var color = this.getForeColor(backgroundColor)
+
             var event: any = {
-                id: this.eventRamdomId(),
+                id: id,
                 backgroundColor: backgroundColor,
                 borderColor: backgroundColor,
-                foreColor: color,
+                textColor: textColor,
                 title: item.turma ?? item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
                 end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
@@ -416,27 +420,26 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.feriados.forEach(item => {
             var event = {
                 id: this.eventRamdomId(),
-                foreColor: 'white',
+                textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
                 title: item.name,
                 start: moment(item.date).toDate(),
                 end: moment(item.date).toDate(),
                 allDay: true,
-                extendedProps: item,
-                feriado: true,
+                extendedProps: {
+                    id: PseudoEvento.EventoId,
+                    data: moment(item.date).toDate(),
+                    descricao: item.name,
+                    evento_Tipo_Id: EventoTipo.Feriado,
+                    ...item,
+                },
             }
             events.push(event)
         })
         this.calendarioOptions.events = events;
-
-        this.cdkEventItensId = this.calendarioOptions.events
-            .filter((x: any) => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(x.extendedProps.evento_Tipo_Id))
-            .map(x => 'event-' + x.id)
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
-
-        // this.htmlToImage();
     }
 
     addHours(data: Date, h: number) {
@@ -454,7 +457,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
 
-    getForeColor(hex: string) {
+    getTextColor(hex: string) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         var rgb = result ? {
             r: parseInt(result[1], 16), g: parseInt(result[2], 16),
@@ -482,13 +485,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         await this.loadFeriados();
         this.setCalendario();
 
-
     }
 
     dateClick(e: DateClickArg) {
         this.selectedEvento = undefined;
     }
-    async selectEvento(e: any, item: Evento/**, component: SelectedEventoComponent */) {
+    async selectEvento(e: any, item: Evento) {
         this.popoverComponent.hidePopover();
         item = JSON.parse(JSON.stringify(item));
         if (item.reagendamentoDe_Evento_Id && !item.reagendamentoDe_Evento) {
@@ -819,95 +821,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             .catch(res => this.loadingFeriados = false);
     }
 
-    event(evento: Evento) {
-        var html = ``;
-        switch (evento.evento_Tipo_Id) {
-            case EventoTipo.Aula:
-                html = this.eventAula(evento);
-                break;
-        }
-    }
-    eventAula(evento: Evento): string {
-        return '';
-    }
-    eventSuperacao(evento: Evento): string {
-        return '';
-    }
-    eventAula0(evento: Evento): string {
-        return '';
-    }
-    eventReuniao(evento: Evento): string {
-        return `
-            
-                <div class="w-full h-full flex flex-column flex-1 p-1 border-2 cursor-pointer" style="background-color: rgb(243, 116, 53); border-color: rgb(243, 116, 53); color: rgb(255, 255, 255);">
-                    <header>
-                        <div class="event-header">
-                            <i class="pi pi-clock text-xs"></i>
-                            <span class="text-xs">12:00</span>
-                        </div>
-                    </header>
-                    <div class="flex align-items-center my-auto gap-2 w-full" style="height: 3rem;">
-                        <div class="text-base font-bold overflow-hidden w-full h-full mb-auto flex">
-                            <p class="my-auto">Reunião Geral</p>
-                        </div>
-                    </div>
-                    <div class="flex align-items-start justify-content-between flex-nowrap h-1rem">
-                    </div>
-                </div>
-        
-        `;
-    }
-    eventOficina(evento: Evento): string {
-        return '';
-    }
-    async htmlToImage() {
-        var div = document.createElement('div');
-        $(div).append(`
-                <div class="event" style="background-color: rgb(243, 116, 53); border-color: rgb(243, 116, 53); color: rgb(255, 255, 255);">
-                    <header>
-                        <div class="event-header">
-                            <i class="pi pi-clock text-xs"></i>
-                            <span class="text-xs">12:00</span>
-                        </div>
-                    </header>
-                    <div class="event-body" style="height: 3rem;">
-                        <div class="text-base font-bold overflow-hidden w-full h-full mb-auto flex">
-                            <p class="my-auto">Reunião Geral</p>
-                        </div>
-                    </div>
-                    <div class="event-footer"></div>
-                </div>`)
-
-        console.log(div)
-
-        document.body.appendChild(div)
-
-
-        // domtoimage.toPng(div)
-        // .then(function (dataUrl: any) {
-        //     console.log('dataUrl', dataUrl)
-        //     var img = new Image();
-        //     img.src = dataUrl;
-        //     document.body.appendChild(img);
-        // })
-        // .catch(function (error: any) {
-        //     console.error('oops, something went wrong!', error);
-        // });
-
-        await html2canvas(div, { scale: 3 })
-            .then(canvas => {
-                console.log('canvas', canvas);
-                const imagem = canvas.toDataURL('image/jpeg');
-                console.log('imagem', imagem);
-                const novaAba = window.open();
-                if (novaAba) novaAba.document.write(`<img src="${imagem}" />`);
-            })
-    }
-
-
     setHorario(data: Date) {
         data = moment(data).toDate();
-        // console.log('data', data)
         if (data.getMinutes() == 0)
             return data.getHours() + 'h';
         else

@@ -174,7 +174,7 @@ export class CadastrarAula0Component implements OnDestroy {
 
         this.activatedRoute.params.subscribe((res) => {
             if (res['aluno_Id']) {
-                this.object.aluno_Id = this.crypto.decrypt(res['aluno_Id']);
+                this.object.alunos = this.crypto.decrypt(res['aluno_Id']);
                 this.blockAlunoField = true;
             }
         });
@@ -389,7 +389,7 @@ export class CadastrarAula0Component implements OnDestroy {
             );
         }
 
-        this.object.aluno_Id = this.alunosSelected.map((x) => x.id);
+        this.object.alunos = this.alunosSelected.map((x) => x.id);
 
         this.object.data = new Date(this.data);
         this.object.data.setHours(

@@ -2,21 +2,22 @@
 <p-confirmdialog key="agendarReposicao">
     <ng-template #message let-message>
         <div class="flex align-items-start gap-2 ">
-            <span class="mt-1"> @if (message.icon) { <i [ngClass]="message.icon" class="text-4xl "></i> } @else { <i class="pi pi-exclamation-triangle text-5xl text-primary-500"></i> } </span>
+            <!-- <span class="mt-1"> @if (message.icon) { <i [ngClass]="message.icon" class="text-4xl "></i> } @else { <i class="pi pi-exclamation-triangle text-5xl text-primary-500"></i> } </span> -->
             <div>
                 <div [innerHTML]="message.message"></div>
-                <div class="formgrid grid">
-                    <div class="field col-12 min-w-15rem mt-2"> <!-- Observações -->
-                        <label for="_observacaoReposicao" class="font-bold text-base">Observações: <span class="text-red-500">*</span> </label>
-                        <textarea pTextarea
-                                  class="w-full"
-                                  name="_observacaoReposicao"
-                                  id="_observacaoReposicao"
-                                  #_observacaoReposicao="ngModel"
-                                  [(ngModel)]="observacaoReposicao"
-                                  placeholder="Aproveite para contar o motivo do agendamento dessa reposição"
-                                  [rows]="3"
-                                  [required]="true"></textarea> @if(_observacaoReposicao.touched && _observacaoReposicao.invalid && _observacaoReposicao.errors) { <div> @if(_observacaoReposicao.errors['required']) { <p class="text-red-500 mt-2 mb-0">Esse campo é obrigatório.</p> } </div> }
+                <div class=" min-w-15rem mt-1"> <!-- Observações -->
+                    <label for="_observacaoReposicao" class="font-bold mt-1 text-base">Observações: <span class="text-red-500">*</span> </label>
+                    <textarea pTextarea
+                              class="w-full mt-1"
+                              name="_observacaoReposicao"
+                              id="_observacaoReposicao"
+                              #_observacaoReposicao="ngModel"
+                              [(ngModel)]="observacaoReposicao"
+                              placeholder="Aproveite para contar o motivo do agendamento dessa reposição"
+                              [rows]="3"
+                              [required]="true"></textarea>
+                    <div *ngIf="_observacaoReposicao.touched && _observacaoReposicao.errors">
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="_observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>
                     </div>
                 </div>
             </div>
@@ -39,7 +40,7 @@
                                  (cdkDragCancelChange)="cdkDragCancel = $event"
                                  (aluno)="selectedAluno = $event"></app-selected-evento>
         </div>
-        <p-toolbar styleClass="border-none bg-white p-3 shadow-1">
+        <p-toolbar styleClass="border-none bg-white p-3 shadow-1 sticky top-1">
             <div class="p-toolbar-group-start flex-1">
                 <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
                     <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
@@ -52,9 +53,9 @@
             <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
                 <p-button icon="pi pi-sync text-sm" (onClick)="update('button')" severity="secondary" label="atualizar" pTooltip="Atualizar calendário" size="small" />
                 <!-- Meu Calendário -->
-                <p-select
-                          [options]="viewMenu"
+                <p-select [options]="viewMenu"
                           [(ngModel)]="view"
+                          (onChange)="calendarViewChanged()"
                           optionValue="value"
                           styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white flex align-items-center"
                           size="small"
@@ -261,138 +262,22 @@
             <!-- FIM SEMANA -->
             <!-- CALENDARIO -->
             <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)">
-                <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar [ngStyle]="{
-                    height: 'calc(100vh - 260px)'
-                }">
+                <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar>
                     <ng-template #allDayContent>
                         <span>Feriados</span>
                     </ng-template>
                     <ng-template #dayHeaderContent let-arg>
-                        <!-- <p class="text-sm uppercase font-light">{{arg.date | date : 'EE'}}</p> 
-                        <p class=" p-4 border-circle  mx-auto inline-flex align-items-center justify-content-center text-xl " style="width: 1.5rem; height: 1.5rem;"
-                        [ngClass]="{ 'bg-primary-500 text-white font-light': arg.isToday }"> {{arg.date | date : 'dd'}} </p> -->
                         <p>{{arg.date | date : 'EE'}}</p>
                         <p>{{arg.date | date : 'dd'}}</p>
                     </ng-template>
                     <ng-template #eventContent let-arg>
-                        <p-popover #popoverTooltip styleClass="bg-transparent border-none p-0 popover-event-hover ">
-                            @if (arg.event.extendedProps.id) 
-                            {
-                                <div class="w-15rem h-8rem shadow-8" style="margin-top: -5px;">
-                                    <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
-                                </div>
-                            }
-                            @else
-                            {
-                              <span class="text-black">Carregando...</span>
-                            }
-                        </p-popover>
-                        <!-- -->
-                        <div (mouseenter)="popoverTooltip.show($event)"(mouseleave)="popoverTooltip.hide()"   class="w-full h-full">
-                            <ng-container *ngTemplateOutlet="eventCalendar; context: { arg: arg, evento: arg.event.extendedProps }"></ng-container>
-                        </div>
+                        <app-evento-item
+                                         [evento]="arg.event.extendedProps"
+                                         [arg]="arg"
+                                         (selectEvent)="selectEvento($event, arg.event.extendedProps)"
+                                         (cdkDrop)="cdkDrop($event, arg.event.extendedProps)"></app-evento-item>
                     </ng-template>
                 </full-calendar>
-                <ng-template #eventCalendar let-arg="arg" let-evento="evento"> 
-                    
-                    
-                    
-                    @if(evento.feriado) { <div class="event" [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: evento.foreColor }">
-                        <p>{{arg.event.title}}</p>
-                    </div> } @else { 
-                        <ng-template #eventHeader>
-                        <div class="event-header">
-                            <i class="pi pi-clock text-xs"></i>
-                            <span class="text-xs mr-auto">{{setHorario(evento.data)}}</span>
-                            <ng-template [ngIf]="evento.evento_Tipo_Id != EventoTipo.Reuniao">
-                                <ng-template #professorTemplate let-professor="professor">
-                                    <p class="text-xs">{{professor}}</p>
-                                </ng-template>
-                                <ng-template [ngIf]="evento.professor">
-                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professor }"></ng-container>
-                                </ng-template>
-                                <ng-template [ngIf]="!evento.professor && evento.professores.length > 0">
-                                    <ng-container *ngTemplateOutlet="professorTemplate; context: { professor: evento.professores[0].nome }"></ng-container>
-                                </ng-template>
-                            </ng-template>
-                        </div>
-                    </ng-template>
-                    <ng-template #eventBody>
-                        <div class="event-body">
-                            <ng-template [ngIf]="evento.reagendamentoDe_Evento_Id">
-                                <span class="event-reagendamento-icon" [pTooltip]="'Reagendamento: clique para ver mais'">R</span>
-                            </ng-template>
-                            <div class="w-full">
-                                <p class="event-description">{{evento.descricao}}</p> @if(evento.sala_Id) { <p class="event-description text-xs">
-                                    <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
-                                </p>
-                                <ng-template #salaTemplate>
-                                    <span class="pr-2">Sala: </span>
-                                    <app-sala-aula [numeroSala]="evento.numeroSala"
-                                                   [andar]="evento.andar"
-                                                   [sala_Id]="evento.sala_Id"></app-sala-aula>
-                                </ng-template> 
-                            }  
-                            </div>
-                        </div>
-                    </ng-template>
-                    <ng-template #eventFooter>
-                        <div class="event-footer flex-column">
-                            
-                            @if([EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)) { 
-                                <p class="event-description text-sm">
-                                    <span class="pr-2">
-                                        <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
-                                        <span>:</span>
-                                    </span>
-                                    <ng-container *ngFor="let aluno of evento.alunos">
-                                        <span>{{aluno.aluno | nameAbv }}</span>
-                                    </ng-container>
-                                </p>
-                            }
-                            <ng-template [ngIf]="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
-                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
-                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                                    <p class="text-xs">{{ perfilCognitivo }} </p>
-                                </ng-template>
-                            </ng-template>
-                            <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
-                                <p class="text-xs">
-                                    <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
-                                        <span *ngSwitchCase="0">Não há vagas</span>
-                                        <span *ngSwitchCase="1">1 vaga / {{evento.capacidadeMaximaAlunos}} total</span>
-                                        <span *ngSwitchDefault>{{evento.capacidadeMaximaAlunos - evento.alunos.length}} vagas / {{evento.capacidadeMaximaAlunos}} total</span>
-                                    </span>
-                                </p>
-                            </ng-container>
-                        </div>
-                    </ng-template> @if(evento.id) { @if([EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)) { <div cdkDropList
-                         [cdkDropListSortingDisabled]="true"
-                         [cdkDropListData]="evento.alunos"
-                         (cdkDropListDropped)="cdkDrop($event, evento)"
-                         [cdkDropListConnectedTo]="['alunos']"
-                         [id]="'event-' + arg.event.id"
-                         (click)="selectEvento($event, evento)"
-                         class="event"
-                         [style]="{
-                                            backgroundColor: arg.backgroundColor, 
-                                            borderColor: arg.backgroundColor, 
-                                            color: evento.foreColor 
-                                            }">
-                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-                    </div> } @else { <div (click)="selectEvento($event, evento)"
-                         class="event"
-                         [style]="{
-                                            backgroundColor: arg.backgroundColor, 
-                                            borderColor: arg.backgroundColor, 
-                                            color: evento.foreColor 
-                                        }">
-                        <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-                        <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-                        <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-                    </div> } } } </ng-template>
             </div>
             <!-- FIM CALENDARIO -->
             <!-- LEGENDA --> @if(!loading) { <!--  -->

@@ -7,8 +7,8 @@ import { PseudoEvento } from "./reposicao.model";
 
 
 export enum CalendarioView {
-    MeuCalendario,
-    Geral
+    MeuCalendario = 1,
+    CalendarioGeral = 2
 }
 
 export class CalendarioRequest {

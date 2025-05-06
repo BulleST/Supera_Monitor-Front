@@ -1,66 +1,6 @@
 ::ng-deep .fc .fc-timegrid-slot-minor {
     border-top-style: hidden !important;
 }
-
-.event {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-flow: column;
-    flex: 1 1 0% !important;
-    padding: 0.25rem;
-    border-width: 2px;
-    border-style: solid;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.event-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-flow: nowrap;
-    gap: 0.25rem;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.event-body {
-    width: 100%;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    margin-top: auto;
-    margin-bottom: auto;
-}
-
-.event-description {
-    width: 100%;
-    height: 100%;
-    margin-bottom: auto;
-    display: flex;
-    align-items: center;
-    font-size: 1rem;
-    font-weight: bold;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.event-footer {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: 100%;
-    gap: 2px
-}
-
 ::ng-deep .fc .fc-timegrid-slot {
     height: 2.5em!important;
 }
@@ -70,32 +10,4 @@
 ::ng-deep .fc .fc-daygrid-event,
 ::ng-deep .fc .fc-daygrid-day-events {
     margin-top: 0px!important;
-}
-
-.event-reagendamento-icon {
-    width: 1.8rem;
-    height: 1.8rem;
-    font-size: 0.8rem !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: none;
-    /* padding: 0.25rem 0.5rem; */
-    margin-right: 0.25rem !important;
-    border-radius: 50% !important;
-    border-width: 2px !important;
-    border-style: solid;
-    font-weight: bold;
-    text-align: center;
-    font-size: 0.75rem !important;
-}
-
-
-.event-educador {
-
-}
-
-::ng-deep .popover-event-hover .p-popover-content {
-    height: 100%;
-    padding: 0px;
 }

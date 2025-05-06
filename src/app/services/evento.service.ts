@@ -32,7 +32,7 @@ export class EventoService extends Service {
     evento = new BehaviorSubject<Evento | undefined>(undefined);
     
     calendarioReload = new EventEmitter<number>();
-    calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.Geral);
+    calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.CalendarioGeral);
     roteiros: Roteiro[] = [];
     
     dashboard = new BehaviorSubject<Dashboard[]>([]);

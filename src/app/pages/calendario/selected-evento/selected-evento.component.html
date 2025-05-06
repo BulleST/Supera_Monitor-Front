@@ -80,7 +80,13 @@
                 </span>
                 
                 <span class="ml-auto">
-                    <ng-template [ngIf]="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) ">
+                    <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
+                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{evento.capacidadeMaximaAlunos}} vagas</span>
+                        <span *ngSwitchCase="0">Não há vagas / {{evento.alunos.length}} alunos</span>
+                        <span *ngSwitchCase="1">1 vaga / {{evento.alunos.length}} alunos</span>
+                        <span *ngSwitchDefault>{{evento.capacidadeMaximaAlunos - evento.alunos.length}} vagas / {{evento.alunos.length}} alunos </span>
+                    </span>
+                    <!-- <ng-template [ngIf]="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) ">
                         <span [ngClass]="{ 'text-red-500': evento.alunos.length > evento.capacidadeMaximaAlunos }">
                             <span>{{evento.alunos.length}}</span>
                             <span>/{{evento.capacidadeMaximaAlunos}}</span>
@@ -90,12 +96,12 @@
 
                     <ng-template [ngIf]="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
                         <span>{{evento.alunos.length}}</span>
-                    </ng-template>
+                    </ng-template> -->
                 </span>
                 <span class="ml-2 text-primary fa-solid fa-user-graduate"></span>
             </div>
             <div class="max-h-10rem overflow-auto w-full">
-                <p class="text-400 p-2" *ngIf="evento.alunos.length == 0">Nenhum aluno inscrito</p>
+                <!-- <p class="text-400 p-2" *ngIf="evento.alunos.length == 0">Nenhum aluno inscrito</p> -->
                 <div *ngFor="let aluno of evento.alunos; let i = index"
                      cdkDrag
                      [cdkDragDisabled]="aluno.presente && evento.finalizado"

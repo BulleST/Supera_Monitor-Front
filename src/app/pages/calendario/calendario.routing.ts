@@ -6,18 +6,18 @@ import { CadastrarOficinaComponent } from './evento/oficina/cadastrar-oficina/ca
 import { CadastrarAula0Component } from './evento/aula-0/cadastrar-aula-0/cadastrar-aula-0.component';
 import { CadastrarReuniaoComponent } from './evento/reuniao/cadastrar-reuniao/cadastrar-reuniao.component';
 import { CadastrarInscricaoComponent } from './evento/oficina/cadastrar-inscricao/cadastrar-inscricao.component';
-import { CadastrarAulaExtraComponent } from './evento/aula/cadastrar-aula-extra/cadastrar-aula-extra.component';
 import { FormComponent as AlunoFormComponent } from '../alunos/form/form.component';
 import { RestricoesComponent } from '../alunos/form/restricoes/restricoes.component';
 import { CalendarioComponent } from './calendario.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
+import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
 
 const routes: Routes = [{
     path: '', component: CalendarioComponent, children: [
 
-        { path: 'aula-extra/agendar', component: CadastrarAulaExtraComponent },
+        { path: 'turma-extra/agendar', component: CadastrarTurmaExtraComponent },
         { path: 'aula-zero/agendar', component: CadastrarAula0Component },
         { path: 'superacao/agendar', component: CadastrarSuperacaoComponent },
         { path: 'reuniao/agendar', component: CadastrarReuniaoComponent },

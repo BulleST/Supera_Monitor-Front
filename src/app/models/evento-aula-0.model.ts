@@ -4,7 +4,7 @@ export class EventoAula0Request {
     id: number = PseudoEvento.EventoId;
     descricao: string = '';
     observacao: string = '';
-    aluno_Id: number[] = [];
+    alunos: number[] = [];
     // aluno_Id: number = undefined as unknown as number; 
     professor_Id: number = undefined as unknown as number; 
     sala_Id: number = undefined as unknown as number; 
