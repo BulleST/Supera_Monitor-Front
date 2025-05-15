@@ -159,32 +159,37 @@
                     emptymessagesource="Nenhum educador para selecionar"
                     emptymessagetarget="Nenhum educador selecionado">
             <ng-template let-item #item>
-                <div class="flex align-items-center w-full">
-                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                    <p class="mr-2">{{ item.nome }}</p>
-                    <p-badge *ngIf="item.disponivel == false"
-                             value="Indisponível"
-                             severity="danger"
-                             [pTooltip]="indisponivelTemplate" />
-                    <ng-template #indisponivelTemplate>
-                        <div class="w-25rem">
-                            <p>
-                                <span>Evento: </span>
-                                <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
-                                <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
-                            </p>
-                            <p>{{item.disponivelEvent.descricao}}</p>
-                            <p *ngIf="item.disponivelEvent.professor">
-                                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
-                                <span>{{item.disponivelEvent.professor}}</span>
-                            </p>
-                            <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                            <p>
-                                <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
-                                <ng-template #onlineTemplate>Online</ng-template>
-                            </p>
-                        </div>
-                    </ng-template>
+                <div>
+                    <div class="flex align-items-center w-full">
+                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                        <p class="mr-2">{{ item.nome }}</p>
+                        <p-badge *ngIf="item.disponivel == false"
+                                 value="Indisponível"
+                                 severity="danger"
+                                 [pTooltip]="indisponivelTemplate" />
+                        <ng-template #indisponivelTemplate>
+                            <div class="w-25rem">
+                                <p>
+                                    <span>Evento: </span>
+                                    <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                                    <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+                                </p>
+                                <p>{{item.disponivelEvent.descricao}}</p>
+                                <p *ngIf="item.disponivelEvent.professor">
+                                    <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                    <span>{{item.disponivelEvent.professor}}</span>
+                                </p>
+                                <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+                                <p>
+                                    <span *ngIf="item.disponivelEvent.numeroSala && item.disponivelEvent.andar; else onlineTemplate">{{item.disponivelEvent.numeroSala}} - {{item.disponivelEvent.andar}}º andar</span>
+                                    <ng-template #onlineTemplate>Online</ng-template>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </div>
+                    <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                        <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                    </ng-container>
                 </div>
             </ng-template>
         </p-picklist>

@@ -1,0 +1,60 @@
+
+<p-toolbar styleClass="border-none bg-white p-4 shadow-1 sticky top-1">
+    <div class="p-toolbar-group-start flex-1">
+        <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+            <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
+            <span class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
+                <span>Calendário</span>
+                <span class="font-bold"> - {{currentTitle}}</span>
+            </span>
+        </h2>
+    </div>
+    <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
+        <!-- Atualizar -->
+        <p-button icon="pi pi-sync " 
+            (onClick)="updateCalendar()" 
+            severity="secondary" 
+            label="atualizar" 
+            pTooltip="Atualizar calendário" />
+        <!-- Meu Calendário -->
+        <p-select [options]="viewMenu"
+                  [(ngModel)]="view"
+                  (onChange)="calendarViewChanged()"
+                  optionValue="value"
+                  styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white flex align-items-center"
+                  appendTo="body">
+            <ng-template let-selectedOption #selectedItem>
+                <div class="text-white -mr-2">
+                    <span class="{{selectedOption.icon}} text-xs"></span>
+                    <span class="ml-2">{{ selectedOption.label }}</span>
+                </div>
+            </ng-template>
+            <ng-template let-item #item>
+                <span class="{{item.icon}}"></span>
+                <span class="ml-2">{{ item.label }}</span>
+            </ng-template>
+            <ng-template #dropdownicon>
+                <i class="pi pi-sort-down-fill text-xs text-white -mt-1"></i>
+            </ng-template>
+        </p-select>
+        <!-- Agendar -->
+        <p-select value="'Agendar'"
+                  [options]="agendarMenuItem"
+                  styleClass="bg-primary-500 hover:bg-primary-600 border-primary-500 hover:border-primary-600 text-white flex align-items-center"
+                  appendTo="body">
+            <ng-template let-selectedOption #selectedItem>
+                <div class="text-white -mr-2">
+                    <span class="ml-2">Agendar</span>
+                </div>
+            </ng-template>
+            <ng-template let-item #item>
+                <div class="w-10rem" (click)="agendarEvento(item, $event)">
+                    <a class="ml-2">{{ item.label }}</a>
+                </div>
+            </ng-template>
+            <ng-template #dropdownicon>
+                <i class="pi pi-sort-down-fill text-xs text-white -mt-1"></i>
+            </ng-template>
+        </p-select>
+    </div>
+</p-toolbar>

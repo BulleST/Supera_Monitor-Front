@@ -116,9 +116,9 @@
                                 </div>
                             </ng-template>
                         </p>
-                        <p class="text-sm">
-                            <{{ item.email }}>
-                        </p>
+                        <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                            <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                        </ng-container>
                     </div>
                     <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                            [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"

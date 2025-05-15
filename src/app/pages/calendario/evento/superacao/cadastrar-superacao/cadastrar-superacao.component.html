@@ -72,46 +72,47 @@
             <div class="field md:col-6 sm:col-6 col-12"> <!-- Aluno -->
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-multiselect [options]="groupedAlunos"
-                          [loading]="loadingAlunos"
-                          [(ngModel)]="alunosSelected"
-                          [readonly]="blockAlunoField"
-                          [disabled]="blockAlunoField"
-                          (onChange)="alunoChanged($event, aluno_Id)"
-                          [group]="true"
-                          display="chip"
-                          #aluno_Id="ngModel"
-                          styleClass="w-full"
-                          optionLabel="label"
-                          class="w-full"
-                          name="aluno_Id"
-                          inputId="aluno_Id"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          [showToggleAll]="false"
-                          [virtualScroll]="true" 
-                          [virtualScrollItemSize]="43" 
-                          [appendTo]="'body'"
-                          optionDisabled="deactivated, disponivel">
-                          <ng-template  #group let-group>
-                              <!-- {{group|json}} -->
-                              <p class="flex align-items-center gap-2 surface-100 -mx-3 py-2 h-full px-2 text-black-alpha-80">
-                                <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(group.value.turma_Id) }"></ng-container>
-                                <span>{{group.value.nome}}</span>
-                                <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                                    <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                                </ng-template> 
-                                <!-- <span class="font-normal">Educador(a) {{group.value.professor}}</span> -->
-                            </p>
-                        </ng-template>
+                               [loading]="loadingAlunos"
+                               [(ngModel)]="alunosSelected"
+                               [readonly]="blockAlunoField"
+                               [disabled]="blockAlunoField"
+                               (onChange)="alunoChanged($event, aluno_Id)"
+                               [group]="true"
+                               display="chip"
+                               #aluno_Id="ngModel"
+                               styleClass="w-full"
+                               optionLabel="label"
+                               optionValue="value"
+                               class="w-full"
+                               name="aluno_Id"
+                               inputId="aluno_Id"
+                               [required]="true"
+                               [filter]="true"
+                               filterBy="nome"
+                               [showToggleAll]="false"
+                               [virtualScroll]="true"
+                               [virtualScrollItemSize]="43"
+                               [appendTo]="'body'"
+                               optionDisabled="deactivated, disponivel">
+                    <ng-template #group let-group>
+                        <!-- {{group|json}} -->
+                        <p class="flex align-items-center gap-2 surface-100 -mx-3 py-2 h-full px-2 text-black-alpha-80">
+                            <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(group.value.turma_Id) }"></ng-container>
+                            <span>{{group.value.nome}}</span>
+                            <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
+                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                            </ng-template>
+                            <!-- <span class="font-normal">Educador(a) {{group.value.professor}}</span> -->
+                        </p>
+                    </ng-template>
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <p class="mb-1">
+                            <p>
                                 <span class="mr-2">{{item.value.nome | nameAbv }}</span>
                                 <p-badge *ngIf="item.value.disponivel == false"
-                                value="Indisponível"
-                                severity="danger"
-                                [pTooltip]="indisponivelTemplate" />
+                                         value="Indisponível"
+                                         severity="danger"
+                                         [pTooltip]="indisponivelTemplate" />
                                 <ng-template #indisponivelTemplate>
                                     <div class="w-25rem">
                                         <p>
@@ -128,19 +129,19 @@
                                         <p *ngIf="item.value.disponivelEvent.sala_Id">
                                             <span>Sala: </span>
                                             <app-sala-aula [numeroSala]="item.value.disponivelEvent.numeroSala"
-                                                            [andar]="item.value.disponivelEvent.andar"
-                                                            [sala_Id]="item.value.disponivelEvent.sala_Id"></app-sala-aula>
+                                                           [andar]="item.value.disponivelEvent.andar"
+                                                           [sala_Id]="item.value.disponivelEvent.sala_Id"></app-sala-aula>
                                         </p>
                                     </div>
                                 </ng-template>
                             </p>
                             <div class=" w-2rem h-2rem ml-auto">
                                 <a *ngIf="item.value.celular"
-                                    [href]="enviarMensagem(item.value)"
-                                    pTooltip="Enviar mensagem"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="-ml-1 p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
+                                   [href]="enviarMensagem(item.value)"
+                                   pTooltip="Enviar mensagem"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="-ml-1 p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
                                 </a>
                             </div>
                         </div>
@@ -178,8 +179,8 @@
                                     <p-badge *ngIf="item.disponivel == false"
                                              value="Indisponível"
                                              severity="danger"
-                                             [pTooltip]="indisponivelTemplate" />
-                                    <ng-template #indisponivelTemplate>
+                                             [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                                    <ng-template #disponivelEvent>
                                         <div class="w-25rem">
                                             <p>
                                                 <span>Evento: </span>
@@ -200,10 +201,9 @@
                                             </p>
                                         </div>
                                     </ng-template>
-                                </p>
-                                <p class="text-sm">
-                                    <{{ item.email }}>
-                                </p>
+                                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                </ng-container>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                    [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
@@ -215,7 +215,7 @@
                 </p-select>
                 <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Educador indisponível.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
                 </div>
             </div>
             <div class="field sm:col-6  col-6"> <!-- Sala -->

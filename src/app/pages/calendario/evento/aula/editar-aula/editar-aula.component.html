@@ -128,9 +128,9 @@
                                         </div>
                                     </ng-template>
                                 </p>
-                                <p class="text-sm">
-                                    <{{ item.email }}>
-                                </p>
+                                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                    <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                </ng-container>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                    [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
@@ -510,13 +510,13 @@
                             </div>
                         </td>
                         <!-- checklist -->
-                        <td class="cursor-pointer z-0">
+                        <td class="cursor-pointer z-0" (click)="popoverChecklistComponent.show($event)">
                             <!--  (click)="popoverChecklistComponent.show($event)" -->
-                            <!-- <app-aluno-checklist-popover #popoverChecklistComponent
+                            <app-aluno-checklist-popover #popoverChecklistComponent
                                                          [aluno]="aluno"></app-aluno-checklist-popover>
                             <app-aluno-checklist-status #checklistStatusComponent
                                                         [aluno]="aluno"
-                                                        [loading]="popoverChecklistComponent.loading"></app-aluno-checklist-status> -->
+                                                        [loading]="popoverChecklistComponent.loading"></app-aluno-checklist-status>
                         </td>
                         <td [pEditableColumn]="aluno.apostila_Abaco_Id"
                             [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"

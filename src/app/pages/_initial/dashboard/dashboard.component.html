@@ -1,22 +1,105 @@
 <div class="p-1">
-    <p-toolbar styleClass="border-none bg-white py-3 px-3 mb-4 shadow-1">
-        <div class="p-toolbar-group-start">
-            <h2 class="flex align-items-center ">
-                <i class="pi pi-calendar mr-3 text-primary text-2xl"></i>
-                <span class="text-2xl font-normal my-0">Dashboard</span>
-            </h2>
-        </div>
-        <div class="p-toolbar-group-center"></div>
-        <div class="p-toolbar-group-end">
-            <div class="flex align-items-center gap-2">
-                <div class="flex align-items-center gap-2">
+    <p-toolbar styleClass="border-none bg-white p-4 mb-4 shadow-1">
+        <div class="p-toolbar-group-end w-full">
+            <div class="w-full flex align-items-center flex-wrap gap-2">
+                <h2 class="flex align-items-center mr-auto">
+                    <i class="pi pi-calendar mr-3 text-primary text-xl"></i>
+                    <span class="text-2xl font-normal my-0">Dashboard</span>
+                </h2>
+                <!-- Turma -->
+                <div class="flex align-items-center justify-content-start gap-2 mr-2">
+                    <label for="turma_Id">Turma: </label>
+                    <p-select
+                              [options]="turmas"
+                              [(ngModel)]="request.turma_Id"
+                              [loading]="loadingTurmas"
+                              (ngModelChange)="turmaChanged()"
+                              #turma_Id="ngModel"
+                              styleClass="w-full"
+                              class="w-full"
+                              name="turma_Id"
+                              inputId="turma_Id"
+                              optionLabel="nome"
+                              optionValue="id"
+                              [filter]="true"
+                              filterBy="nome"
+                              placeholder="Selecione uma turma"
+                              [showClear]="true"
+                              appendTo="body"
+                              optionDisabled="deactivated">
+                        <ng-template let-item #item>
+                            <div class="flex align-items-center justify-content-between w-full gap-2">
+                                <div class="w-full">
+                                    <p class="font-bold">{{ item.nome }}</p>
+                                    <div class="flex align-items-center justify-content-between">
+                                        <p class="text-sm">
+                                            <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                            <span>{{ item.professor }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+                <!-- Educador -->
+                <div class="flex align-items-center justify-content-start gap-2 mr-2">
+                    <label for="professor_Id">Educador:</label>
+                    <p-select
+                              [options]="professores"
+                              [(ngModel)]="request.professor_Id"
+                              [loading]="loadingProfessores"
+                              (ngModelChange)="professorChanged()"
+                              #professor_Id="ngModel"
+                              styleClass="w-full"
+                              class="w-full"
+                              name="professor_Id"
+                              inputId="professor_Id"
+                              optionLabel="nome"
+                              optionValue="id"
+                              [filter]="true"
+                              filterBy="nome"
+                              placeholder="Selecione um educador"
+                              [showClear]="true"
+                              appendTo="body">
+                        <ng-template let-item #item>
+                            <div class="flex align-items-center justify-content-between w-full gap-2">
+                                <div>
+                                    <p class="font-bold mb-1 flex align-items-center ">
+                                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                        <span class="mr-2">{{ item.nome }}</span>
+                                    </p>
+                                    
+                                    <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                        <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+                <!-- Ano -->
+                <div class="flex align-items-center justify-content-start gap-2 ">
                     <label for="ano">Selecione o ano: </label>
                     <p-select inputId="ano"
                               name="ano"
-                              [(ngModel)]="ano"
+                              [(ngModel)]="request.ano"
                               [options]="anos"></p-select>
                 </div>
-                <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar dashboard" class="mr-2" size="small" styleClass="bg-black-alpha-80" />
+                <!-- Atualizar -->
+                <div class="">
+                    <p-button icon="pi pi-filter text-sm text-white"
+                        (onClick)="update()"
+                        severity="secondary"
+                        label="Filtrar"
+                        [text]="true"
+                        pTooltip="Aplicar filtros"
+                        class="mr-2"
+                        [rounded]="true"
+                        [disabled]="loadingDashboard"
+                        [loading]="loadingDashboard"
+                        styleClass="bg-black-alpha-80 text-white" />
+                </div>
             </div>
         </div>
     </p-toolbar>
@@ -30,11 +113,6 @@
              [virtualScroll]="true"
              [virtualScrollItemSize]="60"
              [virtualScrollDelay]="0">
-             <!-- 
-             [scrollable]="true"
-             scrollHeight="calc(100vh - 150px)"
-             [virtualScroll]="true"
-             [virtualScrollItemSize]="60" -->
         <ng-template #header let-columns>
             <tr pFrozenRow>
                 <th rowspan="2"
@@ -94,28 +172,16 @@
                 </ng-container>
             </tr>
         </ng-template>
-        <!-- <ng-template #groupheader let-customer>
-            <tr pRowGroupHeader style="z-index: 999" >
-                <td class="z-1 white-space-nowrap  py-1 surface-900 text-white"
-                    pFrozenColumn
-                    alignFrozen="left"
-                    [frozen]="true">
-                    <div class="flex align-items-center gap-2">
-                        <p>{{customer.turma}}</p>
-                    </div>
-                </td>
-                
-                <ng-container *ngFor="let mes of mesesAno; let i = index;">
-                    <td [colSpan]="mes.roteiros.length" class="z-0 p-0 surface-900 text-white" >  </td>
-                </ng-container>
-            </tr>
-        </ng-template> -->
-            <ng-template #body let-aluno let-i="rowIndex">
+        <ng-template #body let-aluno let-i="rowIndex">
             <tr>
-                <td pFrozenColumn alignFrozen="left" [frozen]="true" class="white-space-nowrap px-2 py-1 z-2" [ngClass]="{
-                    'surface-100': i % 2 == 0,
-                    'surface-50': i % 2 != 0,
-                }">
+                <td pFrozenColumn 
+                    alignFrozen="left" 
+                    [frozen]="true" 
+                    class="white-space-nowrap px-2 py-1 z-2" 
+                    [ngClass]="{
+                        'surface-100': i % 2 == 0, 
+                        'surface-50': i % 2 != 0,
+                    }">
                     <div class="flex align-items-center">
                         <span class="flex w-2rem h-2rem mr-2">
                             <a *ngIf="aluno && aluno.celular;"
@@ -150,15 +216,14 @@
                         <!-- Aulas fora da vigencia do aluno não escreve -->
                         <!-- {{item.aula.data|date : 'dd/MM HH:mm'}} -->
                         <ng-container *ngIf="item.show == true">
-                            <div class="cursor-pointer white-space-nowrap" (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)">
-                                
+                            <div class="cursor-pointer white-space-nowrap" 
+                                (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)">
                                 <p-badge *ngIf="item.primeiraAula"
-                                        styleClass=" bg-pink-500 border-pink-500"
-                                        value="Aula 1"
-                                        size="small"
-                                        severity="danger"
-                                        [pTooltip]="'Primeira aula'" />
-
+                                         styleClass="bg-pink-500 border-pink-500"
+                                         value="Aula 1"
+                                         size="small"
+                                         severity="danger"
+                                         [pTooltip]="'Primeira aula'" />
                                 <!-- Cancelada -->
                                 <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoDe_Evento_Id">
                                     <div class="w-full bg-red-500 text-xs p-1 border-1 border-red-500 text-white text-center">
@@ -186,12 +251,12 @@
                                         && item.participacao.active == true ">
                                     <div class="w-full bg-red-500 text-xs p-1 border-1 border-red-500 text-white text-center flex align-items-center justify-content-center gap-2">
                                         <span>Faltou</span>
-                                            <a *ngIf="aluno && aluno.celular;"
-                                               [href]="enviarMensagem(aluno.nome, aluno.celular)"
-                                               target="_blank"
-                                               pTooltip="Enviar mensagem"
-                                               class="pi pi-whatsapp hover:bg-green-500 text-white border-circle text-xs">
-                                            </a>
+                                        <a *ngIf="aluno && aluno.celular;"
+                                           [href]="enviarMensagem(aluno.nome, aluno.celular)"
+                                           target="_blank"
+                                           pTooltip="Enviar mensagem"
+                                           class="pi pi-whatsapp hover:bg-green-500 text-white border-circle text-xs">
+                                        </a>
                                     </div>
                                     <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                 </ng-container>
@@ -221,47 +286,49 @@
                                            (onHide)="unselectAlunoAula(popoverSelectedAlunoAula)"
                                            [dismissable]="true"
                                            styleClass="-mt-1">
-                                    <div *ngIf="!item.aula.active && !item.aula.reagendamentoPara_Evento_Id">
-                                        <p class="text-red-500 font-bold text-lg">
-                                            <span>Aula Cancelada</span>
-                                            <i class="pi pi-times ml-2"></i>
+                                    <div class="flex gap-2 flex-column">
+                                        <div *ngIf="!item.aula.active && !item.aula.reagendamentoPara_Evento_Id">
+                                            <p class="text-red-500 font-bold text-lg">
+                                                <span>Aula Cancelada</span>
+                                                <i class="pi pi-times ml-2"></i>
+                                            </p>
+                                        </div>
+                                        <div *ngIf="item.aula.reagendamentoDe_Evento_Id && item.aula.reagendamentoDe_Evento">
+                                            <p class="text-orange-500 font-bold text-base">
+                                                <span>Reagendamento da aula do dia {{item.aula.reagendamentoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
+                                                <i class="pi pi-exclamation ml-2"></i>
+                                            </p>
+                                        </div>
+                                        <div *ngIf="item.participacao.reposicaoDe_Evento_Id && item.participacao.reposicaoDe_Evento">
+                                            <p class="text-blue-600 font-bold text-base">
+                                                <span>Reposição da aula do dia {{item.participacao.reposicaoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
+                                                <i class="pi pi-exclamation ml-2"></i>
+                                            </p>
+                                        </div>
+                                        <p-badge *ngIf="item.primeiraAula"
+                                                 styleClass=" bg-pink-500 border-pink-500"
+                                                 value="Aula 1"
+                                                 size="small"
+                                                 severity="danger"
+                                                 [pTooltip]="'Primeira aula'" />
+                                        <p class="flex gap-2">
+                                            <span class="font-bold">Data:</span>
+                                            <span>{{item.aula.data | date:'dd/MM/yy '}}</span>
+                                            <span class="font-bold">Horário:</span>
+                                            <span>{{item.aula.data | date:'HH:mm'}}</span>
                                         </p>
-                                    </div>
-                                    <div *ngIf="item.aula.reagendamentoDe_Evento_Id && item.aula.reagendamentoDe_Evento">
-                                        <p class="text-orange-500 font-bold text-base">
-                                            <span>Reagendamento da aula do dia {{item.aula.reagendamentoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
-                                            <i class="pi pi-exclamation ml-2"></i>
+                                        <p *ngIf="item.aula.turma"><span class="font-bold">Turma</span> {{item.aula.turma}}</p>
+                                        <p *ngIf="item.aula.professor">
+                                            <span class="font-bold">Professor: </span>
+                                            <span>{{item.aula.professor}}</span>
+                                            <span class="border-circle w-1rem h-1rem ml-1 inline-flex" [style]="{ backgroundColor: item.aula.corLegenda }"> </span>
                                         </p>
-                                    </div>
-                                    <div *ngIf="item.participacao.reposicaoDe_Evento_Id && item.participacao.reposicaoDe_Evento">
-                                        <p class="text-blue-600 font-bold text-base">
-                                            <span>Reposição da aula do dia {{item.participacao.reposicaoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
-                                            <i class="pi pi-exclamation ml-2"></i>
+                                        <p class="font-bold mt-2">Observações: </p>
+                                        <p class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis" *ngIf="item.aula.observacao || item.participacao.observacao ">
+                                            <span>{{item.aula.observacao ?? item.participacao.observacao}}</span>
                                         </p>
+                                        <p class="white-space-normal text-500" *ngIf="!item.aula.observacao && !item.participacao.observacao">Nenhuma observação</p>
                                     </div>
-                                    <p-badge *ngIf="item.primeiraAula"
-                                            styleClass=" bg-pink-500 border-pink-500"
-                                            value="Aula 1"
-                                            size="small"
-                                            severity="danger"
-                                            [pTooltip]="'Primeira aula'" />
-                                    <p class="flex gap-2">
-                                        <span class="font-bold">Data:</span>
-                                        <span>{{item.aula.data | date:'dd/MM/yy '}}</span>
-                                        <span class="font-bold">Horário:</span>
-                                        <span>{{item.aula.data | date:'HH:mm'}}</span>
-                                    </p>
-                                    <p *ngIf="item.aula.turma"><span class="font-bold">Turma</span> {{item.aula.turma}}</p>
-                                    <p *ngIf="item.aula.professor">
-                                        <span class="font-bold">Professor: </span>
-                                        <span>{{item.aula.professor}}</span>
-                                        <span class="border-circle w-1rem h-1rem ml-1 inline-flex" [style]="{ backgroundColor: item.aula.corLegenda }"> </span>
-                                    </p>
-                                    <p class="font-bold mt-2">Observações: </p>
-                                    <p class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis" *ngIf="item.aula.observacao || item.participacao.observacao ">
-                                        <span>{{item.aula.observacao ?? item.participacao.observacao}}</span>
-                                    </p>
-                                    <p class="white-space-normal text-500" *ngIf="!item.aula.observacao && !item.participacao.observacao">Nenhuma observação</p>
                                 </p-popover>
                             </div>
                         </ng-container>

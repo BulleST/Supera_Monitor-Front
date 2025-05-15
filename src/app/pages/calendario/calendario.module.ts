@@ -15,13 +15,16 @@ import { EditarAulaComponent } from './evento/aula/editar-aula/editar-aula.compo
 import { CadastrarReuniaoComponent } from './evento/reuniao/cadastrar-reuniao/cadastrar-reuniao.component';
 import { CadastrarInscricaoComponent } from './evento/oficina/cadastrar-inscricao/cadastrar-inscricao.component';
 import { EditarReuniaoComponent } from './evento/reuniao/editar-reuniao/editar-reuniao.component';
-import { SelectedEventoComponent } from './selected-evento/selected-evento.component';
+import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { AlunoChecklistPopoverComponent } from './aluno-checklist-popover/aluno-checklist-popover.component';
 import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
 import { AlunoChecklistStatusComponent } from './aluno-checklist-status/aluno-checklist-status.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
+import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
+import { HeaderComponent } from './full-calendar/header/header.component';
+import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-cognitivo/calculo-perfil-cognitivo.component';
 
 @NgModule({
     declarations: [
@@ -44,6 +47,9 @@ import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extr
         ReagendarEventoComponent,
         SelectedEventoComponent,
         CadastrarTurmaExtraComponent,
+        ToolbarComponent,
+        HeaderComponent,
+        CalculoPerfilCognitivoComponent,
     ],
     imports: [
         CommonModule,

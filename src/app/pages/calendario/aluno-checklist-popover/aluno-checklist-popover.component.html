@@ -1,8 +1,9 @@
-<p-popover #popover styleClass="-mt-1 mx-w-screen" [dismissable]="true">
-    <p-tabs [value]="aluno.checklist_Id ?? 0" scrollable #tabs >
+<p-popover #popover styleClass="-mt-1 mx-w-screen" [dismissable]="true" (onShow)="onPopoverShow()">
+    <p-tabs [value]="checklistIndex" scrollable #tabs [scrollLeft]="scrollLeft">
         <p-tablist style="max-width: 50rem;">
             <p-tab *ngFor="let checklist of aluno.checklistCompleto" 
-                [value]="checklist.id"> 
+                [value]="checklist.id"
+                #tab> 
                 <div class="flex align-items-center ">
                     <span>{{checklist.nome}} </span>
                     

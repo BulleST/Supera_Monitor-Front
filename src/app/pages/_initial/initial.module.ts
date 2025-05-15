@@ -13,6 +13,7 @@ import { MonitoramentoComponent } from './monitoramento/monitoramento.component'
 // import { SelectedAulaComponent } from './home/selected-aula/selected-aula.component';
 // import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { JornadaSuperaChecklistComponent } from './jornada-supera-checklist/jornada-supera-checklist.component';
 // import { CadastrarAulaComponent } from './home/cadastrar-aula/cadastrar-aula.component';
 
 @NgModule({
@@ -26,6 +27,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
         // SelectedAulaComponent,
         // ReagendarAulaComponent,
         DashboardComponent,
+        JornadaSuperaChecklistComponent,
         // CadastrarAulaComponent,
     ],
     imports: [

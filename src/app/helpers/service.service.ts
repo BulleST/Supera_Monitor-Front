@@ -14,7 +14,7 @@ export class Service {
 
     constructor(
         public http: HttpClient,
-        public toastrService: ToastrService
+        public toastrService: ToastrService,
     ) {
         this.url = environment.url + 'back';
     }

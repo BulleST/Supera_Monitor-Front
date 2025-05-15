@@ -21,22 +21,31 @@
                [ngStyle]="{height: '30rem'}">
     <ng-template #eventContent let-arg>
         <ng-container *ngIf="!loading; else loadingEvent">
-            <!-- (click)="contextMenuShow(contextMenu, arg.event.extendedProps, $event)" -->
-            <a class="cursor-pointer" (click)="edit(arg.event.extendedProps)" title="Clique para ver mais" >
-                <div class="border-round-md  p-2 h-full w-full -mt-2 -mb-3 m-1 mr-2" 
-                        [style]="{ 
-                        height: 'calc(3rem + 10vh)',
-                        backgroundColor: arg.event.extendedProps.corLegenda ?? '#000', 
-                        borderColor: arg.event.extendedProps.corLegenda ?? '#000',
-                        color: getForeColor(arg.event.extendedProps.corLegenda ?? '#000')
-                    }">
-                    <p class="text-sm ">
-                        <i class="pi pi-calendar mr-2 text-sm"></i>
-                        <span>Semana {{arg.event.extendedProps.semana}}</span>
-                    </p>
-                    <p class="text-xl font-bold">{{arg.event.title}}</p>
-                </div>
-            </a>
+
+            <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
+            <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
+                <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
+                    <div class="py-1">
+                        <p class="text-xs">
+                            <i class="pi pi-calendar mr-2 text-xs"></i>
+                            <span>Feriado</span>
+                        </p>
+                        <p class="text-base font-bold">{{evento.descricao}}</p>
+                        <p class="text-xs">{{evento.level}} - {{evento.type}}</p>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
+                    <div class="py-1 cursor-pointer" 
+                        (click)="edit(evento)" 
+                        title="Clique para ver mais" >
+                        <p class="text-sm">
+                            <i class="pi pi-calendar mr-2 text-sm"></i>
+                            <span>Semana {{evento.semana}}</span>
+                        </p>
+                        <p class="text-xl font-bold">{{evento.tema}}</p>
+                    </div>
+                </ng-container>
+            </ng-template>
         </ng-container>
         <ng-template #loadingEvent>
             <p-skeleton width="100%" height="calc(3rem + 10vh)" />

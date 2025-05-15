@@ -9,10 +9,17 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { ChecklistService } from '../../../services/checklist.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno } from '../../../models/alunos.model';
-import  moment  from 'moment';
+import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
+import { Professor } from '../../../models/professor.model';
+import { Turma } from '../../../models/turma.model';
+import { DashboardRequest } from '../../../models/dashboard.model';
+import { TurmaService } from '../../../services/turma.service';
+import { AccountService } from '../../../services/account.service';
+import { ProfessorService } from '../../../services/professor.service';
+import { AlunoChecklistItemList, AlunoChecklistItemList_Request } from '../../../models/aluno-checklist-item-list.model';
 
 @Component({
     selector: 'app-monitoramento',
@@ -22,20 +29,33 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
     providers: [ConfirmationService]
 })
 export class MonitoramentoComponent implements OnDestroy {
-    checklists: Checklist[] = []; 
-    items: Checklist_Item[] = [];
-    
-    alunos: Aluno[] = [];
+
     checklistObservacao = '';
     subscription: Subscription[] = [];
-    // @ViewChild('dragScroll', { read: DragScrollComponent }) dragScroll!: DragScrollComponent;
-    width: string = ''
-    height: string = ''
-    disabled = false
-    screen: ScreenWidth = ScreenWidth.lg;
-    ScreenWidth: typeof ScreenWidth = ScreenWidth;
+    request: AlunoChecklistItemList_Request = new AlunoChecklistItemList_Request;
+
+    // width: string = ''
+    // height: string = ''
+    // disabled = false
+    // screen: ScreenWidth = ScreenWidth.lg;
+    // ScreenWidth: typeof ScreenWidth = ScreenWidth;
+    items: Checklist_Item[] = [];
+    checklists: Checklist[] = [];
     loadingChecklist = true;
+
+    list: AlunoChecklistItemList[] = [];
+    listFiltered: AlunoChecklistItemList[] = [];
+    loading = false;
+
+    professores: Professor[] = [];
+    loadingProfessores = false;
+
+    turmas: Turma[] = [];
+    loadingTurmas = false;
+
+    alunos: Aluno[] = [];
     loadingAlunos = false;
+
 
     constructor(
         private header: Header,
@@ -45,20 +65,51 @@ export class MonitoramentoComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private toastr: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private turmaService: TurmaService,
+        private accountService: AccountService,
+        private professorService: ProfessorService,
+
+
     ) {
 
-        var screen = this.mobileService.get().subscribe(res => this.screen = res)
-        this.subscription.push(screen);
-        var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => {
-            // if (this.dragScroll) {
-            //     this.width = $('#dragContainer').width()?.toString() as string;
-            //     setTimeout(() => {
-            //         this.dragScroll.scrollbarWidth = $('#dragContainer').width()?.toString() ?? null;
-            //         this.dragScroll.elWidth = $('#dragContainer').width()?.toString() ?? null;
-            //     }, 200);
-            // }
+        // var screen = this.mobileService.get().subscribe(res => this.screen = res)
+        // this.subscription.push(screen);
+        // var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => {
+        // })
+        // this.subscription.push(menuAsideOpen);
+
+        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        this.subscription.push(professores);
+
+        if (this.professores.length == 0) {
+            this.loadingProfessores = true;
+            lastValueFrom(this.professorService.getList())
+                .then(res => this.loadingProfessores = false)
+                .catch(res => this.loadingProfessores = false);
+        }
+
+        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        this.subscription.push(turmas);
+
+        if (this.turmas.length == 0) {
+            this.loadingTurmas = true;
+            lastValueFrom(this.turmaService.getList())
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false);
+        }
+        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        this.subscription.push(alunos);
+
+        if (this.alunos.length == 0) {
+            this.loadingAlunos = true;
+            lastValueFrom(this.alunoService.getList())
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false);
+        }
+
+        this.accountService.account.subscribe(res => {
+            this.request.professor_Id = res?.professor_Id;
         })
-        this.subscription.push(menuAsideOpen);
 
         this.update();
 
@@ -67,12 +118,14 @@ export class MonitoramentoComponent implements OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe());
     }
+
     async update() {
-        if (!this.checklists.length) 
+        if (!this.checklists.length)
             await this.getChecklists();
 
-        this.getChecklistAlunos();
+        this.getList();
     }
+
 
     async getChecklists() {
         this.loadingChecklist = true;
@@ -80,78 +133,102 @@ export class MonitoramentoComponent implements OnDestroy {
             .then(res => {
                 this.checklists = res;
                 this.items = res.flatMap(x => x.items);
-            })
+            });
+
         this.loadingChecklist = false;
     }
 
-     getChecklistAlunos() {
-        this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.getListWithChecklist())
-            .then(alunos => {
-                var alunosChecklistItem: Aluno_CheckList_Item[] = alunos.flatMap(x => x.alunoChecklist);
-                this.checklists = this.checklists.map(checklist => {
-                        checklist.items.map(checklistItem => {
-                            var naoFinalizados = alunosChecklistItem.filter(x => x.checklist_Item_Id == checklistItem.id && x.finalizado == false && moment(x.prazo).week() <= moment(new Date).week() );
+    getList() {
+        this.loading = true;
+        lastValueFrom(this.alunoService.getChecklist(this.request))
+            .then(res => {
+                this.list = res.map(item => {
+                    if (!item.finalizado && moment(item.prazo).week() < moment(new Date).week())
+                        item.status = 'Atrasado';
+                    else if (!item.finalizado && moment(item.prazo).week() == moment(new Date).week())
+                        item.status = 'Pendente'
+                    else if (!item.finalizado && moment(item.prazo).week() > moment(new Date).week())
+                        item.status = 'À realizar'
+                    else if (item.finalizado)
+                        item.status = 'Finalizado'
+                    return item;
+                });
+                this.loading = false;
 
-                            checklistItem.alunos = naoFinalizados
-                                .filter(x => !x.prazo || moment(x.prazo).isSameOrBefore(new Date, 'dates'))
-                                .map(x => {
-                                    var aluno = alunos.find(aluno => aluno.id == x.aluno_Id) as Aluno;
-                                    x.aluno = aluno;
-                                    if (!x.finalizado && moment(x.prazo).week() < moment(new Date).week())
-                                        x.status = 'Atrasado';
-                                    else if (moment(x.prazo).week() == moment(new Date).week() && !x.finalizado)
-                                        x.status = 'Pendente'
-                                    else if (x.finalizado)
-                                        x.status = 'Finalizado'
-                                    return x;
-                                });
-                        })
-                        return checklist;
-                })
-                this.alunos = alunos;
-              
-                this.loadingAlunos = false;
+                this.filtrarPendentesSemana();
             })
-            .catch(res => {
-                this.loadingAlunos = false;
-            })
+            .catch(res => this.loading = false);
+
     }
 
-    drop(event: CdkDragDrop<Aluno_CheckList_Item[]>) {
-        if (event.previousContainer === event.container) {
-            moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    filtrarPendentesSemana() {
+        if (this.request.pendentesSemana) {
+            this.listFiltered = this.list.filter(x => moment(x.prazo).week() == moment().week())
         } else {
-            transferArrayItem(
-                event.previousContainer.data,
-                event.container.data,
-                event.previousIndex,
-                event.currentIndex,
-            );
+            this.listFiltered = this.list;
+        }
+        this.setChecklist();
+    }
 
-            this.height = ($('#dragContainer')!.height()! + 50 + 20).toString()
-            // this.dragScroll.elHeight = this.height
+    setChecklist() {
+        this.checklists = this.checklists.map(checklist => {
+            checklist.items = checklist.items.map(checklistItem => {
+                var itens = this.listFiltered.filter(x => x.checklist_Item_Id == checklistItem.id);
+                checklistItem.alunos = itens;
+                return checklistItem;
+            });
+            return checklist;
+        });
+    }
 
+    turmaChanged() {
+        var turma = this.turmas.find(x => x.id == this.request.turma_Id);
+        this.request.professor_Id = turma?.professor_Id;
 
-            event.item.data.status = 'Pendente'
+        this.alunos = this.alunos.map(x => {
+            x.deactivated = x.turma_Id == this.request.turma_Id ? undefined : new Date;
+            return x;
+        });
 
+        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        if (this.request.turma_Id && aluno && aluno.turma_Id != this.request.turma_Id) {
+            this.request.aluno_Id = undefined;
         }
     }
 
-    // scrollDragStart(e: DragScrollComponent) {
-    //     this.dragScroll._contentRef.nativeElement.style.cursor = 'grab'
-    //     this.dragScroll._contentRef.nativeElement.style.pointerEvents = 'auto'
+    professorChanged() {
+        this.turmas = this.turmas.map(x => {
+            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
+            return x;
+        })
 
-    // }
+        this.alunos = this.alunos.map(x => {
+            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
+            return x;
+        });
 
-    // scrollDragEnd(e: DragScrollComponent) {
-    //     this.dragScroll._contentRef.nativeElement.style.cursor = 'pointer'
-    // }
-    
+        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        if (this.request.professor_Id && aluno && aluno.professor_Id != this.request.professor_Id) {
+            this.request.aluno_Id = undefined;
+        }
+
+        var turma = this.turmas.find(x => x.id == this.request.turma_Id);
+        if (this.request.turma_Id && turma && turma.id != this.request.turma_Id) {
+            this.request.turma_Id = undefined;
+        }
+
+    }
+
+    alunoChanged() {
+        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        this.request.turma_Id = aluno?.turma_Id;
+        this.request.professor_Id = aluno?.professor_Id;
+    }
+
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
-    
+
     enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
     }
@@ -186,10 +263,10 @@ export class MonitoramentoComponent implements OnDestroy {
         })
     }
 
-    finalizarChecklist(e: any, item: Aluno_CheckList_Item) {
+    finalizarChecklist(e: any, item: AlunoChecklistItemList) {
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
-            message: `Tem certeza que deseja marcar o item <b>"${item.nome}"</b> para o(a) aluno(a) <b>${item.aluno.nome}</b> como finalizado?`,
+            message: `Tem certeza que deseja marcar o item <b>"${item.checklist_Item}"</b> para o(a) aluno(a) <b>${item.aluno}</b> como finalizado?`,
             header: 'Finalizar item da jornada',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
@@ -205,17 +282,21 @@ export class MonitoramentoComponent implements OnDestroy {
                 lastValueFrom(this.service.markAsDone(item.id, this.checklistObservacao))
                     .then(res => {
                         this.checklistObservacao = '';
-                        // this.getChecklistAlunos();
-                        this.toastr.success('Checkelist finalizado.');
 
-                        // var checklist = this.checklists.find(x => x.id == item.checklist_Id) as Checklist; 
-                        // var checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id) as Checklist_Item;
-                        // var index = checklistItem?.alunos.findIndex(x => x.id == item.id);
-                        // console.log('checklist', checklist)
-                        // console.log('checklistItem', checklistItem)
-                        // console.log('index', index)
-                        // if (index != -1) checklistItem?.alunos.splice(index, 1)
+                        var checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
+                        var checklist = this.checklists.find(x => x.id == item.checklist_Id);
+                        if(checklistIndex != -1 && checklist ) {
+                            var checklistItemIndex = checklist.items.findIndex(x => x.id == item.checklist_Item_Id);
+                            var checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id);
 
+                            if (checklistItem && checklistItemIndex != -1) {
+                                var aluno = checklistItem.alunos.find(x => x.aluno_Id == item.aluno_Id);
+                                var alunoIndex = checklistItem.alunos.findIndex(x => x.aluno_Id == item.aluno_Id);
+                                if (aluno && alunoIndex != -1) {
+                                    checklistItem.alunos.splice(alunoIndex, 1);
+                                }
+                            }
+                        }
 
                     })
                     .catch(res => {

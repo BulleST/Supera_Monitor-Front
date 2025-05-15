@@ -8,7 +8,7 @@ import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
 import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { Dashboard} from '../models/dashboard.model';
+import { Dashboard, DashboardRequest} from '../models/dashboard.model';
 import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -32,7 +32,7 @@ export class EventoService extends Service {
     evento = new BehaviorSubject<Evento | undefined>(undefined);
     
     calendarioReload = new EventEmitter<number>();
-    calendarView = new BehaviorSubject<CalendarioView>(CalendarioView.CalendarioGeral);
+    calendarView = new EventEmitter<CalendarioView>();
     roteiros: Roteiro[] = [];
     
     dashboard = new BehaviorSubject<Dashboard[]>([]);
@@ -147,10 +147,9 @@ export class EventoService extends Service {
         }));
     }
 
-    getDashboard(ano: number, mes: number) {
-        return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, { ano, mes })
+    getDashboard(request: DashboardRequest) {
+        return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, request)
         .pipe(map(dashboardList => {
-            
             
             dashboardList = dashboardList.map(res => {
                 res.participacao.active = !res.participacao.deactivated;
@@ -203,6 +202,7 @@ export class EventoService extends Service {
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, model)
     }
+
     editAula0(model: EventoAula0Request ) {
         var request = MyMap(model, new EventoAula0Request) as EventoAula0Request;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
@@ -214,6 +214,7 @@ export class EventoService extends Service {
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, model)
     }
+
     editAulaExtra(model: EventoAulaExtraRequest ) {
         var request = MyMap(model, new EventoAulaExtraRequest) as EventoAulaExtraRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
@@ -225,21 +226,25 @@ export class EventoService extends Service {
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.post<RequestResponse>(`${this.url}/eventos/superacao`, model)
     }
+    
     editSuperacao(model: EventoSuperacaoRequest ) {
         var request = MyMap(model, new EventoSuperacaoRequest) as EventoSuperacaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/superacao`, model)
     }
+    
     createOficina(model: EventoOficinaRequest ) {
         var request = MyMap(model, new EventoOficinaRequest) as EventoOficinaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.post<RequestResponse>(`${this.url}/eventos/oficinas`, model)
     }
+    
     editOficina(model: EventoOficinaRequest ) {
         var request = MyMap(model, new EventoOficinaRequest) as EventoOficinaRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/oficinas`, model)
     }
+    
     createReuniao(model: EventoReuniaoRequest ) {
         var request = MyMap(model, new EventoReuniaoRequest) as EventoReuniaoRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;

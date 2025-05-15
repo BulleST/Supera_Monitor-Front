@@ -179,8 +179,6 @@ export class CancelarEventoComponent implements OnDestroy {
         return this.mensagemWhatsapp.getEventoTipo(e)
     }
 
-
-
     goToReagendamento() {
         if (this.evento) {
             this.service.setEvento(this.evento);
@@ -199,7 +197,6 @@ export class CancelarEventoComponent implements OnDestroy {
             this.router.navigate(['calendario', route, 'reagendar', this.crypto.encrypt(this.evento.id)]);
         }
     }
-
 
     enviarMensagemCancelamento(nome: string, celular: string) {
         return this.mensagemWhatsapp.enviarMensagemCancelamento(nome, celular, this.evento);
@@ -266,8 +263,6 @@ export class CancelarEventoComponent implements OnDestroy {
         }
     }
 
-
-
     request() {
         this.evento.data = new Date(this.evento.data)
         switch (this.evento.evento_Tipo_Id) {
@@ -311,7 +306,6 @@ export class CancelarEventoComponent implements OnDestroy {
         return lastValueFrom(this.service.editOficina(request));
     }
 
-
     sendMensagemAlunos() {
         this.mensagensEnviadasAlunos = this.evento!.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : 1);;
         this.confirmationService.confirm({
@@ -329,6 +323,7 @@ export class CancelarEventoComponent implements OnDestroy {
         });
 
     }
+
     removerAlunoLista(aluno: Evento_Participacao_Aluno, e: any) {
         if (e.which == 2) {
             var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)

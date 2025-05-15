@@ -11,7 +11,6 @@ import { RequestResponse } from '../helpers/request-response.interface';
 })
 export class ChecklistService extends Service {
     override list = new BehaviorSubject<Checklist[]>([]);
-    
     getList() {
         return this.http.get<Checklist[]>(`${this.url}/checklist/all/`).pipe(tap({
             next: res => {
@@ -96,6 +95,9 @@ export class ChecklistService extends Service {
         }
         return this.http.patch<RequestResponse>(`${this.url}/checklist/toggle-item`, request)
             .pipe(tap({
+                next: res => {
+                    this.toastrService.success(`Checklist finalizado`, 'Sucesso')
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível finalizar item da jornada. \n ${getError(err)}`);
                 }

@@ -3,6 +3,8 @@ import { Professor } from "../models/professor.model";
 import { Evento } from "../models/evento.model";
 import { SalaAula, SalaAulaId } from "../models/sala-aula.model";
 import { Aluno } from "../models/alunos.model";
+import { SelectChangeEvent } from "primeng/select";
+import { NgModel } from "@angular/forms";
 
 export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[], eventos: Evento[], turma_Id?: number, evento_Id?: number) {
     var intervaloDe = moment(data);
@@ -17,11 +19,11 @@ export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[]
             var c2 = turmaIntervalo[0].isBefore(eventoIntervalo[1])
             var c3 = turmaIntervalo[1].isAfter(eventoIntervalo[0])
             var c4 = turmaIntervalo[1].isBefore(eventoIntervalo[1])
-            var c5 =  e.alunos.findIndex(x => x.aluno_Id == item.id) != -1
+            var c5 = e.alunos.findIndex(x => x.aluno_Id == item.id) != -1
             var c6 = e.turma_Id != turma_Id;
             var c7 = evento_Id ? e.id != evento_Id : true;
 
-            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {
+            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7) {
                 return e;
             }
 
@@ -39,6 +41,30 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
     var turmaIntervalo = [intervaloDe, intervaloAte];
 
     return professores.map(item => {
+
+        if (item.id == 31) {
+            console.log('expedienteInicio', item.expedienteInicio)
+            console.log('expedienteFim', item.expedienteFim)
+
+        }
+        // Se o horário iniciar antes do inicio do expediente do professor
+        if (item.expedienteInicio) {
+            let _data = moment().set({ hour: intervaloDe.hours(), minute: intervaloDe.minutes(), second: 0 })
+            if (_data.isBefore(item.expedienteInicio)) {
+                item.disponivel = false;
+                return item;
+            }
+        }
+
+        // Se o horário finalizar apos o fim expediente do professor
+        if (item.expedienteFim) {
+            let _data = moment().set({ hour: intervaloAte.hours(), minute: intervaloAte.minutes(), second: 0 })
+            if (_data.isAfter(item.expedienteFim) || _data.add(duracaoMinutos, 'minutes').isAfter(item.expedienteFim)) {
+                item.disponivel = false;
+                return item;
+            }
+        }
+
         var evento = eventos.find(e => {
             var eventoIntervalo = [moment(e.data), moment(e.data).add(e.duracaoMinutos, 'minutes')]
 
@@ -50,11 +76,12 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
             var c6 = e.turma_Id != turma_Id;
             var c7 = evento_Id ? e.id != evento_Id : true;
 
-            if (((c1 && c2) || (c3 && c4)) && !c5 && c6 && c7  &&  item.id == 33) {
+
+            if (((c1 && c2) || (c3 && c4)) && !c5 && c6 && c7 && item.id == 33) {
                 // console.log('oi',e.professor_Id, e.professores)
-            } 
-            
-            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {
+            }
+
+            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7) {
                 return e;
             }
 
@@ -87,7 +114,7 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
             var c6 = e.turma_Id != turma_Id;
             var c7 = evento_Id ? e.id != evento_Id : true;
 
-            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7 ) {
+            if (((c1 && c2) || (c3 && c4)) && c5 && c6 && c7) {
                 return e;
             }
             return false

@@ -6,21 +6,20 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { TurmaService } from '../../../../services/turma.service';
 import { AlunoService } from '../../../../services/alunos.service';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
-import { Aluno_Restricao } from '../../../../models/aluno-restricao.model';
+import { Aluno_Restricao, Aluno_Restricao_Request } from '../../../../models/aluno-restricao.model';
 import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
 import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
 import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import moment from 'moment';
 import { UserService } from '../../../../services/user.service';
-import { CalendarioAlunoChecklistView } from '../../../../models/calendario.model';
 import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
-import { MultiSelect, MultiSelectChangeEvent } from 'primeng/multiselect';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
-import { SelectChangeEvent } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
+import { getError } from '../../../../utils';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -48,9 +47,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     sexos: Pessoa_Sexo[] = [];
     loadingSexos = true;
 
-    @ViewChild('_restricoes') _restricoes!: NgModel;
-    @ViewChild('restricoesMultiselect') restricoesMultiselect!: MultiSelect;
-    restricoes: Aluno_Restricao[] = [];
+    restricoesText = '';
     loadingRestricoes = false;
 
     perfisCognitivos: PerfilCognitivo[] = [];
@@ -65,6 +62,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     minDate: Date = new Date(1900, 1, 1);
     maxDate: Date = new Date();
+    checklistObservacao: string = '';
+    textoChecklist = '';
 
     constructor(
 
@@ -79,8 +78,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private apostilaService: ApostilaService,
     ) {
 
-        var restricaoCreated = this.service.restricaoCreated.subscribe(res => this.restricoes.push(res));
-        this.subscription.push(restricaoCreated)
+        // var restricaoCreated = this.service.restricaoCreated.subscribe(res => this.restricoes.push(res));
+        // this.subscription.push(restricaoCreated)
 
         var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos)
@@ -130,17 +129,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             this.oldTurmaId = this.selectedTurma?.id;
 
             if (this.object.id) {
-                this.loadingRestricoes = true;
-                lastValueFrom(this.restricaoService.getList(this.object.id))
-                    .then(res => {
-                        this.restricoes = res;
-                        this.loadingRestricoes = false;
-                        this.object.restricoes = res;
-                    })
-                    .catch(res => this.loadingRestricoes = false);
-
+                this.loadRestricoes();
                 this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
 
+                if (!this.object.checklist) {
+                    var atrasados = this.object.checklistCompleto.filter(x => x.atrasados.length)
+                    var pendentesDaSemana = this.object.checklistCompleto.filter(x => x.pendentesDaSemana.length)
+                    if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
+                    if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
+                }
                 if(!this.object.rm) {
                     this.object.rm = this.generateRM()
                 }
@@ -247,7 +244,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 return;
             }
             
-            if (this.object.restricoes.length > 0) {
+            if (this.object.restricoes.length > 0 || this.object.restricaoMobilidade) {
                 this.turmaChangedRestricaoConffirm(e, model);
             }
             else {
@@ -263,13 +260,18 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChangedRestricaoConffirm(e: any, model: NgModel) {
+        var message = 'O aluno apresenta as seguintes restrições: <ul>';
+        if (this.object.restricoes.length > 0) {
+            message += `${this.object.restricoes.map(x => `<li>${x.descricao}.</li>`)}`
+        }
+        if (this.object.restricaoMobilidade) {
+            message += `<li class="font-bold">Restrição de mobilidade.</li>`
+            
+        }
+        message += `</ul> <p>Continuar com transferência de turma?</p>`;
         this.confirmationService.confirm({
             target: e.target,
-            message: `
-                <p>O aluno apresenta uma ou mais restrições:</p>
-                <ul>${this.object.restricoes.map(x => `<li>${x.descricao}</li>`)}</ul>
-                <p>Continuar com transferência de turma?</p>
-            `,
+            message: message,
             header: 'Transferência de turma',
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
@@ -343,86 +345,162 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         })
     }
 
-
-    checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
-
-        if (model.control.value) {
-
-            if (moment(item.prazo).week() > moment(new Date).week()) {
-                this.showError('Checklist indisponível', 'Você não pode finalizar esse checklist ainda.', e);
-                model.control.setValue(false);
-                return;
-            }
-
-
+    
+        finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
             this.confirmationService.confirm({
-                target: e.target,
-                message: `Tem certeza que deseja marcar etapa como realizada?.`,
-                header: 'Finalizar etapa',
+                key: 'checklistConfirmation',
+                message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
+                header: 'Finalizar item',
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                rejectVisible: true,
                 rejectIcon: 'pi pi-times',
-                rejectLabel: 'Ainda não',
+                rejectLabel: 'Cancelar',
                 rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
                 accept: async () => {
                     this.loadingChecklists = true;
-                    lastValueFrom(this.checklistService.markAsDone(item.id))
+                    item.observacoes = this.checklistObservacao
+                    lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
                         .then(res => {
+                            this.checklistObservacao = '';
+                            
                             this.loadingChecklists = false;
-                            this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
                             item.finalizado = true;
                             item.dataFinalizacao = res.object.dataFinalizacao;
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
 
-                            // checklist.prazo = checklist.items[0].prazo;
-                            // checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
-                            // checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-                            // checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-
                             this.userService.get(item.account_Finalizacao_Id!)
                                 .then(res => item.account_Finalizacao = res.name);
-
+    
+                        })
+                        .catch(res => {
+                            this.loadingChecklists = false;
+                            this.showError('Não foi possível finalizar checklist.', getError(res), e)
                         })
                 },
                 reject: () => {
-                    model.control.setValue(false);
+                    ngModel.control.setValue(false);
                 }
             });
+    
         }
-    }
 
-    restricaoChanged(e: MultiSelectChangeEvent) {
-        var inserted = e.value.find((x: Aluno_Restricao) => x.id == e.itemValue.id);
-        if (!inserted) {
+        loadRestricoes() {
+            this.loadingRestricoes = true;
+                lastValueFrom(this.restricaoService.getList(this.object.id))
+                    .then(res => {
+                        this.object.restricoes = res;
+                        this.loadingRestricoes = false;
+                        this.getRestricoes();
+                    })
+                    .catch(res => this.loadingRestricoes = false);
+
+        }
+
+
+        cadastrarRestricao(e: any, model: HTMLInputElement) {
+            var restricao = model.value;
+
+            if (!restricao) {
+                this.showError('Erro', 'Insira uma restrição para salvar', e);
+            } else if (this.object.restricoes.find(x => x.descricao == restricao )) {
+                this.showError('Erro', 'Essa restrição já existe', e);
+            } else {
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: `Você inseriu uma nova restrição, deseja salvar?`,
+                    header: 'Inserir restrição',
+                    icon: 'pi pi-exclamation-triangle',
+                    acceptIcon: 'pi pi-check',
+                    acceptLabel: 'Salvar',
+                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                    rejectVisible: true,
+                    rejectIcon: 'pi pi-times',
+                    rejectLabel: 'Cancelar',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                    accept: async () => {
+                        var request: Aluno_Restricao_Request = {
+                            id: 0,
+                            aluno_Id: this.object.id,
+                            descricao: restricao,
+                        }
+                        this.loadingRestricoes = true;
+                        lastValueFrom(this.restricaoService.create(request))
+                            .then(res => {
+                                model.value = '';
+                                this.loadingRestricoes = false;
+                                if (res.success) {
+                                    this.toastrService.success(`Registro cadastrado com sucesso.`);
+
+                                    res.object.active = true;
+
+                                    this.object.restricoes.push(res.object);
+                                    this.getRestricoes();
+                                    console.log(this.restricoesText)
+                                }
+                            })
+                            .catch((res: HttpErrorResponse) => {
+                                this.loadingRestricoes = false;
+                                this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                            })
+                    },
+                    reject: () => {
+                        model.value = '';
+                    }
+                });
+            }
+            
+        }
+        toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel) {
+            var active = item.active;
+            var text = `${active ? 'Habilitar' : 'Desabilitar'}`
+            var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
+            var title = `${text} restrição`;
+            
             this.confirmationService.confirm({
-                target: e.originalEvent.target as any,
-                message: `Tem certeza que deseja remover essa restrição?. \n Não haverá mais notificações referente a essa restrição em futuras atualizações do aluno. \n Restrição: ${e.itemValue.descricao}`,
-                header: 'Remover restrição',
+                target: e.target,
+                message: mensagem,
+                header: title,
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
-                acceptLabel: 'Contrinuar',
+                acceptLabel: text,
                 acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
                 rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
                 accept: async () => {
+                    
+                        this.loadingRestricoes = true;
+                        lastValueFrom(this.restricaoService.toggle(item.id))
+                            .then(res => {
+                                this.loadingRestricoes = false;
+                                if (res.success) {
+                                    this.toastrService.success(`Concluído`);
+
+                                    res.object.active = !res.object.deactivated;
+
+                                    var index = this.object.restricoes.findIndex(x => x.id == item.id);
+                                    if (index != -1) {
+                                        this.object.restricoes.splice(index, 1, res.object)
+                                    }
+                                    this.getRestricoes();
+                                }
+                            })
+                            .catch((res: HttpErrorResponse) => {
+                                this.loadingRestricoes = false;
+                                this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                                model.control.setValue(item.active);
+                            })
+                    
 
                 },
                 reject: () => {
-                    this.object.restricoes.push(e.itemValue);
-                    // this._restricoes.control.setValue(this.object.restricoes);
-                    // this._restricoes.update.emit(this.object.restricoes);
-                    // this.restricoesMultiselect.updateModel(this.object.restricoes)
-                    // this.restricoesMultiselect.selectedOptions = this.object.restricoes
-                    // this.restricoesMultiselect.writeValue(this.object.restricoes);
+                    model.control.setValue(item.active);
                 }
             });
         }
-        console.log(e)
-    }
-
 
     generateRM() {
         const min = 100000;
@@ -430,5 +508,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         var rm = Math.floor(Math.random() * (max - min + 1)) + min
         return rm.toString();
       }
-      
+
+      getRestricoes() {
+        if(!this.object || !this.object.restricoes || this.object.restricoes.length == 0) {
+            this.restricoesText =  ''
+        } else {
+            this.restricoesText =  this.object.restricoes.filter(x => x.active).map(x => x.descricao).join(', ')
+        }
+        return this.restricoesText;
+      }
 }

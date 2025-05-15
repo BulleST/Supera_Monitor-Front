@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
@@ -10,7 +10,7 @@ import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../services/user.service';
 import { Popover } from 'primeng/popover';
-import { TabList, Tabs } from 'primeng/tabs';
+import { Tabs } from 'primeng/tabs';
 import $ from 'jquery';
 
 @Component({
@@ -29,6 +29,10 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
 
     @ViewChild('popover') popover!: Popover
     @ViewChild('tabs') tabs!: Tabs;
+    @ViewChildren('tab') tab!: QueryList<Tabs>;
+
+    checklistIndex: number = 0;
+    scrollLeft: number = 0;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -43,9 +47,12 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
+            this.checklistIndex = this.aluno.checklist_Id ?? this.aluno.checklistCompleto[this.aluno.checklistCompleto.length-1].id;
             if(!this.aluno.alunoChecklist || !this.aluno.alunoChecklist.length )
                 this.loadChecklistAluno();
         }
+    }
+    ngAfterViewInit(): void {
     }
 
     ngOnDestroy(): void {
@@ -84,9 +91,6 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
 
     }
 
-    ngAfterViewInit(): void {
-        
-    }
 
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
         if (model.control.value) {
@@ -153,4 +157,17 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
     }
 
 
+    onPopoverShow() {
+        console.log('tab', this.tab)
+
+        var tab = $(`p-tab[ng-reflect-value="${this.checklistIndex}"]`).last()
+        console.log('tab', tab)
+        console.log('tab', $(tab).offset()?.left)
+
+        this.scrollLeft = $(tab).offset()?.left ?? 0
+
+        $('.p-tablist-viewport').animate({
+            scrollLeft: this.scrollLeft
+        }, 300)
+    }
 }

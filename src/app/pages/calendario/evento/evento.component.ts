@@ -35,6 +35,7 @@ import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
+import { SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-evento',

@@ -1,22 +1,22 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Evento, EventoQueryParams, EventoTipo } from '../../../models/evento.model';
+import { Evento, EventoQueryParams, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
-import { AlunoService } from '../../../services/alunos.service';
+import { AlunoService } from '../../../../services/alunos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import { lastValueFrom } from 'rxjs';
-import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
-import { Crypto } from '../../../utils';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
-import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
-import { EventoService } from '../../../services/evento.service';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
+import { Crypto } from '../../../../utils';
+import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
+import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
+import { EventoService } from '../../../../services/evento.service';
 import { ToastrService } from 'ngx-toastr';
-import { Evento_Participacao_Professor } from '../../../models/evento-participacao-professor.model';
+import { Evento_Participacao_Professor } from '../../../../models/evento-participacao-professor.model';
 import $ from 'jquery';
-import { PseudoEvento } from '../../../models/reposicao.model';
-import { SalaAulaId } from '../../../models/sala-aula.model';
-import { AlunoPopoverComponent } from '../aluno-popover/aluno-popover.component';
+import { PseudoEvento } from '../../../../models/reposicao.model';
+import { SalaAulaId } from '../../../../models/sala-aula.model';
+import { AlunoPopoverComponent } from '../../aluno-popover/aluno-popover.component';
 import moment from 'moment';
 
 @Component({

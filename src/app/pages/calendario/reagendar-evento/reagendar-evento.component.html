@@ -63,7 +63,7 @@
                               [(ngModel)]="data"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
-                              (onBlur)="verificaDisponibilidade()"
+                              (onBlur)="verificaDisponibilidade();"
                               (onMonthChange)="dateNavigatorChanged($event)"
                               (onYearChange)="dateNavigatorChanged($event)"
                               [minDate]="minDate"
@@ -84,10 +84,10 @@
                 </div>
             </div>
             <div class="field sm:col-4 col-6"> <!-- Horário -->
-                <label for="data">Horário: <span class="text-red-500">*</span></label>
+                <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker
-                              inputId="data"
-                              name="data"
+                              inputId="horario"
+                              name="horario"
                               #horaNgModel="ngModel"
                               [(ngModel)]="horario"
                               (onBlur)="verificaDisponibilidade()"
@@ -244,7 +244,7 @@
                 </div>
             </div>
             <!-- Educadores -->
-            <div class="field col" *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+            <div class="field col" *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
                 <p class="font-bold text-primary-500">
                     <span>Educadores</span>
                 </p>
@@ -260,6 +260,9 @@
                         <span class="mr-2">{{ item.nome }}</span>
                         <ng-container *ngTemplateOutlet="indisponivel; context: { item: item }"></ng-container>
                     </div>
+                    <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                        <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                    </ng-container>
                 </div>
             </div>
             <div class="col-12 flex">
@@ -280,8 +283,8 @@
     <p-badge *ngIf="item.disponivel == false"
              value="Indisponível"
              severity="danger"
-             [pTooltip]="indisponivelTemplate" />
-    <ng-template #indisponivelTemplate>
+             [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+    <ng-template #disponivelEvent>
         <div class="w-25rem" *ngIf="item.disponivelEvent">
             <p>
                 <span>Evento: </span>

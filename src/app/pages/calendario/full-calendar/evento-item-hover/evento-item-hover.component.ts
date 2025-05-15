@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Evento, EventoTipo } from '../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { Popover } from 'primeng/popover';
-import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import moment from 'moment';
 
 @Component({

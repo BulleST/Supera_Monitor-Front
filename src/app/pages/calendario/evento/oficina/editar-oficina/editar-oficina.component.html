@@ -88,8 +88,8 @@
                             <p-badge *ngIf="item.disponivel == false"
                                         value="Indisponível"
                                         severity="danger"
-                                        [pTooltip]="indisponivelTemplate" />
-                            <ng-template #indisponivelTemplate>
+                                        [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined"  />
+                            <ng-template #disponivelEvent>
                                 <div class="w-25rem">
                                     <p>
                                         <span>Evento: </span>
@@ -111,9 +111,9 @@
                                 </div>
                             </ng-template>
                         </p>
-                        <p class="text-sm">
-                            <{{ item.email }}>
-                        </p>
+                        <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                            <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                        </ng-container>
                     </div>
                     <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                             [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
@@ -125,7 +125,7 @@
         </p-select>
         <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
-            <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Educador indisponível.</p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
         </div>
     </div>
     <!-- Sala -->

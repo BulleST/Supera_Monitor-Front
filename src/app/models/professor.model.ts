@@ -12,6 +12,8 @@ export class Professor extends Basic_List {
     professor_NivelCertificacao: string = '';
     account_Id: number = undefined as unknown as number;
     corLegenda: string = getRandomColor();
+    expedienteInicio?: Date;
+    expedienteFim?: Date;
 
     // Não mapeados
     disponivel?: boolean;
@@ -28,6 +30,8 @@ export class ProfessorCreateRequest {
     dataNascimento: Date = new Date;
     professor_NivelCertificacao_Id: number = undefined as unknown as number;
     corLegenda: string = getRandomColor();
+    expedienteInicio?: Date;
+    expedienteFim?: Date;
 }
 
 export class ProfessorEditRequest {
@@ -39,6 +43,8 @@ export class ProfessorEditRequest {
     dataNascimento: Date = new Date;
     professor_NivelCertificacao_Id: number = undefined as unknown as number;
     corLegenda: string = getRandomColor();
+    expedienteInicio?: Date;
+    expedienteFim?: Date;
 }
 
 export class Professor_NivelCertificacao {
@@ -92,6 +98,25 @@ export var professorColumns: ColumnTable[] = [
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,
+    },
+    
+    {
+        field: 'expedienteInicio',
+        label: 'Início Expediente',
+        filterType: FilterType.date,
+        displayType: DisplayType.date,
+        options: {
+            format: 'HH:mm'
+        },
+    },
+    {
+        field: 'expedienteFim',
+        label: 'Fim Expediente',
+        filterType: FilterType.date,
+        displayType: DisplayType.date,
+        options: {
+            format: 'HH:mm'
+        },
     },
     {
         field: 'active',

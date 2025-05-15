@@ -20,7 +20,7 @@ export class RoteiroService extends Service {
                 next: list => {
                     list = list.map(x => {
                         x.dataInicio = moment(x.dataInicio, 'YYYY-MM-DD').toDate();
-                        x.dataFim = moment(x.dataFim, 'YYYY-MM-DD').set({ hours: 23, minute: 59}).toDate();
+                        x.dataFim = moment(x.dataFim, 'YYYY-MM-DD').set({ hours: 23, minute: 59 }).toDate();
                         x.corLegenda =  x.corLegenda ?? this.getRandomColor();
                         x.active = !x.deactivated;
                         return x

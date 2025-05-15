@@ -101,18 +101,40 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         })
     }
 
-    professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.professores.find(x => x.id == e.value);
-        this.validaProfessor.emit(item);
-
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
+        professorChanged(e: SelectChangeEvent, model: NgModel) {
+            var item = this.professores.find(x => x.id == e.value);
+            let mensagemErro: string | null = null;
+            this.validaProfessor.emit(item);
+    
+            if (item && !item.disponivel && item.disponivelEvent) {
+                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
+            }
+            else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+            } else {
+                    mensagemErro = null;
+            }
+            
+            if (mensagemErro) {
+                this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            }
+            model.control.setErrors({ indisponivel: mensagemErro });
+            model.control.updateValueAndValidity();
         }
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
-    }
+    
+
+    // professorChanged(e: SelectChangeEvent, model: NgModel) {
+    //     var item = this.professores.find(x => x.id == e.value);
+    //     this.validaProfessor.emit(item);
+
+    //     if (item && item.disponivel == false && item.disponivelEvent) {
+    //         model.control.setErrors({ indisponivel: 'Professor indisponível' });
+    //         this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+    //         return;
+    //     }
+    //     model.control.setErrors({ indisponivel: null });
+    //     model.control.updateValueAndValidity();
+    // }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         var item = this.salaAulas.find(x => x.id == e.value);

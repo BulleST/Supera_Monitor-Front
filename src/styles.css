@@ -5,10 +5,10 @@
 @import '@fortawesome/fontawesome-svg-core/styles.css';
 @import '@fortawesome/fontawesome-free/css/all.css';
 @import '@fortawesome/fontawesome-free/css/regular.css';
-@import 'quill/dist/quill.snow.css';
+/* @import 'quill/dist/quill.snow.css'; */
 @import 'primeflex/themes/primeone-light.scss';
-@tailwind base;
 
+/* @tailwind base; */
 /* @tailwind components; */
 /* @tailwind utilities; */
 :root {
@@ -44,9 +44,8 @@
     --surface-800: var(--p-surface-800);
     --surface-900: var(--p-surface-900);
     --surface-950: var(--p-surface-950);
-    --balloon-width: 5px!important; 
-    --balloon-height: 5px!important;
-    
+    --balloon-width: 5px !important;
+    --balloon-height: 5px !important;
     --yellow-50: #fffcf3;
     --yellow-100: #fff0c3;
     --yellow-200: #ffe494;
@@ -71,11 +70,26 @@ body {
     margin: 0;
     padding: 0;
     font-family: "Roboto", "Helvetica Neue", sans-serif;
+    line-height: 16px;
 }
 
 html,
 body {
     height: 100%;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0
+}
+
+a {
+    text-decoration: none;
 }
 
 .field>label {
@@ -122,8 +136,8 @@ body {
 
 /* width */
 *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    /* width: 20px;
+    height: 10px; */
 }
 
 /* Track */
@@ -176,10 +190,10 @@ body {
     background-color: var(--surface-50) !important;
 }
 
-.fc-daygrid-body, .fc-daygrid-body table {
+.fc-daygrid-body,
+.fc-daygrid-body table {
     width: 100% !important;
 }
-
 
 .fc .fc-button-primary {
     background-color: var(--p-button-secondary-background);
@@ -276,7 +290,6 @@ body {
     text-align: center;
 }
 
-
 .fc-button {
     padding-block: 10px;
     padding-inline: 10px;
@@ -287,13 +300,14 @@ body {
 }
 
 .fc .fc-multimonth-title {
-    padding: 0px 0!important;
-    background-color: var(--surface-800)!important;
+    padding: 0px 0 !important;
+    background-color: var(--surface-800) !important;
     font-weight: 700;
     color: #fff;
 }
 
-.fc-theme-standard td, .fc-theme-standard th {
+.fc-theme-standard td,
+.fc-theme-standard th {
     border: 1px solid var(--fc-border-color);
     background: white;
 }
@@ -301,7 +315,10 @@ body {
 .fc .fc-daygrid-day.fc-day-today {
     background-color: var(--p-primary-100);
 }
-.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link {
+
+.fc-timegrid-event-harness-inset .fc-timegrid-event,
+.fc-timegrid-event.fc-event-mirror,
+.fc-timegrid-more-link {
     box-shadow: none;
 }
 
@@ -311,20 +328,21 @@ body {
     color: var(--p-primary-500) !important;
 }
 
-.fc-scrollgrid-sync-inner, .fc-col-header-cell-cushion {
+.fc-scrollgrid-sync-inner,
+.fc-col-header-cell-cushion {
     width: 100%;
     height: 100%;
     text-align: center;
 }
 
-.p-datatable-thead > tr > th {
+.p-datatable-thead>tr>th {
     white-space: nowrap;
 }
-.p-datatable-thead > tr > th,
-.p-datatable-tbody > tr > td {
+
+.p-datatable-thead>tr>th,
+.p-datatable-tbody>tr>td {
     background-color: inherit;
 }
-
 
 .p-datepicker-day.p-disabled {
     position: relative;
@@ -350,7 +368,8 @@ body {
     rotate: 42deg;
 }
 
-.p-popover:after, .p-popover:before {
+.p-popover:after,
+.p-popover:before {
     /* bottom: 100%;
     left: calc(var(--overlayArrowLeft) + 60px);
     content: " ";
@@ -361,11 +380,11 @@ body {
     display: none;
 }
 
-
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr td {
+.p-datatable.p-datatable-striped .p-datatable-tbody>tr td {
     background-color: var(--p-datatable-row-background);
 }
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(odd) td {
+
+.p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(odd) td {
     background: var(--p-datatable-row-striped-background);
 }
 
@@ -373,4 +392,19 @@ th.p-datatable-frozen-column,
 td.p-datatable-frozen-column {
     position: sticky;
     margin-top: 1px;
+}
+
+thead tr .fc-scroller,
+tbody tr:first-child .fc-scroller {
+    overflow: hidden !important;
+    padding-right: 15px;
+    border-top: 1px #dddddd solid;
+    margin-bottom: -1px;
+}
+
+.p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected,
+.p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected:hover,
+.p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected:focus {
+    background: var(--primary-color);
+    color: white;
 }

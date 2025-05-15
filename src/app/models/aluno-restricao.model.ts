@@ -11,4 +11,5 @@ export class Aluno_Restricao {
     aluno_Id: number = 0;
     created: Date = new Date;
     deactivated?: Date;
+    active: boolean = true;
 }

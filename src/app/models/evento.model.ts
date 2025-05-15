@@ -1,5 +1,6 @@
 import { Evento_Participacao_Aluno } from "./evento-participacao-aluno.model";
 import { Evento_Participacao_Professor } from "./evento-participacao-professor.model";
+import { Feriado } from "./feriado.model";
 import { PerfilCognitivo } from "./perfil-cognitivo.model";
 import { PseudoEvento } from "./reposicao.model";
 
@@ -33,13 +34,13 @@ export class Evento {
     turma_Id?: number;
     turma?: string;
     perfilCognitivo: PerfilCognitivo[] = [];
-    capacidadeMaximaAlunos: number = 0;
+    capacidadeMaximaAlunos: number = 12;
     roteiro_Id: number = PseudoEvento.EventoId;
 
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;
-    feriado: boolean = true;
+    feriado?: Feriado;
 }
 
 export enum EventoTipo {

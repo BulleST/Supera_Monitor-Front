@@ -1,5 +1,6 @@
 // import { Aluno_Aula, alunos } from "./aulas.model";
 
+import { AlunoChecklistItemList } from "./aluno-checklist-item-list.model";
 import { Aluno } from "./alunos.model";
 
 export interface Checklist {
@@ -16,7 +17,8 @@ export interface Checklist_Item {
     checklist_Id: number;
     nome: string;
     ordem: number;
-    alunos: Aluno_CheckList_Item[];
+    alunos: AlunoChecklistItemList[];
+    // alunos: Aluno_CheckList_Item[];
 }
 
 export interface Aluno_CheckList_Item {

@@ -32,8 +32,8 @@ import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MyMap } from '../../../../../utils/map';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
-import { NameAbvPipe } from '../../../../../utils/name.pipe';
 import { groupBy } from 'lodash';
+import $ from 'jquery';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -48,7 +48,7 @@ export class CadastrarAula0Component implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
     object: EventoAula0Request = new EventoAula0Request();
-    data: Date = undefined as unknown as Date;
+    data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
@@ -79,6 +79,8 @@ export class CadastrarAula0Component implements OnDestroy {
 
     @ViewChild('form') form!: NgForm;
     @ViewChild('formDiv') formDiv!: HTMLFormElement;
+    @ViewChild('professor_Id') professor_Id!: NgModel;
+
     SalaAulaId = SalaAulaId;
 
     constructor(
@@ -281,6 +283,14 @@ export class CadastrarAula0Component implements OnDestroy {
             undefined,
             undefined
         );
+        
+        if (this.object.professor_Id) {
+            var e: SelectChangeEvent = {
+                value: this.object.professor_Id,
+                originalEvent: { target: $('#professor_Id').get(0) as any } as any
+            } 
+            this.professorChanged(e, this.professor_Id);
+        }
     }
 
     validaAlunos() {
@@ -295,28 +305,27 @@ export class CadastrarAula0Component implements OnDestroy {
             undefined
         );
     }
-
-    professorChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaProfessores();
-
-        var item = this.professores.find((x) => x.id == e.value);
-
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError(
-                'Professor Indisponível',
-                `Esse professor está atribuído a outra ${this.getTipo(
-                    item.disponivelEvent
-                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
-                    'HH[h]mm'
-                )}</b>.`,
-                e.originalEvent
-            );
-            return;
+        professorChanged(e: SelectChangeEvent, model: NgModel) {
+            var item = this.professores.find(x => x.id == e.value) as Professor;
+            let mensagemErro: string | null = null;
+    
+            if (item && !item.disponivel && item.disponivelEvent) {
+                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
+            }
+            else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+            } else {
+                    mensagemErro = null;
+            }
+            
+            if (mensagemErro) {
+                this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+                model.control.setValue(undefined)
+            }
+            model.control.setErrors({ indisponivel: mensagemErro });
+            model.control.updateValueAndValidity();
         }
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
-    }
+
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();

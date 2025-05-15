@@ -36,7 +36,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
     object: EventoReuniaoRequest = new EventoReuniaoRequest;
 
-    data: Date = undefined as unknown as Date;
+    data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
@@ -250,16 +250,15 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     }
 
     sendConfirmation(form: NgForm, e: any) {
-        if (form.invalid) {
+        if (form.invalid) 
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
-        }
+
         if (this.selected.length < 2)
             return this.showError('Não foi possível salvar', 'Selecione pelo menos 2 educadores para salvar', e);
+        
+        if (this.selected.filter(x => !x.disponivel).length > 0)
+            return this.showError('Não foi possível salvar', 'Selecione apenas educadores disponíveis', e);
 
-
-
-        console.log('selected', this.selected)
-        console.log('professores', this.professores)
 
         this.object.professores = this.selected.map(x => x.id);
 

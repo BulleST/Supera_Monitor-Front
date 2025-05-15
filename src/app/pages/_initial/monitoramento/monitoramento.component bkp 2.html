@@ -1,0 +1,315 @@
+<div class="bg">
+    <div style="background-image: url(assets/images/account-bg-1.png);" class="inner-bg absolute bg-contain bg-no-repeat top-0   right-0 z-0 -mb-5 rotate-90"></div>
+    <div style="background-image: url(assets/images/account-bg-2.png);" class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
+    <!-- <div style="background-image: url(assets/images/account-bg-3.jpg);" class="absolute top-0 left-0 bg-cover bg-no-repeat  z-0 w-full h-full opacity-10"></div> -->
+</div>
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
+    <ng-template #message let-message>
+        <div>
+            <div [innerHTML]="message.message"></div>
+            <div class="w-full flex-1 col-12 px-0">
+                <label for="checklistObservacao">Inserir observação: </label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="checklistObservacao"
+                          id="checklistObservacao"
+                          [(ngModel)]="checklistObservacao"
+                          [rows]="2"></textarea>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+<div *ngIf="loadingChecklist" class="fixed top-0 left-0 w-full h-full flex align-items-center justify-content-center text-center z-3 bg-white-alpha-10">
+    <p class="text-gray-800 fadeout animation-duration-1000 animation-iteration-infinite text-2xl " s>Carregando...</p>
+</div>
+<!-- Loading Checklist -->
+<ng-template #checklistLoadingTemplate>
+    <div *ngFor="let item of [1,2,3,4]" class="p-2 bg-transparent w-20rem border-round-md flex-none ">
+        <p-skeleton width="6rem" height="1.5rem" styleClass="mb-2" />
+        <div class="flex flex-column gap-2 max-h-25rem">
+            <div *ngFor="let item of [1,2]" class="bg-white py-3 w-full flex flex-column border-round-lg shadow-1">
+                <div class="mb-2 mx-3">
+                    <p-skeleton width="100%" height="1.5rem" />
+                </div>
+                <div class="flex flex-column gap-2 overflow-auto max-h-25rem overflow-x-hidden px-3 py-1">
+                    <ng-container *ngTemplateOutlet="loadingAlunosTemplate"></ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<!-- End Loading -->
+<!-- Loading Aluno -->
+<ng-template #loadingAlunosTemplate>
+    <div *ngFor="let item of [1,2,3,4]" class="p-2 px-3 bg-white border-round-md shadow-1 flex align-items-center">
+        <p-skeleton shape="circle" size="2rem" />
+        <div class="flex-1 ml-2">
+            <p-skeleton width="100%" height=".9rem" styleClass="mb-2" />
+            <p-skeleton width="5rem" height=".9rem" styleClass="" />
+        </div>
+    </div>
+</ng-template>
+<!-- End Loading -->
+<p-toolbar styleClass="border-none bg-white p-4 mb-4 ">
+    <div class="p-toolbar-group-start">
+        <h2 class="flex align-items-center ">
+            <i class="pi pi-check-square mr-3 text-primary-500 text-2xl"></i>
+            <span class="text-2xl font-normal my-0">Jornada Supera</span>
+        </h2>
+    </div>
+    <div class="p-toolbar-group-center"></div>
+    <div class="p-toolbar-group-end">
+        <div class="flex align-items-center flex-wrap">
+                <!-- Turma -->
+                <div class="field lg:col-4 col-12 mb-0 flex align-items-center justify-content-start gap-2">
+                    <label for="turma_Id">Turma: </label>
+                    <p-select
+                              [options]="turmas"
+                              [(ngModel)]="request.turma_Id"
+                              [loading]="loadingTurmas"
+                              (ngModelChange)="turmaChanged()"
+                              #turma_Id="ngModel"
+                              styleClass="w-full"
+                              class="w-full"
+                              name="turma_Id"
+                              inputId="turma_Id"
+                              optionLabel="nome"
+                              optionValue="id"
+                              [filter]="true"
+                              filterBy="nome"
+                              placeholder="Selecione uma turma"
+                              [showClear]="true"
+                              appendTo="body"
+                              optionDisabled="deactivated">
+                        <ng-template let-item #item>
+                            <div class="flex align-items-center justify-content-between w-full gap-2">
+                                <div class="w-full">
+                                    <p class="font-bold">{{ item.nome }}</p>
+                                    <div class="flex align-items-center justify-content-between">
+                                        <p class="text-sm">
+                                            <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                            <span>{{ item.professor }}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+                <!-- Educador -->
+                <div class="field lg:col-4 col-12 mb-0 flex align-items-center justify-content-start gap-2">
+                    <label for="professor_Id">Educador:</label>
+                    <p-select
+                              [options]="professores"
+                              [(ngModel)]="request.professor_Id"
+                              [loading]="loadingProfessores"
+                              (ngModelChange)="professorChanged()"
+                              #professor_Id="ngModel"
+                              styleClass="w-full"
+                              class="w-full"
+                              name="professor_Id"
+                              inputId="professor_Id"
+                              optionLabel="nome"
+                              optionValue="id"
+                              [filter]="true"
+                              filterBy="nome"
+                              placeholder="Selecione um educador"
+                              [showClear]="true"
+                              appendTo="body">
+                        <ng-template let-item #item>
+                            <div class="flex align-items-center justify-content-between w-full gap-2">
+                                <div>
+                                    <p class="font-bold mb-1 flex align-items-center ">
+                                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                        <span class="mr-2">{{ item.nome }}</span>
+                                    </p>
+                                    
+                                    <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                        <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+                <!-- Atualizar -->
+                <div class="field lg:col col-12 mb-0 ">
+                    <p-button icon="pi pi-filter text-sm text-white"
+                        (onClick)="update()"
+                        severity="secondary"
+                        label="Filtrar"
+                        [text]="true"
+                        pTooltip="Aplicar filtros"
+                        class="mr-2"
+                        [rounded]="true"
+                        styleClass="bg-black-alpha-80 text-white" />
+                </div>
+        </div>
+    </div>
+</p-toolbar>
+<p-table [value]="[10]" *ngIf="!loadingChecklist">
+    <ng-template #header>
+        <tr class="bg-transparent">
+            <ng-container *ngFor="let checklist of checklists">
+                <th class="bg-transparent w-21rem border-bottom-none p-0">
+                    <p-tag [value]="checklist.nome"
+                           severity="contrast"
+                           styleClass="white-space-nowrap text-center surface-700 ml-1"
+                           class="mb-2 sticky top-0" />
+                </th>
+            </ng-container>
+        </tr>
+    </ng-template>
+    <ng-template #body let-array let-rowIndex="rowIndex">
+        <tr class="bg-transparent" style="height: 225px;">
+            <ng-container *ngFor="let checklist of checklists">
+                <!-- Checklist Item -->
+                <td class="bg-transparent vertical-align-top border-bottom-none  p-1">
+                    <ng-container *ngFor="let checklistItem of checklist.items">
+                        <div class="bg-white-alpha-10 shadow-1 w-22rem flex flex-column border-round-lg flex-none mb-2">
+                            <div *ngIf="checklistItem.nome"
+                                 [pTooltip]="checklistItem.nome"
+                                 class="bg-white flex border-round-md px-3 py-1 ml-3 mr-5 mt-3 ">
+                                <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{checklistItem.nome}} </span>
+                            </div>
+                            <!-- Alunos -->
+                            <div class="flex flex-column gap-2 mt-2 py-2 pl-3 pr-2">
+                                <ng-template #empty>
+                                    <ng-container *ngIf="!loadingAlunos; else loadingAlunosTemplate">
+                                        <p class="text-white ml-2 mb-2" *ngIf="!loadingAlunos">Nenhum aluno nessa etapa...</p>
+                                    </ng-container>
+                                </ng-template>
+                                <ng-container *ngIf="checklistItem.alunos && checklistItem.alunos.length; else empty">
+                                    <p-virtualscroller [items]="checklistItem.alunos"
+                                                       [itemSize]="52"
+                                                       scrollHeight="22rem"
+                                                       styleClass="border border-surface my-scroll"
+                                                       [style]="{ width: '100%', height: '22rem', paddingRight: '2px' }">
+                                        <ng-template #item let-alunoChecklistItem let-options="options">
+                                            <div class="p-2 bg-white border-round-md shadow-1 mb-2 mr-2" style="height: 52px">
+                                                <div class="flex align-items-center">
+                                                    <div class="flex-none pr-2">
+                                                        <button (click)="finalizarChecklist($event, alunoChecklistItem)"
+                                                                class="bg-primary-100 text-primary-500 border-primary-100 hover:bg-primary-200 hover:border-primary-200 p-ripple p-button p-component p-button-primary p-button-sm h-3rem w-4rem flex flex-column justify-content-center align-items-center gap-1">
+                                                            <span class="pi pi-check text-md line-height-1 "></span>
+                                                            <span style="font-size: 10px;" class="font-light line-height-1">Finalizar</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="flex-1 flex flex-column w-full overflow-hidden">
+                                                        <p class=" w-full flex-none flex align-items-center">
+                                                            <span class="overflow-hidden white-space-nowrap text-overflow-ellipsis flex-1">{{alunoChecklistItem.aluno.nome | nameAbv}}</span>
+                                                            <!-- Mensagem de boas-vindas -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 37">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemBoasVindas(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar boas-vindas"></a>
+                                                            </ng-container>
+                                                            <!-- Apresentação do Diretor Franqueado -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 8">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemApresentacaoDiretorFranqueado(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar apresentação"></a>
+                                                            </ng-container>
+                                                            <!-- Confirmação da adequação do aluno ao perfil da turma -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 9">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemAdequacaoTurma(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem de confirmação"></a>
+                                                            </ng-container>
+                                                            <!-- Agendar 1ª Oficina -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 12">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemLembreteOficina(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem para inscrição"></a>
+                                                            </ng-container>
+                                                            <!-- Feedback pós venda -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 13">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemFeedbackPosVenda(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem de feedback"></a>
+                                                            </ng-container>
+                                                            <!-- Confirmação de preeechimento do feedback pós venda -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 32">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem de lembrete de preenchimento"></a>
+                                                            </ng-container>
+                                                            <!-- Agendar Superação -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 22">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemLembreteSuperacao(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem para agendamento"></a>
+                                                            </ng-container>
+                                                            <!-- Agendar 2ª Superação -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 29">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemLembreteSuperacao(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem para agendamento"></a>
+                                                            </ng-container>
+                                                            <!-- Agendar 2ª Oficina -->
+                                                            <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 23">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagemLembreteOficina(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem para inscrição"></a>
+                                                            </ng-container>
+                                                            <!-- MENSAGEM PADRÃO -->
+                                                            <ng-container *ngIf="[8, 9, 12, 13, 32, 37, 22, 29, 23].includes(alunoChecklistItem.checklist_Item_Id) == false">
+                                                                <a *ngIf="alunoChecklistItem.aluno.celular"
+                                                                   target="_blank"
+                                                                   [href]="enviarMensagem(alunoChecklistItem.aluno)"
+                                                                   class="text-green-500 pi pi-whatsapp hover:bg-green-200"
+                                                                   pTooltip="Enviar mensagem a"></a>
+                                                            </ng-container>
+                                                        </p>
+                                                        <span class="flex justify-content-between mx-auto w-full mt-1">
+                                                            <span pTooltip="Prazo"><b>{{alunoChecklistItem.prazo | date : 'dd/MM/yy'}}</b></span>
+                                                            <!-- Atrasado -->
+                                                            <span *ngIf="alunoChecklistItem.status == 'Atrasado'">
+                                                                <span class="text-red-600 font-bold">Atrasado</span>
+                                                                <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite ml-2 mt-1"></i>
+                                                            </span>
+                                                            <!-- Pendentes da Semana -->
+                                                            <span *ngIf="alunoChecklistItem.status == 'Pendente'">
+                                                                <span class="text-orange-500 font-medium">Em Andamento</span>
+                                                                <i class="pi pi-hourglass text-orange-500 ml-2 mt-1"></i>
+                                                            </span>
+                                                            <!-- Finalizado -->
+                                                            <span *ngIf="alunoChecklistItem.status == 'Finalizado'">
+                                                                <span class="text-green-500 ">Finalizado</span>
+                                                                <i class="pi pi-check-circle text-green-500 ml-2 mt-1"></i>
+                                                            </span>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </p-virtualscroller>
+                                </ng-container>
+                            </div>
+                            <!-- End Alunos -->
+                        </div>
+                    </ng-container>
+                </td>
+            </ng-container>
+        </tr>
+    </ng-template>
+</p-table>

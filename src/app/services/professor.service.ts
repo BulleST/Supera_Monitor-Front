@@ -29,6 +29,10 @@ export class ProfessorService extends Service {
             .pipe(tap({
                 next: list => {
                     list.map(item => {
+                        if(item.expedienteInicio)
+                            item.expedienteInicio = new Date(moment().format('YYYY-MM-DD') + 'T' + item.expedienteInicio);
+                        if(item.expedienteFim)
+                            item.expedienteFim = new Date(moment().format('YYYY-MM-DD') + 'T' + item.expedienteFim);
                         if (item.dataNascimento)
                             item.dataNascimento = new Date(moment(item.dataNascimento).format('YYYY-MM-DD'))
                         if (item.dataInicio)
@@ -63,6 +67,8 @@ export class ProfessorService extends Service {
 
     create(model: Professor) {
         var request = MyMap(model, new ProfessorCreateRequest);
+        request.expedienteInicio = model.expedienteInicio ? moment(model.expedienteInicio).format('HH:mm:ss') : undefined;
+        request.expedienteFim = model.expedienteInicio ? moment(model.expedienteFim).format('HH:mm:ss') : undefined;
         return this.http.post<RequestResponse>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {
@@ -73,6 +79,8 @@ export class ProfessorService extends Service {
 
     edit(model: Professor) {
         var request = MyMap(model, new ProfessorEditRequest);
+        request.expedienteInicio = model.expedienteInicio ? moment(model.expedienteInicio).format('HH:mm:ss') : undefined;
+        request.expedienteFim = model.expedienteInicio ? moment(model.expedienteFim).format('HH:mm:ss') : undefined;
         return this.http.put<RequestResponse>(`${this.url}/professor`, request)
             .pipe(tap({
                 error: err => {

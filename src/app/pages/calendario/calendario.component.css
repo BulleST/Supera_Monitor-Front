@@ -1,5 +1,5 @@
 ::ng-deep .fc .fc-timegrid-slot-minor {
-    border-top-style: hidden !important;
+    /* border-top-style: hidden !important; */
 }
 ::ng-deep .fc .fc-timegrid-slot {
     height: 2.5em!important;

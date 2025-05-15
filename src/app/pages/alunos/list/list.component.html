@@ -60,7 +60,7 @@
                         </p-iconfield>
                         <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" pTooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
                         <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar alunos" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <!-- <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" /> -->
+                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" />
                     </div>
                 </div>
             </p-toolbar>
@@ -72,16 +72,16 @@
                         [pSortableColumn]="col.field"
                         class="surface-900 py-0 border-none text-white white-space-nowrap p-3"
                         [ngClass]="{
-                            'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2': col.field == 'nome',
+                            'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 pl-5': col.field == 'nome',
                         }">
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
                             <ng-template [ngIf]="col.filterType != FilterType.none">
                                 <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                    <p-columnFilter 
-                                        [type]="col.filterType" 
-                                        [field]="col.field" 
-                                        display="menu" />
+                                    <p-columnFilter
+                                                    [type]="col.filterType"
+                                                    [field]="col.field"
+                                                    display="menu" />
                                     <p-sortIcon [field]="col.field" />
                                 </div>
                             </ng-template>
@@ -96,113 +96,110 @@
             <tr [pContextMenuRow]="item"
                 class="cursor-pointer"
                 [ngClass]="{ 'bg-primary-50': item == tableSelectedItem,}">
-           
-            <td *ngFor="let col of tableColumns"
-                [pSelectableRow]="item"
-                [pSelectableRowIndex]="rowIndex"
-                [ngClass]="{
+                <td *ngFor="let col of tableColumns"
+                    [pSelectableRow]="item"
+                    [pSelectableRowIndex]="rowIndex"
+                    [ngClass]="{
                     'white-space-nowrap  border-left-none border-right-none': true,
-                    'w-5rem':col.displayType == DisplayType.options,
+                    'w-5rem': col.displayType == DisplayType.options,
                     'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2': col.field == 'nome',
                     }"
-                (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
-                <ng-template [ngIf]="col.field == 'nome'">
-                    <span class="inline-flex w-2rem h-2rem mr-2">
-                        <p-button  *ngIf="item && item.celular"
-                            [link]="true"
-                            routerLink="{{enviarMensagem(item)}}"
-                            icon="pi pi-whatsapp"
-                            severity="success"
-                            pTooltip="Enviar mensagem"
-                            [text]="true"
-                            size="small" />
-                    </span>
-                </ng-template>
-                <ng-template [ngIf]="col.displayType == DisplayType.options">
-                    <ng-container *ngTemplateOutlet="tag; 
-                        context: { 
-                            item: item,
-                            option: getOption(col, item)
-                        }">
-                    </ng-container>
-                    <ng-template #tag let-item="item" let-option="option">
-                        <p-tag *ngIf="option"
-                               styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                               [icon]="option.icon ? (option.icon + ' mr-2 text-xs') : ''"
-                               [value]="option.label"
-                               [severity]="option.severity ? option.severity : 'secondary'"
-                               [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                    </ng-template>
-                </ng-template>
-                <ng-template [ngIf]="col.displayType == DisplayType.text">
-                    <ng-template [ngIf]="col.field == 'professor'">
-                        <ng-container *ngTemplateOutlet="corLegenda; context: { corLegenda: getCorLegenda(item.professor_Id) }"></ng-container>
-                        <ng-template #corLegenda let-corLegenda="corLegenda">
-                            <span class="w-1rem h-1rem inline-flex border-circle mr-2" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                    (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
+                    <div class="flex align-items-center">
+                        <ng-template [ngIf]="col.field == 'nome'">
+                            <ng-container *ngTemplateOutlet="corLegenda; context: { corLegenda: getCorLegenda(item.professor_Id) }"></ng-container>
+                            <ng-template #corLegenda let-corLegenda="corLegenda">
+                                <span class="w-1rem h-1rem inline-flex border-circle " [pTooltip]="item.professor" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                            </ng-template>
+                            <span class="inline-flex w-2rem h-2rem mr-2 align-items-center">
+                                <p-button *ngIf="item && item.celular"
+                                          [link]="true"
+                                          routerLink="{{enviarMensagem(item)}}"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          pTooltip="Enviar mensagem para {{item.celular | mask : '+00 (00) 0.0000-0000'}}"
+                                          [text]="true"
+                                          size="small" />
+                            </span>
                         </ng-template>
-                    </ng-template>
-
-                    <span *ngIf="col.field != 'nome'">{{ item[col.field] }}</span>
-                    <span *ngIf="col.field == 'nome'" pTooltip="{{item.nome}}">{{ item.nome | nameAbv }}</span>
-                </ng-template>
-                <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
-                <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-                <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-            </td>
-            <ng-container *ngFor="let checklist of item.checklistCompleto">
-                <td *ngIf="!checklist"></td>
-                <td *ngIf="checklist"
-                    (click)="popoverChecklistOpen($event, checklist, item)"
-                    class="white-space-nowrap  border-left-none border-right-none text-center px-1 w-3rem">
-                    <div class="flex align-items-center justify-content-center gap-2">
-                        <!-- Finalizado -->
-                        <span *ngIf="checklist.finalizados.length == checklist.items.length">
-                            <span class="flex align-items-center text-green-600 font-medium">
-                                <span>Finalizado</span>
-                                <i class="pi pi-check-circle  ml-auto pl-2 "></i>
-                            </span>
-                        </span>
-                        <!-- Atrasado -->
-                        <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length">
-                            <span class="flex align-items-center text-red-600 font-bold">
-                                <span> Atrasado </span>
-                                <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                <i class="pi pi-times-circle  fadeout animation-duration-300 animation-iteration-infinite ml-1 "></i>
-                            </span>
-                        </span>
-                        <!-- Em Andamento -->
-                        <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length">
-                            <span class="flex align-items-center text-orange-500 font-medium">
-                                <span>Em Andamento </span>
-                                <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                <i class="pi pi-hourglass ml-1 "></i>
-                            </span>
-                        </span>
-                        <!-- Futuro -->
-                        <span *ngIf="checklist.pendentesDaSemana.length == 0 
-                                    && checklist.atrasados.length == 0 
-                                    && checklist.prazo">
-                                    <!-- && checklist.finalizados.length == 0  -->
-                            <span class="flex align-items-center text-blue-500 font-extrabold">
-                                <span>Futuro </span>
-                                <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                <i class="pi pi-clock  ml-1 "></i>
-                            </span>
-                        </span>
-                        <!-- Indefinido -->
-                        <span *ngIf="!checklist.prazo">
-                            <span class="flex align-items-center text-purple-500 font-bold">
-                                <span> Indefinido </span>
-                                <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                <i class="pi pi-question  ml-1 "></i>
-                            </span>
-                        </span>
+                        <ng-template [ngIf]="col.displayType == DisplayType.options">
+                            <ng-container *ngTemplateOutlet="tag; 
+                            context: { 
+                                item: item,
+                                option: getOption(col, item)
+                            }">
+                            </ng-container>
+                            <ng-template #tag let-item="item" let-option="option">
+                                <p-tag *ngIf="option"
+                                       styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                       [icon]="option.icon ? (option.icon + ' mr-2 text-xs') : ''"
+                                       [value]="option.label"
+                                       [severity]="option.severity ? option.severity : 'secondary'"
+                                       [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                            </ng-template>
+                        </ng-template>
+                        <ng-template [ngIf]="col.displayType == DisplayType.text">
+                            <span *ngIf="col.field != 'nome'">{{ item[col.field] }}</span>
+                            <span *ngIf="col.field == 'nome'" pTooltip="{{item.nome}}">{{ item.nome | nameAbv }}</span>
+                        </ng-template>
+                        <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
+                        <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                        <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                     </div>
                 </td>
-            </ng-container>
-            <td class="border-none px-0">
-            </td>
-        </tr>
+                <ng-container *ngFor="let checklist of item.checklistCompleto">
+                    <td *ngIf="!checklist"></td>
+                    <td *ngIf="checklist"
+                        (click)="popoverChecklistOpen($event, checklist, item)"
+                        class="white-space-nowrap  border-left-none border-right-none text-center px-1 w-3rem">
+                        <div class="flex align-items-center justify-content-center gap-2">
+                            <!-- Finalizado -->
+                            <span *ngIf="checklist.finalizados.length == checklist.items.length">
+                                <span class="flex align-items-center text-green-600 font-medium">
+                                    <span>Finalizado</span>
+                                    <i class="pi pi-check-circle  ml-auto pl-2 "></i>
+                                </span>
+                            </span>
+                            <!-- Atrasado -->
+                            <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length">
+                                <span class="flex align-items-center text-red-600 font-bold">
+                                    <span> Atrasado </span>
+                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-times-circle ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Em Andamento -->
+                            <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length">
+                                <span class="flex align-items-center text-orange-500 font-medium">
+                                    <span>Em Andamento </span>
+                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-hourglass ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Futuro -->
+                            <span *ngIf="checklist.pendentesDaSemana.length == 0 
+                                    && checklist.atrasados.length == 0 
+                                    && checklist.prazo">
+                                <!-- && checklist.finalizados.length == 0  -->
+                                <span class="flex align-items-center text-blue-500 font-extrabold">
+                                    <span>Futuro </span>
+                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-clock  ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Indefinido -->
+                            <span *ngIf="!checklist.prazo">
+                                <span class="flex align-items-center text-purple-500 font-bold">
+                                    <span> Indefinido </span>
+                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-question  ml-1 "></i>
+                                </span>
+                            </span>
+                        </div>
+                    </td>
+                </ng-container>
+                <td class="border-none px-0"></td>
+            </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">
@@ -228,7 +225,8 @@
     <p-popover #popoverChecklist
                (onHide)="popoverChecklistClosed()"
                [dismissable]="true"
-               styleClass="-mt-2">
+               styleClass="-mt-2"
+               appendTo="body">
         <div class="w-full" *ngIf="selectedChecklist">
             <div class="flex align-items-center justify-content-between w-full">
                 <p class="mb-2">
@@ -241,7 +239,7 @@
                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                           icon="pi pi-whatsapp"
                           severity="success"
-                          pTooltip="Enviar mensagem"
+                          pTooltip="Enviar mensagem para {{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000'}}"
                           [text]="true"
                           (onClick)="enviarMensagem(tableSelectedItem)" />
             </div>
@@ -250,23 +248,151 @@
                     class="flex align-items-center gap-2 py-1"
                     (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
                     (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
-                    <p-checkbox #checkbox
+                    <p-checkbox *ngIf="!checklistItem.finalizado"
+                                #checkbox
                                 [inputId]="'checklistitem-' + checklistItem.id"
                                 [name]="'checklistitem-' + checklistItem.id"
                                 #finalizado="ngModel"
                                 [ngModel]="checklistItem.finalizado"
-                                [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
                                 [binary]="true"
+                                [readonly]="checklistItem.finalizado"
                                 (onChange)="checkboxChange(checklistItem, selectedChecklist, finalizado, $event)" />
+                                
+                    <div *ngIf="checklistItem.finalizado" class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
+                        <div class="p-checkbox-box">
+                            <i class="pi pi-check p-checkbox-icon "></i>
+                        </div>
+                    </div>
                     <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                    <ng-container *ngIf="tableSelectedItem && tableSelectedItem.celular">
+                        <!-- Apresentação do Diretor Franqueado -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 8">
+                            <a target="_blank"
+                               [href]="enviarMensagemApresentacaoDiretorFranqueado(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar apresentação">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Confirmação da adequação do aluno ao perfil da turma -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 9">
+                            <a target="_blank"
+                               [href]="enviarMensagemAdequacaoTurma(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem de confirmação">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Agendar 1ª Oficina -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 12">
+                            <a target="_blank"
+                               [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem de lembrete">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Feedback pós venda -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 13">
+                            <a target="_blank"
+                               [href]="enviarMensagemFeedbackPosVenda(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem de feedback">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Confirmação de preeechimento do feedback pós venda -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 32">
+                            <a target="_blank"
+                               [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem de lembrete de preenchimento">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Mensagem de boas-vindas -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 37">
+                            <a target="_blank"
+                               [href]="enviarMensagemBoasVindas(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem de boas-vindas">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Agendar Superação -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 22">
+                            <a target="_blank"
+                               [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem para agendamento">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Agendar 2ª Superação -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 29">
+                            <a target="_blank"
+                               [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem para agendamento">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                        <!-- Agendar 2ª Oficina -->
+                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 23">
+                            <a target="_blank"
+                               [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
+                               class="flex align-items-center gap-2 ml-auto h-2rem"
+                               pTooltip="Enviar mensagem para inscrição">
+                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true" />
+                            </a>
+                        </ng-container>
+                    </ng-container>
                     <p-popover #checklistData appendTo="body">
                         <p>
                             <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
                             <span *ngIf="checklistItem.account_Finalizacao"> por <b>{{checklistItem.account_Finalizacao }}</b></span>
                         </p>
-                        <p class="mt-2">Observações: </p>
-                        <p *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</p>
-                        <p *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</p>
+                        <p class="mt-2">
+                            <span class="font-medium">Observações: </span>
+                            <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
+                            <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
+                        </p>
                     </p-popover>
                 </li>
             </ul>

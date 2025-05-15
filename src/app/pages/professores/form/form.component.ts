@@ -10,6 +10,9 @@ import { Account } from '../../../models/account.model';
 import { UserService } from '../../../services/user.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { Turma } from '../../../models/turma.model';
+import { TurmaService } from '../../../services/turma.service';
+import moment from 'moment';
 
 @Component({
     selector: 'app-form',
@@ -37,12 +40,17 @@ export class FormComponent implements OnDestroy {
     minDate: Date = new Date(1950, 1, 1);
     maxDate: Date = new Date();
 
+
+    turmas: Turma[] = [];
+    loadingTurmas = false;
+
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private service: ProfessorService,
         private userService: UserService,
+        private turmaService: TurmaService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
     ) {
@@ -61,6 +69,8 @@ export class FormComponent implements OnDestroy {
             })
             .catch(res => this.loadingAccounts = false)
 
+
+
         this.loadPage();
     }
 
@@ -73,10 +83,20 @@ export class FormComponent implements OnDestroy {
             this.isEditPage = !!res['id'];
             if (this.isEditPage) {
                 this.loading = true;
-                var id = this.crypto.decrypt(res['id'])
+                var id = this.crypto.decrypt(res['id']);
+
+                this.loadingTurmas = true;
+                lastValueFrom(this.turmaService.getList())
+                    .then(res => {
+                        this.turmas = res.filter(x => x.professor_Id == id);
+                        this.loadingTurmas = false;
+                    })
+                    .catch(res => this.loadingTurmas = false);
+
 
                 this.service.get(id)
-                    .then(res => {
+                        .then(res => {
+                        console.log(res.expedienteInicio)
                         this.object = res;
                         this.loading = false;
                         this.visible = true;
@@ -113,12 +133,41 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    showError(message: string, e: any) {
+    expedienteChanged(e: any) {
+        if (this.isEditPage) {
+            var mensagem = '';
+            if (this.object.expedienteInicio) {
+                
+                let turmas = this.turmas.filter(x => x.active     
+                                                && moment(x.horario).isBefore(this.object.expedienteInicio))
+                if (turmas.length > 0) {
+                    mensagem = 'Existem turmas atribuídas a esse educador com horário iniciando antes do expediente escolhido.';
+                    mensagem += `\n Turmas:  \n ${turmas.map(x => x.nome).join('\n ')}`
+                }
+            }
+
+
+            if (this.object.expedienteFim) {
+                let turmas = this.turmas.filter(x => x.active
+                                                && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
+                                                || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
+                if (turmas.length > 0) {
+                    mensagem += '\n Existem turmas atribuídas a esse educador com horário finalizando após o expediente escolhido.';
+                    mensagem += `\n Turmas:  ${turmas.map(x => x.nome).join(', ')}`
+                }
+            }
+            if (mensagem) {
+                this.showError('Expediente inválido', mensagem, e)
+            }
+        }
+
+    }
+
+    showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Ocorreu um erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            header: header,
             acceptLabel: 'OK',
             acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
             rejectVisible: false,
@@ -143,17 +192,18 @@ export class FormComponent implements OnDestroy {
                 }
                 else {
                     this.error = res.message;
-                    this.showError(this.error, e);
+                    this.showError('Erro', this.error, e);
                 }
             })
             .catch((res: HttpErrorResponse) => {
                 this.error = res.error.message;
                 this.loading = false;
-                this.showError(this.error, e);
+                this.showError('Erro', this.error, e);
             })
     }
 
     request() {
+        
         if (this.isEditPage) {
             return lastValueFrom(this.service.edit(this.object));
         }

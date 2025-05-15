@@ -4,6 +4,17 @@ export class PerfilCognitivo {
     descricao: string = '';
 }
 
+export class PerfilCognitivo_Calculo_Data {
+    data: Date = new Date;
+    perfilCognitivo: PerfilCognitivo_Calculo[] = [];
+}
+export class PerfilCognitivo_Calculo {
+    id: number = 0;
+    quantidadeAlunos: number = 0;
+    nome: string = '';
+    descricao: string = '';
+}
+
 var id = 1;
 export var perfisCognitivos: PerfilCognitivo[] = [
     { id: id++, nome: 'Júnior 1', descricao: 'Idade entre 06 e 09 anos'},

@@ -45,7 +45,7 @@ export class ReagendarEventoComponent implements OnDestroy {
     evento: Evento = new Evento;
     SalaAulaId = SalaAulaId;
 
-    data: Date = undefined as unknown as Date;
+    data = new Date(moment().format('YYYY-MM-DD'));
     horario: Date = undefined as unknown as Date;
     minDate = new Date();
     maxDate = new Date();
@@ -122,7 +122,6 @@ export class ReagendarEventoComponent implements OnDestroy {
         this.subscription.push(eventos);
 
         var evento = this.service.evento.subscribe(res => {
-            console.log('evento', res)
             if (!res) {
                 try {
                     var evento = JSON.parse(localStorage.getItem('evento') ?? '')
@@ -212,6 +211,7 @@ export class ReagendarEventoComponent implements OnDestroy {
     }
 
     async verificaDisponibilidade() {
+        console.log('verificaDisponibilidade')
         var valid = true;
 
         if (!this.data || !this.horario) {
@@ -221,7 +221,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         this.loadingEventos = true;
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes());
-
+        
         var request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
@@ -248,6 +248,19 @@ export class ReagendarEventoComponent implements OnDestroy {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
+        
+        var professoresIds = this.evento.professores.map(x => x.professor_Id);
+        var professoresEvento = this.professores.filter(x => professoresIds.includes(x.id) || this.evento.professor_Id == x.id );
+        var indisponiveis = professoresEvento.filter(x => !x.disponivel);
+        console.log('indisponiveis', indisponiveis)
+
+        if (indisponiveis.length > 0) {
+            var mensagemErro = `Os educadores a seguir estão indisponíveis.`;
+            mensagemErro += `\n ${indisponiveis.map(x => x.nome).join('<br>')}`
+            this.showError('Educador indisponível', mensagemErro, {target: this.formDiv })
+
+            this.horario = undefined as any;
+        }
     }
 
     validaAlunos() {

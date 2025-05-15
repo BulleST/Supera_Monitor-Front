@@ -30,6 +30,7 @@ import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { MyMap } from '../../../../../utils/map';
 import { groupBy } from 'lodash'
 import { NameAbvPipe } from '../../../../../utils/name.pipe';
+import $ from 'jquery';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -44,9 +45,22 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
 
-    object: EventoSuperacaoRequest = new EventoSuperacaoRequest;
+    // object: EventoSuperacaoRequest = new EventoSuperacaoRequest;
+    object: EventoSuperacaoRequest = {
+    "id": -1,
+    "data": new Date("2025-05-17T12:00"),
+    "descricao": "Superação",
+    "observacao": "teste",
+    "duracaoMinutos": 60,
+    "sala_Id": 8,
+    "alunos": [
+    ],
+    "professores": [
+        32
+    ]
+};
 
-    data: Date = undefined as unknown as Date;
+    data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
@@ -77,6 +91,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     @ViewChild('form') form!: NgForm;
     @ViewChild('formDiv') formDiv!: HTMLFormElement;
+    @ViewChild('professor_Id') professor_Id!: NgModel;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -96,7 +111,6 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     ) {
 
         this.object.descricao = 'Superação';
-
 
         var professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
@@ -262,6 +276,14 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
+        
+        if (this.professorSelected) {
+            var e: SelectChangeEvent = {
+                value: this.professorSelected,
+                originalEvent: { target: $('#professor_Id').get(0) as any } as any
+            } 
+            this.professorChanged(e, this.professor_Id);
+        }
     }
 
     validaAlunos() {
@@ -269,20 +291,28 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
-
-    professorChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaProfessores();
-
-        var item = this.professores.find(x => x.id == e.value);
-
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
+    
+        professorChanged(e: SelectChangeEvent, model: NgModel) {
+            var item = e.value as Professor;
+            let mensagemErro: string | null = null;
+    
+            if (item && !item.disponivel && item.disponivelEvent) {
+                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
+            }
+            else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+            } else {
+                    mensagemErro = null;
+            }
+            
+            if (mensagemErro) {
+                this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            }
+            model.control.setErrors({ indisponivel: mensagemErro });
+            model.control.updateValueAndValidity();
         }
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
-    }
+
+    
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
@@ -338,12 +368,13 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         if (form.invalid) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
-        if (!this.alunosSelected)
+        if (!this.alunosSelected || !this.alunosSelected.length)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
         if (!this.professorSelected)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
+        console.log(this.alunosSelected)
         this.object.alunos = this.alunosSelected.map(x => x.id);
         this.object.professores = [this.professorSelected.id];
 

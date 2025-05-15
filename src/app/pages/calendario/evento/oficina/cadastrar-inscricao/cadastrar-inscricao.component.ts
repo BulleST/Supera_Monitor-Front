@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
 import { Professor } from '../../../../../models/professor.model';
 import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
@@ -27,6 +27,7 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
+import $ from 'jquery';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
@@ -64,6 +65,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     loadingEventos = false;
 
     PseudoEvento = PseudoEvento;
+    @ViewChild('professor_Id') professor_Id!: NgModel;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -110,12 +112,10 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
         this.subscription.push(alunos);
 
-        // if (this.alunos.length == 0) {
         this.loadingAlunos = true;
         lastValueFrom(this.alunoService.getListWithChecklist())
             .then(res => this.loadingAlunos = false)
             .catch(res => this.loadingAlunos = false);
-        // }
 
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
         this.subscription.push(turmas);
@@ -227,6 +227,14 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     validaProfessores() {
         var data = this.object.data;
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
+    
+        if (this.object.professor_Id) {
+            var e: SelectChangeEvent = {
+                value: this.object.professor_Id,
+                originalEvent: { target: $('#professor_Id').get(0) as any } as any
+            } 
+            this.professorChanged(e, this.professor_Id);
+        }
     }
 
     validaAlunos() {
@@ -234,19 +242,28 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
 
+
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaProfessores();
+        var item = this.professores.find(x => x.id == e.value) as Professor;
+        let mensagemErro: string | null = null;
 
-        var item = this.professores.find(x => x.id == e.value);
-
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
+        if (item && !item.disponivel && item.disponivelEvent) {
+            mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
         }
-        model.control.setErrors({ indisponivel: null });
+        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+            mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+        } else {
+            mensagemErro = null;
+        }
+        
+        if (mensagemErro) {
+            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            model.control.setValue(undefined)
+        }
+        model.control.setErrors({ indisponivel: mensagemErro });
         model.control.updateValueAndValidity();
     }
+
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();

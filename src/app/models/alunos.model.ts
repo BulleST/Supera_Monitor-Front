@@ -57,6 +57,7 @@ export class Aluno {
 
     dataInicioVigencia: Date = new Date;
     dataFimVigencia?: Date;
+    primeiraAula?: Date;
 
     created: Date = new Date;
     lastUpdated?: Date;
@@ -71,6 +72,8 @@ export class Aluno {
     turmaDesc: string = '';
     diaSemana: number = 0;
     horario: Date = new Date;
+
+    restricaoMobilidade: boolean = false;
 
     professor_Id: number = 0;
     professor: string = '';
@@ -100,15 +103,16 @@ export class Aluno {
     alunoChecklist: Aluno_CheckList_Item[] = [];
     restricoes: Aluno_Restricao[] = [];
 
-    checklist_Id: number = '' as any;
-    checklist: string = '';
+    checklist_Id?: number = '' as any;
+    checklist?: string = '';
 
     aulas: Dashboard[] = [];
-    primeiraAula?: Dashboard;
+    // primeiraAula?: Dashboard;
     // aulas: Dashboard_Aulas[] = [];
     // mesesAula: Evento_Mes[] = [];
     disponivel?: boolean;
     disponivelEvent?: Evento;
+    aulasParaRepor: Evento[] = []
 }
 
 export interface Pessoa_DropDown {
@@ -133,6 +137,22 @@ export var alunosColumns: ColumnTable[] = [
     //     displayType: DisplayType.text,
     //     options: undefined,
     // },
+    // {
+    //     field: 'dataNascimento',
+    //     label: 'Data de Nascimento',
+    //     filterType: FilterType.date,
+    //     displayType: DisplayType.date,
+    //     options: {
+    //         format: 'dd/MM/yyyy'
+    //     },
+    // },
+    // {
+    //     field: 'professor',
+    //     label: 'Educador',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.color,
+    //     options: undefined,
+    // },
     {
         field: 'nome',
         label: 'Nome',
@@ -140,13 +160,13 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         options: undefined,
     },
-    {
-        field: 'turmaDesc',
-        label: 'Dias de Aula',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
+    // {
+    //     field: 'turmaDesc',
+    //     label: 'Dias de Aula',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
     {
         field: 'turma',
         label: 'Turma',
@@ -154,13 +174,13 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         options: undefined,
     },
-    {
-        field: 'professor',
-        label: 'Educador',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
-    },
+    // {
+    //     field: 'professor',
+    //     label: 'Educador',
+    //     filterType: FilterType.text,
+    //     displayType: DisplayType.text,
+    //     options: undefined,
+    // },
     {
         field: 'perfilCognitivo',
         label: 'Perfil Cognitivo',

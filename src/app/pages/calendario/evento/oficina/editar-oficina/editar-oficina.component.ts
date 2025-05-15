@@ -83,8 +83,8 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         this.validaProfessor.emit(professor);
 
         if (professor && professor.disponivel == false && professor.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' });
-            this.showError('Professor Indisponível', `Esse professor está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            model.control.setErrors({ indisponivel: 'Educador indisponível' });
+            this.showError('Educador Indisponível', `Esse educador está atribuído para outra aula com a turma <b>${professor.disponivelEvent.turma ?? professor.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(professor.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
         model.control.setErrors({ indisponivel: null });

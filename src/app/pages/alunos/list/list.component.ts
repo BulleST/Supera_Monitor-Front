@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService,  MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
@@ -49,7 +49,7 @@ export class ListComponent implements OnDestroy {
     selectedChecklist?: CalendarioAlunoChecklistView;
     @ViewChild('popoverChecklist') popoverChecklist!: Popover;
 
-    
+
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -85,7 +85,7 @@ export class ListComponent implements OnDestroy {
                 aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
                 aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
                 aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
-            
+
                 return aluno;
             });
         });
@@ -130,7 +130,7 @@ export class ListComponent implements OnDestroy {
     contextMenuSelectionChange(item: any) {
         this.tableMenu = [
             {
-                
+
                 label: 'Menu',
                 disabled: true,
                 styleClass: 'text-500 font-bold opacity-100',
@@ -237,20 +237,20 @@ export class ListComponent implements OnDestroy {
     }
 
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
-        
+
         if (model.control.value) {
             // if (moment(item.prazo).week() > moment(new Date).week()) {
             //     this.showError('Checklist indisponível', `Você não pode finalizar esse checklist ainda. \n Prazo inicial a partir do dia ${moment(item.prazo).add(-7, 'day').format('DD/MM/YY')}`, e);
             //     model.control.setValue(false); 
             //     return;
             // }
-            
+
             // if(!item.prazo) {   
             //     this.showError('Checklist indisponível', `O aluno não possui data de vigência`, e);
             //     model.control.setValue(false); 
             //     return;
             // }
-            
+
             model.control.setValue(false);
 
             this.confirmationService.confirm({
@@ -277,7 +277,7 @@ export class ListComponent implements OnDestroy {
                             item.finalizado = true;
                             item.dataFinalizacao = res.object.dataFinalizacao;
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
-                            
+
                             checklist.prazo = checklist.items[0].prazo;
                             checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
                             checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
@@ -293,10 +293,10 @@ export class ListComponent implements OnDestroy {
                 },
                 reject: () => {
                     console.log('reject')
-                    
+
                     model.control.setValue(false);
                 },
-                
+
             });
         }
     }
@@ -328,7 +328,7 @@ export class ListComponent implements OnDestroy {
 
     //         }
     //     })
-        
+
     //     // Agendamento Aula 0 
     //     if (checklist.items.find(x => x.checklist_Item_Id == 31) != undefined) {
     //         array.push({ 
@@ -340,7 +340,7 @@ export class ListComponent implements OnDestroy {
     //             }
     //         })
     //     }
-        
+
     //     // Apresentação do diretor franqueado
     //     if (checklist.items.find(x => x.checklist_Item_Id == 8) != undefined) {
     //         array.push({ 
@@ -363,7 +363,7 @@ export class ListComponent implements OnDestroy {
     //             }
     //         })
     //     }
-        
+
     //     // Confirmação de preenchimento do feedback pós-venda
     //     if (checklist.items.find(x => x.checklist_Item_Id == 32) != undefined) {
     //         array.push({ 
@@ -379,11 +379,7 @@ export class ListComponent implements OnDestroy {
     //     return array
     // }
 
-    enviarMensagem(aluno: Aluno) {
-       return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
-    }
-    
-    popoverChecklistOpen(e:any, item: CalendarioAlunoChecklistView, aluno: Aluno) {
+    popoverChecklistOpen(e: any, item: CalendarioAlunoChecklistView, aluno: Aluno) {
         this.popoverChecklist.show(e)
         this.selectedChecklist = item;
         this.tableSelectedItem = aluno
@@ -393,6 +389,32 @@ export class ListComponent implements OnDestroy {
     popoverChecklistClosed() {
         this.selectedChecklist = undefined;
         this.tableSelectedItem = undefined;
+    }
+
+    enviarMensagem(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    }
+
+    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
+    }
+    enviarMensagemBoasVindas(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular);
+    }
+    enviarMensagemAdequacaoTurma(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
+    }
+    enviarMensagemLembreteOficina(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
+    }
+    enviarMensagemLembreteSuperacao(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
+    }
+    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
+    }
+    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
     }
 
 }

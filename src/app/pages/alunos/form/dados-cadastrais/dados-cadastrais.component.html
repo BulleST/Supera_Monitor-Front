@@ -1,12 +1,23 @@
-
-<p-confirmdialog styleClass="w-25rem">
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
     <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
+        <div>
+            <div [innerHTML]="message.message"></div>
+            <div class="w-full flex-1 col-12 px-0">
+                <label for="checklistObservacao">Inserir observação: </label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="checklistObservacao"
+                          id="checklistObservacao"
+                          [(ngModel)]="checklistObservacao"
+                          [rows]="2"></textarea>
+            </div>
+        </div>
     </ng-template>
 </p-confirmdialog>
 
-
 <div class="formgrid grid">
+    <!-- Foto -->
     <div class="lg:col-3 md:col-3 col-12 px-0 flex overflow-hidden">
         <p-fileupload
                       #fileUpload
@@ -74,8 +85,9 @@
     </div>
     <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
         <p-divider layout="vertical" class="hidden md:block h-full min-h-0 mt-2 mb-5"></p-divider>
-        <div class="formgrid grid pl-2 sm:px-4">
-            <div class="field md:col-6 col-12"> <!-- Nome -->
+        <div class="formgrid grid pl-2 sm:px-3">
+            <!-- Nome -->
+            <div class="field md:col-4 sm:col-8 col-12"> 
                 <label for="nome">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -89,7 +101,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Data de Nascimento -->
+             <!-- Data de Nascimento -->
+            <div class="field md:col-3 sm:col-4 col-4">
                 <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataNascimento="ngModel"
@@ -110,9 +123,9 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Data da Matrícula -->
-                <label for="created">Data da Matrícula: <!-- <span class="text-red-500">*</span> -->
-                </label>
+             <!-- Data de Cadastro -->
+            <div class="field md:col-3 sm:col-6 col-4">
+                <label for="created">Data de Cadastro: </label>
                 <input type="text"
                        pInputText
                        [value]="object.created | date : 'dd/MM/yyyy'"
@@ -121,10 +134,75 @@
                        class="w-full"
                        readonly>
             </div>
+             <!-- RM -->
+            <div class="field md:col-2 sm:col-6 col-4">
+                <label for="rm">RM <small class="text-400">(Registro de Matrícula)</small>: </label>
+                <input type="text"
+                       pInputText
+                       #rm="ngModel"
+                       [(ngModel)]="object.rm"
+                       id="rm"
+                       name="rm"
+                       class="w-full"
+                       readonly>
+            </div>
 
+             <!-- Telefone -->
+            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12">
+                <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #telefone="ngModel"
+                             [(ngModel)]="object.telefone"
+                             mask="+99 (99) 9999-9999"
+                             placeholder="+55 (99) 9999-9999"
+                             [autoClear]="true"
+                             id="telefone"
+                             name="telefone"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+             <!-- Celular -->
+            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12">
+                <label for="celular">Celular: <span class="text-red-500">*</span></label>
+                <p-inputmask
+                             #celular="ngModel"
+                             [(ngModel)]="object.celular"
+                             mask="+99 (99) 9.9999-9999"
+                             placeholder="+55 (99) 9.9999-9999"
+                             [autoClear]="true"
+                             id="celular"
+                             name="celular"
+                             class="w-full"
+                             styleClass="w-full"
+                             [required]="true" />
+                <div *ngIf="celular.touched && celular.invalid && celular.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+             <!-- E-mail -->
+            <div class="field sm:col-6 col-12">
+                <label for="email">E-mail: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       [email]="true"
+                       #email="ngModel"
+                       [(ngModel)]="object.email"
+                       id="email"
+                       name="email"
+                       class="w-full"
+                       [required]="true"
+                       placeholder="example@gmail.com">
+                <div *ngIf="email.touched && email.invalid && email.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
 
-
-            <div class="field md:col-3 sm:col-4 col-12"> <!-- Início Vigência -->
+             <!-- Início Vigência -->
+            <div class="field md:col-4 sm:col-4 col-12">
                 <label for="dataInicioVigencia">Início Vigência: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicioVigencia="ngModel"
@@ -145,7 +223,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicioVigencia.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-4 col-12"> <!-- Fim Vigência -->
+             <!-- Fim Vigência -->
+            <div class="field md:col-4 sm:col-4 col-12">
                 <label for="dataFimVigencia">Fim Vigência: </label>
                 <p-datepicker
                               #dataFimVigencia="ngModel"
@@ -163,13 +242,173 @@
                               [required]="false"
                               appendTo="body" />
             </div>
+            <!-- Primeira Aula -->
+            <div class="field md:col-4 sm:col-4 col-12">
+                <label for="primeiraAula">Primeira Aula: </label>
+                <p-datepicker
+                              #primeiraAula="ngModel"
+                              [(ngModel)]="object.primeiraAula"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              [selectOtherMonths]="true"
+                              [minDate]="minDate"
+                              [maxDate]="maxDate"
+                              inputId="primeiraAula"
+                              name="primeiraAula"
+                              class="w-full"
+                              inputStyleClass="w-full"
+                              styleClass="w-full"
+                              [required]="false"
+                              appendTo="body" />
+            </div>
 
+             <!-- Gênero -->
+            <div class="field sm:col-3 col-12">
+                <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="sexos"
+                          [(ngModel)]="object.pessoa_Sexo_Id"
+                          [loading]="loadingSexos"
+                          #pessoa_Sexo_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="pessoa_Sexo_Id"
+                          inputId="pessoa_Sexo_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <!-- <ng-template #restricoes>
+                {{getRestricoes()}}
+            </ng-template> -->
+             <!-- Restrições -->
+            <div class="field sm:col-4 col-12">
+                <label for="restricoes">Restrições: </label>
+                <p-iconfield>
+                    <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pip-spinner"  />
+                    <input type="text"
+                           pInputText
+                           [value]="restricoesText"
+                           id="restricoes"
+                           name="restricoes"
+                           class="w-full"
+                           [ngClass]="{ 'pointer-events-none': isEditPage == false }"
+                           [required]="true"
+                           placeholder="Selecione"
+                           [disabled]="!isEditPage"
+                           [readonly]="true"
+                           (focus)="isEditPage ? restricoes.show($event) : undefined"
+                           (onBlur)="isEditPage ? restricoes.hide() : undefined">
+                </p-iconfield>
+                <p-popover #restricoes styleClass="-mt-1">
+                    <div class="p-2 border-bottom-1 border-200 ">
+                        <p-iconfield>
+                                <input type="text"
+                                    pInputText
+                                    #restricao
+                                    id="restricao"
+                                    name="restricao"
+                                    class="w-full"
+                                    [required]="true"
+                                    (keyup.enter)="cadastrarRestricao($event, restricao)"
+                                    placeholder="Inserir nova restrição...">
+                                <p-inputicon >
+                                    <span class="text-primary-500">enter</span>
+                                </p-inputicon>
+                        </p-iconfield>
+                        <div class="">
+                            <ng-container *ngFor="let item of object.restricoes; let i = index">
+                                <div class="flex align-items-center gap-2 p-2" [ngClass]="{
+                                    'surface-50': i % 2 == 0
+                                }" >
+                                   <p-checkbox 
+                                       [name]="'active-' + i"
+                                       [inputId]="'active-' + i"
+                                       #checkbox="ngModel"
+                                       [(ngModel)]="item.active" 
+                                       [binary]="true"
+                                       (onChange)="toggleRestricao($event, item, checkbox)" />
+   
+                                   <p>{{item.descricao}}</p>
+                               </div>
+                            </ng-container>
+                    
+                        </div>
+                    </div>
+                </p-popover>
+                <!--
+                <p-select [disabled]="!isEditPage"
+                    [options]="object.restricoes"
+                    [(ngModel)]="object.restricoes"
+                    [loading]="loadingRestricoes"
+                    #_restricoes="ngModel"
+                    #_restricoesSelect
+                    inputId="restricoes"
+                    name="restricoes"
+                    optionLabel="descricao" 
+                    [pTooltip]="restricoes"
+                    [placeholder]="restricoes.elementRef.nativeElement.innerText"
+                    styleClass="w-full"
+                    appendTo="body" >
+                      <ng-template #selectedItem let-selectedOption>
+                        <div class="flex items-center gap-2" *ngIf="selectedOption">
+                            <div>{{ selectedOption.descricao }}</div>
+                        </div>
+                    </ng-template>
+                    <ng-template #header>
+                        <div class="p-2 border-bottom-1 border-200">
+                        <p-iconfield>
+                                <input type="text"
+                                    pInputText
+                                    #restricao
+                                    id="restricao"
+                                    name="restricao"
+                                    class="w-full"
+                                    [required]="true"
+                                    (keyup.enter)="cadastrarRestricao($event, restricao)"
+                                    placeholder="Inserir nova restrição...">
+                                <p-inputicon >
+                                    <span class="text-primary-500">enter</span>
+                                </p-inputicon>
+                        </p-iconfield>
+                        </div>
+                    </ng-template>
+                    <ng-template #item let-item>
+                        <div class="flex align-items-center gap-2">
+                            <p-checkbox 
+                                name="active"
+                                inputId="active"
+                                #checkbox="ngModel"
+                                [(ngModel)]="item.active" 
+                                [binary]="true"
+                                (onChange)="toggleRestricao($event, item, checkbox)" />
 
-            <div class="field md:col-6 sm:col-4 col-12"> <!-- Etapa Checklist -->
+                            <p>{{item.descricao}}</p>
+                        </div>
+                    </ng-template>
+                </p-select>
+                
+            -->
+                <div class="flex align-itens-center gap-2 mt-2">
+                    <p-checkbox inputId="restricaoMobilidade"
+                        name="restricaoMobilidade"
+                        #restricaoMobilidade="ngModel"
+                        [(ngModel)]="object.restricaoMobilidade" 
+                        [binary]="true" />
+                    <label for="restricaoMobilidade">Mobilidade reduzida</label>
+                </div>
+            </div>
+            <!-- Etapa Checklist -->
+            <div class="field sm:col-5 col-12">
                 <label for="etapaChecklist">Etapa Checklist: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.checklist"
+                       [value]="object.checklist ?? textoChecklist"
                        class="w-full"
                        readonly
                        [required]="true"
@@ -196,15 +435,19 @@
                                         <div class="flex flex-column align-items-start">
                                             <div class="inline-flex align-items-center gap-2 my-1 w-min-content pr-3" [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined">
                                                 
-                                                <p-checkbox #checkbox
-                                                  [inputId]="'checklistitem-' + checklistItem.id"
-                                                  [name]="'checklistitem-' + checklistItem.id"
-                                                  #finalizado="ngModel"
-                                                  [(ngModel)]="checklistItem.finalizado"
-                                                  [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
-                                                  [binary]="true"
-                                                  [readonly]="checklistItem.finalizado || checklist.id > checklistItem.checklist_Id"
-                                                  (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                                <p-checkbox *ngIf="!checklistItem.finalizado" 
+                                                [inputId]="'checklistitem-' + checklistItem.id"
+                                                [name]="'checklistitem-' + checklistItem.id"
+                                                
+                                                #checkboxModel="ngModel"
+                                                    [(ngModel)]="checklistItem.finalizado"
+                                                    [binary]="true"
+                                                    (ngModelChange)="finalizarChecklist($event, checklistItem, checkboxModel)"/>
+                                                <div *ngIf="checklistItem.finalizado" class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
+                                                    <div class="p-checkbox-box">
+                                                        <i class="pi pi-check p-checkbox-icon "></i>
+                                                    </div>
+                                                </div>
                                                 <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
                                                 
                                               <ng-template #finalizadoTooltip>
@@ -222,131 +465,8 @@
                        </p-popover>
             </div>
 
-            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12"> <!-- Telefone -->
-                <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
-                <p-inputmask
-                             #telefone="ngModel"
-                             [(ngModel)]="object.telefone"
-                             mask="+99 (99) 9999-9999"
-                             placeholder="+55 (99) 9999-9999"
-                             [autoClear]="true"
-                             id="telefone"
-                             name="telefone"
-                             class="w-full"
-                             styleClass="w-full"
-                             [required]="true" />
-                <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12"> <!-- Celular -->
-                <label for="celular">Celular: <span class="text-red-500">*</span></label>
-                <p-inputmask
-                             #celular="ngModel"
-                             [(ngModel)]="object.celular"
-                             mask="+99 (99) 9.9999-9999"
-                             placeholder="+55 (99) 9.9999-9999"
-                             [autoClear]="true"
-                             id="celular"
-                             name="celular"
-                             class="w-full"
-                             styleClass="w-full"
-                             [required]="true" />
-                <div *ngIf="celular.touched && celular.invalid && celular.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field sm:col-6 col-12"> <!-- E-mail -->
-                <label for="email">E-mail: <span class="text-red-500">*</span></label>
-                <input type="text"
-                       pInputText
-                       [email]="true"
-                       #email="ngModel"
-                       [(ngModel)]="object.email"
-                       id="email"
-                       name="email"
-                       class="w-full"
-                       [required]="true"
-                       placeholder="example@gmail.com">
-                <div *ngIf="email.touched && email.invalid && email.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field sm:col-4 col-12"> <!-- Gênero -->
-                <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="sexos"
-                          [(ngModel)]="object.pessoa_Sexo_Id"
-                          [loading]="loadingSexos"
-                          #pessoa_Sexo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="pessoa_Sexo_Id"
-                          inputId="pessoa_Sexo_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field sm:col-4 col-12"> <!-- Perfil Cognitivo -->
-                <label for="perfilCognitivo_Id">Perfil Cognitivo: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="perfisCognitivos"
-                          [(ngModel)]="object.perfilCognitivo_Id"
-                          [loading]="loadingPerfisCognitivos"
-                          #perfilCognitivo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="perfilCognitivo_Id"
-                          inputId="perfilCognitivo_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="perfilCognitivo_Id.touched && perfilCognitivo_Id.invalid && perfilCognitivo_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field sm:col-4 col-12"> <!-- Restrições -->
-                <label for="restricoes">Restrições: </label>
-                <p-multiselect 
-                    [options]="restricoes"
-                    [(ngModel)]="object.restricoes"
-                    [loading]="loadingRestricoes"
-                    (onChange)="restricaoChanged($event)"
-                    #_restricoes="ngModel"
-                    #restricoesMultiselect
-                    inputId="restricoes"
-                    name="restricoes"
-                    optionLabel="descricao" 
-                    placeholder="Selecione"
-                    [filter]="true"
-                    filterBy="descricao"
-                    styleClass="w-full"
-                    appendTo="body" >
-                    <ng-template #selectedItems let-selectedOption>
-                        <div class="flex items-center gap-2" *ngIf="selectedOption">
-                            {{selectedOption|json}}
-                        </div>
-                    </ng-template>
-                    <ng-template #header>
-                        <a [routerLink]="['./restricao/cadastrar']"
-                            class="text-primary-500 font-bold flex align-items-center p-3 hover:underline">
-                            <i class="pi pi-plus mr-2 text-sm"></i>
-                            <span>Inserir Restrição</span>
-                        </a>
-                    </ng-template>
-                </p-multiselect>
-                <div *ngIf="_restricoes.touched && _restricoes.invalid && _restricoes.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="_restricoes.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-            <div class="field col-12"> <!-- Endereço -->
+             <!-- Endereço -->
+            <div class="field col-12">
                 <label for="endereco">Endereço: </label>
                 <input type="text"
                        pInputText
@@ -359,41 +479,9 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            
-            <div class="field sm:col-4 col-4"> <!-- RM -->
-                <label for="rm">RM <small class="text-400">(Registro de Matrícula)</small>: </label>
-                <input type="text"
-                       pInputText
-                       #rm="ngModel"
-                       [(ngModel)]="object.rm"
-                       id="rm"
-                       name="rm"
-                       class="w-full"
-                       readonly>
-            </div>
-            <div class="field sm:col-4 col-4"> <!-- Login -->
-                <label for="loginApp">Login <small class="text-400">(Sensirial Moove App)</small>: </label>
-                <input type="text"
-                       pInputText
-                       #loginApp="ngModel"
-                       [(ngModel)]="object.loginApp"
-                       id="loginApp"
-                       name="loginApp"
-                       class="w-full"
-                       >
-            </div>
-            <div class="field sm:col-4 col-4"> <!-- Senha -->
-                <label for="senhaApp">Senha <small class="text-400">(Sensirial Moove App)</small>: </label>
-                <input type="text"
-                       pInputText
-                       #senhaApp="ngModel"
-                       [(ngModel)]="object.senhaApp"
-                       id="senhaApp"
-                       name="senhaApp"
-                       class="w-full"
-                       >
-            </div>
-            <div class="field sm:col-4 col-12"> <!-- Turma -->
+
+             <!-- Turma -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="turmas"
@@ -431,7 +519,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Professor -->
+             <!-- Professor -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="professor">Professor: </label>
                 <input type="text"
                        pInputText
@@ -441,7 +530,29 @@
                        class="w-full"
                        readonly>
             </div>
-            <div class="field sm:col-4 col-12"> <!-- Turma -->
+             <!-- Perfil Cognitivo -->
+            <div class="field md:col-3 sm:col-6 col-12">
+                <label for="perfilCognitivo_Id">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="perfisCognitivos"
+                          [(ngModel)]="object.perfilCognitivo_Id"
+                          [loading]="loadingPerfisCognitivos"
+                          #perfilCognitivo_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="perfilCognitivo_Id"
+                          inputId="perfilCognitivo_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="perfilCognitivo_Id.touched && perfilCognitivo_Id.invalid && perfilCognitivo_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+             <!-- KIT Apostila -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="apostila_Kit_Id">Kit Apostila</label>
                 <p-select
                           [options]="kits"
@@ -473,7 +584,9 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="apostila_Kit_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Apostila Ábaco -->
+
+             <!-- Apostila Ábaco -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="apostila_Abaco">Apostila Ábaco: </label>
                 <input type="text"
                        pInputText
@@ -483,7 +596,8 @@
                        class="w-full"
                        readonly>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Página -->
+             <!-- Página -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="numeroPaginaAbaco">Página: </label>
                 <input type="text"
                        pInputText
@@ -493,7 +607,8 @@
                        class="w-full"
                        readonly>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Apostila AH -->
+             <!-- Apostila AH -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="apostila_AH">Apostila AH: </label>
                 <input type="text"
                        pInputText
@@ -503,7 +618,8 @@
                        class="w-full"
                        readonly>
             </div>
-            <div class="field md:col-3 sm:col-6 col-12"> <!-- Página -->
+             <!-- Página -->
+            <div class="field md:col-3 sm:col-6 col-12">
                 <label for="numeroPaginaAH">Página: </label>
                 <input type="text"
                        pInputText

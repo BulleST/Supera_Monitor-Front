@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Evento, EventoTipo } from '../../../models/evento.model';
-import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
+import { Evento, EventoTipo } from '../../../../models/evento.model';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import moment from 'moment';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 
 @Component({
     selector: 'app-evento-item',

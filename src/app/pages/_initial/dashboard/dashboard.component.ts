@@ -8,7 +8,7 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Evento } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard, Dashboard_Mes } from '../../../models/dashboard.model';
+import { Dashboard, Dashboard_Mes, DashboardRequest } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -18,6 +18,10 @@ import { AlunoService } from '../../../services/alunos.service';
 import { ToastrService } from 'ngx-toastr';
 import $ from 'jquery';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { TurmaService } from '../../../services/turma.service';
+import { Turma } from '../../../models/turma.model';
+import { AccountService } from '../../../services/account.service';
+import { Role } from '../../../models/account-perfil.model';
 
 @Component({
     selector: 'app-dashboard',
@@ -42,14 +46,16 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
     subscription: Subscription[] = [];
-    anos: number[] = Array.from({ length: 3 }, (a, i) => (new Date).getFullYear() - i)
-    ano: number = (new Date).getFullYear();
+    anos: number[] = []
     expandedRowsKeys = {};
 
     professores: Professor[] = [];
     loadingProfessores = false;
+    
+    turmas: Turma[] = [];
+    loadingTurmas = false;
 
-
+    request: DashboardRequest = new DashboardRequest;
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -57,7 +63,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         private roteiroService: RoteiroService,
         private professorService: ProfessorService,
         private alunoService: AlunoService,
+        private turmaService: TurmaService,
         private toastr: ToastrService,
+        private accountService: AccountService,
     ) {
         var professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
@@ -65,14 +73,30 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
              lastValueFrom(this.professorService.getList())
-             .then(res => {
-                this.professores = res;
-                this.loadingProfessores = false;
-            });
+             .then(res => this.loadingProfessores = false)
+             .catch(res => this.loadingProfessores = false);
         }
 
-        // var dashboard = this.service.dashboard.subscribe(res => this.dashboard = res);
-        // this.subscription.push(dashboard);
+        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        this.subscription.push(turmas);
+
+        if (this.turmas.length == 0) {
+            this.loadingTurmas = true;
+             lastValueFrom(this.turmaService.getList())
+             .then(res => this.loadingTurmas = false)
+             .catch(res => this.loadingTurmas = false);
+        }
+
+        this.accountService.account.subscribe(res => {
+            this.request.professor_Id = res?.professor_Id;
+        })
+
+        var anoMin = 2025;
+        var currentAno = new Date().getFullYear();
+        for (let ano = anoMin; ano <= currentAno; ano++) {
+            this.anos.push(ano)            
+        }
+
 
     }
 
@@ -111,13 +135,13 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
                         tema: 'Carregando...',
                         dataInicio: moment().set({
                             month: i,
-                            year: this.ano,
+                            year: this.request.ano,
                             day: 1,
                             week: index
                         }).toDate(),
                         dataFim: moment().set({
                             month: i,
-                            year: this.ano,
+                            year: this.request.ano,
                             day: 6,
                             week: index
                         }).toDate(),
@@ -154,7 +178,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
                 mes.mes = index;
                 mes.mesString = mesString;
 
-                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.ano)
+                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.request.ano)
                 mes.roteiros.forEach(roteiro => { lastSemana = roteiro.semana });
 
                 if (mes.roteiros.length > 0) {
@@ -164,7 +188,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
                     intervaloAte = lastRoteiro.dataFim;
     
                 } else {
-                    intervaloDe = moment(new Date(this.ano, index, 1)).subtract(7, 'days').toDate();
+                    intervaloDe = moment(new Date(this.request.ano, index, 1)).subtract(7, 'days').toDate();
                     intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
                 }
 
@@ -214,7 +238,25 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.loadingAlunos = true;
         await lastValueFrom(this.alunoService.getListWithChecklist())
         .then(res => {
-            this.alunos = res.filter(x => x.active).sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
+            this.alunos = res.filter(x => x.active);
+            
+            if (this.request.turma_Id) 
+                this.alunos = this.alunos.filter(x => x.turma_Id == this.request.turma_Id);
+
+            if (this.request.professor_Id) 
+                this.alunos = this.alunos.filter(x => x.professor_Id == this.request.professor_Id);
+
+            this.alunos = this.alunos.sort((a, b) => {
+                if (a.turma < b.turma) return -1;
+                if (a.turma > b.turma) return 1;
+                if (a.nome < b.nome) return -1;
+                if (a.nome > b.nome) return 1;
+                return 0;
+            });
+            
+            
+            
+            // .sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
             this.loadingAlunos = false;
         })
         .catch(res => this.loadingAlunos = false);
@@ -225,21 +267,37 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.loadingDashboard = true;
         this.dashboard = [];
         var done: number[] = [];
-        // await lastValueFrom(this.service.getDashboard(this.ano, 1)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 2)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 3)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 4)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 5)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 6)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 7)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 8)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 9)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 10)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 11)).then(res => this.dashboard.push(...res))
-        // await lastValueFrom(this.service.getDashboard(this.ano, 12)).then(res => this.dashboard.push(...res))
+        /*
+        this.request.mes = 1
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
+        this.request.mes = ++this.request.mes;
+        */
         await new Promise<boolean>((resolve, reject) => {
             this.meses.forEach((mes: string, i: number) => {
-                lastValueFrom(this.service.getDashboard(this.ano, i+1))
+                this.request.mes = i+1;
+                lastValueFrom(this.service.getDashboard(this.request))
                 .then(async res => {
                     done.push(i);
                     this.dashboard.push(...res);
@@ -266,6 +324,19 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
         this.expandedRowsKeys = this.alunos.reduce((acc: any, p :any) => (acc[p.turma_Id] = true) && acc, {});
         this.loadingDashboard = false;
+    }
+
+    turmaChanged() {
+        var turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma;
+        this.request.professor_Id = turma.professor_Id;
+    }
+    
+    professorChanged() {
+        this.turmas.map(x => {
+            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
+            return x;
+        })
+        this.request.turma_Id = undefined;
     }
     
     enviarMensagem(nome:string, celular:string) {

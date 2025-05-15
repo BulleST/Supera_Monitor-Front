@@ -11,6 +11,13 @@ export class Dashboard {
     participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
 }
 
+export class DashboardRequest {
+    ano: number = new Date().getFullYear();
+    mes: number = 0;
+    turma_Id?: number;
+    professor_Id?: number;
+}
+
 // export class Dashboard_Aulas { 
 //     id: number = 0; 
 //     show: boolean = true;

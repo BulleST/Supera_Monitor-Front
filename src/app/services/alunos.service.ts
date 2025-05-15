@@ -14,6 +14,7 @@ import { CalendarioAlunoChecklistView } from '../models/calendario.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
+import { AlunoChecklistItemList, AlunoChecklistItemList_Request } from '../models/aluno-checklist-item-list.model';
 
 @Injectable({
     providedIn: 'root',
@@ -45,8 +46,20 @@ export class AlunoService extends Service {
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
+                next: res => {
+                    this.list.next(res);
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getChecklist(request: AlunoChecklistItemList_Request) {
+        return this.http.post<AlunoChecklistItemList[]>(`${this.url}/alunos/checklists/all`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar jornada supera. \n ${getError(err)}`)
                 }
             }));
     }
@@ -75,8 +88,6 @@ export class AlunoService extends Service {
                         })
                         aluno.checklistCompleto = this.checklists
                             .map(checklist => {
-                                var hoje = new Date();
-
                                 var checklistAluno = new CalendarioAlunoChecklistView;
                                 checklistAluno.id = checklist.id;
                                 checklistAluno.nome = checklist.nome;
