@@ -2,19 +2,18 @@ import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, signal, ViewChi
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { CalendarOptions, DatesSetArg, EventApi, EventClickArg } from '@fullcalendar/core';
+import { CalendarOptions, DatesSetArg, EventClickArg } from '@fullcalendar/core';
 import moment from 'moment';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import { FullCalendarComponent } from '@fullcalendar/angular';
-import { EventImpl } from '@fullcalendar/core/internal';
 import { ToastrService } from 'ngx-toastr';
 import { PseudoEvento, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
-import { Crypto, getError } from '../../../utils';
+import { Crypto, getError, showError } from '../../../utils';
 import { EventoService } from '../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
@@ -27,6 +26,8 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { AlunoRestricaoService } from '../../../services/aluno-restricao.service';
 import { Feriado } from '../../../models/feriado.model';
 import { TurmaService } from '../../../services/turma.service';
+import { CalendarioUtils } from '../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-agendar-reposicao-aluno',
@@ -45,7 +46,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     selectedAula?: any;
     selectedEvento?: Evento;
     EventoTipo = EventoTipo;
-    
+
     aluno: Aluno = new Aluno;
     participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
     evento: Evento = new Evento;
@@ -109,6 +110,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private professorService: ProfessorService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         var params = this.activatedRoute.params.subscribe(res => {
@@ -211,7 +213,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
 
@@ -247,11 +249,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         calendar.removeAllEvents();
 
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        var eventos = this.eventos.filter(x => x.active == true 
-        /* não é feriado */           && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false
-        /* tem vagas disponíveis */   && x.capacidadeMaximaAlunos > x.alunos.length
-        /* mesmo perfil do aluno */   && x.perfilCognitivo.map(y => y.id).includes(this.aluno.perfilCognitivo_Id)
-        /* aluno não está na aula */  && x.alunos.map(x => x.aluno_Id).includes(this.aluno.id) == false);
+        var eventos = this.eventos.filter(x => x.active == true
+        /* não é feriado */ && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false
+        /* tem vagas disponíveis */ && x.capacidadeMaximaAlunos > x.alunos.length
+        /* mesmo perfil do aluno */ && x.perfilCognitivo.map(y => y.id).includes(this.aluno.perfilCognitivo_Id)
+        /* aluno não está na aula */ && x.alunos.map(x => x.aluno_Id).includes(this.aluno.id) == false);
 
         var events = eventos.map(item => {
             var backgroundColor = '#2e2e2e';
@@ -260,15 +262,15 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             } else if (item.professores && item.professores.length > 0) {
                 backgroundColor = item.professores[0].corLegenda;
             }
-            var color = this.getTextColor(backgroundColor)
+            var color = this.calendarioUtils.getTextColor(backgroundColor)
             var event: any = {
-                id: this.eventRamdomId(),
+                id: this.calendarioUtils.eventRamdomId(),
                 backgroundColor: backgroundColor,
                 borderColor: backgroundColor,
                 textColor: color,
                 title: item.turma ?? item.descricao,
                 start: moment(item.data, 'YYYY-MM-DD HH:mm').toDate(),
-                end: this.addHours(moment(item.data, 'YYYY-MM-DD HH:mm').toDate(), 2),
+                end: moment(item.data).add(item.duracaoMinutos, 'minutes').toDate(),
                 extendedProps: item,
             }
             return event;
@@ -284,7 +286,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             };
 
             var event = {
-                id: this.eventRamdomId(),
+                id: this.calendarioUtils.eventRamdomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
@@ -301,38 +303,6 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
     }
-
-    addHours(data: Date, h: number) {
-        data.setTime(data.getTime() + (h * 60 * 60 * 1000));
-        return data;
-    }
-
-    eventRamdomId() {
-        let length = 5;
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        let counter = 0;
-        while (counter < length) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            counter += 1;
-        }
-        return result;
-    }
-
-    getTextColor(hex: string) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        var rgb = result ? {
-            r: parseInt(result[1], 16), g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : {
-            r: 0,
-            g: 0,
-            b: 0
-        };
-        return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 180 ? '#2e2e2e' : '#fff';
-    }
-
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
         if (!perfilCognitivo || perfilCognitivo.length == 0)
             return '';
@@ -390,11 +360,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                     header: 'Atenção',
                     acceptIcon: 'pi pi-check',
                     acceptLabel: 'Continuar',
-                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
                     rejectVisible: true,
                     rejectIcon: 'pi pi-times',
                     rejectLabel: 'Cancelar',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                    rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
                     accept: async () => {
                         setTimeout(() => {
                             this.selecionarEvento(e, target);
@@ -421,16 +391,17 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     }
 
     selecionarEvento(e: EventClickArg, target: Evento) {
+        console.log(e, target)
         this.confirmationService.confirm({
             target: e.jsEvent.target as EventTarget,
             message: `Selecionar aula do dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.turma}</b> com o professor <b>${target.professor}</b>?`,
             header: 'Selecionar aula',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Selecionar',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: async () => {
                 this.selectedAula = e.event;
                 this.selectedEvento = target;
@@ -442,32 +413,25 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         });
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
-    confirmaReposicao(e: any) {
+    sendConfirmation(e: any) {
+        playAlert();
 
         var target = this.selectedEvento as Evento;
-
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja marcar reposição do aluno <b>${this.aluno.nome} </b> do dia <b>${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}</b> para o dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.descricao}</b> com o professor <b>${target.professor}</b>?`,
             header: 'Agendar reposição',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(target, e)
             },
@@ -511,18 +475,20 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                 this.loading = false;
                 this.selectedAula = undefined;
                 this.service.calendarioReload.emit(this.evento.id);
-                this.visible = false;
-                this.visibleChange();
+                playSuccess();
+                this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
 
                 if (this.aluno.celular) {
                     this.sendMensagemAluno(e, target);
+                } else {
+                    this.visible = false;
+                    this.visibleChange();
                 }
 
-                this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
+                this.showError('Erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
             })
     }
 
@@ -544,10 +510,10 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false
                 this.visibleChange();

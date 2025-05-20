@@ -7,12 +7,12 @@ import { CadastrarAula0Component } from './evento/aula-0/cadastrar-aula-0/cadast
 import { CadastrarReuniaoComponent } from './evento/reuniao/cadastrar-reuniao/cadastrar-reuniao.component';
 import { CadastrarInscricaoComponent } from './evento/oficina/cadastrar-inscricao/cadastrar-inscricao.component';
 import { FormComponent as AlunoFormComponent } from '../alunos/form/form.component';
-import { RestricoesComponent } from '../alunos/form/restricoes/restricoes.component';
 import { CalendarioComponent } from './calendario.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
+import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
 
 const routes: Routes = [{
     path: '', component: CalendarioComponent, children: [
@@ -24,6 +24,9 @@ const routes: Routes = [{
         { path: 'oficina/agendar', component: CadastrarOficinaComponent },
         { path: 'oficina/inscrever/:evento_id', component: CadastrarInscricaoComponent },
 
+        { path: ':evento_nome/:evento_id/reposicao', component: ReposicaoComponent },
+        { path: ':evento_nome/reposicao', component: ReposicaoComponent },
+        
         { path: ':evento_nome/:evento_id', component: EventoComponent },
         { path: ':evento_nome/chamada/:evento_id', component: EventoComponent },
         { path: ':evento_nome/reagendar/:evento_id', component: ReagendarEventoComponent },
@@ -31,9 +34,7 @@ const routes: Routes = [{
         
         { path: 'aluno/reposicao/:aluno_id', component: AgendarReposicaoAlunoComponent },
 
-        { path: 'aluno/:aluno_id', component: AlunoFormComponent, children: [
-            { path: 'restricao/cadastrar', component: RestricoesComponent }
-        ]}
+        { path: 'aluno/:aluno_id', component: AlunoFormComponent }
     ]
 },];
 

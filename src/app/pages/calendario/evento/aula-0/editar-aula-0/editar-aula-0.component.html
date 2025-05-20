@@ -44,11 +44,11 @@
     <!-- Aluno -->
     <div class="field lg:col-6 sm:col-4 col-12">
         <label for="aluno">Aluno: </label>
-        <p-iconfield [pTooltip]="checklistStatus">
+        <p-iconfield>
             <input type="text"
                    pInputText
-                   (mouseenter)="popoverComponent.show($event)"
-                   (focus)="popoverComponent.show($event)"
+                   (mouseenter)="popoverChecklistComponent.showPopover($event)"
+                   (focus)="popoverChecklistComponent.showPopover($event)"
                    [value]="alunoSelected.aluno"
                    styleClass="w-full"
                    class="w-full"
@@ -56,10 +56,7 @@
                    readonly />
             <p-inputicon styleClass="fa-solid fa-user-graduate" />
         </p-iconfield>
-        <ng-template #checklistStatus>
-            <app-aluno-checklist-status [aluno]="alunoSelected" [loading]="popoverComponent.loading"></app-aluno-checklist-status>
-        </ng-template>
-        <app-aluno-checklist-popover #popoverComponent [aluno]="alunoSelected"></app-aluno-checklist-popover>
+        <app-aluno-checklist #popoverChecklistComponent [aluno]="alunoSelected"></app-aluno-checklist>
     </div>
     <!-- Educador -->
     <div class="field lg:col-5 sm:col-5  col-5">
@@ -117,7 +114,7 @@
                             </ng-template>
                         </p>
                         <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                            <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                            <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                         </ng-container>
                     </div>
                     <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"

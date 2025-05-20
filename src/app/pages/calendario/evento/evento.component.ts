@@ -1,18 +1,17 @@
 import { Component, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Evento, EventoQueryParams, EventoTipo } from '../../../models/evento.model';
-import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Evento_Participacao_Professor } from '../../../models/evento-participacao-professor.model';
 import { Aluno } from '../../../models/alunos.model';
 import { Professor } from '../../../models/professor.model';
-import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
+import { SalaAula } from '../../../models/sala-aula.model';
 import { Turma } from '../../../models/turma.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { SalaAulaService } from '../../../services/sala-aula.service';
-import { Crypto, getError } from '../../../utils';
+import { Crypto, getError, showError } from '../../../utils';
 import { ProfessorService } from '../../../services/professor.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { EventoService } from '../../../services/evento.service';
@@ -25,8 +24,6 @@ import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model';
 import { MyMap } from '../../../utils/map';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
-import { ChecklistService } from '../../../services/checklist.service';
-import { UserService } from '../../../services/user.service';
 import { Popover } from 'primeng/popover';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { Roteiro } from '../../../models/roteiro.model';
@@ -35,7 +32,8 @@ import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
-import { SelectChangeEvent } from 'primeng/select';
+import { CalendarioUtils } from '../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-evento',
@@ -95,11 +93,9 @@ export class EventoComponent implements OnDestroy {
         private professorService: ProfessorService,
         private alunoService: AlunoService,
         private service: EventoService,
-        private mensagemWhatsapp: MensagemWhatsapp,
         private turmaService: TurmaService,
-        private checklistService: ChecklistService,
-        private userService: UserService,
         private roteiroService: RoteiroService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         var params = this.activatedRoute.snapshot.params;
@@ -110,7 +106,7 @@ export class EventoComponent implements OnDestroy {
             return
         }
 
-        this.encryptedId=params['evento_id'];
+        this.encryptedId = params['evento_id'];
         var url = this.activatedRoute.url.subscribe(res => {
             this.isChamadaPage = res.find(x => x.path == 'chamada') ? true : false
         })
@@ -181,10 +177,20 @@ export class EventoComponent implements OnDestroy {
         this.subscription.push(eventos);
 
         var evento = this.service.evento.subscribe(async res => {
+            console.log('evento subscription', res)
             if (!res) {
                 try {
-                    var evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                    this.service.setEvento(evento)
+                    var decrypted = this.crypto.decrypt(this.encryptedId);
+                    if (this.encryptedId && decrypted && decrypted != PseudoEvento.EventoId) {
+                        await lastValueFrom(this.service.get(decrypted))
+                            .then(res => {
+                                this.service.setEvento(res);
+                                this.evento = res;
+                            })
+                    } else {
+                        var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+                        this.service.setEvento(evento)
+                    }
                 }
                 catch (e) {
                     this.visible = false;
@@ -235,21 +241,15 @@ export class EventoComponent implements OnDestroy {
         if (!this.visible) {
             var route = this.isChamadaPage ? '../../../' : '../../'
             this.router.navigate([route], { relativeTo: this.activatedRoute });
-            // this.service.setEvento(undefined)
         }
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
+
     async verificaDisponibilidade() {
         var valid = true;
 
@@ -272,7 +272,7 @@ export class EventoComponent implements OnDestroy {
 
     }
 
-  validaSalaAulas() {
+    validaSalaAulas() {
         var data = this.evento.data;
         this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
@@ -290,17 +290,17 @@ export class EventoComponent implements OnDestroy {
     professorChanged(professor: Professor) {
         this.validaProfessores()
     }
-    
+
     salaAulaChanged(salaAula: SalaAula) {
         this.validaSalaAulas()
     }
-    
+
     alunoChanged(aluno: Aluno) {
         this.validaAlunos()
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     goToAluno(aluno: Evento_Participacao_Aluno) {
@@ -311,17 +311,17 @@ export class EventoComponent implements OnDestroy {
     async goToIniciarChamada(e: any) {
         this.isChamadaPage = true;
         this.evento.alunos
-        .filter(x => x.active)
-        .map(item => {
-            item.presente = true;
-            return item;
-        });
+            .filter(x => x.active)
+            .map(item => {
+                item.presente = true;
+                return item;
+            });
 
         this.evento.professores
-        .map(item => {
-            item.presente = true;
-            return item;
-        });
+            .map(item => {
+                item.presente = true;
+                return item;
+            });
 
 
         this.service.setEvento(this.evento)
@@ -341,16 +341,19 @@ export class EventoComponent implements OnDestroy {
     }
 
     finalizarConfirmation(e: any) {
+
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
             header: `Finalizar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: `Finalizar`,
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Ainda não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: async () => {
                 this.finalizar(e);
             },
@@ -364,18 +367,18 @@ export class EventoComponent implements OnDestroy {
         if (response.success) {
 
             this.evento.id = response.object.id;
-            this.evento.alunos = this.evento.alunos.map(item => {
-                var participacao = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
-                item.id = participacao.id;
-                item.evento_Id = participacao.evento_Id;
-                item.presente = item.presente ?? false;
-                return item;
+            this.evento.alunos = this.evento.alunos.map(participacao => {
+                var participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
+                participacao.id = participacaoResponse.id;
+                participacao.evento_Id = participacaoResponse.evento_Id;
+                participacao.presente = participacao.presente ?? false;
+                return participacao;
             });
-            this.evento.professores = this.evento.professores.map(item => {
-                var participacao = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == item.professor_Id) as Evento_Participacao_Professor;
-                item.id = participacao.id;
-                item.evento_Id = participacao.evento_Id;
-                return item;
+            this.evento.professores = this.evento.professores.map(participacao => {
+                var participacaoResponse = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == participacao.professor_Id) as Evento_Participacao_Professor;
+                participacao.id = participacaoResponse.id;
+                participacao.evento_Id = participacaoResponse.evento_Id;
+                return participacao;
             })
 
             var request: EventoChamadaRequest = {
@@ -392,7 +395,14 @@ export class EventoComponent implements OnDestroy {
                         numeroPaginaAH: x.numeroPaginaAH,
                     }
                 }),
-                professores: []
+                professores: this.evento.professores.map(item => {
+                    return {
+                        participacao_Id: item.id,
+                        observacao: item.observacao,
+                        presente: true,
+
+                    }
+                })
             };
 
             if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
@@ -414,6 +424,9 @@ export class EventoComponent implements OnDestroy {
                     this.service.calendarioReload.emit(this.evento.id);
                     this.markChecklistAsDone();
 
+                    playSuccess();
+
+
                     this.toastrService.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
                 })
                 .catch(res => {
@@ -429,17 +442,20 @@ export class EventoComponent implements OnDestroy {
         if (form.invalid) {
             return this.showError('OPA!', `Não foi possível salvar! \n Preencha os dados corretamente para continuar`, e);
         }
+
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja salvar?`,
             header: `Salvar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Salvar',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: async () => {
                 this.send(e);
             },
@@ -459,6 +475,7 @@ export class EventoComponent implements OnDestroy {
                 this.toastrService.success('Dados atualizados com sucesso.')
                 this.router.navigate(['', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute, replaceUrl: true });
                 this.loading = false;
+                playSuccess();
 
             })
             .catch(res => {

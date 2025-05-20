@@ -3,14 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, showError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Turma, turmaColumns } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
-import moment from 'moment';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
+import { playAlert, playSuccess, playError } from '../../../utils/audio';
 
 @Component({
     selector: 'app-list',
@@ -54,11 +54,11 @@ export class ListComponent implements OnDestroy {
             this.list = res.map(turma => {
                 turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
                 turma.active = !turma.deactivated;
-                        
+
                 if (turma.numeroSala != 0 && turma.andar != 0)
-                     turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
+                    turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
                 else turma.salaDeAulaString = 'ONLINE'
-                
+
                 return turma
             })
         });
@@ -137,6 +137,9 @@ export class ListComponent implements OnDestroy {
 
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
+
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
@@ -144,39 +147,33 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
                         if (res.success) {
-                            this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
+                            this.toastrService.success(deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
+                            playSuccess();
                         } else {
-                            this.showError(res.message, e);
+                            this.showError('Erro', res.message, e);
                         }
                     })
                     .catch((res: HttpErrorResponse) => {
-                        this.showError(res.error.message, e);
+                        this.showError('Erro', res.error.message, e);
                     })
             },
         });
     }
 
-    showError(message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        });
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
     }
 
     getOption(col: ColumnTable, row: any) {

@@ -47,6 +47,7 @@ export class ChecklistService extends Service {
                     x.finalizado = !!x.dataFinalizacao;
                     return x;
                 });
+                return res;
             },
             error: err => {
                 this.toastrService.error(`Não foi possível carregar checklist do aluno. \n ${getError(err)}`);

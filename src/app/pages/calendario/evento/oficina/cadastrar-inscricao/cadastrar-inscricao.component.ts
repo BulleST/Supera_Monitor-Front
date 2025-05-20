@@ -1,14 +1,14 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAula } from '../../../../../models/sala-aula.model';
 import { Turma } from '../../../../../models/turma.model';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { getError } from '../../../../../utils';
+import { getError, showError } from '../../../../../utils';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { ProfessorService } from '../../../../../services/professor.service';
 import { AlunoService } from '../../../../../services/alunos.service';
@@ -28,6 +28,8 @@ import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import $ from 'jquery';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
@@ -80,6 +82,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private service: EventoService,
         private checklistService: ChecklistService,
         private accountService: AccountService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         var params = this.activatedRoute.snapshot.params;
@@ -186,16 +189,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     async verificaDisponibilidade() {
         var valid = true;
@@ -227,12 +223,12 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     validaProfessores() {
         var data = this.object.data;
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
-    
+
         if (this.object.professor_Id) {
             var e: SelectChangeEvent = {
                 value: this.object.professor_Id,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
-            } 
+            }
             this.professorChanged(e, this.professor_Id);
         }
     }
@@ -255,7 +251,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         } else {
             mensagemErro = null;
         }
-        
+
         if (mensagemErro) {
             this.showError('Educador indisponível', mensagemErro, e.originalEvent)
             model.control.setValue(undefined)
@@ -291,12 +287,13 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
-    
+
     getCorTurma(turma_Id: number) {
         return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
     }
+
     enviarMensagem(nome: string, celular: string) {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular)
     }
@@ -306,7 +303,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     sendConfirmation(form: NgForm, e: any) {
-        console.log('aluno', this.selectedAluno)
 
         if (form.invalid) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
@@ -316,15 +312,17 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             header: 'Salvar oficina',
             message: `Salvar dados e inscrever aluno(a) ${this.selectedAluno.nome.split(' ')[0]}?`,
             acceptLabel: `Salvar`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             }
@@ -348,6 +346,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
+                playSuccess();
                 if (this.selectedAluno!.celular) {
                     this.sendMensagemAlunos(e, this.object)
                 } else {
@@ -379,10 +378,10 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false
                 this.visibleChange();

@@ -18,10 +18,14 @@ export class EventoItemComponent implements OnChanges {
     @Output() selectEvent = new EventEmitter<any>;
     @Output() cdkDrop = new EventEmitter<any>;
     EventoTipo = EventoTipo;
+    alunosStr = '';
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
+            if (this.evento.alunos && this.evento.alunos.length){
+                this.alunosStr = this.evento.alunos.map(x => x.aluno.split(' ')[0]).join(', ')
+            }
         }
         if (changes['arg']) {
             this.arg = changes['arg'].currentValue;

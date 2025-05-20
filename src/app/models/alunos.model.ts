@@ -35,8 +35,10 @@ export class AlunoRequest {
     professor_Id: number = 0;
     pessoa_Sexo_Id?: number;
     apostila_Kit_Id?: number;
-
+    
+    restricaoMobilidade: boolean = false;
     restricoes: Aluno_Restricao[] = [];
+    primeiraAula?: Date;
 
 }
 

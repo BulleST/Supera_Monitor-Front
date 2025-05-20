@@ -35,8 +35,10 @@ export class Evento {
     turma?: string;
     perfilCognitivo: PerfilCognitivo[] = [];
     capacidadeMaximaAlunos: number = 12;
-    roteiro_Id: number = PseudoEvento.EventoId;
-
+    roteiro_Id?: number;
+    semana?: number;
+    tema?: string;
+    
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;

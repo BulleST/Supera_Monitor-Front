@@ -30,7 +30,8 @@ export class Header {
                             {
                                 label: 'Dashboard',
                                 tooltip: 'Dashboard',
-                                iconFontawesome: faCalendar,
+                                // iconFontawesome: faCalendar,
+                                icon: 'bi bi-table',
                                 routerLink: ['dashboard'],
                                 routerLinkActiveOptions: { exact: false },
                                 routerLinkActive: 'active-link',

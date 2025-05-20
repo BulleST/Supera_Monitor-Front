@@ -17,12 +17,12 @@
         </div>
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
-        <p-divider layout="horizontal" *ngIf="object.id == PseudoEvento.EventoId" >
+        <p-divider layout="horizontal" *ngIf="object.id == PseudoEvento.EventoId">
             <p class="text-primary-500 font-medium">Defina o tema e outros dados da oficina para salvar inscrição</p>
         </p-divider>
         <div class="formgrid grid">
             <!-- Aluno -->
-            <div class="field md:col-12 sm:col-6 col-12"> 
+            <div class="field md:col-12 sm:col-6 col-12">
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-select [options]="alunos"
                           [loading]="loadingAlunos"
@@ -55,9 +55,9 @@
                                     <p class="font-bold mb-1">
                                         <span class="mr-2">{{item.nome}}</span>
                                         <p-badge *ngIf="item.disponivel == false"
-                                                value="Indisponível"
-                                                severity="danger"
-                                                [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                                                 value="Indisponível"
+                                                 severity="danger"
+                                                 [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
                                         <ng-template #disponivelEvent>
                                             <div class="w-25rem">
                                                 <p>
@@ -98,7 +98,7 @@
                 </div>
             </div>
             <!-- Descrição -->
-            <div class="field lg:col-5 md:col-4 sm:col-6 col-12"> 
+            <div class="field lg:col-5 md:col-4 sm:col-6 col-12">
                 <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -156,7 +156,7 @@
                 </p-iconfield>
             </div>
             <!-- Educador -->
-            <div class="field col-6"> 
+            <div class="field col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
@@ -209,9 +209,8 @@
                                         </div>
                                     </ng-template>
                                 </p>
-                                
                                 <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                    <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                                 </ng-container>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
@@ -228,7 +227,7 @@
                 </div>
             </div>
             <!-- Sala -->
-            <div class="field col-6"> 
+            <div class="field col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="salaAulas"
@@ -290,7 +289,7 @@
                 </div>
             </div>
             <!-- Observações -->
-            <div class="field col-12"> 
+            <div class="field col-12">
                 <label for="observacao">Observações:</label>
                 <textarea pTextarea
                           class="w-full"

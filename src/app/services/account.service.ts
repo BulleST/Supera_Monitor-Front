@@ -67,6 +67,7 @@ export class AccountService {
         lastValueFrom(this.http.post<any>(`${this.url}/accounts/revoke-token`, { token: this.accountValue?.refreshToken }, { withCredentials: true } /**/))
         this.stopRefreshTokenTimer();
         this.setAccount('logout', undefined);
+        localStorage.clear();
         this.router.navigate(['accounts', 'login']);
     }
 

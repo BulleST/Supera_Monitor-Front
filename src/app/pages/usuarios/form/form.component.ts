@@ -1,7 +1,7 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
@@ -10,6 +10,7 @@ import { Account, AccountResponse } from '../../../models/account.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Role } from '../../../models/account-perfil.model';
 import { ToastrService } from 'ngx-toastr';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-form',
@@ -29,7 +30,7 @@ export class FormComponent implements OnDestroy {
     subscription: Subscription[] = [];
     account?: AccountResponse;
     Role: typeof Role = Role;
-    
+
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -84,46 +85,59 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    showError(message: string, e: any) {
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
+
+    async sendConfirmation(form: NgForm, e: any) {
+        if (form.invalid) {
+            return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
+        }
+
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
+            message: 'Tem certeza que deseja salvar os dados do usuário?',
+            header: 'Salvar dados',
+            acceptLabel: 'Salvar',
+            acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-text ',
+            accept: () => {
+                this.send(e)
+            }
         })
     }
 
 
-    send(form: NgForm, e: any) {
-        if (form.invalid) {
-            return;
-        }
+
+    send(e: any) {
         this.loading = true;
-
         this.object.role_Id = Role.Assistant;
-
         this.request()
             .then(res => {
                 this.loading = false;
-                if (res.success) {                    
-                    this.toastrService.success( this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
+                if (res.success) {
+                    this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
+                    playSuccess();
                 }
                 else {
                     this.error = res.message;
-                    this.showError(this.error, e);
+                    this.showError('Erro', this.error, e);
                 }
             })
             .catch((res: HttpErrorResponse) => {
                 this.error = res.error.message;
                 this.loading = false;
-                this.showError(this.error, e);
-            })
+                this.showError('Erro', this.error, e);
+            });
     }
 
     request() {

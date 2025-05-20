@@ -1,9 +1,7 @@
 <p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
-<p-confirmdialog styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
-    </ng-template>
-</p-confirmdialog>
+
+<app-confirm-dialog></app-confirm-dialog>
+
 <p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
     <ng-template #message let-message>
         <div>
@@ -20,6 +18,7 @@
         </div>
     </ng-template>
 </p-confirmdialog>
+
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt

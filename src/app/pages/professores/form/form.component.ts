@@ -1,7 +1,6 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, getError, insertOrReplace } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { ProfessorService } from '../../../services/professor.service';
@@ -13,6 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Turma } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import moment from 'moment';
+import { Crypto, getError, insertOrReplace, playAlert, playError, playSuccess, showError } from '../../../utils';
 
 @Component({
     selector: 'app-form',
@@ -95,7 +95,7 @@ export class FormComponent implements OnDestroy {
 
 
                 this.service.get(id)
-                        .then(res => {
+                    .then(res => {
                         console.log(res.expedienteInicio)
                         this.object = res;
                         this.loading = false;
@@ -137,9 +137,9 @@ export class FormComponent implements OnDestroy {
         if (this.isEditPage) {
             var mensagem = '';
             if (this.object.expedienteInicio) {
-                
-                let turmas = this.turmas.filter(x => x.active     
-                                                && moment(x.horario).isBefore(this.object.expedienteInicio))
+
+                let turmas = this.turmas.filter(x => x.active
+                    && moment(x.horario).isBefore(this.object.expedienteInicio))
                 if (turmas.length > 0) {
                     mensagem = 'Existem turmas atribuídas a esse educador com horário iniciando antes do expediente escolhido.';
                     mensagem += `\n Turmas:  \n ${turmas.map(x => x.nome).join('\n ')}`
@@ -149,8 +149,8 @@ export class FormComponent implements OnDestroy {
 
             if (this.object.expedienteFim) {
                 let turmas = this.turmas.filter(x => x.active
-                                                && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
-                                                || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
+                    && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
+                        || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
                 if (turmas.length > 0) {
                     mensagem += '\n Existem turmas atribuídas a esse educador com horário finalizando após o expediente escolhido.';
                     mensagem += `\n Turmas:  ${turmas.map(x => x.nome).join(', ')}`
@@ -162,33 +162,53 @@ export class FormComponent implements OnDestroy {
         }
 
     }
+    goToCalendario() {
+        this.router.navigate(['professores', 'calendario', this.crypto.encrypt(this.object.id)]);
+    }
+
 
     showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
+
+
+
+    async sendConfirmation(form: NgForm, e: any) {
+        if (form.invalid) {
+            return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
+        }
+
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
-            message: message,
-            header: header,
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
+            message: 'Tem certeza que deseja salvar os dados do professor?',
+            header: 'Salvar dados',
+            acceptLabel: 'Salvar',
+            acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-text ',
+            accept: () => {
+                this.send(e)
+            }
         })
     }
 
 
-    async send(form: NgForm, e: any) {
-        if (form.invalid) {
-            return;
-        }
+    async send(e: any) {
         this.loading = true;
 
         this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
-                    this.toastrService.success( this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
+                    this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
+                    playSuccess();
                 }
                 else {
                     this.error = res.message;
@@ -203,15 +223,11 @@ export class FormComponent implements OnDestroy {
     }
 
     request() {
-        
         if (this.isEditPage) {
             return lastValueFrom(this.service.edit(this.object));
         }
         return lastValueFrom(this.service.create(this.object));
     }
 
-    goToCalendario() {
-        this.router.navigate(['professores', 'calendario', this.crypto.encrypt(this.object.id)]);
-    }
 
 }

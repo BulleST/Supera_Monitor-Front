@@ -19,6 +19,7 @@ import { Popover } from 'primeng/popover';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { ProfessorService } from '../../../services/professor.service';
 import { Professor } from '../../../models/professor.model';
+import { playAlert, playSuccess, playError } from '../../../utils/audio';
 
 @Component({
     selector: 'app-list',
@@ -181,6 +182,8 @@ export class ListComponent implements OnDestroy {
     }
 
     deactivated(e: any, item: any) {
+        playAlert();
+
         var deactivated = !item.active;
         this.confirmationService.confirm({
             target: e.target,
@@ -188,9 +191,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
@@ -199,10 +202,9 @@ export class ListComponent implements OnDestroy {
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
+                            playSuccess();
                         } else {
-                            setTimeout(() => {
-                                this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
-                            }, 300);
+                            this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
                         }
                     })
                     .catch(res => {
@@ -212,14 +214,15 @@ export class ListComponent implements OnDestroy {
         });
     }
 
-    showError(title: string, message: string, e: any) {
+    showError(header: string, message: string, e: any) {
+        playError();
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: title,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
+            header: header,
+            // icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
             acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         });
     }
@@ -239,32 +242,20 @@ export class ListComponent implements OnDestroy {
     checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
 
         if (model.control.value) {
-            // if (moment(item.prazo).week() > moment(new Date).week()) {
-            //     this.showError('Checklist indisponível', `Você não pode finalizar esse checklist ainda. \n Prazo inicial a partir do dia ${moment(item.prazo).add(-7, 'day').format('DD/MM/YY')}`, e);
-            //     model.control.setValue(false); 
-            //     return;
-            // }
-
-            // if(!item.prazo) {   
-            //     this.showError('Checklist indisponível', `O aluno não possui data de vigência`, e);
-            //     model.control.setValue(false); 
-            //     return;
-            // }
-
             model.control.setValue(false);
 
+            playAlert();
             this.confirmationService.confirm({
-                // target: e.target,
                 key: 'checklistConfirmation',
                 message: `Tem certeza que deseja marcar item da jornada como realizada?.`,
                 header: 'Finalizar item da jornada',
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
                 accept: async () => {
                     this.loadingChecklist = true;
                     item.observacoes = this.checklistObservacao
@@ -274,6 +265,7 @@ export class ListComponent implements OnDestroy {
                             model.control.setValue(true);
                             this.loadingChecklist = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
+                            playSuccess();
                             item.finalizado = true;
                             item.dataFinalizacao = res.object.dataFinalizacao;
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
@@ -300,84 +292,6 @@ export class ListComponent implements OnDestroy {
             });
         }
     }
-
-
-    // itemsMenuChecklist(checklist: CalendarioAlunoChecklistView) {
-    //     var array: MenuItem[] = [];
-    //     array.push({
-    //         icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //         label: 'Lembrete de oficina',
-    //         styleClass: 'mx-0 pl-0',
-    //         command: () => {
-    //             console.log(this.tableSelectedItem)
-    //             if (this.tableSelectedItem && this.tableSelectedItem.celular) {
-    //                 var celular = this.tableSelectedItem.celular.replace(/\D/g, '')
-    //                 var mensagem = `
-    //                     Olá ${this.tableSelectedItem.nome},
-    //                     Espero que esteja bem.
-    //                     Estamos com a oficina xyz`;
-    //                 window.open(`https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`)
-    //             }
-    //         }
-    //     })
-    //     array.push({
-    //         icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //         label: 'Lembrete de superação',
-    //         styleClass: 'mx-0 pl-0',
-    //         command: () => {
-
-    //         }
-    //     })
-
-    //     // Agendamento Aula 0 
-    //     if (checklist.items.find(x => x.checklist_Item_Id == 31) != undefined) {
-    //         array.push({ 
-    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //             label: 'Agendar Aula 0',
-    //             styleClass: 'mx-0 pl-0',
-    //             command: () => {
-
-    //             }
-    //         })
-    //     }
-
-    //     // Apresentação do diretor franqueado
-    //     if (checklist.items.find(x => x.checklist_Item_Id == 8) != undefined) {
-    //         array.push({ 
-    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //             label: 'Enviar mensagem de apresentação',
-    //             styleClass: 'mx-0 pl-0',
-    //             command: () => {
-
-    //             }
-    //         })
-    //     }
-    //     // Feedback pós-venda
-    //     if (checklist.items.find(x => x.checklist_Item_Id == 13) != undefined) {
-    //         array.push({ 
-    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //             label: 'Enviar mensagem de feedback pós-venda',
-    //             styleClass: 'mx-0 pl-0',
-    //             command: () => {
-
-    //             }
-    //         })
-    //     }
-
-    //     // Confirmação de preenchimento do feedback pós-venda
-    //     if (checklist.items.find(x => x.checklist_Item_Id == 32) != undefined) {
-    //         array.push({ 
-    //             icon: 'pi pi-send text-primary-500 text-sm inline-flex -ml-2',
-    //             label: 'Confirmar resposta ao feedback pós-venda',
-    //             styleClass: 'mx-0 pl-0',
-    //             command: () => {
-
-    //             }
-    //         })
-    //     }
-
-    //     return array
-    // }
 
     popoverChecklistOpen(e: any, item: CalendarioAlunoChecklistView, aluno: Aluno) {
         this.popoverChecklist.show(e)

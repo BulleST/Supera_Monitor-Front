@@ -1,4 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
+
 <p-confirmdialog key="enviarMensagemReagendamento" styleClass="w-25rem">
     <ng-template #message let-message>
         <div class="flex align-items-start gap-2 ">
@@ -18,7 +19,7 @@
                            pTooltip="Enviar mensagem"
                            target="_blank"
                            rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
                             <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
                             <span class="p-button-label">{{aluno.aluno}}</span>
                         </a>
@@ -29,7 +30,7 @@
                                   pTooltip="Nenhum celular cadastrado"
                                   [label]="aluno.aluno"
                                   [text]="true"
-                                  size="small"
+                                  
                                   [disabled]="true" />
                     </div>
                 </div>
@@ -37,6 +38,7 @@
         </div>
     </ng-template>
 </p-confirmdialog>
+
 <p-dialog [header]="'Reagendar ' + tipoString"
           [maximizable]="true"
           [draggable]="true"
@@ -274,7 +276,7 @@
                           [loading]="loading"
                           [rounded]="true"
                           [disabled]="loading || form.invalid"
-                          size="small" />
+                           />
             </div>
         </div>
     </form>

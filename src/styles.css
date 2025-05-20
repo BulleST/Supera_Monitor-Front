@@ -170,7 +170,7 @@ a {
 
 .p-datatable-hoverable .p-datatable-tbody>tr:nth-child(odd):hover,
 .p-datatable-hoverable .p-datatable-tbody>tr:nth-child(even):hover {
-    background: var(--p-primary-300) !important;
+    background: var(--p-primary-200) !important;
 }
 
 .p-inputtext:disabled {
@@ -256,7 +256,7 @@ a {
 
 .p-datatable-column-filter-button {
     margin-top: -3px;
-    color: #d1cfcf !important;
+    color: white !important;
     padding: 0 0;
 }
 

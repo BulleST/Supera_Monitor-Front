@@ -79,6 +79,7 @@ export class AlunoService extends Service {
                         aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
                         aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
                         aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
+                        aluno.primeiraAula = aluno.primeiraAula ? moment(aluno.primeiraAula).toDate() : undefined;
 
 
                         aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
@@ -176,7 +177,13 @@ export class AlunoService extends Service {
     }
 
     edit(model: Aluno) {
-        var request = MyMap(model, new AlunoRequest);
+        console.log('model', model)
+        var request = MyMap(model, new AlunoRequest) as AlunoRequest;
+        request.primeiraAula = model.primeiraAula;
+        request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
+        request.apostila_Kit_Id = model.apostila_Kit_Id;
+        request.dataFimVigencia = model.dataFimVigencia;
+        console.log('request', request)
         return this.http.put<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {

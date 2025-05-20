@@ -11,7 +11,7 @@ import { EventoService } from '../../../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
-import { getError } from '../../../../../utils';
+import { getError, showError } from '../../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Evento } from '../../../../../models/evento.model';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
@@ -20,6 +20,8 @@ import { validaProfessores, validaSalaAulas } from '../../../../../utils/validac
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import $ from 'jquery';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playError, playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-oficina',
@@ -68,6 +70,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
         private service: EventoService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Oficina';
 
@@ -113,27 +116,18 @@ export class CadastrarOficinaComponent implements OnDestroy {
             this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
         }
     }
-
+    
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
-    
+
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
         if (e.year != this.ano) {
             this.ano = e.year ?? new Date().getFullYear();
             this.loadFeriados()
         }
     }
-
 
     loadFeriados() {
         this.loadingFeriados = true;
@@ -183,7 +177,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
-        console.log('validaProfessores', this.professorSelected, this.professor_Id)
         if (this.professorSelected) {
             var e: SelectChangeEvent = {
                 value: this.professorSelected,
@@ -192,7 +185,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
             this.professorChanged(e, this.professor_Id);
         }
     }
-
 
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
@@ -216,7 +208,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
         
         model.control.setErrors({ indisponivel: mensagemErro });
         model.control.updateValueAndValidity();
-        console.log(mensagemErro, model)
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
@@ -233,7 +224,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
 
@@ -244,8 +235,10 @@ export class CadastrarOficinaComponent implements OnDestroy {
         if (!this.professorSelected)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
-        this.object.professores = [this.professorSelected.id];
 
+        playAlert();
+
+        this.object.professores = [this.professorSelected.id];
         this.object.data = new Date(this.data);
         this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
@@ -256,9 +249,9 @@ export class CadastrarOficinaComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar oficina para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar oficina`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             }
@@ -277,6 +270,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
                 this.visibleChange();
                 this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
+                playSuccess();
             })
             .catch(res => {
                 this.loading = false;

@@ -19,29 +19,23 @@ import { Popover } from 'primeng/popover';
 export class CalculoPerfilCognitivoComponent implements OnChanges {
     @Input() eventos!: Evento[];
     @Input() data!: Date;
-    // @Input() fullCalendar!: FullCalendarComponent
     @Input() feriados: Feriado[] = [];
+    @Input() perfilCoginitivo: PerfilCognitivo[] = [];
+    @Input() loadingPerfilCognitivo = false;
     calendar!: Calendar;
 
     @ViewChild('popover') popover!: Popover;
 
     model!: PerfilCognitivo_Calculo_Data;
-    perfilCoginitivo: PerfilCognitivo[] = [];
 
-    constructor(
-        private service: PerfilCognitivoService
-    ) {
+    constructor() {}
 
-        lastValueFrom(this.service.getList())
-            .then(res => {
-                this.perfilCoginitivo = res;
-            })
-
-    }
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['eventos']) this.eventos = changes['eventos'].currentValue;
         if (changes['data']) this.data = changes['data'].currentValue;
         if (changes['feriados']) this.feriados = changes['feriados'].currentValue;
+        if (changes['perfilCoginitivo']) this.perfilCoginitivo = changes['perfilCoginitivo'].currentValue;
+        if (changes['loadingPerfilCognitivo']) this.loadingPerfilCognitivo = changes['loadingPerfilCognitivo'].currentValue;
         this.calcula();
     }
 

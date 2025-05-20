@@ -1,10 +1,10 @@
 <ng-container *ngIf="evento && evento.id">
-    <app-evento-item-hover #eventoPopover [evento]="evento" [arg]="arg"></app-evento-item-hover>
+    <app-evento-item-hover #eventoItemHover [evento]="evento" [arg]="arg"></app-evento-item-hover>
     <!-- FERIADO -->
     <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
         <div class="event"
-                (mouseenter)="eventoPopover.show($event)"
-                (mouseleave)="eventoPopover.hide()"
+                (mouseenter)="eventoItemHover.show($event)"
+                (mouseleave)="eventoItemHover.hide()"
                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
             <p>Feriado</p>
             <p>{{evento.descricao}}</p>
@@ -19,9 +19,23 @@
                 [cdkDropListData]="evento.alunos"
                 (cdkDropListDropped)="cdkDropListDropped($event)"
                 [cdkDropListConnectedTo]="['alunos']"
-                [id]="arg.event.id"
-                (mouseenter)="eventoPopover.show($event)"
-                (mouseleave)="eventoPopover.hide()"
+                [id]="arg.event?.id"
+                (mouseenter)="eventoItemHover.show($event)"
+                (mouseleave)="eventoItemHover.hide()"
+                (click)="eventoClick($event)"
+                [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
+            <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+            <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+            <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+        </div>
+                <!--  -->
+    </ng-container>
+    
+    <!-- OFICINA, REUNIÃO -->
+    <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+        <div class="event"
+                (mouseenter)="eventoItemHover.show($event)"
+                (mouseleave)="eventoItemHover.hide()"
                 (click)="eventoClick($event)"
                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
             <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
@@ -30,13 +44,18 @@
         </div>
     </ng-container>
     
-    <!-- OFICINA, REUNIÃO, SUPERAÇÃO, AULA ZERO -->
-    <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao, EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
-        <div class="event"
-                (mouseenter)="eventoPopover.show($event)"
-                (mouseleave)="eventoPopover.hide()"
+    
+    <!-- SUPERAÇÃO, AULA ZERO -->
+    <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
+        <div class="event "
+                (mouseenter)="eventoItemHover.show($event)"
+                (mouseleave)="eventoItemHover.hide()"
                 (click)="eventoClick($event)"
-                [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
+                [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }"
+                [ngClass]="{
+                    'event-superacao': EventoTipo.Superacao == evento.evento_Tipo_Id,
+                    'event-aula-zero': EventoTipo.AulaZero == evento.evento_Tipo_Id,
+                }">
             
             <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
             <ng-container *ngTemplateOutlet="eventBody"></ng-container>
@@ -67,13 +86,13 @@
                 <span class="event-reagendamento-icon" [pTooltip]="'Reagendamento: clique para ver mais'">R</span>
             </ng-template>
             <div class="w-full">
-                <p class="event-description mb-0">{{evento.descricao}}</p>
+                <p class="event-descricao">{{evento.descricao}}</p>
                 <ng-container *ngIf="evento.sala_Id">
-                    <p class="event-description text-sm mb-0 mt-1">
+                    <p class="event-sala">
                         <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
                     </p>
                     <ng-template #salaTemplate>
-                        <span class="pr-2">Sala: </span>
+                        <span class="pr-1 font-bold">Sala: </span>
                         <app-sala-aula [numeroSala]="evento.numeroSala"
                                        [andar]="evento.andar"
                                        [sala_Id]="evento.sala_Id"></app-sala-aula>
@@ -84,25 +103,27 @@
     </ng-template>
     <ng-template #eventFooter>
         <div class="event-footer flex-column">
-            <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                <p class="event-description text-sm">
-                    <span class="pr-2">
-                        <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
-                        <span>:</span>
-                    </span>
-                    <ng-container *ngFor="let aluno of evento.alunos">
-                        <span>{{aluno.aluno | nameAbv }}</span>
-                    </ng-container>
-                </p>
-            </ng-container>
+                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                    <p class="event-alunos text-xs mb-0 font-normal">
+                        <!-- <span class="pr-2">
+                            <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
+                            <span>:</span>
+                        </span> -->
+                        <span>{{alunosStr}}</span>
+
+                        <!-- <ng-container *ngFor="let aluno of evento.alunos">
+                            <span>{{aluno.aluno | firstWord }}</span>
+                        </ng-container> -->
+                    </p>
+                </ng-container>
             <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
                 <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
                 <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                    <p class="text-xs m-0">{{ perfilCognitivo }} </p>
+                    <p class="event-perfil">{{ perfilCognitivo }} </p>
                 </ng-template>
             </ng-container>
             <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
-                <p class="text-xs m-0">
+                <p class="event-vagas">
                     <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
                         <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{evento.capacidadeMaximaAlunos}} vagas</span>
                         <span *ngSwitchCase="0">Não há vagas / {{evento.alunos.length}} alunos</span>

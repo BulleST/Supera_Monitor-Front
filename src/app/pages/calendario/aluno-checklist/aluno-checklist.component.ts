@@ -12,17 +12,18 @@ import { UserService } from '../../../services/user.service';
 import { Popover } from 'primeng/popover';
 import { Tabs } from 'primeng/tabs';
 import $ from 'jquery';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { showError } from '../../../utils';
 
 @Component({
-    selector: 'app-aluno-checklist-popover',
+    selector: 'app-aluno-checklist',
     standalone: false,
-    templateUrl: './aluno-checklist-popover.component.html',
-    styleUrl: './aluno-checklist-popover.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    templateUrl: './aluno-checklist.component.html',
+    styleUrl: './aluno-checklist.component.css',
+    // changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , AfterViewInit {
+export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewInit {
     @Input() aluno: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
-    @Output() alunoChanged = new EventEmitter<Evento_Participacao_Aluno>();
     loading: boolean = false;
     checklists: Checklist[] = [];
     subscription: Subscription[] = [];
@@ -30,6 +31,10 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
     @ViewChild('popover') popover!: Popover
     @ViewChild('tabs') tabs!: Tabs;
     @ViewChildren('tab') tab!: QueryList<Tabs>;
+
+    textoChecklist = '';
+    checklist?: CalendarioAlunoChecklistView;
+    atrasado = false;
 
     checklistIndex: number = 0;
     scrollLeft: number = 0;
@@ -39,17 +44,29 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
         private toastrService: ToastrService,
         private service: ChecklistService,
         private userService: UserService,
+        private checklistService: ChecklistService
     ) {
         var checklist = this.service.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklist);
 
     }
-    ngOnChanges(changes: SimpleChanges): void {
+
+    async ngOnChanges(changes: SimpleChanges) {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            this.checklistIndex = this.aluno.checklist_Id ?? this.aluno.checklistCompleto[this.aluno.checklistCompleto.length-1].id;
-            if(!this.aluno.alunoChecklist || !this.aluno.alunoChecklist.length )
-                this.loadChecklistAluno();
+
+            if (   !this.aluno.alunoChecklist 
+                || !this.aluno.alunoChecklist.length 
+                || !this.aluno.checklistCompleto 
+                || !this.aluno.checklistCompleto.length) {
+                await this.loadChecklistAluno();
+                this.setChecklist()
+            } else {
+                this.setChecklist()
+            }
+
+
+
         }
     }
     ngAfterViewInit(): void {
@@ -60,13 +77,13 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
     }
 
     async loadChecklistAluno() {
+        this.loading = true;
+
         if (this.checklists.length == 0) {
-            this.loading = true;
             await lastValueFrom(this.service.getList())
         }
 
-        this.loading = true;
-        lastValueFrom(this.service.getChecklistAluno(this.aluno.aluno_Id))
+        await lastValueFrom(this.service.getChecklistAluno(this.aluno.aluno_Id))
             .then(res => {
                 this.aluno.alunoChecklist = res.filter(x => x.aluno_Id == this.aluno.aluno_Id)
                     .map(checklistAluno => {
@@ -86,8 +103,26 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
                         return checklistAluno;
                     });
                 this.loading = false;
-                this.alunoChanged.emit(this.aluno)
             })
+    }
+
+    setChecklist() {
+        
+            if (this.aluno.checklist_Id) {
+                this.checklist = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id) as CalendarioAlunoChecklistView;
+                this.checklistIndex = this.aluno.checklist_Id;
+            }
+            else if (!this.aluno.checklist_Id && this.aluno.checklistCompleto && this.aluno.checklistCompleto.length > 0) {
+                
+                this.checklist = this.aluno.checklistCompleto[this.aluno.checklistCompleto.length - 1]
+                this.checklistIndex = this.checklist.id;
+                
+                var pendentesDaSemana = this.aluno.checklistCompleto.filter(x => x.pendentesDaSemana.length)
+                var atrasados = this.aluno.checklistCompleto.filter(x => x.atrasados.length > 0);
+                this.atrasado = atrasados.length > 0;
+                if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
+                if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
+            }
 
     }
 
@@ -100,20 +135,23 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
                 return;
             }
 
+            playAlert();
+
             this.confirmationService.confirm({
                 target: e.target,
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,
                 header: 'Finalizar etapa',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Ainda não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
                 accept: async () => {
                     this.loading = true;
                     lastValueFrom(this.service.markAsDone(item.id))
                         .then(res => {
+                            playSuccess();
                             this.loading = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
                             item.finalizado = true;
@@ -136,36 +174,24 @@ export class AlunoChecklistPopoverComponent implements OnChanges, OnDestroy , Af
             });
         }
     }
-    showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
-    }
 
-    show(e: any) {
+        
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
+    
+
+    showPopover(e: any) {
         this.popover.show(e)
     }
 
-    hide() {
+    hidePopover() {
         this.popover.hide();
     }
 
-
     onPopoverShow() {
-        console.log('tab', this.tab)
-
         var tab = $(`p-tab[ng-reflect-value="${this.checklistIndex}"]`).last()
-        console.log('tab', tab)
-        console.log('tab', $(tab).offset()?.left)
-
         this.scrollLeft = $(tab).offset()?.left ?? 0
-
         $('.p-tablist-viewport').animate({
             scrollLeft: this.scrollLeft
         }, 300)

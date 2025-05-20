@@ -1,4 +1,3 @@
-
 <div class="formgrid grid">
     <!-- Data -->
     <div class="field lg:col-2 sm:col-3 col-5">
@@ -6,12 +5,12 @@
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
             <input type="text"
-                    pInputText
-                    [value]="evento.data | date : 'dd/MM/yyyy'"
-                    styleClass="w-full"
-                    class="w-full"
-                    id="professor"
-                    readonly />
+                   pInputText
+                   [value]="evento.data | date : 'dd/MM/yyyy'"
+                   styleClass="w-full"
+                   class="w-full"
+                   id="professor"
+                   readonly />
         </p-iconfield>
     </div>
     <!-- Horário -->
@@ -19,12 +18,12 @@
         <label for="horario">Horário:</label>
         <p-iconfield>
             <input type="text"
-                    pInputText
-                    [value]="evento.data | date : 'HH:mm'"
-                    styleClass="w-full"
-                    class="w-full"
-                    id="horario"
-                    readonly />
+                   pInputText
+                   [value]="evento.data | date : 'HH:mm'"
+                   styleClass="w-full"
+                   class="w-full"
+                   id="horario"
+                   readonly />
             <p-inputicon styleClass="pi pi-clock" />
         </p-iconfield>
     </div>
@@ -33,38 +32,35 @@
         <label for="duracaoEvento">Duração:</label>
         <p-iconfield>
             <input type="text"
-                    pInputText
-                    [value]="duracaoEvento"
-                    styleClass="w-full"
-                    class="w-full"
-                    id="duracaoEvento"
-                    readonly />
+                   pInputText
+                   [value]="duracaoEvento"
+                   styleClass="w-full"
+                   class="w-full"
+                   id="duracaoEvento"
+                   readonly />
             <p-inputicon styleClass="pi pi-hourglass" />
         </p-iconfield>
     </div>
-     <!-- Aluno -->
+    <!-- Aluno -->
     <div class="field lg:col-6 sm:col-4 col-12">
         <label for="aluno">Aluno: </label>
-        <p-iconfield  [pTooltip]="checklistStatus">
+        <p-iconfield>
             <input type="text"
-                    pInputText
-                    (mouseenter)="popoverComponent.show($event)"
-                    (focus)="popoverComponent.show($event)"
-                    [value]="alunoSelected.aluno"
-                    styleClass="w-full"
-                    class="w-full"
-                    id="aluno"
-                    readonly />
+                   pInputText
+                   (mouseenter)="popoverChecklistComponent.showPopover($event)"
+                   (focus)="popoverChecklistComponent.showPopover($event)"
+                   [value]="alunoSelected.aluno"
+                   styleClass="w-full"
+                   class="w-full"
+                   id="aluno"
+                   readonly />
             <p-inputicon styleClass="fa-solid fa-user-graduate" />
         </p-iconfield>
-        <ng-template #checklistStatus>
-            <app-aluno-checklist-status [aluno]="alunoSelected" [loading]="popoverComponent.loading"></app-aluno-checklist-status>
-        </ng-template>
-        <app-aluno-checklist-popover #popoverComponent [aluno]="alunoSelected"></app-aluno-checklist-popover>
+        <app-aluno-checklist #popoverChecklistComponent [aluno]="alunoSelected"></app-aluno-checklist>
     </div>
-     <!-- Educador -->
+    <!-- Educador -->
     <div class="field lg:col-5 sm:col-5  col-5">
-        <label for="professor_Id">Educador: <span  *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="professores"
                   [(ngModel)]="evento.professor_Id"
@@ -117,7 +113,7 @@
                             </ng-template>
                         </p>
                         <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                            <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                            <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                         </ng-container>
                     </div>
                     <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
@@ -133,9 +129,9 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">Educador indisponível.</p>
         </div>
     </div>
-     <!-- Sala -->
+    <!-- Sala -->
     <div class="field lg:col-5 sm:col-5  col-5">
-        <label for="sala_Id">Sala: <span  *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="salaAulas"
                   [(ngModel)]="evento.sala_Id"
@@ -202,21 +198,19 @@
         <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
                   [severity]="alunoSelected.presente ? 'success': 'danger'"
                   [icon]="alunoSelected.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                  size="small"
                   styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
                   class="ml-auto mt-auto"
                   (click)="evento.finalizado ? undefined : presenteClick( $event)" />
     </div>
-     <!-- Observações -->
+    <!-- Observações -->
     <div class="field col-12">
         <label for="observacao">Observações:</label>
         <textarea pTextarea
-            class="w-full"
-            name="observacao"
-            id="observacao"
-            [(ngModel)]="evento.observacao"
-            [readonly]="evento.finalizado"
-            [rows]="3"></textarea>
-       
+                  class="w-full"
+                  name="observacao"
+                  id="observacao"
+                  [(ngModel)]="evento.observacao"
+                  [readonly]="evento.finalizado"
+                  [rows]="3"></textarea>
     </div>
 </div>

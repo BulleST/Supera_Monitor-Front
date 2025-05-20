@@ -7,7 +7,7 @@ import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService, SelectItemGroup } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError } from '../../../../../utils';
+import { Crypto, getError, showError } from '../../../../../utils';
 import moment from 'moment';
 import { Turma } from '../../../../../models/turma.model';
 import { TurmaService } from '../../../../../services/turma.service';
@@ -34,6 +34,8 @@ import { MyMap } from '../../../../../utils/map';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { groupBy } from 'lodash';
 import $ from 'jquery';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -97,6 +99,7 @@ export class CadastrarAula0Component implements OnDestroy {
         private mensagemWhatsapp: MensagemWhatsapp,
         private checklistService: ChecklistService,
         private accountService: AccountService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Aula 0';
 
@@ -139,7 +142,7 @@ export class CadastrarAula0Component implements OnDestroy {
             var grouped = groupBy(this.alunos, 'turma_Id');
 
             this.groupedAlunos = [];
-            for(let turma_Id in grouped) {
+            for (let turma_Id in grouped) {
                 var alunosTurma = grouped[turma_Id] as Aluno[];
                 var turma = {
                     nome: alunosTurma[0].turma,
@@ -198,16 +201,9 @@ export class CadastrarAula0Component implements OnDestroy {
         return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
     }
 
+    
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        });
+        showError(this.confirmationService, header, message, e);
     }
 
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
@@ -262,33 +258,19 @@ export class CadastrarAula0Component implements OnDestroy {
     validaSalaAulas() {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
-        this.salaAulas = validaSalaAulas(
-            data,
-            this.object.duracaoMinutos,
-            this.salaAulas,
-            this.eventos,
-            undefined,
-            undefined
-        );
+        this.salaAulas = validaSalaAulas(data,this.object.duracaoMinutos,this.salaAulas,this.eventos,undefined,undefined);
     }
 
     validaProfessores() {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
-        this.professores = validaProfessores(
-            data,
-            this.object.duracaoMinutos,
-            this.professores,
-            this.eventos,
-            undefined,
-            undefined
-        );
-        
+        this.professores = validaProfessores(data,this.object.duracaoMinutos,this.professores,this.eventos,undefined,undefined);
+
         if (this.object.professor_Id) {
             var e: SelectChangeEvent = {
                 value: this.object.professor_Id,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
-            } 
+            }
             this.professorChanged(e, this.professor_Id);
         }
     }
@@ -296,35 +278,30 @@ export class CadastrarAula0Component implements OnDestroy {
     validaAlunos() {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
-        this.alunos = validaAlunos(
-            data,
-            this.object.duracaoMinutos,
-            this.alunos,
-            this.eventos,
-            undefined,
-            undefined
-        );
+        this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
-        professorChanged(e: SelectChangeEvent, model: NgModel) {
-            var item = this.professores.find(x => x.id == e.value) as Professor;
-            let mensagemErro: string | null = null;
-    
-            if (item && !item.disponivel && item.disponivelEvent) {
-                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
-            }
-            else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
-                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
-            } else {
-                    mensagemErro = null;
-            }
-            
-            if (mensagemErro) {
-                this.showError('Educador indisponível', mensagemErro, e.originalEvent)
-                model.control.setValue(undefined)
-            }
-            model.control.setErrors({ indisponivel: mensagemErro });
-            model.control.updateValueAndValidity();
+
+    professorChanged(e: SelectChangeEvent, model: NgModel) {
+        this.validaProfessores();
+        var item = this.professores.find(x => x.id == e.value) as Professor;
+        let mensagemErro: string | null = null;
+
+        if (item && !item.disponivel && item.disponivelEvent) {
+            mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
         }
+        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+            mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+        } else {
+            mensagemErro = null;
+        }
+
+        if (mensagemErro) {
+            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            model.control.setValue(undefined)
+        }
+        model.control.setErrors({ indisponivel: mensagemErro });
+        model.control.updateValueAndValidity();
+    }
 
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
@@ -349,6 +326,7 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+        this.validaAlunos();
         var alunos = e.value as Aluno[];
         var aluno = (e.originalEvent as any).option as Aluno;
 
@@ -366,9 +344,9 @@ export class CadastrarAula0Component implements OnDestroy {
                 header: `Selecionar ${alunos.length} alunos?`,
                 message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                rejectButtonStyleClass: 'p-button-text ',
                 reject: () => {
                     this.alunosSelected = [this.alunosSelected[0]]
                 },
@@ -379,24 +357,18 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e);
+        return this.calendarioUtils.getEventoTipo(e);
     }
 
     sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
-            return this.showError(
-                'Não foi possível salvar',
-                'Preencha todos os dados corretamente para salvar',
-                e
-            );
+            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
         if (this.alunosSelected.length == 0) {
-            return this.showError(
-                'Não foi possível salvar',
-                'Preencha todos os dados corretamente para salvar',
-                e
-            );
+            return this.showError('Não foi possível salvar','Preencha todos os dados corretamente para salvar',e);
         }
+        
+        playAlert();
 
         this.object.alunos = this.alunosSelected.map((x) => x.id);
 
@@ -422,15 +394,16 @@ export class CadastrarAula0Component implements OnDestroy {
                 )}?.`;
         }
 
+        
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula 0',
             message: mensagem,
             acceptLabel: `Agendar aula 0`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             },
@@ -445,26 +418,24 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.loading = false;
                 this.object = res.object;
                 this.service.calendarioReload.emit(res.object.id);
+                this.markChecklistAsDone();
+                this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado' );
+                playSuccess();
 
                 if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
                     this.sendMensagemAluno(e, res.object);
-                } else {
+                } else if (this.alunosSelected.filter(x => x.celular).length > 0) {
                     this.sendMensagemAlunos();
                 }
-
-                this.markChecklistAsDone();
-                this.toastrService.success(
-                    'Aula 0 cadastrada com sucesso.',
-                    'Agendamento finalizado'
-                );
+                else {
+                    this.visible = false;
+                    this.visibleChange();
+                }
+                
             })
             .catch((res) => {
                 this.loading = false;
-                this.showError(
-                    'Agendamento falhou',
-                    `Não foi possível agendar aula 0. <br> ${getError(res)}`,
-                    e
-                );
+                this.showError('Agendamento falhou',`Não foi possível agendar aula 0. <br> ${getError(res)}`,e);
             });
     }
 
@@ -477,18 +448,14 @@ export class CadastrarAula0Component implements OnDestroy {
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
             acceptButtonStyleClass:
-                'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+                ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(
-                    aluno.nome,
-                    aluno.celular,
-                    evento
-                );
+                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(aluno.nome, aluno.celular, evento);
                 window.open(url, '_target');
             },
             reject: () => {
@@ -505,9 +472,9 @@ export class CadastrarAula0Component implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();

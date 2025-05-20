@@ -6,6 +6,7 @@ import { ResetPassword } from '../../../models/accounts.model';
 import { AccountService } from '../../../services/account.service';
 import { getError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
+import { playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-reset-password',
@@ -41,15 +42,17 @@ export class ResetPasswordComponent {
                         icon: 'pi pi-key text-xl',
                         rejectVisible: false,
                         acceptLabel: 'Fazer Login',
-                        acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                        acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
                         accept: () => {
                             this.router.navigate(['account', 'login']);
                         }
-                    })
+                    });
+                    playSuccess();
                 }
                 else {
                     this.error = res.message;
 
+                    playError();
                     this.confirmationService.confirm({
                         target: e.target,
                         message: res.message,
@@ -57,12 +60,13 @@ export class ResetPasswordComponent {
                         icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
                         rejectVisible: false,
                         acceptLabel: 'OK',
-                        acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                        acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
                     })
                 }
-
             })
+
             .catch((res) => {
+                playError();
                 this.error = getError(res);
                 this.loading = false;
             })

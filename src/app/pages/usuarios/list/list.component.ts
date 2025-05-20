@@ -4,13 +4,14 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { UserService } from '../../../services/user.service';
-import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, showError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { AccountService } from '../../../services/account.service';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AccountResponse, Account, userColumns } from '../../../models/account.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-list',
@@ -128,7 +129,7 @@ export class ListComponent implements OnDestroy {
 
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
-
+            playAlert();
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
@@ -136,9 +137,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
@@ -146,20 +147,24 @@ export class ListComponent implements OnDestroy {
                             this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             insertOrReplace(this.service, res.object);
                             item = res.object;
+                            playSuccess();
                         } else {
                             setTimeout(() => {
-                                this.showError(res.message, e);
+                                this.showError('Erro', res.message, e);
                             }, 300);
                         }
                     })
                     .catch((res: HttpErrorResponse) => {
-                        this.showError(res.error.message, e);
+                        this.showError('Erro', res.error.message, e);
                     })
             },
         });
     }
 
     resetPassword(e: any, item: any) {
+        
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja resetar a senha deste usuário? 
@@ -167,36 +172,29 @@ export class ListComponent implements OnDestroy {
             header: 'Resetar Senha?',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Resetar Senha',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.service.resetPassword(item.id))
                     .then(res => {
                         if (res.success) {
                             item = res.object;
                             this.toastrService.success( `Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
+                            playSuccess()
                         } else {
-                                this.showError(res.message, e);
+                            this.showError('Erro', res.message, e);
                         }
                     })
                     .catch((res: HttpErrorResponse) => {
-                        this.showError(res.error.message, e);
+                        this.showError('Erro', res.error.message, e);
                     });
             },
         });
     }
 
-    showError(message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        });
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
     }
 
     getOption(col: ColumnTable, row: any) {

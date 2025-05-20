@@ -8,7 +8,7 @@ import { MobileService, ScreenWidth } from '../../utils/mobile';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
 import { Roteiro } from '../../models/roteiro.model';
-import { getError, Header } from '../../utils';
+import { getError, Header, showError } from '../../utils';
 import { AlunoService } from '../../services/alunos.service';
 import { AccountService } from '../../services/account.service';
 import { RoteiroService } from '../../services/roteiro.service';
@@ -36,6 +36,10 @@ import 'moment/locale/pt-br';
 import $ from 'jquery'
 import { EventoReuniaoRequest } from '../../models/evento-reuniao.model';
 import { EventoOficinaRequest } from '../../models/evento-oficina.model';
+import { CalendarioUtils } from '../../utils/calendario-utils';
+import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
+import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
+import { playError } from '../../utils/audio';
 
 
 @Component({
@@ -65,12 +69,15 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     data = new Date;
     minData = new Date(2025, 0, 1);
     observacaoReposicao: string = '';
-    
+
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     @ViewChild('popoverComponent') popoverComponent!: SelectedEventoComponent;
 
     feriados: Feriado[] = [];
     loadingFeriados = false;
+
+    perfilCognitivo: PerfilCognitivo[] = [];
+    loadingPerfilCognitivo = false;
 
     currentRoteiro?: Roteiro;
     roteiros: Roteiro[] = [];
@@ -139,6 +146,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private mobileService: MobileService,
         private toastrService: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private calendarioUtils: CalendarioUtils,
+        private perfilCognitivoService: PerfilCognitivoService,
+
 
     ) {
         var screen = this.mobileService.get().subscribe(res => {
@@ -161,8 +171,19 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         var account = this.accountService.account.subscribe(res => this.account = res);
         this.subscription.push(account);
 
-        var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res.sort((x,y) => x.dataInicio.getTime() - y.dataInicio.getTime()));
+        var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime()));
         this.subscription.push(roteiros);
+
+        var perfilCognitivo = this.perfilCognitivoService.list.subscribe(res => this.perfilCognitivo = res);
+        this.subscription.push(perfilCognitivo);
+
+        if (this.perfilCognitivo.length == 0) {
+            this.loadingPerfilCognitivo = true;
+            lastValueFrom(this.perfilCognitivoService.getList('calendario'))
+                .then(res => this.loadingPerfilCognitivo = false)
+                .catch(res => this.loadingPerfilCognitivo = false);
+
+        }
 
         var calendarioReload = this.service.calendarioReload.subscribe(res => this.update('calenadrioReload'));
         this.subscription.push(calendarioReload);
@@ -255,18 +276,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    eventRamdomId() {
-        let length = 5;
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        let counter = 0;
-        while (counter < length) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            counter += 1;
-        }
-        return result;
-    }
 
     async getCalendario(where: string) {
         this.loading = true;
@@ -293,10 +302,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
 
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        var eventosCancelar = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')));
-        if (this.feriados.length > 0 && eventosCancelar.length > 0) {
-            this.cancelarEventos(eventosCancelar);
-        }
+        // var eventosCancelar = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')));
+        // if (this.feriados.length > 0 && eventosCancelar.length > 0) {
+        //     this.cancelarEventos(eventosCancelar);
+        // }
         var eventos = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
 
         var events = eventos.map(item => {
@@ -304,8 +313,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 : item.corLegenda ? item.corLegenda
                     : item.professores && item.professores.length > 0 ? item.professores[0].corLegenda
                         : '#2e2e2e';
-            var textColor = this.getTextColor(backgroundColor);
-            var id = 'event-' + this.eventRamdomId();
+            var textColor = this.calendarioUtils.getTextColor(backgroundColor);
+            var id = 'event-' + this.calendarioUtils.eventRamdomId();
 
             if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
@@ -326,7 +335,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.feriados.forEach(item => {
             var event = {
-                id: this.eventRamdomId(),
+                id: this.calendarioUtils.eventRamdomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
@@ -348,20 +357,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
     }
-
-    getTextColor(hex: string) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        var rgb = result ? {
-            r: parseInt(result[1], 16), g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : {
-            r: 0,
-            g: 0,
-            b: 0
-        };
-        return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 180 ? '#2e2e2e' : '#fff';
-    }
-
 
     async datesSet(arg: DatesSetArg) {
         this.loading = true;
@@ -391,6 +386,18 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 .then(res => {
                     item.reagendamentoDe_Evento = res;
                 })
+        }
+
+        if (item.alunos && item.alunos.length) {
+            item.alunos.map(async aluno => {
+                if (aluno.reposicaoDe_Evento_Id) {
+                    aluno.reposicaoDe_Evento = await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
+                }
+                if (aluno.reposicaoPara_Evento_Id) {
+                    aluno.reposicaoPara_Evento = await lastValueFrom(this.service.get(aluno.reposicaoPara_Evento_Id))
+                }
+                return aluno;
+            })
         }
 
         this.selectedEvento = item;
@@ -438,52 +445,69 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
             var source = this.selectedEvento;
             var aluno = event.item.data as Evento_Participacao_Aluno;
+
+            var erroMessage = '';
+
             if (target.alunos.length >= target.capacidadeMaximaAlunos) {
-                document.dispatchEvent(new Event('mouseup'));
-                this.cdkCancelDrag('keyup');
-                return this.showError('Não autorizado', 'Essa aula atingiu o limite permitido de alunos.', event.event);
+                erroMessage = 'Essa aula atingiu o limite permitido de alunos.';
             }
 
             if (target.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id) == false) {
-                document.dispatchEvent(new Event('mouseup'));
-                this.cdkCancelDrag('keyup')
-                return this.showError('Não autorizado', 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permididas.', event.event);
+                erroMessage = 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permitidas.';
             }
 
             if (target.alunos.find(x => x.aluno_Id == aluno.aluno_Id)) {
-                document.dispatchEvent(new Event('mouseup'));
-                this.cdkCancelDrag('keyup')
-                return this.showError('Não autorizado', 'Esse aluno já está atribuído à essa aula', event.event);
+                erroMessage = 'Esse aluno já está atribuído à essa aula';
             }
 
             if (target.finalizado) {
-                document.dispatchEvent(new Event('mouseup'));
-                this.cdkCancelDrag('keyup')
-                return this.showError('Não autorizado', 'Essa aula já foi finalizada', event.event);
+                erroMessage = 'Essa aula já foi finalizada';
             }
+
+            if (moment(source.data).format('YYYY-MM-DD HH:mm') == moment(target.data).format('YYYY-MM-DD HH:mm')) {
+                erroMessage = 'O aluno não pode repor no mesmo dia e horário.';
+            }
+
+            if (aluno.reposicaoDe_Evento_Id) {
+                erroMessage = 'O aluno não pode repor uma aula duas vezes.';
+            }
+
+            if (erroMessage) {
+                this.cdkCancelDrag('keyup')
+                document.dispatchEvent(new Event('mouseup'));
+                return this.showError('Não autorizado', erroMessage, event.event);
+            }
+
 
             if (target.data != source.data) {
 
                 var restricoes = await lastValueFrom(this.alunoRestricaoService.getList(aluno.aluno_Id));
-                restricoes = restricoes.filter(x => !x.deactivated)
-                if (restricoes.length > 0) {
+                aluno.restricoes = restricoes;
+
+                var message = ``;
+
+                if (restricoes.filter(x => !x.active).length > 0 || aluno.restricaoMobilidade) {
+
+                    message = 'Este aluno possui algumas restrições. <br> <ul>'
+                    if (aluno.restricaoMobilidade) {
+                        message += `<li>Restrição de mobilidade</li>`
+                    }
+                    if (restricoes.filter(x => !x.active).length > 0) {
+                        message += restricoes.map(x => `<li>${x.descricao}</li>`);
+                    }
+                    message += '</ul><br>Deseja continuar?'
+
                     this.confirmationService.confirm({
                         target: event.event.target as EventTarget,
-                        message: `Este aluno possui algumas restrições. <br> 
-                                    <ul>
-                                        ${restricoes.map(x => `<li>${x.descricao}</li>`)}
-                                    </ul>
-                                    <br>
-                                    Deseja continuarl?`,
+                        message: message,
                         header: 'Atenção',
-                        icon: 'pi pi-exclamation-triangle',
                         acceptIcon: 'pi pi-check',
                         acceptLabel: 'Continuar',
-                        acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+                        acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
                         rejectVisible: true,
                         rejectIcon: 'pi pi-times',
                         rejectLabel: 'Cancelar',
-                        rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+                        rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
                         accept: async () => {
                             this.agendaReposicaoConffirm(event.event, aluno, source, target);
                             this.cdkCancelDrag('keyup')
@@ -492,9 +516,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                             this.cdkCancelDrag('keyup')
                         }
                     });
+
                 } else {
                     this.agendaReposicaoConffirm(event.event, aluno, source, target);
                 }
+
             }
         }
     }
@@ -512,18 +538,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target ?? e,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            acceptIcon: '',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     agendaReposicaoConffirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
         this.confirmationService.confirm({
@@ -532,11 +551,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             header: 'Agendar reposição',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: async () => {
                 this.agendaReposicao(e, aluno, source, target);
                 this.cdkCancelDrag('keyup')
@@ -602,10 +621,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                rejectButtonStyleClass: 'p-button-text ',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
                     window.open(url, '_target');
@@ -681,7 +700,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         lastValueFrom(this.roteiroService.getList('loadRoteiros'))
             .then(res => {
                 this.loadingRoteiro = false;
-                this.roteiros = res.sort((x,y) => x.dataInicio.getTime() - y.dataInicio.getTime());
+                this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime());
                 this.currentRoteiro = res.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim))
             })
             .catch(res => this.loadingRoteiro = false)
@@ -694,7 +713,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         await lastValueFrom(this.service.getFeriados(ano))
             .then(res => {
                 res.forEach(item => {
-                    var index = this.feriados.findIndex(x => moment(x.date).isSame(item.date)  )
+                    var index = this.feriados.findIndex(x => moment(x.date).isSame(item.date))
                     if (index == -1) {
                         this.feriados.push(item);
                     }
@@ -710,76 +729,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
 
     getEventoTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
-    /**
-     * Cancelamento automático de eventos
-     */
-
-    cancelarEventos(eventos: Evento[]) {
-        var terminou = [];
-        eventos.forEach(evento => {
-            var data = moment(evento.data).format('YYYY-MM-DD')
-            var feriado = this.feriados.find(x => moment(x.date).isSame(data)) as Feriado;
-            evento.observacao = `Cancelamento automático \n Feriado: ${feriado.name}`;
-            this.cancelarEventoAutomaticamente(evento, feriado)
-            .then(res => {
-                terminou.push(res);
-                // if (terminou.length == eventos.length) {
-                //     this.service.calendarioReload.emit(123);
-                // }
-            })
-        });
-
-    }
-    
-
-    async cancelarEventoAutomaticamente(evento: Evento, feriado: Feriado) {
-        this.loading = true;
-        var response: RequestResponse = { success: true, message: '', object: null };
-        var tipo = this.getEventoTipo(evento);
-
-        if (evento.id == PseudoEvento.EventoId) {
-            await this.request(evento)
-                .then(res => {
-                    evento.id = res.object.id;
-                    response = res;
-                })
-                .catch(res => {
-                    
-                    this.toastrService.error(`${getError(res)}`);
-                })
-        }
-
-        if (response.success) {
-            var request: EventoCancelamentoRequest = {
-                id: evento.id,
-                observacao: evento.observacao
-            };
-            response = await lastValueFrom(this.service.cancelar(request))
-                .then(res => {
-                    this.loading = false;
-                    return res
-                })
-                .catch(res => {
-                    this.toastrService.error(`Não foi possível cancelar a ${tipo}. \n ${getError(res)}`);
-                    return res
-                })
-        }
-        return response;
-    }
-
-
-    request(evento: Evento) {
-        evento.data = new Date(evento.data)
-        switch (evento.evento_Tipo_Id) {
-            case EventoTipo.Aula: return this.requestAulaTurma(evento);
-            case EventoTipo.Reuniao: return this.requestReuniao(evento);
-            case EventoTipo.Oficina: return this.requestOficina(evento);
-            default: return this.requestAulaTurma(evento);
-        }
-    }
 
     requestAulaTurma(evento: Evento) {
         var request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
@@ -792,33 +744,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return lastValueFrom(this.service.createAulaTurma(request));
         return lastValueFrom(this.service.editAulaTurma(request));
     }
-
-    requestReuniao(evento: Evento) {
-        var request = MyMap(evento, new EventoReuniaoRequest);
-        request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = evento.professores.map(x => x.professor_Id);
-        request.sala_Id = request.sala_Id ?? 14; // professores; 
-
-        if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createReuniao(request));
-        return lastValueFrom(this.service.editReuniao(request));
-    }
-
-    requestOficina(evento: Evento) {
-        var request = MyMap(evento, new EventoOficinaRequest);
-        request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = evento.professores.map(x => x.professor_Id);
-        request.sala_Id = request.sala_Id ?? 13 // online; 
-        if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createOficina(request));
-        return lastValueFrom(this.service.editOficina(request));
-    }
-
-
-    /**
-     * Fim Cancelamento automático de eventos
-     */
-
 
 }
 

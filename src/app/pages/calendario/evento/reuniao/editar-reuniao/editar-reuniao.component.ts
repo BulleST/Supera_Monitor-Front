@@ -9,7 +9,7 @@ import { Evento } from '../../../../../models/evento.model';
 import { Professor } from '../../../../../models/professor.model';
 import { Evento_Participacao_Professor } from '../../../../../models/evento-participacao-professor.model';
 import { SalaAula } from '../../../../../models/sala-aula.model';
-import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
+import { MensagemWhatsapp , CalendarioUtils, showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-editar-reuniao',
@@ -47,6 +47,7 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
     }
@@ -82,17 +83,11 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         this.source = this.professores.filter(x => !professoresIds.includes(x.id))
     }
 
-    showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
-    }
+        
+        showError(header: string, message: string, e: any) {
+            showError(this.confirmationService, header, message, e);
+        }
+    
 
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
@@ -108,7 +103,7 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     enviarMensagem(nome: string, celular: string) {

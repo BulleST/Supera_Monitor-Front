@@ -28,14 +28,15 @@ import { Feriado } from '../models/feriado.model';
 })
 export class EventoService extends Service {
     
-    eventos = new BehaviorSubject<Evento[]>([]);
     evento = new BehaviorSubject<Evento | undefined>(undefined);
+    eventos = new BehaviorSubject<Evento[]>([]);
+    feriados = new BehaviorSubject<Feriado[]>([]);
+    dashboard = new BehaviorSubject<Dashboard[]>([]);
+
     
     calendarioReload = new EventEmitter<number>();
     calendarView = new EventEmitter<CalendarioView>();
     roteiros: Roteiro[] = [];
-    
-    dashboard = new BehaviorSubject<Dashboard[]>([]);
 
     constructor(
         http: HttpClient,
@@ -59,11 +60,47 @@ export class EventoService extends Service {
     
     get(id: number) {
         return this.http.get<Evento>(`${this.url}/eventos/${id}`)
+        .pipe(tap(evento => {
+            evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate(),
+            evento.active = !evento.deactivated;
+            evento.professores = evento.professores ?? [];
+            evento.alunos = evento.alunos ?? [];
+            evento.alunos.map(async aluno => {
+                aluno.active = !aluno.deactivated;               
+                return aluno;
+            } );
+            evento.alunos = evento.alunos.filter(aluno => aluno.active)
+
+            if (!evento.professor_Id && evento.professores.length > 0) {
+                evento.professor_Id = evento.professores[0].professor_Id;
+                evento.professor = evento.professores[0].nome;
+            }
+
+            if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
+                var roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim));
+                if (roteiro) evento.roteiro_Id = roteiro.id;
+            }
+
+            return evento;
+        }))
     }
     
     getFeriados(ano: number = new Date().getFullYear()) {
         var token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
         return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
+        .pipe(tap({
+            next: res => {
+                var list = this.feriados.value;
+                res.forEach(item => {
+                    var index = res.findIndex(x => moment(x.date).isSame(item.date));
+                    if (index == -1) list.push(item);
+                    else list.splice(index, 1, item);
+                })
+                this.feriados.next(list);
+                return of(list);
+
+            }
+        }))
     }
 
 
@@ -74,7 +111,7 @@ export class EventoService extends Service {
                     if (this.roteiroService.list.value.length == 0) 
                         await lastValueFrom(this.roteiroService.getList('calendario'))
     
-                    var eventosExistentes = this.eventos.value as Evento[];
+                    var list = this.eventos.value as Evento[];
                     eventos = eventos.map(evento => {
                         evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate(),
                         evento.active = !evento.deactivated;
@@ -93,14 +130,16 @@ export class EventoService extends Service {
                             if (roteiro) evento.roteiro_Id = roteiro.id;
                         }
     
-                        var index = eventosExistentes.findIndex(x => x.turma_Id == evento.turma_Id && moment(x.data).isSame(evento.data));
-                        if (index == -1) eventosExistentes.push(evento);
-                        else eventosExistentes.splice(index, 1, evento);
+                        var index = list.findIndex(x => x.id == evento.id 
+                                && x.turma_Id == evento.turma_Id 
+                                && moment(x.data).isSame(evento.data));
+                        if (index == -1) list.push(evento);
+                        else list.splice(index, 1, evento);
                         return evento;
                     });
     
-                    this.eventos.next(eventosExistentes);
-                    return of(eventosExistentes);
+                    this.eventos.next(list);
+                    return of(list);
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);

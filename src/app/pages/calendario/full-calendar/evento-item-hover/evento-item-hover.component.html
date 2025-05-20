@@ -4,7 +4,7 @@
             <ng-container *ngTemplateOutlet="eventoTemplate"></ng-container>
         </div>
         <ng-template #eventoTemplate>
-            <div class="event"
+            <div class="event event-hover"
                  [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
                 <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado; else eventFeriado">
                     <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
@@ -58,16 +58,17 @@
             </div>
         </ng-template>
         <ng-template #eventFooter>
-            <div class="event-footer flex-column">
+            <div class="event-footer ">
                 <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                     <p class="event-description text-sm">
-                        <span class="pr-2">
+                        <!-- <span class="pr-2">
                             <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
                             <span>:</span>
-                        </span>
-                        <ng-container *ngFor="let aluno of evento.alunos">
-                            <span>{{aluno.aluno | nameAbv }}</span>
-                        </ng-container>
+                        </span> -->
+                        <span>{{alunosStr}}</span>
+                        <!-- <ng-container *ngFor="let aluno of evento.alunos">
+                            <span>{{aluno.aluno | firstWord }}</span>
+                        </ng-container> -->
                     </p>
                 </ng-container>
                 <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">

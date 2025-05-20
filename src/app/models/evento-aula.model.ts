@@ -20,7 +20,7 @@ export class EventoAulaExtraRequest {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
     // turma_Id: number = 0;
-    roteiro_Id: number = 0;
+    roteiro_Id?: number;
     professor_Id: number = 0;
     sala_Id: number = 0;
     duracaoMinutos: number = 120;

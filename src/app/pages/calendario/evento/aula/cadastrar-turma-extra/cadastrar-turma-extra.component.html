@@ -1,3 +1,4 @@
+
 <app-confirm-dialog></app-confirm-dialog>
 <p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
     <ng-template #message let-message>
@@ -19,7 +20,7 @@
                            pTooltip="Enviar mensagem"
                            target="_blank"
                            rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
                             <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
                             <span class="p-button-label">{{aluno.nome}}</span>
                         </a>
@@ -30,7 +31,6 @@
                                   pTooltip="Nenhum celular cadastrado"
                                   [label]="aluno.nome"
                                   [text]="true"
-                                  size="small"
                                   [disabled]="true" />
                     </div>
                 </div>
@@ -41,21 +41,19 @@
 <p-confirmdialog key="selecionarReposicao"
                  styleClass="w-30rem"
                  #selecionarReposicaoDialog
-                 [closable]="false"
-                 (onHide)="closeEventoReposicaoDialog()">
+                 [closable]="true">
     <ng-template #message let-message>
-        <ng-container *ngIf="alunoSelected">
-            <div class="flex align-items-start gap-2 ">
+        <ng-container *ngIf="selectedAlunoSource">
+            <div class="flex align-items-start gap-2 w-full">
                 <span class="mt-4">
                     <i class="pi pi-calendar text-3xl text-pink-500"></i>
                 </span>
-                <div>
+                <div class="w-full">
                     <div [innerHTML]="message.message"></div>
                     <div class="formgrid grid">
                         <div class="field col-12"> <!-- Eventos  -->
                             <label for="evento_Id">Selecione uma aula: <span class="text-red-500">*</span></label>
-                            <p-select
-                                      [options]="alunoSelected.aulasParaRepor"
+                            <p-select [options]="selectedAlunoSource.aulasParaRepor"
                                       [(ngModel)]="selectedEventoReposicao"
                                       [loading]="loadingEventosReposicaoAluno"
                                       #evento_Id="ngModel"
@@ -66,7 +64,8 @@
                                       optionLabel="data"
                                       [required]="true"
                                       [filter]="true"
-                                      [filterBy]="'data, turma, professor'"
+                                      [filterBy]="'data,turma,professor'"
+                                      emptyMessage="Nenhuma aula para repor"
                                       appendTo="body">
                                 <ng-template #selectedItem let-selectedOption>
                                     <ng-container *ngIf="selectedOption">
@@ -137,26 +136,6 @@
                             <div *ngIf="evento_Id.touched && evento_Id.invalid && evento_Id.errors">
                                 <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['required']">Esse campo é obrigatório.</p>
                                 <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['indisponivel']">Educador indisponível.</p>
-                            </div>
-                        </div>
-                        <div class="w-full px-2 flex">
-                            <div class="flex justify-content-end gap-2 ml-auto">
-                                <p-button type="button"
-                                          styleClass="px-3"
-                                          label="Cancelar"
-                                          icon="pi pi-times"
-                                          [rounded]="true"
-                                          size="small"
-                                          severity="secondary"
-                                          (onClick)="selecionarReposicaoDialog.close($event)" />
-                                <p-button type="button"
-                                          styleClass="px-3"
-                                          label="Selecionar aula"
-                                          icon="pi pi-check"
-                                          [rounded]="true"
-                                          size="small"
-                                          (onClick)="selectEventoReposicao($event, selecionarReposicaoDialog)"
-                                          [disabled]="evento_Id.errors || !selectedEventoReposicao" />
                             </div>
                         </div>
                     </div>
@@ -324,7 +303,7 @@
                                     </ng-template>
                                 </p>
                                 <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                    <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                                 </ng-container>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
@@ -421,21 +400,6 @@
                           [required]="true"
                           styleClass="w-full"
                           appendTo="body" />
-                <!-- <p-multiselect
-                               [(ngModel)]="object.perfilCognitivo"
-                               [options]="perfisCognitivos"
-                               [loading]="loadingPerfisCognitivos"
-                               #perfilCognitivo="ngModel"
-                               inputId="perfilCognitivo"
-                               name="perfilCognitivo"
-                               placeholder="Selecione"
-                               optionValue="id"
-                               optionLabel="nome"
-                               [filter]="true"
-                               filterBy="nome"
-                               [required]="true"
-                               styleClass="w-full"
-                               appendTo="body" /> -->
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -447,141 +411,143 @@
                        pInputText
                        [value]="roteiro ? roteiro.tema : 'Indefinido'"
                        [pTooltip]="roteiro ? roteiro.tema + ' - ' + roteiro.semana : 'Indefinido'"
+                       tooltipPosition="top"
                        id="roteiro"
                        name="roteiro"
+                       readonly
                        class="w-full">
             </div>
-            <!-- Roteiro da Aula -->
-            <!-- <div class="field md:col-3 sm:col-3 col-6">  
-                <label for="roteiro_Id">Roteiro da Aula: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="roteiros"
-                          [(ngModel)]="object.roteiro_Id"
-                          [loading]="loadingRoteiros"
-                          #roteiro_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="roteiro_Id"
-                          inputId="roteiro_Id"
-                          optionLabel="tema"
-                          optionValue="id"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
-                          optionDisabled="deactivated">
-                    <ng-template #selectedItem let-selectedOption>
-                        <span class="mr-2">{{ selectedOption.tema }} - Semana {{selectedOption.semana}}</span>
-                    </ng-template>
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div>
-                                <p class="font-bold mb-1">
-                                    <span class="mr-2">{{ item.tema }} - Semana {{item.semana}}</span>
-                                </p>
-                            </div>
-                        </div>
-                    </ng-template>
-                </p-select>
-                <div *ngIf="roteiro_Id.touched && roteiro_Id.invalid && roteiro_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="roteiro_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="roteiro_Id.errors['indisponivel']">Professor indisponível.</p>
-                </div>
-            </div> -->
             <!-- Alunos -->
             <div class="field col-12">
                 <label class="text-orange-500 font-bold">Selecione os Alunos</label>
                 <hr class="mb-4 border-orange-500 border-1">
-                <!-- (onMoveAllToSource)="onMoveAllToSource($event)"
-                            (onMoveAllToTarget)="onMoveAllToTarget($event)" -->
-                <p-picklist #picklist
-                            styleClass="picklist-moveall-disabled"
-                            [disabled]="!data || !horario"
-                            [source]="alunos"
-                            [target]="alunosSelected"
-                            [sourceStyle]="{ height: '40rem' }"
-                            [targetStyle]="{ height: '40rem' }"
-                            (onMoveToSource)="onMoveToSource($event)"
-                            (onMoveToTarget)="onMoveToTarget($event)"
-                            (onSourceSelect)="onSourceSelect($event)"
-                            filterBy="nome, turma"
-                            sourceFilterPlaceholder="Procure por nome ou turma"
-                            targetFilterPlaceholder="Procure por nome ou turma"
-                            [showSourceControls]="false"
-                            [showTargetControls]="false"
-                            [moveAllToTargetProps]="{ styleClass: 'hidden', style: { display: 'none' } }"
-                            [moveAllToSourceProps]="{ styleClass: 'hidden', style: { display: 'none' } }"
-                            [dragdrop]="true"
-                            [responsive]="true"
-                            metaKeySelection="id"
-                            stripedRows
-                            breakpoint="550px"
-                            styleClass="max-w-full">
-                    <ng-template let-item #item>
-                        <div class="w-full">
-                            <div class="flex align-items-center gap-2">
-                                <!-- Whatsapp -->
-                                <div class="w-2rem h-2rem flex flex-none align-items-center justify-content-center">
-                                    <ng-container *ngIf="item.celular">
-                                        <a [href]="enviarMensagem(item)"
-                                            [pTooltip]="'Enviar mensagem'"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="pi pi-whatsapp p-1 text-green-500 hover:text-white hover:bg-green-500 border-circle">
-                                        </a>
-                                    </ng-container>
-                                    <ng-container *ngIf="!item.celular">
-                                        <a [pTooltip]="'Aluno não possui celular cadastrado'"
-                                           class="pi pi-whatsapp p-1 text-200 border-circle pointer-events-none">
-                                        </a>
-                                    </ng-container>
-                                </div>
-                                <!-- Nome -->
-                                <p class="mr-2">{{ item.nome }}</p>
-                                <p-badge *ngIf="item.disponivel == false"
-                                         value="Indisponível"
-                                         severity="danger"
-                                         [pTooltip]="indisponivelTemplate" />
-                            </div>
-                            <div class="flex align-items-center gap-2">
-                                <!-- Cor legenda -->
-                                <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
-                                <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                                    <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
-                                        <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                                    </div>
-                                </ng-template>
-                                <!-- Turma -->
-                                <p [pTooltip]="'Turma: ' + item.turma">
-                                    <span class="font-bold">{{ item.turma }}</span>
-                                </p>
-                                <!-- PerfilCognitivo -->
-                                <p class="ml-auto">{{item.perfilCognitivo}}</p>
-                            </div>
-                        </div>
-                        <ng-template #indisponivelTemplate>
-                            <div class="w-25rem">
-                                <p>
-                                    <span>Evento: </span>
-                                    <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
-                                    <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
-                                </p>
-                                <p>{{item.disponivelEvent.descricao}}</p>
-                                <p *ngIf="item.disponivelEvent.professor">
-                                    <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
-                                    <span>{{item.disponivelEvent.professor}}</span>
-                                </p>
-                                <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
-                                <p *ngIf="item.disponivelEvent.sala_Id">
-                                    <span>Sala: </span>
-                                    <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
-                                                   [andar]="item.disponivelEvent.andar"
-                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                                </p>
-                            </div>
-                        </ng-template>
-                    </ng-template>
-                </p-picklist>
+                <div class="flex flex-wrap gap-1">
+                    <div class="md:col col-12"
+                         cdkDropList
+                         #alunosSource="cdkDropList"
+                         [cdkDropListConnectedTo]="alunosTarget"
+                         [cdkDropListData]="alunos"
+                         (cdkDropListDropped)="sourceDropped($event)">
+                        <!-- <ng-container *ngTemplateOutlet="tableTemplate1; context: { list: alunos }"></ng-container> -->
+                        <p-table #dtSource
+                                 [value]="alunos"
+                                 [loading]="loadingAlunos"
+                                 styleClass="h-30rem"
+                                 [scrollable]="true"
+                                 scrollHeight="30rem"
+                                 [loading]="loading"
+                                 selectionMode="single"
+                                 [(selection)]="selectedAlunoSource"
+                                 [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
+                            <ng-template #header>
+                                <tr>
+                                    <th>Clique e arraste para selecionar</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="flex align-items-center gap-2">
+                                            <span>Nome </span>
+                                            <p-iconfield iconPosition="left" class="ml-auto">
+                                                <p-inputicon styleClass="pi pi-search" />
+                                                <input pInputText
+                                                       type="text"
+                                                       #inputSource
+                                                       (input)="dtSource.filterGlobal(inputSource.value, 'contains')"
+                                                       placeholder="Filtrar nome ou turma" />
+                                            </p-iconfield>
+                                            <p-sortIcon field="nome" />
+                                        </div>
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-item>
+                                <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
+                                    <td [ngClass]="{
+                                        'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id
+                                    }">
+                                        <div cdkDrag [cdkDragData]="item">
+                                            <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                            <div *cdkDragPreview class="p-4">
+                                                <div class="shadow-2 bg-white p-2">
+                                                    <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                    <div class="flex md:flex-column md:w-min w-full gap-2 px-1 py-1 sticky top-0 justify-content-center align-items-center">
+                        <p-button
+                                  icon="pi pi-angle-right"
+                                  styleClass="md:rotate-180 rotate-90"
+                                  severity="secondary"
+                                  [disabled]="!selectedAlunoSource"
+                                  (onClick)="moveToTarget($event)" />
+                        <p-button
+                                  icon="pi pi-angle-left "
+                                  styleClass="md:rotate-180 rotate-90"
+                                  severity="secondary"
+                                  [disabled]="!selectedAlunoTarget"
+                                  (onClick)="moveToSource($event)" />
+                    </div>
+                    <div class="md:col col-12"
+                         cdkDropList
+                         #alunosTarget="cdkDropList"
+                         [cdkDropListConnectedTo]="alunosSource"
+                         [cdkDropListData]="alunosSelected"
+                         (cdkDropListDropped)="targetDropped($event)">
+                        <p-table #dtTarget
+                                 [value]="alunosSelected"
+                                 [loading]="loadingAlunos"
+                                 styleClass="h-30rem"
+                                 [scrollable]="true"
+                                 scrollHeight="30rem"
+                                 [loading]="loading"
+                                 selectionMode="single"
+                                 [(selection)]="selectedAlunoTarget"
+                                 [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
+                            <ng-template #header>
+                                <tr>
+                                    <th>Clique e arraste para remover</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="flex align-items-center gap-2">
+                                            <span>Nome </span>
+                                            <p-iconfield iconPosition="left" class="ml-auto">
+                                                <p-inputicon styleClass="pi pi-search" />
+                                                <input pInputText
+                                                       type="text"
+                                                       #inputTarget
+                                                       (input)="dtTarget.filterGlobal(inputTarget.value, 'contains')"
+                                                       placeholder="Filtrar nome, turma ou perfil cognitivo" />
+                                            </p-iconfield>
+                                            <p-sortIcon field="nome" />
+                                        </div>
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-item>
+                                <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
+                                    <td [ngClass]="{
+                                        'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id
+                                    }">
+                                        <div cdkDrag [cdkDragData]="item">
+                                            <div *cdkDragPreview>
+                                                <div class="shadow-2 bg-white">
+                                                    <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                                </div>
+                                            </div>
+                                            <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </div>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"
@@ -590,9 +556,72 @@
                           icon="pi pi-check"
                           [disabled]="loading || form.invalid"
                           [loading]="loading"
-                          [rounded]="true"
-                          size="small" />
+                          [rounded]="true" />
             </div>
         </div>
     </form>
 </p-dialog>
+<ng-template #alunoTemplate let-item="item">
+    <div class="cursor-pointer">
+        <div class="flex align-items-center gap-2">
+            <!-- Whatsapp -->
+            <div class="w-2rem h-2rem flex flex-none align-items-center justify-content-center">
+                <ng-container *ngIf="item.celular">
+                    <a [href]="enviarMensagem(item)"
+                       [pTooltip]="'Enviar mensagem'"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="pi pi-whatsapp p-1 text-green-500 hover:text-white hover:bg-green-500 border-circle">
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="!item.celular">
+                    <a [pTooltip]="'Aluno não possui celular cadastrado'"
+                       class="pi pi-whatsapp p-1 text-200 border-circle pointer-events-none">
+                    </a>
+                </ng-container>
+            </div>
+            <!-- Nome -->
+            <p class="mr-2">{{ item.nome }}</p>
+            <p-badge *ngIf="item.disponivel == false"
+                     value="Indisponível"
+                     severity="danger"
+                     [pTooltip]="indisponivelTemplate" />
+        </div>
+        <div class="flex align-items-center gap-2">
+            <!-- Cor legenda -->
+            <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
+            <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
+                <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
+                    <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                </div>
+            </ng-template>
+            <!-- Turma -->
+            <p [pTooltip]="'Turma: ' + item.turma">
+                <span class="font-bold">{{ item.turma }}</span>
+            </p>
+            <!-- PerfilCognitivo -->
+            <p class="ml-auto">{{item.perfilCognitivo}}</p>
+        </div>
+    </div>
+    <ng-template #indisponivelTemplate>
+        <div class="w-25rem">
+            <p>
+                <span>Evento: </span>
+                <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+            </p>
+            <p>{{item.disponivelEvent.descricao}}</p>
+            <p *ngIf="item.disponivelEvent.professor">
+                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                <span>{{item.disponivelEvent.professor}}</span>
+            </p>
+            <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+            <p *ngIf="item.disponivelEvent.sala_Id">
+                <span>Sala: </span>
+                <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                               [andar]="item.disponivelEvent.andar"
+                               [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+            </p>
+        </div>
+    </ng-template>
+</ng-template>

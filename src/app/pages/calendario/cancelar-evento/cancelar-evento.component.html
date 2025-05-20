@@ -19,7 +19,7 @@
                            pTooltip="Enviar mensagem"
                            target="_blank"
                            rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text p-button-sm white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
+                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
                             <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
                             <span class="p-button-label">{{participacao.aluno}}</span>
                         </a>
@@ -55,7 +55,7 @@
             </span>
         </div>
     </ng-template>
-    <form #form="ngForm" (submit)="sendConfirmation( $event)">
+    <form #form="ngForm" (submit)="sendConfirmation( $event, form)">
         <p class="text-lg mb-1">Tem certeza que deseja cancelar essa {{tipoEventoString}}? Talvez você queira reagendar. </p>
         <p class="text-lg my-2 flex flex-wrap gap-2 align-items-center">
             <span class="col p-0 white-space-nowrap">

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, HostListener, OnDestroy, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, QueryList, signal, ViewChild, ViewChildren } from '@angular/core';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
@@ -16,34 +16,34 @@ import { ProfessorService } from '../../../services/professor.service';
 import { Professor } from '../../../models/professor.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { ToastrService } from 'ngx-toastr';
-import $ from 'jquery';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { TurmaService } from '../../../services/turma.service';
 import { Turma } from '../../../models/turma.model';
 import { AccountService } from '../../../services/account.service';
-import { Role } from '../../../models/account-perfil.model';
 
 @Component({
-    selector: 'app-dashboard',
+    selector: 'app-monitoramento-dashboard',
     standalone: false,
-    templateUrl: './dashboard.component.html',
-    styleUrl: './dashboard.component.css',
+    templateUrl: './monitoramento-dashboard.component.html',
+    styleUrl: './monitoramento-dashboard.component.css',
     providers: [ConfirmationService],
 })
-export class DashboardComponent implements OnDestroy, AfterViewInit {
-    
+export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit {
+
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
-    
+
     alunos: Aluno[] = [];
     loadingAlunos = false;
-    
+
     dashboard: Dashboard[] = [];
     loadingDashboard = false;
     mesesAno: Dashboard_Mes[] = [];
     meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    
+    tableHeight = 0;
+    @ViewChild('toolbar') toolbar!: ElementRef;
+
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
     subscription: Subscription[] = [];
     anos: number[] = []
@@ -51,7 +51,7 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
     professores: Professor[] = [];
     loadingProfessores = false;
-    
+
     turmas: Turma[] = [];
     loadingTurmas = false;
 
@@ -72,9 +72,9 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-             lastValueFrom(this.professorService.getList())
-             .then(res => this.loadingProfessores = false)
-             .catch(res => this.loadingProfessores = false);
+            lastValueFrom(this.professorService.getList())
+                .then(res => this.loadingProfessores = false)
+                .catch(res => this.loadingProfessores = false);
         }
 
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
@@ -82,19 +82,29 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
 
         if (this.turmas.length == 0) {
             this.loadingTurmas = true;
-             lastValueFrom(this.turmaService.getList())
-             .then(res => this.loadingTurmas = false)
-             .catch(res => this.loadingTurmas = false);
+            lastValueFrom(this.turmaService.getList())
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false);
         }
 
         this.accountService.account.subscribe(res => {
-            this.request.professor_Id = res?.professor_Id;
-        })
+            if (!localStorage.getItem('professor_Id')) {
+                this.request.professor_Id = res?.professor_Id;
+            }
+        });
+
+        if (!!localStorage.getItem('professor_Id')) {
+            this.request.professor_Id = parseInt(localStorage.getItem('professor_Id')!)
+        }
+
+        if (!!localStorage.getItem('turma_Id')) {
+            this.request.turma_Id = parseInt(localStorage.getItem('turma_Id')!)
+        }
 
         var anoMin = 2025;
         var currentAno = new Date().getFullYear();
         for (let ano = anoMin; ano <= currentAno; ano++) {
-            this.anos.push(ano)            
+            this.anos.push(ano)
         }
 
 
@@ -107,13 +117,13 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     ngAfterViewInit(): void {
         this.update();
 
-        setTimeout(() => {
-            $('.p-virtualscroller').height('calc(100vh - 150px)')
-        }, 500);
-    }
+        // setTimeout(() => {
+        //     $('.p-virtualscroller').height('calc(100vh - 150px)')
+        // }, 500);
+        console.log(window.innerHeight, this.toolbar.nativeElement.offsetHeight)
 
-    @HostListener('keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
+        this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
+
     }
 
     randomDate(start: Date, end: Date) {
@@ -128,10 +138,10 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
             return {
                 mes: i,
                 mesString: moment().month(i).format('MMMM'),
-                roteiros: Array.from({ length: 4 }, (vv,ii) => {
+                roteiros: Array.from({ length: 4 }, (vv, ii) => {
                     return {
                         id: -1,
-                        semana: ii+1,
+                        semana: ii + 1,
                         tema: 'Carregando...',
                         dataInicio: moment().set({
                             month: i,
@@ -160,106 +170,106 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.setDashboard();
     }
 
-    
+
     setRoteiros() {
         this.loadingRoteiros = true;
         lastValueFrom(this.roteiroService.getList('dashboard setRoteiros'))
-        .then(res => {
-            this.roteiros = res;
+            .then(res => {
+                this.roteiros = res;
 
-                                
-            var lastRoteiro: Roteiro;
-            var lastSemana: number = 0;
-            var intervaloDe: Date;
-            var intervaloAte: Date;
 
-            this.mesesAno = this.meses.map((mesString, index) => {
-                var mes = new Dashboard_Mes;
-                mes.mes = index;
-                mes.mesString = mesString;
+                var lastRoteiro: Roteiro;
+                var lastSemana: number = 0;
+                var intervaloDe: Date;
+                var intervaloAte: Date;
 
-                mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.request.ano)
-                mes.roteiros.forEach(roteiro => { lastSemana = roteiro.semana });
+                this.mesesAno = this.meses.map((mesString, index) => {
+                    var mes = new Dashboard_Mes;
+                    mes.mes = index;
+                    mes.mesString = mesString;
 
-                if (mes.roteiros.length > 0) {
-                    lastRoteiro =  mes.roteiros[ mes.roteiros.length - 1];
-                    lastSemana = lastRoteiro.semana;
-                    intervaloDe = lastRoteiro.dataInicio;
-                    intervaloAte = lastRoteiro.dataFim;
-    
-                } else {
-                    intervaloDe = moment(new Date(this.request.ano, index, 1)).subtract(7, 'days').toDate();
-                    intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
-                }
+                    mes.roteiros = this.roteiros.filter(x => x.dataInicio.getMonth() == index && x.dataInicio.getFullYear() == this.request.ano)
+                    mes.roteiros.forEach(roteiro => { lastSemana = roteiro.semana });
 
-                if(mes.roteiros.length < 4 ) {
-                    var diff = 4 - mes.roteiros.length;
-                    for (let i = 1; i <= diff; i++) {
-    
-                        intervaloDe = moment(intervaloDe).add(1, 'week').toDate();
+                    if (mes.roteiros.length > 0) {
+                        lastRoteiro = mes.roteiros[mes.roteiros.length - 1];
+                        lastSemana = lastRoteiro.semana;
+                        intervaloDe = lastRoteiro.dataInicio;
+                        intervaloAte = lastRoteiro.dataFim;
+
+                    } else {
+                        intervaloDe = moment(new Date(this.request.ano, index, 1)).subtract(7, 'days').toDate();
                         intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
-
-                        if (intervaloAte.getMonth() != mes.mes) {
-                            intervaloAte = moment(intervaloDe).endOf('month').toDate();
-                        }
-
-                        var pseudoRoteiro: Roteiro = {
-                            id: PseudoEvento.EventoId,
-                            semana: ++lastSemana,
-                            tema: 'Tema indefinido',
-                            dataInicio: intervaloDe,
-                            dataFim: intervaloAte,
-                        }
-                        mes.roteiros.push(pseudoRoteiro)
                     }
-    
-                }
-    
-                return mes
-            });
-            
-            this.loadingRoteiros = false;
 
-            
-            setTimeout(() => {
-                var container = document.querySelectorAll('.p-virtualscroller')[0] as HTMLElement;
-                var tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
-                container.scrollLeft = tr.offsetLeft - tr.offsetWidth;
-            }, 2000);
+                    if (mes.roteiros.length < 4) {
+                        var diff = 4 - mes.roteiros.length;
+                        for (let i = 1; i <= diff; i++) {
+
+                            intervaloDe = moment(intervaloDe).add(1, 'week').toDate();
+                            intervaloAte = moment(intervaloDe).add(6, 'days').toDate();
+
+                            if (intervaloAte.getMonth() != mes.mes) {
+                                intervaloAte = moment(intervaloDe).endOf('month').toDate();
+                            }
+
+                            var pseudoRoteiro: Roteiro = {
+                                id: PseudoEvento.EventoId,
+                                semana: ++lastSemana,
+                                tema: 'Tema indefinido',
+                                dataInicio: intervaloDe,
+                                dataFim: intervaloAte,
+                            }
+                            mes.roteiros.push(pseudoRoteiro)
+                        }
+
+                    }
+
+                    return mes
+                });
+
+                this.loadingRoteiros = false;
 
 
-        })
-        .catch(res => this.loadingRoteiros = false);
+                setTimeout(() => {
+                    var container = document.querySelectorAll('.p-virtualscroller')[0] as HTMLElement;
+                    var tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
+                    container.scrollLeft = tr.offsetLeft - tr.offsetWidth;
+                }, 2000);
+
+
+            })
+            .catch(res => this.loadingRoteiros = false);
 
     }
 
 
     async setAlunos() {
         this.loadingAlunos = true;
-        await lastValueFrom(this.alunoService.getListWithChecklist())
-        .then(res => {
-            this.alunos = res.filter(x => x.active);
-            
-            if (this.request.turma_Id) 
-                this.alunos = this.alunos.filter(x => x.turma_Id == this.request.turma_Id);
+        await lastValueFrom(this.alunoService.getList())
+            .then(res => {
+                this.alunos = res.filter(x => x.active);
 
-            if (this.request.professor_Id) 
-                this.alunos = this.alunos.filter(x => x.professor_Id == this.request.professor_Id);
+                if (this.request.turma_Id)
+                    this.alunos = this.alunos.filter(x => x.turma_Id == this.request.turma_Id);
 
-            this.alunos = this.alunos.sort((a, b) => {
-                if (a.turma < b.turma) return -1;
-                if (a.turma > b.turma) return 1;
-                if (a.nome < b.nome) return -1;
-                if (a.nome > b.nome) return 1;
-                return 0;
-            });
-            
-            
-            
-            // .sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
-            this.loadingAlunos = false;
-        })
-        .catch(res => this.loadingAlunos = false);
+                if (this.request.professor_Id)
+                    this.alunos = this.alunos.filter(x => x.professor_Id == this.request.professor_Id);
+
+                this.alunos = this.alunos.sort((a, b) => {
+                    if (a.turma < b.turma) return -1;
+                    if (a.turma > b.turma) return 1;
+                    if (a.nome < b.nome) return -1;
+                    if (a.nome > b.nome) return 1;
+                    return 0;
+                });
+
+
+
+                // .sort((x,y) => x.nome < y.nome ? -1 : x.nome > y.nome ? 1 : 0);
+                this.loadingAlunos = false;
+            })
+            .catch(res => this.loadingAlunos = false);
     }
 
 
@@ -267,6 +277,8 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         this.loadingDashboard = true;
         this.dashboard = [];
         var done: number[] = [];
+        // this.request.mes = 5;
+        // await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
         /*
         this.request.mes = 1
         await lastValueFrom(this.service.getDashboard(this.request)).then(res => this.dashboard.push(...res))
@@ -296,24 +308,24 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
         */
         await new Promise<boolean>((resolve, reject) => {
             this.meses.forEach((mes: string, i: number) => {
-                this.request.mes = i+1;
+                this.request.mes = i + 1;
                 lastValueFrom(this.service.getDashboard(this.request))
-                .then(async res => {
-                    done.push(i);
-                    this.dashboard.push(...res);
-                    if (done.length == 12) {
+                    .then(async res => {
+                        done.push(i);
+                        this.dashboard.push(...res);
+                        if (done.length == 12) {
                             resolve(true);
-                    }
-                })
-                .catch(res => {
-                    this.toastr.error('Não foi possível carregar ' + mes);
-                });
-                
+                        }
+                    })
+                    .catch(res => {
+                        this.toastr.error('Não foi possível carregar ' + mes);
+                    });
+
             });
         })
 
         this.alunos = this.alunos.map(aluno => {
-            var aulas: Dashboard[] = this.dashboard.filter(x => x.aluno_Id == aluno.id).sort((x,y) => x.aula.data.getTime() - y.aula.data.getTime());
+            var aulas: Dashboard[] = this.dashboard.filter(x => x.aluno_Id == aluno.id).sort((x, y) => x.aula.data.getTime() - y.aula.data.getTime());
             aulas = aulas.map(aula => {
                 aula.primeiraAula = this.primeiraAula(aula.participacao, aula.aula)
                 return aula;
@@ -322,28 +334,43 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
             return aluno;
         })
 
-        this.expandedRowsKeys = this.alunos.reduce((acc: any, p :any) => (acc[p.turma_Id] = true) && acc, {});
+        // console.log('dashboard', this.dashboard);
+
+        this.expandedRowsKeys = this.alunos.reduce((acc: any, p: any) => (acc[p.turma_Id] = true) && acc, {});
         this.loadingDashboard = false;
+    }
+    @HostListener('window:resize', ['$event'])
+    onResize(event: any) {
+        console.log(window.innerHeight, this.toolbar.nativeElement.offsetHeight)
+        this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
+
     }
 
     turmaChanged() {
         var turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma;
         this.request.professor_Id = turma.professor_Id;
+
+        localStorage.setItem('turma_Id', (this.request.turma_Id ?? 0).toString())
+        localStorage.setItem('professor_Id', (this.request.professor_Id ?? 0).toString())
+
     }
-    
+
     professorChanged() {
         this.turmas.map(x => {
             x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
             return x;
         })
         this.request.turma_Id = undefined;
+
+        localStorage.setItem('turma_Id', (this.request.turma_Id ?? 0).toString())
+        localStorage.setItem('professor_Id', (this.request.professor_Id ?? 0).toString())
     }
-    
-    enviarMensagem(nome:string, celular:string) {
+
+    enviarMensagem(nome: string, celular: string) {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
 
-    enviarMensagemFalta(nome:string, celular:string, evento: Evento | any) {
+    enviarMensagemFalta(nome: string, celular: string, evento: Evento | any) {
         return this.mensagemWhatsapp.enviarMensagemFalta(nome, celular, evento);
     }
 
@@ -385,4 +412,5 @@ export class DashboardComponent implements OnDestroy, AfterViewInit {
     primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
         return moment(aluno.primeiraAula).isSame(evento.data)
     }
+
 }

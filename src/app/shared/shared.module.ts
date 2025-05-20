@@ -4,23 +4,19 @@ import { provideHttpClient, withFetch,  withInterceptorsFromDi } from '@angular/
 import { ProfileComponent } from './profile/profile.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import {  FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { TranslateModule } from '@ngx-translate/core';
-// import { DragScrollComponent, DragScrollItemDirective } from 'ngx-drag-scroll';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
 // Alunos
 import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
 import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
-import { ChecklistComponent as AlunoChecklistComponent } from '../pages/alunos/form/checklist/checklist.component';
 import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-import { RestricoesComponent as AlunoRestricoesComponent } from '../pages/alunos/form/restricoes/restricoes.component';
 import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/form/historico/historico.component';
-import { FaltasComponent as AlunoFaltasComponent } from '../pages/alunos/form/faltas/faltas.component';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 // End Alunos
 import { RouterModule } from '@angular/router';
@@ -29,6 +25,9 @@ import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { NameAbvPipe } from '../utils/name.pipe';
 import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
 import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/evento-item-hover/evento-item-hover.component';
+import { AlunoPopoverComponent } from '../pages/calendario/aluno-popover/aluno-popover.component';
+import { AlunoChecklistComponent } from '../pages/calendario/aluno-checklist/aluno-checklist.component';
+import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 
 
 @NgModule({
@@ -37,13 +36,12 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
         ChangePasswordComponent,
 
         // Alunos
+        AlunoChecklistComponent,
+        AlunoPopoverComponent,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
-        AlunoChecklistComponent,
         AlunoCalendarioComponent,
-        AlunoRestricoesComponent,
         AlunoHistoricoComponent,
-        AlunoFaltasComponent,
         // End Alunos
 
         AgendarReposicaoAlunoComponent,
@@ -71,11 +69,12 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
         // DragScrollItemDirective,
         
         // Alunos
+        AlunoChecklistComponent,
+        AlunoPopoverComponent,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
-        AlunoChecklistComponent,
         AlunoCalendarioComponent,
-        AlunoRestricoesComponent,
+        AlunoHistoricoComponent,
         // End Alunos
         
         AgendarReposicaoAlunoComponent,
@@ -97,15 +96,15 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
         NgxMaskPipe,
         TranslateModule,
         DragDropModule,
-        // DragScrollComponent, 
-        // DragScrollItemDirective,
         FullCalendarModule,
         NameAbvPipe,
+        NameFirstWordPipe,
     ],
     providers: [
         provideHttpClient(withFetch()),
         provideHttpClient(withInterceptorsFromDi()),
         NameAbvPipe,
+        NameFirstWordPipe,
         
     ]
 })

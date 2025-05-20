@@ -18,8 +18,9 @@ import { AlunoRestricaoService } from '../../../../services/aluno-restricao.serv
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
 import { Select, SelectChangeEvent } from 'primeng/select';
-import { getError } from '../../../../utils';
+import { getError, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
+import { playAlert, playError, playSuccess } from '../../../../utils/audio';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -78,9 +79,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private apostilaService: ApostilaService,
     ) {
 
-        // var restricaoCreated = this.service.restricaoCreated.subscribe(res => this.restricoes.push(res));
-        // this.subscription.push(restricaoCreated)
-
         var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos)
 
@@ -96,14 +94,14 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             })
             .catch(res => this.loadingSexos = false);
 
-            
+
         this.loadingKits = true;
         lastValueFrom(this.apostilaService.getKit())
-        .then(res => {
-            this.kits = res;
-            this.loadingKits = false;
-        })
-        .catch(res => this.loadingKits = false);
+            .then(res => {
+                this.kits = res;
+                this.loadingKits = false;
+            })
+            .catch(res => this.loadingKits = false);
 
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
@@ -138,7 +136,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                     if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
                     if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
                 }
-                if(!this.object.rm) {
+                if (!this.object.rm) {
                     this.object.rm = this.generateRM()
                 }
             }
@@ -215,7 +213,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     kitChanged(model: NgModel, e: SelectChangeEvent) {
         if (this.selectedKit) {
             this.object.apostila_Kit_Id = this.selectedKit.id;
-            
+
             var ah = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 2 && x.ordem == 1);
             this.object.apostila_AH_Id = ah?.id;
             this.object.apostila_AH = ah?.nome;
@@ -243,7 +241,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.turmaReject(model);
                 return;
             }
-            
+
             if (this.object.restricoes.length > 0 || this.object.restricaoMobilidade) {
                 this.turmaChangedRestricaoConffirm(e, model);
             }
@@ -266,20 +264,19 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         if (this.object.restricaoMobilidade) {
             message += `<li class="font-bold">Restrição de mobilidade.</li>`
-            
+
         }
         message += `</ul> <p>Continuar com transferência de turma?</p>`;
         this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Transferência de turma',
-            icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: () => {
                 this.turmaChangedConffirm(e, model);
             },
@@ -302,10 +299,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: () => {
                 this.turmaAccept();
             },
@@ -333,188 +330,191 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.object.professor = turma.professor;
     }
 
-    showError(title: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: title,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
     }
 
-    
-        finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
-            this.confirmationService.confirm({
-                key: 'checklistConfirmation',
-                message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
-                header: 'Finalizar item',
-                icon: 'pi pi-exclamation-triangle',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                rejectVisible: true,
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                accept: async () => {
-                    this.loadingChecklists = true;
-                    item.observacoes = this.checklistObservacao
-                    lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
-                        .then(res => {
-                            this.checklistObservacao = '';
-                            
-                            this.loadingChecklists = false;
-                            item.finalizado = true;
-                            item.dataFinalizacao = res.object.dataFinalizacao;
-                            item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
 
-                            this.userService.get(item.account_Finalizacao_Id!)
-                                .then(res => item.account_Finalizacao = res.name);
-    
-                        })
-                        .catch(res => {
-                            this.loadingChecklists = false;
-                            this.showError('Não foi possível finalizar checklist.', getError(res), e)
-                        })
-                },
-                reject: () => {
-                    ngModel.control.setValue(false);
-                }
-            });
-    
-        }
 
-        loadRestricoes() {
-            this.loadingRestricoes = true;
-                lastValueFrom(this.restricaoService.getList(this.object.id))
+    finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
+        playAlert();
+
+        this.confirmationService.confirm({
+            key: 'checklistConfirmation',
+            message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
+            header: 'Finalizar item',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Finalizar',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            rejectVisible: true,
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            accept: async () => {
+                this.loadingChecklists = true;
+                item.observacoes = this.checklistObservacao
+                lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
                     .then(res => {
-                        this.object.restricoes = res;
-                        this.loadingRestricoes = false;
-                        this.getRestricoes();
+                        playSuccess();
+                        this.checklistObservacao = '';
+
+                        this.loadingChecklists = false;
+                        item.finalizado = true;
+                        item.dataFinalizacao = res.object.dataFinalizacao;
+                        item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
+
+                        this.userService.get(item.account_Finalizacao_Id!)
+                            .then(res => item.account_Finalizacao = res.name);
+
                     })
-                    .catch(res => this.loadingRestricoes = false);
-
-        }
-
-
-        cadastrarRestricao(e: any, model: HTMLInputElement) {
-            var restricao = model.value;
-
-            if (!restricao) {
-                this.showError('Erro', 'Insira uma restrição para salvar', e);
-            } else if (this.object.restricoes.find(x => x.descricao == restricao )) {
-                this.showError('Erro', 'Essa restrição já existe', e);
-            } else {
-                this.confirmationService.confirm({
-                    target: e.target,
-                    message: `Você inseriu uma nova restrição, deseja salvar?`,
-                    header: 'Inserir restrição',
-                    icon: 'pi pi-exclamation-triangle',
-                    acceptIcon: 'pi pi-check',
-                    acceptLabel: 'Salvar',
-                    acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
-                    rejectVisible: true,
-                    rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Cancelar',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                    accept: async () => {
-                        var request: Aluno_Restricao_Request = {
-                            id: 0,
-                            aluno_Id: this.object.id,
-                            descricao: restricao,
-                        }
-                        this.loadingRestricoes = true;
-                        lastValueFrom(this.restricaoService.create(request))
-                            .then(res => {
-                                model.value = '';
-                                this.loadingRestricoes = false;
-                                if (res.success) {
-                                    this.toastrService.success(`Registro cadastrado com sucesso.`);
-
-                                    res.object.active = true;
-
-                                    this.object.restricoes.push(res.object);
-                                    this.getRestricoes();
-                                    console.log(this.restricoesText)
-                                }
-                            })
-                            .catch((res: HttpErrorResponse) => {
-                                this.loadingRestricoes = false;
-                                this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
-                            })
-                    },
-                    reject: () => {
-                        model.value = '';
-                    }
-                });
+                    .catch(res => {
+                        this.loadingChecklists = false;
+                        this.showError('Não foi possível finalizar checklist.', getError(res), e)
+                    })
+            },
+            reject: () => {
+                ngModel.control.setValue(false);
             }
-            
-        }
-        toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel) {
-            var active = item.active;
-            var text = `${active ? 'Habilitar' : 'Desabilitar'}`
-            var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
-            var title = `${text} restrição`;
-            
-            this.confirmationService.confirm({
-                target: e.target,
-                message: mensagem,
-                header: title,
-                icon: 'pi pi-exclamation-triangle',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: text,
-                acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0 p-button-icon-right',
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
-                accept: async () => {
-                    
-                        this.loadingRestricoes = true;
-                        lastValueFrom(this.restricaoService.toggle(item.id))
-                            .then(res => {
-                                this.loadingRestricoes = false;
-                                if (res.success) {
-                                    this.toastrService.success(`Concluído`);
+        });
 
-                                    res.object.active = !res.object.deactivated;
+    }
 
-                                    var index = this.object.restricoes.findIndex(x => x.id == item.id);
-                                    if (index != -1) {
-                                        this.object.restricoes.splice(index, 1, res.object)
-                                    }
-                                    this.getRestricoes();
-                                }
-                            })
-                            .catch((res: HttpErrorResponse) => {
-                                this.loadingRestricoes = false;
-                                this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
-                                model.control.setValue(item.active);
-                            })
-                    
+    loadRestricoes() {
+        this.loadingRestricoes = true;
+        lastValueFrom(this.restricaoService.getList(this.object.id))
+            .then(res => {
+                this.object.restricoes = res;
+                this.loadingRestricoes = false;
+                this.getRestricoes();
+            })
+            .catch(res => this.loadingRestricoes = false);
 
-                },
-                reject: () => {
-                    model.control.setValue(item.active);
-                }
-            });
-        }
+    }
 
     generateRM() {
         const min = 100000;
         const max = 999999;
         var rm = Math.floor(Math.random() * (max - min + 1)) + min
         return rm.toString();
-      }
+    }
 
-      getRestricoes() {
-        if(!this.object || !this.object.restricoes || this.object.restricoes.length == 0) {
-            this.restricoesText =  ''
+    getRestricoes() {
+        if (!this.object || !this.object.restricoes || this.object.restricoes.length == 0) {
+            this.restricoesText = ''
         } else {
-            this.restricoesText =  this.object.restricoes.filter(x => x.active).map(x => x.descricao).join(', ')
+            this.restricoesText = this.object.restricoes.filter(x => x.active).map(x => x.descricao).join(', ')
         }
         return this.restricoesText;
-      }
+    }
+
+    cadastrarRestricao(e: any, model: HTMLInputElement) {
+        var restricao = model.value;
+
+        if (!restricao) {
+            this.showError('Erro', 'Insira uma restrição para salvar', e);
+        } else if (this.object.restricoes.find(x => x.descricao == restricao)) {
+            this.showError('Erro', 'Essa restrição já existe', e);
+        } else {
+            playAlert();
+
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Você inseriu uma nova restrição, deseja salvar?`,
+                header: 'Inserir restrição',
+                icon: 'pi pi-exclamation-triangle',
+                acceptIcon: 'pi pi-check',
+                acceptLabel: 'Salvar',
+                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                rejectVisible: true,
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Cancelar',
+                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                accept: async () => {
+                    var request: Aluno_Restricao_Request = {
+                        id: 0,
+                        aluno_Id: this.object.id,
+                        descricao: restricao,
+                    }
+                    this.loadingRestricoes = true;
+                    lastValueFrom(this.restricaoService.create(request))
+                        .then(res => {
+                            model.value = '';
+                            this.loadingRestricoes = false;
+                            if (res.success) {
+                                this.toastrService.success(`Registro cadastrado com sucesso.`);
+
+                                playSuccess();
+
+                                res.object.active = true;
+
+                                this.object.restricoes.push(res.object);
+                                this.getRestricoes();
+                            }
+                        })
+                        .catch((res: HttpErrorResponse) => {
+                            this.loadingRestricoes = false;
+                            this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                        })
+                },
+                reject: () => {
+                    model.value = '';
+                }
+            });
+        }
+
+    }
+    toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel) {
+        var active = item.active;
+        var text = `${active ? 'Habilitar' : 'Desabilitar'}`
+        var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
+        var title = `${text} restrição`;
+
+        playAlert();
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: mensagem,
+            header: title,
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: text,
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            accept: async () => {
+
+                this.loadingRestricoes = true;
+                lastValueFrom(this.restricaoService.toggle(item.id))
+                    .then(res => {
+                        this.loadingRestricoes = false;
+                        if (res.success) {
+                            this.toastrService.success(`Concluído`);
+
+                            res.object.active = !res.object.deactivated;
+                            playSuccess();
+
+                            var index = this.object.restricoes.findIndex(x => x.id == item.id);
+                            if (index != -1) {
+                                this.object.restricoes.splice(index, 1, res.object)
+                            }
+                            this.getRestricoes();
+                        }
+                    })
+                    .catch((res: HttpErrorResponse) => {
+                        this.loadingRestricoes = false;
+                        this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                        model.control.setValue(item.active);
+                    })
+
+
+            },
+            reject: () => {
+                model.control.setValue(item.active);
+            }
+        });
+    }
+
 }

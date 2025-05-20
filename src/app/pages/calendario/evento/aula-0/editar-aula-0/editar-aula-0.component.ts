@@ -12,6 +12,9 @@ import { Evento_Participacao_Aluno } from '../../../../../models/evento-particip
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playAlert, playError } from '../../../../../utils/audio';
+import { showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-editar-aula-0',
@@ -45,6 +48,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         public mensagemWhatsapp: MensagemWhatsapp,
         private accountService: AccountService,
         private checklistService: ChecklistService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
@@ -73,18 +77,11 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
-
+    
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
         var professor = this.professores.find(x => x.id == e.value) as Professor;
@@ -115,7 +112,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     enviarMensagem(nome: string, celular: string) {
@@ -133,16 +130,17 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
         if (!this.alunoSelected.presente && this.alunoSelected.celular) {
             var nome = this.alunoSelected.aluno.split(' ')[0];
+            playAlert();
             this.confirmationService.confirm({
                 target: e.targer,
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                rejectButtonStyleClass: 'p-button-text ',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
                     window.open(url, '_blank')

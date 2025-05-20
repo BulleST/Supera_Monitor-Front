@@ -212,8 +212,9 @@
                             <app-calculo-perfil-cognitivo #calculo
                                 [data]="arg.date"
                                 [eventos]="eventos"
-                                [feriados]="feriados"></app-calculo-perfil-cognitivo>
-                            
+                                [feriados]="feriados"
+                                [perfilCoginitivo]="perfilCognitivo"
+                                [loadingPerfilCognitivo]="loadingPerfilCognitivo"></app-calculo-perfil-cognitivo>
                             <div class="flex flex-column gap-2 " (mouseenter)="calculo.show($event)" (mouseleave)="calculo.hide()">
                                 <p>{{arg.date | date : 'EE'}}</p>
                                 <p>{{arg.date | date : 'dd'}}</p>

@@ -26,7 +26,6 @@ export class AlunoPopoverComponent implements OnChanges {
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
-        private activatedRoute: ActivatedRoute,
         private router: Router,
         private crypto: Crypto,
         private service: EventoService,
@@ -43,18 +42,6 @@ export class AlunoPopoverComponent implements OnChanges {
         if (changes['showChecklist']) {
             this.showChecklist = changes['showChecklist'].currentValue;
         }
-    }
-
-    showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
     }
 
     toggle(e: any) {
@@ -74,10 +61,8 @@ export class AlunoPopoverComponent implements OnChanges {
     }
     
     goToAluno(aluno: Evento_Participacao_Aluno) {
-        // this.service.setEvento(this.evento);
-        var encrypted = this.crypto.encrypt(aluno.aluno_Id)
-        // this.router.navigate([ 'aluno', encrypted], { relativeTo: this.activatedRoute })
-        return ['aluno', encrypted];
+        this.service.setEvento(this.evento);
+        this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)])
     }
 
     goToReposicao(aluno: Evento_Participacao_Aluno) {

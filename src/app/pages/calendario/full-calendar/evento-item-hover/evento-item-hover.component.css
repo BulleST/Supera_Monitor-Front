@@ -1,17 +1,17 @@
-.event {
+.event.event-hover {
     width: 100%;
     height: 100%;
     display: flex;
     flex-flow: column;
     flex: 1 1 0% !important;
-    padding: 0.25rem;
+    padding: 0.35rem;
     border-width: 2px;
     border-style: solid;
     cursor: pointer;
     border-radius: 3px;
 }
 
-.event-header {
+.event.event-hover .event-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,7 +22,7 @@
     overflow: hidden;
 }
 
-.event-body {
+.event.event-hover .event-body {
     width: 100%;
     height: 3rem;
     display: flex;
@@ -32,10 +32,10 @@
     margin-bottom: auto;
 }
 
-.event-description {
+.event.event-hover .event-description {
     width: 100%;
     height: 100%;
-    margin-bottom: 5px;
+    padding-bottom: 5px;
     display: flex;
     align-items: center;
     font-size: 1rem;
@@ -45,19 +45,21 @@
     text-overflow: ellipsis;
 }
 
-.event-footer {
+.event.event-hover .event-footer {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-flow: wrap;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     width: 100%;
-    gap: 2px
+    gap: 2px;
+    margin-top: auto;
+    flex: none;
 }
 
-.event-reagendamento-icon {
+.event.event-hover .event-reagendamento-icon {
     width: 1.8rem;
     height: 1.8rem;
     font-size: 0.8rem !important;

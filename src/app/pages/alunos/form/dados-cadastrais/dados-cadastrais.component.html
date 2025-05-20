@@ -1,4 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
+
 <p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
     <ng-template #message let-message>
         <div>
@@ -136,7 +137,7 @@
             </div>
              <!-- RM -->
             <div class="field md:col-2 sm:col-6 col-4">
-                <label for="rm">RM <small class="text-400">(Registro de Matrícula)</small>: </label>
+                <label for="rm">RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
                 <input type="text"
                        pInputText
                        #rm="ngModel"
@@ -250,6 +251,7 @@
                               [(ngModel)]="object.primeiraAula"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
+                              [showTime]="true"
                               [selectOtherMonths]="true"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
@@ -283,9 +285,6 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <!-- <ng-template #restricoes>
-                {{getRestricoes()}}
-            </ng-template> -->
              <!-- Restrições -->
             <div class="field sm:col-4 col-12">
                 <label for="restricoes">Restrições: </label>
@@ -318,82 +317,35 @@
                                     (keyup.enter)="cadastrarRestricao($event, restricao)"
                                     placeholder="Inserir nova restrição...">
                                 <p-inputicon >
-                                    <span class="text-primary-500">enter</span>
+                                    <span class="text-primary-500 cursor-pointer hover:text-primary-600 hover:bg-primary-100 p-1 px-2 border-round-md -mr-2" (click)="cadastrarRestricao($event, restricao)">enter</span>
                                 </p-inputicon>
                         </p-iconfield>
                         <div class="">
-                            <ng-container *ngFor="let item of object.restricoes; let i = index">
-                                <div class="flex align-items-center gap-2 p-2" [ngClass]="{
-                                    'surface-50': i % 2 == 0
-                                }" >
-                                   <p-checkbox 
-                                       [name]="'active-' + i"
-                                       [inputId]="'active-' + i"
-                                       #checkbox="ngModel"
-                                       [(ngModel)]="item.active" 
-                                       [binary]="true"
-                                       (onChange)="toggleRestricao($event, item, checkbox)" />
-   
-                                   <p>{{item.descricao}}</p>
-                               </div>
+                            <ng-container *ngIf="object.restricoes && object.restricoes.length; else restricoesEmptyTemplate">
+                                <ng-container *ngFor="let item of object.restricoes; let i = index">
+                                    <div class="flex align-items-center gap-2 p-2" [ngClass]="{
+                                        'surface-50': i % 2 == 0
+                                    }" >
+                                       <p-checkbox 
+                                           [name]="'active-' + i"
+                                           [inputId]="'active-' + i"
+                                           #checkbox="ngModel"
+                                           [(ngModel)]="item.active" 
+                                           [binary]="true"
+                                           (onChange)="toggleRestricao($event, item, checkbox)" />
+       
+                                       <p>{{item.descricao}}</p>
+                                   </div>
+                                </ng-container>
                             </ng-container>
+                            <ng-template #restricoesEmptyTemplate>
+                                <p class="text-500 mt-2">Nenhuma restrição inserida</p>
+                            </ng-template>
+                            
                     
                         </div>
                     </div>
                 </p-popover>
-                <!--
-                <p-select [disabled]="!isEditPage"
-                    [options]="object.restricoes"
-                    [(ngModel)]="object.restricoes"
-                    [loading]="loadingRestricoes"
-                    #_restricoes="ngModel"
-                    #_restricoesSelect
-                    inputId="restricoes"
-                    name="restricoes"
-                    optionLabel="descricao" 
-                    [pTooltip]="restricoes"
-                    [placeholder]="restricoes.elementRef.nativeElement.innerText"
-                    styleClass="w-full"
-                    appendTo="body" >
-                      <ng-template #selectedItem let-selectedOption>
-                        <div class="flex items-center gap-2" *ngIf="selectedOption">
-                            <div>{{ selectedOption.descricao }}</div>
-                        </div>
-                    </ng-template>
-                    <ng-template #header>
-                        <div class="p-2 border-bottom-1 border-200">
-                        <p-iconfield>
-                                <input type="text"
-                                    pInputText
-                                    #restricao
-                                    id="restricao"
-                                    name="restricao"
-                                    class="w-full"
-                                    [required]="true"
-                                    (keyup.enter)="cadastrarRestricao($event, restricao)"
-                                    placeholder="Inserir nova restrição...">
-                                <p-inputicon >
-                                    <span class="text-primary-500">enter</span>
-                                </p-inputicon>
-                        </p-iconfield>
-                        </div>
-                    </ng-template>
-                    <ng-template #item let-item>
-                        <div class="flex align-items-center gap-2">
-                            <p-checkbox 
-                                name="active"
-                                inputId="active"
-                                #checkbox="ngModel"
-                                [(ngModel)]="item.active" 
-                                [binary]="true"
-                                (onChange)="toggleRestricao($event, item, checkbox)" />
-
-                            <p>{{item.descricao}}</p>
-                        </div>
-                    </ng-template>
-                </p-select>
-                
-            -->
                 <div class="flex align-itens-center gap-2 mt-2">
                     <p-checkbox inputId="restricaoMobilidade"
                         name="restricaoMobilidade"
@@ -403,9 +355,9 @@
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
             </div>
-            <!-- Etapa Checklist -->
+            <!-- Etapa da jornada -->
             <div class="field sm:col-5 col-12">
-                <label for="etapaChecklist">Etapa Checklist: </label>
+                <label for="etapaChecklist">Etapa da jornada: </label>
                 <input type="text"
                        pInputText
                        [value]="object.checklist ?? textoChecklist"
@@ -503,12 +455,12 @@
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div class="w-full">
                                 <p class="font-bold">{{ item.nome }}</p>
-                                <div class="flex align-items-center justify-content-between">
+                                <div class="flex align-items-center justify-content-between mt-1">
                                     <p class="text-sm">
                                         <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
                                         <span>{{ item.professor }}</span>
                                     </p>
-                                    <span><b>Vagas: </b>{{item.alunosAtivos}}/{{ item.capacidadeMaximaAlunos }}</span>
+                                    <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vagas</span>
                                     <p class="text-sm">{{item.perfilCognitivo[0].nome}}</p>
                                 </div>
                             </div>
@@ -571,12 +523,14 @@
                           optionDisabled="deactivated"
                           [required]="true">
                     <ng-template let-item #item>
-                        <p>{{ item.nome }}</p>
                         <div class="flex flex-column">
-                            <p class="font-bold">Apostilas:</p>
-                            <p *ngFor="let apostila of item.apostilas">
-                                <span>{{apostila.nome}} - <b>Total de Páginas </b>{{apostila.numeroTotalPaginas}}</span>
-                            </p>
+                            <p class="font-bold">{{ item.nome }}</p>
+                            <div class="flex flex-column">
+                                <p class="font-bold">Apostilas:</p>
+                                <p *ngFor="let apostila of item.apostilas">
+                                    <span>{{apostila.nome}} - <b>Total de Páginas </b>{{apostila.numeroTotalPaginas}}</span>
+                                </p>
+                            </div>
                         </div>
                     </ng-template>
                 </p-select>

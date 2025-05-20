@@ -1,4 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
+
 <p-dialog [header]="'Agendar Reunião'"
           [maximizable]="true"
           [draggable]="true"
@@ -114,7 +115,7 @@
                         <p-badge *ngIf="item.disponivel == false"
                                  value="Indisponível"
                                  severity="danger"
-                                [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                                 [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
                         <ng-template #disponivelEvent>
                             <div class="w-25rem">
                                 <p>
@@ -164,12 +165,11 @@
                             (onMoveToTarget)="onMoveToTarget($event)"
                             (onMoveAllToSource)="onMoveAllToSource($event)"
                             (onMoveAllToTarget)="onMoveAllToTarget($event)"
-                            filterBy="nome, turma"
+                            filterBy="nome,turma"
                             sourceFilterPlaceholder="Procure por nome"
                             targetFilterPlaceholder="Procure por nome"
                             [showSourceControls]="false"
                             [showTargetControls]="false"
-                            empty
                             [dragdrop]="true"
                             [responsive]="true"
                             metaKeySelection="id"
@@ -209,7 +209,7 @@
                                 </ng-template>
                             </div>
                             <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                             </ng-container>
                         </div>
                     </ng-template>
@@ -222,7 +222,6 @@
                           icon="pi pi-check"
                           [loading]="loading"
                           [rounded]="true"
-                          size="small"
                           [disabled]="form.invalid || loading" />
             </div>
         </div>

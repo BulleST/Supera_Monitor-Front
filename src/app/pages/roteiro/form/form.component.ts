@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Roteiro } from '../../../models/roteiro.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Crypto, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace,  playAlert, playError, playSuccess, showError } from '../../../utils';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
@@ -27,8 +27,8 @@ export class FormComponent implements OnDestroy {
     isEditPage = false;
     subscription: Subscription[] = [];
 
-    totalSize : number = 0;
-    totalSizePercent : number = 0;
+    totalSize: number = 0;
+    totalSizePercent: number = 0;
 
     jornadas: Roteiro[] = [];
     loadingJornada: boolean = false;
@@ -115,31 +115,23 @@ export class FormComponent implements OnDestroy {
         return `${formattedSize} ${sizes[i]}`;
     }
 
-    showError(message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+    
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
     }
 
-
     async getInvalidDates() {
-        if(this.isEditPage == false) {
+        if (this.isEditPage == false) {
             if (this.jornadas.length == 0) {
                 this.loadingJornada = true;
                 await lastValueFrom(this.service.getList()).then(res => this.jornadas = res);
                 this.loadingJornada = false;
             }
-    
+
             this.jornadas.forEach(jornada => {
                 var data = new Date(jornada.dataInicio);
-    
-                while(moment(data).isSameOrBefore(jornada.dataFim, 'date') ) {
+
+                while (moment(data).isSameOrBefore(jornada.dataFim, 'date')) {
                     this.invalidDates.push(data);
                     data = moment(data).add(1, 'day').toDate();
                 }
@@ -158,43 +150,47 @@ export class FormComponent implements OnDestroy {
         var list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
         var data = moment(ngModel.value).toDate()
         var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim && x.id != this.object.id);
-        
+
         if (existe) {
-            this.toastrService.error('Essa data já está em um tema existente');
+            this.toastrService.error('Essa data já está em um outro tema.');
             ngModel.control.setErrors({
                 'invalid': 'Essa data já está sendo utilizada no período da semana ' + existe.semana + '.'
-            })
+            });
+            playError();
+
         } else {
             ngModel.control.setErrors({ 'invalid': null });
             ngModel.control.updateValueAndValidity();
-
-
-            // var newList: Roteiro[] = JSON.parse(JSON.stringify(list));
-            // newList.push(this.object)
-            // newList.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
-
-            // var semana = 1;
-            // newList.map(x => {
-            //     x.semana = semana++;
-            //     if (this.object.dataInicio == x.dataInicio || this.object.dataFim == x.dataFim) {
-            //         this.object.semana = x.semana
-            //     }
-            // })
-
-
-            
         }
-        
-        
-
 
     }
 
-
-    async send(form: NgForm, e: any) {
+    sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
-            return;
+            return this.showError('Campos Inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
+
+        playAlert();
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: 'Tem certeza que deseja salvar os dados do roteiro?',
+            header: 'Salvar dados',
+            acceptLabel: 'Salvar',
+            acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-text ',
+            accept: () => {
+                this.send(e)
+            }
+        })
+    }
+
+
+    async send(e: any) {
+
         this.loading = true;
 
         this.request()
@@ -206,16 +202,17 @@ export class FormComponent implements OnDestroy {
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
+                    playSuccess();
                 }
                 else {
                     this.error = res.message;
-                    this.showError(this.error, e);
+                    this.showError('Erro', this.error, e);
                 }
             })
             .catch((res: HttpErrorResponse) => {
                 this.error = res.error.message;
                 this.loading = false;
-                this.showError(this.error, e);
+                this.showError('Erro', this.error, e);
             })
     }
 

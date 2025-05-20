@@ -8,7 +8,7 @@ import { Professor } from '../../../models/professor.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError } from '../../../utils';
+import { Crypto, getError, showError } from '../../../utils';
 import { SalaAulaService } from '../../../services/sala-aula.service';
 import { ProfessorService } from '../../../services/professor.service';
 import { AlunoService } from '../../../services/alunos.service';
@@ -32,6 +32,8 @@ import { Aluno_CheckList_Item } from '../../../models/checklist.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 import { Feriado } from '../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
+import { CalendarioUtils } from '../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-reagendar-evento',
@@ -94,6 +96,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         private turmaService: TurmaService,
         private accountService: AccountService,
         private checklistService: ChecklistService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
@@ -173,16 +176,9 @@ export class ReagendarEventoComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     async setAlunosProfessores() {
         this.professores = this.professorService.list.value;
@@ -211,7 +207,6 @@ export class ReagendarEventoComponent implements OnDestroy {
     }
 
     async verificaDisponibilidade() {
-        console.log('verificaDisponibilidade')
         var valid = true;
 
         if (!this.data || !this.horario) {
@@ -221,7 +216,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         this.loadingEventos = true;
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes());
-        
+
         var request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
@@ -248,16 +243,15 @@ export class ReagendarEventoComponent implements OnDestroy {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
-        
+
         var professoresIds = this.evento.professores.map(x => x.professor_Id);
-        var professoresEvento = this.professores.filter(x => professoresIds.includes(x.id) || this.evento.professor_Id == x.id );
+        var professoresEvento = this.professores.filter(x => professoresIds.includes(x.id) || this.evento.professor_Id == x.id);
         var indisponiveis = professoresEvento.filter(x => !x.disponivel);
-        console.log('indisponiveis', indisponiveis)
 
         if (indisponiveis.length > 0) {
             var mensagemErro = `Os educadores a seguir estão indisponíveis.`;
             mensagemErro += `\n ${indisponiveis.map(x => x.nome).join('<br>')}`
-            this.showError('Educador indisponível', mensagemErro, {target: this.formDiv })
+            this.showError('Educador indisponível', mensagemErro, { target: this.formDiv })
 
             this.horario = undefined as any;
         }
@@ -283,7 +277,7 @@ export class ReagendarEventoComponent implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     getCorTurma(turma_Id: number) {
@@ -301,13 +295,13 @@ export class ReagendarEventoComponent implements OnDestroy {
     async loadFeriados() {
         this.loadingFeriados = true;
         await lastValueFrom(this.service.getFeriados(this.ano))
-        .then(res => {
-            this.feriados = res;
-            this.loadingFeriados = false;
-            var feriadoDates = res.map(x => moment(x.date, 'YYYY-MM-DD').toDate());
-            this.feriadoDates.push(...feriadoDates);
-        })
-        .catch(res => this.loadingFeriados = false);
+            .then(res => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+                var feriadoDates = res.map(x => moment(x.date, 'YYYY-MM-DD').toDate());
+                this.feriadoDates.push(...feriadoDates);
+            })
+            .catch(res => this.loadingFeriados = false);
     }
 
     sendMensagemAlunos() {
@@ -318,7 +312,7 @@ export class ReagendarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectVisible: false,
             accept: () => {
                 this.visible = false
@@ -349,6 +343,8 @@ export class ReagendarEventoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
+        playAlert();
+
         var professoresIndisponiveis = this.professores.filter(x => x.disponivel == false);
         var alunosIndisponiveis = this.alunos.filter(x => x.disponivel == false);
 
@@ -367,9 +363,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  Deseja continuar mesmo assim? `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-text p-button-sm',
+                    rejectButtonStyleClass: 'p-button-text ',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -393,9 +389,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-text p-button-sm',
+                    rejectButtonStyleClass: 'p-button-text ',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -412,9 +408,9 @@ export class ReagendarEventoComponent implements OnDestroy {
             message: `Tem certeza que deseja reagendar a ${this.tipoString} para o dia ${moment(this.data).format('DD/MM')} às ${moment(this.horario).format('HH[h]mm')}?.`,
             acceptLabel: `Reagendar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             }
@@ -424,7 +420,6 @@ export class ReagendarEventoComponent implements OnDestroy {
 
     async send(e: any) {
         this.loading = true;
-
         var response: RequestResponse = { success: true, message: '', object: null };
 
         if (this.evento.id == PseudoEvento.EventoId) {
@@ -436,7 +431,7 @@ export class ReagendarEventoComponent implements OnDestroy {
                 .catch(res => this.showError('Erro', getError(res), e))
         }
         if (response.success) {
-            
+
             this.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
 
             var request: EventoReagendamentoRequest = {
@@ -451,6 +446,8 @@ export class ReagendarEventoComponent implements OnDestroy {
                     this.loading = false;
                     this.service.calendarioReload.emit(res.object.id);
                     this.updateCheklistAlunos();
+                    playSuccess();
+                    this.toastrService.success('Reagendamento realizado com sucesso.', 'Reagendamento finalizado');
 
                     if (this.evento.alunos.length > 0)
                         this.sendMensagemAlunos();
@@ -458,7 +455,6 @@ export class ReagendarEventoComponent implements OnDestroy {
                         this.visible = false;
                         this.visibleChange();
                     }
-                    this.toastrService.success('Reagendamento realizado com sucesso.', 'Reagendamento finalizado');
                 })
                 .catch(res => {
                     this.loading = false;
@@ -472,7 +468,6 @@ export class ReagendarEventoComponent implements OnDestroy {
     updateCheklistAlunos() {
         var tipo = this.tipoString[0].toUpperCase() + this.tipoString.substring(1);
 
-
         this.alunos.forEach(item => {
             var checklist_Item_Id = 0;
             var mensagem = '';
@@ -481,24 +476,23 @@ export class ReagendarEventoComponent implements OnDestroy {
             // Agendar Aula 0
             if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 31) as Aluno_CheckList_Item;
-            } 
+            }
             // Agendar Superacao
             else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 22) as Aluno_CheckList_Item;
-            } 
+            }
             // Agendar 1/2ª Oficina
             else if (this.evento.evento_Tipo_Id == EventoTipo.Oficina) {
                 alunoChecklist = item.alunoChecklist.find(x => x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) as Aluno_CheckList_Item;
             }
 
-            console.log('alunoChecklist', alunoChecklist)
 
             if (alunoChecklist) {
                 mensagem = alunoChecklist.observacoes + `\n\n`;
                 mensagem += `${tipo} reagendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}.
                             \n Reagendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
-                
-                            alunoChecklist.observacoes = mensagem;
+
+                alunoChecklist.observacoes = mensagem;
                 if (checklist_Item_Id && mensagem) {
                     lastValueFrom(this.checklistService.markAsDone(checklist_Item_Id, mensagem))
                 }
@@ -510,9 +504,6 @@ export class ReagendarEventoComponent implements OnDestroy {
     request() {
         this.evento.data = new Date(this.evento.data)
         switch (this.evento.evento_Tipo_Id) {
-            // case EventoTipo.AulaZero: return this.requestAula0();
-            // case EventoTipo.AulaExtra: return this.requestAulaExtra();
-            // case EventoTipo.Superacao: return this.requestSuperacao();
             case EventoTipo.Aula: return this.requestAulaTurma();
             case EventoTipo.Reuniao: return this.requestReuniao();
             case EventoTipo.Oficina: return this.requestOficina();
@@ -549,32 +540,5 @@ export class ReagendarEventoComponent implements OnDestroy {
             return lastValueFrom(this.service.createOficina(request));
         return lastValueFrom(this.service.editOficina(request));
     }
-
-    // requestAula0() {
-    //     var request = MyMap(this.evento, new EventoAula0Request);
-    //     request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-    //     request.professores = [this.evento.professor_Id];
-    //     if (this.evento.id == PseudoEvento.EventoId)
-    //         return lastValueFrom(this.service.createAula0(request));
-    //     return lastValueFrom(this.service.editAula0(request));
-    // }
-
-    // requestAulaExtra() {
-    //     var request = MyMap(this.evento, new EventoAulaExtraRequest);
-    //     request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-    //     request.professores = [this.evento.professor_Id];
-    //     if (this.evento.id == PseudoEvento.EventoId)
-    //         return lastValueFrom(this.service.createAulaExtra(request));
-    //     return lastValueFrom(this.service.editAulaExtra(request));
-    // }
-
-    // requestSuperacao() {
-    //     var request = MyMap(this.evento, new EventoSuperacaoRequest);
-    //     request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-    //     request.professores = [this.evento.professor_Id];
-    //     if (this.evento.id == PseudoEvento.EventoId)
-    //         return lastValueFrom(this.service.createSuperacao(request));
-    //     return lastValueFrom(this.service.editSuperacao(request));
-    // }
 
 }

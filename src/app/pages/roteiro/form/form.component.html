@@ -1,8 +1,6 @@
-<p-confirmdialog styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
-    </ng-template>
-</p-confirmdialog>
+
+<app-confirm-dialog></app-confirm-dialog>
+
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
@@ -48,7 +46,7 @@
             </p-popover>
         </div>
     </ng-template>
-    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+    <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <div class="field col-12"> <!-- Tema -->
                 <label for="tema">Tema: <span class="text-red-500">*</span></label>

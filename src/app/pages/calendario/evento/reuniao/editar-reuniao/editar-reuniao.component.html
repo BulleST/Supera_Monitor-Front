@@ -145,7 +145,7 @@
                     (onMoveToTarget)="onMoveToTarget($event)"
                     (onMoveAllToSource)="onMoveAllToSource($event)"
                     (onMoveAllToTarget)="onMoveAllToTarget($event)"
-                    filterBy="nome, turma"
+                    filterBy="nome,turma"
                     sourceFilterPlaceholder="Procure por nome"
                     targetFilterPlaceholder="Procure por nome"
                     [showSourceControls]="false"
@@ -237,7 +237,6 @@
                                           [label]="item.presente ? 'Presente': 'Faltou'"
                                           [severity]="item.presente ? 'success': 'danger'"
                                           [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                                          size="small"
                                           styleClass="py-1 line-height-2" />
                             </ng-template>
                             <ng-template #output>
@@ -247,7 +246,6 @@
                                           [label]="item.presente ? 'Presente': 'Faltou'"
                                           [severity]="item.presente ? 'success': 'danger'"
                                           [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                                          size="small"
                                           styleClass="py-1 line-height-2" />
                             </ng-template>
                         </p-cellEditor>

@@ -8,6 +8,7 @@ import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Popover } from 'primeng/popover';
 import { HttpErrorResponse } from '@angular/common/http';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 
 @Component({
@@ -33,9 +34,7 @@ export class FormComponent implements OnDestroy {
         private service: AlunoService,
         private confirmationService: ConfirmationService,
     ) {
-
         this.loadPage();
-
     }
 
     ngOnDestroy(): void {
@@ -62,8 +61,8 @@ export class FormComponent implements OnDestroy {
                     });
 
             } else {
-                // this.visible = true;
-                this.visible = false;
+                // this.visible = false;
+                this.visible = true;
                 this.visibleChange();
             }
         })
@@ -76,41 +75,77 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    showError(message: string, e: any) {
+    showError(header: string, message: string, e: any) {
         this.confirmationService.confirm({
             target: e.target,
             message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
+            header: header,
+            // icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
             acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }
-
-    send(form: NgForm, e: any) {
+    async sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
-            return;
+            return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
+        playAlert();
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: 'Tem certeza que deseja salvar os dados da turma?',
+            header: 'Salvar dados',
+            acceptLabel: 'Salvar',
+            acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-text ',
+            accept: () => {
+                this.send(e)
+            }
+        })
+    }
+
+
+    send(e: any) {
         this.loading = true;
 
         this.request()
             .then(res => {
                 this.loading = false;
                 if (res.success) {
-                    insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
+                    playSuccess();
+
+                    var list = this.service.list.value;
+                    var index = list.findIndex(x => x.id == this.object.id);
+
+                    var object = list[index];
+
+                    // Inserir aqui os itens que aparecem nas colunas da tabela
+                    object.nome = res.object.nome;
+                    object.restricaoMobilidade = res.object.restricaoMobilidade;
+                    object.turma = res.object.turma;
+                    object.turma_Id = res.object.turma_Id;
+                    object.perfilCognitivo_Id = res.object.perfilCognitivo_Id;
+                    object.perfilCognitivo = res.object.perfilCognitivo;
+
+                    list.splice(index, 1, object);
+                    this.service.list.next(list);
+
                 }
                 else {
                     this.error = res.message;
-                    this.showError(this.error, e);
+                    this.showError('Erro', this.error, e);
                 }
             })
             .catch((res: HttpErrorResponse) => {
                 this.error = res.error.message;
                 this.loading = false;
-                this.showError(this.error, e);
+                this.showError('Erro', this.error, e);
             })
     }
 

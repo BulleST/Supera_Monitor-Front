@@ -1,3 +1,5 @@
+import { Aluno_Restricao } from "./aluno-restricao.model";
+import { Apostila } from "./apostila.model";
 import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
 import { Evento } from "./evento.model";
@@ -26,11 +28,15 @@ export class Evento_Participacao_Aluno {
 
     apostila_Abaco?: string;
     apostila_Abaco_Id?: number = undefined as any;
-    numeroPaginaAbaco?: number = undefined as any;
+    numeroPaginaAbaco: number = 0;
+    apostilaAbacoObject: Apostila = new Apostila;
+    apostilasAbacoList: Apostila[] = [];
 
     apostila_AH?: string;
     apostila_AH_Id?: number = undefined as any;
-    numeroPaginaAH?: number = undefined as any;
+    numeroPaginaAH: number = 0;
+    apostilaAHObject: Apostila = new Apostila;
+    apostilasAHList: Apostila[] = [];
 
 
     apostila_Kit?: string;
@@ -57,6 +63,8 @@ export class Evento_Participacao_Aluno {
     active: boolean = true;
     primeiraAula?: Date;
 
+    restricaoMobilidade: boolean = false;
+    restricoes: Aluno_Restricao[] = []
 }
 
 export var alunoParticipacao: Evento_Participacao_Aluno[] = [];

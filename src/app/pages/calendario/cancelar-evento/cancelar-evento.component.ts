@@ -7,7 +7,7 @@ import { Professor } from '../../../models/professor.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError } from '../../../utils';
+import { Crypto, getError, showError } from '../../../utils';
 import { ProfessorService } from '../../../services/professor.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { EventoService } from '../../../services/evento.service';
@@ -22,6 +22,9 @@ import { TurmaService } from '../../../services/turma.service';
 import { Turma } from '../../../models/turma.model';
 import { MyMap } from '../../../utils/map';
 import { SalaAulaId } from '../../../models/sala-aula.model';
+import { CalendarioUtils } from '../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-cancelar-evento',
@@ -40,8 +43,6 @@ export class CancelarEventoComponent implements OnDestroy {
 
     mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
     alunos: Evento_Participacao_Aluno[] = [];
-    // alunos: Aluno[] = [];
-    // loadingAlunos = false;
 
     professores: Professor[] = [];
     loadingProfessores = false;
@@ -60,6 +61,7 @@ export class CancelarEventoComponent implements OnDestroy {
         private alunoService: AlunoService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private calendarioUtils: CalendarioUtils,
         private turmaService: TurmaService,
     ) {
 
@@ -76,18 +78,6 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        // var alunos = this.alunoService.list.subscribe(res => {
-        //     this.alunos = res.filter(x => x.active == true);
-        //     this.setAlunosProfessores();
-        // });
-        // this.subscription.push(alunos);
-
-        // if (this.alunos.length == 0) {
-        //     this.loadingAlunos = true;
-        //     lastValueFrom(this.alunoService.getList())
-        //         .then(res => this.loadingAlunos = false)
-        //         .catch(res => this.loadingAlunos = false);
-        // }
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
         this.subscription.push(turmas);
 
@@ -149,12 +139,6 @@ export class CancelarEventoComponent implements OnDestroy {
     }
 
     setAlunosProfessores() {
-        // if (this.alunos.length > 0 && this.evento.alunos.length > 0) {
-
-        //     var alunosIds = this.evento.alunos.map(x => x.aluno_Id);
-        //     this.alunos = this.alunos.filter(x => alunosIds.includes(x.id));
-        // }
-
         if (this.professores.length > 0 && this.evento.professores.length > 0) {
 
             var professoresEvento = this.evento.professores.map(x => x.professor_Id)
@@ -162,21 +146,15 @@ export class CancelarEventoComponent implements OnDestroy {
         }
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     getTipo(e: Evento) {
         e.evento_Tipo_Id = this.evento.evento_Tipo_Id;
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     goToReagendamento() {
@@ -206,15 +184,20 @@ export class CancelarEventoComponent implements OnDestroy {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
 
-    sendConfirmation(e: any) {
+    sendConfirmation(e: any, form: NgForm) {
+        if (form.invalid) {
+            return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
+        }
+
+        playAlert();
         this.confirmationService.confirm({
             target: e.target,
             header: `Cancelar ${this.tipoEventoString}`,
             message: `Tem certeza que deseja cancelar a ${this.tipoEventoString} do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: 'Não cancelar',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded px-3 mr-0',
             rejectLabel: `Cancelar ${this.tipoEventoString}`,
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -249,6 +232,7 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado');
                     this.service.calendarioReload.emit(res.object.id);
                     this.loading = false;
+                    playSuccess();
 
                     if (this.evento.alunos.length > 0)
                         this.sendMensagemAlunos();
@@ -314,7 +298,7 @@ export class CancelarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectVisible: false,
             accept: () => {
                 this.visible = false;

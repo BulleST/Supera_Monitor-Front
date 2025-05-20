@@ -20,7 +20,7 @@ import moment from 'moment';
 import { RoteiroService } from '../../../../../services/roteiro.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../../services/evento.service';
-import { getError } from '../../../../../utils';
+import { getError, showError } from '../../../../../utils';
 import { Evento, EventoCancelamentoRequest, EventoTipo } from '../../../../../models/evento.model';
 import { MyMap as MyMap } from '../../../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
@@ -33,6 +33,17 @@ import { RequestResponse } from '../../../../../helpers/request-response.interfa
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import $ from 'jquery';
+import {
+    CdkDragDrop,
+    CdkDrag,
+    CdkDropList,
+    CdkDropListGroup,
+    moveItemInArray,
+    transferArrayItem,
+} from '@angular/cdk/drag-drop';
+import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-turma-extra',
@@ -50,7 +61,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     object: EventoAulaExtraRequest = new EventoAulaExtraRequest;
 
     data: Date = new Date; // new Date(2025,5,21)//
-    horario: Date = undefined as unknown as Date; // new Date(2025, 5, 21, 12, 0, 0);
+    horario: Date = new Date(2025, 5, 21, 12, 0, 0); // undefined as unknown as Date; // new Date(2025, 5, 21, 12, 0, 0);
     minData = new Date();
 
     @ViewChild('perfilCognitivo') perfilCognitivo!: NgModel
@@ -72,8 +83,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     loadingTurmas = false;
 
     mensagensEnviadasAlunos: Aluno[] = [];
-    alunoSelected?: Aluno;
     alunosSelected: Aluno[] = [];
+
+    selectedAlunoSource?: Aluno;
+    selectedAlunoTarget?: Aluno;
+
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -84,7 +98,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     eventos: Evento[] = [];
     loadingEventos = false;
 
-    @ViewChild('picklist') picklist!: PickList;
+    // @ViewChild('picklist') picklist!: PickList;
     @ViewChild('professor_Id') professor_Id!: NgModel;
 
     feriados: Feriado[] = [];
@@ -103,8 +117,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         private toastrService: ToastrService,
         private salaAulaService: SalaAulaService,
         private alunoService: AlunoService,
+        private alunoRestricaoService: AlunoRestricaoService,
         private roteiroService: RoteiroService,
         public mensagemWhatsapp: MensagemWhatsapp,
+        private calendarioUtils: CalendarioUtils,
     ) {
         var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res);
         this.subscription.push(roteiros);
@@ -187,16 +203,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         }
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
+
 
     getCorTurma(turma_Id: number) {
         return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
@@ -217,51 +228,16 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         this.loadingFeriados = true;
         await lastValueFrom(this.service.getFeriados(this.ano))
             .then(res => {
-                res.forEach(item => {
-                    var index = this.feriados.findIndex(x => moment(x.date).isSame(item.date));
-                    if (index == -1) {
-                        this.feriados.push(item);
-                    } else {
-                        this.feriados.splice(index, 1, item);
-                    }
-                });
-
+                this.feriados = res
                 this.feriadoDates = this.feriados.map(x => moment(x.date).toDate());
                 this.loadingFeriados = false;
             })
             .catch(res => this.loadingFeriados = false);
     }
 
-
-    // turmaChanged() {
-    //     if (this.object.turma_Id) {
-    //         var turma = this.turmas.find(x => x.id == this.object.turma_Id) as Turma;
-    //         this.alunosSelected = this.alunos.filter(x => x.turma_Id == this.object.turma_Id);
-    //         this.object.capacidadeMaximaAlunos = turma.capacidadeMaximaAlunos ?? 12
-    //         this.object.professor_Id = turma.professor_Id;
-    //         this.object.sala_Id = turma.sala_Id;
-    //         this.object.descricao = turma.nome;
-    //         this.perfilCognitivoSelected = this.perfisCognitivos.find(x => x.id == turma.perfilCognitivo[0].id)
-
-    //         var roteiro = this.roteiros.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim));
-    //         if (roteiro) {
-    //             this.object.roteiro_Id = roteiro.id;
-    //         }
-
-    //         this.verificaDisponibilidade();
-    //     }
-    // }
-
-    @HostListener('mouseup', ['$event'])
-    middleclickEvent(event: any) {
-        if (event.which === 2) {
-        }
-    }
-
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
-
 
     removerAlunoLista(aluno: Aluno, e: any) {
         if (e.which == 2) {
@@ -277,159 +253,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         return this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
     }
 
-    onSourceSelect(e: PickListSourceSelectEvent) {
-        var aluno = e.items[0] as Aluno;
-    }
-
-    onMoveToSource(e: PickListMoveToSourceEvent) {
-        this.validaAlunos();
-        var aluno = e.items[0] as Aluno;
-        var index = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
-        if (index != -1) this.object.alunos.splice(index, 1);
-    }
-
-    onMoveToTarget(e: PickListMoveAllToTargetEvent) {
-        this.validaAlunos();
-        var aluno = e.items[0] as Aluno;
-        this.alunoSelected = aluno;
-        if (!aluno.disponivel) {
-            this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', { target: this.picklist.el.nativeElement });
-            this.closeEventoReposicaoDialog();
-        } 
-        else if (!this.data) {
-            this.showError('Selecione uma data', 'Selecione uma data para carregar sugestões de reposição do aluno.', { target: this.picklist.el.nativeElement } );
-            this.closeEventoReposicaoDialog();
-        }
-        else if (!this.horario) {
-            this.showError('Selecione um horário', 'Selecione um horário para carregar sugestões de reposição do aluno.', { target: this.picklist.el.nativeElement } );
-            this.closeEventoReposicaoDialog();
-        } 
-        else {
-                
-                this.confirmationService.confirm({
-                    key: 'selecionarReposicao',
-                    message: ``,
-                    header: 'Selecionar aula a repor',
-                    acceptVisible: false,
-                    rejectVisible: false,
-                });
-
-                var request: CalendarioRequest = {
-                    aluno_Id: aluno.id,
-                    intervaloDe: moment(this.data).subtract(1, 'month').toDate(),
-                    intervaloAte: moment(this.data).add(1, 'month').toDate(),
-                }
-                this.loadingEventosReposicaoAluno = true;
-                lastValueFrom(this.service.calendario(request))
-                .then(res => {
-
-                    var feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));
-                    aluno.aulasParaRepor = res;
-
-                    /* Apenas eventos do tipo aula */
-                    aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.evento_Tipo_Id == EventoTipo.Aula);
-                    /* Apenas aulas não reagendadas */
-                    aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => !evento.reagendamentoPara_Evento_Id);
-                    /* Apenas aulas com falta/sem reposicao */
-                    aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.alunos.find(a => a.aluno_Id == aluno.id && a.presente != true && !a.reposicaoPara_Evento_Id) != undefined);
-                    /* Apenas aulas instanciadas ou aulas em feriados */
-                    aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.id != PseudoEvento.EventoId || feriadosDates.includes(moment(evento.data).format('YYYY-MM-DD')));
-                    
-                    aluno.aulasParaRepor = aluno.aulasParaRepor
-                                            .map(evento => {
-                                                evento.alunos = evento.alunos.filter(x => x.aluno_Id == aluno.id);
-                                                var data = moment(evento.data).format('YYYY-MM-DD')
-                                                evento.feriado = this.feriados.find(x => moment(x.date).format('YYYY-MM-DD') == data);
-                                                return evento;
-                                            });
-
-                    this.loadingEventosReposicaoAluno = false;
-                    
-                })
-        }
-    }
-
-    async selectEventoReposicao(e: any, dialog: ConfirmDialog) {
-        if(!this.selectedEventoReposicao) {
-            this.showError('Erro', 'Selecione uma aula para repor', e);
-        }
-        else {
-            var response: RequestResponse = { success: true, message: '', object: null };
-            if (this.selectedEventoReposicao.id == PseudoEvento.EventoId) {
-                
-                let request: EventoAulaRequest = MyMap(this.selectedEventoReposicao, new EventoAulaRequest);
-                request.perfilCognitivo = this.selectedEventoReposicao.perfilCognitivo.map(x => x.id);
-                request.professores = this.selectedEventoReposicao.professores.map(x => x.professor_Id);
-                request.alunos = this.selectedEventoReposicao.alunos.map(x => x.aluno_Id);
-
-                response = await lastValueFrom(this.service.createAulaTurma(request))
-                                    .catch(res => {
-                                        this.showError('Erro', `Não foi possível selecionar. \n ${getError(res)}`, e)
-                                        return res
-                                    });
-                
-                this.selectedEventoReposicao.id = response.object.id;
-            }
-            
-            // Se for feriado e a aula ainda não tiver sido cancelada
-            if (this.selectedEventoReposicao.feriado && this.selectedEventoReposicao.active) {
-                this.selectedEventoReposicao.observacao = `Cancelamento automático \n Feriado: ${this.selectedEventoReposicao.feriado.name}`;
-                let request: EventoCancelamentoRequest = {
-                    id: this.selectedEventoReposicao.id,
-                    observacao: this.selectedEventoReposicao.observacao
-                } 
-                response = await lastValueFrom(this.service.cancelar(request))
-            }
-            
-            var alunoReposicao = {aluno_Id: this.alunoSelected!.id, reposicaoDe_Evento_Id: this.selectedEventoReposicao.id };
-            this.object.alunos.push(alunoReposicao);
-            this.picklist.source = this.alunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
-            this.picklist.target = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
-
-            delete this.selectedEventoReposicao;
-            delete this.alunoSelected;
-
-            dialog.close(e);
-        }
-    }
-
-    closeEventoReposicaoDialog() {
-        if(this.alunoSelected ) {
-            var aluno = this.alunoSelected as Aluno;
-            var index = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
-            if (index != -1) this.object.alunos.splice(index, 1);
-            
-            var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
-            this.alunosSelected.splice(index, 1)
-            this.alunos.push(aluno);
-            
-            this.picklist.source = this.alunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
-            this.picklist.target = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
-
-            delete this.selectedEventoReposicao;
-            delete this.alunoSelected;
-        }
-    }
-
-    //   onMoveAllToSource(e: any) {
-    //       this.validaAlunos();
-    //   }
-
-    //   onMoveAllToTarget(e: any) {
-    //       this.validaAlunos();
-    //       var items = e.items as Aluno[];
-    //       if (items.find(x => !x.disponivel)) {
-    //           this.showError('Aluno indisponível', 'Você não pode mover alunos indisponíveis.', { target: this.picklist.el.nativeElement });
-    //           this.alunos = items.filter(x => !x.disponivel);
-    //           this.alunosSelected = items.filter(x => x.disponivel);
-    //       }
-    //   }
-
     async verificaDisponibilidade() {
         var roteiro = this.roteiros.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim));
         this.roteiro = roteiro;
         if (roteiro) {
-            this.object.roteiro_Id = roteiro.id;
+            this.object.roteiro_Id = roteiro.id ?? undefined;
         }
 
         var valid = true;
@@ -467,6 +295,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     validaProfessores() {
+        this.loadingProfessores = true;
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
@@ -474,9 +303,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             var e: SelectChangeEvent = {
                 value: this.object.professor_Id,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
-            } 
+            }
             this.professorChanged(e, this.professor_Id);
         }
+        this.loadingProfessores = false;
     }
 
     validaAlunos() {
@@ -495,9 +325,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
             mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
         } else {
-                mensagemErro = null;
+            mensagemErro = null;
         }
-        
+
         if (mensagemErro) {
             this.showError('Educador indisponível', mensagemErro, e.originalEvent)
             model.control.setValue(undefined)
@@ -520,7 +350,312 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
+    }
+
+    sendMensagemAlunos() {
+        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
+        this.confirmationService.confirm({
+            key: 'enviarMensagem',
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            header: 'Enviar whatsapp',
+            icon: 'pi pi-whatsapp text-green-500',
+            acceptLabel: `Concluir`,
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-text ',
+            accept: () => {
+                this.visible = false
+                this.visibleChange();
+            },
+        });
+    }
+
+
+    moveToSource(e: any) {
+        if (this.selectedAlunoTarget) {
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Tem certeza?`,
+                header: 'Remover aluno',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-text ',
+                accept: () => {
+
+                    var objIndex = this.object.alunos.findIndex(x => x.aluno_Id == this.selectedAlunoTarget!.id);
+                    this.object.alunos.splice(objIndex, 1);
+
+                    var index = this.alunosSelected.findIndex(x => x.id == this.selectedAlunoTarget!.id);
+                    this.alunosSelected.splice(index, 1);
+
+                    this.alunos.push(this.selectedAlunoTarget as Aluno);
+
+                    this.sortList();
+                    this.removeSelection();
+                },
+                reject: () => this.removeSelection(),
+            });
+
+        }
+    }
+
+    moveToTarget(e: any) {
+        if (!this.selectedAlunoSource) {
+            this.showError('Selecionar aluno', 'Selecione um aluno para mover.', e.event);
+        }
+        else if (this.selectedAlunoSource.disponivel == false) {
+            this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
+        }
+        else if (!this.data) {
+            this.showError('Selecione uma data', 'Selecione uma data para carregar sugestões de reposição do aluno.', e.event);
+        }
+        else if (!this.horario) {
+            this.showError('Selecione um horário', 'Selecione um horário para carregar sugestões de reposição do aluno.', e.event);
+        }
+        else {
+            var event: any = {
+                event: e,
+                item: {
+                    data: this.selectedAlunoSource
+                },
+                previousContainer: {
+                    data: this.alunos
+                },
+                container: {
+                    data: this.alunosSelected
+                },
+                previousIndex: 0,
+                currentIndex: 0,
+            }
+            this.restricoesConfirm(event)
+        }
+
+
+    }
+
+    sourceDropped(e: CdkDragDrop<Aluno[]>) {
+
+        if (e.previousContainer != e.container) {
+            var aluno = e.item.data;
+            this.selectedAlunoTarget = aluno;
+
+            this.confirmationService.confirm({
+                target: e.event.target as any,
+                message: `Tem certeza?`,
+                header: 'Remover aluno',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-text ',
+                accept: () => {
+
+                    var indexObj = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
+                    this.object.alunos.splice(indexObj, 1);
+
+                    var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
+                    this.alunosSelected.splice(index, 1);
+
+                    this.alunos.push(aluno);
+
+                    this.sortList();
+                    this.removeSelection();
+
+                },
+                reject: () => this.removeSelection(),
+            });
+
+        }
+    }
+
+    async targetDropped(e: CdkDragDrop<Aluno[]>) {
+        if (e.previousContainer != e.container) {
+
+            var aluno = e.item.data as Aluno;
+            this.selectedAlunoSource = aluno;
+
+            if (aluno.disponivel == false) {
+                this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
+            }
+            else if (!this.data) {
+                this.showError('Selecione uma data', 'Selecione uma data para carregar sugestões de reposição do aluno.', e.event);
+            }
+            else if (!this.horario) {
+                this.showError('Selecione um horário', 'Selecione um horário para carregar sugestões de reposição do aluno.', e.event);
+            }
+            else {
+                this.restricoesConfirm(e)
+            }
+
+        }
+    }
+
+    async restricoesConfirm(e: CdkDragDrop<Aluno[]>) {
+        var aluno = this.selectedAlunoSource as Aluno;
+        this.selectedAlunoSource = aluno;
+
+        aluno.restricoes = await lastValueFrom(this.alunoRestricaoService.getList(aluno.id));
+
+        if (aluno.restricoes.filter(x => x.active).length || aluno.restricaoMobilidade) {
+
+            playAlert(1);
+
+            var message = 'Esse aluno possui as seguintes restrições. <div>';
+
+            if (aluno.restricoes.filter(x => x.active).length)
+                message += aluno.restricoes.filter(x => x.active).map(x => `<p class="ml-4">• ${x.descricao}</p>`).join('');
+
+            if (aluno.restricaoMobilidade) {
+                message += '<p class="font-bold ml-4">• Restrição de mobilidade.</p>'
+            }
+            message += '</div> <br> Deseja continuar?';
+
+
+
+            this.confirmationService.confirm({
+                target: e.event.target as any,
+                header: 'Continuar?',
+                message: message,
+                acceptLabel: 'Continuar',
+                rejectLabel: 'Cancelar',
+                acceptButtonStyleClass: ' p-button-rounded mr-0',
+                rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+                accept: () => this.selectEventoConfirm(e),
+                reject: () => this.removeSelection(),
+            });
+        } else {
+            this.selectEventoConfirm(e)
+        }
+
+    }
+
+    selectEventoConfirm(e: CdkDragDrop<Aluno[]>) {
+        var aluno = this.selectedAlunoSource as Aluno;
+        this.selectedAlunoSource = aluno;
+        var request: CalendarioRequest = {
+            aluno_Id: aluno.id,
+            intervaloDe: moment(this.data).subtract(1, 'month').toDate(),
+            intervaloAte: moment(this.data).add(1, 'month').toDate(),
+        }
+        this.loadingEventosReposicaoAluno = true;
+        lastValueFrom(this.service.calendario(request))
+            .then(res => {
+
+                var feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));
+                aluno.aulasParaRepor = res;
+
+                /* Apenas eventos do tipo aula */
+                aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.evento_Tipo_Id == EventoTipo.Aula);
+                /* Apenas aulas não reagendadas */
+                aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => !evento.reagendamentoPara_Evento_Id);
+                /* Apenas aulas sem presença marcada e sem reposição marcada */
+                aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.alunos.find(a => a.aluno_Id == aluno.id
+                    && a.presente != true
+                    && !a.reposicaoPara_Evento_Id
+                    && !a.reposicaoDe_Evento_Id) != undefined);
+                /* Apenas aulas instanciadas ou aulas em feriados */
+                aluno.aulasParaRepor = aluno.aulasParaRepor.filter(evento => evento.id != PseudoEvento.EventoId || feriadosDates.includes(moment(evento.data).format('YYYY-MM-DD')));
+
+                aluno.aulasParaRepor = aluno.aulasParaRepor
+                    .map(evento => {
+                        evento.alunos = evento.alunos.filter(x => x.aluno_Id == aluno.id);
+                        var data = moment(evento.data).format('YYYY-MM-DD')
+                        evento.feriado = this.feriados.find(x => moment(x.date).format('YYYY-MM-DD') == data);
+                        return evento;
+                    });
+
+                this.loadingEventosReposicaoAluno = false;
+
+
+            })
+
+        this.confirmationService.confirm({
+            key: 'selecionarReposicao',
+            message: ``,
+            header: 'Selecionar aula a repor',
+            acceptLabel: 'Continuar',
+            rejectLabel: 'Cancelar',
+            acceptButtonStyleClass: ' p-button-rounded mr-0',
+            rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+            accept: async () => this.selectEventoSave(e),
+            reject: () => this.removeSelection(),
+        });
+    }
+
+    async selectEventoSave(e: CdkDragDrop<Aluno[]>) {
+        var aluno = this.selectedAlunoSource as Aluno;
+        if (!this.selectedEventoReposicao || !this.selectedAlunoSource) {
+            this.confirmationService.confirm({
+                key: 'selecionarReposicao',
+                message: ``,
+                header: 'Selecionar aula a repor',
+                acceptLabel: 'Continuar',
+                rejectLabel: 'Cancelar',
+                acceptButtonStyleClass: ' p-button-rounded mr-0',
+                rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+                accept: async () => this.selectEventoSave(e),
+                reject: () => this.removeSelection(),
+            });
+            this.showError('Erro', 'Selecione uma aula e aluno para repor', e.event);
+        }
+        else {
+            var response: RequestResponse = { success: true, message: '', object: null };
+            if (this.selectedEventoReposicao.id == PseudoEvento.EventoId) {
+
+                let request: EventoAulaRequest = MyMap(this.selectedEventoReposicao, new EventoAulaRequest);
+                request.perfilCognitivo = this.selectedEventoReposicao.perfilCognitivo.map(x => x.id);
+                request.professores = this.selectedEventoReposicao.professores.map(x => x.professor_Id);
+                request.alunos = this.selectedEventoReposicao.alunos.map(x => x.aluno_Id);
+
+                response = await lastValueFrom(this.service.createAulaTurma(request))
+                    .catch(res => {
+                        this.showError('Erro', `Não foi possível selecionar. \n ${getError(res)}`, e)
+                        return res
+                    });
+
+                this.selectedEventoReposicao = response.object as Evento;
+            }
+
+            // Se for feriado e a aula ainda não tiver sido cancelada
+            if (this.selectedEventoReposicao.feriado && this.selectedEventoReposicao.active) {
+                this.selectedEventoReposicao.observacao = `Cancelamento automático \n Feriado: ${this.selectedEventoReposicao.feriado.name}`;
+                let request: EventoCancelamentoRequest = {
+                    id: this.selectedEventoReposicao.id,
+                    observacao: this.selectedEventoReposicao.observacao
+                }
+                response = await lastValueFrom(this.service.cancelar(request))
+            }
+
+            var alunoReposicao = {
+                aluno_Id: aluno.id,
+                reposicaoDe_Evento_Id: this.selectedEventoReposicao.id
+            };
+            this.object.alunos.push(alunoReposicao);
+
+            this.transferAlunoTarget(e);
+        }
+    }
+
+    transferAlunoTarget(e: CdkDragDrop<Aluno[]>) {
+        var aluno = this.selectedAlunoSource as Aluno;
+        var index = this.alunos.findIndex(x => x.id == aluno.id);
+
+        this.alunosSelected.push(aluno);
+        this.alunos.splice(index, 1);
+
+        this.sortList();
+        this.removeSelection();
+    }
+
+    sortList() {
+        this.alunos = this.alunos.sort((x, y) => x.nome < y.nome ? -1 : 1)
+        this.alunosSelected = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+    }
+
+    removeSelection() {
+        delete this.selectedEventoReposicao;
+        delete this.selectedAlunoSource;
     }
 
     sendConfirmation(form: NgForm, e: any) {
@@ -541,6 +676,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         if (aluno && aluno.disponivelEvent) {
             return this.showError('Aluno indisponível', `O alunos ${aluno.nome} está atribuído a uma ${this.getTipo(aluno.disponivelEvent)} no dia ${moment(aluno.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
+        if (!this.alunosSelected.length) {
+            return this.showError('Selecionar aluno', `Selecione pelo menos algum aluno para continuar`, e)
+        }
 
         // this.object.alunos = this.alunosSelected.map(x => x.id);
         this.object.data = new Date(this.data);
@@ -553,9 +691,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar essa aula para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar aula`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             }
@@ -566,12 +704,16 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         this.loading = true;
 
+        this.object.perfilCognitivo = this.perfilCognitivoSelected ? [this.perfilCognitivoSelected.id] : [];
+
         lastValueFrom(this.service.createAulaExtra(this.object))
             .then(res => {
                 this.loading = false;
                 this.sendMensagemAlunos();
                 this.toastrService.success('Aula cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
+
+                playSuccess(1)
             })
             .catch(res => {
                 this.loading = false;
@@ -579,24 +721,5 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             })
 
     }
-
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
-        this.confirmationService.confirm({
-            key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
-            accept: () => {
-                this.visible = false
-                this.visibleChange();
-            },
-        });
-    }
-
 
 }

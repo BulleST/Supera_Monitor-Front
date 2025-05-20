@@ -6,20 +6,18 @@ import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError } from '../../../../../utils';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { ProfessorService } from '../../../../../services/professor.service';
 import { EventoService } from '../../../../../services/evento.service';
-import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
 import { Evento } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
-import { validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
+import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, playAlert, playError, playSuccess, Crypto, getError, showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-cadastrar-reuniao',
@@ -54,7 +52,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
     eventos: Evento[] = [];
     loadingEventos = false;
-            
+
     feriados: Feriado[] = [];
     loadingFeriados = false;
     feriadoDates: Date[] = [];
@@ -69,6 +67,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         private service: EventoService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Reunião';
 
@@ -112,19 +111,11 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
     dataChanged() {
@@ -144,7 +135,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             this._horario.control.setValue(this.horario)
         }
     }
-    
+
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
         if (e.year != this.ano) {
             this.ano = e.year ?? new Date().getFullYear();
@@ -155,12 +146,12 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     loadFeriados() {
         this.loadingFeriados = true;
         lastValueFrom(this.service.getFeriados(this.ano))
-        .then(res => {
-            this.feriados = res;
-            this.loadingFeriados = false;
-            this.feriadoDates = res.map(x => moment(x.date).toDate());
-        })
-        .catch(res => this.loadingFeriados = false);
+            .then(res => {
+                this.feriados = res;
+                this.loadingFeriados = false;
+                this.feriadoDates = res.map(x => moment(x.date).toDate());
+            })
+            .catch(res => this.loadingFeriados = false);
     }
 
     async verificaDisponibilidade() {
@@ -250,15 +241,16 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     }
 
     sendConfirmation(form: NgForm, e: any) {
-        if (form.invalid) 
+        if (form.invalid)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
 
         if (this.selected.length < 2)
             return this.showError('Não foi possível salvar', 'Selecione pelo menos 2 educadores para salvar', e);
-        
+
         if (this.selected.filter(x => !x.disponivel).length > 0)
             return this.showError('Não foi possível salvar', 'Selecione apenas educadores disponíveis', e);
 
+        playAlert();
 
         this.object.professores = this.selected.map(x => x.id);
 
@@ -272,9 +264,9 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar reunião para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar reunião`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.send(e);
             }
@@ -292,6 +284,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 this.visibleChange();
                 this.toastrService.success('Reunião cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
+                playSuccess();
             })
             .catch(res => {
                 this.loading = false;

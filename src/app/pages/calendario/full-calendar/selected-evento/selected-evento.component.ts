@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Evento, EventoQueryParams, EventoTipo } from '../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
 import { AlunoService } from '../../../../services/alunos.service';
@@ -18,6 +18,7 @@ import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAulaId } from '../../../../models/sala-aula.model';
 import { AlunoPopoverComponent } from '../../aluno-popover/aluno-popover.component';
 import moment from 'moment';
+import { CalendarioUtils } from '../../../../utils/calendario-utils';
 
 @Component({
     selector: 'app-selected-evento',
@@ -56,7 +57,8 @@ export class SelectedEventoComponent implements OnChanges {
         private crypto: Crypto,
         private confirmationService: ConfirmationService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private toastrService: ToastrService
+        private toastrService: ToastrService,
+        private calendarioUtils: CalendarioUtils,
 
     ) {
 
@@ -67,7 +69,7 @@ export class SelectedEventoComponent implements OnChanges {
             this.evento = changes['evento'].currentValue;
 
             if (this.evento) {
-                this.tipoEventoString = this.mensagemWhatsapp.getEventoTipo(this.evento);
+                this.tipoEventoString = this.calendarioUtils.getEventoTipo(this.evento);
                 this.loadReposicoes();
             } else {
                 this.hidePopover();
@@ -150,18 +152,6 @@ export class SelectedEventoComponent implements OnChanges {
         popoverComponent.aluno = aluno;
         popoverComponent.show(e);
         popoverComponent.showChecklist = true;
-    }
-
-    showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target ?? e,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
     }
 
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
@@ -290,5 +280,12 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.mouse.x >= (width / 2))
             return 'right'
         return 'left'
+    }
+
+    getPrimeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
+        if (moment(aluno.primeiraAula).format('DD-MM-YYYY') == moment(evento.data).format('DD-MM-YYYY')) {
+            return true;
+        }
+        return false;
     }
 }

@@ -1,4 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
+
 <p-dialog [header]="'Agendar Oficina'"
           [maximizable]="true"
           [draggable]="true"
@@ -132,9 +133,8 @@
                                         </div>
                                     </ng-template>
                                 </p>
-                                
                                 <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                    <p class="text-sm" >Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
                                 </ng-container>
                             </div>
                             <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
@@ -145,7 +145,7 @@
                         </div>
                     </ng-template>
                 </p-select>
-                <p class="text-red-500 mt-2 mb-0" >{{professor_Id.errors|json}}</p>
+                <p class="text-red-500 mt-2 mb-0">{{professor_Id.errors|json}}</p>
                 <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>

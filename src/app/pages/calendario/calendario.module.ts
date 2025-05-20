@@ -18,19 +18,19 @@ import { EditarReuniaoComponent } from './evento/reuniao/editar-reuniao/editar-r
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
-import { AlunoChecklistPopoverComponent } from './aluno-checklist-popover/aluno-checklist-popover.component';
-import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
-import { AlunoChecklistStatusComponent } from './aluno-checklist-status/aluno-checklist-status.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
 import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { HeaderComponent } from './full-calendar/header/header.component';
 import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-cognitivo/calculo-perfil-cognitivo.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
+// import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
+// import { AlunoChecklistComponent } from './aluno-checklist/aluno-checklist.component';
 
 @NgModule({
     declarations: [
-        AlunoChecklistPopoverComponent,
-        AlunoChecklistStatusComponent,
-        AlunoPopoverComponent,
+        // AlunoChecklistComponent,
+        // AlunoPopoverComponent,
         CalendarioComponent,
         CadastrarSuperacaoComponent,
         CadastrarOficinaComponent,
@@ -50,11 +50,15 @@ import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-
         ToolbarComponent,
         HeaderComponent,
         CalculoPerfilCognitivoComponent,
+        ReposicaoComponent,
+
+        
     ],
     imports: [
         CommonModule,
         CalendarioRoutingModule,
         SharedModule,
+        DragDropModule
     ],
     bootstrap: [CalendarioComponent]
 })

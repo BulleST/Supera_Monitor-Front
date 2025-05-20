@@ -11,10 +11,10 @@ import moment from 'moment';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { Apostila } from '../../../../../models/apostila.model';
-import { Aluno } from '../../../../../models/alunos.model';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
+import { showError, CalendarioUtils } from '../../../../../utils';
 
 @Component({
     selector: 'app-editar-superacao',
@@ -54,17 +54,18 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         private apostilaService: ApostilaService,
         private accountService: AccountService,
         private checklistService: ChecklistService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
 
-        if (this.apostilas.length == 0 ) {
+        if (this.apostilas.length == 0) {
             this.loadingApostila = true;
             lastValueFrom(this.apostilaService.getApostilas())
                 .then(res => this.loadingApostila = false)
                 .catch(res => this.loadingApostila = false)
         }
-        
+
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
         })
@@ -89,52 +90,32 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
+
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
-        professorChanged(e: SelectChangeEvent, model: NgModel) {
-            var item = this.professores.find(x => x.id == e.value);
-            let mensagemErro: string | null = null;
-            this.validaProfessor.emit(item);
-    
-            if (item && !item.disponivel && item.disponivelEvent) {
-                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
-            }
-            else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
-                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
-            } else {
-                    mensagemErro = null;
-            }
-            
-            if (mensagemErro) {
-                this.showError('Educador indisponível', mensagemErro, e.originalEvent)
-            }
-            model.control.setErrors({ indisponivel: mensagemErro });
-            model.control.updateValueAndValidity();
+    professorChanged(e: SelectChangeEvent, model: NgModel) {
+        var item = this.professores.find(x => x.id == e.value);
+        let mensagemErro: string | null = null;
+        this.validaProfessor.emit(item);
+
+        if (item && !item.disponivel && item.disponivelEvent) {
+            mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
         }
-    
+        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+            mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+        } else {
+            mensagemErro = null;
+        }
 
-    // professorChanged(e: SelectChangeEvent, model: NgModel) {
-    //     var item = this.professores.find(x => x.id == e.value);
-    //     this.validaProfessor.emit(item);
+        if (mensagemErro) {
+            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+        }
+        model.control.setErrors({ indisponivel: mensagemErro });
+        model.control.updateValueAndValidity();
+    }
 
-    //     if (item && item.disponivel == false && item.disponivelEvent) {
-    //         model.control.setErrors({ indisponivel: 'Professor indisponível' });
-    //         this.showError('Professor Indisponível', `Esse professor está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-    //         return;
-    //     }
-    //     model.control.setErrors({ indisponivel: null });
-    //     model.control.updateValueAndValidity();
-    // }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         var item = this.salaAulas.find(x => x.id == e.value);
@@ -149,7 +130,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e);
     }
 
     enviarMensagem(nome: string, celular: string) {
@@ -172,10 +153,10 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: 'p-button-sm p-button-rounded p-button-success  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text p-button-sm',
+                rejectButtonStyleClass: 'p-button-text ',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
                     window.open(url, '_blank')
@@ -185,23 +166,23 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         }
         return this.alunoSelected;
     }
-    
-        markChecklistAsDone() {
-            // Comparecimento na superação
-            // Id 35
-            var aluno = this.alunoSelected as Evento_Participacao_Aluno;
-            var id = 35;
-            var alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
-    
-            if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
-                var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
+
+    markChecklistAsDone() {
+        // Comparecimento na superação
+        // Id 35
+        var aluno = this.alunoSelected as Evento_Participacao_Aluno;
+        var id = 35;
+        var alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
+
+        if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
+            var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
                                 Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-                }
+            if (alunoChecklist && !alunoChecklist.finalizado) {
+                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
             }
         }
-        
+    }
+
 
 }

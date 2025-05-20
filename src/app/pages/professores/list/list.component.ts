@@ -3,13 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace, showError } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Professor, professorColumns } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { UserService } from '../../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-list',
@@ -129,8 +130,21 @@ export class ListComponent implements OnDestroy {
         this.tableSelectedItem = undefined;
     }
 
+    getOption(col: ColumnTable, row: any) {
+        var item = col.options.items.find((x: any) => x.value == row[col.field]);
+        return item;
+    }
+
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
+
+
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
+
+        playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -139,30 +153,33 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.userService.deactivated(item.account_Id, deactivated))
                     .then(res => {
                         if (res.success) {
-                            this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
+                            this.toastrService.success(deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
+                            playSuccess();
                         } else {
-                            this.showError(res.message, e);
+                            this.showError('Erro', res.message, e);
                         }
                     })
                     .catch(res => {
-                        this.showError(getError(res), e);
+                        this.showError('Erro', getError(res), e);
                     })
             },
         });
     }
 
     resetPassword(e: any, item: any) {
+        playAlert();
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja resetar a senha deste professor? 
@@ -170,40 +187,25 @@ export class ListComponent implements OnDestroy {
             header: 'Resetar Senha?',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Resetar Senha',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text p-button-sm',
+            rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 lastValueFrom(this.userService.resetPassword(item.account_Id))
                     .then(res => {
                         if (res.success) {
-                            this.toastrService.success( `Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
+                            this.toastrService.success(`Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
                             item = res.object;
+                            playSuccess();
                         } else {
-                            this.showError(res.message, e);
+                            this.showError('Erro', res.message, e);
                         }
                     })
                     .catch(res => {
-                        this.showError(getError(res), e);
+                        this.showError('Erro', getError(res), e);
                     });
             },
         });
     }
 
-    showError(message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        });
-    }
-
-    getOption(col: ColumnTable, row: any) {
-        var item = col.options.items.find((x: any) => x.value == row[col.field]);
-        return item;
-    }
 }

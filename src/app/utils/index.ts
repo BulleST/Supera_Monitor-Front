@@ -5,3 +5,7 @@ export * from './list.service';
 export { MobileService } from './mobile';
 export { ThemeService } from './theme';
 export * from './column-table';
+export * from './audio';
+export * from './calendario-utils';
+export * from './mensagem-whatsapp';
+export * from './validacao';

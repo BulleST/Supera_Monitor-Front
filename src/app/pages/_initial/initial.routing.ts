@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { InitialComponent } from './initial.component';
-import { MonitoramentoComponent } from './monitoramento/monitoramento.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
+import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 
 const calendario = () => import('./../calendario/calendario.module').then(res => res.CalendarioModule);
 const alunos = () => import('./../alunos/alunos.module').then(res => res.AlunosModule);
@@ -14,8 +14,8 @@ const usuarios = () => import('./../usuarios/usuarios.module').then(res => res.U
 const routes: Routes = [
     {
         path: '', component: InitialComponent, children: [
-            { path: 'jornada-supera', component: MonitoramentoComponent },
-            { path: 'dashboard', component: DashboardComponent },
+            { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent },
+            { path: 'dashboard', component: MonitoramentoDashboardComponent },
             { path: 'alunos', loadChildren: alunos },
             { path: 'calendario', loadChildren: calendario },
             { path: 'roteiro', loadChildren: roteiro },

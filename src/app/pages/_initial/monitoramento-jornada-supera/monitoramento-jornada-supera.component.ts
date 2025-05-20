@@ -1,44 +1,34 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../models/checklist.model';
-// import { DragScrollComponent } from 'ngx-drag-scroll';
-import { getError, Header, MobileService } from '../../../utils';
-import $ from 'jquery'
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { ScreenWidth } from '../../../utils/mobile';
+import { Component, OnDestroy } from '@angular/core';
+import { Checklist, Checklist_Item } from '../../../models/checklist.model';
+import { getError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ChecklistService } from '../../../services/checklist.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno } from '../../../models/alunos.model';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
-import { ToastrService } from 'ngx-toastr';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Professor } from '../../../models/professor.model';
 import { Turma } from '../../../models/turma.model';
-import { DashboardRequest } from '../../../models/dashboard.model';
 import { TurmaService } from '../../../services/turma.service';
 import { AccountService } from '../../../services/account.service';
 import { ProfessorService } from '../../../services/professor.service';
 import { AlunoChecklistItemList, AlunoChecklistItemList_Request } from '../../../models/aluno-checklist-item-list.model';
+import { playAlert, playError, playSuccess } from '../../../utils/audio';
 
 @Component({
-    selector: 'app-monitoramento',
+    selector: 'app-monitoramento-jornada-supera',
     standalone: false,
-    templateUrl: './monitoramento.component.html',
-    styleUrl: './monitoramento.component.css',
+    templateUrl: './monitoramento-jornada-supera.component.html',
+    styleUrl: './monitoramento-jornada-supera.component.css',
     providers: [ConfirmationService]
 })
-export class MonitoramentoComponent implements OnDestroy {
+export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     checklistObservacao = '';
     subscription: Subscription[] = [];
     request: AlunoChecklistItemList_Request = new AlunoChecklistItemList_Request;
 
-    // width: string = ''
-    // height: string = ''
-    // disabled = false
-    // screen: ScreenWidth = ScreenWidth.lg;
-    // ScreenWidth: typeof ScreenWidth = ScreenWidth;
     items: Checklist_Item[] = [];
     checklists: Checklist[] = [];
     loadingChecklist = true;
@@ -58,12 +48,9 @@ export class MonitoramentoComponent implements OnDestroy {
 
 
     constructor(
-        private header: Header,
-        private mobileService: MobileService,
         private service: ChecklistService,
         private alunoService: AlunoService,
         private confirmationService: ConfirmationService,
-        private toastr: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private turmaService: TurmaService,
         private accountService: AccountService,
@@ -71,12 +58,6 @@ export class MonitoramentoComponent implements OnDestroy {
 
 
     ) {
-
-        // var screen = this.mobileService.get().subscribe(res => this.screen = res)
-        // this.subscription.push(screen);
-        // var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => {
-        // })
-        // this.subscription.push(menuAsideOpen);
 
         var professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
@@ -108,8 +89,21 @@ export class MonitoramentoComponent implements OnDestroy {
         }
 
         this.accountService.account.subscribe(res => {
-            this.request.professor_Id = res?.professor_Id;
+            if (!localStorage.getItem('professor_Id')) {
+                this.request.professor_Id = res?.professor_Id;
+            }
         })
+        
+        if (!!localStorage.getItem('professor_Id')) {
+            this.request.professor_Id = parseInt(localStorage.getItem('professor_Id')!)
+        }
+
+        if (!!localStorage.getItem('turma_Id')) {
+            this.request.turma_Id = parseInt(localStorage.getItem('turma_Id')!)
+        }
+        if (!!localStorage.getItem('aluno_Id')) {
+            this.request.aluno_Id = parseInt(localStorage.getItem('aluno_Id')!)
+        }
 
         this.update();
 
@@ -194,6 +188,10 @@ export class MonitoramentoComponent implements OnDestroy {
         if (this.request.turma_Id && aluno && aluno.turma_Id != this.request.turma_Id) {
             this.request.aluno_Id = undefined;
         }
+        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
+        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
+        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
+
     }
 
     professorChanged() {
@@ -216,6 +214,9 @@ export class MonitoramentoComponent implements OnDestroy {
         if (this.request.turma_Id && turma && turma.id != this.request.turma_Id) {
             this.request.turma_Id = undefined;
         }
+        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
+        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
+        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
 
     }
 
@@ -223,6 +224,11 @@ export class MonitoramentoComponent implements OnDestroy {
         var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
         this.request.turma_Id = aluno?.turma_Id;
         this.request.professor_Id = aluno?.professor_Id;
+
+        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
+        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
+        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
+
     }
 
     enviarMensagem(aluno: Aluno) {
@@ -252,18 +258,22 @@ export class MonitoramentoComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
+        playError();
+
         this.confirmationService.confirm({
             target: e.target ?? e,
             message: message,
             header: header,
-            icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
+            // icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
             acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectVisible: false,
         })
     }
 
     finalizarChecklist(e: any, item: AlunoChecklistItemList) {
+        playAlert();
+
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
             message: `Tem certeza que deseja marcar o item <b>"${item.checklist_Item}"</b> para o(a) aluno(a) <b>${item.aluno}</b> como finalizado?`,
@@ -271,16 +281,18 @@ export class MonitoramentoComponent implements OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Finalizar',
-            acceptButtonStyleClass: 'p-button-rounded p-button-sm px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-sm p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
             accept: async () => {
                 this.loadingAlunos = true;
                 item.observacoes = this.checklistObservacao
                 lastValueFrom(this.service.markAsDone(item.id, this.checklistObservacao))
                     .then(res => {
+                        playSuccess();
+
                         this.checklistObservacao = '';
 
                         var checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
@@ -301,7 +313,7 @@ export class MonitoramentoComponent implements OnDestroy {
                     })
                     .catch(res => {
                         this.loadingAlunos = false;
-                        this.showError('Não foi possível finalizar checklist.', getError(res), e)
+                        this.showError('Não foi possível finalizar checklist.', getError(res), e);
                     })
             },
             reject: () => {

@@ -1,34 +1,22 @@
-import { NgModule, APP_INITIALIZER } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { InitialRoutingModule } from './initial.routing';
 import { InitialComponent } from './initial.component';
-// import { HomeComponent } from './home/home.component';
 
 import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
-import { MonitoramentoComponent } from './monitoramento/monitoramento.component';
-// import { SelectedAlunoComponent } from './home/selected-aluno/selected-aluno.component';
-// import { SelectedAulaComponent } from './home/selected-aula/selected-aula.component';
-// import { ReagendarAulaComponent } from './home/reagendar-aula/reagendar-aula.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { JornadaSuperaChecklistComponent } from './jornada-supera-checklist/jornada-supera-checklist.component';
-// import { CadastrarAulaComponent } from './home/cadastrar-aula/cadastrar-aula.component';
+import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
+import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 
 @NgModule({
     declarations: [
         InitialComponent,
         HeaderComponent,
-        // HomeComponent,
         NavMenuComponent,
-        MonitoramentoComponent,
-        // SelectedAlunoComponent,
-        // SelectedAulaComponent,
-        // ReagendarAulaComponent,
-        DashboardComponent,
-        JornadaSuperaChecklistComponent,
-        // CadastrarAulaComponent,
+        MonitoramentoJornadaSuperaComponent,
+        MonitoramentoDashboardComponent,
     ],
     imports: [
         CommonModule,

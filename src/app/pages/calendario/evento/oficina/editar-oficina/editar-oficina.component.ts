@@ -12,6 +12,9 @@ import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { playError } from '../../../../../utils/audio';
+import { showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-editar-oficina',
@@ -44,6 +47,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         public mensagemWhatsapp: MensagemWhatsapp,
         private accountService: AccountService,
         private checklistService: ChecklistService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
@@ -64,17 +68,9 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
-
+    
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-sm p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
 
@@ -105,7 +101,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     }
 
     getTipo(e: Evento) {
-        return this.mensagemWhatsapp.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e)
     }
 
     enviarMensagem(nome: string, celular: string) {
@@ -115,12 +111,13 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     inputFocus(e: any) {
         e.target.select()
     }
+    
     markChecklistAsDone() {
         // Comparecimento na 1ª ou 2ª Oficina
         // Id 34 ou 36
         this.evento.alunos.filter(x => x.presente).forEach(aluno => {
             var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36) && !x.finalizado) as Aluno_CheckList_Item;
-             if (alunoChecklist) {
+            if (alunoChecklist) {
                 var mensagem = `Aluno compareceu na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
                                 Oficina finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
                 if (alunoChecklist && !alunoChecklist.finalizado) {

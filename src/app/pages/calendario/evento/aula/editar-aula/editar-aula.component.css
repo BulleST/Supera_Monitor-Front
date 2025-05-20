@@ -1,0 +1,28 @@
+select {
+    display: inline-flex;
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    background: var(--p-select-background);
+    border: 1px solid var(--p-select-border-color);
+    border-radius: var(--p-select-border-radius);
+    box-shadow: var(--p-select-shadow);
+    /* outline-color: var(--p-select-border-color); */
+    outline-color: transparent;
+    outline-width: 1px;
+    padding: 0.5rem 0.7rem 0.5rem 2rem;
+    width: 10rem;
+    color: #515151;
+    margin: 1px;
+}
+
+select:focus-within,
+select:focus-visible {
+    border-color: var(--p-select-border-color);
+}
+select:hover {
+    border-color: var(--p-select-hover-border-color);
+}
+select:focus {
+    border-color: var(--p-select-focus-border-color);
+}

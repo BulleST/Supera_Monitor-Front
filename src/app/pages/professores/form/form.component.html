@@ -48,7 +48,7 @@
             </p-popover>
         </div>
     </ng-template>
-    <form (ngSubmit)="send(form, $event)" #form="ngForm">
+    <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
         <div class="formgrid grid">
             <!-- Account -->
             <ng-container *ngIf="!isEditPage">

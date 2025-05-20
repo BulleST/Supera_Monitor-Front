@@ -16,50 +16,51 @@ export class HistoricoComponent implements OnChanges {
 
     @Input() object: Aluno = new Aluno;
     loading = false;
-    list: Aluno_Historico[] = [
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2025, 2, 28, 10, 30),
-            account_Created: 'Letícia',
-            descricao: 'Transferencia de turma: O aluno foi transferido da turma A para turma B',
-        },
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2025, 2, 27, 15, 30),
-            account_Created: 'Letícia',
-            descricao: 'Reposição agendada: O aluno agendou reposição do dia 25/03/25 para o dia 28/03/25 com a turma ABC',
-        },
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2025, 2, 25, 15, 30),
-            account_Created: 'Letícia',
-            descricao: 'Superação agendada: O aluno agendou superação  para o dia 28/03/25 com o professor João',
-        },
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2025, 2, 4, 15, 30),
-            account_Created: 'Letícia',
-            descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-        },
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2024, 2, 4, 15, 30),
-            account_Created: 'Letícia',
-            descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-        },
-        {
-            id: 0,
-            aluno_Id: 0,
-            data: new Date(2025, 0, 4, 15, 30),
-            account_Created: 'Letícia',
-            descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-        },
-    ]
+    // list: Aluno_Historico[] = [
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2025, 2, 28, 10, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Transferencia de turma: O aluno foi transferido da turma A para turma B',
+    //     },
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2025, 2, 27, 15, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Reposição agendada: O aluno agendou reposição do dia 25/03/25 para o dia 28/03/25 com a turma ABC',
+    //     },
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2025, 2, 25, 15, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Superação agendada: O aluno agendou superação  para o dia 28/03/25 com o professor João',
+    //     },
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2025, 2, 4, 15, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
+    //     },
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2024, 2, 4, 15, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
+    //     },
+    //     {
+    //         id: 0,
+    //         aluno_Id: 0,
+    //         data: new Date(2025, 0, 4, 15, 30),
+    //         account_Created: 'Letícia',
+    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
+    //     },
+    // ]
+    list: Aluno_Historico[] = [];
 
 
     constructor(

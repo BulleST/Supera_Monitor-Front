@@ -4,6 +4,7 @@ import { AccountService } from '../../../services/account.service';
 import { LoadingService } from '../../../parts/loading/loading';
 import { getError } from '../../../utils';
 import { Login } from '../../../models/accounts.model';
+import { playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-login',
@@ -29,6 +30,7 @@ export class LoginComponent {
         lastValueFrom(this.accountService.login(this.object))
             .then(res => {
                 this.loadingHelper.loading.next(false);
+                playSuccess();
                 // this.appinitService.initialized.next(true);
             })
             .catch(res => {

@@ -11,14 +11,7 @@ export class PerfilCognitivoService extends Service {
     override list = new BehaviorSubject<PerfilCognitivo[]>([]);
 
     
-    getList() {
-        // return new Observable<PerfilCognitivo[]>(subscription => {
-        //     this.list.next(perfisCognitivos);
-        //     subscription.next(perfisCognitivos);
-        //     subscription.complete();
-        // })
-
-
+    getList(where?: string) {
         return this.http.get<PerfilCognitivo[]>(`${this.url}/turmas/perfil/all/`)
             .pipe(tap({
                 next: list => {

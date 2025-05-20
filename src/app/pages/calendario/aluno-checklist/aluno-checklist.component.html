@@ -1,12 +1,52 @@
+<ng-container *ngIf="aluno">
+    <div class="flex align-items-center gap-2 white-space-nowrap">
+        <ng-container *ngIf="atrasado">
+            <div>
+                <!-- Atrasado -->
+                <span pTooltip="Esse aluno está atrasado na jornada">
+                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                </span>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="checklist">
+            <div class="font-bold" *ngIf="!atrasado">
+                <!-- Finalizado -->
+                <i *ngIf="checklist.finalizados.length == checklist.items.length"
+                   pTooltip="Finalizado"
+                   class="pi pi-check-circle text-green-500"></i>
+                <!-- Atrasado -->
+                <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Atrasado">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                </span>
+                <!-- Pendentes da Semana -->
+                <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Em andamento">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                </span>
+            </div>
+            <span>{{checklist.nome }}</span>
+        </ng-container>
+        <ng-container *ngIf="!checklist">
+            <span>{{textoChecklist }}</span>
+        </ng-container>
+        <ng-container *ngIf="loading">
+            <div pTooltip="Carregando">
+                <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>
 <p-popover #popover styleClass="-mt-1 mx-w-screen" [dismissable]="true" (onShow)="onPopoverShow()">
     <p-tabs [value]="checklistIndex" scrollable #tabs [scrollLeft]="scrollLeft">
         <p-tablist style="max-width: 50rem;">
-            <p-tab *ngFor="let checklist of aluno.checklistCompleto" 
-                [value]="checklist.id"
-                #tab> 
+            <p-tab *ngFor="let checklist of aluno.checklistCompleto"
+                   [value]="checklist.id"
+                   #tab>
                 <div class="flex align-items-center ">
                     <span>{{checklist.nome}} </span>
-                    
                     <div *ngIf="!loading" class="ml-2 font-bold">
                         <!-- Finalizado -->
                         <i *ngIf="checklist.finalizados.length == checklist.items.length"
