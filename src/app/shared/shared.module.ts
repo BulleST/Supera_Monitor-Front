@@ -28,6 +28,7 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
 import { AlunoPopoverComponent } from '../pages/calendario/aluno-popover/aluno-popover.component';
 import { AlunoChecklistComponent } from '../pages/calendario/aluno-checklist/aluno-checklist.component';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 
 @NgModule({
@@ -64,6 +65,7 @@ import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
         ProfileComponent,
         ChangePasswordComponent,
         DragDropModule,
+        ScrollingModule,
         FullCalendarModule,
         // DragScrollComponent, 
         // DragScrollItemDirective,
@@ -96,6 +98,7 @@ import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
         NgxMaskPipe,
         TranslateModule,
         DragDropModule,
+        ScrollingModule,
         FullCalendarModule,
         NameAbvPipe,
         NameFirstWordPipe,

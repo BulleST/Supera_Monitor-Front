@@ -1,6 +1,6 @@
 <div class="formgrid grid">
     <!-- Descrição -->
-    <div class="field col-12">
+    <div class="field md:col-4 sm:col-4 col-12">
         <label for="descricao">Descrição: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <input type="text"
                pInputText
@@ -15,7 +15,7 @@
         </div>
     </div>
     <!-- Data -->
-    <div class="field sm:col-4 col-5">
+    <div class="field md:col-3 sm:col-3 col-5">
         <label for="dataInicio">Data:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
@@ -29,7 +29,7 @@
         </p-iconfield>
     </div>
     <!-- Horário -->
-    <div class="field sm:col-4 col-5">
+    <div class="field md:col-3 sm:col-3 col-5">
         <label for="horario">Horário:</label>
         <p-iconfield>
             <input type="text"
@@ -43,7 +43,7 @@
         </p-iconfield>
     </div>
     <!-- Duração -->
-    <div class="field sm:col-4 col-3">
+    <div class="field md:col-2 sm:col-2 col-2">
         <label for="duracaoEvento">Duração:</label>
         <p-iconfield>
             <input type="text"
@@ -56,8 +56,23 @@
             <p-inputicon styleClass="pi pi-hourglass" />
         </p-iconfield>
     </div>
+    <!-- Limite de Alunos -->
+    <div class="field md:col-4 sm:col-4 col-12">
+        <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
+        <p-inputnumber #capacidadeMaximaAlunos="ngModel"
+                        [(ngModel)]="evento.capacidadeMaximaAlunos"
+                        id="capacidadeMaximaAlunos"
+                        name="capacidadeMaximaAlunos"
+                        class="w-full"
+                        styleClass="w-full"
+                        inputStyleClass="w-full"
+                        [required]="true" />
+        <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
+            <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
+        </div>
+    </div>
     <!-- Educador -->
-    <div class="field col-6">
+    <div class="field md:col-4 sm:col-4 col-6">
         <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="professores"
@@ -128,7 +143,7 @@
         </div>
     </div>
     <!-- Sala -->
-    <div class="field col-6">
+    <div class="field md:col-4 sm:col-4 col-6">
         <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select [options]="salaAulas"
                   [(ngModel)]="evento.sala_Id"

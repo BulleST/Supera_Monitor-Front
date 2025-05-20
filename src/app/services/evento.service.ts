@@ -65,6 +65,7 @@ export class EventoService extends Service {
             evento.active = !evento.deactivated;
             evento.professores = evento.professores ?? [];
             evento.alunos = evento.alunos ?? [];
+            evento.alunos = evento.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : 1);
             evento.alunos.map(async aluno => {
                 aluno.active = !aluno.deactivated;               
                 return aluno;

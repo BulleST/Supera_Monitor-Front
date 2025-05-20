@@ -59,7 +59,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     ) {
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
@@ -69,7 +69,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -78,7 +78,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 .then(res => this.loadingTurmas = false)
                 .catch(res => this.loadingTurmas = false);
         }
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res);
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -156,6 +156,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     filtrarPendentesSemana() {
+        console.log('pendentesSemana', this.request.pendentesSemana)
         if (this.request.pendentesSemana) {
             this.listFiltered = this.list.filter(x => moment(x.prazo).week() == moment().week())
         } else {
@@ -167,7 +168,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     setChecklist() {
         this.checklists = this.checklists.map(checklist => {
             checklist.items = checklist.items.map(checklistItem => {
-                var itens = this.listFiltered.filter(x => x.checklist_Item_Id == checklistItem.id);
+                let itens = this.listFiltered.filter(x => x.checklist_Item_Id == checklistItem.id);
                 checklistItem.alunos = itens;
                 return checklistItem;
             });
@@ -176,85 +177,129 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     turmaChanged() {
-        var turma = this.turmas.find(x => x.id == this.request.turma_Id);
-        this.request.professor_Id = turma?.professor_Id;
+        if (this.request.turma_Id) {
+            let turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma; 
+            this.request.professor_Id = turma.professor_Id;
+        }
 
-        this.alunos = this.alunos.map(x => {
-            x.deactivated = x.turma_Id == this.request.turma_Id ? undefined : new Date;
-            return x;
-        });
+        this.setAlunosDisabled();
+        
 
-        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        let aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
         if (this.request.turma_Id && aluno && aluno.turma_Id != this.request.turma_Id) {
             this.request.aluno_Id = undefined;
         }
-        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
-        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
-        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
 
+        this.setLocalStorage();
     }
 
     professorChanged() {
-        this.turmas = this.turmas.map(x => {
-            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
-            return x;
-        })
+        
+        this.setTurmaDisabled();
+        this.setAlunosDisabled();
 
-        this.alunos = this.alunos.map(x => {
-            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
-            return x;
-        });
-
-        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        let aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
         if (this.request.professor_Id && aluno && aluno.professor_Id != this.request.professor_Id) {
             this.request.aluno_Id = undefined;
         }
 
-        var turma = this.turmas.find(x => x.id == this.request.turma_Id);
+        let turma = this.turmas.find(x => x.id == this.request.turma_Id);
         if (this.request.turma_Id && turma && turma.id != this.request.turma_Id) {
             this.request.turma_Id = undefined;
         }
-        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
-        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
-        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
+        
+        this.setLocalStorage();
 
     }
 
     alunoChanged() {
-        var aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
-        this.request.turma_Id = aluno?.turma_Id;
-        this.request.professor_Id = aluno?.professor_Id;
-
-        localStorage.setItem('turma_Id', (this.request.turma_Id??0).toString())
-        localStorage.setItem('professor_Id', (this.request.professor_Id??0).toString())
-        localStorage.setItem('aluno_Id', (this.request.aluno_Id??0).toString())
+        if (this.request.aluno_Id) {
+            let aluno = this.alunos.find(x => x.id == this.request.aluno_Id) as Aluno;
+            this.request.turma_Id = aluno.turma_Id;
+            this.request.professor_Id = aluno.professor_Id;
+        }
+        
+        this.setLocalStorage();
+    }
+    
+    setTurmaDisabled() {
+        this.turmas = this.turmas.map((x: any) => {
+            x.disabled = this.request.professor_Id ? x.professor_Id == this.request.professor_Id ? false : true : false;
+            return x;
+        })
 
     }
 
-    enviarMensagem(aluno: Aluno) {
+
+    setAlunosDisabled() {
+        this.alunos = this.alunos.map((x: any) => {
+            if (this.request.turma_Id && this.request.professor_Id) {
+                x.disabled = x.turma_Id == this.request.turma_Id && x.professor_Id == this.request.professor_Id ? false : true;
+            } else if (this.request.turma_Id) {
+                x.disabled = x.turma_Id == this.request.turma_Id ? false : true;
+            } else if (this.request.professor_Id) {
+                x.disabled = x.professor_Id == this.request.professor_Id ? false : true;
+            }
+            return x;
+        });
+    }
+    
+    setLocalStorage() {
+        if(this.request.turma_Id) {
+            localStorage.setItem('turma_Id', (this.request.turma_Id??null).toString());
+        }else {
+            localStorage.removeItem('turma_Id');
+        }
+        if(this.request.professor_Id) {
+            localStorage.setItem('professor_Id', (this.request.professor_Id??null).toString());
+        }else {
+            localStorage.removeItem('professor_Id');
+        }
+        if(this.request.aluno_Id) {
+            localStorage.setItem('aluno_Id', (this.request.aluno_Id??null).toString());
+        }else {
+            localStorage.removeItem('aluno_Id');
+        }
+
+    }
+
+    getCorTurma(turma_Id: number) {
+        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
+    }
+
+    enviarMensagemAluno(aluno: Aluno) {
+        if(!aluno.nome) {
+            console.log('aluno', aluno)
+        }
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
+    enviarMensagem(aluno: AlunoChecklistItemList) {
+        if(!aluno.aluno) {
+            console.log('aluno', aluno)
+        }
+        return this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
+    }
 
-    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
+    enviarMensagemApresentacaoDiretorFranqueado(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.aluno, aluno.celular);
     }
-    enviarMensagemBoasVindas(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular);
+    enviarMensagemBoasVindas(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.aluno, aluno.celular);
     }
-    enviarMensagemAdequacaoTurma(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
+    enviarMensagemAdequacaoTurma(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.aluno, aluno.celular);
     }
-    enviarMensagemLembreteOficina(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
+    enviarMensagemLembreteOficina(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.aluno, aluno.celular);
     }
-    enviarMensagemLembreteSuperacao(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
+    enviarMensagemLembreteSuperacao(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.aluno, aluno.celular);
     }
-    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
+    enviarMensagemFeedbackPosVenda(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.aluno, aluno.celular);
     }
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
+    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: AlunoChecklistItemList) {
+        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.aluno, aluno.celular);
     }
 
     showError(header: string, message: string, e: any) {
@@ -295,15 +340,15 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
                         this.checklistObservacao = '';
 
-                        var checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
-                        var checklist = this.checklists.find(x => x.id == item.checklist_Id);
+                        let checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
+                        let checklist = this.checklists.find(x => x.id == item.checklist_Id);
                         if(checklistIndex != -1 && checklist ) {
-                            var checklistItemIndex = checklist.items.findIndex(x => x.id == item.checklist_Item_Id);
-                            var checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id);
+                            let checklistItemIndex = checklist.items.findIndex(x => x.id == item.checklist_Item_Id);
+                            let checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id);
 
                             if (checklistItem && checklistItemIndex != -1) {
-                                var aluno = checklistItem.alunos.find(x => x.aluno_Id == item.aluno_Id);
-                                var alunoIndex = checklistItem.alunos.findIndex(x => x.aluno_Id == item.aluno_Id);
+                                let aluno = checklistItem.alunos.find(x => x.aluno_Id == item.aluno_Id);
+                                let alunoIndex = checklistItem.alunos.findIndex(x => x.aluno_Id == item.aluno_Id);
                                 if (aluno && alunoIndex != -1) {
                                     checklistItem.alunos.splice(alunoIndex, 1);
                                 }

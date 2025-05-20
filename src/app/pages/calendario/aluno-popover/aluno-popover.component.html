@@ -1,17 +1,16 @@
 <p-popover #popover appendTo="body" styleClass="-mt-1 max-w-screen" [dismissable]="true">
     <div class="flex pl-2 pr-4">
-        <div class="relative my-auto flex align-items-center justify-content-center border-circle border-1 border-300 w-9rem h-9rem my-auto">
+        <div class="relative my-auto flex align-items-center justify-content-center border-circle overflow-hidden border-primary-500 border-1 w-9rem h-9rem my-auto p-1">
             <i class="pi pi-user text-xl" *ngIf="!aluno.aluno_Foto"></i>
-            <img *ngIf="aluno.aluno_Foto"
-                 class=" border-circle"
-                 [src]="aluno.aluno_Foto"
-                 [alt]="aluno.aluno" />
-            <!-- <p-badge *ngIf="aluno.flagNovo" value="Aula 1" class="absolute top-0 left-50 -ml-4 -mt-2" /> -->
-            <p-badge *ngIf="aluno.reposicaoDe_Evento_Id" value="Reposição" class="absolute top-0 left-50 -ml-5 -mt-2" />
+            <div *ngIf="aluno.aluno_Foto" class="w-full h-full bg-cover	bg-center border-circle" [style]="{ backgroundImage: 'url(' + aluno.aluno_Foto + ')'}"></div>
+
         </div>
         <p-divider styleClass="mx-4 my-4" layout="vertical" />
         <div class=" flex flex-column py-3 gap-1">
-            <p class="text-xl text-primary-500 font-bold">{{ aluno.aluno }}</p>
+            <div class="flex align-items-center">
+                <p class="text-xl text-primary-500 font-bold">{{ aluno.aluno }} </p>
+                <p-badge *ngIf="aluno.reposicaoDe_Evento_Id" value="Reposição" class="ml-2" styleClass="bg-purple-500" />
+            </div>
             <p><b>Turma: </b>{{ aluno.turma }} </p>
             <p *ngIf="aluno.apostila_Abaco"><b>Apostila Ábaco: </b>{{ aluno.apostila_Abaco }} / <b>Página: </b>{{ aluno.numeroPaginaAbaco }}</p>
             <p *ngIf="aluno.apostila_AH"><b>Apostila AH: </b>{{ aluno.apostila_AH }} / <b>Página: </b>{{ aluno.numeroPaginaAH }}</p>
@@ -27,7 +26,6 @@
                 <p-button label="Ver aluno"
                           [rounded]="true"
                           icon="pi pi-user-edit"
-                          size="small"
                           styleClass="white-space-nowrap"
                           (onClick)="goToAluno(aluno)" />
                 <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) && (aluno.presente != true && evento.finalizado) || evento.finalizado == false">
@@ -35,7 +33,6 @@
                               label="Agendar Reposição"
                               icon="pi pi-calendar"
                               [rounded]="true"
-                              size="small"
                               severity="secondary"
                               styleClass="white-space-nowrap"
                               (onClick)="goToReposicao(aluno)" />

@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Roteiro } from '../../../models/roteiro.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Crypto, insertOrReplace,  playAlert, playError, playSuccess, showError } from '../../../utils';
+import { Crypto, insertOrReplace, playAlert, playError, playSuccess, showError } from '../../../utils';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
@@ -115,7 +115,7 @@ export class FormComponent implements OnDestroy {
         return `${formattedSize} ${sizes[i]}`;
     }
 
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
@@ -178,10 +178,10 @@ export class FormComponent implements OnDestroy {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text ',
             accept: () => {
                 this.send(e)
             }
@@ -197,13 +197,14 @@ export class FormComponent implements OnDestroy {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
+                    playSuccess();
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
+                    res.object.active = true;
                     console.log('res', res)
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
-                    playSuccess();
                 }
                 else {
                     this.error = res.message;

@@ -5,7 +5,7 @@ import { MyMap } from '../utils/map';
 import moment from 'moment';
 import 'moment/locale/pt-br'
 import { Service } from '../helpers/service.service';
-import { getError, playError } from '../utils';
+import { getError, insertOrReplace, playError, playSuccess } from '../utils';
 import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 
 @Injectable({
@@ -67,8 +67,17 @@ export class RoteiroService extends Service {
         var request = MyMap(model, new RoteiroRequest);
         return this.http.post<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
+                next: res => {
+                    // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
+                    // insertOrReplace(this, res.object, 'list');
+                    // this.toastrService.success(`Registro cadastrado com sucesso.`);
+                    // playSuccess();
+                    
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar roteiro. \n ${getError(err)}`);
+                    return err;
                 }
             }));
         }
@@ -77,8 +86,17 @@ export class RoteiroService extends Service {
             var request = MyMap(model, new RoteiroRequest);
             return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
+                next: res => {
+                    // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
+                    // insertOrReplace(this, res.object, 'list');
+                    // this.toastrService.success(`Registro atualizado com sucesso.`);
+                    // playSuccess();
+                    
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível editar roteiro. \n ${getError(err)}`);
+                    return err;
                 }
             }));
     }

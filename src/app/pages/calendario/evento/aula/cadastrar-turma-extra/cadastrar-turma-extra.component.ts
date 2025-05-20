@@ -25,21 +25,14 @@ import { Evento, EventoCancelamentoRequest, EventoTipo } from '../../../../../mo
 import { MyMap as MyMap } from '../../../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
-import { PickList, PickListMoveAllToTargetEvent, PickListMoveToSourceEvent, PickListSourceSelectEvent } from 'primeng/picklist';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { RequestResponse } from '../../../../../helpers/request-response.interface';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
-import { ConfirmDialog } from 'primeng/confirmdialog';
 import $ from 'jquery';
 import {
     CdkDragDrop,
-    CdkDrag,
-    CdkDropList,
-    CdkDropListGroup,
-    moveItemInArray,
-    transferArrayItem,
 } from '@angular/cdk/drag-drop';
 import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';

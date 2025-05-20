@@ -20,7 +20,8 @@
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
-            <div class="field md:col-6 sm:col-6 col-12"> <!-- Descrição -->
+            <!-- Descrição -->
+            <div class="field md:col-6 sm:col-12 col-12"> 
                 <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -34,7 +35,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-3 col-6"> <!-- Data -->
+            <!-- Data -->
+            <div class="field md:col-3 sm:col-4 col-6"> 
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker #_data="ngModel"
                               [(ngModel)]="data"
@@ -59,7 +61,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field md:col-3 sm:col-3 col-6"> <!-- Horário -->
+            <!-- Horário -->
+            <div class="field md:col-3 sm:col-4 col-6"> 
                 <label for="hora">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker inputId="hora"
                               name="hora"
@@ -83,7 +86,23 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="hora.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Educador -->
+            <!-- Limite de Alunos -->
+            <div class="field md:col-4 sm:col-4 col-12">
+                <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
+                <p-inputnumber #capacidadeMaximaAlunos="ngModel"
+                               [(ngModel)]="object.capacidadeMaximaAlunos"
+                               id="capacidadeMaximaAlunos"
+                               name="capacidadeMaximaAlunos"
+                               class="w-full"
+                               styleClass="w-full"
+                               inputStyleClass="w-full"
+                               [required]="true" />
+                <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <!-- Educador -->
+            <div class="field md:col-4 sm:col-6 col-6"> 
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
@@ -145,13 +164,13 @@
                         </div>
                     </ng-template>
                 </p-select>
-                <p class="text-red-500 mt-2 mb-0">{{professor_Id.errors|json}}</p>
                 <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Sala -->
+            <!-- Sala -->
+            <div class="field md:col-4 sm:col-6 col-6"> 
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="salaAulas"
@@ -212,7 +231,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
                 </div>
             </div>
-            <div class="field col-12"> <!-- Observações -->
+            <!-- Observações -->
+            <div class="field col-12"> 
                 <label for="observacao">Observações:</label>
                 <textarea pTextarea
                           class="w-full"

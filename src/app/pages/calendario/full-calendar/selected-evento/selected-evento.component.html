@@ -3,9 +3,8 @@
            styleClass="z-2 -mt-1"
            (onHide)="onHide()"
            [dismissable]="true">
-    <div *ngIf="evento" class="p-2 flex flex-column row-gap-1 -m-2 w-30rem max-w-fit" >
+    <div *ngIf="evento" class="p-2 flex flex-column row-gap-1 -m-2 max-w-fit">
         <div class="p-2 white-space-normal">
-            
             <div class="flex align-items-center gap-2">
                 <ng-container *ngIf="evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento">
                     <div [tooltipPosition]="tooltipPosition()" [pTooltip]="tooltipTemplate">
@@ -63,20 +62,13 @@
         </div>
         <!-- Alunos -->
         <ng-template [ngIf]="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false ">
-            <div class="flex align-items-end justify-content-between px-2 w-full gap-2">
+            <div class="flex align-items-center justify-content-between px-2 w-full gap-2">
                 <span class="font-bold block text-primary">
                     <span *ngIf="evento.alunos.length != 1">Alunos</span>
                     <span *ngIf="evento.alunos.length == 1">Aluno</span>
                     <span *ngIf="evento.evento_Tipo_Id == EventoTipo.Oficina"> inscritos</span>
                 </span>
-                <div class="flex flex-column">
-                    <a *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) "
-                    (auxclick)="goToInscricaoOficina()"
-                    (click)="goToInscricaoOficina()"
-                    pTooltip="Inscrever aluno"
-                    class="p-ripple p-button p-1 p-component p-button-rounded p-button-sm white-space-nowrap hover:underline">
-                        <span >Inscrever</span>
-                    </a>
+                <div class="flex flex-column align-items-end">
                     <div class="flex align-items-center">
                         <span class="ml-auto">
                             <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
@@ -124,12 +116,11 @@
                                 'surface-50': i % 2 != 0 
                             }">
                             <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center ">
-                                <img *ngIf="aluno.aluno_Foto" [src]="aluno.aluno_Foto">
-                                <i *ngIf="!aluno.aluno_Foto" class="pi pi-user text-primary text-xs"></i>
+                                <i class="pi pi-user text-primary text-xs"></i>
                             </div>
                             <span>
                                 <span class="hover:underline hover:text-primary-500"
-                                [ngClass]="{
+                                      [ngClass]="{
                                     'text-green-500': evento.finalizado && aluno.presente == true,
                                     'text-red-500': evento.finalizado && aluno.presente == false,
                                     'text-800': !evento.finalizado && !aluno.reposicaoDe_Evento_Id,
@@ -147,11 +138,11 @@
                                          [pTooltip]="reposicaoDe_Evento"
                                          tooltipPosition="bottom" />
                                 <p-badge *ngIf="primeiraAula(aluno, evento)"
-                                        styleClass="ml-2 bg-pink-500"
-                                        value="Aula 1"
-                                        size="small"
-                                        severity="danger"
-                                        [pTooltip]="'Primeira aula'" />
+                                         styleClass="ml-2 bg-pink-500"
+                                         value="Aula 1"
+                                         size="small"
+                                         severity="danger"
+                                         [pTooltip]="'Primeira aula'" />
                                 <span *ngIf="evento.finalizado" class="ml-2">
                                     <span *ngIf="aluno.presente == true" class="pi pi-check text-green-500" pTooltip="Presente"></span>
                                     <span *ngIf="aluno.presente == false" class="pi pi-thumbs-down-fill text-red-500" pTooltip="Faltou"></span>
@@ -214,7 +205,30 @@
                       [rounded]="true"
                       size="small"
                       (onClick)="goToEvento()" />
+
             <ng-template [ngIf]="evento.finalizado == false">
+                <p-button *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id) "
+                          [disabled]="evento.id == PseudoEvento.EventoId"
+                          [pTooltip]="evento.id == PseudoEvento.EventoId ? 'Defina tema, educador e sala, para inserir aluno' : 'Inscrever aluno'"
+                          label="Inscrever"
+                          icon="pi pi-user-plus text-sm hover:underline "
+                          styleClass="surface-900 border-900 text-white hover:surface-700 hover:border-700"
+                          [rounded]="true"
+                          pRipple
+                          severity="secondary"
+                          size="small"
+                          (onClick)="goToInscricaoOficina()" />
+                <p-button *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) "
+                        [pTooltip]="'Inserir reposição'"
+                        label="Reposição"
+                        icon="pi pi-user-plus text-sm "
+                        styleClass="surface-900 border-900 text-white hover:surface-700 hover:border-700"
+                        [rounded]="true"
+                        pRipple
+                        severity="secondary"
+                        size="small"
+                        (onClick)="goToReposicao()" />
+               
                 <div class="ml-auto flex gap-2">
                     <p-button
                               severity="secondary"

@@ -177,7 +177,6 @@ export class EventoComponent implements OnDestroy {
         this.subscription.push(eventos);
 
         var evento = this.service.evento.subscribe(async res => {
-            console.log('evento subscription', res)
             if (!res) {
                 try {
                     var decrypted = this.crypto.decrypt(this.encryptedId);
@@ -186,6 +185,10 @@ export class EventoComponent implements OnDestroy {
                             .then(res => {
                                 this.service.setEvento(res);
                                 this.evento = res;
+                            })
+                            .catch(res => {
+                                this.visible = false;
+                                this.visibleChange();
                             })
                     } else {
                         var evento = JSON.parse(localStorage.getItem('evento') ?? '')

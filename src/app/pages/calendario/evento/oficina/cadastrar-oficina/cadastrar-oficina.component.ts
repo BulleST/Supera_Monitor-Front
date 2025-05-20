@@ -113,7 +113,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
     
     visibleChange() {
         if (!this.visible) {
-            this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
     }
     
@@ -249,9 +249,9 @@ export class CadastrarOficinaComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar oficina para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar oficina`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text ',
             accept: () => {
                 this.send(e);
             }

@@ -103,10 +103,8 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
         var list = this.service.list.subscribe(res => {
             console.log('list subscription', res)
-            if (res.length > 0) {
-                this.calendarioList = res;
-                this.setCalendario();
-            }
+            this.calendarioList = res;
+            this.setCalendario();
         });
         this.subscription.push(list);
 
@@ -180,6 +178,9 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     setCalendario() {
         console.log('setCalendario')
 
+        var calendar = this.fullCalendar.getApi();
+        calendar.removeAllEvents();
+
         var events: any[] = [];
         this.feriados.forEach(item => {
             var event = {
@@ -218,7 +219,8 @@ export class ListComponent implements OnDestroy, AfterViewInit {
             });
 
 
-        this.calendarioOptions.events = [];
+            
+        this.fullCalendar.getApi().updateSize();
         this.calendarioOptions.events = events;
     }
 

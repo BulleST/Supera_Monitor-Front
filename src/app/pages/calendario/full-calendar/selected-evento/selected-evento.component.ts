@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
@@ -46,7 +46,7 @@ export class SelectedEventoComponent implements OnChanges {
     mensagensEnviadasProfessor: Evento_Participacao_Professor[] = [];
 
     tipoEventoString = '';
-    mouse: any = {x:0, y:0};
+    mouse: any = { x: 0, y: 0 };
 
 
     constructor(
@@ -165,7 +165,7 @@ export class SelectedEventoComponent implements OnChanges {
 
     goToInscricaoOficina() {
         if (this.evento) {
-            this.service.setEvento(this.evento)
+            this.service.setEvento(this.evento);
             this.router.navigate(['calendario', 'oficina', 'inscrever', this.crypto.encrypt(this.evento.id)])
         }
     }
@@ -248,6 +248,14 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
+
+    goToReposicao() {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+            this.router.navigate(['aula', this.crypto.encrypt(this.evento.id), 'reposicao'], { relativeTo: this.activatedRoute });
+        }
+    }
+
     loadReposicoes() {
         if (this.evento) {
             this.evento.alunos.forEach(async item => {
@@ -271,7 +279,7 @@ export class SelectedEventoComponent implements OnChanges {
     onMouseMove(event: MouseEvent): void {
         const x = event.clientX;
         const y = event.clientY;
-        this.mouse = {x,y};
+        this.mouse = { x, y };
         console.log(`Mouse X: ${x}, Mouse Y: ${y}`);
     }
 

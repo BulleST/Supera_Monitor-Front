@@ -21,7 +21,7 @@ import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monit
     imports: [
         CommonModule,
         InitialRoutingModule,
-        SharedModule
+        SharedModule,
     ],
     bootstrap: [InitialComponent]
 })

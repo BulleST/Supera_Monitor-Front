@@ -1,14 +1,14 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula } from '../../../../../models/sala-aula.model';
+import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { Turma } from '../../../../../models/turma.model';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { getError, showError } from '../../../../../utils';
+import { Crypto, getError, showError } from '../../../../../utils';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { ProfessorService } from '../../../../../services/professor.service';
 import { AlunoService } from '../../../../../services/alunos.service';
@@ -29,7 +29,8 @@ import { AccountService } from '../../../../../services/account.service';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../../utils/audio';
+import { MultiSelectChangeEvent } from 'primeng/multiselect';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
@@ -40,7 +41,7 @@ import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
 
 })
 export class CadastrarInscricaoComponent implements OnDestroy {
-    object: Evento = new Evento;
+    evento: Evento = new Evento;
 
     visible: boolean = false;
     loading = false;
@@ -49,16 +50,16 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     duracaoEvento = '';
     EventoTipo = EventoTipo;
 
-    selectedAluno?: Aluno;
+    alunosSelected: Aluno[] = [];
     mensagensEnviadasAlunos: Aluno[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
-    professores: Professor[] = [];
-    loadingProfessores = false;
+    // professores: Professor[] = [];
+    // loadingProfessores = false;
 
-    salaAulas: SalaAula[] = [];
-    loadingSalaAulas = false;
+    // salaAulas: SalaAula[] = [];
+    // loadingSalaAulas = false;
 
     turmas: Turma[] = [];
     loadingTurmas = false;
@@ -67,15 +68,15 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     loadingEventos = false;
 
     PseudoEvento = PseudoEvento;
-    @ViewChild('professor_Id') professor_Id!: NgModel;
+    SalaAulaId = SalaAulaId;
 
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
-        private salaAulaService: SalaAulaService,
-        private professorService: ProfessorService,
+        // private salaAulaService: SalaAulaService,
+        // private professorService: ProfessorService,
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private turmaService: TurmaService,
@@ -83,6 +84,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private checklistService: ChecklistService,
         private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
+        private crypto: Crypto,
     ) {
 
         var params = this.activatedRoute.snapshot.params;
@@ -92,27 +94,30 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return
         }
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true));
-        this.subscription.push(professores);
+        // var professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true));
+        // this.subscription.push(professores);
 
-        if (this.professores.length == 0) {
-            this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
-        }
+        // if (this.professores.length == 0) {
+        //     this.loadingProfessores = true;
+        //     lastValueFrom(this.professorService.getList())
+        //         .then(res => this.loadingProfessores = false)
+        //         .catch(res => this.loadingProfessores = false);
+        // }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
-        this.subscription.push(salaAula);
+        // var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
+        // this.subscription.push(salaAula);
 
-        if (this.salaAulas.length == 0) {
-            this.loadingSalaAulas = true;
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
-        }
+        // if (this.salaAulas.length == 0) {
+        //     this.loadingSalaAulas = true;
+        //     lastValueFrom(this.salaAulaService.getList())
+        //         .then(res => this.loadingSalaAulas = false)
+        //         .catch(res => this.loadingSalaAulas = false);
+        // }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
+        var alunos = this.alunoService.list.subscribe(res => {
+            this.alunos = res.filter(x => x.active == true);
+            this.setAlunos();
+        });
         this.subscription.push(alunos);
 
         this.loadingAlunos = true;
@@ -136,8 +141,21 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         var evento = this.service.evento.subscribe(async res => {
             if (!res) {
                 try {
-                    var evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                    this.service.setEvento(evento)
+                   var decrypted = this.crypto.decrypt(params['evento_id']);
+                    if (params['evento_id'] && decrypted && decrypted != PseudoEvento.EventoId) {
+                        await lastValueFrom(this.service.get(decrypted))
+                            .then(res => {
+                                this.service.setEvento(res);
+                                this.evento = res;
+                            })
+                            .catch(res => {
+                                this.visible = false;
+                                this.visibleChange();
+                            })
+                    } else {
+                        var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+                        this.service.setEvento(evento)
+                    }
                 }
                 catch (e) {
                     this.visible = false;
@@ -147,29 +165,27 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             }
 
             if (res) {
-                this.object = res;
+                this.evento = res;
                 this.visible = true;
                 this.verificaDisponibilidade();
 
 
-                var minutos = this.object.duracaoMinutos % 60
-                var horas = this.object.duracaoMinutos / 60;
+                var minutos = this.evento.duracaoMinutos % 60
+                var horas = this.evento.duracaoMinutos / 60;
                 var horaRedonda = (horas - Math.floor(horas)) == 0;
 
                 this.duracaoEvento = horaRedonda ?
                     horas.toString().padStart(2, '0') + 'h' :
                     horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
 
-
-                var alunosOficina = this.object.alunos.map(x => x.aluno_Id);
-                this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
+                    this.setAlunos();
             }
         });
         this.subscription.push(evento);
 
 
         setTimeout(() => {
-            if (!this.object) {
+            if (!this.evento) {
                 this.visible = false;
                 this.visibleChange();
             }
@@ -192,6 +208,15 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         showError(this.confirmationService, header, message, e);
     }
 
+    setAlunos() {
+        if (this.evento && this.alunos.length) {
+            
+
+                var alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
+                this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
+        }
+    }
+
 
     async verificaDisponibilidade() {
         var valid = true;
@@ -199,87 +224,59 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.loadingEventos = true;
         var request: CalendarioRequest = new CalendarioRequest;
 
-        request.intervaloDe = moment(this.object.data, 'YYYY-MM-DD').toDate();
-        request.intervaloAte = moment(this.object.data, 'YYYY-MM-DD').add(1, 'day').toDate();
+        request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate();
+        request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD').add(1, 'day').toDate();
 
         this.loadingEventos = true;
         await lastValueFrom(this.service.calendario(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
-        this.validaProfessores();
-        this.validaSalaAulas();
+        // this.validaProfessores();
+        // this.validaSalaAulas();
         this.validaAlunos();
 
         return valid
 
     }
 
-    validaSalaAulas() {
-        var data = this.object.data;
-        this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
-    }
+    // validaSalaAulas() {
+    //     var data = this.object.data;
+    //     this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
+    // }
 
-    validaProfessores() {
-        var data = this.object.data;
-        this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
+    // validaProfessores() {
+    //     var data = this.object.data;
+    //     this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
 
-        if (this.object.professor_Id) {
-            var e: SelectChangeEvent = {
-                value: this.object.professor_Id,
-                originalEvent: { target: $('#professor_Id').get(0) as any } as any
-            }
-            this.professorChanged(e, this.professor_Id);
-        }
-    }
+    //     if (this.object.professor_Id) {
+    //         var e: SelectChangeEvent = {
+    //             value: this.object.professor_Id,
+    //             originalEvent: { target: $('#professor_Id').get(0) as any } as any
+    //         }
+    //         this.professorChanged(e, this.professor_Id);
+    //     }
+    // }
 
     validaAlunos() {
-        var data = this.object.data;
-        this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
+        var data = this.evento.data;
+        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
 
 
-    professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.professores.find(x => x.id == e.value) as Professor;
-        let mensagemErro: string | null = null;
-
-        if (item && !item.disponivel && item.disponivelEvent) {
-            mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
-        }
-        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
-            mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
+    // alunoChanged(e: SelectChangeEvent, model: NgModel) {
+    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+        var aluno = e.itemValue as Aluno;
+        var alunos = e.value as Aluno[];
+        var index = alunos.findIndex(x => x.id == aluno.id);
+        if (index == -1) {
+            // está removendo alunos
         } else {
-            mensagemErro = null;
-        }
-
-        if (mensagemErro) {
-            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
-            model.control.setValue(undefined)
-        }
-        model.control.setErrors({ indisponivel: mensagemErro });
-        model.control.updateValueAndValidity();
-    }
-
-
-    salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaSalaAulas();
-
-        var item = this.salaAulas.find(x => x.id == e.value);
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
-        }
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
-    }
-
-    alunoChanged(e: SelectChangeEvent, model: NgModel) {
-        var aluno = e.value as Aluno;
-        if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Aluno indisponível' });
-            this.showError('Aluno Indisponível', `Esse aluno tem outra ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-            return;
+            if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
+                model.control.setErrors({ indisponivel: 'Aluno indisponível' });
+                this.showError('Aluno Indisponível', `Esse aluno tem outra ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+                return;
+            }
         }
 
         model.control.setErrors({ indisponivel: null });
@@ -299,7 +296,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     enviarMensagemInscricao(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagemInscricao(nome, celular, this.object);
+        return this.mensagemWhatsapp.enviarMensagemInscricao(nome, celular, this.evento);
     }
 
     sendConfirmation(form: NgForm, e: any) {
@@ -308,17 +305,17 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
-        if (!this.selectedAluno) {
-            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
+        if (!this.alunosSelected.length) {
+            return this.showError('Não foi possível salvar', 'Selecione um aluno para continuar com inscrição', e)
         }
 
         playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
-            header: 'Salvar oficina',
-            message: `Salvar dados e inscrever aluno(a) ${this.selectedAluno.nome.split(' ')[0]}?`,
-            acceptLabel: `Salvar`,
+            header: 'Inscrever alunos',
+            message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.alunosSelected.map(x => x.nome.split(' ')[0]).join(', ')}?`,
+            acceptLabel: `Salvar e inscrever`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
             rejectLabel: 'Cancelar',
@@ -335,79 +332,97 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.loading = true;
         var response: RequestResponse = { success: false, message: '', object: undefined };
 
-        if (this.object.id == PseudoEvento.EventoId) {
+        if (this.evento.id == PseudoEvento.EventoId) {
             response = await lastValueFrom(this.requestOficina());
-            this.object.id = response.object.id;
+            this.evento.id = response.object.id;
         }
 
-        lastValueFrom(this.service.inscrever(this.selectedAluno!.id, this.object.id))
-            .then(res => {
-                this.loading = false;
-                this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
-                this.service.calendarioReload.emit(res.object.id);
-                this.markChecklistAsDone();
-                playSuccess();
-                if (this.selectedAluno!.celular) {
-                    this.sendMensagemAlunos(e, this.object)
-                } else {
-                    this.visible = false
-                    this.visibleChange();
-                }
+        var count = 0
+        await new Promise<boolean>((resolve, reject) => {
+            this.alunosSelected.forEach(aluno => {
+                lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
+                    .then(res => {
+                        count++;
+                        if (count == this.alunosSelected.length) {
+                            resolve(true);
+                        }
+                    })
+                    .catch(res => {
+                        count++;
+                        this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
+                        if (count == this.alunosSelected.length) {
+                            resolve(true);
+                        }
+                    })
             })
-            .catch(res => {
-                this.loading = false;
-                this.showError('Agendamento falhou', `Não foi possível finalizar inscrição. <br> ${getError(res)}`, e);
-            })
+        });
+
+
+        this.loading = false;
+        this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
+        this.service.calendarioReload.emit(0);
+        this.markChecklistAsDone();
+        this.sendMensagemAlunos();
+        playSuccess();
 
     }
 
     requestOficina() {
-        var request = MyMap(this.object, new EventoOficinaRequest);
+        var request = MyMap(this.evento, new EventoOficinaRequest);
         request.alunos = [];
-        request.professores = [this.object.professor_Id];
-        request.data = new Date(this.object.data);
-        request.data = moment(this.object.data).format('YYYY-MM-DD[T]HH:mm') as any;
+        request.professores = [this.evento.professor_Id];
+        request.data = new Date(this.evento.data);
+        request.data = moment(this.evento.data).format('YYYY-MM-DD[T]HH:mm') as any;
 
         return this.service.createOficina(request);
     }
-
-    sendMensagemAlunos(e: any, evento: any) {
+    
+    sendMensagemAlunos() {
+        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
-            target: e.target,
-            message: `Inscrição concluída com sucesso. <br> Clique para enviar mensagem de confirmação.`,
+            key: 'enviarMensagem',
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500 text-4xl',
-            acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
-            acceptIcon: 'pi pi-whatsapp',
-            rejectLabel: 'Não enviar',
+            icon: 'pi pi-whatsapp text-green-500',
+            acceptLabel: `Concluir`,
+            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-text ',
             accept: () => {
                 this.visible = false
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(this.selectedAluno!.nome, this.selectedAluno!.celular, evento);
-                window.open(url, '_target');
             },
-            reject: () => {
-                this.visible = false
-                this.visibleChange();
-            }
         });
+    }
+
+
+    removerAlunoLista(aluno: Aluno, e: any) {
+        if (e.which == 2) {
+            var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+            if (index != -1)
+                this.mensagensEnviadasAlunos.splice(index, 1);
+        }
+    }
+
+    enviarMensagemAgendamento(aluno: Aluno) {
+        var evento = MyMap(this.evento, new Evento)
+        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+        return this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, evento);
     }
 
     markChecklistAsDone() {
         // Agendar 1ª Oficina ou 2ª 
         // checklist_Item_Id 12 ou 23
-        var aluno = this.selectedAluno as Aluno;
-        var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
-        console.log('aluno', this.selectedAluno)
-        if (alunoChecklist) {
-            var mensagem = `Inscrição na oficina do dia ${moment(this.object.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
-                            Inscrição realizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        this.alunosSelected.forEach(aluno => {
+            var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
+            if (alunoChecklist) {
+                var mensagem = `Inscrição na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
+                                Inscrição realizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+                if (alunoChecklist && !alunoChecklist.finalizado) {
+                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+                }
             }
-        }
+        })
     }
 
 
