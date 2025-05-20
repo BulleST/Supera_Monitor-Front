@@ -5,7 +5,7 @@ import { MyMap } from '../utils/map';
 import moment from 'moment';
 import 'moment/locale/pt-br'
 import { Service } from '../helpers/service.service';
-import { getError } from '../utils';
+import { getError, playError } from '../utils';
 import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 
 @Injectable({
@@ -71,11 +71,11 @@ export class RoteiroService extends Service {
                     this.toastrService.error(`Não foi possível cadastrar roteiro. \n ${getError(err)}`);
                 }
             }));
-    }
-
-    edit(model: Roteiro) {
-        var request = MyMap(model, new RoteiroRequest);
-        return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
+        }
+        
+        edit(model: Roteiro) {
+            var request = MyMap(model, new RoteiroRequest);
+            return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível editar roteiro. \n ${getError(err)}`);

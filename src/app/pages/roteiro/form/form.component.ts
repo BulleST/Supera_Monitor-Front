@@ -199,6 +199,7 @@ export class FormComponent implements OnDestroy {
                 if (res.success) {
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
+                    console.log('res', res)
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
