@@ -33,7 +33,7 @@ import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils
 import { Feriado } from '../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-reagendar-evento',
@@ -312,7 +312,7 @@ export class ReagendarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectVisible: false,
             accept: () => {
                 this.visible = false
@@ -363,9 +363,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  Deseja continuar mesmo assim? `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-text ',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -389,9 +389,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-text ',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -408,9 +408,9 @@ export class ReagendarEventoComponent implements OnDestroy {
             message: `Tem certeza que deseja reagendar a ${this.tipoString} para o dia ${moment(this.data).format('DD/MM')} às ${moment(this.horario).format('HH[h]mm')}?.`,
             acceptLabel: `Reagendar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e);
             }
@@ -489,8 +489,7 @@ export class ReagendarEventoComponent implements OnDestroy {
 
             if (alunoChecklist) {
                 mensagem = alunoChecklist.observacoes + `\n\n`;
-                mensagem += `${tipo} reagendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}.
-                            \n Reagendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
+                mensagem += `${tipo} reagendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}. \n Reagendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
 
                 alunoChecklist.observacoes = mensagem;
                 if (checklist_Item_Id && mensagem) {

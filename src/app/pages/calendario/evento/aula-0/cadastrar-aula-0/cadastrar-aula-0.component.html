@@ -66,6 +66,7 @@
                               (onBlur)="verificaDisponibilidade()"
                               (onMonthChange)="dateNavigatorChanged($event)"
                               (onYearChange)="dateNavigatorChanged($event)"
+                              placeholder="DD/MM/YYYY"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               [minDate]="minData"
@@ -91,6 +92,7 @@
                               #_horario="ngModel"
                               [(ngModel)]="horario"
                               (onBlur)="verificaDisponibilidade()"
+                              placeholder="HH:MM"
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
@@ -121,6 +123,7 @@
                           #aluno_Id="ngModel"
                           styleClass="w-full"
                           optionLabel="label"
+                          optionValue="value"
                           class="w-full"
                           name="aluno_Id"
                           inputId="aluno_Id"
@@ -133,14 +136,12 @@
                           [appendTo]="'body'"
                           optionDisabled="deactivated, disponivel">
                           <ng-template  #group let-group>
-                              <!-- {{group|json}} -->
                               <p class="flex align-items-center gap-2 surface-100 -mx-3 py-2 h-full px-2 text-black-alpha-80">
                                 <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(group.value.turma_Id) }"></ng-container>
                                 <span>{{group.value.nome}}</span>
                                 <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
                                     <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
                                 </ng-template> 
-                                <!-- <span class="font-normal">Educador(a) {{group.value.professor}}</span> -->
                             </p>
                         </ng-template>
                     <ng-template let-item #item>
@@ -326,7 +327,6 @@
                           icon="pi pi-check"
                           [loading]="loading"
                           [rounded]="true"
-                          size="small"
                           [disabled]="form.invalid || loading" />
             </div>
         </div>

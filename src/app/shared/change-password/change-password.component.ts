@@ -54,7 +54,7 @@ export class ChangePasswordComponent implements OnDestroy {
             header: 'Erro',
             icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
             acceptLabel: 'OK',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectVisible: false,
         })
     }
@@ -78,7 +78,7 @@ export class ChangePasswordComponent implements OnDestroy {
                     icon: 'pi pi-check-circle text-2xl -mr-2 text-green-400',
                    
                     acceptLabel: 'OK',
-                    acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                     rejectVisible: false,
                 })
             } else {

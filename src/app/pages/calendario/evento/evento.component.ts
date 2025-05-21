@@ -24,7 +24,6 @@ import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model';
 import { MyMap } from '../../../utils/map';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
-import { Popover } from 'primeng/popover';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { Roteiro } from '../../../models/roteiro.model';
 import { EventoAula0Request } from '../../../models/evento-aula-0.model';
@@ -33,7 +32,7 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-evento',
@@ -44,7 +43,7 @@ import { playAlert, playError, playSuccess } from '../../../utils/audio';
 })
 export class EventoComponent implements OnDestroy {
     evento: Evento = new Evento;
-    queryParams: EventoQueryParams = new EventoQueryParams;
+    // queryParams: EventoQueryParams = new EventoQueryParams;
 
     visible: boolean = false;
     loading = false;
@@ -54,14 +53,10 @@ export class EventoComponent implements OnDestroy {
     isChamadaPage = false;
     duracaoEvento = '';
     width = '1000px';
-    loadingChecklist = false;
     tipo = EventoTipo;
     encryptedId = '';
 
-    @ViewChild('popoverSelectedAluno') popoverSelectedAluno!: Popover;
-    @ViewChild('popoverChecklist') popoverChecklist!: Popover;
     @ViewChildren('componentForm') componentForm!: QueryList<any>;
-
 
     selectedAluno?: Evento_Participacao_Aluno;
     mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
@@ -356,7 +351,7 @@ export class EventoComponent implements OnDestroy {
             acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Ainda não',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
                 this.finalizar(e);
             },
@@ -458,7 +453,7 @@ export class EventoComponent implements OnDestroy {
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
                 this.send(e);
             },

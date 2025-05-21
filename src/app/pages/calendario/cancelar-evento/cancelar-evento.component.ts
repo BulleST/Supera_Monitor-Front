@@ -23,7 +23,7 @@ import { Turma } from '../../../models/turma.model';
 import { MyMap } from '../../../utils/map';
 import { SalaAulaId } from '../../../models/sala-aula.model';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 import { NgForm } from '@angular/forms';
 
 @Component({
@@ -195,9 +195,9 @@ export class CancelarEventoComponent implements OnDestroy {
             header: `Cancelar ${this.tipoEventoString}`,
             message: `Tem certeza que deseja cancelar a ${this.tipoEventoString} do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: 'Não cancelar',
-            acceptButtonStyleClass: ' p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: `Cancelar ${this.tipoEventoString}`,
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -298,7 +298,7 @@ export class CancelarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectVisible: false,
             accept: () => {
                 this.visible = false;

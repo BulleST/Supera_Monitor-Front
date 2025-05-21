@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, insertOrReplace } from '../../../utils';
+import { Crypto, insertOrReplace, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { Aluno } from '../../../models/alunos.model';
@@ -76,15 +76,7 @@ export class FormComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            // icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
     async sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
@@ -98,10 +90,10 @@ export class FormComponent implements OnDestroy {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e)
             }

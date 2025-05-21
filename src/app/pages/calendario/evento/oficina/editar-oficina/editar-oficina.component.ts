@@ -13,7 +13,6 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playError } from '../../../../../utils/audio';
 import { showError } from '../../../../../utils';
 
 @Component({

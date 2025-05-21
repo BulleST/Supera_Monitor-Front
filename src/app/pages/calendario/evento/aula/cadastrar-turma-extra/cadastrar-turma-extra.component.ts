@@ -28,7 +28,6 @@ import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
-import { RequestResponse } from '../../../../../helpers/request-response.interface';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import $ from 'jquery';
 import {
@@ -36,7 +35,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-turma-extra',
@@ -86,7 +85,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     loadingEventosReposicaoAluno = false;
     selectedEventoReposicao?: Evento;
-    selecionarReposicaoVisible = false;
 
     eventos: Evento[] = [];
     loadingEventos = false;
@@ -354,9 +352,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false
                 this.visibleChange();
@@ -372,9 +370,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
 
                     var objIndex = this.object.alunos.findIndex(x => x.aluno_Id == this.selectedAlunoTarget!.id);
@@ -439,9 +437,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
 
                     var indexObj = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
@@ -593,32 +591,34 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             this.showError('Erro', 'Selecione uma aula e aluno para repor', e.event);
         }
         else {
-            var response: RequestResponse = { success: true, message: '', object: null };
-            if (this.selectedEventoReposicao.id == PseudoEvento.EventoId) {
+            // var response: RequestResponse = { success: true, message: '', object: null };
+            // if (this.selectedEventoReposicao.id == PseudoEvento.EventoId) {
 
-                let request: EventoAulaRequest = MyMap(this.selectedEventoReposicao, new EventoAulaRequest);
-                request.perfilCognitivo = this.selectedEventoReposicao.perfilCognitivo.map(x => x.id);
-                request.professores = this.selectedEventoReposicao.professores.map(x => x.professor_Id);
-                request.alunos = this.selectedEventoReposicao.alunos.map(x => x.aluno_Id);
+            //     let request: EventoAulaRequest = MyMap(this.selectedEventoReposicao, new EventoAulaRequest);
+            //     request.perfilCognitivo = this.selectedEventoReposicao.perfilCognitivo.map(x => x.id);
+            //     request.professores = this.selectedEventoReposicao.professores.map(x => x.professor_Id);
+            //     request.alunos = this.selectedEventoReposicao.alunos.map(x => x.aluno_Id);
 
-                response = await lastValueFrom(this.service.createAulaTurma(request))
-                    .catch(res => {
-                        this.showError('Erro', `Não foi possível selecionar. \n ${getError(res)}`, e)
-                        return res
-                    });
+            //     response = await lastValueFrom(this.service.createAulaTurma(request))
+            //         .catch(res => {
+            //             this.showError('Erro', `Não foi possível selecionar. \n ${getError(res)}`, e)
+            //             return res
+            //         });
 
-                this.selectedEventoReposicao = response.object as Evento;
-            }
+            //     this.selectedEventoReposicao = response.object as Evento;
+            // }
 
-            // Se for feriado e a aula ainda não tiver sido cancelada
-            if (this.selectedEventoReposicao.feriado && this.selectedEventoReposicao.active) {
-                this.selectedEventoReposicao.observacao = `Cancelamento automático \n Feriado: ${this.selectedEventoReposicao.feriado.name}`;
-                let request: EventoCancelamentoRequest = {
-                    id: this.selectedEventoReposicao.id,
-                    observacao: this.selectedEventoReposicao.observacao
-                }
-                response = await lastValueFrom(this.service.cancelar(request))
-            }
+            // console.log('selectedEventoReposicao', this.selectedEventoReposicao)
+
+            // // Se for feriado e a aula ainda não tiver sido cancelada
+            // if (this.selectedEventoReposicao.feriado && this.selectedEventoReposicao.active) {
+            //     this.selectedEventoReposicao.observacao = `Cancelamento automático \n Feriado: ${this.selectedEventoReposicao.feriado.name}`;
+            //     let request: EventoCancelamentoRequest = {
+            //         id: this.selectedEventoReposicao.id,
+            //         observacao: this.selectedEventoReposicao.observacao
+            //     };
+            //     response = await lastValueFrom(this.service.cancelar(request))
+            // }
 
             var alunoReposicao = {
                 aluno_Id: aluno.id,
@@ -684,9 +684,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar essa aula para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar aula`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e);
             }

@@ -1,5 +1,5 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
-import { Evento, EventoCancelamentoRequest, EventoTipo } from '../../models/evento.model';
+import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
+import { Evento, EventoTipo } from '../../models/evento.model';
 import { CalendarOptions, DatesSetArg, EventApi, EventHoveringArg } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { ConfirmationService } from 'primeng/api';
@@ -25,7 +25,6 @@ import { RequestResponse } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
 import { Feriado } from '../../models/feriado.model';
-
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -34,13 +33,9 @@ import listPlugin from '@fullcalendar/list';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import $ from 'jquery'
-import { EventoReuniaoRequest } from '../../models/evento-reuniao.model';
-import { EventoOficinaRequest } from '../../models/evento-oficina.model';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
-import { playError } from '../../utils/audio';
-
 
 @Component({
     selector: 'app-calendario',
@@ -302,10 +297,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
 
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        // var eventosCancelar = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')));
-        // if (this.feriados.length > 0 && eventosCancelar.length > 0) {
-        //     this.cancelarEventos(eventosCancelar);
-        // }
         var eventos = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
 
         var events = eventos.map(item => {
@@ -507,7 +498,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                         rejectVisible: true,
                         rejectIcon: 'pi pi-times',
                         rejectLabel: 'Cancelar',
-                        rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                        rejectButtonStyleClass: 'p-button-rounded p-button-text',
                         accept: async () => {
                             this.agendaReposicaoConffirm(event.event, aluno, source, target);
                             this.cdkCancelDrag('keyup')
@@ -555,7 +546,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
                 this.agendaReposicao(e, aluno, source, target);
                 this.cdkCancelDrag('keyup')
@@ -624,7 +615,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
                     window.open(url, '_target');

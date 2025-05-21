@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import { lastValueFrom } from 'rxjs';
 import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
-import { Crypto } from '../../../../utils';
+import { Crypto, playAlert } from '../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../services/evento.service';
@@ -170,6 +170,46 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
+    goToInserirAlunoConfirm(e: any) {
+        if (this.evento) {
+            if (this.evento.alunos.length >= this.evento.capacidadeMaximaAlunos) {
+                
+                playAlert();
+
+                this.confirmationService.confirm({
+                    target: e.target,
+                    message: `Tem certeza que deseja inserir mais um aluno nessa ${this.tipoEventoString}?`,
+                    header: `Inserir aluno`,
+                    acceptIcon: 'pi pi-check',
+                    acceptLabel: `Sim`,
+                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-icon-right',
+                    rejectIcon: 'pi pi-times',
+                    rejectLabel: 'Não',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                    accept: async () => {
+                        this.goToInserirAluno();
+                    },
+                });
+            } else {
+                this.goToInserirAluno();
+            }
+        }
+    }
+    
+    goToInserirAluno() {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+
+            var route: 'aula-zero' | 'superacao' = 'aula-zero'
+            switch (this.evento.evento_Tipo_Id) {
+                case EventoTipo.AulaZero: route = 'aula-zero'; break;
+                case EventoTipo.Superacao: route = 'superacao'; break;
+                default: route = 'aula-zero'; break;
+            }
+            this.router.navigate(['calendario', route, 'inserir-aluno', this.crypto.encrypt(this.evento.id)])
+        }
+    }
+
     goToReagendamento() {
         if (this.evento) {
             this.service.setEvento(this.evento);
@@ -252,7 +292,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToReposicao() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-            this.router.navigate(['aula', this.crypto.encrypt(this.evento.id), 'reposicao'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['aula', 'reposicao', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
         }
     }
 

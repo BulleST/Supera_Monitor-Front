@@ -153,9 +153,7 @@ export class FormComponent implements OnDestroy {
 
         if (existe) {
             this.toastrService.error('Essa data já está em um outro tema.');
-            ngModel.control.setErrors({
-                'invalid': 'Essa data já está sendo utilizada no período da semana ' + existe.semana + '.'
-            });
+            ngModel.control.setErrors({'invalid': 'Essa data já está sendo utilizada no período da semana ' + existe.semana + '.'});
             playError();
 
         } else {
@@ -178,7 +176,7 @@ export class FormComponent implements OnDestroy {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-text ',

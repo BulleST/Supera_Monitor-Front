@@ -22,7 +22,7 @@ import { EventoService } from '../../../services/evento.service';
 import { validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
 import $ from 'jquery';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-form',
@@ -283,10 +283,10 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e)
             }

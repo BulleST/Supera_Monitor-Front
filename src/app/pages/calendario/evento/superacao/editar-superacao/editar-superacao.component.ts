@@ -156,7 +156,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
                     window.open(url, '_blank')

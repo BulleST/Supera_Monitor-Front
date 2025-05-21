@@ -116,14 +116,7 @@ export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit
 
     ngAfterViewInit(): void {
         this.update();
-
-        // setTimeout(() => {
-        //     $('.p-virtualscroller').height('calc(100vh - 150px)')
-        // }, 500);
-        console.log(window.innerHeight, this.toolbar.nativeElement.offsetHeight)
-
         this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
-
     }
 
     randomDate(start: Date, end: Date) {
@@ -334,7 +327,6 @@ export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit
             return aluno;
         })
 
-        // console.log('dashboard', this.dashboard);
 
         this.expandedRowsKeys = this.alunos.reduce((acc: any, p: any) => (acc[p.turma_Id] = true) && acc, {});
         this.loadingDashboard = false;
@@ -347,23 +339,93 @@ export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit
     }
 
     turmaChanged() {
-        var turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma;
-        this.request.professor_Id = turma.professor_Id;
+        if (this.request.turma_Id) {
+            let turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma; 
+            this.request.professor_Id = turma.professor_Id;
+        }
 
-        localStorage.setItem('turma_Id', (this.request.turma_Id ?? 0).toString())
-        localStorage.setItem('professor_Id', (this.request.professor_Id ?? 0).toString())
+        this.setAlunosDisabled();
+        
 
+        let aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        if (this.request.turma_Id && aluno && aluno.turma_Id != this.request.turma_Id) {
+            this.request.aluno_Id = undefined;
+        }
+
+        this.setLocalStorage();
     }
 
     professorChanged() {
-        this.turmas.map(x => {
-            x.deactivated = x.professor_Id == this.request.professor_Id ? undefined : new Date;
+        
+        this.setTurmaDisabled();
+        this.setAlunosDisabled();
+
+        let aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
+        if (this.request.professor_Id && aluno && aluno.professor_Id != this.request.professor_Id) {
+            this.request.aluno_Id = undefined;
+        }
+
+        let turma = this.turmas.find(x => x.id == this.request.turma_Id);
+        if (this.request.turma_Id && turma && turma.id != this.request.turma_Id) {
+            this.request.turma_Id = undefined;
+        }
+        
+        this.setLocalStorage();
+
+    }
+
+    alunoChanged() {
+        if (this.request.aluno_Id) {
+            let aluno = this.alunos.find(x => x.id == this.request.aluno_Id) as Aluno;
+            this.request.turma_Id = aluno.turma_Id;
+            this.request.professor_Id = aluno.professor_Id;
+        }
+        
+        this.setLocalStorage();
+    }
+    
+    setTurmaDisabled() {
+        this.turmas = this.turmas.map((x: any) => {
+            x.disabled = this.request.professor_Id ? x.professor_Id == this.request.professor_Id ? false : true : false;
             return x;
         })
-        this.request.turma_Id = undefined;
 
-        localStorage.setItem('turma_Id', (this.request.turma_Id ?? 0).toString())
-        localStorage.setItem('professor_Id', (this.request.professor_Id ?? 0).toString())
+    }
+
+    setAlunosDisabled() {
+        this.alunos = this.alunos.map((x: any) => {
+            if (this.request.turma_Id && this.request.professor_Id) {
+                x.disabled = x.turma_Id == this.request.turma_Id && x.professor_Id == this.request.professor_Id ? false : true;
+            } else if (this.request.turma_Id) {
+                x.disabled = x.turma_Id == this.request.turma_Id ? false : true;
+            } else if (this.request.professor_Id) {
+                x.disabled = x.professor_Id == this.request.professor_Id ? false : true;
+            }
+            return x;
+        });
+    }
+    
+    setLocalStorage() {
+        if(this.request.turma_Id) {
+            localStorage.setItem('turma_Id', (this.request.turma_Id??null).toString());
+        }else {
+            localStorage.removeItem('turma_Id');
+        }
+        if(this.request.professor_Id) {
+            localStorage.setItem('professor_Id', (this.request.professor_Id??null).toString());
+        }else {
+            localStorage.removeItem('professor_Id');
+        }
+        if(this.request.aluno_Id) {
+            localStorage.setItem('aluno_Id', (this.request.aluno_Id??null).toString());
+        }else {
+            localStorage.removeItem('aluno_Id');
+        }
+
+    }
+
+    getCorTurma(turma_Id: number) {
+        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
     }
 
     enviarMensagem(nome: string, celular: string) {

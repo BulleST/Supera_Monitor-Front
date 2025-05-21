@@ -19,7 +19,7 @@ import { Popover } from 'primeng/popover';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { ProfessorService } from '../../../services/professor.service';
 import { Professor } from '../../../models/professor.model';
-import { playAlert, playSuccess, playError } from '../../../utils/audio';
+import { playAlert, playSuccess, showError } from '../../../utils';
 
 @Component({
     selector: 'app-list',
@@ -191,9 +191,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
@@ -215,16 +215,7 @@ export class ListComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
-        playError();
-        this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: header,
-            // icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        });
+        showError(this.confirmationService, header, message, e)
     }
 
     getOption(col: ColumnTable, row: any) {
@@ -255,7 +246,7 @@ export class ListComponent implements OnDestroy {
                 acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     this.loadingChecklist = true;
                     item.observacoes = this.checklistObservacao

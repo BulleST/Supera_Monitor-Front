@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Checklist, Checklist_Item } from '../../../models/checklist.model';
-import { getError } from '../../../utils';
+import { getError, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ChecklistService } from '../../../services/checklist.service';
 import { AlunoService } from '../../../services/alunos.service';
@@ -14,7 +14,7 @@ import { TurmaService } from '../../../services/turma.service';
 import { AccountService } from '../../../services/account.service';
 import { ProfessorService } from '../../../services/professor.service';
 import { AlunoChecklistItemList, AlunoChecklistItemList_Request } from '../../../models/aluno-checklist-item-list.model';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-monitoramento-jornada-supera',
@@ -230,7 +230,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     }
 
-
     setAlunosDisabled() {
         this.alunos = this.alunos.map((x: any) => {
             if (this.request.turma_Id && this.request.professor_Id) {
@@ -268,9 +267,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     enviarMensagemAluno(aluno: Aluno) {
-        if(!aluno.nome) {
-            console.log('aluno', aluno)
-        }
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
     enviarMensagem(aluno: AlunoChecklistItemList) {
@@ -303,17 +299,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     showError(header: string, message: string, e: any) {
-        playError();
-
-        this.confirmationService.confirm({
-            target: e.target ?? e,
-            message: message,
-            header: header,
-            // icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, header, message, e);
     }
 
     finalizarChecklist(e: any, item: AlunoChecklistItemList) {
@@ -326,11 +312,11 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Finalizar',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
                 this.loadingAlunos = true;
                 item.observacoes = this.checklistObservacao

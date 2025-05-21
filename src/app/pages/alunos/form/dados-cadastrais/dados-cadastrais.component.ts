@@ -17,10 +17,10 @@ import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
-import { Select, SelectChangeEvent } from 'primeng/select';
+import {  SelectChangeEvent } from 'primeng/select';
 import { getError, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
-import { playAlert, playError, playSuccess } from '../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../utils/audio';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -276,7 +276,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.turmaChangedConffirm(e, model);
             },
@@ -302,7 +302,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.turmaAccept();
             },
@@ -351,7 +351,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
                 this.loadingChecklists = true;
                 item.observacoes = this.checklistObservacao
@@ -430,7 +430,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 rejectVisible: true,
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     var request: Aluno_Restricao_Request = {
                         id: 0,
@@ -483,7 +483,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: async () => {
 
                 this.loadingRestricoes = true;

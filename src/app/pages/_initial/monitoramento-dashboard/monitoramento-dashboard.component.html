@@ -1,23 +1,24 @@
 <div class="p-1">
-    <p-toolbar
-               styleClass="border-none bg-white p-4 mb-4 shadow-1">
-        <div class="p-toolbar-group-end w-full" #toolbar>
-            <div class="w-full flex align-items-center flex-wrap gap-2">
-                <h2 class="flex align-items-center mr-auto">
-                    <i class="pi pi-calendar mr-3 text-primary text-xl"></i>
-                    <span class="text-2xl font-normal my-0">Dashboard</span>
+    <p-toolbar styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
+        <div class="p-toolbar-group-start w-full ">
+            <div class="flex align-items-center flex-wrap w-full">
+                <h2 class="flex align-items-center ">
+                    <i class="bi bi-table mr-3 text-primary-500 text-2xl"></i>
+                    <span class="text-2xl font-normal my-0 white-space-nowrap">Dashboard</span>
                 </h2>
+                
+            </div>
+            <div class="flex align-items-center justify-content-end flex-wrap w-full gap-2 mt-1">
                 <!-- Turma -->
-                <div class="flex align-items-center justify-content-start gap-2 mr-2">
-                    <label for="turma_Id">Turma: </label>
+                <div class="md:col sm:col-12 col-12 flex align-items-center flex-nowrap">
+                    <label for="turma_Id" class="white-space-nowrap mr-2">Turma: </label>
                     <p-select
                               [options]="turmas"
                               [(ngModel)]="request.turma_Id"
                               [loading]="loadingTurmas"
                               (ngModelChange)="turmaChanged()"
                               #turma_Id="ngModel"
-                              styleClass="w-full"
-                              class="w-full"
+                              [style]="{width: '100%'}"
                               name="turma_Id"
                               inputId="turma_Id"
                               optionLabel="nome"
@@ -27,7 +28,7 @@
                               placeholder="Selecione uma turma"
                               [showClear]="true"
                               appendTo="body"
-                              optionDisabled="deactivated">
+                              optionDisabled="disabled">
                         <ng-template let-item #item>
                             <div class="flex align-items-center justify-content-between w-full gap-2">
                                 <div class="w-full">
@@ -44,16 +45,15 @@
                     </p-select>
                 </div>
                 <!-- Educador -->
-                <div class="flex align-items-center justify-content-start gap-2 mr-2">
-                    <label for="professor_Id">Educador:</label>
+                <div class="md:col sm:col-12 col-12 flex align-items-center flex-nowrap">
+                    <label for="professor_Id" class="white-space-nowrap mr-2">Educador:</label>
                     <p-select
                               [options]="professores"
                               [(ngModel)]="request.professor_Id"
                               [loading]="loadingProfessores"
                               (ngModelChange)="professorChanged()"
                               #professor_Id="ngModel"
-                              styleClass="w-full"
-                              class="w-full"
+                              [style]="{width: '100%'}"
                               name="professor_Id"
                               inputId="professor_Id"
                               optionLabel="nome"
@@ -78,31 +78,80 @@
                         </ng-template>
                     </p-select>
                 </div>
+                <!-- Aluno -->
+                <div class="md:col sm:col-12 col-12 flex align-items-center flex-nowrap">
+                    <label for="aluno_Id" class="white-space-nowrap mr-2">Aluno: </label>
+                    <p-select [options]="alunos"
+                              [loading]="loadingAlunos"
+                              [(ngModel)]="request.aluno_Id"
+                              (ngModelChange)="alunoChanged()"
+                              [style]="{width: '100%'}"
+                              optionLabel="nome"
+                              optionValue="id"
+                              name="aluno_Id"
+                              inputId="aluno_Id"
+                              [required]="true"
+                              [filter]="true"
+                              filterBy="nome,turma"
+                              [virtualScroll]="true"
+                              [virtualScrollItemSize]="43"
+                              [showClear]="true"
+                              optionDisabled="disabled"
+                              appendTo="body">
+                        <ng-template let-item #item>
+                            <div>
+                                <div class="flex align-items-center w-full gap-1">
+                                    <div class="w-2rem h-2rem">
+                                        <a *ngIf="item.celular"
+                                           [href]="enviarMensagem(item.nome, item.celular)"
+                                           pTooltip="Enviar mensagem"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-green-500 hover:bg-green-500 hover:text-white ">
+                                        </a>
+                                        <a *ngIf="!item.celular"
+                                           class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-400 pointer-event-none">
+                                        </a>
+                                    </div>
+                                    <p>{{item.nome | nameAbv }}</p>
+                                </div>
+                                <p class="text-sm">
+                                    <span class="w-2rem h-2rem p-2 inline-flex align-itens-center mr-1">
+                                        <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
+                                        <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
+                                            <span class="w-1rem h-1rem border-circle inline-flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                                        </ng-template>
+                                    </span>
+                                    <span>Turma: {{ item.turma }}</span>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
                 <!-- Ano -->
-                <div class="flex align-items-center justify-content-start gap-2 ">
-                    <label for="ano">Selecione o ano: </label>
+                <div class="md:col sm:col-12 col-12 flex align-items-center flex-nowrap">
+                    <label for="ano" class="white-space-nowrap mr-2" >Ano: </label>
                     <p-select inputId="ano"
                               name="ano"
                               [(ngModel)]="request.ano"
                               [options]="anos"></p-select>
                 </div>
-                <!-- Atualizar -->
+                <!-- Filtrar -->
                 <div class="">
                     <p-button icon="pi pi-filter text-sm text-white"
                               (onClick)="update()"
                               severity="secondary"
-                              label="Filtrar e atualizar"
+                              label="Filtrar"
                               [text]="true"
                               pTooltip="Aplicar filtros"
                               class="mr-2"
                               [rounded]="true"
-                              [disabled]="loadingDashboard"
-                              [loading]="loadingDashboard"
                               styleClass="bg-black-alpha-80 text-white" />
                 </div>
             </div>
         </div>
     </p-toolbar>
+
     <div>
         <h3>Legenda</h3>
         <div class="my-2 p-4 flex align-items-center justify-content-between gap-2 flex-wrap bg-white shadow-1 border-round-md ">

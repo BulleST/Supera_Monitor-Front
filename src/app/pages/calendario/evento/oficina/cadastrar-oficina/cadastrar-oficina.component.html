@@ -45,6 +45,7 @@
                               (onYearChange)="dateNavigatorChanged($event)"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
+                              placeholder="DD/MM/YYYY"
                               [minDate]="minData"
                               inputId="data"
                               name="data"
@@ -69,6 +70,7 @@
                               #hora="ngModel"
                               [(ngModel)]="horario"
                               (onBlur)="verificaDisponibilidade()"
+                              placeholder="HH:MM"
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
@@ -248,7 +250,6 @@
                           icon="pi pi-check"
                           [loading]="loading"
                           [rounded]="true"
-                          size="small"
                           [disabled]="form.invalid || loading" />
             </div>
         </div>

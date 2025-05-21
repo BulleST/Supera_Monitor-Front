@@ -6,7 +6,6 @@ import moment from "moment";
 import { Feriado } from "../models/feriado.model";
 import { RequestResponse } from "../helpers/request-response.interface";
 import { PseudoEvento } from "../models/reposicao.model";
-import { getError } from "./error";
 import { MyMap } from "./map";
 import { EventoOficinaRequest } from "../models/evento-oficina.model";
 import { EventoReuniaoRequest } from "../models/evento-reuniao.model";
@@ -26,10 +25,11 @@ export class CalendarioUtils {
         this.service.feriados.subscribe(res => this.feriados = res);
 
         this.service.eventos.subscribe(res => {
-            console.log()
+            console.log('eventos subscriber', res);
             var feriados = this.service.feriados.value;
             var feriadosDates = feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
             var eventosCancelar = res.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')));
+            console.log('eventos eventosCancelar', eventosCancelar);
             this.cancelarEventos(eventosCancelar);
         })
 
@@ -77,34 +77,48 @@ export class CalendarioUtils {
      * Cancelamento automático de eventos
      */
 
-    cancelarEventos(eventos: Evento[]) {
+    async cancelarEventos(eventos: Evento[]) {
         var terminou = [];
-        eventos.forEach(evento => {
-            var data = moment(evento.data).format('YYYY-MM-DD')
-            var feriado = this.feriados.find(x => moment(x.date).isSame(data)) as Feriado;
-            evento.observacao = `Cancelamento automático \n Feriado: ${feriado.name}`;
-            this.cancelarEventoAutomaticamente(evento, feriado)
-                .then(res => {
-                    terminou.push(res);
-                })
+        var list = this.service.eventos.value as Evento[];
+        await new Promise(resolve => {
+            eventos.forEach(evento => {
+                var data = moment(evento.data).format('YYYY-MM-DD')
+                var feriado = this.feriados.find(x => moment(x.date).isSame(data)) as Feriado;
+                evento.observacao = `Cancelamento automático \n Feriado: ${feriado.name}`;
+                this.cancelarEventoAutomaticamente(evento, feriado)
+                    .then(res => {
+                        terminou.push(res);
+                        var index = list.findIndex(x => x.id == res.id);
+                        if (index != -1) {
+                            list.splice(index, 1, res)
+                        }
+                        if(terminou.length == eventos.length) {
+                            resolve(true);
+                        }
+                    })
+                    .catch(res => {
+                        terminou.push(res);
+                        if(terminou.length == eventos.length) {
+                            resolve(false);
+                        }
+                    })
+            });
         });
-
+        if (terminou.length == eventos.length) {
+            this.service.eventos.next(list)
+        }
     }
 
 
     async cancelarEventoAutomaticamente(evento: Evento, feriado: Feriado) {
         var response: RequestResponse = { success: true, message: '', object: null };
-        var tipo = this.getEventoTipo(evento);
 
         if (evento.id == PseudoEvento.EventoId) {
             await this.request(evento)
                 .then(res => {
                     evento.id = res.object.id;
                     response = res;
-                })
-                .catch(res => {
-                    // this.toastrService.error(`${getError(res)}`);
-                })
+                });
         }
 
         if (response.success) {
@@ -114,15 +128,15 @@ export class CalendarioUtils {
             };
             response = await lastValueFrom(this.service.cancelar(request))
                 .then(res => {
-                    return res
-                })
-                .catch(res => {
-                    // this.toastrService.error(`Não foi possível cancelar a ${tipo}. \n ${getError(res)}`);
-                    return res
+                    evento.active = false;
+                    evento.deactivated = res.object.deactivated;
+                    evento.observacao = res.object.observacao;
+                    return res;
                 })
         }
-        return response;
+        return evento;
     }
+
     request(evento: Evento) {
         evento.data = new Date(evento.data)
         switch (evento.evento_Tipo_Id) {

@@ -255,7 +255,7 @@
             <p class="text-orange-500 font-bold">Alunos</p>
             <p-button *ngIf="!isChamadaPage && !evento.finalizado"
                       type="button"
-                      (onClick)="inserirReposicao($event)"
+                      (onClick)="goToReposicao()"
                       styleClass="px-3 mr-2"
                       label="Inserir reposicao"
                       icon="pi pi-plus"

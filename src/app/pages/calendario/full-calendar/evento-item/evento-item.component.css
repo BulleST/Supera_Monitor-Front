@@ -112,15 +112,22 @@
 .event.event-aula-zero,
 .event.event-superacao {
     padding: 0;
-    margin: -1px;
+    margin: -3px;
     width: calc(100% + 4px);
-    height: calc(100% + 1px);
+    height: calc(100% + 4px);
     line-height: 0.9;
+    scale: 0.9;
+}
+
+.event.event-aula-zero .event-header,
+.event.event-superacao .event-header {
+    padding-top: 1px;
+
 }
 
 .event.event-aula-zero .event-body .event-descricao,
 .event.event-superacao .event-body .event-descricao {
-    font-weight: normal;
+font-weight: normal;
 }
 
 .event.event-aula-zero .event-body .event-sala,

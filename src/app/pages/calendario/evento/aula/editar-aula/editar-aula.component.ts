@@ -12,15 +12,14 @@ import { Evento_Participacao_Aluno } from '../../../../../models/evento-particip
 import { Apostila, ApostilaTipo } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { Roteiro } from '../../../../../models/roteiro.model';
-import { MobileService, showError } from '../../../../../utils';
+import { Crypto, MobileService, showError } from '../../../../../utils';
 import { ScreenWidth } from '../../../../../utils/mobile';
 import { Aluno } from '../../../../../models/alunos.model';
 import { AlunoService } from '../../../../../services/alunos.service';
-import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventoService } from '../../../../../services/evento.service';
-import { playAlert, playError } from '../../../../../utils/audio';
+import { playAlert } from '../../../../../utils/audio';
 import { TableEditCancelEvent, TableEditCompleteEvent, TableEditInitEvent } from 'primeng/table';
 
 @Component({
@@ -77,15 +76,16 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         private calendarioUtils: CalendarioUtils,
         private router: Router,
         private activatedRoute: ActivatedRoute,
+        private crypto: Crypto,
     ) {
 
-        var screen = this.mobileService.get().subscribe(res => this.screen = res);
+        let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
+        let apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res);
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -108,13 +108,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 this.perfilCognitivo = this.evento.perfilCognitivo[0].nome;
             }
 
-            if (!this.evento.roteiro_Id) {
-                var roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim));
-                this.roteiro = roteiro;
-                if (roteiro) {
-                    this.evento.roteiro_Id = roteiro.id;
-                }
-            }
+            this.setRoteiro();
         }
 
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
@@ -126,7 +120,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
 
-        if (changes['roteiros']) this.roteiros = changes['roteiros'].currentValue;
+        if (changes['roteiros']) {
+            this.roteiros = changes['roteiros'].currentValue;
+            this.setRoteiro();
+        }
         if (changes['loadingRoteiros']) this.loadingRoteiros = changes['loadingRoteiros'].currentValue;
 
         this.width.emit('1200px');
@@ -135,14 +132,14 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
 
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.professores.find(x => x.id == e.value);
+        let item = this.professores.find(x => x.id == e.value);
         this.validaProfessor.emit(item);
 
         if (item && item.disponivel == false && item.disponivelEvent) {
@@ -156,7 +153,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value);
         this.validaSala.emit(item);
 
         if (item && item.disponivel == false && item.disponivelEvent) {
@@ -189,7 +186,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         item.presente = false;
         if (item.celular) {
             playAlert();
-            var nome = item.aluno.split(' ')[0];
+            let nome = item.aluno.split(' ')[0];
             this.confirmationService.confirm({
                 target: e.targer,
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
@@ -199,9 +196,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
-                    var url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
+                    let url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
                     window.open(url, '_blank')
                 },
             });
@@ -212,7 +209,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         item.presente = !item.presente;
 
         if (item.presente == false && item.celular) {
-            var nome = item.aluno.split(' ')[0];
+            let nome = item.aluno.split(' ')[0];
             playAlert();
             this.confirmationService.confirm({
                 target: e.target,
@@ -223,9 +220,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
-                    var url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
+                    let url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
                     window.open(url, '_blank')
                 },
             });
@@ -283,8 +280,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAbacoChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
-        var newApostila = item.apostilaAbacoObject as Apostila;
-        var oldApostila = this.clonedRow[item.id].apostilaAbacoObject as Apostila;
+        let newApostila = item.apostilaAbacoObject as Apostila;
+        let oldApostila = this.clonedRow[item.id].apostilaAbacoObject as Apostila;
 
         if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
 
@@ -297,7 +294,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
                     item.numeroPaginaAbaco = 1;
@@ -319,8 +316,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any) {
-        var prev = this.clonedRow[item.id];
-        var current = item;
+        let prev = this.clonedRow[item.id];
+        let current = item;
         if (current.numeroPaginaAbaco <= prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
 
             this.confirmationService.confirm({
@@ -328,9 +325,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_Abaco}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                 rejectLabel: 'Não, foi um engano',
-                rejectButtonStyleClass: ' p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 reject: () => {
                     item.numeroPaginaAbaco = prev.numeroPaginaAbaco;
                 }
@@ -344,8 +341,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAHChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
-        var newApostila = this.apostilas.find(x => x.id == item.apostila_AH_Id) as Apostila;
-        var oldApostila = this.apostilas.find(x => x.id == this.clonedRow[item.id].apostila_AH_Id) as Apostila;
+        let newApostila = this.apostilas.find(x => x.id == item.apostila_AH_Id) as Apostila;
+        let oldApostila = this.apostilas.find(x => x.id == this.clonedRow[item.id].apostila_AH_Id) as Apostila;
 
         if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
 
@@ -358,7 +355,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
                     item.numeroPaginaAH = 1;
@@ -381,8 +378,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
     numeroPaginaAHChange(item: Evento_Participacao_Aluno, e: any) {
 
-        var prev = this.clonedRow[item.id];
-        var current = item;
+        let prev = this.clonedRow[item.id];
+        let current = item;
 
         if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
 
@@ -391,9 +388,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_AH}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                 rejectLabel: 'Não, foi um engano',
-                rejectButtonStyleClass: ' p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 reject: () => {
                     item.numeroPaginaAH = prev.numeroPaginaAH;
                 }
@@ -401,8 +398,26 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         }
     }
-    inserirReposicao(e: any) {
-        this.service.setEvento(this.evento);
-        this.router.navigate(['reposicao'], { relativeTo: this.activatedRoute });
+   
+
+    goToReposicao() {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+            this.router.navigate(['aula', 'reposicao', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
+        }
+    }
+    
+
+    setRoteiro() {
+        if (this.roteiros.length && this.evento) {
+            let roteiro: Roteiro | undefined;
+            if(this.evento.roteiro_Id) {
+                roteiro = this.roteiros.find(x => x.id == this.evento.roteiro_Id);
+                this.evento.roteiro_Id = roteiro?.id;
+            } else {
+                roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim));
+            }
+            this.roteiro = roteiro;
+        }
     }
 }

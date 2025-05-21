@@ -16,6 +16,7 @@ export class DashboardRequest {
     mes: number = 0;
     turma_Id?: number;
     professor_Id?: number;
+    aluno_Id?: number;
 }
 
 // export class Dashboard_Aulas { 

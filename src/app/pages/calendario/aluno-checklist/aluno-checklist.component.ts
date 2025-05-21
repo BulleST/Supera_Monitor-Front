@@ -12,7 +12,7 @@ import { UserService } from '../../../services/user.service';
 import { Popover } from 'primeng/popover';
 import { Tabs } from 'primeng/tabs';
 import $ from 'jquery';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 import { showError } from '../../../utils';
 
 @Component({
@@ -146,7 +146,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                 acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Ainda não',
-                rejectButtonStyleClass: 'p-button-rounded  p-button-outlined',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     this.loading = true;
                     lastValueFrom(this.service.markAsDone(item.id))

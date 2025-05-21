@@ -75,8 +75,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private router: Router,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
-        // private salaAulaService: SalaAulaService,
-        // private professorService: ProfessorService,
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private turmaService: TurmaService,
@@ -317,9 +315,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.alunosSelected.map(x => x.nome.split(' ')[0]).join(', ')}?`,
             acceptLabel: `Salvar e inscrever`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e);
             }
@@ -385,9 +383,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false
                 this.visibleChange();

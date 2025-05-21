@@ -35,7 +35,7 @@ import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { groupBy } from 'lodash';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -201,7 +201,7 @@ export class CadastrarAula0Component implements OnDestroy {
         return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
     }
 
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
@@ -258,13 +258,13 @@ export class CadastrarAula0Component implements OnDestroy {
     validaSalaAulas() {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
-        this.salaAulas = validaSalaAulas(data,this.object.duracaoMinutos,this.salaAulas,this.eventos,undefined,undefined);
+        this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
 
     validaProfessores() {
         var data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
-        this.professores = validaProfessores(data,this.object.duracaoMinutos,this.professores,this.eventos,undefined,undefined);
+        this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
 
         if (this.object.professor_Id) {
             var e: SelectChangeEvent = {
@@ -282,7 +282,8 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaProfessores();
+        console.log('professorChanged', e)
+        // this.validaProfessores();
         var item = this.professores.find(x => x.id == e.value) as Professor;
         let mensagemErro: string | null = null;
 
@@ -344,9 +345,9 @@ export class CadastrarAula0Component implements OnDestroy {
                 header: `Selecionar ${alunos.length} alunos?`,
                 message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 reject: () => {
                     this.alunosSelected = [this.alunosSelected[0]]
                 },
@@ -365,9 +366,9 @@ export class CadastrarAula0Component implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
         if (this.alunosSelected.length == 0) {
-            return this.showError('Não foi possível salvar','Preencha todos os dados corretamente para salvar',e);
+            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
-        
+
         playAlert();
 
         this.object.alunos = this.alunosSelected.map((x) => x.id);
@@ -394,16 +395,16 @@ export class CadastrarAula0Component implements OnDestroy {
                 )}?.`;
         }
 
-        
+
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula 0',
             message: mensagem,
             acceptLabel: `Agendar aula 0`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e);
             },
@@ -419,7 +420,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.object = res.object;
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
-                this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado' );
+                this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado');
                 playSuccess();
 
                 if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
@@ -431,11 +432,11 @@ export class CadastrarAula0Component implements OnDestroy {
                     this.visible = false;
                     this.visibleChange();
                 }
-                
+
             })
             .catch((res) => {
                 this.loading = false;
-                this.showError('Agendamento falhou',`Não foi possível agendar aula 0. <br> ${getError(res)}`,e);
+                this.showError('Agendamento falhou', `Não foi possível agendar aula 0. <br> ${getError(res)}`, e);
             });
     }
 
@@ -451,7 +452,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -472,9 +473,9 @@ export class CadastrarAula0Component implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -504,26 +505,13 @@ export class CadastrarAula0Component implements OnDestroy {
         if (this.alunosSelected) {
             var id = 31;
             this.alunosSelected.forEach((aluno) => {
-                var alunoChecklist = aluno.alunoChecklist.find(
-                    (x) => x.checklist_Item_Id == id
-                ) as Aluno_CheckList_Item;
-                var professor = this.professores.find(
-                    (x) => x.id == this.object.professor_Id
-                ) as Professor;
+                var alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+                var professor = this.professores.find((x) => x.id == this.object.professor_Id) as Professor;
 
                 if (!alunoChecklist.finalizado) {
-                    var mensagem = `Aula 0 agendada para o dia ${moment(
-                        this.object.data
-                    ).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome
-                        }.\n
-                                    Agendamento realizado por ${this.accountService.accountValue?.name
-                        } no dia ${moment(new Date()).format(
-                            'DD/MM/YY [aproximadamente às] HHH[h]mm'
-                        )}}`;
+                    var mensagem = `Aula 0 agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${professor.nome}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
                     if (alunoChecklist && !alunoChecklist.finalizado) {
-                        lastValueFrom(
-                            this.checklistService.markAsDone(alunoChecklist.id, mensagem)
-                        );
+                        lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
                     }
                 }
             });

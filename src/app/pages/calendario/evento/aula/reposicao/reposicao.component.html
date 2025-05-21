@@ -179,7 +179,8 @@
                                     </ng-container>
                                 </ng-container>
                             </p>
-                            <p>Turma: {{evento.turma}} </p>
+                            <p *ngIf="evento.turma">Turma: {{evento.turma}} </p>
+                            <p *ngIf="!evento.turma">{{evento.descricao}} </p>
                         </div>
                     </ng-template>
                 </p-select>

@@ -23,7 +23,7 @@ import { EventoAulaRequest } from '../../../../../models/evento-aula.model';
 import { Feriado } from '../../../../../models/feriado.model';
 import { ToastrService } from 'ngx-toastr';
 import { getError, showError } from '../../../../../utils';
-import { playAlert, playError, playSuccess } from '../../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-reposicao',
@@ -115,7 +115,9 @@ export class ReposicaoComponent implements OnDestroy {
                 .then(res => this.loadingFeriados = false)
                 .catch(res => this.loadingFeriados = false);
         }
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
+        var eventos = this.service.eventos.subscribe(res => {
+            this.filterEventos(res);
+        });
         this.subscription.push(eventos);
 
         var evento = this.service.evento.subscribe(async res => {
@@ -165,7 +167,7 @@ export class ReposicaoComponent implements OnDestroy {
         }
     }
 
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
@@ -254,8 +256,8 @@ export class ReposicaoComponent implements OnDestroy {
                     message: message,
                     acceptLabel: 'Continuar',
                     rejectLabel: 'Cancelar',
-                    acceptButtonStyleClass: ' p-button-rounded mr-0',
-                    rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+                    acceptButtonStyleClass: 'p-button-rounded mr-0',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-text bg-primary-50',
                     accept: () => this.selectEventoConfirm(e),
                     reject: () => this.removeSelection(),
                 });
@@ -277,32 +279,40 @@ export class ReposicaoComponent implements OnDestroy {
             lastValueFrom(this.service.calendario(request))
                 .then(res => {
 
-                    var feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));
-                    this.eventos = res;
-
-                    /* Apenas eventos do tipo aula */
-                    this.eventos = this.eventos.filter(evento => evento.evento_Tipo_Id == EventoTipo.Aula);
-                    /* Apenas aulas não reagendadas */
-                    this.eventos = this.eventos.filter(evento => !evento.reagendamentoPara_Evento_Id);
-                    /* Apenas aulas sem presença marcada e sem reposição marcada */
-                    this.eventos = this.eventos.filter(evento => evento.alunos.find(a => a.aluno_Id == this.selectedAluno!.id
-                        && a.presente != true
-                        && !a.reposicaoPara_Evento_Id
-                        && !a.reposicaoDe_Evento_Id) != undefined);
-                    /* Apenas aulas instanciadas ou aulas em feriados */
-                    this.eventos = this.eventos.filter(evento => evento.id != PseudoEvento.EventoId || feriadosDates.includes(moment(evento.data).format('YYYY-MM-DD')));
-
-                    this.eventos = this.eventos
-                        .map(evento => {
-                            evento.alunos = evento.alunos.filter(x => x.aluno_Id == this.selectedAluno!.id);
-                            var data = moment(evento.data).format('YYYY-MM-DD')
-                            evento.feriado = this.feriados.find(x => moment(x.date).format('YYYY-MM-DD') == data);
-                            return evento;
-                        });
-
+                    this.filterEventos(res);
                     this.loadingEventos = false;
                 })
         }
+
+    }
+
+    filterEventos(eventos: Evento[]) {
+        var feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));
+        this.eventos = eventos;
+
+        /* Apenas eventos do tipo aula */
+        this.eventos = this.eventos.filter(evento => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id));
+        /* Apenas aulas não reagendadas */
+        this.eventos = this.eventos.filter(evento => !evento.reagendamentoPara_Evento_Id);
+        /* Apenas aulas sem presença marcada e sem reposição marcada */
+        if (this.selectedAluno) {
+            // this.eventos = this.eventos.filter(evento => evento.alunos.find(a => a.aluno_Id == this.selectedAluno.id)
+            this.eventos = this.eventos.filter(evento => evento.alunos.find(a => a.aluno_Id == this.selectedAluno!.id
+                && a.presente != true
+                && !a.reposicaoPara_Evento_Id
+                && !a.reposicaoDe_Evento_Id) != undefined);
+        }
+        /* Apenas aulas instanciadas ou aulas em feriados */
+        this.eventos = this.eventos.filter(evento => evento.id != PseudoEvento.EventoId || feriadosDates.includes(moment(evento.data).format('YYYY-MM-DD')));
+
+        this.eventos = this.eventos
+            .map(evento => {
+                evento.alunos = evento.alunos.filter(x => x.aluno_Id == this.selectedAluno!.id);
+                var data = moment(evento.data).format('YYYY-MM-DD')
+                evento.feriado = this.feriados.find(x => moment(x.date).format('YYYY-MM-DD') == data);
+                return evento;
+            });
+
 
     }
 
@@ -324,7 +334,7 @@ export class ReposicaoComponent implements OnDestroy {
             acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.visible = false
                 this.visibleChange();

@@ -13,6 +13,7 @@ import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.compo
 import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
 import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
+import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 
 const routes: Routes = [{
     path: '', component: CalendarioComponent, children: [
@@ -23,17 +24,16 @@ const routes: Routes = [{
         { path: 'reuniao/agendar', component: CadastrarReuniaoComponent },
         { path: 'oficina/agendar', component: CadastrarOficinaComponent },
         { path: 'oficina/inscrever/:evento_id', component: CadastrarInscricaoComponent },
-
-        { path: ':evento_nome/:evento_id/reposicao', component: ReposicaoComponent },
-        { path: ':evento_nome/reposicao', component: ReposicaoComponent },
         
+
         { path: ':evento_nome/:evento_id', component: EventoComponent },
+        { path: ':evento_nome/reposicao/:evento_id', component: ReposicaoComponent },
+        { path: ':evento_nome/inserir-aluno/:evento_id', component: InserirAlunoComponent },
         { path: ':evento_nome/chamada/:evento_id', component: EventoComponent },
         { path: ':evento_nome/reagendar/:evento_id', component: ReagendarEventoComponent },
         { path: ':evento_nome/cancelar/:evento_id', component: CancelarEventoComponent },
         
         { path: 'aluno/reposicao/:aluno_id', component: AgendarReposicaoAlunoComponent },
-
         { path: 'aluno/:aluno_id', component: AlunoFormComponent }
     ]
 },];

@@ -21,7 +21,7 @@ import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playError, playAlert, playSuccess } from '../../../../../utils/audio';
+import { playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-oficina',

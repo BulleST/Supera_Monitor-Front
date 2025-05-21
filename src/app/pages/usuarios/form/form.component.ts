@@ -10,7 +10,7 @@ import { Account, AccountResponse } from '../../../models/account.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Role } from '../../../models/account-perfil.model';
 import { ToastrService } from 'ngx-toastr';
-import { playAlert, playError, playSuccess } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-form',
@@ -103,10 +103,10 @@ export class FormComponent implements OnDestroy {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 this.send(e)
             }

@@ -10,7 +10,7 @@ import { Turma, turmaColumns } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-import { playAlert, playSuccess, playError } from '../../../utils/audio';
+import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-list',
@@ -147,9 +147,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: ' p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-text ',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {

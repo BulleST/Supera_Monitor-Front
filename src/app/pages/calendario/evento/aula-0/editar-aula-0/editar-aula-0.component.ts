@@ -13,7 +13,7 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playError } from '../../../../../utils/audio';
+import { playAlert } from '../../../../../utils/audio';
 import { showError } from '../../../../../utils';
 
 @Component({
@@ -140,7 +140,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-text ',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
                     window.open(url, '_blank')
@@ -162,8 +162,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
                 var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
                 
-                mensagem = `Aluno compareceu na aula do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                                    Aula 0 finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}`
+                mensagem = `Aluno compareceu na aula do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${professor.nome}.\n Aula 0 finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
             }
         }
