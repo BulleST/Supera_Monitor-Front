@@ -156,7 +156,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     filtrarPendentesSemana() {
-        console.log('pendentesSemana', this.request.pendentesSemana)
         if (this.request.pendentesSemana) {
             this.listFiltered = this.list.filter(x => moment(x.prazo).week() == moment().week())
         } else {
@@ -270,9 +269,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
     enviarMensagem(aluno: AlunoChecklistItemList) {
-        if(!aluno.aluno) {
-            console.log('aluno', aluno)
-        }
         return this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
     }
 

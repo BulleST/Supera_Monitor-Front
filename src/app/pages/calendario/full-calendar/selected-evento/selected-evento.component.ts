@@ -320,7 +320,6 @@ export class SelectedEventoComponent implements OnChanges {
         const x = event.clientX;
         const y = event.clientY;
         this.mouse = { x, y };
-        console.log(`Mouse X: ${x}, Mouse Y: ${y}`);
     }
 
     tooltipPosition() {

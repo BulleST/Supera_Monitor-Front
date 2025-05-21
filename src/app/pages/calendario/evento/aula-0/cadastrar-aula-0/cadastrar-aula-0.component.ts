@@ -282,7 +282,6 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        console.log('professorChanged', e)
         // this.validaProfessores();
         var item = this.professores.find(x => x.id == e.value) as Professor;
         let mensagemErro: string | null = null;

@@ -133,8 +133,6 @@ export class InserirAlunoComponent {
                 this.visible = true;
                 this.verificaDisponibilidade();
                 this.tipoString = this.getTipo(this.evento);
-                var alunosEvento = this.evento.alunos.map(x => x.aluno_Id)
-                this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id));
 
                 this.setAlunos();
             }
@@ -165,6 +163,7 @@ export class InserirAlunoComponent {
     }
 
     setAlunos() {
+        console.log('setAlunos', this.evento, this.alunos.length)
         if (this.evento && this.alunos.length) {
             var alunosInseridos = this.evento.alunos.map(x => x.aluno_Id);
             this.alunos = this.alunos.filter(x => x.active && !alunosInseridos.includes(x.id));
@@ -291,9 +290,9 @@ export class InserirAlunoComponent {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-primary',
             acceptIcon: 'pi pi-whatsapp',
-            rejectLabel: 'Cancelar',
+            rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-rounded p-button-text',
             accept: () => {
                 var url = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);

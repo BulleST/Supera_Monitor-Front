@@ -102,7 +102,6 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         this.subscription.push(open);
 
         var list = this.service.list.subscribe(res => {
-            console.log('list subscription', res)
             this.calendarioList = res;
             this.setCalendario();
         });
@@ -176,8 +175,6 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
     }
     setCalendario() {
-        console.log('setCalendario')
-
         var calendar = this.fullCalendar.getApi();
         calendar.removeAllEvents();
 

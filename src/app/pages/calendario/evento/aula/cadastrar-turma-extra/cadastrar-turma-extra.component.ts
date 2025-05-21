@@ -591,35 +591,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             this.showError('Erro', 'Selecione uma aula e aluno para repor', e.event);
         }
         else {
-            // var response: RequestResponse = { success: true, message: '', object: null };
-            // if (this.selectedEventoReposicao.id == PseudoEvento.EventoId) {
-
-            //     let request: EventoAulaRequest = MyMap(this.selectedEventoReposicao, new EventoAulaRequest);
-            //     request.perfilCognitivo = this.selectedEventoReposicao.perfilCognitivo.map(x => x.id);
-            //     request.professores = this.selectedEventoReposicao.professores.map(x => x.professor_Id);
-            //     request.alunos = this.selectedEventoReposicao.alunos.map(x => x.aluno_Id);
-
-            //     response = await lastValueFrom(this.service.createAulaTurma(request))
-            //         .catch(res => {
-            //             this.showError('Erro', `Não foi possível selecionar. \n ${getError(res)}`, e)
-            //             return res
-            //         });
-
-            //     this.selectedEventoReposicao = response.object as Evento;
-            // }
-
-            // console.log('selectedEventoReposicao', this.selectedEventoReposicao)
-
-            // // Se for feriado e a aula ainda não tiver sido cancelada
-            // if (this.selectedEventoReposicao.feriado && this.selectedEventoReposicao.active) {
-            //     this.selectedEventoReposicao.observacao = `Cancelamento automático \n Feriado: ${this.selectedEventoReposicao.feriado.name}`;
-            //     let request: EventoCancelamentoRequest = {
-            //         id: this.selectedEventoReposicao.id,
-            //         observacao: this.selectedEventoReposicao.observacao
-            //     };
-            //     response = await lastValueFrom(this.service.cancelar(request))
-            // }
-
             var alunoReposicao = {
                 aluno_Id: aluno.id,
                 reposicaoDe_Evento_Id: this.selectedEventoReposicao.id

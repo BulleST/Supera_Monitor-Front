@@ -275,8 +275,6 @@ export class ListComponent implements OnDestroy {
                         })
                 },
                 reject: () => {
-                    console.log('reject')
-
                     model.control.setValue(false);
                 },
 

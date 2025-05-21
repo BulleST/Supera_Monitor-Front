@@ -333,7 +333,6 @@ export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit
     }
     @HostListener('window:resize', ['$event'])
     onResize(event: any) {
-        console.log(window.innerHeight, this.toolbar.nativeElement.offsetHeight)
         this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
 
     }
