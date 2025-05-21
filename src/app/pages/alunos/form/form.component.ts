@@ -52,6 +52,7 @@ export class FormComponent implements OnDestroy {
                 this.service.get(aluno_id)
                     .then(res => {
                         this.object = res;
+                        console.log('form object', this.object)
                         this.loading = false;
                         this.visible = true;
                     })

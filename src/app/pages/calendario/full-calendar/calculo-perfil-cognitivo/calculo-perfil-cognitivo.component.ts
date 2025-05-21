@@ -5,8 +5,6 @@ import { Evento } from '../../../../models/evento.model';
 import { Calendar } from '@fullcalendar/core';
 import moment from 'moment';
 import { PerfilCognitivo, PerfilCognitivo_Calculo_Data } from '../../../../models/perfil-cognitivo.model';
-import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
-import { lastValueFrom } from 'rxjs';
 import { Popover } from 'primeng/popover';
 
 @Component({
@@ -23,6 +21,8 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
     @Input() perfilCoginitivo: PerfilCognitivo[] = [];
     @Input() loadingPerfilCognitivo = false;
     calendar!: Calendar;
+
+    visible = false;
 
     @ViewChild('popover') popover!: Popover;
 
@@ -45,7 +45,8 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
 
             var dataPerfilCog: PerfilCognitivo_Calculo_Data = {
                 data: this.data,
-                perfilCognitivo: []
+                perfilCognitivo: [],
+                total: 0
             };
 
             var dataFormated = moment(this.data).format('YYYY-MM-DD');
@@ -53,6 +54,7 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
             var alunosData = eventosData.flatMap(x => x.alunos).filter(x => x.active);
             this.perfilCoginitivo.forEach(item => {
                 var alunosPerfil = alunosData.filter(x => x.perfilCognitivo_Id == item.id);
+                dataPerfilCog.total += alunosPerfil.length;
                 dataPerfilCog.perfilCognitivo.push({
                     id: item.id,
                     descricao: item.descricao,
@@ -66,10 +68,12 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
         }
     }
     show(e: any) {
+        this.visible = true;
         this.popover.show(e)
     }
-
+    
     hide() {
+        this.visible = false;
         this.popover.hide()
     }
 

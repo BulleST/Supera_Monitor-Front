@@ -24,7 +24,7 @@ export class EventoItemHoverComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            this.alunosStr = this.evento.alunos.map(x => x.aluno.split(' ')[0]).join(', ')
+            if (this.evento.alunos) this.alunosStr = this.evento.alunos.map(x => x.aluno.split(' ')[0]).join(', ')
         }
         if (changes['arg']) {
             this.arg = changes['arg'].currentValue;

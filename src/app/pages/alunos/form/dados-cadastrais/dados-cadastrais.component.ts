@@ -43,16 +43,16 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     oldTurmaId?: number;
     selectedTurma?: Turma;
     turmas: Turma[] = [];
-    loadingTurmas = true;
+    loadingTurmas = false;
 
     sexos: Pessoa_Sexo[] = [];
-    loadingSexos = true;
+    loadingSexos = false;
 
     restricoesText = '';
     loadingRestricoes = false;
 
     perfisCognitivos: PerfilCognitivo[] = [];
-    loadingPerfisCognitivos = true;
+    loadingPerfisCognitivos = false;
 
     loadingChecklists = false;
     checklists: Checklist[] = [];
@@ -82,11 +82,14 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos)
 
-        if (this.perfisCognitivos.length == 0)
+        if (this.perfisCognitivos.length == 0) {
+            this.loadingPerfisCognitivos = true;
             lastValueFrom(this.perfilCognitivoService.getList())
                 .then(res => this.loadingPerfisCognitivos = false)
                 .catch(res => this.loadingPerfisCognitivos = false);
+        }
 
+        this.loadingSexos = true;
         lastValueFrom(this.service.getSexo())
             .then(res => {
                 this.sexos = res;

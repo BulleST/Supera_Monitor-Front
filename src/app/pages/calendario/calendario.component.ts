@@ -36,6 +36,7 @@ import $ from 'jquery'
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
+import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-calendario',
@@ -103,6 +104,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         editable: false,
         selectable: false,
         showNonCurrentDates: true,
+        allDaySlot: false,
         headerToolbar: {
             left: '',
             center: '',
@@ -243,21 +245,24 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.setCalendario();
     }
 
-    dataSelect() {
-        // Se for exibição diária
-        if (this.dayView) {
-            this.calendarioRequest.intervaloDe = this.data;
-            this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
-            this.currentRoteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim))
-        }
-        // Se for exibição da semana
-        else {
-            if (moment(this.data).week() != moment(this.calendarioRequest.intervaloDe).week()) {
-                this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
-                this.calendarioRequest.intervaloAte = moment(this.calendarioRequest.intervaloDe).add(7, 'days').toDate();
+    dataSelect(model: NgModel) {
+        if (model.dirty && model.touched) {
+            // Se for exibição diária
+            if (this.dayView) {
+                this.calendarioRequest.intervaloDe = this.data;
                 this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
-                this.currentRoteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim))
             }
+            // Se for exibição da semana
+            else {
+                if (moment(this.data).week() != moment(this.calendarioRequest.intervaloDe).week()) {
+                    this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
+                    this.calendarioRequest.intervaloAte = moment(this.calendarioRequest.intervaloDe).add(7, 'days').toDate();
+                    this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
+                }
+            }
+
+            model.control.markAsUntouched();
+            model.control.markAsPristine();
         }
     }
 
@@ -324,7 +329,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return event;
         });
 
-        this.feriados.forEach(item => {
+        this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte))
+            .forEach(item => {
             var event = {
                 id: this.calendarioUtils.eventRamdomId(),
                 textColor: 'white',
@@ -347,6 +353,17 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.calendarioOptions.events = events;
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
+
+
+        var temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte));
+        console.log('temFeriadoNaSemana', temFeriadoNaSemana)
+
+        if (temFeriadoNaSemana.length) {
+            this.calendarioOptions.allDaySlot = true;
+        } else {
+            this.calendarioOptions.allDaySlot = false;
+        }
+
     }
 
     async datesSet(arg: DatesSetArg) {

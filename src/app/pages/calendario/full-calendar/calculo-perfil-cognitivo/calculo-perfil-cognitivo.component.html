@@ -1,5 +1,7 @@
 <p-popover #popover appendTo="body">
     <ng-container *ngIf="!loadingPerfilCognitivo">
+        <p class="mb-2">Material para impressão</p>
+        <p><b>Total:</b> {{model.total}} alunos</p>
         <div *ngFor="let perfil of model.perfilCognitivo" class="text-sm flex flex-column">
             <ng-container *ngIf="perfil.quantidadeAlunos > 1">
                 <p><b>{{perfil.nome}}:</b> {{perfil.quantidadeAlunos}} alunos</p>

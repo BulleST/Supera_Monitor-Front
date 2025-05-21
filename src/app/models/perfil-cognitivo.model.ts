@@ -7,6 +7,7 @@ export class PerfilCognitivo {
 export class PerfilCognitivo_Calculo_Data {
     data: Date = new Date;
     perfilCognitivo: PerfilCognitivo_Calculo[] = [];
+    total: number = 0
 }
 export class PerfilCognitivo_Calculo {
     id: number = 0;

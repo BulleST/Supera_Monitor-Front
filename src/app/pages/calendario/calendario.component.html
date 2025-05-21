@@ -84,7 +84,8 @@
                         <!-- Data -->
                         <div class="flex align-items-center mr-2">
                             <label for="data" class="mr-1">Data: </label>
-                            <p-datepicker (onSelect)="dataSelect()"
+                            <p-datepicker 
+                                            (onBlur)="dataSelect(dataNgModel)"
                                           #dataNgModel="ngModel"
                                           [(ngModel)]="data"
                                           [showIcon]="true"
@@ -179,7 +180,7 @@
                                 <div class="col-12 surface-50 shadow-1">
                                     <div class="flex align-items-center mx-2">
                                         <label for="data" class="mr-1">Data: </label>
-                                        <p-datepicker (onSelect)="dataSelect()"
+                                        <p-datepicker (onBlur)="dataSelect(dataNgModel)"
                                                       #dataNgModel="ngModel"
                                                       [(ngModel)]="data"
                                                       [showIcon]="true"
@@ -206,8 +207,6 @@
             <!-- CALENDARIO -->
             <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)">
                 <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar>
-                    <ng-template #allDayContent>
-                    </ng-template>
                     <ng-template #dayHeaderContent let-arg>
                             <app-calculo-perfil-cognitivo #calculo
                                 [data]="arg.date"
@@ -215,10 +214,19 @@
                                 [feriados]="feriados"
                                 [perfilCoginitivo]="perfilCognitivo"
                                 [loadingPerfilCognitivo]="loadingPerfilCognitivo"></app-calculo-perfil-cognitivo>
-                            <div class="flex flex-column gap-2 " (mouseenter)="calculo.show($event)" (mouseleave)="calculo.hide()">
-                                <p>{{arg.date | date : 'EE'}}</p>
-                                <p>{{arg.date | date : 'dd'}}</p>
-                            </div>
+                                <div class="flex align-items-center justify-content-center gap-2">
+                                    <!-- <div class="w-1rem h-1rem bg-primary-500 border-circle" *ngIf="arg.isToday"></div> -->
+                                    <div class="flex flex-column gap-2 " 
+                                    [ngClass]="{ 'text-primary-500': calculo.visible }"
+                                        (mouseenter)="calculo.show($event)" 
+                                        (mouseleave)="calculo.hide()">
+                                        <!-- <div class="w-1rem h-1rem bg-primary-500 border-circle" *ngIf="arg.isToday"></div> -->
+                                        <p>{{arg.date | date : 'EE'}}</p>
+                                        <p class="p-1 border-circle w-2rem h-2rem flex align-items-center justify-content-center "
+                                                [ngClass]="{ 'bg-primary-500 text-white' : arg.isToday }"
+                                        >{{arg.date | date : 'dd'}}</p>
+                                    </div>
+                                </div>
                     </ng-template>
                     <ng-template #eventContent let-arg>
                         <app-evento-item
