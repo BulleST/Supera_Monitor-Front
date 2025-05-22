@@ -142,14 +142,12 @@ export class ListComponent implements OnDestroy {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
-                      ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} a turma “<b>${item.nome}</b>”?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
-            rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
+            rejectLabel: 'Cancelar',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
