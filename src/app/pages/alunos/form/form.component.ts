@@ -43,11 +43,11 @@ export class FormComponent implements OnDestroy {
 
 
     loadPage() {
-        var params = this.activatedRoute.params.subscribe(res => {
+        let params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.loading = true;
-                var aluno_id = this.crypto.decrypt(res['aluno_id'])
+                let aluno_id = this.crypto.decrypt(res['aluno_id'])
 
                 lastValueFrom(this.service.get(aluno_id))
                     .then(res => {
@@ -72,7 +72,8 @@ export class FormComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
+            let route = this.isEditPage ? ['../../'] : ['../']
+            this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
 
@@ -113,10 +114,10 @@ export class FormComponent implements OnDestroy {
                     this.visibleChange();
                     playSuccess();
 
-                    var list = this.service.list.value;
-                    var index = list.findIndex(x => x.id == this.object.id);
+                    let list = this.service.list.value;
+                    let index = list.findIndex(x => x.id == this.object.id);
 
-                    var object = list[index];
+                    let object = list[index];
 
                     // Inserir aqui os itens que aparecem nas colunas da tabela
                     object.nome = res.object.nome;
