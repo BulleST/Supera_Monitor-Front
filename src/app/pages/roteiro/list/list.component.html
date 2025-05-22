@@ -1,16 +1,51 @@
-<p-toolbar styleClass="border-none bg-white p-3    ">
-    <div class="p-toolbar-group-start flex-1">
+<p-toolbar styleClass="border-none bg-white p-4  align-items-stretch ">
+    <div class="p-toolbar-group-start flex flex-1 align-items-center">
         <h2 class="flex align-items-center ">
             <i class="bi bi-calendar-range mr-3 text-primary text-2xl"></i>
             <span class="text-xl font-normal">Roteiro Supera <span *ngIf="currentTitle" class="font-bold text-xl"> - {{currentTitle}}</span></span>
         </h2>
     </div>
-    <div class="p-toolbar-group-end items-stretch">
-        <p-button icon="pi pi-angle-left text-sm" (onClick)="prev()" severity="secondary" pTooltip="Próximo" class="mr-2" />
-        <p-button icon="pi pi-angle-right text-sm" (onClick)="next()" severity="secondary" pTooltip="Anterior" class="mr-2" />
-        <p-button (onClick)="today()" severity="secondary" pTooltip="Hoje" class="mr-2" label="hoje" styleClass="bg-black-alpha-50 text-white" />
-        <p-button icon="pi pi-sync text-sm" (onClick)="update()" severity="secondary" label="atualizar" pTooltip="Atualizar roteiro" class="mr-2"  />
-        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true" styleClass="px-3" />
+    <div class="p-toolbar-group-end align-items-stretch">
+        <p-button
+                  icon="pi pi-angle-left text-sm"
+                  (onClick)="prev()" 
+                  severity="secondary"
+                  pTooltip="Próximo"
+                  tooltipPosition="top"
+                  class="mr-2" 
+                  styleClass="h-full" />
+        <p-button
+                (onClick)="today()"
+                severity="secondary"
+                pTooltip="Hoje"
+                tooltipPosition="top"
+                class="mr-2"
+                label="hoje"
+                styleClass="surface-900 border-900 hover:surface-700 hover:border-700 text-white" />
+        <p-button
+                  icon="pi pi-angle-right text-sm"
+                  (onClick)="next()" 
+                  severity="secondary"
+                  pTooltip="Anterior"
+                  tooltipPosition="top"
+                  class="mr-2 h-full" 
+                  styleClass="h-full" />
+        <p-button
+                  icon="pi pi-sync text-sm"
+                  (onClick)="update()"
+                  severity="secondary"
+                  label="atualizar"
+                  pTooltip="Atualizar roteiro"
+                  tooltipPosition="top"
+                  class="mr-2 h-full" />
+        <p-button
+                  icon="pi pi-plus text-sm"
+                  label="Cadastrar"
+                  [routerLink]="['cadastrar' ]"
+                  [rounded]="true"
+                  pTooltip="Cadastrar roteiro"
+                  tooltipPosition="top"
+                  styleClass="px-3" />
     </div>
 </p-toolbar>
 <p-contextmenu #contextMenu [model]="items" appendTo="body" />
@@ -21,7 +56,6 @@
                [ngStyle]="{height: '30rem'}">
     <ng-template #eventContent let-arg>
         <ng-container *ngIf="!loading; else loadingEvent">
-
             <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
             <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
                 <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
@@ -35,9 +69,9 @@
                     </div>
                 </ng-container>
                 <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
-                    <div class="py-1 cursor-pointer" 
-                        (click)="edit(evento)" 
-                        title="Clique para ver mais" >
+                    <div class="py-1 cursor-pointer"
+                         (click)="edit(evento)"
+                         title="Clique para ver mais">
                         <p class="text-sm">
                             <i class="pi pi-calendar mr-2 text-sm"></i>
                             <span>Semana {{evento.semana}}</span>

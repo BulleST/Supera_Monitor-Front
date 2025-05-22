@@ -1,7 +1,5 @@
 <p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
-
 <app-confirm-dialog></app-confirm-dialog>
-
 <p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
     <ng-template #message let-message>
         <div>
@@ -18,7 +16,6 @@
         </div>
     </ng-template>
 </p-confirmdialog>
-
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -57,9 +54,32 @@
                                    (input)="dt.filterGlobal(tableSearch, 'contains')"
                                    placeholder="Pesquisar" />
                         </p-iconfield>
-                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" pTooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar alunos" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" />
+                        <p-button
+                                  icon="pi pi-filter-slash text-sm text-white"
+                                  (onClick)="clear(dt)"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Limpar filtro"
+                                  tooltipPosition="top"
+                                  class="mr-2"
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-sync text-sm text-white"
+                                  (onClick)="update()"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Atualizar alunos"
+                                  tooltipPosition="top"
+                                  class="mr-2"
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-plus text-sm"
+                                  label="Cadastrar"
+                                  pTooltip="Cadastrar aluno"
+                                  tooltipPosition="top"
+                                  [routerLink]="['cadastrar']"
+                                  [rounded]="true"
+                                  styleClass="h-full px-3" />
                     </div>
                 </div>
             </p-toolbar>
@@ -256,7 +276,6 @@
                                 [binary]="true"
                                 [readonly]="checklistItem.finalizado"
                                 (onChange)="checkboxChange(checklistItem, selectedChecklist, finalizado, $event)" />
-                                
                     <div *ngIf="checklistItem.finalizado" class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
                         <div class="p-checkbox-box">
                             <i class="pi pi-check p-checkbox-icon "></i>

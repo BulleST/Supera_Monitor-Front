@@ -1,7 +1,5 @@
-<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick"/>
-
+<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
 <app-confirm-dialog></app-confirm-dialog>
-
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -40,9 +38,32 @@
                                    (input)="dt.filterGlobal(tableSearch, 'contains')"
                                    placeholder="Pesquisar" />
                         </p-iconfield>
-                        <p-button icon="pi pi-filter-slash text-sm text-white" (onClick)="clear(dt)" severity="secondary" [text]="true" pTooltip="Limpar filtro" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-sync text-sm text-white" (onClick)="update()" severity="secondary" [text]="true" pTooltip="Atualizar usuários" class="mr-2" size="small" styleClass="h-full bg-black-alpha-80" />
-                        <p-button icon="pi pi-plus text-sm" label="Cadastrar" [routerLink]="['cadastrar' ]" [rounded]="true"  size="small" styleClass="h-full px-3" />
+                        <p-button
+                                  icon="pi pi-filter-slash text-sm text-white"
+                                  (onClick)="clear(dt)"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Limpar filtro"
+                                  tooltipPosition="bottom"
+                                  class="mr-2" 
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-sync text-sm text-white"
+                                  (onClick)="update()"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Atualizar usuários"
+                                  tooltipPosition="bottom"
+                                  class="mr-2" 
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-plus text-sm"
+                                  label="Cadastrar"
+                                  [routerLink]="['cadastrar' ]"
+                                  [rounded]="true"
+                                  pTooltip="Cadastrar usuário"
+                                  tooltipPosition="bottom"
+                                  styleClass="h-full px-3" />
                     </div>
                 </div>
             </p-toolbar>
@@ -55,15 +76,15 @@
                         <span>{{ col.label }}</span>
                         <ng-template [ngIf]="col.filterType != FilterType.none">
                             <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                <p-columnFilter 
-                                [type]="col.filterType" 
-                                [field]="col.field" 
-                                display="menu" />
+                                <p-columnFilter
+                                                [type]="col.filterType"
+                                                [field]="col.field"
+                                                display="menu" />
                                 <!-- 
                                 [showMatchModes]="false"
                                 matchMode="contains"
                                 [showOperator]="false"
-                                operator="any" -->   
+                                operator="any" -->
                                 <p-sortIcon [field]="col.field" />
                             </div>
                         </ng-template>
@@ -97,6 +118,7 @@
                                    [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
                                    [value]="option.label"
                                    [severity]="option.severity ? option.severity : 'secondary'"
+                                   tooltipPosition="top"
                                    [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                         </ng-template>
                     </ng-template>
@@ -108,7 +130,6 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.mask">{{ item[col.field] | mask : col.options.format }}</ng-template>
-
                 </td>
                 <td class="border-none px-0">
                 </td>
@@ -118,7 +139,7 @@
             <ng-container *ngIf="tableLoading; else elseTemplate">
                 <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td  class="border-none"><p-skeleton /></td>
+                    <td class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>
             <ng-template #elseTemplate>
