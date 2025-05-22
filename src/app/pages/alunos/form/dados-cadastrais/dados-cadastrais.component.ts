@@ -17,7 +17,7 @@ import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
-import {  SelectChangeEvent } from 'primeng/select';
+import { SelectChangeEvent } from 'primeng/select';
 import { getError, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../../utils/audio';
@@ -120,6 +120,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
+
+            console.log('object', this.object)
             this.loadFoto();
 
             if (this.turmas.length == 0)
@@ -133,7 +135,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.loadRestricoes();
                 this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
 
-                if (!this.object.checklist) {
+                if (!this.object.checklist && this.object.checklistCompleto) {
                     var atrasados = this.object.checklistCompleto.filter(x => x.atrasados.length)
                     var pendentesDaSemana = this.object.checklistCompleto.filter(x => x.pendentesDaSemana.length)
                     if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
@@ -433,7 +435,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 rejectVisible: true,
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     var request: Aluno_Restricao_Request = {
                         id: 0,

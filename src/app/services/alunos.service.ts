@@ -42,35 +42,9 @@ export class AlunoService extends Service {
         })
 
     }
-    
-    getList() {
-        return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
-            .pipe(tap({
-                next: res => {
-                    this.list.next(res);
-                },
-                error: err => {
-                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
-                }
-            }));
-    }
-
-    getChecklist(request: AlunoChecklistItemList_Request) {
-        return this.http.post<AlunoChecklistItemList[]>(`${this.url}/alunos/checklists/all`, request)
-            .pipe(tap({
-                error: err => {
-                    this.toastrService.error(`Não foi possível carregar jornada supera. \n ${getError(err)}`)
-                }
-            }));
-    }
-
-    getListWithChecklist() {
-        return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
-            .pipe(tap({
-                next: list => {
-                    var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-                    list = list.map(aluno => {
-                        aluno.active = !aluno.deactivated;
+    mapAluno(aluno: Aluno) {
+        var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+   aluno.active = !aluno.deactivated;
 
                         aluno.created = moment(aluno.created).toDate();
                         aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
@@ -100,8 +74,25 @@ export class AlunoService extends Service {
                                 return checklistAluno;
                             });
                         return aluno;
-                    })
+    }
+    getList() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
+            .pipe(tap({
+                next: list => {                     
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    this.list.next(list);
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
 
+    getListWithChecklist() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
+            .pipe(tap({
+                next: list => {
+                     list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
                     return of(list);
                 },
@@ -110,6 +101,15 @@ export class AlunoService extends Service {
                 }
             }));
     }
+    getChecklist(request: AlunoChecklistItemList_Request) {
+        return this.http.post<AlunoChecklistItemList[]>(`${this.url}/alunos/checklists/all`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar jornada supera. \n ${getError(err)}`)
+                }
+            }));
+    }
+
 
     getHistorico(id: number) {
         return this.http.get<Aluno_Historico[]>(`${this.url}/alunos/historico/${id}`)
@@ -151,28 +151,28 @@ export class AlunoService extends Service {
     }
 
     get(id: number) {
-        return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
-            .pipe(tap({
-                next: res => {
-                    return res;
-                },
-                error: err => {
-                    this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
-                }
-            }));
-        // return new Promise<Aluno>(async (resolve, reject) => {
-        //     if (this.list.value.length == 0) {
-        //         await lastValueFrom(this.getListWithChecklist());
-        //     }
+        // return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
+        //     .pipe(tap({
+        //         next: res => {
+        //             return res;
+        //         },
+        //         error: err => {
+        //             this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
+        //         }
+        //     }));
+        return new Promise<Aluno>(async (resolve, reject) => {
+            if (this.list.value.length == 0) {
+                await lastValueFrom(this.getListWithChecklist());
+            }
 
-        //     var item = this.list.value.find(x => x.id == id) as Aluno;
-        //     if (!item) {
-        //         this.toastrService.error(`Aluno não encontrado.'. `);
-        //         return reject('Aluno não encontrado.')
-        //     }
+            var item = this.list.value.find(x => x.id == id) as Aluno;
+            if (!item) {
+                this.toastrService.error(`Aluno não encontrado.'. `);
+                return reject('Aluno não encontrado.')
+            }
 
-        //     return resolve(item);
-        // })
+            return resolve(item);
+        })
     }
 
     create(model: Aluno) {

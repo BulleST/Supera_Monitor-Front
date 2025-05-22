@@ -270,11 +270,14 @@
                                [href]="enviarMensagemApresentacaoDiretorFranqueado(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar apresentação">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Confirmação da adequação do aluno ao perfil da turma -->
@@ -283,11 +286,14 @@
                                [href]="enviarMensagemAdequacaoTurma(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem de confirmação">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Agendar 1ª Oficina -->
@@ -296,11 +302,14 @@
                                [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem de lembrete">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Feedback pós venda -->
@@ -309,11 +318,14 @@
                                [href]="enviarMensagemFeedbackPosVenda(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem de feedback">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Confirmação de preeechimento do feedback pós venda -->
@@ -322,11 +334,14 @@
                                [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem de lembrete de preenchimento">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Mensagem de boas-vindas -->
@@ -335,11 +350,14 @@
                                [href]="enviarMensagemBoasVindas(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem de boas-vindas">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Agendar Superação -->
@@ -348,11 +366,14 @@
                                [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem para agendamento">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Agendar 2ª Superação -->
@@ -361,11 +382,14 @@
                                [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem para agendamento">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                         <!-- Agendar 2ª Oficina -->
@@ -374,11 +398,14 @@
                                [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
                                class="flex align-items-center gap-2 ml-auto h-2rem"
                                pTooltip="Enviar mensagem para inscrição">
-                                <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span>
+                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
                                 <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
                                           icon="pi pi-whatsapp"
+                                          iconPos="right"
                                           severity="success"
-                                          [text]="true" />
+                                          [rounded]="true"
+                                          size="small"
+                                          label="Enviar mensagem" />
                             </a>
                         </ng-container>
                     </ng-container>
@@ -389,7 +416,7 @@
                         </p>
                         <p class="mt-2">
                             <span class="font-medium">Observações: </span>
-                            <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
+                            <span *ngIf="checklistItem.observacoes" [innerHTML]="checklistItem.observacoes"></span>
                             <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
                         </p>
                     </p-popover>

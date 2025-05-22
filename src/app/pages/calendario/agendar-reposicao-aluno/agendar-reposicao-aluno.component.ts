@@ -174,7 +174,8 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
     async loadAluno() {
         this.loading = true;
-        this.aluno = await lastValueFrom(this.alunoService.get(this.participacao.aluno_Id));
+        this.aluno = await this.alunoService.get(this.participacao.aluno_Id);
+        // this.aluno = await lastValueFrom(this.alunoService.get(this.participacao.aluno_Id));
         if (!this.aluno) {
             this.visible = false;
             this.visibleChange();

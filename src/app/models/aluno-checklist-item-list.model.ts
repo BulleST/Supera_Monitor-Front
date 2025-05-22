@@ -18,6 +18,9 @@ export class AlunoChecklistItemList {
     finalizado: boolean = false;
     status: string = '';
     observacoes: string = '';
+    email: string = '';
+    diaSemana: number = 0;
+    horario: Date = new Date;
 }
 
 export class AlunoChecklistItemList_Request {

@@ -69,23 +69,22 @@ export class ListComponent implements OnDestroy {
         this.tableColumns = alunosColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
 
-        this.update();
 
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
         var list = this.service.list.subscribe(alunos => {
             this.list = alunos.map(aluno => {
-                var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-                aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
+                // var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+                // aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
 
-                aluno.created = moment(aluno.created).toDate();
-                aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
-                // Nuláveis
-                aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
-                aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
-                aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
+                // aluno.created = moment(aluno.created).toDate();
+                // aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
+                // aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
+                // // Nuláveis
+                // aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
+                // aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
+                // aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
 
                 return aluno;
             });
@@ -94,6 +93,8 @@ export class ListComponent implements OnDestroy {
 
         var checklist = this.checklistService.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklist);
+
+        this.update()
     }
 
 
@@ -302,7 +303,7 @@ export class ListComponent implements OnDestroy {
         return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
     }
     enviarMensagemBoasVindas(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular);
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor);
     }
     enviarMensagemAdequacaoTurma(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);

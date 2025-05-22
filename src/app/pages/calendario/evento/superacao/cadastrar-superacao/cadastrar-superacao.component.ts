@@ -431,7 +431,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(
+                var url = this.mensagemWhatsapp.enviarMensagemAgendamento(
                     aluno.nome,
                     aluno.celular,
                     evento

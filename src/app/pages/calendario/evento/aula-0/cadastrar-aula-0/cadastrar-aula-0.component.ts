@@ -455,7 +455,7 @@ export class CadastrarAula0Component implements OnDestroy {
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemConfirmacao(aluno.nome, aluno.celular, evento);
+                var url = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
                 window.open(url, '_target');
             },
             reject: () => {
