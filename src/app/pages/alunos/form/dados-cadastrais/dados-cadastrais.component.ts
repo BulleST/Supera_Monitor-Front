@@ -21,6 +21,7 @@ import { SelectChangeEvent } from 'primeng/select';
 import { getError, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../../utils/audio';
+import { Popover } from 'primeng/popover';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -414,7 +415,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         return this.restricoesText;
     }
 
-    cadastrarRestricao(e: any, model: HTMLInputElement) {
+    cadastrarRestricao(e: any, model: HTMLInputElement, popover: Popover) {
         var restricao = model.value;
 
         if (!restricao) {
@@ -451,6 +452,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                                 this.toastrService.success(`Registro cadastrado com sucesso.`);
 
                                 playSuccess();
+                                popover.show(e);
 
                                 res.object.active = true;
 
@@ -470,7 +472,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
 
     }
-    toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel) {
+    toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel, popover: Popover) {
         var active = item.active;
         var text = `${active ? 'Habilitar' : 'Desabilitar'}`
         var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
@@ -500,6 +502,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
                             res.object.active = !res.object.deactivated;
                             playSuccess();
+                            popover.show(e);
 
                             var index = this.object.restricoes.findIndex(x => x.id == item.id);
                             if (index != -1) {

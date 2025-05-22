@@ -318,10 +318,10 @@
                                     name="restricao"
                                     class="w-full"
                                     [required]="true"
-                                    (keyup.enter)="cadastrarRestricao($event, restricao)"
+                                    (keyup.enter)="cadastrarRestricao($event, restricao, restricoes)"
                                     placeholder="Inserir nova restrição...">
                                 <p-inputicon >
-                                    <span class="text-primary-500 cursor-pointer hover:text-primary-600 hover:bg-primary-100 p-1 px-2 border-round-md -mr-2" (click)="cadastrarRestricao($event, restricao)">enter</span>
+                                    <span class="text-primary-500 cursor-pointer hover:text-primary-600 hover:bg-primary-100 p-1 px-2 border-round-md -mr-2" (click)="cadastrarRestricao($event, restricao, restricoes)">enter</span>
                                 </p-inputicon>
                         </p-iconfield>
                         <div class="">
@@ -336,7 +336,7 @@
                                            #checkbox="ngModel"
                                            [(ngModel)]="item.active" 
                                            [binary]="true"
-                                           (onChange)="toggleRestricao($event, item, checkbox)" />
+                                           (onChange)="toggleRestricao($event, item, checkbox, restricoes)" />
        
                                        <p>{{item.descricao}}</p>
                                    </div>
