@@ -361,7 +361,11 @@ export class EventoComponent implements OnDestroy {
     async finalizar(e: any) {
         this.loading = true;
 
-        var response: RequestResponse = await lastValueFrom(this.request())
+        var response: RequestResponse = await lastValueFrom(this.request()).catch(res => {
+            this.loading = false;
+            return res;
+
+        })
         if (response.success) {
 
             this.evento.id = response.object.id;

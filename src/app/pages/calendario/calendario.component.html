@@ -180,7 +180,8 @@
                                 <div class="col-12 surface-50 shadow-1">
                                     <div class="flex align-items-center mx-2">
                                         <label for="data" class="mr-1">Data: </label>
-                                        <p-datepicker (onBlur)="dataSelect(dataNgModel)"
+                                        <p-datepicker (onSelect)="dataSelect(dataNgModel)"
+                                                        (onSelect)="dataSelect(dataNgModel)"
                                                       #dataNgModel="ngModel"
                                                       [(ngModel)]="data"
                                                       [showIcon]="true"

@@ -151,19 +151,28 @@ export class AlunoService extends Service {
     }
 
     get(id: number) {
-        return new Promise<Aluno>(async (resolve, reject) => {
-            if (this.list.value.length == 0) {
-                await lastValueFrom(this.getListWithChecklist());
-            }
+        return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
+            .pipe(tap({
+                next: res => {
+                    return res;
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
+                }
+            }));
+        // return new Promise<Aluno>(async (resolve, reject) => {
+        //     if (this.list.value.length == 0) {
+        //         await lastValueFrom(this.getListWithChecklist());
+        //     }
 
-            var item = this.list.value.find(x => x.id == id) as Aluno;
-            if (!item) {
-                this.toastrService.error(`Aluno não encontrado.'. `);
-                return reject('Aluno não encontrado.')
-            }
+        //     var item = this.list.value.find(x => x.id == id) as Aluno;
+        //     if (!item) {
+        //         this.toastrService.error(`Aluno não encontrado.'. `);
+        //         return reject('Aluno não encontrado.')
+        //     }
 
-            return resolve(item);
-        })
+        //     return resolve(item);
+        // })
     }
 
     create(model: Aluno) {

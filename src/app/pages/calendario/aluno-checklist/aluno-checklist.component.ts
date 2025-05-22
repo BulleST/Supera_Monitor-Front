@@ -14,25 +14,32 @@ import { Tabs } from 'primeng/tabs';
 import $ from 'jquery';
 import { playAlert, playSuccess } from '../../../utils/audio';
 import { showError } from '../../../utils';
+import { Aluno } from '../../../models/alunos.model';
 
 @Component({
     selector: 'app-aluno-checklist',
     standalone: false,
     templateUrl: './aluno-checklist.component.html',
     styleUrl: './aluno-checklist.component.css',
-    // changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ConfirmationService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewInit {
-    @Input() aluno: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
+    @Input() participacao?: Evento_Participacao_Aluno;
+    @Input() aluno?: Aluno;
+    item: Aluno | Evento_Participacao_Aluno = undefined as any;
+
     loading: boolean = false;
     checklists: Checklist[] = [];
     subscription: Subscription[] = [];
+    visible = false;
 
     @ViewChild('popover') popover!: Popover
     @ViewChild('tabs') tabs!: Tabs;
     @ViewChildren('tab') tab!: QueryList<Tabs>;
 
     textoChecklist = '';
+    checklistObservacao = '';
     checklist?: CalendarioAlunoChecklistView;
     atrasado = false;
 
@@ -52,22 +59,26 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
     }
 
     async ngOnChanges(changes: SimpleChanges) {
+        if (changes['participacao']) {
+            this.participacao = changes['participacao'].currentValue as Evento_Participacao_Aluno;
+            this.item = this.participacao;
+        }
         if (changes['aluno']) {
-            this.aluno = changes['aluno'].currentValue;
+            this.aluno = changes['aluno'].currentValue as Aluno;
+            this.item = this.aluno;
+        }
 
-            if (   !this.aluno.alunoChecklist 
-                || !this.aluno.alunoChecklist.length 
-                || !this.aluno.checklistCompleto 
-                || !this.aluno.checklistCompleto.length) {
+            console.log(this.item);
+            if ((!this.item.alunoChecklist
+                || !this.item.alunoChecklist.length
+                || !this.item.checklistCompleto
+                || !this.item.checklistCompleto.length)) {
                 await this.loadChecklistAluno();
                 this.setChecklist()
             } else {
                 this.setChecklist()
             }
 
-
-
-        }
     }
     ngAfterViewInit(): void {
     }
@@ -83,14 +94,23 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             await lastValueFrom(this.service.getList())
         }
 
-        await lastValueFrom(this.service.getChecklistAluno(this.aluno.aluno_Id))
+        console.group(typeof this.item,  this.item,)
+        var id = 0;
+        if (this.participacao) {
+            var id = this.participacao.aluno_Id;
+        }
+        if (this.item) {
+            var id = this.item.id;
+        }
+        console.log(id)
+        await lastValueFrom(this.service.getChecklistAluno(id))
             .then(res => {
-                this.aluno.alunoChecklist = res.filter(x => x.aluno_Id == this.aluno.aluno_Id)
+                this.item.alunoChecklist = res.filter(x => x.aluno_Id == id)
                     .map(checklistAluno => {
                         checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
                         return checklistAluno
                     });
-                this.aluno.checklistCompleto = this.checklists
+                this.item.checklistCompleto = this.checklists
                     .map(checklist => {
                         var checklistAluno = new CalendarioAlunoChecklistView;
                         checklistAluno.id = checklist.id;
@@ -107,22 +127,22 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
     }
 
     setChecklist() {
-        
-            if (this.aluno.checklist_Id) {
-                this.checklist = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id) as CalendarioAlunoChecklistView;
-                this.checklistIndex = this.aluno.checklist_Id;
-            }
-            else if (!this.aluno.checklist_Id && this.aluno.checklistCompleto && this.aluno.checklistCompleto.length > 0) {
-                
-                this.checklist = this.aluno.checklistCompleto[this.aluno.checklistCompleto.length - 1]
-                this.checklistIndex = this.checklist.id;
-                
-                var pendentesDaSemana = this.aluno.checklistCompleto.filter(x => x.pendentesDaSemana.length)
-                var atrasados = this.aluno.checklistCompleto.filter(x => x.atrasados.length > 0);
-                this.atrasado = atrasados.length > 0;
-                if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
-                if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
-            }
+
+        if (this.item.checklist_Id) {
+            this.checklist = this.item.checklistCompleto.find(x => x.id == this.item.checklist_Id) as CalendarioAlunoChecklistView;
+            this.checklistIndex = this.item.checklist_Id;
+        }
+        else if (!this.item.checklist_Id && this.item.checklistCompleto && this.item.checklistCompleto.length > 0) {
+
+            this.checklist = this.item.checklistCompleto[this.item.checklistCompleto.length - 1]
+            this.checklistIndex = this.checklist.id;
+
+            var pendentesDaSemana = this.item.checklistCompleto.filter(x => x.pendentesDaSemana.length)
+            var atrasados = this.item.checklistCompleto.filter(x => x.atrasados.length > 0);
+            this.atrasado = atrasados.length > 0;
+            if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
+            if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
+        }
 
     }
 
@@ -138,9 +158,10 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             playAlert();
 
             this.confirmationService.confirm({
-                target: e.target,
+                key: 'checklistConfirmation',
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,
                 header: 'Finalizar etapa',
+                icon: 'pi pi-comment-dots text-4xl mr-2',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
                 acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
@@ -149,9 +170,11 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                 rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     this.loading = true;
-                    lastValueFrom(this.service.markAsDone(item.id))
+                    item.observacoes = this.checklistObservacao
+                    lastValueFrom(this.service.markAsDone(item.id, item.observacoes))
                         .then(res => {
                             playSuccess();
+                            this.checklistObservacao = '';
                             this.loading = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
                             item.finalizado = true;
@@ -175,21 +198,33 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
         }
     }
 
-        
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
-    
 
-    showPopover(e: any) {
-        this.popover.show(e)
+    show() {
+        this.visible = true;
+        var nome = this.item instanceof Evento_Participacao_Aluno ? this.item.aluno : this.item.nome;
+        this.confirmationService.confirm({
+            key: 'checklistAluno',
+            header: 'Jornada Supera do ' + nome,
+            rejectVisible: false,
+            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptLabel: 'Fechar',
+            accept: () => {
+                this.visible = false;
+            }
+        })
     }
 
-    hidePopover() {
-        this.popover.hide();
+    hide() {
+        this.visible = false;
+        this.confirmationService.close();
     }
 
     onPopoverShow() {
+        this.visible = true;
         var tab = $(`p-tab[ng-reflect-value="${this.checklistIndex}"]`).last()
         this.scrollLeft = $(tab).offset()?.left ?? 0
         $('.p-tablist-viewport').animate({

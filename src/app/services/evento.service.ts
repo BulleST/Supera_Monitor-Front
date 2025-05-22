@@ -190,12 +190,11 @@ export class EventoService extends Service {
     getDashboard(request: DashboardRequest) {
         return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, request)
         .pipe(map(dashboardList => {
-            
             dashboardList = dashboardList.map(res => {
                 res.participacao.active = !res.participacao.deactivated;
                 res.aula.active = !res.aula.deactivated;
                 res.aula.data = moment(res.aula.data).toDate();
-
+                
                 // Procura se a aula foi reagendada
                 if (res.aula.reagendamentoPara_Evento_Id) {
                     res.aula.reagendamentoPara_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoPara_Evento_Id)?.aula;
@@ -210,16 +209,13 @@ export class EventoService extends Service {
                 if (res.participacao.reposicaoPara_Evento_Id) {
                     res.participacao.reposicaoPara_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoPara_Evento_Id)?.aula;
                 }
-
+                
                 // Procura se a aula foi reposicao de outra
                 if (res.participacao.reposicaoDe_Evento_Id) {
                     res.participacao.reposicaoDe_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoDe_Evento_Id)?.aula;
                 }
                 return res;
             });
-
-            // dashboardList = dashboardList.sort((x,y) => x.aula.data.getTime() - y.aula.data.getTime());
-
             
             return dashboardList;
         }))

@@ -8,8 +8,7 @@
         <p-divider styleClass="mx-4 my-4" layout="vertical" />
         <div class=" flex flex-column py-3 gap-1">
             <div class="flex align-items-center">
-                <p class="text-xl text-primary-500 font-bold">{{ aluno.aluno }} </p>
-                <p-badge *ngIf="aluno.reposicaoDe_Evento_Id" value="Reposição" class="ml-2" styleClass="bg-purple-500" />
+                <p class="text-xl text-primary-500 font-bold">{{ aluno.nome }} </p>
             </div>
             <p><b>Turma: </b>{{ aluno.turma }} </p>
             <p *ngIf="aluno.apostila_Abaco"><b>Apostila Ábaco: </b>{{ aluno.apostila_Abaco }} / <b>Página: </b>{{ aluno.numeroPaginaAbaco }}</p>
@@ -18,7 +17,7 @@
             <ng-container *ngIf="showChecklist">
                 <div class="gap-1 flex align-items-center" (click)="alunoChecklistComponent.show()" >
                     <b>Jornada Supera: </b>
-                    <app-aluno-checklist #alunoChecklistComponent [participacao]="aluno"></app-aluno-checklist>
+                    <app-aluno-checklist #alunoChecklistComponent [aluno]="aluno"></app-aluno-checklist>
                 </div>
             </ng-container>
             
@@ -28,17 +27,8 @@
                           icon="pi pi-user-edit"
                           styleClass="white-space-nowrap"
                           (onClick)="goToAluno(aluno)" />
-                <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id) && (aluno.presente != true && evento.finalizado) || evento.finalizado == false">
-                    <p-button
-                              label="Agendar Reposição"
-                              icon="pi pi-calendar"
-                              [rounded]="true"
-                              severity="secondary"
-                              styleClass="white-space-nowrap"
-                              (onClick)="goToReposicao(aluno)" />
-                </ng-container>
                 <a *ngIf="aluno.celular"
-                   [href]="enviarMensagem(aluno.aluno, aluno.celular)" 
+                   [href]="enviarMensagem(aluno.nome, aluno.celular)" 
                    class="p-component p-ripple p-button p-button-success p-button-rounded  white-space-nowrap">
                     <span class="pi pi-whatsapp p-button-icon p-button-icon-left "></span>
                     <span class="p-button-label">Enviar mensagem</span>

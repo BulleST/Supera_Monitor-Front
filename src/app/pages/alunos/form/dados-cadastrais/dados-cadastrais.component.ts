@@ -347,7 +347,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             key: 'checklistConfirmation',
             message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
             header: 'Finalizar item',
-            icon: 'pi pi-exclamation-triangle',
+            icon: 'pi pi-comment-dots text-4xl mr-2',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Finalizar',
             acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',

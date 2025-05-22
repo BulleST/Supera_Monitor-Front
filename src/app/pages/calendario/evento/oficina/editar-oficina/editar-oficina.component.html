@@ -258,8 +258,8 @@
                         </div>
                     </td>
                     <!-- checklist -->
-                    <td (click)="loadingChecklist ? undefined : popoverChecklistComponent.showPopover($event)" class="cursor-pointer">
-                        <app-aluno-checklist #popoverChecklistComponent [aluno]="item"></app-aluno-checklist>
+                    <td (click)="loadingChecklist ? undefined : alunoChecklistComponent.show()" class="cursor-pointer">
+                        <app-aluno-checklist #alunoChecklistComponent [aluno]="item"></app-aluno-checklist>
                     </td>
                     <!-- Presente -->
                     <td [pEditableColumn]="item.presente"

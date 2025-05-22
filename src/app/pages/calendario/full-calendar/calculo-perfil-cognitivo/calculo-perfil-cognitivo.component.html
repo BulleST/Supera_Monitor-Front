@@ -1,13 +1,16 @@
 <p-popover #popover appendTo="body">
     <ng-container *ngIf="!loadingPerfilCognitivo">
-        <p class="mb-2">Material para impressão</p>
-        <p><b>Total:</b> {{model.total}} alunos</p>
-        <div *ngFor="let perfil of model.perfilCognitivo" class="text-sm flex flex-column">
-            <ng-container *ngIf="perfil.quantidadeAlunos > 1">
-                <p><b>{{perfil.nome}}:</b> {{perfil.quantidadeAlunos}} alunos</p>
-            </ng-container>
-            <ng-container *ngIf="perfil.quantidadeAlunos == 1">
-                <p><b>{{perfil.nome}}:</b> {{perfil.quantidadeAlunos}} aluno</p>
+        <p class="text-md">Perfil dos alunos do dia</p>
+        <p class="mb-2 font-bold text-sm">{{data | date : 'EE dd \'de\' MMMM' }}</p>
+        <div  class="text-sm flex flex-column">
+            <p><b>Total:</b> {{model.total}} alunos</p>
+            <ng-container *ngFor="let perfil of model.perfilCognitivo">
+                <ng-container *ngIf="perfil.quantidadeAlunos > 1">
+                    <p><b>{{perfil.nome}}:</b> {{perfil.quantidadeAlunos}} alunos</p>
+                </ng-container>
+                <ng-container *ngIf="perfil.quantidadeAlunos == 1">
+                    <p><b>{{perfil.nome}}:</b> {{perfil.quantidadeAlunos}} aluno</p>
+                </ng-container>
             </ng-container>
         </div>
     </ng-container>

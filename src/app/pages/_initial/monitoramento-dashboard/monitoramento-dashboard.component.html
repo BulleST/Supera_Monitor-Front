@@ -153,7 +153,10 @@
     </p-toolbar>
 
     <div>
-        <h3>Legenda</h3>
+        <div class="flex justify-content-between align-itens-center">
+            <h3>Legenda</h3>
+            <p *ngIf="!loadingAlunos && !loadingDashboard">{{alunosList.length}} alunos</p>
+        </div>
         <div class="my-2 p-4 flex align-items-center justify-content-between gap-2 flex-wrap bg-white shadow-1 border-round-md ">
             <div class="flex align-itens-center gap-2">
                 <span class="w-1rem h-1rem border-circle bg-yellow-500"></span>
@@ -188,16 +191,10 @@
                 <span>Primeira Aula</span>
             </div>
         </div>
-        <p-table [value]="alunos"
+        <p-table [value]="alunosList"
                  pStripedRows
                  dataKey="id"
                  [showGridlines]="false">
-            <!-- 
-                 [scrollable]="true"
-                 scrollHeight="calc(100vh - 150px)"
-                 [virtualScroll]="true"
-                 [virtualScrollItemSize]="60"
-                 [virtualScrollDelay]="0" -->
             <ng-template #header let-columns>
                 <tr pFrozenRow>
                     <th rowspan="2"
@@ -277,8 +274,16 @@
                                     <i class="pi pi-whatsapp p-button-icon ng-star-inserted"></i>
                                 </a>
                             </span>
-                            <span class="text-base" [pTooltip]="aluno.nome">{{aluno.nome | nameAbv }}</span>
-                            <!-- <span> - Aulas{{aluno.aulas|json}}</span> -->
+                            <p (click)="alunoPopover.show($event)" class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer">{{aluno.nome | nameAbv }}</p>
+
+                            <app-aluno-popover-details #alunoPopover [aluno]="aluno"></app-aluno-popover-details>
+                            
+
+                            <!-- <a class="text-base text-primary-500 hover:underline hover:font-bold" 
+                                [routerLink]="goToAluno(aluno)" 
+                                [pTooltip]="'Ver aluno'"
+                                tooltipPosition="top"
+                                >{{aluno.nome | nameAbv }}</a> -->
                         </div>
                     </td>
                     <td class="white-space-nowrap px-2 py-1 z-2" [ngClass]="{
@@ -298,25 +303,10 @@
                                 'surface-50': i % 2 != 0,
                             }"
                             *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id">
-                            <!-- <p>{{item.aula.reagendamentoPara_Evento_Id + ' - '+ item.participacao.reposicaoPara_Evento_Id}}</p>
-                                    <p>data: {{item.aula.data|date:'dd/MM HH:mm'}}</p>
-                                    <p>finalizado: {{item.aula.finalizado}}</p>
-                                    <p>presente: {{item.participacao.presente}}</p>
-                                    <p>active: {{item.participacao.active}}</p>
-                                    <p>roteiro_Id: {{item.aula.roteiro_Id}}</p> -->
-                            <!-- 
-                            *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id" -->
                             <!-- Aulas fora da vigencia do aluno não escreve -->
-                            <!-- {{item.aula.data|date : 'dd/MM HH:mm'}} -->
                             <ng-container *ngIf="item.show == true">
-                                <div class="cursor-pointer white-space-nowrap"
+                                <div class="cursor-pointer white-space-nowrap flex w-full"
                                      (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)">
-                                    <p-badge *ngIf="item.primeiraAula"
-                                             styleClass="bg-pink-500 border-pink-500"
-                                             value="Aula 1"
-                                             size="small"
-                                             severity="danger"
-                                             [pTooltip]="'Primeira aula'" />
                                     <!-- Cancelada -->
                                     <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoDe_Evento_Id">
                                         <div class="w-full surface-800 text-xs border-1 border-800 text-white text-center">
@@ -344,8 +334,11 @@
                                             && item.participacao.active == true ">
                                         <div class="w-full text-xs border-1 text-white text-center flex align-items-center justify-content-center gap-2"
                                              [ngClass]="{
-                                            'bg-red-500 border-red-500' : !item.participacao.reposicaoDe_Evento_Id,
-                                            'bg-blue-500 border-blue-500' : item.participacao.reposicaoDe_Evento_Id
+                                            'bg-red-500' : !item.participacao.reposicaoDe_Evento_Id,
+                                            'bg-blue-500' : item.participacao.reposicaoDe_Evento_Id ,
+                                            'border-pink-500' : item.primeiraAula,
+                                            'border-red-500' : !item.primeiraAula && !item.participacao.reposicaoDe_Evento_Id,
+                                            'border-blue-500' : !item.primeiraAula && item.participacao.reposicaoDe_Evento_Id,
     
                                         }">
                                             <span>Faltou</span>
@@ -362,22 +355,27 @@
                                     <ng-container *ngIf="item.aula.finalizado
                                             && item.participacao.presente == true 
                                             && item.participacao.active">
-                                        <div class="w-full text-xs border-1 text-white"
-                                             [ngClass]="{
-                                            'bg-green-500 border-green-500 text-white' : !item.participacao.reposicaoDe_Evento_Id,
-                                            'bg-green-300 border-green-300 text-green-700' : item.participacao.reposicaoDe_Evento_Id
-    
-                                        }">
-                                            <div class="px-1 flex align-items-center gap-2">
-                                                <span>{{item.participacao.apostila_Abaco}}</span>
-                                                <span class="ml-auto"> P. {{item.participacao.numeroPaginaAbaco}}</span>
-                                            </div>
-                                            <div class="px-1 flex align-items-center gap-2">
-                                                <span>{{item.participacao.apostila_AH}}</span>
-                                                <span class="ml-auto"> P. {{item.participacao.numeroPaginaAH}}</span>
-                                            </div>
-                                        </div>
+                                                <div class="text-xs border-1 text-white"
+                                                     [ngClass]="{
+                                                    'bg-green-500 text-white' : !item.participacao.reposicaoDe_Evento_Id,
+                                                    'bg-green-300 text-green-700' : item.participacao.reposicaoDe_Evento_Id ,
+                                                    'border-pink-500' : item.primeiraAula,
+                                                    'border-green-500' : !item.primeiraAula && !item.participacao.reposicaoDe_Evento_Id,
+                                                    'border-green-300' : !item.primeiraAula && item.participacao.reposicaoDe_Evento_Id,
+                                                }">
+                                                    <div class="px-1 flex align-items-center gap-2">
+                                                        <span>{{item.participacao.apostila_Abaco}}</span>
+                                                        <span class="ml-auto"> P. {{item.participacao.numeroPaginaAbaco}}</span>
+                                                    </div>
+                                                    <div class="px-1 flex align-items-center gap-2">
+                                                        <span>{{item.participacao.apostila_AH}}</span>
+                                                        <span class="ml-auto"> P. {{item.participacao.numeroPaginaAH}}</span>
+                                                    </div>
+                                                </div>
                                     </ng-container>
+                                    <div *ngIf="item.primeiraAula" class="primeira-aula" [ngClass]="{'em-pe': item.aula.id == PseudoEvento.EventoId}" pTooltip="Primeira aula" tooltipPosition="top">
+                                        <span>Aula 1</span>
+                                    </div>
                                     <ng-template #dataTemplate>
                                         <div class="flex w-full">
                                             <p class="px-2 flex-1 bg-white text-center text-xs border-1 border-200 border-top-none border-right-none">{{item.aula.data | date: 'dd/MM'}} </p>
@@ -445,7 +443,6 @@
                         <tr style="height: 35px;">
                             <td class="py-4" pFrozenColumn>
                                 <div class="flex align-items-center gap-2">
-                                    <p-skeleton shape="circle" size="1.3rem" />
                                     <p-skeleton width="15rem" height="1rem" />
                                 </div>
                             </td>

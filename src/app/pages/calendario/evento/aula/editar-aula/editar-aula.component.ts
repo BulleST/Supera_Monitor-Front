@@ -261,18 +261,21 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         })
     }
 
-    clonedRow: { [id: number]: Evento_Participacao_Aluno } = {};
+    clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {};
 
     onEditInit(e: TableEditInitEvent) {
-        this.clonedRow[e.data.id as number] = { ...e.data };
+        console.log('onEditInit', e);
+        this.clonedRow[e.data.aluno_Id as number] = { ...e.data };
     }
 
     onEditComplete(e: TableEditCompleteEvent) {
-        this.clonedRow[e.data.id as number] = { ...e.data };
+        console.log('onEditComplete', e);
+        this.clonedRow[e.data.aluno_Id as number] = { ...e.data };
     }
 
     onEditCancel(e: TableEditCancelEvent) {
-        this.clonedRow[e.data.id as number] = { ...e.data };
+        console.log('onEditCancel', e);
+        this.clonedRow[e.data.aluno_Id as number] = { ...e.data };
     }
 
     //
@@ -280,8 +283,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAbacoChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
+        console.log('item', item)
+        console.log('clonedRow', this.clonedRow)
         let newApostila = item.apostilaAbacoObject as Apostila;
-        let oldApostila = this.clonedRow[item.id].apostilaAbacoObject as Apostila;
+        let oldApostila = this.clonedRow[item.aluno_Id].apostilaAbacoObject as Apostila;
 
         if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
 
@@ -316,8 +321,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any) {
-        let prev = this.clonedRow[item.id];
+        let prev = this.clonedRow[item.aluno_Id];
         let current = item;
+        console.log('numeroPaginaAbacoChange prev', prev)
+        console.log('numeroPaginaAbacoChange current', current)
         if (current.numeroPaginaAbaco <= prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
 
             this.confirmationService.confirm({
@@ -341,8 +348,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAHChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
+        console.log('item', item)
+        console.log('clonedRow', this.clonedRow)
+
         let newApostila = this.apostilas.find(x => x.id == item.apostila_AH_Id) as Apostila;
-        let oldApostila = this.apostilas.find(x => x.id == this.clonedRow[item.id].apostila_AH_Id) as Apostila;
+        let oldApostila = this.apostilas.find(x => x.id == this.clonedRow[item.aluno_Id].apostila_AH_Id) as Apostila;
 
         if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
 
@@ -378,7 +388,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
     numeroPaginaAHChange(item: Evento_Participacao_Aluno, e: any) {
 
-        let prev = this.clonedRow[item.id];
+        let prev = this.clonedRow[item.aluno_Id];
         let current = item;
 
         if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
