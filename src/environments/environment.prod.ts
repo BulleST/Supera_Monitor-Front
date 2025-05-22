@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  url: 'https://localhost:7281/'
+  url: 'https://supera-monitor-front-c4aybwhfhgbkaxhp.canadacentral-01.azurewebsites.net/',
 };

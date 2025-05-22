@@ -26,7 +26,7 @@ export class AccountService {
         private activatedRoute: ActivatedRoute,
         private http: HttpClient,
     ) {
-        this.url = environment.url + 'back';
+        this.url = environment.url ;
 
         this.account = this.accountSubject.asObservable();
 

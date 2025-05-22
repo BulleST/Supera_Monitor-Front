@@ -16,6 +16,6 @@ export class Service {
         public http: HttpClient,
         public toastrService: ToastrService,
     ) {
-        this.url = environment.url + 'back';
+        this.url = environment.url; //+ 'back';
     }
 }

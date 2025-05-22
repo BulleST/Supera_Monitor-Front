@@ -68,7 +68,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             this.item = this.aluno;
         }
 
-            console.log(this.item);
             if ((!this.item.alunoChecklist
                 || !this.item.alunoChecklist.length
                 || !this.item.checklistCompleto
@@ -94,7 +93,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             await lastValueFrom(this.service.getList())
         }
 
-        console.group(typeof this.item,  this.item,)
         var id = 0;
         if (this.participacao) {
             var id = this.participacao.aluno_Id;
@@ -102,7 +100,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
         if (this.item) {
             var id = this.item.id;
         }
-        console.log(id)
         await lastValueFrom(this.service.getChecklistAluno(id))
             .then(res => {
                 this.item.alunoChecklist = res.filter(x => x.aluno_Id == id)
