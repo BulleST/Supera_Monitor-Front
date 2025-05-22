@@ -206,7 +206,7 @@
             </div>
             <!-- FIM SEMANA -->
             <!-- CALENDARIO -->
-            <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)">
+            <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)" class="w-full overflow-auto">
                 <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar>
                     <ng-template #dayHeaderContent let-arg>
                             <app-calculo-perfil-cognitivo #calculo

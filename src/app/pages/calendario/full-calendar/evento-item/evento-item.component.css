@@ -109,6 +109,8 @@
     display: flex;
 }
 
+.event.event-reuniao,
+.event.event-oficina,
 .event.event-aula-zero,
 .event.event-superacao {
     padding: 0;
@@ -119,23 +121,76 @@
     scale: 0.9;
 }
 
+.event.event-reuniao .event-header,
+.event.event-oficina .event-header,
 .event.event-aula-zero .event-header,
 .event.event-superacao .event-header {
     padding-top: 1px;
-
 }
 
+.event.event-reuniao .event-body .event-descricao,
+.event.event-oficina .event-body .event-descricao,
 .event.event-aula-zero .event-body .event-descricao,
 .event.event-superacao .event-body .event-descricao {
-font-weight: normal;
+    font-weight: normal;
 }
 
+.event.event-reuniao .event-body .event-sala,
+.event.event-oficina .event-body .event-sala,
 .event.event-aula-zero .event-body .event-sala,
 .event.event-superacao .event-body .event-sala {
     font-size: .75rem;
 }
 
+.event.event-reuniao .event-body .event-reagendamento-icon,
+.event.event-oficina .event-body .event-reagendamento-icon,
 .event.event-aula-zero .event-body .event-reagendamento-icon,
 .event.event-superacao .event-body .event-reagendamento-icon {
     border-width: 1px;
+}
+
+@media (max-width: 500px) {
+    .event-header>* {
+        line-height: 1.4;
+        font-size: 0.4rem !important;
+    }
+
+    .event-body {
+        height: auto;
+    }
+
+    .event p {
+        line-height: 1;
+    }
+
+    .event-descricao {
+        font-size: 0.7rem;
+    }
+
+    .event.event-reuniao .event-body .event-descricao,
+    .event.event-oficina .event-body .event-descricao,
+    .event.event-aula-zero .event-body .event-descricao,
+    .event.event-superacao .event-body .event-descricao {
+        font-size: 0.7rem;
+    }
+    
+    .event.event-reuniao .event-body .event-vagas,
+    .event.event-oficina .event-body .event-vagas,
+    .event.event-aula-zero .event-body .event-vagas,
+    .event.event-superacao .event-body .event-vagas {
+        font-size: 0.5rem;
+    }
+
+    .event-sala {
+        font-size: .5rem ;
+        margin-top: 10px;
+    }
+
+    .event-perfil {
+        font-size: 0.5rem;
+    }
+
+    .event-vagas {
+        font-size: .5rem;
+    }
 }

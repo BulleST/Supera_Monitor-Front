@@ -31,23 +31,9 @@
                 <!--  -->
     </ng-container>
     
-    <!-- OFICINA, REUNIÃO -->
-    <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+    <!-- OFICINA, REUNIÃO, SUPERAÇÃO, AULA ZERO -->
+    <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao, EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
         <div class="event"
-                (mouseenter)="eventoItemHover.show($event)"
-                (mouseleave)="eventoItemHover.hide()"
-                (click)="eventoClick($event)"
-                [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }">
-            <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
-            <ng-container *ngTemplateOutlet="eventBody"></ng-container>
-            <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
-        </div>
-    </ng-container>
-    
-    
-    <!-- SUPERAÇÃO, AULA ZERO -->
-    <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
-        <div class="event "
                 (mouseenter)="eventoItemHover.show($event)"
                 (mouseleave)="eventoItemHover.hide()"
                 (click)="eventoClick($event)"
@@ -55,13 +41,16 @@
                 [ngClass]="{
                     'event-superacao': EventoTipo.Superacao == evento.evento_Tipo_Id,
                     'event-aula-zero': EventoTipo.AulaZero == evento.evento_Tipo_Id,
+                    'event-reuniao': EventoTipo.Oficina == evento.evento_Tipo_Id,
+                    'event-oficina': EventoTipo.Reuniao == evento.evento_Tipo_Id,
                 }">
-            
             <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
             <ng-container *ngTemplateOutlet="eventBody"></ng-container>
             <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
         </div>
     </ng-container>
+    
+    
     
     <ng-template #eventHeader>
         <div class="event-header">

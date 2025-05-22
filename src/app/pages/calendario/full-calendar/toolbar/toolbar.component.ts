@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { CalendarioRequest, CalendarioView } from '../../../../models/calendario.model';
 import { EventoService } from '../../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { Router } from '@angular/router';
+import { MobileService } from '../../../../utils';
+import { ScreenWidth } from '../../../../utils/mobile';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-toolbar',
@@ -12,9 +15,12 @@ import { Router } from '@angular/router';
     styleUrl: './toolbar.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToolbarComponent implements OnChanges {
+export class ToolbarComponent implements OnChanges, OnDestroy {
     @Input() currentTitle: string = '';
     @Output() update = new EventEmitter<boolean>();
+    screen: ScreenWidth = ScreenWidth.lg;
+    ScreenWidth = ScreenWidth;
+    subscription: Subscription[] = [];
 
     view: CalendarioView = CalendarioView.CalendarioGeral;
     viewMenu: MenuItem[] = [
@@ -80,8 +86,15 @@ export class ToolbarComponent implements OnChanges {
 
     constructor(
         private service: EventoService,
+        private mobileService: MobileService,
         private router: Router,
     ) {
+
+        var screen = this.mobileService.get().subscribe(res => {
+            this.screen = res;
+            console.log(this.screen)
+        });
+        this.subscription.push(screen);
 
     }
 
@@ -91,6 +104,11 @@ export class ToolbarComponent implements OnChanges {
         }
 
     }
+
+    ngOnDestroy(): void {
+        this.subscription.forEach(e => e.unsubscribe());
+    }
+
 
     updateCalendar() {
         this.update.emit(true)

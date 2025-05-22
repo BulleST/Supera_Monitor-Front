@@ -1,13 +1,29 @@
 ::ng-deep .fc .fc-timegrid-slot-minor {
     /* border-top-style: hidden !important; */
 }
+
 ::ng-deep .fc .fc-timegrid-slot {
-    height: 2.5em!important;
+    height: 2.5em !important;
 }
+
 ::ng-deep .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
-    margin-bottom: 0px!important;
+    margin-bottom: 0px !important;
 }
+
 ::ng-deep .fc .fc-daygrid-event,
 ::ng-deep .fc .fc-daygrid-day-events {
-    margin-top: 0px!important;
+    margin-top: 0px !important;
+}
+
+@media (max-width: 500px) {
+    .myycalendar {
+        width: calc(100vw + 410px);
+        overflow: auto;
+        height: calc(100vh + 20px);
+    }
+
+    ::ng-deep .fc .fc-timegrid-slot {
+        height: 1.5rem !important;
+    }
+
 }

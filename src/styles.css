@@ -408,3 +408,20 @@ tbody tr:first-child .fc-scroller {
     background: var(--primary-color);
     color: white;
 }
+
+.p-button {
+    white-space: nowrap;
+}
+
+.p-select-small .pi {
+    font-size: 10px;
+}
+
+.p-select-small .p-select-label {
+    font-size: 10.5px;
+    padding: 3px 7px;
+}
+
+.p-select-small .p-select-dropdown {
+    width: 21px;
+}
