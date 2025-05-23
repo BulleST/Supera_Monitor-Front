@@ -389,7 +389,8 @@
                                     </div>
                                     <ng-container *ngFor="let checklistItem of checklist.items">
                                         <div class="flex flex-column align-items-start">
-                                            <div class="inline-flex align-items-center gap-2 my-1 w-min-content pr-3" [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined">
+                                            <div class="inline-flex align-items-center gap-2 my-1 w-min-content pr-3" 
+                                                [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined">
                                                 
                                                 <p-checkbox *ngIf="!checklistItem.finalizado" 
                                                 [inputId]="'checklistitem-' + checklistItem.id"

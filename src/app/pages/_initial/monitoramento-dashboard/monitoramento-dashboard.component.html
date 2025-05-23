@@ -105,6 +105,7 @@
                                         <a *ngIf="item.celular"
                                            [href]="enviarMensagem(item.nome, item.celular)"
                                            pTooltip="Enviar mensagem"
+                                           tooltipPosition="top"
                                            target="_blank"
                                            rel="noopener noreferrer"
                                            class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-green-500 hover:bg-green-500 hover:text-white ">
@@ -144,6 +145,7 @@
                               label="Filtrar"
                               [text]="true"
                               pTooltip="Aplicar filtros"
+                              tooltipPosition="top"
                               class="mr-2"
                               [rounded]="true"
                               styleClass="bg-black-alpha-80 text-white" />
@@ -270,6 +272,7 @@
                                    [href]="enviarMensagem(aluno.nome, aluno.celular)"
                                    target="_blank"
                                    pTooltip="Enviar mensagem"
+                                   tooltipPosition="top"
                                    class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text ">
                                     <i class="pi pi-whatsapp p-button-icon ng-star-inserted"></i>
                                 </a>
@@ -346,6 +349,7 @@
                                                [href]="enviarMensagem(aluno.nome, aluno.celular)"
                                                target="_blank"
                                                pTooltip="Enviar mensagem"
+                                               tooltipPosition="top"
                                                class="pi pi-whatsapp hover:bg-green-500 text-white border-circle text-xs">
                                             </a>
                                         </div>
@@ -373,7 +377,11 @@
                                                     </div>
                                                 </div>
                                     </ng-container>
-                                    <div *ngIf="item.primeiraAula" class="primeira-aula" [ngClass]="{'em-pe': item.aula.id == PseudoEvento.EventoId}" pTooltip="Primeira aula" tooltipPosition="top">
+                                    <div *ngIf="item.primeiraAula" 
+                                    class="primeira-aula" 
+                                    [ngClass]="{'em-pe': item.aula.id == PseudoEvento.EventoId}" 
+                                    pTooltip="Primeira aula" 
+                                    tooltipPosition="top">
                                         <span>Aula 1</span>
                                     </div>
                                     <ng-template #dataTemplate>
@@ -411,7 +419,8 @@
                                                      value="Aula 1"
                                                      size="small"
                                                      severity="danger"
-                                                     [pTooltip]="'Primeira aula'" />
+                                                     [pTooltip]="'Primeira aula'" 
+                                                     tooltipPosition="top"/>
                                             <p class="flex gap-2">
                                                 <span class="font-bold">Data:</span>
                                                 <span>{{item.aula.data | date:'dd/MM/yy '}}</span>

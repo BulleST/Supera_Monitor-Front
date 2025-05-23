@@ -31,13 +31,13 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome}, 
-            \n Espero que esteja bem! 
-            \nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY')} e gostaria de saber se houve um imprevisto. 
-            \nImprevistos acontecem e queremos saber se você está enfrentando dificuldades. 
-            \nSugiro agendarmos uma reposição, para você não perder o conteúdo. 
-            \nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
-            \n
-            \nIremos aguardar sua resposta...`;
+            \r\n Espero que esteja bem! 
+            \r\nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY')} e gostaria de saber se houve um imprevisto. 
+            \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades. 
+            \r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. 
+            \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
+            \r\n
+            \r\nIremos aguardar sua resposta...`;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
     }
@@ -47,11 +47,11 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome}, 
-            \nEspero que esteja bem!
-            \nSua ${this.calendarioUtils.getEventoTipo(evento)} foi agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
-            \nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
-            \n
-            \nNos vemos em breve! `;
+            \r\nEspero que esteja bem!
+            \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
+            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\n
+            \r\nNos vemos em breve! `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
     }
@@ -61,12 +61,12 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-            \nEspero que esteja bem!
-            \nSua ${this.calendarioUtils.getEventoTipo(evento)} foi reagendada para dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}. 
-            \n
-            \nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
-            \n
-            \nNos vemos em breve!`;
+            \r\nEspero que esteja bem!
+            \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi reagendada para dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}. 
+            \r\n
+            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\n
+            \r\nNos vemos em breve!`;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
     }
@@ -76,12 +76,12 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-            \nEspero que esteja bem!
-            \nInfelizmente sua ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi cancelada devido "${evento.observacao}". 
-            \n
-            \nPor favor, me avise sua disponibilidade para que possamos combinar um novo horário.
-            \n
-            \nAgradeço pela compreensão!`;
+            \r\nEspero que esteja bem!
+            \r\nInfelizmente sua ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi cancelada devido "${evento.observacao}". 
+            \r\n
+            \r\nPor favor, me avise sua disponibilidade para que possamos combinar um novo horário.
+            \r\n
+            \r\nAgradeço pela compreensão!`;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
     }
@@ -91,12 +91,12 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-            \nEspero que esteja bem!
-            \nConfirmo que a reposição da ${this.calendarioUtils.getEventoTipo(evento)} está agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
-            \n
-            \nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
-            \n
-            \nNos vemos em breve!
+            \r\nEspero que esteja bem!
+            \r\nConfirmo que a reposição da ${this.calendarioUtils.getEventoTipo(evento)} está agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
+            \r\n
+            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\n
+            \r\nNos vemos em breve!
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
@@ -107,12 +107,12 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-            \nEspero que esteja bem!
-            \nSua inscrição na oficina do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi confirmada.
-            \n
-            \nFico à disposição caso precise de algo antes da oficina.
-            \n
-            \nNos vemos em breve!
+            \r\nEspero que esteja bem!
+            \r\nSua inscrição na oficina do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi confirmada.
+            \r\n
+            \r\nFico à disposição caso precise de algo antes da oficina.
+            \r\n
+            \r\nNos vemos em breve!
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
@@ -133,13 +133,13 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome}, 
-                        \nEspero que esteja bem!
-                        \nPassando para confirmar se você já conseguiu preencher o formulário que enviamos.
-                        \nCaso ainda não tenha preenchido, posso te enviar novamente — é rapidinho! 😊
-                        \n
-                        \nLink: <Link do formulário>
-                        \n
-                        \nFico no aguardo, tá bom?
+                        \r\nEspero que esteja bem!
+                        \r\nPassando para confirmar se você já conseguiu preencher o formulário que enviamos.
+                        \r\nCaso ainda não tenha preenchido, posso te enviar novamente — é rapidinho! 😊
+                        \r\n
+                        \r\nLink: <Link do formulário>
+                        \r\n
+                        \r\nFico no aguardo, tá bom?
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
@@ -157,39 +157,40 @@ export class MensagemWhatsapp {
         return link
     }
 
-    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana: number, horario: Date, professor: string) {
+    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: Date, professor?: string) {
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
 
         var array = nome.split(' ');
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-            \nTudo bem?
-            \nMeu nome é Antonio Neto, coordenador pedagógico da Equipe Supera Paraíso!
-            \n
-            \nEstamos felizes e honrados em ter você como nosso(a) aluno(a)! 
-            \nSeja bem-vindo(a) à Família SUPERA! 💪🧠
-            \n
-            \nPara começar, vamos ver algumas informações importantes sobre o início do curso:
-            \nSua Turma: ${semana[diaSemana]} ${moment(horario).format('HH:mm')}
-            \nSeu educador é o ${professor}.
-            \n
-            \nTe incluímos em dois grupos do SUPERA no WhatsApp 💪🧠
-            \n
-            \nO Supera INFORMATIVOS é onde enviamos recados gerais, gabaritos, oficinas e etc. 
-            \n
-            \nJá o SUPERA [${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}] é o grupo apenas da sua turma, onde enviamos exercícios, reflexão da semana e recados voltados a turma.
-            \n
-            \nSENSORIAL MOOVE (SUPERA ONLINE PREMIUM): Sendo nosso aluno, você possui acesso ao nosso aplicativo com exercícios complementares ao treino cognitivo. Poderá ser baixado nos links abaixo 👇 
-            \n
-            \nCelular (IPHONE): https://apps.apple.com/br/app/sensorial-moove/id1613606380
-            \nCelular (ANDROID): https://play.google.com/store/apps/details?id=com.sensorial.moove&pli=1
-            \nComputador: https://apps.microsoft.com/detail/9pj1l9fd95nc?hl=en-us&gl=BR
-            \n
-            \nSEU USUÁRIO: ${email}
-            \nSUA SENHA: Super@123
-            \n
-            \nQualquer dúvida, estou à disposição!
+            \r\nTudo bem?
+            \r\nMeu nome é Antonio Neto, coordenador pedagógico da Equipe Supera Paraíso!
+            \r\n
+            \r\nEstamos felizes e honrados em ter você como nosso(a) aluno(a)! 
+            \r\nSeja bem-vindo(a) à Família SUPERA! 💪🧠
+            \r\n
+            \r\nPara começar, vamos ver algumas informações importantes sobre o início do curso:
+            
+            ${diaSemana && horario ? `\r\nSua Turma: ${semana[diaSemana]} ${moment(horario).format('HH:mm')}.` : '' }
+            ${professor ? `\r\nSeu educador é o ${professor}.` : '' }
+            \r\n
+            \r\nTe incluímos em dois grupos do SUPERA no WhatsApp 💪🧠
+            \r\n
+            \r\nO Supera INFORMATIVOS é onde enviamos recados gerais, gabaritos, oficinas e etc. 
+            \r\n
+            ${diaSemana && horario ? `\r\nJá o SUPERA [${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}] é o grupo apenas da sua turma, onde enviamos exercícios, reflexão da semana e recados voltados a turma.` : '' }
+            \r\n
+            \r\nSENSORIAL MOOVE (SUPERA ONLINE PREMIUM): Sendo nosso aluno, você possui acesso ao nosso aplicativo com exercícios complementares ao treino cognitivo. Poderá ser baixado nos links abaixo 👇 
+            \r\n
+            \r\nCelular (IPHONE): https://apps.apple.com/br/app/sensorial-moove/id1613606380
+            \r\nCelular (ANDROID): https://play.google.com/store/apps/details?id=com.sensorial.moove&pli=1
+            \r\nComputador: https://apps.microsoft.com/detail/9pj1l9fd95nc?hl=en-us&gl=BR
+            \r\n
+            ${email ? `\r\nSEU USUÁRIO: ${email}` : ''}
+            \r\nSUA SENHA: Super@123
+            \r\n
+            \r\nQualquer dúvida, estou à disposição!
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
@@ -200,12 +201,12 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-                        \nEspero que esteja bem!
-                        \n
-                        \nQueremos saber como você está se sentindo em relação à sua turma.
-                        \nEstá tudo indo bem por aí? Há algo em que possamos te ajudar ou melhorar para que sua experiência seja ainda mais positiva?
-                        \n
-                        \nConte com a gente! 😊
+                        \r\nEspero que esteja bem!
+                        \r\n
+                        \r\nQueremos saber como você está se sentindo em relação à sua turma.
+                        \r\nEstá tudo indo bem por aí? Há algo em que possamos te ajudar ou melhorar para que sua experiência seja ainda mais positiva?
+                        \r\n
+                        \r\nConte com a gente! 😊
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
@@ -217,14 +218,14 @@ export class MensagemWhatsapp {
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
-                \nEspero que esteja bem!
-                \n
-                \nGostaria de te convidar para participar de uma oficina super especial conosco.
-                \nNela, vamos trabalhar juntos o desenvolvimento da criatividade, autoestima, coordenação motora e da sua capacidade de expressão de forma divertida e envolvente!
-                \n
-                \nSerá uma alegria ter você com a gente!
-                \n
-                \nPosso contar com você? 💪🙂
+                \r\nEspero que esteja bem!
+                \r\n
+                \r\nGostaria de te convidar para participar de uma oficina super especial conosco.
+                \r\nNela, vamos trabalhar juntos o desenvolvimento da criatividade, autoestima, coordenação motora e da sua capacidade de expressão de forma divertida e envolvente!
+                \r\n
+                \r\nSerá uma alegria ter você com a gente!
+                \r\n
+                \r\nPosso contar com você? 💪🙂
 
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;

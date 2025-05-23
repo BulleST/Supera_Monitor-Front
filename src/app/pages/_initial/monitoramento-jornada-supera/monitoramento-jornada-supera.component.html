@@ -164,6 +164,7 @@
                                     <a *ngIf="item.celular"
                                        [href]="enviarMensagemAluno(item)"
                                        pTooltip="Enviar mensagem"
+                                       tooltipPosition="top"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-green-500 hover:bg-green-500 hover:text-white ">
@@ -195,6 +196,7 @@
                           label="Filtrar"
                           [text]="true"
                           pTooltip="Aplicar filtros"
+                          tooltipPosition="top"
                           class="mr-2"
                           [rounded]="true"
                           styleClass="bg-black-alpha-80 text-white" />
@@ -224,6 +226,7 @@
                         <div class="bg-white-alpha-10 shadow-1 w-22rem flex flex-column border-round-lg flex-none mb-2">
                             <div *ngIf="checklistItem.nome"
                                  [pTooltip]="checklistItem.nome"
+                                 tooltipPosition=" top"
                                  class="bg-white flex border-round-md px-3 py-1 ml-3 mr-5 mt-3 ">
                                 <span class="text-overflow-ellipsis text-primary-700 font-semibold white-space-nowrap text-center text-sm overflow-hidden w-full"> {{checklistItem.nome}} </span>
                             </div>
@@ -235,15 +238,15 @@
                                     </ng-container>
                                 </ng-template>
                                 <ng-container *ngIf="checklistItem.alunos && checklistItem.alunos.length; else empty">
-                                        <cdk-virtual-scroll-viewport 
-                                                        [itemSize]="52" 
-                                                        [minBufferPx]="200" 
-                                                        [maxBufferPx]="208" 
-                                                        [style]="{ height: checklistItem.alunos.length > 4 ? '22rem' : (checklistItem.alunos.length * (52 + 5)) + 'px' }">
-                                            <div *cdkVirtualFor="let alunoChecklistItem of checklistItem.alunos" class="p-2 bg-white border-round-md shadow-1 mb-2 mr-2">
-                                                <ng-container *ngTemplateOutlet="alunoItemTemplate; context: { alunoChecklistItem: alunoChecklistItem }"></ng-container>
-                                            </div>
-                                        </cdk-virtual-scroll-viewport>
+                                    <cdk-virtual-scroll-viewport
+                                                                 [itemSize]="52"
+                                                                 [minBufferPx]="200"
+                                                                 [maxBufferPx]="208"
+                                                                 [style]="{ height: checklistItem.alunos.length > 4 ? '22rem' : (checklistItem.alunos.length * (52 + 5)) + 'px' }">
+                                        <div *cdkVirtualFor="let alunoChecklistItem of checklistItem.alunos" class="p-2 bg-white border-round-md shadow-1 mb-2 mr-2">
+                                            <ng-container *ngTemplateOutlet="alunoItemTemplate; context: { alunoChecklistItem: alunoChecklistItem }"></ng-container>
+                                        </div>
+                                    </cdk-virtual-scroll-viewport>
                                 </ng-container>
                             </div>
                             <!-- End Alunos -->
@@ -272,7 +275,8 @@
                        target="_blank"
                        [href]="enviarMensagemBoasVindas(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar boas-vindas"></a>
+                       pTooltip="Enviar boas-vindas"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Apresentação do Diretor Franqueado -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 8">
@@ -280,7 +284,8 @@
                        target="_blank"
                        [href]="enviarMensagemApresentacaoDiretorFranqueado(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar apresentação"></a>
+                       pTooltip="Enviar apresentação"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Confirmação da adequação do aluno ao perfil da turma -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 9">
@@ -288,7 +293,8 @@
                        target="_blank"
                        [href]="enviarMensagemAdequacaoTurma(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem de confirmação"></a>
+                       pTooltip="Enviar mensagem de confirmação"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Agendar 1ª Oficina -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 12">
@@ -296,7 +302,8 @@
                        target="_blank"
                        [href]="enviarMensagemLembreteOficina(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem para inscrição"></a>
+                       pTooltip="Enviar mensagem para inscrição"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Feedback pós venda -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 13">
@@ -304,7 +311,8 @@
                        target="_blank"
                        [href]="enviarMensagemFeedbackPosVenda(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem de feedback"></a>
+                       pTooltip="Enviar mensagem de feedback"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Confirmação de preeechimento do feedback pós venda -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 32">
@@ -312,7 +320,8 @@
                        target="_blank"
                        [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem de lembrete de preenchimento"></a>
+                       pTooltip="Enviar mensagem de lembrete de preenchimento"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Agendar Superação -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 22">
@@ -320,7 +329,8 @@
                        target="_blank"
                        [href]="enviarMensagemLembreteSuperacao(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem para agendamento"></a>
+                       pTooltip="Enviar mensagem para agendamento"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Agendar 2ª Superação -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 29">
@@ -328,7 +338,8 @@
                        target="_blank"
                        [href]="enviarMensagemLembreteSuperacao(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem para agendamento"></a>
+                       pTooltip="Enviar mensagem para agendamento"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- Agendar 2ª Oficina -->
                 <ng-container *ngIf="alunoChecklistItem.checklist_Item_Id == 23">
@@ -336,7 +347,8 @@
                        target="_blank"
                        [href]="enviarMensagemLembreteOficina(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem para inscrição"></a>
+                       pTooltip="Enviar mensagem para inscrição"
+                       tooltipPosition="top"></a>
                 </ng-container>
                 <!-- MENSAGEM PADRÃO -->
                 <ng-container *ngIf="[8, 9, 12, 13, 32, 37, 22, 29, 23].includes(alunoChecklistItem.checklist_Item_Id) == false">
@@ -344,7 +356,8 @@
                        target="_blank"
                        [href]="enviarMensagem(alunoChecklistItem)"
                        class="text-green-500 pi pi-whatsapp hover:bg-green-200"
-                       pTooltip="Enviar mensagem a"></a>
+                       pTooltip="Enviar mensagem a"
+                       tooltipPosition="top"></a>
                 </ng-container>
             </p>
             <span class="flex justify-content-between mx-auto w-full mt-1">
