@@ -62,6 +62,7 @@ export class TurmaService extends Service {
 
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
+        request.linkGrupo = model.linkGrupo;
 
         return this.http.post<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
@@ -76,6 +77,7 @@ export class TurmaService extends Service {
         
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
+        request.linkGrupo = model.linkGrupo;
 
         return this.http.put<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
