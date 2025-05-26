@@ -20,9 +20,14 @@ export function showError(confirmationService: ConfirmationService, header: stri
 
 export function getError(res: HttpErrorResponse) {
     var msg = "Ocorreu um erro, mas não foi possível localizar a causa.";
-    console.error(res)
+    console.log('res.error', res.error);
+    console.log('res.error.message', res.error.message);
+    console.log('res.message', res.message);
     if (res.error && res.error.message) {
         msg = res.error.message
+    }
+    else if (res.error && res.error.Message) {
+        msg = res.error.Message
     }
     else if (typeof res.error == 'string') {
         msg = res.error
@@ -32,8 +37,6 @@ export function getError(res: HttpErrorResponse) {
     } else {
         msg = 'Ocorreu um erro. \n' + res.toString();
     }
-
-
     return msg;
 }
 
