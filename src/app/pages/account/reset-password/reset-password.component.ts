@@ -42,7 +42,7 @@ export class ResetPasswordComponent {
                         icon: 'pi pi-key text-xl',
                         rejectVisible: false,
                         acceptLabel: 'Fazer Login',
-                        acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                        acceptButtonStyleClass: 'p-button-rounded',
                         accept: () => {
                             this.router.navigate(['account', 'login']);
                         }
@@ -60,7 +60,7 @@ export class ResetPasswordComponent {
                         icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500',
                         rejectVisible: false,
                         acceptLabel: 'OK',
-                        acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                        acceptButtonStyleClass: 'p-button-rounded',
                     })
                 }
             })

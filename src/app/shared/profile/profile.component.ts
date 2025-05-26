@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { AccountService } from '../../services/account.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
-import { getError } from '../../utils';
+import { getError, showError } from '../../utils';
 import { AccountResponse } from '../../models/account.model';
 
 @Component({
@@ -52,15 +52,7 @@ export class ProfileComponent implements OnDestroy {
     }
     
     showError(message: string, e: any) {
-         this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, 'Erro', message, e);
     }
 
     send(form: NgForm, e: any) {

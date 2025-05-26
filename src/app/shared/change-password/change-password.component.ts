@@ -4,7 +4,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { AccountService } from '../../services/account.service';
 import { ConfirmationService } from 'primeng/api';
 import { NgForm } from '@angular/forms';
-import { getError } from '../../utils';
+import { getError, showError } from '../../utils';
 import { AccountResponse } from './../../models/account.model';
 
 @Component({
@@ -48,15 +48,7 @@ export class ChangePasswordComponent implements OnDestroy {
 
     
     showError(message: string, e: any) {
-         this.confirmationService.confirm({
-            target: e.target,
-            message: message,
-            header: 'Erro',
-            icon: 'pi pi-times-circle text-2xl -mr-2 text-red-500 text-red-500',
-            acceptLabel: 'OK',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
-            rejectVisible: false,
-        })
+        showError(this.confirmationService, 'Erro', message, e);
     }
 
     send(form: NgForm, e: any) {
@@ -78,7 +70,7 @@ export class ChangePasswordComponent implements OnDestroy {
                     icon: 'pi pi-check-circle text-2xl -mr-2 text-green-400',
                    
                     acceptLabel: 'OK',
-                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded',
                     rejectVisible: false,
                 })
             } else {

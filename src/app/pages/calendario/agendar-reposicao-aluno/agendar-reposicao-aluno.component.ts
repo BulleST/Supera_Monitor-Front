@@ -361,11 +361,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                     header: 'Atenção',
                     acceptIcon: 'pi pi-check',
                     acceptLabel: 'Continuar',
-                    acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded',
                     rejectVisible: true,
                     rejectIcon: 'pi pi-times',
                     rejectLabel: 'Cancelar',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: async () => {
                         setTimeout(() => {
                             this.selecionarEvento(e, target);
@@ -399,10 +399,10 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             header: 'Selecionar aula',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Selecionar',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.selectedAula = e.event;
                 this.selectedEvento = target;
@@ -429,10 +429,10 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             header: 'Agendar reposição',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(target, e)
             },
@@ -511,10 +511,10 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptButtonStyleClass: 'p-button-rounded p-button-success',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false
                 this.visibleChange();

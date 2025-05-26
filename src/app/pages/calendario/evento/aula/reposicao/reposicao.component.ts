@@ -257,7 +257,7 @@ export class ReposicaoComponent implements OnDestroy {
                     acceptLabel: 'Continuar',
                     rejectLabel: 'Cancelar',
                     acceptButtonStyleClass: 'p-button-rounded mr-0',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-text bg-primary-50',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => this.selectEventoConfirm(e),
                     reject: () => this.removeSelection(),
                 });
@@ -331,10 +331,10 @@ export class ReposicaoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
+            acceptButtonStyleClass: ' p-button-rounded p-button-success',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false
                 this.visibleChange();
@@ -370,7 +370,7 @@ export class ReposicaoComponent implements OnDestroy {
             header: `Agendar reposição`,
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',

@@ -176,7 +176,7 @@ export class FormComponent implements OnDestroy {
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
             rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-text ',

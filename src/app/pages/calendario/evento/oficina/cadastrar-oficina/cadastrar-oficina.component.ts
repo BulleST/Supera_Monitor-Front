@@ -250,7 +250,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
             acceptLabel: `Agendar oficina`,
             acceptIcon: 'pi pi-check',
             rejectLabel: 'Não',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-text ',
             accept: () => {
                 this.send(e);

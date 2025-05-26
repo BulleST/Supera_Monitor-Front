@@ -137,10 +137,10 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
                     window.open(url, '_blank')

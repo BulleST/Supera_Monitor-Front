@@ -308,11 +308,11 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Finalizar',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.loadingAlunos = true;
                 item.observacoes = this.checklistObservacao

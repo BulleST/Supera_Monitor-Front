@@ -312,7 +312,7 @@ export class ReagendarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: false,
             accept: () => {
                 this.visible = false
@@ -363,9 +363,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  Deseja continuar mesmo assim? `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -389,9 +389,9 @@ export class ReagendarEventoComponent implements OnDestroy {
                                  `,
                     acceptLabel: `Continuar`,
                     acceptIcon: 'pi pi-check',
-                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                    acceptButtonStyleClass: 'p-button-rounded',
                     rejectLabel: 'Escolher outra data',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => resolve(true),
                     reject: () => reject(false),
                 })
@@ -408,9 +408,9 @@ export class ReagendarEventoComponent implements OnDestroy {
             message: `Tem certeza que deseja reagendar a ${this.tipoString} para o dia ${moment(this.data).format('DD/MM')} às ${moment(this.horario).format('HH[h]mm')}?.`,
             acceptLabel: `Reagendar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
             }

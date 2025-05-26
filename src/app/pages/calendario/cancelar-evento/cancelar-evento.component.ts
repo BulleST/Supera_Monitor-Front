@@ -195,9 +195,9 @@ export class CancelarEventoComponent implements OnDestroy {
             header: `Cancelar ${this.tipoEventoString}`,
             message: `Tem certeza que deseja cancelar a ${this.tipoEventoString} do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: 'Não cancelar',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: `Cancelar ${this.tipoEventoString}`,
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -298,7 +298,7 @@ export class CancelarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: false,
             accept: () => {
                 this.visible = false;

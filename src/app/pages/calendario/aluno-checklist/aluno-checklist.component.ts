@@ -161,10 +161,10 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                 icon: 'pi pi-comment-dots text-4xl mr-2',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Ainda não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     this.loading = true;
                     item.observacoes = this.checklistObservacao
@@ -207,7 +207,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             key: 'checklistAluno',
             header: 'Jornada Supera do ' + nome,
             rejectVisible: false,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             acceptLabel: 'Fechar',
             accept: () => {
                 this.visible = false;

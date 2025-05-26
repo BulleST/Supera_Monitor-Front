@@ -135,11 +135,10 @@ export class ListComponent implements OnDestroy {
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
                       ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
@@ -172,9 +171,9 @@ export class ListComponent implements OnDestroy {
             header: 'Resetar Senha?',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: 'Resetar Senha',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 lastValueFrom(this.service.resetPassword(item.id))
                     .then(res => {

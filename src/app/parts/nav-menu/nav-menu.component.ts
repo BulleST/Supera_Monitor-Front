@@ -63,12 +63,11 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
             target: e.target,
             message: `Tem certeza que deseja sair?`,
             header: 'Sair',
-            icon: 'pi pi-exclamation-triangle',
             closeOnEscape: true,
             acceptLabel: `Sair`,
-            acceptButtonStyleClass: 'text-center',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-outlined text-center',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.accountService.logout();
             },

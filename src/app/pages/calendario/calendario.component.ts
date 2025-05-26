@@ -511,11 +511,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                         header: 'Atenção',
                         acceptIcon: 'pi pi-check',
                         acceptLabel: 'Continuar',
-                        acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                        acceptButtonStyleClass: 'p-button-rounded',
                         rejectVisible: true,
                         rejectIcon: 'pi pi-times',
                         rejectLabel: 'Cancelar',
-                        rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                        rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                         accept: async () => {
                             this.agendaReposicaoConffirm(event.event, aluno, source, target);
                             this.cdkCancelDrag('keyup')
@@ -559,11 +559,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             header: 'Agendar reposição',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.agendaReposicao(e, aluno, source, target);
                 this.cdkCancelDrag('keyup')
@@ -628,11 +628,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
+                acceptLabel: `Enviar mensagem`,
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                acceptButtonStyleClass: 'p-button-rounded p-button-success',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
                     var url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
                     window.open(url, '_target');

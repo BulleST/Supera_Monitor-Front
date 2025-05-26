@@ -279,10 +279,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             header: 'Transferência de turma',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.turmaChangedConffirm(e, model);
             },
@@ -305,10 +305,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.turmaAccept();
             },
@@ -353,11 +353,11 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             icon: 'pi pi-comment-dots text-4xl mr-2',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Finalizar',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.loadingChecklists = true;
                 item.observacoes = this.checklistObservacao
@@ -432,11 +432,11 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Salvar',
-                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 rejectVisible: true,
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
                 accept: async () => {
                     var request: Aluno_Restricao_Request = {
                         id: 0,
@@ -485,12 +485,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             message: mensagem,
             header: title,
             icon: 'pi pi-exclamation-triangle',
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             acceptIcon: 'pi pi-check',
-            acceptLabel: text,
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptLabel: text,
             accept: async () => {
 
                 this.loadingRestricoes = true;

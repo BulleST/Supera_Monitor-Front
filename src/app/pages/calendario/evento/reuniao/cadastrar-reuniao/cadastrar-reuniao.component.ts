@@ -264,9 +264,9 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar reunião para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar reunião`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
             }

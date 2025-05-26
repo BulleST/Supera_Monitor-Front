@@ -193,10 +193,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success',
                 acceptIcon: 'pi pi-whatsapp',
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
                     let url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
                     window.open(url, '_blank')
@@ -216,11 +216,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
                 acceptIcon: 'pi pi-whatsapp',
+                acceptLabel: `Enviar mensagem`,
                 rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                acceptButtonStyleClass: ' p-button-rounded p-button-success',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
                     let url = this.mensagemWhatsapp.enviarMensagemFalta(item.aluno, item.celular!, this.evento);
                     window.open(url, '_blank')
@@ -296,10 +296,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
                     item.numeroPaginaAbaco = 1;
@@ -332,9 +332,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_Abaco}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não, foi um engano',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
                     item.numeroPaginaAbaco = prev.numeroPaginaAbaco;
                 }
@@ -362,10 +362,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
                     item.numeroPaginaAH = 1;
@@ -398,9 +398,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_AH}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não, foi um engano',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
                     item.numeroPaginaAH = prev.numeroPaginaAH;
                 }

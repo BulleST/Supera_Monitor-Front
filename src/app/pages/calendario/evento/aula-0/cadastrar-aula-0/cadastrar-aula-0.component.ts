@@ -344,9 +344,9 @@ export class CadastrarAula0Component implements OnDestroy {
                 header: `Selecionar ${alunos.length} alunos?`,
                 message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
                     this.alunosSelected = [this.alunosSelected[0]]
                 },
@@ -401,9 +401,9 @@ export class CadastrarAula0Component implements OnDestroy {
             message: mensagem,
             acceptLabel: `Agendar aula 0`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
             },
@@ -451,7 +451,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -472,9 +472,9 @@ export class CadastrarAula0Component implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false;
                 this.visibleChange();

@@ -348,10 +348,10 @@ export class EventoComponent implements OnDestroy {
             header: `Finalizar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: `Finalizar`,
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
+            acceptButtonStyleClass: 'p-button-roundedp-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Ainda não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.finalizar(e);
             },
@@ -453,11 +453,11 @@ export class EventoComponent implements OnDestroy {
             header: `Salvar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Salvar',
-            acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: true,
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.send(e);
             },

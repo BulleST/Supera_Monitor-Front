@@ -192,9 +192,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
@@ -244,10 +244,10 @@ export class ListComponent implements OnDestroy {
                 icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-rounded  px-3 mr-0 p-button-icon-right',
+                acceptButtonStyleClass: 'p-button-roundedp-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     this.loadingChecklist = true;
                     item.observacoes = this.checklistObservacao

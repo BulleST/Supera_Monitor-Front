@@ -182,10 +182,10 @@ export class SelectedEventoComponent implements OnChanges {
                     header: `Inserir aluno`,
                     acceptIcon: 'pi pi-check',
                     acceptLabel: `Sim`,
-                    acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-icon-right',
+                    acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
                     rejectIcon: 'pi pi-times',
                     rejectLabel: 'Não',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: async () => {
                         this.goToInserirAluno();
                     },

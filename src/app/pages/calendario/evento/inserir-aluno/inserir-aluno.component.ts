@@ -244,9 +244,9 @@ export class InserirAlunoComponent {
             message: `Tem certeza que deseja inserir o aluno selecionado? <br> ${aluno}`,
             acceptLabel: `Salvar e inserir`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
             }
@@ -290,10 +290,10 @@ export class InserirAlunoComponent {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0 p-button-primary',
+            acceptButtonStyleClass: 'p-button-rounded p-button-primary',
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 var url = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
                 window.open(url, '_blank')

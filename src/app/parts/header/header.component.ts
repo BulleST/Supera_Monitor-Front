@@ -111,9 +111,9 @@ export class HeaderComponent implements OnDestroy {
             icon: 'pi pi-exclamation-triangle',
             closeOnEscape: true,
             acceptLabel: `Sair`,
-            acceptButtonStyleClass: 'text-center',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-outlined text-center',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.accountService.logout();
             },

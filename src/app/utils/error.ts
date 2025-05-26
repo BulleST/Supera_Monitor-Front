@@ -12,7 +12,7 @@ export function showError(confirmationService: ConfirmationService, header: stri
         header: header,
         icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
         acceptLabel: 'OK',
-        acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+        acceptButtonStyleClass: 'p-button-rounded',
         acceptIcon: '',
         rejectVisible: false,
     })

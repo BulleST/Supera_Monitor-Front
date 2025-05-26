@@ -352,9 +352,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectVisible: false,
             accept: () => {
                 this.visible = false
                 this.visibleChange();
@@ -370,9 +369,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
 
                     var objIndex = this.object.alunos.findIndex(x => x.aluno_Id == this.selectedAlunoTarget!.id);
@@ -437,9 +436,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-text',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
 
                     var indexObj = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
@@ -510,8 +509,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: message,
                 acceptLabel: 'Continuar',
                 rejectLabel: 'Cancelar',
-                acceptButtonStyleClass: ' p-button-rounded mr-0',
-                rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+                acceptButtonStyleClass: ' p-button-rounded',
+                rejectButtonStyleClass: ' p-button-rounded p-button-outlined',
                 accept: () => this.selectEventoConfirm(e),
                 reject: () => this.removeSelection(),
             });
@@ -567,8 +566,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             header: 'Selecionar aula a repor',
             acceptLabel: 'Continuar',
             rejectLabel: 'Cancelar',
-            acceptButtonStyleClass: ' p-button-rounded mr-0',
-            rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+            acceptButtonStyleClass: ' p-button-rounded',
+            rejectButtonStyleClass: ' p-button-rounded p-button-outlined',
             accept: async () => this.selectEventoSave(e),
             reject: () => this.removeSelection(),
         });
@@ -583,8 +582,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 header: 'Selecionar aula a repor',
                 acceptLabel: 'Continuar',
                 rejectLabel: 'Cancelar',
-                acceptButtonStyleClass: ' p-button-rounded mr-0',
-                rejectButtonStyleClass: ' p-button-rounded p-button-text bg-primary-50',
+                acceptButtonStyleClass: ' p-button-rounded',
+                rejectButtonStyleClass: ' p-button-rounded p-button-outlined',
                 accept: async () => this.selectEventoSave(e),
                 reject: () => this.removeSelection(),
             });
@@ -655,9 +654,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             message: `Tem certeza que deseja agendar essa aula para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
             acceptLabel: `Agendar aula`,
             acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
             }

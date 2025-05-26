@@ -144,8 +144,8 @@ export class ListComponent implements OnDestroy {
             target: e.target,
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} a turma “<b>${item.nome}</b>”?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            acceptButtonStyleClass: 'p-button-rounded px-3 mr-0',
-            rejectButtonStyleClass: 'p-button-rounded p-button-text',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             rejectLabel: 'Cancelar',
             accept: () => {
