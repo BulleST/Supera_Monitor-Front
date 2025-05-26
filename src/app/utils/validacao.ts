@@ -44,10 +44,6 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
         if (item.expedienteInicio) {
             let _data = moment().set({ hour: intervaloDe.hours(), minute: intervaloDe.minutes(), second: 0 })
             if (_data.isBefore(item.expedienteInicio)) {
-
-                if (item.id == 31) {
-                    console.log('expedienteInicio', item.expedienteInicio)
-                }
                 item.disponivel = false;
                 return item;
             }
@@ -56,11 +52,7 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
         // Se o horário finalizar apos o fim expediente do professor
         if (item.expedienteFim) {
             let _data = moment().set({ hour: intervaloAte.hours(), minute: intervaloAte.minutes(), second: 0 })
-            console.log('_data', _data.format('DD/MM HH:mm'))
             if (_data.isAfter(item.expedienteFim) ) {
-                if (item.id == 31) {
-                    console.log('expedienteFim', item.expedienteFim)
-                }
                 item.disponivel = false;
                 return item;
             }

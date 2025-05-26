@@ -180,8 +180,22 @@ export class MensagemWhatsapp {
         if (professor) {
             mensagem += `\r\nSeu educador é o ${professor}.`;
         }
+        mensagem += `
+                \r\n
+                \r\nTe incluiremos no grupo da turma do SUPERA no WhatsApp, onde enviamos exercícios, reflexão da semana e recados voltados a turma 💪🧠
+                \r\nAceite o convite e não perca nenhuma informação! 😉
+                `;
+
         if (linkGrupo && diaSemana && horario) {
             mensagem += `
+                \r\n
+                \r\nCaso não tenha sido incluído, clique no link abaixo para entrar no grupo. 
+                \r\n
+                \r\n[${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}]: ${linkGrupo}
+                \r\n
+            `;
+        } else {
+             mensagem += `
                 \r\n
                 \r\nTe incluiremos no grupo da turma do SUPERA no WhatsApp, onde enviamos exercícios, reflexão da semana e recados voltados a turma 💪🧠
                 \r\nCaso não tenha sido incluído, clique no link abaixo para entrar no grupo. 
@@ -190,6 +204,7 @@ export class MensagemWhatsapp {
                 \r\n[${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}]: ${linkGrupo}
                 \r\n
             `;
+
         }
 
         mensagem += `
