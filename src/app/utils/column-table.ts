@@ -27,6 +27,7 @@ export enum DisplayType {
     color = 'color',
     time = 'time',
     mask = 'mask',
+    link = 'link',
 }
 
 export enum FilterType {

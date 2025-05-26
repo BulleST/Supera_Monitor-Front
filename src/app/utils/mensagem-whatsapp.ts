@@ -157,7 +157,7 @@ export class MensagemWhatsapp {
         return link
     }
 
-    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: Date, professor?: string) {
+    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: Date, professor?: string, linkGrupo?: string) {
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
 
         var array = nome.split(' ');
@@ -171,15 +171,28 @@ export class MensagemWhatsapp {
             \r\nSeja bem-vindo(a) à Família SUPERA! 💪🧠
             \r\n
             \r\nPara começar, vamos ver algumas informações importantes sobre o início do curso:
+            \r\n
             
-            ${diaSemana && horario ? `\r\nSua Turma: ${semana[diaSemana]} ${moment(horario).format('HH:mm')}.` : '' }
-            ${professor ? `\r\nSeu educador é o ${professor}.` : '' }
-            \r\n
-            \r\nTe incluímos em dois grupos do SUPERA no WhatsApp 💪🧠
-            \r\n
-            \r\nO Supera INFORMATIVOS é onde enviamos recados gerais, gabaritos, oficinas e etc. 
-            \r\n
-            ${diaSemana && horario ? `\r\nJá o SUPERA [${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}] é o grupo apenas da sua turma, onde enviamos exercícios, reflexão da semana e recados voltados a turma.` : '' }
+        `;
+        if (diaSemana && horario) {
+            mensagem += `\r\nSua Turma: ${semana[diaSemana]} ${moment(horario).format('HH:mm')}.`;
+        }
+        if (professor) {
+            mensagem += `\r\nSeu educador é o ${professor}.`;
+        }
+        if (linkGrupo && diaSemana && horario) {
+            mensagem += `
+                \r\n
+                \r\nTe incluiremos no grupo da turma do SUPERA no WhatsApp, onde enviamos exercícios, reflexão da semana e recados voltados a turma 💪🧠
+                \r\nCaso não tenha sido incluído, clique no link abaixo para entrar no grupo. 
+                \r\nAceite o convite e não perca nenhuma informação! 😉
+                \r\n
+                \r\n[${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}]: ${linkGrupo}
+                \r\n
+            `;
+        }
+
+        mensagem += `
             \r\n
             \r\nSENSORIAL MOOVE (SUPERA ONLINE PREMIUM): Sendo nosso aluno, você possui acesso ao nosso aplicativo com exercícios complementares ao treino cognitivo. Poderá ser baixado nos links abaixo 👇 
             \r\n
@@ -190,8 +203,7 @@ export class MensagemWhatsapp {
             ${email ? `\r\nSEU USUÁRIO: ${email}` : ''}
             \r\nSUA SENHA: Super@123
             \r\n
-            \r\nQualquer dúvida, estou à disposição!
-        `;
+            \r\nQualquer dúvida, estou à disposição!`;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return link
     }
@@ -213,19 +225,21 @@ export class MensagemWhatsapp {
     }
 
 
-    enviarMensagemLembreteOficina(nome: string, celular: string) {
+    enviarMensagemLembreteOficina(nome: string, celular: string, proximaOficina?: Evento) {
         var array = nome.split(' ');
         nome = array[0];
         var celular = celular.replace(/\D/g, '')
         var mensagem = `Olá ${nome},
                 \r\nEspero que esteja bem!
                 \r\n
-                \r\nGostaria de te convidar para participar de uma oficina super especial conosco.
-                \r\nNela, vamos trabalhar juntos o desenvolvimento da criatividade, autoestima, coordenação motora e da sua capacidade de expressão de forma divertida e envolvente!
+                \r\nVenho te convidar para participar da nossa oficina Supera.
+                \r\nVamos trabalhar juntos o seu desenvolvimento através de jogos e apostila Abrindo Horizontes!
                 \r\n
                 \r\nSerá uma alegria ter você com a gente!
                 \r\n
                 \r\nPosso contar com você? 💪🙂
+                \r\n
+                \r\n Atenção: o não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
 
         `;
         var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;

@@ -5,6 +5,7 @@ import { PerfilCognitivo } from "./perfil-cognitivo.model";
 export class TurmaRequest {
     id: number = 0;
     nome: string = '';
+    linkGrupo?: string;
     diaSemana: number = undefined as unknown as number;
     horario: Date = undefined as unknown as Date;
     professor_Id: number = undefined as unknown as number;
@@ -20,6 +21,7 @@ export class Turma extends Basic_List {
     professor_Id: number = undefined as unknown as number;
     professor: string = '';
     corLegenda: string = '';
+    linkGrupo?: string;
     sala_Id: number = undefined as unknown as number;
     numeroSala: number = undefined as unknown as number;
     andar: number = undefined as unknown as number;
@@ -109,6 +111,12 @@ export var turmaColumns: ColumnTable[] = [
         options: {
             width: '15px'
         },
+    },
+    {
+        field: 'linkGrupo',
+        label: 'Convite Whatsapp',
+        filterType: FilterType.text,
+        displayType: DisplayType.link,
     },
     {
         field: 'active',

@@ -102,6 +102,7 @@
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="rowIndex"
+                    [pSelectableRowDisabled]="col.displayType == DisplayType.link"
                     class="border-none white-space-nowrap"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
@@ -124,6 +125,10 @@
                     <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
                     <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                    <ng-template [ngIf]="col.displayType == DisplayType.link">
+                        <!-- {{item[col.field]}} -->
+                        <a *ngIf="item[col.field]" [href]="item[col.field]" target="_blank" class="text-primary-500 hover:underline hover:text-primary-400">Clique para abrir link</a>
+                    </ng-template>
                 </td>
                 <td class="border-none px-0">
                 </td>
