@@ -197,12 +197,7 @@ export class MensagemWhatsapp {
         } else {
              mensagem += `
                 \r\n
-                \r\nTe incluiremos no grupo da turma do SUPERA no WhatsApp, onde enviamos exercícios, reflexão da semana e recados voltados a turma 💪🧠
-                \r\nCaso não tenha sido incluído, clique no link abaixo para entrar no grupo. 
-                \r\nAceite o convite e não perca nenhuma informação! 😉
-                \r\n
-                \r\n[${semana[diaSemana].toLowerCase()} - ${moment(horario).format('HH:mm')}]: ${linkGrupo}
-                \r\n
+                \r\nCaso não tenha sido incluído, enviaremos o convite para você clicar e entrar no grupo.
             `;
 
         }
