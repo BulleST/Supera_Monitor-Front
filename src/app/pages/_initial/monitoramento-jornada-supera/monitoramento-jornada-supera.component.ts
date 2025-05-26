@@ -276,7 +276,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.aluno, aluno.celular);
     }
     enviarMensagemBoasVindas(aluno: AlunoChecklistItemList) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.aluno, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor);
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.aluno, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
     }
     enviarMensagemAdequacaoTurma(aluno: AlunoChecklistItemList) {
         return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.aluno, aluno.celular);

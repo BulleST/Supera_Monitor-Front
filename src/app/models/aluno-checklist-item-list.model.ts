@@ -21,6 +21,7 @@ export class AlunoChecklistItemList {
     email: string = '';
     diaSemana: number = 0;
     horario: Date = new Date;
+    linkGrupo?: string;
 }
 
 export class AlunoChecklistItemList_Request {

@@ -107,7 +107,7 @@ export class Aluno {
 
     checklist_Id?: number = '' as any;
     checklist?: string = '';
-
+    
     aulas: Dashboard[] = [];
     // primeiraAula?: Dashboard;
     // aulas: Dashboard_Aulas[] = [];
@@ -115,6 +115,7 @@ export class Aluno {
     disponivel?: boolean;
     disponivelEvent?: Evento;
     aulasParaRepor: Evento[] = []
+    linkGrupo?: string = '';
 }
 
 export interface Pessoa_DropDown {
