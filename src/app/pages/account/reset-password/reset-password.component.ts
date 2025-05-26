@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons';
 import { lastValueFrom } from 'rxjs';
@@ -28,17 +28,22 @@ export class ResetPasswordComponent {
         private router: Router,
         private service: AccountService,
         private confirmationService: ConfirmationService,
+        private cdRef: ChangeDetectorRef
     ) {
         this.object.token = this.activatedRoute.snapshot.queryParams['token'];
     }
 
     validatePasswordMatch(model: NgModel, secondaryModel: NgModel) {
         if (this.object.confirmPassword != this.object.password && secondaryModel.touched) {
-            model.control.setErrors({ notMatch: true });
+            model.control.setErrors({ notMatch : 'Inválido' });
         } else {
-            model.control.setErrors({ notMatch: null });
+            model.control.setErrors({ notMatch : undefined });
         }
-        secondaryModel.control.setErrors({ notMatch: null });
+        
+        secondaryModel.control.setErrors({ notMatch : undefined });
+
+        model.control.updateValueAndValidity();
+        secondaryModel.control.updateValueAndValidity();
     }
 
     send(e: any) {

@@ -16,8 +16,8 @@ export class Register {
 
 export class ResetPassword {
     token: string = '';
-    password: string = '';
-    confirmPassword: string = '';
+    password!: string;
+    confirmPassword!: string ;
 }
 
 export class ChangePassword {
