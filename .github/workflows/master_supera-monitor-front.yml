@@ -55,4 +55,4 @@ jobs:
           app-name: 'supera-monitor-front'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ECB77F0B633D40B7BE04A157F6BA50C6 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9EA8364C70644ED59808E0EEA84E9B4C }}
