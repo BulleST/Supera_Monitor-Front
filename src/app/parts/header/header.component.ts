@@ -108,7 +108,6 @@ export class HeaderComponent implements OnDestroy {
             target: e.target,
             message: `Tem certeza que deseja sair?`,
             header: 'Sair',
-            icon: 'pi pi-exclamation-triangle',
             closeOnEscape: true,
             acceptLabel: `Sair`,
             acceptButtonStyleClass: 'p-button-rounded',

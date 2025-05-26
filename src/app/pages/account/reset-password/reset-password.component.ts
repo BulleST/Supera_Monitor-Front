@@ -7,6 +7,7 @@ import { AccountService } from '../../../services/account.service';
 import { getError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { playError, playSuccess } from '../../../utils/audio';
+import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-reset-password',
@@ -29,6 +30,15 @@ export class ResetPasswordComponent {
         private confirmationService: ConfirmationService,
     ) {
         this.object.token = this.activatedRoute.snapshot.queryParams['token'];
+    }
+
+    validatePasswordMatch(model: NgModel, secondaryModel: NgModel) {
+        if (this.object.confirmPassword != this.object.password && secondaryModel.touched) {
+            model.control.setErrors({ notMatch: true });
+        } else {
+            model.control.setErrors({ notMatch: null });
+        }
+        secondaryModel.control.setErrors({ notMatch: null });
     }
 
     send(e: any) {

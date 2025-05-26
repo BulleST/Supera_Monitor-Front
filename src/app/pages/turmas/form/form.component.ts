@@ -203,8 +203,9 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             minutes: this.object.horario.getMinutes(),
             seconds: 0
         }).toDate();
-
+        console.log('data', data)
         this.professores = validaProfessores(data, 120, this.professores, this.eventos, this.object.id);
+        console.log('professores', this.professores)
 
         if (this.object.professor_Id) {
             var e: SelectChangeEvent = {
