@@ -18,7 +18,7 @@ import { AlunoRestricaoService } from '../../../../services/aluno-restricao.serv
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
 import { SelectChangeEvent } from 'primeng/select';
-import { getError, showError } from '../../../../utils';
+import { getError, MensagemWhatsapp, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../../utils/audio';
 import { Popover } from 'primeng/popover';
@@ -78,6 +78,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private toastrService: ToastrService,
         private userService: UserService,
         private apostilaService: ApostilaService,
+        private mensagemWhatsapp: MensagemWhatsapp,
     ) {
 
         var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
@@ -524,5 +525,64 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             }
         });
     }
+    enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item) {
+        // Apresentação do Diretor Franqueado 
+        if (checklistItem.checklist_Item_Id == 8) {
+            return this.enviarMensagemApresentacaoDiretorFranqueado(this.object);
+            // Confirmação da adequação do aluno ao perfil da turma 
+        } else if (checklistItem.checklist_Item_Id == 9) {
+            return this.enviarMensagemAdequacaoTurma(this.object);
+            // Agendar 1ª Oficina 
+        } else if (checklistItem.checklist_Item_Id == 12) {
+            return this.enviarMensagemLembreteOficina(this.object);
+            // Feedback pós venda 
+        } else if (checklistItem.checklist_Item_Id == 13) {
+            return this.enviarMensagemFeedbackPosVenda(this.object);
+            // Confirmação de preeechimento do feedback pós venda 
+        } else if (checklistItem.checklist_Item_Id == 32) {
+            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(this.object);
+            // Mensagem de boas-vindas 
+        } else if (checklistItem.checklist_Item_Id == 37) {
+            return this.enviarMensagemBoasVindas(this.object);
+            // Agendar Superação 
+        } else if (checklistItem.checklist_Item_Id == 22) {
+            return this.enviarMensagemLembreteSuperacao(this.object);
+            // Agendar 2ª Superação 
+        } else if (checklistItem.checklist_Item_Id == 29) {
+            return this.enviarMensagemLembreteSuperacao(this.object);
+            // Agendar 2ª Oficina 
+        } else if (checklistItem.checklist_Item_Id == 23) {
+            return this.enviarMensagemLembreteOficina(this.object);
+        } else {
+            return this.enviarMensagem(this.object);
+        }
+    }
+
+    enviarMensagem(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    }
+
+    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
+    }
+    enviarMensagemBoasVindas(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
+    }
+    enviarMensagemAdequacaoTurma(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
+    }
+    enviarMensagemLembreteOficina(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
+    }
+    enviarMensagemLembreteSuperacao(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
+    }
+    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
+    }
+    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
+        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
+    }
+
 
 }

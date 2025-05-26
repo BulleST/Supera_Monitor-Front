@@ -348,7 +348,7 @@ export class EventoComponent implements OnDestroy {
             header: `Finalizar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: `Finalizar`,
-            acceptButtonStyleClass: 'p-button-roundedp-button-icon-right',
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Ainda não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',

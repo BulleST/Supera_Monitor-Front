@@ -94,7 +94,6 @@
         </ng-template>
         <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
             <tr [pContextMenuRow]="item"
-                (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);"
                 class="cursor-pointer"
                 [ngClass]="{ 
                 'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,

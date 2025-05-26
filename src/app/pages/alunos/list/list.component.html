@@ -136,7 +136,8 @@
                                           routerLink="{{enviarMensagem(item)}}"
                                           icon="pi pi-whatsapp"
                                           severity="success"
-                                          pTooltip="Enviar mensagem para {{item.celular | mask : '+00 (00) 0.0000-0000'}}"
+                                          pTooltip="Enviar mensagem para {{item.celular | mask : '+00 (00) 0.0000-0000' }}"
+                                          tooltipPosition="top"
                                           [text]="true"
                                           size="small" />
                             </span>
@@ -255,16 +256,16 @@
                         <span *ngIf="!selectedChecklist.prazo">Indefinido</span>
                     </b>
                 </p>
-                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                          icon="pi pi-whatsapp"
-                          severity="success"
-                          pTooltip="Enviar mensagem para {{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000'}}"
-                          [text]="true"
-                          (onClick)="enviarMensagem(tableSelectedItem)" />
+                <a *ngIf="tableSelectedItem && tableSelectedItem.celular"
+                   class="p-button p-button-text p-button-success"
+                   pTooltip="Enviar mensagem para {{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000'}}"
+                   [href]="enviarMensagem(tableSelectedItem)">
+                    <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
+                </a>
             </div>
             <ul class="p-0 ml-0">
                 <li *ngFor="let checklistItem of selectedChecklist.items"
-                    class="flex align-items-center gap-2 py-1"
+                    class="flex align-items-center gap-2 py"
                     (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
                     (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
                     <p-checkbox *ngIf="!checklistItem.finalizado"
@@ -282,151 +283,16 @@
                         </div>
                     </div>
                     <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                    <ng-container *ngIf="tableSelectedItem && tableSelectedItem.celular">
-                        <!-- Apresentação do Diretor Franqueado -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 8">
-                            <a target="_blank"
-                               [href]="enviarMensagemApresentacaoDiretorFranqueado(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar apresentação">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Confirmação da adequação do aluno ao perfil da turma -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 9">
-                            <a target="_blank"
-                               [href]="enviarMensagemAdequacaoTurma(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem de confirmação">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Agendar 1ª Oficina -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 12">
-                            <a target="_blank"
-                               [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem de lembrete">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Feedback pós venda -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 13">
-                            <a target="_blank"
-                               [href]="enviarMensagemFeedbackPosVenda(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem de feedback">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Confirmação de preeechimento do feedback pós venda -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 32">
-                            <a target="_blank"
-                               [href]="enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem de lembrete de preenchimento">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Mensagem de boas-vindas -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 37">
-                            <a target="_blank"
-                               [href]="enviarMensagemBoasVindas(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem de boas-vindas">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Agendar Superação -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 22">
-                            <a target="_blank"
-                               [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem para agendamento">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Agendar 2ª Superação -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 29">
-                            <a target="_blank"
-                               [href]="enviarMensagemLembreteSuperacao(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem para agendamento">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
-                        <!-- Agendar 2ª Oficina -->
-                        <ng-container *ngIf="checklistItem.checklist_Item_Id == 23">
-                            <a target="_blank"
-                               [href]="enviarMensagemLembreteOficina(tableSelectedItem)"
-                               class="flex align-items-center gap-2 ml-auto h-2rem"
-                               pTooltip="Enviar mensagem para inscrição">
-                                <!-- <span class="text-green-500 hover:underline">{{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000' }}</span> -->
-                                <p-button *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                                          icon="pi pi-whatsapp"
-                                          iconPos="right"
-                                          severity="success"
-                                          [rounded]="true"
-                                          size="small"
-                                          label="Enviar mensagem" />
-                            </a>
-                        </ng-container>
+                    <ng-container *ngIf="tableSelectedItem 
+                                        && tableSelectedItem.celular 
+                                        && checklistItem.finalizado == false 
+                                        && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
+                        <a [href]="enviarMensagemCondicao(checklistItem, tableSelectedItem)"
+                            target="_blank"
+                            class="p-button p-button-sm p-button-rounded p-button-success py-1 px-3 ml-auto">
+                            <span class="p-button-label">Enviar mensagem</span>
+                            <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
+                        </a>
                     </ng-container>
                     <p-popover #checklistData appendTo="body">
                         <p>

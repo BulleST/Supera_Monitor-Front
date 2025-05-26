@@ -93,7 +93,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 this.request.professor_Id = res?.professor_Id;
             }
         })
-        
+
         if (!!localStorage.getItem('professor_Id')) {
             this.request.professor_Id = parseInt(localStorage.getItem('professor_Id')!)
         }
@@ -177,12 +177,12 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     turmaChanged() {
         if (this.request.turma_Id) {
-            let turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma; 
+            let turma = this.turmas.find(x => x.id == this.request.turma_Id) as Turma;
             this.request.professor_Id = turma.professor_Id;
         }
 
         this.setAlunosDisabled();
-        
+
 
         let aluno = this.alunos.find(x => x.id == this.request.aluno_Id);
         if (this.request.turma_Id && aluno && aluno.turma_Id != this.request.turma_Id) {
@@ -193,7 +193,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     professorChanged() {
-        
+
         this.setTurmaDisabled();
         this.setAlunosDisabled();
 
@@ -206,7 +206,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         if (this.request.turma_Id && turma && turma.id != this.request.turma_Id) {
             this.request.turma_Id = undefined;
         }
-        
+
         this.setLocalStorage();
 
     }
@@ -217,10 +217,10 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
             this.request.turma_Id = aluno.turma_Id;
             this.request.professor_Id = aluno.professor_Id;
         }
-        
+
         this.setLocalStorage();
     }
-    
+
     setTurmaDisabled() {
         this.turmas = this.turmas.map((x: any) => {
             x.disabled = this.request.professor_Id ? x.professor_Id == this.request.professor_Id ? false : true : false;
@@ -241,21 +241,21 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
             return x;
         });
     }
-    
+
     setLocalStorage() {
-        if(this.request.turma_Id) {
-            localStorage.setItem('turma_Id', (this.request.turma_Id??null).toString());
-        }else {
+        if (this.request.turma_Id) {
+            localStorage.setItem('turma_Id', (this.request.turma_Id ?? null).toString());
+        } else {
             localStorage.removeItem('turma_Id');
         }
-        if(this.request.professor_Id) {
-            localStorage.setItem('professor_Id', (this.request.professor_Id??null).toString());
-        }else {
+        if (this.request.professor_Id) {
+            localStorage.setItem('professor_Id', (this.request.professor_Id ?? null).toString());
+        } else {
             localStorage.removeItem('professor_Id');
         }
-        if(this.request.aluno_Id) {
-            localStorage.setItem('aluno_Id', (this.request.aluno_Id??null).toString());
-        }else {
+        if (this.request.aluno_Id) {
+            localStorage.setItem('aluno_Id', (this.request.aluno_Id ?? null).toString());
+        } else {
             localStorage.removeItem('aluno_Id');
         }
 
@@ -268,6 +268,39 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     enviarMensagemAluno(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
+    enviarMensagemCondicao(aluno: AlunoChecklistItemList) {
+        // Apresentação do Diretor Franqueado 
+        if (aluno.checklist_Item_Id == 8) {
+            return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
+            // Confirmação da adequação do aluno ao perfil da turma 
+        } else if (aluno.checklist_Item_Id == 9) {
+            return this.enviarMensagemAdequacaoTurma(aluno);
+            // Agendar 1ª Oficina 
+        } else if (aluno.checklist_Item_Id == 12) {
+            return this.enviarMensagemLembreteOficina(aluno);
+            // Feedback pós venda 
+        } else if (aluno.checklist_Item_Id == 13) {
+            return this.enviarMensagemFeedbackPosVenda(aluno);
+            // Confirmação de preeechimento do feedback pós venda 
+        } else if (aluno.checklist_Item_Id == 32) {
+            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
+            // Mensagem de boas-vindas 
+        } else if (aluno.checklist_Item_Id == 37) {
+            return this.enviarMensagemBoasVindas(aluno);
+            // Agendar Superação 
+        } else if (aluno.checklist_Item_Id == 22) {
+            return this.enviarMensagemLembreteSuperacao(aluno);
+            // Agendar 2ª Superação 
+        } else if (aluno.checklist_Item_Id == 29) {
+            return this.enviarMensagemLembreteSuperacao(aluno);
+            // Agendar 2ª Oficina 
+        } else if (aluno.checklist_Item_Id == 23) {
+            return this.enviarMensagemLembreteOficina(aluno);
+        } else {
+            return this.enviarMensagem(aluno);
+        }
+    }
+
     enviarMensagem(aluno: AlunoChecklistItemList) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
     }
@@ -324,7 +357,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
                         let checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
                         let checklist = this.checklists.find(x => x.id == item.checklist_Id);
-                        if(checklistIndex != -1 && checklist ) {
+                        if (checklistIndex != -1 && checklist) {
                             let checklistItemIndex = checklist.items.findIndex(x => x.id == item.checklist_Item_Id);
                             let checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id);
 

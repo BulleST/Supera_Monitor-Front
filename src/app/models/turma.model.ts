@@ -49,7 +49,7 @@ export var turmaColumns: ColumnTable[] = [
     },
     {
         field: 'professor',
-        label: 'Professor',
+        label: 'Educador(a)',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: undefined,

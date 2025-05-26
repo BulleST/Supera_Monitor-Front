@@ -241,12 +241,11 @@ export class ListComponent implements OnDestroy {
                 key: 'checklistConfirmation',
                 message: `Tem certeza que deseja marcar item da jornada como realizada?.`,
                 header: 'Finalizar item da jornada',
-                icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
-                acceptButtonStyleClass: 'p-button-roundedp-button-icon-right',
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
+                acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     this.loadingChecklist = true;
@@ -293,6 +292,38 @@ export class ListComponent implements OnDestroy {
     popoverChecklistClosed() {
         this.selectedChecklist = undefined;
         this.tableSelectedItem = undefined;
+    }
+    enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item, aluno: Aluno) {
+        // Apresentação do Diretor Franqueado 
+        if (checklistItem.checklist_Item_Id == 8) {
+            return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
+            // Confirmação da adequação do aluno ao perfil da turma 
+        } else if (checklistItem.checklist_Item_Id == 9) {
+            return this.enviarMensagemAdequacaoTurma(aluno);
+            // Agendar 1ª Oficina 
+        } else if (checklistItem.checklist_Item_Id == 12) {
+            return this.enviarMensagemLembreteOficina(aluno);
+            // Feedback pós venda 
+        } else if (checklistItem.checklist_Item_Id == 13) {
+            return this.enviarMensagemFeedbackPosVenda(aluno);
+            // Confirmação de preeechimento do feedback pós venda 
+        } else if (checklistItem.checklist_Item_Id == 32) {
+            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
+            // Mensagem de boas-vindas 
+        } else if (checklistItem.checklist_Item_Id == 37) {
+            return this.enviarMensagemBoasVindas(aluno);
+            // Agendar Superação 
+        } else if (checklistItem.checklist_Item_Id == 22) {
+            return this.enviarMensagemLembreteSuperacao(aluno);
+            // Agendar 2ª Superação 
+        } else if (checklistItem.checklist_Item_Id == 29) {
+            return this.enviarMensagemLembreteSuperacao(aluno);
+            // Agendar 2ª Oficina 
+        } else if (checklistItem.checklist_Item_Id == 23) {
+            return this.enviarMensagemLembreteOficina(aluno);
+        } else {
+            return this.enviarMensagem(aluno);
+        }
     }
 
     enviarMensagem(aluno: Aluno) {
