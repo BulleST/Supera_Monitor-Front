@@ -88,11 +88,12 @@
             </ng-template>
         </p-fileupload>
     </div>
+    <!-- <div class="col-12 px-0 flex align-items-start"> -->
     <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
         <p-divider layout="vertical" class="hidden md:block h-full min-h-0 mt-2 mb-5"></p-divider>
         <div class="formgrid grid pl-2 sm:px-3">
             <!-- Nome -->
-            <div class="field md:col-4 sm:col-8 col-12">
+            <div class="field lg:col-4 md:col-6 sm:col-8 xs:col-8 col-12">
                 <label for="nome">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -106,8 +107,20 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
+            <!-- RM -->
+            <div class="field lg:col-2 md:col-2 sm:col-6 xs:col-4 col-12">
+                <label for="rm">RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
+                <input type="text"
+                       pInputText
+                       #rm="ngModel"
+                       [(ngModel)]="object.rm"
+                       id="rm"
+                       name="rm"
+                       class="w-full"
+                       readonly>
+            </div>
             <!-- Data de Nascimento -->
-            <div class="field md:col-3 sm:col-4 col-4">
+            <div class="field lg:col-3 md:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataNascimento="ngModel"
@@ -128,28 +141,26 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <!-- Data de Cadastro -->
-            <div class="field md:col-3 sm:col-6 col-4">
-                <label for="created">Data de Cadastro: </label>
-                <input type="text"
-                       pInputText
-                       [value]="object.created | date : 'dd/MM/yyyy'"
-                       id="created"
-                       name="created"
-                       class="w-full"
-                       readonly>
-            </div>
-            <!-- RM -->
-            <div class="field md:col-2 sm:col-6 col-4">
-                <label for="rm">RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
-                <input type="text"
-                       pInputText
-                       #rm="ngModel"
-                       [(ngModel)]="object.rm"
-                       id="rm"
-                       name="rm"
-                       class="w-full"
-                       readonly>
+            <!-- Gênero -->
+            <div class="field lg:col-3 md:col-6 sm:col-3 xs:col-6 col-12">
+                <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="sexos"
+                          [(ngModel)]="object.pessoa_Sexo_Id"
+                          [loading]="loadingSexos"
+                          #pessoa_Sexo_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="pessoa_Sexo_Id"
+                          inputId="pessoa_Sexo_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [showClear]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
             </div>
             <!-- Telefone -->
             <div class="field lg:col-3 sm:col-3 xs:col-6 col-12">
@@ -188,7 +199,7 @@
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field sm:col-6 col-12">
+            <div class="field sm:col-6 xs:col-12 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -204,8 +215,23 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
+            <!-- Endereço -->
+            <div class="field col-12">
+                <label for="endereco">Endereço: </label>
+                <input type="text"
+                       pInputText
+                       #endereco="ngModel"
+                       [(ngModel)]="object.endereco"
+                       id="endereco"
+                       name="endereco"
+                       class="w-full"
+                       placeholder="Rua das Pedras 123 - Vila das Amoras SP">
+                <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
             <!-- Início Vigência -->
-            <div class="field md:col-4 sm:col-4 col-12">
+            <div class="field lg:col-2 md:col-4 sm:col-4 xs:col-6 col-12">
                 <label for="dataInicioVigencia">Início Vigência: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicioVigencia="ngModel"
@@ -227,7 +253,7 @@
                 </div>
             </div>
             <!-- Fim Vigência -->
-            <div class="field md:col-4 sm:col-4 col-12">
+            <div class="field lg:col-2 md:col-4 sm:col-4 xs:col-6 col-12">
                 <label for="dataFimVigencia">Fim Vigência: </label>
                 <p-datepicker
                               #dataFimVigencia="ngModel"
@@ -244,50 +270,31 @@
                               [required]="false"
                               appendTo="body" />
             </div>
-            <!-- Primeira Aula -->
-            <div class="field md:col-4 sm:col-4 col-12">
-                <label for="primeiraAula">Primeira Aula: </label>
-                <p-datepicker
-                              #primeiraAula="ngModel"
-                              [(ngModel)]="object.primeiraAula"
-                              [showIcon]="true"
-                              [iconDisplay]="'input'"
-                              [showTime]="true"
-                              [selectOtherMonths]="true"
-                              [minDate]="minDate"
-                              [maxDate]="maxDate"
-                              inputId="primeiraAula"
-                              name="primeiraAula"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
-                              [required]="false"
-                              appendTo="body" />
-            </div>
-            <!-- Gênero -->
-            <div class="field sm:col-3 col-12">
-                <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="sexos"
-                          [(ngModel)]="object.pessoa_Sexo_Id"
-                          [loading]="loadingSexos"
-                          #pessoa_Sexo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="pessoa_Sexo_Id"
-                          inputId="pessoa_Sexo_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
             <!-- Restrições -->
-            <div class="field sm:col-4 col-12">
-                <label for="restricoes">Restrições: </label>
+            <div class="field lg-col-4 sm:col-4 col-12">
+                <div class="flex align-items-center gap-2 justify-content-between mb-1">
+                    <label for="restricoes">Restrições: </label>
+                    <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1" (click)="popoverExplicacaoRestricoes.show($event)">
+                        <span>Info</span>
+                        <span class="pi pi-question-circle" ></span>
+                    </div>
+                    <p-popover #popoverExplicacaoRestricoes appendTo="body" styleClass="w-30rem ">
+                        
+                        <div class="max-h-20rem overflow-auto">
+                            <p>As restrições identificam as dificuldades que o aluno tem.</p>
+                        <p class="mt-2 mb-2">Podem ser restrições de:</p>
+                        <p class="ml-2">• Problemas auditivos e/ou visuais</p>
+                        <p class="ml-2">• Dificuldades motoras</p>
+                        <p class="ml-2">• Outras</p>
+                        <p class="mt-2">Essas restrições <b>NÃO</b> são necessariamente limitantes para o agendamento de reposição ou transferência de turma mas devem ser levadas em consideração sempre que realizar alguma ação.</p>
+                        <p>Uma mensagem de alerta será exibida para as restrições do aluno.</p>
+                        <p class="text-red-500 font-bold mt-4">ATENÇÃO:</p>
+                        <p>A restrição de <b>mobilidade reduzida</b> deve ser marcada no campo checkbox abaixo.</p>
+                        <p>Ela impõe limitações para inserir reposições ou transferencia de turma.</p>
+                        <p>Você será impedido de realizar essas ações e será avisado por isso.</p>
+                        </div>
+                    </p-popover>
+                </div>
                 <p-iconfield>
                     <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pip-spinner" />
                     <input type="text"
@@ -353,7 +360,7 @@
                 </div>
             </div>
             <!-- Etapa da jornada -->
-            <div class="field sm:col-5 col-12">
+            <div class="field lg:col-4 sm:col-5 col-12">
                 <label for="etapaChecklist">Etapa da jornada: </label>
                 <input type="text"
                        pInputText
@@ -421,23 +428,9 @@
                     </div>
                 </p-popover>
             </div>
-            <!-- Endereço -->
-            <div class="field col-12">
-                <label for="endereco">Endereço: </label>
-                <input type="text"
-                       pInputText
-                       #endereco="ngModel"
-                       [(ngModel)]="object.endereco"
-                       id="endereco"
-                       name="endereco"
-                       class="w-full">
-                <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
             <!-- Turma -->
-            <div class="field md:col-3 sm:col-6 col-12">
-                <label for="turma_Id">Turma: <span class="text-red-500">*</span></label>
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                <label for="turma_Id">Turma:</label>
                 <p-select
                           [options]="turmas"
                           [(ngModel)]="selectedTurma"
@@ -451,9 +444,9 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
+                          placeholder="Selecione"
                           optionDisabled="deactivated"
-                          (onChange)="turmaChanged(turma_Id, $event)"
-                          [required]="true">
+                          (onChange)="turmaChanged(turma_Id, $event)">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div class="w-full">
@@ -470,24 +463,21 @@
                         </div>
                     </ng-template>
                 </p-select>
-                <div *ngIf="turma_Id.touched && turma_Id.invalid && turma_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="turma_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
             </div>
-            <!-- Professor -->
-            <div class="field md:col-3 sm:col-6 col-12">
-                <label for="professor">Professor: </label>
+            <!-- Educador -->
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                <label for="professor">Educador: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.professor"
+                       [value]="object.professor ?? 'Selecione a turma para definir o educador'"
                        id="professor"
                        name="professor"
                        class="w-full"
                        readonly>
             </div>
             <!-- Perfil Cognitivo -->
-            <div class="field md:col-3 sm:col-6 col-12">
-                <label for="perfilCognitivo_Id">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                <label for="perfilCognitivo_Id">Perfil Cognitivo:</label>
                 <p-select
                           [options]="perfisCognitivos"
                           [(ngModel)]="object.perfilCognitivo_Id"
@@ -500,14 +490,10 @@
                           optionLabel="nome"
                           optionValue="id"
                           [showClear]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="perfilCognitivo_Id.touched && perfilCognitivo_Id.invalid && perfilCognitivo_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
+                          appendTo="body"/>
             </div>
             <!-- KIT Apostila -->
-            <div class="field md:col-3 sm:col-6 col-12">
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="apostila_Kit_Id">Kit Apostila</label>
                 <p-select
                           [options]="kits"
@@ -523,8 +509,7 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated"
-                          [required]="true">
+                          optionDisabled="deactivated">
                     <ng-template let-item #item>
                         <div class="flex flex-column">
                             <p class="font-bold">{{ item.nome }}</p>
@@ -542,7 +527,7 @@
                 </div>
             </div>
             <!-- Apostila Ábaco -->
-            <div class="field md:col-3 sm:col-6 col-12">
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="apostila_Abaco">Apostila Ábaco: </label>
                 <input type="text"
                        pInputText
@@ -553,7 +538,7 @@
                        readonly>
             </div>
             <!-- Página -->
-            <div class="field md:col-3 sm:col-6 col-12">
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="numeroPaginaAbaco">Página: </label>
                 <input type="text"
                        pInputText
@@ -564,7 +549,7 @@
                        readonly>
             </div>
             <!-- Apostila AH -->
-            <div class="field md:col-3 sm:col-6 col-12">
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="apostila_AH">Apostila AH: </label>
                 <input type="text"
                        pInputText
@@ -575,7 +560,7 @@
                        readonly>
             </div>
             <!-- Página -->
-            <div class="field md:col-3 sm:col-6 col-12">
+            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="numeroPaginaAH">Página: </label>
                 <input type="text"
                        pInputText

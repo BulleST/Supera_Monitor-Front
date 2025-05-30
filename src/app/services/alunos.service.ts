@@ -29,7 +29,7 @@ export class AlunoService extends Service {
     constructor(
         private checklistService: ChecklistService,
         http: HttpClient,
-        toastrService:ToastrService,
+        toastrService: ToastrService,
 
     ) {
         super(http, toastrService);
@@ -44,41 +44,44 @@ export class AlunoService extends Service {
     }
     mapAluno(aluno: Aluno) {
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-   aluno.active = !aluno.deactivated;
+        aluno.active = !aluno.deactivated;
 
-                        aluno.created = moment(aluno.created).toDate();
-                        aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                        aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
-                        // Nuláveis
-                        aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
-                        aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
-                        aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
-                        aluno.primeiraAula = aluno.primeiraAula ? moment(aluno.primeiraAula).toDate() : undefined;
+        aluno.created = moment(aluno.created).toDate();
+        aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
+        aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
 
+        // Nuláveis
+        aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
+        aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
+        aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
 
-                        aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
-                        aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
-                            checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
-                            return checklistAluno
-                        })
-                        aluno.checklistCompleto = this.checklists
-                            .map(checklist => {
-                                var checklistAluno = new CalendarioAlunoChecklistView;
-                                checklistAluno.id = checklist.id;
-                                checklistAluno.nome = checklist.nome;
-                                checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-                                checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
-                                checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                                checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
-                                checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-                                return checklistAluno;
-                            });
-                        return aluno;
+        if (aluno.diaSemana && aluno.horario) {
+            aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
+        }
+
+        aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
+            checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
+            return checklistAluno
+        })
+        aluno.checklistCompleto = this.checklists
+            .map(checklist => {
+                var checklistAluno = new CalendarioAlunoChecklistView;
+                checklistAluno.id = checklist.id;
+                checklistAluno.nome = checklist.nome;
+                checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
+                checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
+                checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
+                checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                return checklistAluno;
+            });
+        return aluno;
     }
+
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
-                next: list => {                     
+                next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
                 },
@@ -92,7 +95,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
             .pipe(tap({
                 next: list => {
-                     list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
                     return of(list);
                 },
@@ -113,12 +116,12 @@ export class AlunoService extends Service {
 
     getHistorico(id: number) {
         return this.http.get<Aluno_Historico[]>(`${this.url}/alunos/historico/${id}`)
-        .pipe(map((res: any) => {
-            return res.map((x: any) => {
-                x.account_Created == x.account.name;
-                return x
-            })
-        }))
+            .pipe(map((res: any) => {
+                return res.map((x: any) => {
+                    x.account_Created == x.account.name;
+                    return x
+                })
+            }))
     }
 
 
@@ -187,7 +190,7 @@ export class AlunoService extends Service {
 
     edit(model: Aluno) {
         var request = MyMap(model, new AlunoRequest) as AlunoRequest;
-        request.primeiraAula = model.primeiraAula;
+        // request.primeiraAula = model.primeiraAula;
         request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
         request.apostila_Kit_Id = model.apostila_Kit_Id;
         request.dataFimVigencia = model.dataFimVigencia;

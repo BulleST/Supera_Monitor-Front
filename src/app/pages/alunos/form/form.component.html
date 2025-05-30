@@ -11,9 +11,10 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title"><i class="fa-solid fa-user-graduate mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Dados do Aluno</span>
-            <p-button class="ml-auto"
+            <p-button *ngIf="isEditPage" 
+                    class="ml-auto"
                       type="button"
-                      icon="pi pi-exclamation-circle"
+                      icon="pi pi-exclamation-circle text-blue-500"
                       size="large"
                       [text]="true"
                       [rounded]="true"
