@@ -5,14 +5,10 @@
     <div class=" flex align-items-center justify-content-center z-1 bg-primary-500">
         <img src="assets/images/logo-metodo-supera-white.png" alt="" class="w-12rem">
     </div>
-    <div class="xl:col-3 lg:col-4 md:col-4 sm:col-6 col-10 static z-1">
-        <div class="bg-white my-app-dark:surface-800 border-round-md px-5 py-4">
+    <div class="xl:col-3 lg:col-4 md:col-5 sm:col-6 col-10 static z-1">
+        <div class="bg-white my-app-dark:surface-800 border-round-md px-5 py-5">
             <router-outlet></router-outlet>
         </div>
     </div>
-    <p-confirmdialog styleClass="w-25rem">
-        <ng-template #message let-message>
-            <div [innerHTML]="message.message"></div>
-        </ng-template>
-    </p-confirmdialog>
+    <app-confirm-dialog></app-confirm-dialog>
 </div>
