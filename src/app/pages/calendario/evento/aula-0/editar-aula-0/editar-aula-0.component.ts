@@ -130,7 +130,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
         if (!this.alunoSelected.presente && this.alunoSelected.celular) {
             var nome = this.alunoSelected.aluno.split(' ')[0];
-            playAlert();
+            // playAlert();
             this.confirmationService.confirm({
                 target: e.targer,
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,

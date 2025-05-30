@@ -62,12 +62,12 @@ export class ResetPasswordComponent {
                             this.router.navigate(['account', 'login']);
                         }
                     });
-                    playSuccess();
+                    // playSuccess();
                 }
                 else {
                     this.error = res.message;
 
-                    playError();
+                    // playError();
                     this.confirmationService.confirm({
                         target: e.target,
                         message: res.message,
@@ -81,7 +81,7 @@ export class ResetPasswordComponent {
             })
 
             .catch((res) => {
-                playError();
+                // playError();
                 this.error = getError(res);
                 this.loading = false;
             })

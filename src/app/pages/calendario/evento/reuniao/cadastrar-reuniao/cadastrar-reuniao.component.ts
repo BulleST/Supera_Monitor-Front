@@ -250,7 +250,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         if (this.selected.filter(x => !x.disponivel).length > 0)
             return this.showError('Não foi possível salvar', 'Selecione apenas educadores disponíveis', e);
 
-        playAlert();
+        // playAlert();
 
         this.object.professores = this.selected.map(x => x.id);
 
@@ -284,7 +284,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 this.visibleChange();
                 this.toastrService.success('Reunião cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
-                playSuccess();
+                // playSuccess();
             })
             .catch(res => {
                 this.loading = false;

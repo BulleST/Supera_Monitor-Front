@@ -343,7 +343,7 @@ export class ReagendarEventoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
-        playAlert();
+        // playAlert();
 
         var professoresIndisponiveis = this.professores.filter(x => x.disponivel == false);
         var alunosIndisponiveis = this.alunos.filter(x => x.disponivel == false);
@@ -446,7 +446,7 @@ export class ReagendarEventoComponent implements OnDestroy {
                     this.loading = false;
                     this.service.calendarioReload.emit(res.object.id);
                     this.updateCheklistAlunos();
-                    playSuccess();
+                    // playSuccess();
                     this.toastrService.success('Reagendamento realizado com sucesso.', 'Reagendamento finalizado');
 
                     if (this.evento.alunos.length > 0)

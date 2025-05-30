@@ -236,7 +236,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
 
-        playAlert();
+        // playAlert();
 
         this.object.professores = [this.professorSelected.id];
         this.object.data = new Date(this.data);
@@ -270,7 +270,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
                 this.visibleChange();
                 this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
-                playSuccess();
+                // playSuccess();
             })
             .catch(res => {
                 this.loading = false;

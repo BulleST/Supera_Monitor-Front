@@ -183,7 +183,7 @@ export class ListComponent implements OnDestroy {
     }
 
     deactivated(e: any, item: any) {
-        playAlert();
+        // playAlert();
 
         var deactivated = !item.active;
         this.confirmationService.confirm({
@@ -203,7 +203,7 @@ export class ListComponent implements OnDestroy {
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
-                            playSuccess();
+                            // playSuccess();
                         } else {
                             this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
                         }
@@ -236,7 +236,7 @@ export class ListComponent implements OnDestroy {
         if (model.control.value) {
             model.control.setValue(false);
 
-            playAlert();
+            // playAlert();
             this.confirmationService.confirm({
                 key: 'checklistConfirmation',
                 message: `Tem certeza que deseja marcar item da jornada como realizada?.`,
@@ -256,7 +256,7 @@ export class ListComponent implements OnDestroy {
                             model.control.setValue(true);
                             this.loadingChecklist = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
-                            playSuccess();
+                            // playSuccess();
                             item.finalizado = true;
                             item.dataFinalizacao = res.object.dataFinalizacao;
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;

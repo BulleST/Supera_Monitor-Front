@@ -345,7 +345,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
 
     finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
@@ -364,7 +364,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 item.observacoes = this.checklistObservacao
                 lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
                     .then(res => {
-                        playSuccess();
+                        // playSuccess();
                         this.checklistObservacao = '';
 
                         this.loadingChecklists = false;
@@ -424,7 +424,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         } else if (this.object.restricoes.find(x => x.descricao == restricao)) {
             this.showError('Erro', 'Essa restrição já existe', e);
         } else {
-            playAlert();
+            // playAlert();
 
             this.confirmationService.confirm({
                 target: e.target,
@@ -452,7 +452,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                             if (res.success) {
                                 this.toastrService.success(`Registro cadastrado com sucesso.`);
 
-                                playSuccess();
+                                // playSuccess();
                                 popover.show(e);
 
                                 res.object.active = true;
@@ -479,7 +479,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
         var title = `${text} restrição`;
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -502,7 +502,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                             this.toastrService.success(`Concluído`);
 
                             res.object.active = !res.object.deactivated;
-                            playSuccess();
+                            // playSuccess();
                             popover.show(e);
 
                             var index = this.object.restricoes.findIndex(x => x.id == item.id);

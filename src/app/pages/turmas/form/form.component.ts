@@ -274,7 +274,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         if (form.invalid || professorValido == false) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -314,7 +314,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                     insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
-                    playSuccess();
+                    // playSuccess();
                 }
                 else {
                     this.error = res.message;

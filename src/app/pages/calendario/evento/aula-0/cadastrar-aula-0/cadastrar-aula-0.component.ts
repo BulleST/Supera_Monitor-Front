@@ -368,7 +368,7 @@ export class CadastrarAula0Component implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
 
-        playAlert();
+        // playAlert();
 
         this.object.alunos = this.alunosSelected.map((x) => x.id);
 
@@ -420,7 +420,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
                 this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado');
-                playSuccess();
+                // playSuccess();
 
                 if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
                     this.sendMensagemAluno(e, res.object);

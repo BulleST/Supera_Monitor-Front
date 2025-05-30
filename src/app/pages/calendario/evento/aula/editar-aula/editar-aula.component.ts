@@ -185,7 +185,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     faltou(item: Evento_Participacao_Aluno, e: any) {
         item.presente = false;
         if (item.celular) {
-            playAlert();
+            // playAlert();
             let nome = item.aluno.split(' ')[0];
             this.confirmationService.confirm({
                 target: e.targer,
@@ -210,7 +210,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         if (item.presente == false && item.celular) {
             let nome = item.aluno.split(' ')[0];
-            playAlert();
+            // playAlert();
             this.confirmationService.confirm({
                 target: e.target,
                 message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,

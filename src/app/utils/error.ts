@@ -4,7 +4,7 @@ import { playError } from "./audio";
 import { ConfirmationService } from "primeng/api";
 
 export function showError(confirmationService: ConfirmationService, header: string, message: string, e: any) {
-    playError();
+    // playError();
 
     confirmationService.confirm({
         target: e.target ?? e,

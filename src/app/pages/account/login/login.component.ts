@@ -30,7 +30,7 @@ export class LoginComponent {
         lastValueFrom(this.accountService.login(this.object))
             .then(res => {
                 this.loadingHelper.loading.next(false);
-                playSuccess();
+                // playSuccess();
                 // this.appinitService.initialized.next(true);
             })
             .catch(res => {

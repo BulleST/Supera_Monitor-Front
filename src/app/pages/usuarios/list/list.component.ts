@@ -129,7 +129,7 @@ export class ListComponent implements OnDestroy {
 
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
-            playAlert();
+            // playAlert();
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
@@ -146,7 +146,7 @@ export class ListComponent implements OnDestroy {
                             this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
                             insertOrReplace(this.service, res.object);
                             item = res.object;
-                            playSuccess();
+                            // playSuccess();
                         } else {
                             setTimeout(() => {
                                 this.showError('Erro', res.message, e);
@@ -162,7 +162,7 @@ export class ListComponent implements OnDestroy {
 
     resetPassword(e: any, item: any) {
         
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -180,7 +180,7 @@ export class ListComponent implements OnDestroy {
                         if (res.success) {
                             item = res.object;
                             this.toastrService.success( `Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
-                            playSuccess()
+                            // playSuccess()
                         } else {
                             this.showError('Erro', res.message, e);
                         }

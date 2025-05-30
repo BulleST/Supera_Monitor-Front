@@ -307,7 +307,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Selecione um aluno para continuar com inscrição', e)
         }
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -361,7 +361,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.service.calendarioReload.emit(0);
         this.markChecklistAsDone();
         this.sendMensagemAlunos();
-        playSuccess();
+        // playSuccess();
 
     }
 

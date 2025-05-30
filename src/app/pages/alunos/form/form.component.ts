@@ -85,7 +85,7 @@ export class FormComponent implements OnDestroy {
         if (form.invalid) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -113,7 +113,7 @@ export class FormComponent implements OnDestroy {
                 if (res.success) {
                     this.visible = false;
                     this.visibleChange();
-                    playSuccess();
+                    // playSuccess();
 
                     let list = this.service.list.value;
                     let index = list.findIndex(x => x.id == this.object.id);

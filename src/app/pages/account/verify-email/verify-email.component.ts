@@ -34,15 +34,15 @@ export class VerifyEmailComponent {
                 if (res.success) {
                     this.success = res.message;
                     delete this.error;
-                    playSuccess();
+                    // playSuccess();
                 } else {
-                    playError()
+                    // playError()
                     this.error = res.message;
                     delete this.success;
                 }
             })
             .catch((res) => {
-                playError()
+                // playError()
                 delete this.success;
                 this.error = getError(res)
                 this.loading = false;

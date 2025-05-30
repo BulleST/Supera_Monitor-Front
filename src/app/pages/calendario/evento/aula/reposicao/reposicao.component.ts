@@ -237,7 +237,7 @@ export class ReposicaoComponent implements OnDestroy {
 
             if (this.selectedAluno.restricoes.filter(x => x.active).length || this.selectedAluno.restricaoMobilidade) {
 
-                playAlert();
+                // playAlert();
 
                 var message = 'Esse aluno possui as seguintes restrições. <div>';
 
@@ -362,7 +362,7 @@ export class ReposicaoComponent implements OnDestroy {
             return this.showError('Aluno indisponível', `Você não pode inserir alunos indisponíveis`, e);
         }
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -412,7 +412,7 @@ export class ReposicaoComponent implements OnDestroy {
                 this.visible = false;
                 this.visibleChange();
 
-                playSuccess();
+                // playSuccess();
 
                 this.toastrService.success(`Reposição agendada para o dia ${moment(this.evento.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
 

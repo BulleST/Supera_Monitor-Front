@@ -340,7 +340,7 @@ export class EventoComponent implements OnDestroy {
 
     finalizarConfirmation(e: any) {
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -426,7 +426,7 @@ export class EventoComponent implements OnDestroy {
                     this.service.calendarioReload.emit(this.evento.id);
                     this.markChecklistAsDone();
 
-                    playSuccess();
+                    // playSuccess();
 
 
                     this.toastrService.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
@@ -445,7 +445,7 @@ export class EventoComponent implements OnDestroy {
             return this.showError('OPA!', `Não foi possível salvar! \n Preencha os dados corretamente para continuar`, e);
         }
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -477,7 +477,7 @@ export class EventoComponent implements OnDestroy {
                 this.toastrService.success('Dados atualizados com sucesso.')
                 this.router.navigate(['', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute, replaceUrl: true });
                 this.loading = false;
-                playSuccess();
+                // playSuccess();
 
             })
             .catch(res => {

@@ -71,7 +71,7 @@ export class RoteiroService extends Service {
                     // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
                     // insertOrReplace(this, res.object, 'list');
                     // this.toastrService.success(`Registro cadastrado com sucesso.`);
-                    // playSuccess();
+                    // // playSuccess();
                     
                     return res;
                 },
@@ -90,7 +90,7 @@ export class RoteiroService extends Service {
                     // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
                     // insertOrReplace(this, res.object, 'list');
                     // this.toastrService.success(`Registro atualizado com sucesso.`);
-                    // playSuccess();
+                    // // playSuccess();
                     
                     return res;
                 },

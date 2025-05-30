@@ -154,7 +154,7 @@ export class FormComponent implements OnDestroy {
         if (existe) {
             this.toastrService.error('Essa data já está em um outro tema.');
             ngModel.control.setErrors({'invalid': 'Essa data já está sendo utilizada no período da semana ' + existe.semana + '.'});
-            playError();
+            // playError();
 
         } else {
             ngModel.control.setErrors({ 'invalid': null });
@@ -168,7 +168,7 @@ export class FormComponent implements OnDestroy {
             return this.showError('Campos Inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -195,7 +195,7 @@ export class FormComponent implements OnDestroy {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
-                    playSuccess();
+                    // playSuccess();
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
                     res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
                     res.object.active = true;

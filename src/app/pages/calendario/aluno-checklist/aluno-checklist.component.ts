@@ -152,7 +152,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                 return;
             }
 
-            playAlert();
+            // playAlert();
 
             this.confirmationService.confirm({
                 key: 'checklistConfirmation',
@@ -170,7 +170,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                     item.observacoes = this.checklistObservacao
                     lastValueFrom(this.service.markAsDone(item.id, item.observacoes))
                         .then(res => {
-                            playSuccess();
+                            // playSuccess();
                             this.checklistObservacao = '';
                             this.loading = false;
                             this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);

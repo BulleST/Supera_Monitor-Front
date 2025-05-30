@@ -189,7 +189,7 @@ export class CancelarEventoComponent implements OnDestroy {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
 
-        playAlert();
+        // playAlert();
         this.confirmationService.confirm({
             target: e.target,
             header: `Cancelar ${this.tipoEventoString}`,
@@ -232,7 +232,7 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado');
                     this.service.calendarioReload.emit(res.object.id);
                     this.loading = false;
-                    playSuccess();
+                    // playSuccess();
 
                     if (this.evento.alunos.length > 0)
                         this.sendMensagemAlunos();

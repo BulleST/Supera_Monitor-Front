@@ -138,7 +138,7 @@ export class ListComponent implements OnDestroy {
     deactivated(e: any, item: any) {
         var deactivated = !item.active;
 
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -157,7 +157,7 @@ export class ListComponent implements OnDestroy {
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
-                            playSuccess();
+                            // playSuccess();
                         } else {
                             this.showError('Erro', res.message, e);
                         }

@@ -332,7 +332,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     finalizarChecklist(e: any, item: AlunoChecklistItemList) {
-        playAlert();
+        // playAlert();
 
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
@@ -351,7 +351,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 item.observacoes = this.checklistObservacao
                 lastValueFrom(this.service.markAsDone(item.id, this.checklistObservacao))
                     .then(res => {
-                        playSuccess();
+                        // playSuccess();
 
                         this.checklistObservacao = '';
 

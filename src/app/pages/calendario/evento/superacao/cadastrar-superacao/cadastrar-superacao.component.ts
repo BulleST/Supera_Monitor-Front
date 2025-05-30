@@ -366,7 +366,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
 
-        playAlert();
+        // playAlert();
 
         this.object.alunos = this.alunosSelected.map(x => x.id);
         this.object.professores = [this.professorSelected.id];
@@ -401,7 +401,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
-                playSuccess();
+                // playSuccess();
 
                 if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
                     this.sendMensagemAluno(e, res.object);

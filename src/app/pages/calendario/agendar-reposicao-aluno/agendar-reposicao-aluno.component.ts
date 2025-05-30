@@ -420,7 +420,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     }
 
     sendConfirmation(e: any) {
-        playAlert();
+        // playAlert();
 
         var target = this.selectedEvento as Evento;
         this.confirmationService.confirm({
@@ -476,7 +476,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                 this.loading = false;
                 this.selectedAula = undefined;
                 this.service.calendarioReload.emit(this.evento.id);
-                playSuccess();
+                // playSuccess();
                 this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
 
                 if (this.aluno.celular) {

@@ -174,7 +174,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             if (this.evento.alunos.length >= this.evento.capacidadeMaximaAlunos) {
                 
-                playAlert();
+                // playAlert();
 
                 this.confirmationService.confirm({
                     target: e.target,

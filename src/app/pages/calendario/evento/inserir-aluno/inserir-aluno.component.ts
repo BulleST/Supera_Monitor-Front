@@ -235,7 +235,7 @@ export class InserirAlunoComponent {
             return this.showError('Não foi possível salvar', 'Selecione um aluno para inserir na ' + this.getTipo(this.evento), e)
         }
 
-        playAlert();
+        // playAlert();
         var aluno = this.selectedAluno as Aluno;
 
         this.confirmationService.confirm({
@@ -271,7 +271,7 @@ export class InserirAlunoComponent {
                 this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
                 this.service.calendarioReload.emit(0);
                 this.sendMensagemAlunos(e);
-                playSuccess();
+                // playSuccess();
             })
             .catch(res => {
                 this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
