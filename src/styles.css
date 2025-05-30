@@ -425,3 +425,109 @@ tbody tr:first-child .fc-scroller {
 .p-select-small .p-select-dropdown {
     width: 21px;
 }
+
+.p-select.ng-touched.ng-invalid,
+p-multiselect.ng-touched.ng-invalid .p-inputtext,
+p-datepicker.ng-touched.ng-invalid .p-inputtext,
+p-inputmask.ng-touched.ng-invalid .p-inputtext,
+.p-inputtext.ng-touched.ng-invalid input,
+input.ng-invalid.ng-touched {
+    border: 1px #e93636 solid !important;
+    animation: 0.6s shadowInvalid infinite;
+    box-shadow: 0 0 3px 1px #ff00006c;
+}
+
+@keyframes shadowInvalid {
+    0% {
+        box-shadow: 0 0 0 0 transparent;
+    }
+
+    50% {
+        box-shadow: 0 0 3px 1px #ff0000a6
+    }
+}
+
+@media screen and (min-width: 320px) and (max-width: 570px) {
+    .xs\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .xs\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .xs\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .xs\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .xs\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .xs\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .xs\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .xs\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .xs\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .xs\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .xs\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .xs\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .xs\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .xs\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}
