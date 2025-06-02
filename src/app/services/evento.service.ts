@@ -3,7 +3,7 @@ import { BehaviorSubject,  lastValueFrom,  map,  of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest, EventoTipo } from '../models/evento.model';
-import { EventoAulaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
+import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
 import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
@@ -245,14 +245,14 @@ export class EventoService extends Service {
         return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model)
     }
   
-    createAulaExtra(model: EventoAulaExtraRequest ) {
-        var request = MyMap(model, new EventoAulaExtraRequest) as EventoAulaExtraRequest;
+    createAulaExtra(model: EventoTurmaExtraRequest ) {
+        var request = MyMap(model, new EventoTurmaExtraRequest) as EventoTurmaExtraRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, model)
     }
 
-    editAulaExtra(model: EventoAulaExtraRequest ) {
-        var request = MyMap(model, new EventoAulaExtraRequest) as EventoAulaExtraRequest;
+    editAulaExtra(model: EventoTurmaExtraRequest ) {
+        var request = MyMap(model, new EventoTurmaExtraRequest) as EventoTurmaExtraRequest;
         request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model)
     }

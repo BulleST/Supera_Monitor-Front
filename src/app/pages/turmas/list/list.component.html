@@ -1,5 +1,7 @@
 <p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
+
 <app-confirm-dialog></app-confirm-dialog>
+
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -8,10 +10,10 @@
              [rowsPerPageOptions]="[50, 100, 1000]"
              [paginator]="list.length > 50"
              [columns]="tableColumns"
-             [globalFilterFields]="tableGlobalFilterFields"
+             [globalFilterFields]="tableGlobalFilterFields" 
              [(contextMenuSelection)]="tableSelectedItem"
-             [contextMenu]="cm"
              (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
+             [contextMenu]="cm"
              dataKey="id"
              stripedRows
              showGridlines
@@ -38,8 +40,7 @@
                                    (input)="dt.filterGlobal(tableSearch, 'contains')"
                                    placeholder="Pesquisar" />
                         </p-iconfield>
-                        <p-button
-                                  icon="pi pi-filter-slash text-sm text-white"
+                        <p-button icon="pi pi-filter-slash text-sm text-white"
                                   (onClick)="clear(dt)"
                                   severity="secondary"
                                   [text]="true"
@@ -47,8 +48,7 @@
                                   tooltipPosition="top"
                                   class="mr-2"
                                   styleClass="h-full bg-black-alpha-80" />
-                        <p-button
-                                  icon="pi pi-sync text-sm text-white"
+                        <p-button icon="pi pi-sync text-sm text-white"
                                   (onClick)="update()"
                                   severity="secondary"
                                   [text]="true"
@@ -56,8 +56,7 @@
                                   tooltipPosition="top"
                                   class="mr-2"
                                   styleClass="h-full bg-black-alpha-80" />
-                        <p-button
-                                  icon="pi pi-plus text-sm"
+                        <p-button icon="pi pi-plus text-sm"
                                   label="Cadastrar"
                                   pTooltip="Cadastrar turma"
                                   tooltipPosition="top"
@@ -71,66 +70,72 @@
         <ng-template pTemplate="header">
             <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
                 <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
-                <th *ngFor="let col of tableColumns" [pSortableColumn]="col.field"
+                <th *ngFor="let col of tableColumns" 
+                    [pSortableColumn]="col.field"
                     class="surface-900 py-0 border-none text-white white-space-nowrap"
                     [style]="{ 
-                    width: col.options && col.options.width ? col.options.width : ''
-                }">
+                        width: col.options && col.options.width ? col.options.width : ''
+                    }">
+                    
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
-                        <ng-template [ngIf]="col.filterType != FilterType.none">
-                            <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
-                                <p-columnFilter
-                                                [type]="col.filterType"
+                        <ng-container *ngIf="col.filterType != FilterType.none">
+                            <div class="flex align-items-center" 
+                                [ngClass]="{
+                                    'ml-3': col.displayType != DisplayType.options 
+                                }">
+                                <p-columnFilter [type]="col.filterType"
                                                 [field]="col.field"
                                                 display="menu" />
                                 <p-sortIcon [field]="col.field" />
                             </div>
-                        </ng-template>
+                        </ng-container>
                     </div>
                 </th>
                 <th class="surface-900 py-0 border-bottom-none text-white"></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <ng-template pTemplate="body" let-item let-index="rowIndex">
             <tr [pContextMenuRow]="item"
-                class="cursor-pointer"
+                class="cursor-pointer border-top-1 border-bottom-1 border-primary-500 bg-primary-100"
                 [ngClass]="{ 
-                'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
+                    'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
                 }">
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
-                    [pSelectableRowIndex]="rowIndex"
+                    [pSelectableRowIndex]="index"
                     [pSelectableRowDisabled]="col.displayType == DisplayType.link"
                     class="border-none white-space-nowrap"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
                     }">
-                    <ng-template [ngIf]="col.displayType == DisplayType.options">
+                    <ng-container *ngIf="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; context: { item: item, option: getOption(col, item) }"></ng-container>
                         <ng-template #tag let-item="item" let-option="option">
+                            <p class="white-space-nowrap">Option: {{option | json}}</p>
+                            <p class="white-space-nowrap">Item: {{item | json}}</p>
                             <p-tag *ngIf="option"
                                    styleClass="font-normal"
                                    [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
                                    [value]="option.label"
                                    [severity]="option.severity ? option.severity : 'secondary'"
+                                   tooltipPosition="top"
                                    [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                         </ng-template>
-                    </ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.color">
-                        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
-                    </ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-                    <ng-template [ngIf]="col.displayType == DisplayType.link">
-                        <!-- {{item[col.field]}} -->
+                    </ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.color">
+                        <span class="w-1rem h-1rem flex border-circle" 
+                        [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+                    </ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+                    <ng-container *ngIf="col.displayType == DisplayType.link">
                         <a *ngIf="item[col.field]" [href]="item[col.field]" target="_blank" class="text-primary-500 hover:underline hover:text-primary-400">Clique para abrir link</a>
-                    </ng-template>
+                    </ng-container>
                 </td>
-                <td class="border-none px-0">
-                </td>
+                <td class="border-none px-0"></td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

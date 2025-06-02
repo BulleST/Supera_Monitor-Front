@@ -9,7 +9,6 @@ import { getError } from '../utils';
 
 @Injectable({
     providedIn: 'root',
-
 })
 export class TurmaService extends Service {
     override list = new BehaviorSubject<Turma[]>([]);

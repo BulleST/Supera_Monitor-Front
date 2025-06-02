@@ -15,7 +15,7 @@ import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { AlunoService } from '../../../../../services/alunos.service';
 import { NgForm, NgModel } from '@angular/forms';
 import { Roteiro } from '../../../../../models/roteiro.model';
-import { EventoAulaExtraRequest, EventoAulaRequest } from '../../../../../models/evento-aula.model';
+import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../../../models/evento-aula.model';
 import moment from 'moment';
 import { RoteiroService } from '../../../../../services/roteiro.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
@@ -50,7 +50,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
 
-    object: EventoAulaExtraRequest = new EventoAulaExtraRequest;
+    object: EventoTurmaExtraRequest = new EventoTurmaExtraRequest;
 
     data: Date = new Date; // new Date(2025,5,21)//
     horario: Date = new Date(2025, 5, 21, 12, 0, 0); // undefined as unknown as Date; // new Date(2025, 5, 21, 12, 0, 0);

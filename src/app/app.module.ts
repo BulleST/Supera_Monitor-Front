@@ -11,7 +11,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { AppComponent } from './app.component';
 import { LoadingComponent } from './parts/loading/loading.component';
-import { AlertComponent } from './parts/alert/alert.component';
+// import { AlertComponent } from './parts/alert/alert.component';
 import { RequestInterceptor } from './helpers/request.interceptor';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { LoadingService } from './parts/loading/loading';
@@ -29,7 +29,7 @@ registerLocaleData(localeBr , 'pt-BR');
     declarations: [
         AppComponent,
         LoadingComponent,
-        AlertComponent,
+        // AlertComponent,
         DescricaoSalaComponent,
     ],
     imports: [

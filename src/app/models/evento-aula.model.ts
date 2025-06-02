@@ -16,10 +16,9 @@ export class EventoAulaRequest {
     capacidadeMaximaAlunos = 12;
 }
 
-export class EventoAulaExtraRequest {
+export class EventoTurmaExtraRequest {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
-    // turma_Id: number = 0;
     roteiro_Id?: number;
     professor_Id: number = 0;
     sala_Id: number = 0;

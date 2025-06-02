@@ -333,6 +333,4 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             return lastValueFrom(this.service.edit(this.object));
         return lastValueFrom(this.service.create(this.object));
     }
-
-
 }

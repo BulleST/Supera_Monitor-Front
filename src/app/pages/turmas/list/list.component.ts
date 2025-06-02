@@ -76,10 +76,7 @@ export class ListComponent implements OnDestroy {
         this.tableLoading = true;
         lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
-            .catch(res => {
-                this.tableLoading = false;
-
-            });
+            .catch(res => this.tableLoading = false);
     }
 
     contextMenuSelectionChange(item: any) {

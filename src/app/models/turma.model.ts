@@ -45,28 +45,24 @@ export var turmaColumns: ColumnTable[] = [
         label: 'Nome',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
     },
     {
         field: 'professor',
         label: 'Educador(a)',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
     },
     {
         field: 'diasDeAulaString',
         label: 'Dias de Aula',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
     },
     {
         field: 'salaDeAulaString',
         label: 'Sala',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
     },
     // {
     //     field: 'diaSemana',
@@ -101,7 +97,6 @@ export var turmaColumns: ColumnTable[] = [
         label: 'Perfil Cognitivo',
         filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
     },
     {
         field: 'capacidadeMaximaAlunos',
@@ -124,9 +119,21 @@ export var turmaColumns: ColumnTable[] = [
         filterType: FilterType.text,
         displayType: DisplayType.options,
         options: {
-            "items": [
-                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false },
-                { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
+            items: [
+                {
+                    value: true,
+                    label: "Ativo",
+                    severity: "success",
+                    icon: "pi pi-lock-open",
+                    showDeactivatedDate: false
+                },
+                {
+                    value: false,
+                    label: "Inativo",
+                    severity: "danger",
+                    icon: "pi pi-lock",
+                    showDeactivatedDate: true
+                }
             ]
         },
     },

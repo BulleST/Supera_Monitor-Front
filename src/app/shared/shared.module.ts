@@ -90,7 +90,6 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         CommonModule,
         RouterModule,
         PrimengModule,
-        FormsModule,
         ToastrModule.forRoot({ enableHtml: true }),
         FontAwesomeModule,
         NgxMaskDirective,

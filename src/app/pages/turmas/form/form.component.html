@@ -56,14 +56,14 @@
                        name="nome"
                        class="w-full"
                        [required]="true">
+                       {{object.nome}}
                 <div *ngIf="nome.touched && nome.invalid && nome.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <div class="field lg:col-3 sm:col-3 col-6"> <!-- Dias de Aula -->
                 <label for="diaSemana">Dias de Aula: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="diasSemana"
+                <p-select [options]="diasSemana"
                           [(ngModel)]="object.diaSemana"
                           (onBlur)="verificaDisponibilidade()"
                           #diaSemana="ngModel"

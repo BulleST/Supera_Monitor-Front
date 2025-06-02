@@ -18,7 +18,7 @@ import { EventoService } from '../../../services/evento.service';
 import { TurmaService } from '../../../services/turma.service';
 import moment from 'moment';
 import { NgForm, NgModel } from '@angular/forms';
-import { EventoAulaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
+import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model';
 import { MyMap } from '../../../utils/map';
@@ -526,7 +526,7 @@ export class EventoComponent implements OnDestroy {
     }
 
     requestAulaExtra() {
-        var request = MyMap(this.evento, new EventoAulaExtraRequest);
+        var request = MyMap(this.evento, new EventoTurmaExtraRequest);
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = [this.evento.professor_Id];
         if (this.evento.id == PseudoEvento.EventoId)

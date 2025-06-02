@@ -24,6 +24,8 @@
         </div>
     </ng-template>
 </p-confirmdialog>
+
+
 <section id="home" #home>
     <div>
         <div id="alunos"
@@ -32,8 +34,7 @@
              [cdkDropListConnectedTo]="cdkEventItensId"
              [cdkDropListSortingDisabled]="true"
              #alunos="cdkDropList">
-            <app-selected-evento
-                                 #popoverComponent
+            <app-selected-evento #popoverComponent
                                  [evento]="selectedEvento"
                                  [cdkEventItensId]="cdkEventItensId"
                                  [cdkDragCancel]="cdkDragCancel"
@@ -47,10 +48,11 @@
             <div class="flex align-items-center justify-content-between flex-wrap  mt-4 -mb-4 py-3  ">
                 <div *ngIf="currentRoteiro" class="flex align-items-center cursor-pointer">
                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
-                    <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center py-2 px-4 mx-1" (click)="popoverSemana.toggle($event)"
-                         [ngClass]="{
-                        'text-white bg-primary-500': popoverSemana.overlayVisible
-                    }">
+                    <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center py-2 px-4 mx-1" 
+                        (click)="popoverSemana.toggle($event)"
+                        [ngClass]="{
+                            'text-white bg-primary-500': popoverSemana.overlayVisible
+                        }">
                         <span class="font-bold text-base">Semana {{currentRoteiro.semana}} - {{currentRoteiro.tema}} </span>
                     </div>
                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
@@ -181,7 +183,6 @@
                                     <div class="flex align-items-center mx-2">
                                         <label for="data" class="mr-1">Data: </label>
                                         <p-datepicker (onSelect)="dataSelect(dataNgModel)"
-                                                        (onSelect)="dataSelect(dataNgModel)"
                                                       #dataNgModel="ngModel"
                                                       [(ngModel)]="data"
                                                       [showIcon]="true"
