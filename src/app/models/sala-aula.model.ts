@@ -16,7 +16,8 @@ export class SalaAula {
 
 
 export enum SalaAulaId {
-    professores = 14,
-    online = 13,
+    financeiro = 3,
+    professores = 2,
+    online = 1,
 
 }

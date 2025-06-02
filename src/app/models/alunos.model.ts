@@ -2,14 +2,12 @@ import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
-import { Dashboard, /*Dashboard_Aulas, Dashboard_Mes*/ } from "./dashboard.model";
+import { Dashboard } from "./dashboard.model";
 import { Evento } from "./evento.model";
 
 export class AlunoRequest {
     id: number = 0;
     rm: string = '';    
-    loginApp: string = '';    
-    senhaApp: string = '';
     pessoa_Id: number = 0
     nome: string = '';
     dataNascimento: Date = new Date;
@@ -18,28 +16,21 @@ export class AlunoRequest {
     email: string = '';
     observacao: string = '';
     endereco: string = '';
-    aluno_Foto: string = '';
+    aluno_Foto?: string;
+    restricaoMobilidade: boolean = false;
 
     dataInicioVigencia: Date = new Date;
     dataFimVigencia?: Date;
 
-    created: Date = new Date;
-    lastUpdated?: Date;
-    deactivated?: Date;
-    active: boolean = false;
-
-    perfilCognitivo_Id: number = 0;
-    perfilCognitivo: string = '';
-
-    turma_Id: number = 0;
-    professor_Id: number = 0;
+    perfilCognitivo_Id?: number;
+    turma_Id?: number;
     pessoa_Sexo_Id?: number;
     apostila_Kit_Id?: number;
     
-    restricaoMobilidade: boolean = false;
     restricoes: Aluno_Restricao[] = [];
-    primeiraAula?: Date;
 
+    primeiraAula_Id?: number;
+    aulaZero_Id?: number;
 }
 
 export class Aluno {
@@ -59,7 +50,6 @@ export class Aluno {
 
     dataInicioVigencia: Date = new Date;
     dataFimVigencia?: Date;
-    primeiraAula?: Date;
 
     created: Date = new Date;
     lastUpdated?: Date;
@@ -69,16 +59,17 @@ export class Aluno {
     perfilCognitivo_Id: number = 0;
     perfilCognitivo: string = '';
 
-    turma_Id: number = 0;
-    turma: string = '';
-    turmaDesc: string = '';
-    diaSemana: number = 0;
-    horario: Date = new Date;
+    turma_Id?: number;
+    turma?: string;
+    turmaDesc?: string;
+    diaSemana?: number;
+    horario?: Date;
 
     restricaoMobilidade: boolean = false;
 
-    professor_Id: number = 0;
-    professor: string = '';
+    professor_Id?: number;
+    professor?: string;
+    linkGrupo?: string;
 
     pessoa_Sexo_Id?: number;
     pessoa_Sexo?: string = '';
@@ -95,9 +86,6 @@ export class Aluno {
     numeroPaginaAH?: number = '' as any;
     numeroPaginaAbaco?: number = '' as any;
     
-    // apostila_Abaco_Kit_Id?: number;
-    // apostila_AH_Kit_Id?: number;
-    
     kit?: string = '' as any;
     apostila_Kit_Id?: number = undefined as any;
 
@@ -109,13 +97,15 @@ export class Aluno {
     checklist?: string = '';
     
     aulas: Dashboard[] = [];
-    // primeiraAula?: Dashboard;
-    // aulas: Dashboard_Aulas[] = [];
-    // mesesAula: Evento_Mes[] = [];
     disponivel?: boolean;
     disponivelEvent?: Evento;
     aulasParaRepor: Evento[] = []
-    linkGrupo?: string = '';
+
+    
+    primeiraAula_Id?: number;
+    primeiraAula?: Evento;
+    aulaZero_Id?: number;
+    aulaZero?: Evento;
 }
 
 export interface Pessoa_DropDown {

@@ -23,6 +23,7 @@ import { ChecklistService } from '../../../../services/checklist.service';
 import { Turma } from '../../../../models/turma.model';
 import { TurmaService } from '../../../../services/turma.service';
 import { SalaAulaId } from '../../../../models/sala-aula.model';
+import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 
 @Component({
     selector: 'app-inserir-aluno',
@@ -50,7 +51,8 @@ export class InserirAlunoComponent {
 
     turmas: Turma[] = [];
     loadingTurmas = false;
-    
+
+
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -58,6 +60,7 @@ export class InserirAlunoComponent {
         private confirmationService: ConfirmationService,
         private crypto: Crypto,
         private alunoService: AlunoService,
+        private alunoRestricaoService: AlunoRestricaoService,
         private service: EventoService,
         private calendarioUtils: CalendarioUtils,
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -70,7 +73,7 @@ export class InserirAlunoComponent {
 
         var params = this.activatedRoute.snapshot.params;
         if (!params['evento_id'] || !params['evento_nome']
-            || !['aula-zero', 'superacao'].includes(params['evento_nome'])) {
+            || !['aula-zero', 'superacao', 'aula'].includes(params['evento_nome'])) {
             this.visible = false;
             this.visibleChange();
             return
@@ -132,7 +135,7 @@ export class InserirAlunoComponent {
                 this.evento = res;
                 this.visible = true;
                 this.verificaDisponibilidade();
-                this.tipoString = this.getTipo(this.evento);
+                this.tipoString = this.tipoString;
 
                 this.setAlunos();
             }
@@ -204,12 +207,63 @@ export class InserirAlunoComponent {
             return;
         }
 
+        if (aluno.restricaoMobilidade && this.evento.andar && this.evento.andar > 1) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+            this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da ${this.tipoString} na sala ${this.evento.numeroSala} - ${this.evento.andar}º andar.`, e.originalEvent);
+            return;
+        }
+
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
+
+        this.getRestricoes(e.originalEvent);
+
+
     }
 
     getCorTurma(turma_Id: number) {
         return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
+    }
+
+    getRestricoes(e: any) {
+        if (this.selectedAluno) {
+            var aluno = this.selectedAluno as Aluno;
+            this.loadingAlunos = true;
+            this.loading = true;
+            lastValueFrom(this.alunoRestricaoService.getList(aluno.id))
+                .then(res => {
+                    aluno.restricoes = res;
+                    let index = this.alunos.findIndex(x => x.id == aluno.id);
+                    this.alunos.splice(index, 1, aluno);
+
+                    if (aluno.restricoes.filter(x => x.active == true ).length > 0) {
+
+                        var mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
+                        mensagem += res.map(x => '• ' + x.descricao).join('<br>');
+                        mensagem += `<br> Tem certeza que deseja inserir ele nessa ${this.tipoString}?`;
+
+                        this.confirmationService.confirm({
+                            target: e.target,
+                            header: 'Inserir aluno',
+                            message: mensagem,
+                            acceptLabel: `Continuar`,
+                            acceptIcon: 'pi pi-check',
+                            acceptButtonStyleClass: 'p-button-rounded',
+                            rejectLabel: 'Cancelar',
+                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                            accept: () => {
+                                this.selectedAluno = aluno;
+                            },
+                            reject: () => {
+                                this.selectedAluno = undefined;
+                            }
+                        })
+
+                    }
+                })
+
+        }
+
     }
 
 
@@ -232,7 +286,7 @@ export class InserirAlunoComponent {
         }
 
         if (!this.selectedAluno) {
-            return this.showError('Não foi possível salvar', 'Selecione um aluno para inserir na ' + this.getTipo(this.evento), e)
+            return this.showError('Não foi possível salvar', 'Selecione um aluno para inserir na ' + this.tipoString, e)
         }
 
         // playAlert();
@@ -286,7 +340,7 @@ export class InserirAlunoComponent {
         var aluno = this.selectedAluno as Aluno;
         this.confirmationService.confirm({
             target: e.target,
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.getTipo(this.evento)}.`,
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
@@ -334,7 +388,6 @@ export class InserirAlunoComponent {
             }
         }
     }
-
 
     checklistAula0(aluno: Aluno) {
         // Agendamento na aula 0

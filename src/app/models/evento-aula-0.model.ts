@@ -5,7 +5,6 @@ export class EventoAula0Request {
     descricao: string = '';
     observacao: string = '';
     alunos: number[] = [];
-    // aluno_Id: number = undefined as unknown as number; 
     professor_Id: number = undefined as unknown as number; 
     sala_Id: number = undefined as unknown as number; 
     data: Date = undefined as unknown as Date; 

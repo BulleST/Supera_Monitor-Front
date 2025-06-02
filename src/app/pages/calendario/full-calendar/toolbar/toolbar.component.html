@@ -47,14 +47,16 @@
             <p-select value="'Agendar'"
                       [options]="agendarMenuItem"
                       [styleClass]="'bg-primary-500 hover:bg-primary-600 border-primary-500 hover:border-primary-600 text-white flex align-items-center ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "
-                      appendTo="body">
+                      appendTo="body"
+                      (onChange)="agendarEvento($event)"
+                      scrollHeight="250px">
                 <ng-template let-selectedOption #selectedItem>
                     <div class="text-white -mr-2">
                         <span class="ml-2">Agendar</span>
                     </div>
                 </ng-template>
                 <ng-template let-item #item>
-                    <div class="w-10rem" (click)="agendarEvento(item, $event)">
+                    <div class="w-10rem">
                         <a class="ml-2">{{ item.label }}</a>
                     </div>
                 </ng-template>

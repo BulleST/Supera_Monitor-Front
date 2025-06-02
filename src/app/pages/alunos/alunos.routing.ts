@@ -6,7 +6,7 @@ import { ListComponent } from './list/list.component';
 const routes: Routes = [
     {
         path: '', component: ListComponent, children: [
-            { path: 'cadastrar', component: FormComponent },
+            // { path: 'cadastrar', component: FormComponent },
             { path: 'editar/:aluno_id', component: FormComponent },
         ]
     },

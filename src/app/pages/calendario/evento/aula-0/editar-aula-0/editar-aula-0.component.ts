@@ -60,7 +60,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
             this.evento = changes['evento'].currentValue;
             this.alunoSelected = this.evento.alunos[0];
             this.evento.professor_Id = this.evento.professores[0].professor_Id;
-
         }
         if (changes['professores']) this.professores = changes['professores'].currentValue;
         if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
@@ -101,13 +100,20 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         var salaAula = this.salaAulas.find(x => x.id == e.value) as SalaAula;
         this.validaSala.emit(salaAula);
 
+        let alunosComRestricaoMobilidade = this.evento.alunos.filter(x => x.restricaoMobilidade);
+
         if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuída para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } else {
-            model.control.setErrors({ indisponivel: null });
+        } 
+        else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+            this.showError('Restrição de Mobilidade', `O(s) aluno(s) ${alunosComRestricaoMobilidade.map(x => x.aluno.split(' '[0])).join(', ')} tem restrição de mobilidade e não podem participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
+            return;
         }
+
+        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 

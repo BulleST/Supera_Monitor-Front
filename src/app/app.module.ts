@@ -21,6 +21,7 @@ import { AppRoutingModule } from './app.routing';
 
 import { registerLocaleData } from '@angular/common';
 import localeBr  from '@angular/common/locales/pt';
+import { DescricaoSalaComponent } from './pages/shared/descricao-sala/descricao-sala.component';
 
 registerLocaleData(localeBr , 'pt-BR');
 
@@ -29,6 +30,7 @@ registerLocaleData(localeBr , 'pt-BR');
         AppComponent,
         LoadingComponent,
         AlertComponent,
+        DescricaoSalaComponent,
     ],
     imports: [
         BrowserModule,

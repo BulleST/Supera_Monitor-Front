@@ -186,10 +186,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
 
         this.calendarioRequest.perfil_Cognitivo_Id = this.aluno.perfilCognitivo_Id;
 
-        this.corLegenda = (await this.turmaService.get(this.aluno.turma_Id)).corLegenda;
+        if (this.aluno.turma_Id) {
+            this.corLegenda = (await this.turmaService.get(this.aluno.turma_Id)).corLegenda;
+        }
 
-
-        this.getCalendario('reposicao aluno')
+        this.getCalendario();
 
         this.calendarVisible.update(() => true);
     }
@@ -208,7 +209,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         this.calendarioRequest.intervaloDe = moment(new Date()).startOf('week').toDate();
         this.calendarioRequest.intervaloAte = moment(new Date()).endOf('week').toDate();
 
-        await this.getCalendario('datesSet');
+        await this.getCalendario();
         this.setCalendario();
 
     }
@@ -218,10 +219,11 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
     }
 
 
-    async getCalendario(where: string) {
+    async getCalendario() {
         this.loading = true;
 
         this.calendarioRequest.perfil_Cognitivo_Id = this.aluno.perfilCognitivo_Id;
+
         await lastValueFrom(this.service.calendario(this.calendarioRequest))
             .then(calendarioList => {
                 this.eventos = calendarioList
@@ -230,8 +232,13 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
                         && x.finalizado == false
                         && moment(x.data).isSameOrAfter(new Date))
 
-                if (this.calendarioRequest.perfil_Cognitivo_Id)
+                if (this.calendarioRequest.perfil_Cognitivo_Id) {
                     this.eventos = this.eventos.filter(x => x.perfilCognitivo.map(perfil => perfil.id).includes(this.calendarioRequest.perfil_Cognitivo_Id!));
+                }
+                
+                if (this.aluno.restricaoMobilidade) {
+                    this.eventos = this.eventos.filter(x => x.andar == 1);
+                }
 
                 this.setCalendario();
                 this.setLegenda();
@@ -329,7 +336,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         this.calendarioRequest.intervaloDe = arg.view.currentStart;
         this.calendarioRequest.intervaloAte = arg.view.currentEnd;
 
-        await this.getCalendario('datesset');
+        await this.getCalendario();
         await this.loadFeriados();
         this.setCalendario();
     }

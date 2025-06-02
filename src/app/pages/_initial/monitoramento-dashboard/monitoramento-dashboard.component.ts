@@ -253,8 +253,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy, AfterViewInit
         .then(res => {
             
             res = res.sort((a, b) => {
-                if (a.turma < b.turma) return -1;
-                if (a.turma > b.turma) return 1;
+                // if (a.turma < b.turma) return -1;
+                // if (a.turma > b.turma) return 1;
                 if (a.nome < b.nome) return -1;
                 if (a.nome > b.nome) return 1;
                 return 0;

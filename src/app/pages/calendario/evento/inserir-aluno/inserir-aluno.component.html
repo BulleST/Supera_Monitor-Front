@@ -94,6 +94,7 @@
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['restricaoMobilidade']">{{aluno_Id.errors['restricaoMobilidade']}}.</p>
                 </div>
             </div>
         </div>

@@ -66,7 +66,7 @@
                               (onBlur)="verificaDisponibilidade()"
                               (onMonthChange)="dateNavigatorChanged($event)"
                               (onYearChange)="dateNavigatorChanged($event)"
-                              placeholder="DD/MM/YYYY"
+                              placeholder="dd/mm/yyyy"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
                               [minDate]="minData"
@@ -92,7 +92,7 @@
                               #_horario="ngModel"
                               [(ngModel)]="horario"
                               (onBlur)="verificaDisponibilidade()"
-                              placeholder="HH:MM"
+                              placeholder="hh:mm"
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
@@ -114,7 +114,7 @@
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-multiselect [options]="groupedAlunos"
                           [loading]="loadingAlunos"
-                          [(ngModel)]="alunosSelected"
+                          [(ngModel)]="selectedAlunos"
                           [readonly]="blockAlunoField"
                           [disabled]="blockAlunoField"
                           (onChange)="alunoChanged($event, aluno_Id)"
@@ -134,7 +134,8 @@
                           [virtualScroll]="true" 
                           [virtualScrollItemSize]="43" 
                           [appendTo]="'body'"
-                          optionDisabled="deactivated, disponivel">
+                          optionDisabled="deactivated, disponivel"
+                          placeholder="Selecione">
                           <ng-template  #group let-group>
                               <p class="flex align-items-center gap-2 surface-100 -mx-3 py-2 h-full px-2 text-black-alpha-80">
                                 <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(group.value.turma_Id) }"></ng-container>
@@ -209,7 +210,8 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          placeholder="Selecione">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
@@ -268,15 +270,16 @@
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
                           styleClass="w-full"
+                          optionValue="id"
                           class="w-full"
                           name="sala_Id"
                           inputId="sala_Id"
-                          optionValue="id"
                           [required]="true"
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          placeholder="Selecione">
                     <ng-template #selectedItem let-selectedOption>
                         <app-sala-aula [numeroSala]="selectedOption.numeroSala"
                                        [andar]="selectedOption.andar"
@@ -318,6 +321,7 @@
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['restricaoMobilidade']">{{sala_Id.errors['restricaoMobilidade']}}</p>
                 </div>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">

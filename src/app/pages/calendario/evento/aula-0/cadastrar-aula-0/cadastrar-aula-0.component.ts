@@ -36,6 +36,7 @@ import { groupBy } from 'lodash';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { playAlert, playSuccess } from '../../../../../utils/audio';
+import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -50,14 +51,14 @@ export class CadastrarAula0Component implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
     object: EventoAula0Request = new EventoAula0Request();
-    data: Date = new Date;
+    data: Date = undefined as unknown as Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
     blockAlunoField = false;
 
     mensagensEnviadasAlunos: Aluno[] = [];
-    alunosSelected: Aluno[] = [];
+    selectedAlunos: Aluno[] = [];
     groupedAlunos: SelectItemGroup[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
@@ -95,6 +96,7 @@ export class CadastrarAula0Component implements OnDestroy {
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
         private alunoService: AlunoService,
+        private alunoRestricaoService: AlunoRestricaoService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private checklistService: ChecklistService,
@@ -155,7 +157,7 @@ export class CadastrarAula0Component implements OnDestroy {
                     corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
                 }
                 this.groupedAlunos.push({
-                    label: turma.nome,
+                    label: turma.nome ?? "Indefinido",
                     value: turma,
                     items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
                 });
@@ -197,10 +199,11 @@ export class CadastrarAula0Component implements OnDestroy {
         }
     }
 
-    getCorTurma(turma_Id: number) {
-        return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
+    getCorTurma(turma_Id?: number) {
+        if (turma_Id)
+            return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? '';
+        else return null
     }
-
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
@@ -305,22 +308,24 @@ export class CadastrarAula0Component implements OnDestroy {
 
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
+        var salaAula = this.salaAulas.find(x => x.id == e.value) as SalaAula;
+
         this.validaSalaAulas();
+
+        let alunosComRestricaoMobilidade = this.selectedAlunos.filter(x => x.restricaoMobilidade);
 
         var item = this.salaAulas.find((x) => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError(
-                'Sala Indisponível',
-                `Essa sala está atribuída a outra ${this.getTipo(
-                    item.disponivelEvent
-                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
-                    'HH[h]mm'
-                )}</b>.`,
-                e.originalEvent
-            );
+            this.showError('Sala Indisponível',`Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`,e.originalEvent);
+            return;
+        } 
+        else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+            this.showError('Restrição de Mobilidade', `O(s) aluno(s) ${alunosComRestricaoMobilidade.map(x => x.nome.split(' '[0])).join(', ')} tem restrição de mobilidade e não podem participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
             return;
         }
+
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
@@ -329,14 +334,18 @@ export class CadastrarAula0Component implements OnDestroy {
         this.validaAlunos();
         var alunos = e.value as Aluno[];
         var aluno = (e.originalEvent as any).option as Aluno;
+        var salaAula = this.salaAulas.find(x => x.id == this.object.sala_Id) as SalaAula;
 
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
-            if (index) this.alunosSelected.splice(index, 1);
-
+            var index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+            if (index) this.selectedAlunos.splice(index, 1);
             this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-
+        }
+        else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+            this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
+            return;
         }
         else if (alunos.length > 1) {
             this.confirmationService.confirm({
@@ -348,12 +357,57 @@ export class CadastrarAula0Component implements OnDestroy {
                 rejectLabel: 'Não',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
-                    this.alunosSelected = [this.alunosSelected[0]]
+                    this.selectedAlunos = [this.selectedAlunos[0]]
                 },
             });
         }
 
         model.control.updateValueAndValidity();
+
+        this.getRestricoes(e.originalEvent, aluno);
+    }
+
+    getRestricoes(e: any, aluno: Aluno) {
+        if (this.selectedAlunos) {
+            this.loadingAlunos = true;
+            this.loading = true;
+            lastValueFrom(this.alunoRestricaoService.getList(aluno.id))
+                .then(res => {
+                    aluno.restricoes = res;
+                    let index = this.alunos.findIndex(x => x.id == aluno.id);
+                    this.alunos.splice(index, 1, aluno);
+
+                    index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+                    this.selectedAlunos.splice(index, 1, aluno);
+
+                    if (aluno.restricoes.filter(x => x.active == true).length > 0) {
+
+                        var mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
+                        mensagem += res.map(x => '• ' + x.descricao).join('<br>');
+                        mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
+
+                        this.confirmationService.confirm({
+                            target: e.target,
+                            header: 'Inserir aluno',
+                            message: mensagem,
+                            acceptLabel: `Continuar`,
+                            acceptIcon: 'pi pi-check',
+                            acceptButtonStyleClass: 'p-button-rounded',
+                            rejectLabel: 'Cancelar',
+                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                            accept: () => {
+                            },
+                            reject: () => {
+                                index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+                                this.selectedAlunos.splice(index, 1, aluno);
+                            }
+                        })
+
+                    }
+                })
+
+        }
+
     }
 
     getTipo(e: Evento) {
@@ -364,13 +418,13 @@ export class CadastrarAula0Component implements OnDestroy {
         if (form.invalid) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
-        if (this.alunosSelected.length == 0) {
+        if (this.selectedAlunos.length == 0) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
         }
 
         // playAlert();
 
-        this.object.alunos = this.alunosSelected.map((x) => x.id);
+        this.object.alunos = this.selectedAlunos.map((x) => x.id);
 
         this.object.data = new Date(this.data);
         this.object.data.setHours(
@@ -381,19 +435,11 @@ export class CadastrarAula0Component implements OnDestroy {
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
 
         var mensagem = ``;
-        if (this.alunosSelected.length == 1) {
-            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${this.alunosSelected[0].nome
-                } para o dia ${moment(this.object.data).format(
-                    'DD/MM/YY [às] HH[h]mm'
-                )}?.`;
-        } else if (this.alunosSelected.length > 1) {
-            mensagem = `Tem certeza que deseja agendar a aula 0 dos alunos ${this.alunosSelected
-                .map((x) => x.nome)
-                .join(', ')} para o dia ${moment(this.object.data).format(
-                    'DD/MM/YY [às] HH[h]mm'
-                )}?.`;
+        if (this.selectedAlunos.length == 1) {
+            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${this.selectedAlunos[0].nome} para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`;
+        } else if (this.selectedAlunos.length > 1) {
+            mensagem = `Tem certeza que deseja agendar a aula 0 dos alunos ${this.selectedAlunos.map((x) => x.nome).join(', ')} para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`;
         }
-
 
         this.confirmationService.confirm({
             target: e.target,
@@ -422,9 +468,9 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado');
                 // playSuccess();
 
-                if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
+                if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
                     this.sendMensagemAluno(e, res.object);
-                } else if (this.alunosSelected.filter(x => x.celular).length > 0) {
+                } else if (this.selectedAlunos.filter(x => x.celular).length > 0) {
                     this.sendMensagemAlunos();
                 }
                 else {
@@ -440,7 +486,7 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     sendMensagemAluno(e: any, evento: any) {
-        var aluno = this.alunosSelected[0] as Aluno;
+        var aluno = this.selectedAlunos[0] as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -465,7 +511,7 @@ export class CadastrarAula0Component implements OnDestroy {
         });
     }
     sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
             message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
@@ -501,9 +547,9 @@ export class CadastrarAula0Component implements OnDestroy {
     }
     markChecklistAsDone() {
         // Agendamento na aula 0
-        if (this.alunosSelected) {
+        if (this.selectedAlunos) {
             var id = 31;
-            this.alunosSelected.forEach((aluno) => {
+            this.selectedAlunos.forEach((aluno) => {
                 var alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
                 var professor = this.professores.find((x) => x.id == this.object.professor_Id) as Professor;
 

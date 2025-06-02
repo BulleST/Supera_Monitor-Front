@@ -159,7 +159,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                     corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
                 }
                 this.groupedAlunos.push({
-                    label: turma.nome,
+                    label: turma.nome ?? 'Indefinido',
                     value: turma,
                     items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
                 });
@@ -203,8 +203,10 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         }
     }
 
-    getCorTurma(turma_Id: number) {
-        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
+    getCorTurma(turma_Id?: number) {
+        if (turma_Id)
+            return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? '';
+        else return null
     }
 
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {

@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { MobileService } from '../../../../utils';
 import { ScreenWidth } from '../../../../utils/mobile';
 import { Subscription } from 'rxjs';
+import { SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-toolbar',
@@ -45,10 +46,27 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
                 evento.evento_Tipo_Id = EventoTipo.AulaZero;
                 this.service.setEvento(evento);
             }
+        }, {
+            label: 'Aula 1',
+            routerLink: 'calendario/aula-1/agendar',
+            command: () => {
+                var evento = new Evento;
+                evento.evento_Tipo_Id = EventoTipo.AulaZero;
+                this.service.setEvento(evento);
+            }
         },
         {
             label: 'Turma Extra',
             routerLink: 'calendario/turma-extra/agendar',
+            command: () => {
+                var evento = new Evento;
+                evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+                this.service.setEvento(evento);
+            }
+        },
+        {
+            label: 'Reposição',
+            routerLink: 'calendario/reposicao/agendar',
             command: () => {
                 var evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.AulaExtra;
@@ -119,11 +137,10 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.service.calendarView.emit(this.view);
     }
 
-    agendarEvento(item: MenuItem, e: any) {
-        this.router.navigateByUrl(item.routerLink);
-        if (item.command)
-            item.command(e);
+    agendarEvento(e: SelectChangeEvent) {
+        this.router.navigateByUrl(e.value.routerLink);
+        if (e.value.command)
+            e.value.command(e);
     }
-
 
 }
