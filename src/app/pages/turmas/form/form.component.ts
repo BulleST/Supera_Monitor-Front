@@ -50,7 +50,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         { id: 6, label: 'Sábado' },
     ];
 
-    selectedPerfil?: PerfilCognitivo;
+    selectedPerfil: PerfilCognitivo[] = [];
     perfisCognitivos: PerfilCognitivo[] = [];
     loadingPerfisCognitivos = false;
 
@@ -132,7 +132,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     loadPage() {
-
         var params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['id'];
             if (this.isEditPage) {
@@ -147,7 +146,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
                         if (this.object.perfilCognitivo.length > 0) {
                             var perfilId = this.object.perfilCognitivo[0].id;
-                            this.selectedPerfil = this.perfisCognitivos.find(x => x.id == perfilId) ?? this.object.perfilCognitivo[0]
+                            this.selectedPerfil = this.perfisCognitivos.filter(x => x.id == perfilId) ?? []
                         }
 
                         this.verificaDisponibilidade();
@@ -162,7 +161,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         })
         this.subscription.push(params);
     }
-
 
     visibleChange() {
         if (!this.visible) {
@@ -182,7 +180,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         this.validaSalaAulas();
 
         return valid
-
     }
 
     validaSalaAulas() {
@@ -213,8 +210,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             this.professorChanged(e, this.professor_Id);
         }
     }
-
-
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
         var item = this.professores.find(x => x.id == e.value);
@@ -248,14 +243,10 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         model.control.updateValueAndValidity();
     }
 
-
-
     perfilChange(model: NgModel) {
-        if (this.selectedPerfil)
-            this.object.perfilCognitivo = [this.selectedPerfil];
-        else
-            this.object.perfilCognitivo = [];
-    }
+    // PRIMENG Multiselect já lida com quase todo o onChange
+    this.object.perfilCognitivo = model.value
+  }
 
     goToCalendario() {
         this.router.navigate(['turmas', 'calendario', this.crypto.encrypt(this.object.id)]);

@@ -253,7 +253,7 @@
             </div>
             <div class="field lg:col-6 sm:col-3 col-6"> <!-- Perfil Cognitivo -->
                 <label for="perfilCognitivo">Perfil Cognitivo: <span class="text-red-500">*</span></label>
-                <!-- <p-multiselect 
+                <p-multiselect 
                     [options]="perfisCognitivos"
                     [(ngModel)]="object.perfilCognitivo"
                     [loading]="loadingPerfisCognitivos"
@@ -267,22 +267,7 @@
                     filterBy="nome"
                     [required]="true"
                     styleClass="w-full" 
-                    appendTo="body" /> -->
-                <p-select
-                          [options]="perfisCognitivos"
-                          [(ngModel)]="selectedPerfil"
-                          [loading]="loadingPerfisCognitivos"
-                          (ngModelChange)="perfilChange(perfilCognitivo)"
-                          #perfilCognitivo="ngModel"
-                          inputId="perfilCognitivo"
-                          name="perfilCognitivo"
-                          placeholder="Selecione"
-                          optionLabel="nome"
-                          [filter]="true"
-                          filterBy="nome"
-                          [required]="true"
-                          styleClass="w-full"
-                          appendTo="body" />
+                    appendTo="body" />
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
