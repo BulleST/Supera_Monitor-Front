@@ -28,6 +28,8 @@
                           styleClass="white-space-nowrap"
                           (onClick)="goToAluno(aluno)" />
                 <a *ngIf="aluno.celular"
+                   target="_blank"
+                   rel="noopener noreferrer"
                    [href]="enviarMensagem(aluno.nome, aluno.celular)" 
                    class="p-component p-ripple p-button p-button-success p-button-rounded  white-space-nowrap">
                     <span class="pi pi-whatsapp p-button-icon p-button-icon-left "></span>

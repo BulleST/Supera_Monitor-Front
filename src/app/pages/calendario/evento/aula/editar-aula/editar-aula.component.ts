@@ -217,72 +217,62 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     e.target.select()
   }
 
+  contatar(item: Evento_Participacao_Aluno, e: any) {
+    let url = this.mensagemWhatsapp.enviarMensagemFalta(
+      item.aluno,
+      item.celular!,
+      e,
+    )
+
+    window.open(url, '_blank')
+  }
+
   presente(item: Evento_Participacao_Aluno, e: any) {
     item.presente = true
   }
 
+  getContactTooltipMessage(presente: boolean) {
+    return presente ? 'Abrir WhatsApp' : 'Sem celular cadastrado'
+  }
+
   faltou(item: Evento_Participacao_Aluno, e: any) {
     item.presente = false
-    if (item.celular) {
-      // playAlert();
-      let nome = item.aluno.split(' ')[0]
-      this.confirmationService.confirm({
-        target: e.targer,
-        message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
-        header: 'Enviar whatsapp',
-        icon: 'pi pi-whatsapp text-green-500 text-4xl',
-        acceptLabel: `Enviar mensagem`,
-        acceptButtonStyleClass: ' p-button-rounded p-button-success',
-        acceptIcon: 'pi pi-whatsapp',
-        rejectLabel: 'Não enviar',
-        rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-        accept: () => {
-          let url = this.mensagemWhatsapp.enviarMensagemFalta(
-            item.aluno,
-            item.celular!,
-            this.evento,
-          )
-          window.open(url, '_blank')
-        },
-      })
-    }
+    // if (item.celular) {
+    //   // playAlert();
+    //   let nome = item.aluno.split(' ')[0]
+    //   this.confirmationService.confirm({
+    //     target: e.targer,
+    //     message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
+    //     header: 'Enviar whatsapp',
+    //     icon: 'pi pi-whatsapp text-green-500 text-4xl',
+    //     acceptLabel: `Enviar mensagem`,
+    //     acceptButtonStyleClass: ' p-button-rounded p-button-success',
+    //     acceptIcon: 'pi pi-whatsapp',
+    //     rejectLabel: 'Não enviar',
+    //     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+    //     accept: () => {
+    //       let url = this.mensagemWhatsapp.enviarMensagemFalta(
+    //         item.aluno,
+    //         item.celular!,
+    //         this.evento,
+    //       )
+    //       window.open(url, '_blank')
+    //     },
+    //   })
+    // }
   }
 
   presenteClick(item: Evento_Participacao_Aluno, e: any) {
     item.presente = !item.presente
-
-    if (item.presente == false && item.celular) {
-      let nome = item.aluno.split(' ')[0]
-      // playAlert();
-      // this.confirmationService.confirm({
-      //   target: e.target,
-      //   message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
-      //   header: 'Enviar whatsapp',
-      //   icon: 'pi pi-whatsapp text-green-500 text-4xl',
-      //   acceptIcon: 'pi pi-whatsapp',
-      //   acceptLabel: `Enviar mensagem`,
-      //   rejectLabel: 'Não enviar',
-      //   acceptButtonStyleClass: ' p-button-rounded p-button-success',
-      //   rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-      //   accept: () => {
-      //     let url = this.mensagemWhatsapp.enviarMensagemFalta(
-      //       item.aluno,
-      //       item.celular!,
-      //       this.evento,
-      //     )
-      //     window.open(url, '_blank')
-      //   },
-      // })
-    }
     return item
   }
 
   // Dribla o PrimeNG pra mudar o estado do presente sem ter que dar 2 cliques
   triggerEditAndClick(cell: any, item: any, event: Event): void {
-    cell.initCellEdit?.() // Step 1: Enter edit mode
+    cell.initCellEdit?.()
 
     setTimeout(() => {
-      this.presenteClick(item, event) // Step 2: Mutate your value (item.presente)
+      this.presenteClick(item, event)
       cell.onEditorSubmit?.()
       cell.closeCellEdit?.()
     })

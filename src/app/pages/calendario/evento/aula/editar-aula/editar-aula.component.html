@@ -557,7 +557,7 @@
                 *ngIf="isChamadaPage"
               >
                 <div
-                  class="flex align-items center justifi-content-center gap-2 mb-2"
+                  class="flex align-items center gap-2 mb-2"
                 >
                   <p-button
                     label="Presente"
@@ -574,6 +574,19 @@
                     icon="pi pi-thumbs-down-fill"
                     [outlined]="item.presente != false"
                     (onClick)="faltou(item, $event)"
+                  />
+                  <p-button
+                    *ngIf="item.presente === false"
+                    [disabled]="!item.celular"
+                    label="Contatar"
+                    variant="outlined"
+                    severity="info"
+                    size="small"
+                    [pTooltip]="getContactTooltipMessage(!!item.celular)"
+                    tooltipPosition="bottom"
+                    icon="pi pi-whatsapp"
+                    [outlined]="item.presente != false"
+                    (onClick)="contatar(item, $event)"
                   />
                 </div>
               </div>
@@ -780,7 +793,7 @@
           ></app-aluno-popover>
           <tr>
             <!-- Nome -->
-            <td class="w-8rem sticky left-0 z-2 cursor-pointer">
+            <td class="w-8rem sticky left-0 z-2">
               <div class="flex align-items-center">
                 <div
                   class="inline-flex w-2rem h-2rem -ml-2 flex-none align-items-center"
@@ -796,8 +809,8 @@
                   </a>
                   <a
                     *ngIf="!item.celular"
-                    pTooltip="Nenhum celular cadastrado"
-                    class="pi pi-whatsapp p-2 flex text-green-400 ponter-events-none"
+                    pTooltip="Sem celular cadastrado"
+                    class="pi pi-whatsapp p-2 flex text-gray-400 ponter-events-none"
                   >
                   </a>
                 </div>
@@ -806,8 +819,8 @@
                   (click)="popoverAluno.show($event)"
                 >
                   <span
-                    class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2"
-                    [pTooltip]="item.aluno"
+                    class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline"
+                    pTooltip="Ver detalhes"
                     >{{ item.aluno | nameAbv }}</span
                   >
                   <p-badge
@@ -1087,7 +1100,7 @@
             </td>
             <!-- Presente -->
             <td
-              class="w-4rem z-0"
+              class="w-full z-0"
               #editableCell
               [pEditableColumn]="item.presente"
               [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
@@ -1096,63 +1109,90 @@
             >
               <p-cellEditor>
                 <ng-template #input>
-                  <p-button
-                    [disabled]="!isChamadaPage || evento.finalizado"
-                    [label]="
-                      item.presente === true
-                        ? 'Presente'
-                        : item.presente === false
-                        ? 'Faltou'
-                        : '?'
-                    "
-                    [severity]="
-                      item.presente === true
-                        ? 'success'
-                        : item.presente === false
-                        ? 'danger'
-                        : 'secondary'
-                    "
-                    [icon]="
-                      item.presente === true
-                        ? 'pi pi-check'
-                        : item.presente === false
-                        ? 'pi pi-thumbs-down-fill'
-                        : ''
-                    "
-                    iconPos="right"
-                    styleClass="mt-4"
-                    (onClick)="presenteClick(item, $event)"
-                  />
+                  <div class="mt-4 flex align-items-start gap-1">
+                    <p-button
+                      [disabled]="!isChamadaPage || evento.finalizado"
+                      [label]="
+                        item.presente === true
+                          ? 'Presente'
+                          : item.presente === false
+                          ? 'Faltou'
+                          : '?'
+                      "
+                      [severity]="
+                        item.presente === true
+                          ? 'success'
+                          : item.presente === false
+                          ? 'danger'
+                          : 'secondary'
+                      "
+                      [icon]="
+                        item.presente === true
+                          ? 'pi pi-check'
+                          : item.presente === false
+                          ? 'pi pi-thumbs-down-fill'
+                          : ''
+                      "
+                      iconPos="right"
+                      (onClick)="presenteClick(item, $event)"
+                    />
+                    <p-button
+                      *ngIf="item.presente === false"
+                      [disabled]="!item.celular"
+                      label="Contatar"
+                      icon="pi pi-whatsapp"
+                      iconPos="right"
+                      [pTooltip]="getContactTooltipMessage(!!item.celular)"
+                      tooltipPosition="bottom"
+                      severity="info"
+                      (onClick)="contatar(item, $event)"
+                    ></p-button>
+                  </div>
                 </ng-template>
 
                 <ng-template #output>
-                  <p-button
-                    [disabled]="!isChamadaPage || evento.finalizado"
-                    [label]="
-                      item.presente === true
-                        ? 'Presente'
-                        : item.presente === false
-                        ? 'Faltou'
-                        : '?'
-                    "
-                    [severity]="
-                      item.presente === true
-                        ? 'success'
-                        : item.presente === false
-                        ? 'danger'
-                        : 'secondary'
-                    "
-                    [icon]="
-                      item.presente === true
-                        ? 'pi pi-check'
-                        : item.presente === false
-                        ? 'pi pi-thumbs-down-fill'
-                        : ''
-                    "
-                    iconPos="right"
-                    styleClass="mt-4"
-                    (onClick)="triggerEditAndClick(editableCell, item, $event)"
-                  />
+                  <div class="mt-4 flex align-items-start gap-1">
+                    <p-button
+                      [disabled]="!isChamadaPage || evento.finalizado"
+                      [label]="
+                        item.presente === true
+                          ? 'Presente'
+                          : item.presente === false
+                          ? 'Faltou'
+                          : '?'
+                      "
+                      [severity]="
+                        item.presente === true
+                          ? 'success'
+                          : item.presente === false
+                          ? 'danger'
+                          : 'secondary'
+                      "
+                      [icon]="
+                        item.presente === true
+                          ? 'pi pi-check'
+                          : item.presente === false
+                          ? 'pi pi-thumbs-down-fill'
+                          : ''
+                      "
+                      iconPos="right"
+                      styleClass="w-full"
+                      (onClick)="
+                        triggerEditAndClick(editableCell, item, $event)
+                      "
+                    />
+                    <p-button
+                      *ngIf="item.presente === false"
+                      [disabled]="!item.celular"
+                      label="Contatar"
+                      icon="pi pi-whatsapp"
+                      iconPos="right"
+                      [pTooltip]="getContactTooltipMessage(!!item.celular)"
+                      tooltipPosition="bottom"
+                      severity="info"
+                      (onClick)="contatar(item, $event)"
+                    ></p-button>
+                  </div>
                 </ng-template>
               </p-cellEditor>
             </td>
