@@ -49,8 +49,8 @@ export class FormComponent implements OnDestroy {
                 this.loading = true;
                 let aluno_id = this.crypto.decrypt(res['aluno_id'])
 
-                this.service.get(aluno_id)
-                // lastValueFrom(this.service.get(aluno_id))
+                // this.service.get(aluno_id)
+                lastValueFrom(this.service.get(aluno_id))
                     .then(res => {
                         this.object = res;
                         console.log('form object', this.object)
@@ -145,9 +145,7 @@ export class FormComponent implements OnDestroy {
     }
 
     request() {
-        if (this.isEditPage)
-            return lastValueFrom(this.service.edit(this.object))
-        return lastValueFrom(this.service.create(this.object))
+        return lastValueFrom(this.service.edit(this.object))
     }
 
 }
