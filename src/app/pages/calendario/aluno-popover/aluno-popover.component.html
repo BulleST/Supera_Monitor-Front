@@ -38,7 +38,9 @@
                               (onClick)="goToReposicao(aluno)" />
                 </ng-container>
                 <a *ngIf="aluno.celular"
-                   [href]="enviarMensagem(aluno.aluno, aluno.celular)" 
+                   [href]="enviarMensagem(aluno.aluno, aluno.celular)"
+                   target="_blank"
+                   rel="noopener noreferrer"
                    class="p-component p-ripple p-button p-button-success p-button-rounded  white-space-nowrap">
                     <span class="pi pi-whatsapp p-button-icon p-button-icon-left "></span>
                     <span class="p-button-label">Enviar mensagem</span>
