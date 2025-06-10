@@ -35,6 +35,18 @@ export class CalendarioUtils {
 
     }
 
+    weekOfYear(date: Date)  {
+        const startOfYear = new Date(date.getFullYear(), 0, 1);
+        startOfYear.setDate(startOfYear.getDate() + (startOfYear.getDay() % 7));
+        let weekOfYear = Math.round((date.getTime() - startOfYear.getTime()) / (7 * 24 * 3600 * 1000));
+
+        if (date.getMonth() == 11) {
+            weekOfYear += 1;
+        }
+
+        return weekOfYear;
+    };
+
     getTextColor(hex: string) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         var rgb = result ? {

@@ -64,12 +64,13 @@ export class Aluno {
     turmaDesc?: string;
     diaSemana?: number;
     horario?: Date;
+    linkGrupo?: string;
 
     restricaoMobilidade: boolean = false;
 
     professor_Id?: number;
     professor?: string;
-    linkGrupo?: string;
+    corLegenda?: string;
 
     pessoa_Sexo_Id?: number;
     pessoa_Sexo?: string = '';

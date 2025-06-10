@@ -10,6 +10,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
 import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 import { AlunoPopoverDetailsComponent } from './aluno-popover-details/aluno-popover-details.component';
+import { FiltroComponent } from './monitoramento-dashboard/filtro/filtro.component';
 
 @NgModule({
     declarations: [
@@ -19,6 +20,7 @@ import { AlunoPopoverDetailsComponent } from './aluno-popover-details/aluno-popo
         MonitoramentoJornadaSuperaComponent,
         MonitoramentoDashboardComponent,
         AlunoPopoverDetailsComponent,
+        FiltroComponent,
     ],
     imports: [
         CommonModule,

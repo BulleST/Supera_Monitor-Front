@@ -59,6 +59,8 @@ export class AlunoService extends Service {
             aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
         }
 
+        if (aluno.alunoChecklist && aluno.alunoChecklist.length) {
+
         aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
             checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
             return checklistAluno
@@ -75,6 +77,8 @@ export class AlunoService extends Service {
                 checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
                 return checklistAluno;
             });
+        }
+
         return aluno;
     }
 
@@ -82,7 +86,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
                 next: list => {
-                    list = list.map(aluno => this.mapAluno(aluno));
+                    // list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
                 },
                 error: err => {
@@ -104,6 +108,7 @@ export class AlunoService extends Service {
                 }
             }));
     }
+
     getChecklist(request: AlunoChecklistItemList_Request) {
         return this.http.post<AlunoChecklistItemList[]>(`${this.url}/alunos/checklists/all`, request)
             .pipe(tap({
@@ -154,46 +159,40 @@ export class AlunoService extends Service {
     }
 
     get(id: number) {
-        // return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
-        //     .pipe(tap({
-        //         next: res => {
-        //             return res;
-        //         },
-        //         error: err => {
-        //             this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
-        //         }
-        //     }));
-        return new Promise<Aluno>(async (resolve, reject) => {
-            if (this.list.value.length == 0) {
-                await lastValueFrom(this.getListWithChecklist());
-            }
-
-            var item = this.list.value.find(x => x.id == id) as Aluno;
-            if (!item) {
-                this.toastrService.error(`Aluno não encontrado.'. `);
-                return reject('Aluno não encontrado.')
-            }
-
-            return resolve(item);
-        })
-    }
-
-    create(model: Aluno) {
-        var request = MyMap(model, new AlunoRequest);
-        return this.http.post<RequestResponse>(`${this.url}/alunos`, request)
+        return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({
+                next: res => {
+                    return res;
+                },
                 error: err => {
-                    this.toastrService.error(`Não foi possível cadastrar aluno. \n ${getError(err)}`)
+                    this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
                 }
             }));
+        // return new Promise<Aluno>(async (resolve, reject) => {
+        //     if (this.list.value.length == 0) {
+        //         await lastValueFrom(this.getListWithChecklist());
+        //     }
+
+        //     var item = this.list.value.find(x => x.id == id) as Aluno;
+        //     if (!item) {
+        //         this.toastrService.error(`Aluno não encontrado.'. `);
+        //         return reject('Aluno não encontrado.')
+        //     }
+
+        //     return resolve(item);
+        // })
     }
 
     edit(model: Aluno) {
         var request = MyMap(model, new AlunoRequest) as AlunoRequest;
-        // request.primeiraAula = model.primeiraAula;
         request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
         request.apostila_Kit_Id = model.apostila_Kit_Id;
         request.dataFimVigencia = model.dataFimVigencia;
+        request.turma_Id = model.turma_Id;
+        request.perfilCognitivo_Id = model.perfilCognitivo_Id;
+        request.aluno_Foto = model.aluno_Foto;
+        request.aulaZero_Id = model.aulaZero_Id;
+        request.primeiraAula_Id = model.primeiraAula_Id;
         return this.http.put<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
                 error: err => {
