@@ -193,7 +193,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
                     : item.professores && item.professores.length > 0 ? item.professores[0].corLegenda
                         : '#2e2e2e';
             var textColor = this.calendarioUtils.getTextColor(backgroundColor);
-            var id = 'event-' + this.calendarioUtils.eventRamdomId();
+            var id = 'event-' + this.calendarioUtils.eventRandomId();
 
             var event: any = {
                 id: id,
@@ -210,7 +210,7 @@ export class CalendarioComponent implements OnChanges, OnDestroy {
 
         this.feriados.forEach(item => {
             var event = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',

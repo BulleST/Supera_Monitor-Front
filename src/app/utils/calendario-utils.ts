@@ -60,7 +60,7 @@ export class CalendarioUtils {
         return (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 180 ? '#2e2e2e' : '#fff';
     }
 
-    eventRamdomId() {
+    eventRandomId() {
         let length = 5;
         let result = '';
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -71,6 +71,52 @@ export class CalendarioUtils {
             counter += 1;
         }
         return result;
+    }
+
+    getEventStyles(item: Evento): { backgroundColor: string, textColor: string, borderColor: string, zIndex: number } {
+        const MEETING_COLOR = '#F37435'
+        const DEFAULT_COLOR = '#2E2E2E'
+        const DIM_COLOR = '#3F3F46'
+
+        let backgroundColor = DEFAULT_COLOR
+        let borderColor = DEFAULT_COLOR
+        let textColor = this.getTextColor(backgroundColor)
+        let zIndex = 0
+
+        switch (item.evento_Tipo_Id) {
+            case EventoTipo.Reuniao:
+                backgroundColor = MEETING_COLOR,
+                borderColor = MEETING_COLOR,
+                textColor = this.getTextColor(MEETING_COLOR)
+                break
+            default: 
+                backgroundColor = item.corLegenda ?? item?.professores[0]?.corLegenda ?? DEFAULT_COLOR
+                borderColor = backgroundColor
+                textColor = this.getTextColor(backgroundColor)
+                break
+        }        
+
+        // Lowers opacity, keeps color
+        // if (item.active === false) {
+        //     backgroundColor = this.dimHexToRgba(backgroundColor, 1, 0.25)
+        //     borderColor = this.dimHexToRgba(borderColor, 1, 0.25)
+        //     textColor = this.dimHexToRgba(textColor, 1, 0.25)
+        // }
+
+        // Solid dim color (gray)
+        if (item.active === false) {
+            backgroundColor = DIM_COLOR
+            borderColor = DIM_COLOR
+            textColor = this.getTextColor(DIM_COLOR)
+            zIndex = -100
+        }
+
+        return {
+            backgroundColor,
+            borderColor,
+            textColor,
+            zIndex,
+        }
     }
 
     getEventoTipo(evento: Evento) {

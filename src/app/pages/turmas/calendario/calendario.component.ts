@@ -215,7 +215,7 @@ export class CalendarioComponent {
             }
             var color = this.calendarioUtils.getTextColor(backgroundColor)
             var event: any = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 backgroundColor: backgroundColor,
                 borderColor: backgroundColor,
                 foreColor: color,
@@ -229,7 +229,7 @@ export class CalendarioComponent {
 
         this.feriados.forEach(item => {
             var event = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 foreColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',

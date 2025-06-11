@@ -181,7 +181,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         var events: any[] = [];
         this.feriados.forEach(item => {
             var event = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
@@ -203,7 +203,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         this.calendarioList.filter(x => x.active == true)
             .forEach(x => {
                 var event = {
-                    id: this.calendarioUtils.eventRamdomId(),
+                    id: this.calendarioUtils.eventRandomId(),
                     title: x.tema,
                     extendedProps: x,
                     start: x.dataInicio,

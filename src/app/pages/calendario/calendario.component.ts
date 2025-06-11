@@ -293,46 +293,88 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             })
     }
 
-    setCalendario() {
+    dimHexToRgba(hex: string, factor: number, opacity: number) {
+        // Ensure factor is between 0 and 1, and opacity is between 0 and 1
+        if (factor < 0 || factor > 1 || opacity < 0 || opacity > 1) {
+            throw new Error("Factor and opacity must be between 0 and 1.");
+        }
+
+        // Convert hex to RGB
+        let r = parseInt(hex.substring(1, 3), 16);
+        let g = parseInt(hex.substring(3, 5), 16);
+        let b = parseInt(hex.substring(5, 7), 16);
+
+        // Dim each channel
+        r = Math.max(0, Math.floor(r * factor));
+        g = Math.max(0, Math.floor(g * factor));
+        b = Math.max(0, Math.floor(b * factor));
+
+        // Return RGBA string
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    
+    dimHexColor(hex: string, factor: number, alpha: number) {
+        // Ensure factor is between 0 and 1, and alpha is between 00 and FF
+        if (factor < 0 || factor > 1 || alpha < 0 || alpha > 255) {
+            throw new Error('Factor must be between 0 and 1. Alpha must be between 0 and 255.')
+        }
+
+        // Convert hex to RGB
+        let r = parseInt(hex.substring(1, 3), 16)
+        let g = parseInt(hex.substring(3, 5), 16)
+        let b = parseInt(hex.substring(5, 7), 16)
+
+        // Dim each channel
+        r = Math.max(0, Math.floor(r * factor))
+        g = Math.max(0, Math.floor(g * factor))
+        b = Math.max(0, Math.floor(b * factor))
+
+        // Convert alpha to hex
+        let alphaHex = alpha.toString(16).padStart(2, '0')
+
+        // Return 8-digit hex string
+        return `#${r.toString(16).padStart(2, '0')}${g
+            .toString(16)
+            .padStart(2, '0')}${b.toString(16).padStart(2, '0')}${alphaHex}`
+    }
+
+    setCalendario() {  
         this.loading = true;
         this.cdkEventItensId = [];
-
+        
         var calendar = this.fullCalendar.getApi();
         calendar.removeAllEvents();
-
-
+        
         var feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        var eventos = this.eventos.filter(x => x.active == true && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
-
+        var eventos = this.eventos.filter(x => feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
+        
         var events = eventos.map(item => {
-            var backgroundColor = item.evento_Tipo_Id == EventoTipo.Reuniao ? '#F37435'
-                : item.corLegenda ? item.corLegenda
-                    : item.professores && item.professores.length > 0 ? item.professores[0].corLegenda
-                        : '#2e2e2e';
-            var textColor = this.calendarioUtils.getTextColor(backgroundColor);
-            var id = 'event-' + this.calendarioUtils.eventRamdomId();
-
+            var id = 'event-' + this.calendarioUtils.eventRandomId();
+            
             if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
             }
 
+            const eventStyles = this.calendarioUtils.getEventStyles(item)
+            
             var event: any = {
                 id: id,
-                backgroundColor: backgroundColor,
-                borderColor: backgroundColor,
-                textColor: textColor,
+                backgroundColor: eventStyles.backgroundColor,
+                borderColor: eventStyles.borderColor,
+                textColor: eventStyles.textColor,
                 title: item.turma ?? item.descricao,
                 start: moment(item.data).toDate(),
                 end: moment(item.data).add(item.duracaoMinutos, 'minutes').toDate(),
                 extendedProps: item,
             }
+
             return event;
         });
 
         this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte))
             .forEach(item => {
             var event = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
@@ -517,7 +559,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                         rejectLabel: 'Cancelar',
                         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                         accept: async () => {
-                            this.agendaReposicaoConffirm(event.event, aluno, source, target);
+                            this.agendaReposicaoConfirm(event.event, aluno, source, target);
                             this.cdkCancelDrag('keyup')
                         },
                         reject: () => {
@@ -526,7 +568,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                     });
 
                 } else {
-                    this.agendaReposicaoConffirm(event.event, aluno, source, target);
+                    this.agendaReposicaoConfirm(event.event, aluno, source, target);
                 }
 
             }
@@ -552,7 +594,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
 
-    agendaReposicaoConffirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
+    agendaReposicaoConfirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
         this.confirmationService.confirm({
             key: 'agendarReposicao',
             message: `Agendar reposição do aluno(a) <b>${aluno.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,

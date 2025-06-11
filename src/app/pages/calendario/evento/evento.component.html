@@ -101,14 +101,14 @@
         <ng-template [ngIf]="evento.finalizado == false">
             <div class="col-12 px-0 flex align-items-center justify-content-end">
                 <ng-template [ngIf]="!isChamadaPage">
-                    <p-button type="button"
+                    <!-- <p-button type="button"
                               (onClick)="goToIniciarChamada($event)"
                               styleClass="mr-2 px-3 border-2 border-primary-500"
                               label="Iniciar chamada"
                               icon="pi pi-list-check text-lg"
                               [outlined]="true"
                               [loading]="loading"
-                              [rounded]="true" />
+                              [rounded]="true" /> -->
                     <p-button type="button"
                               (onClick)="sendConfirmation($event, form)"
                               styleClass="px-3 mr-2"

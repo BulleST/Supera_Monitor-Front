@@ -255,20 +255,29 @@ export class SelectedEventoComponent implements OnChanges {
             this.evento.data = new Date(this.evento.data);
 
             var alunos = this.alunoService.list.value;
+
             if (!alunos.length)
                 await lastValueFrom(this.alunoService.getListWithChecklist()).then(res => alunos = res);
 
             this.evento.alunos = this.evento.alunos.map(participacao => {
-                var aluno = alunos.find(x => x.id == participacao.aluno_Id);
+                const aluno = alunos.find(x => x.id == participacao.aluno_Id);
+
                 if (aluno) {
                     participacao.alunoChecklist = aluno.alunoChecklist;
                     participacao.checklistCompleto = aluno.checklistCompleto;
                     participacao.checklist_Id = aluno.checklist_Id;
                     participacao.checklist = aluno.checklist;
+                    participacao.presente = aluno.active && true;
                 }
+
                 return participacao;
             });
 
+            this.evento.professores
+                .map(item => {
+                    item.presente = true;
+                    return item;
+                });
 
             this.service.setEvento(this.evento);
             var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
@@ -283,11 +292,10 @@ export class SelectedEventoComponent implements OnChanges {
                 default: route = 'aula'; break;
             }
 
-            this.router.navigate([route, this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute })
+            this.router.navigate(['calendario', route, 'chamada', this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
     }
-
 
     goToReposicao() {
         if (this.evento) {

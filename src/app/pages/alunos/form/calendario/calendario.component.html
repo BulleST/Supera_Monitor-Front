@@ -68,7 +68,7 @@
             <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
                 <ng-container *ngIf="!loading && evento">
                     <app-evento-item-hover #eventoPopover [evento]="evento" [arg]="arg"></app-evento-item-hover>
-                    <div class="w-full flex flex-column  p-1 overflow-hidden border-2 border-round-sm  "
+                    <div class="w-full flex flex-column p-1 overflow-hidden border-2 border-round-sm"
                          (mouseenter)="eventoPopover.show($event)"
                          (mouseleave)="eventoPopover.hide()"
                          [ngStyle]="{

@@ -81,13 +81,13 @@
                         </ng-container>
                     </div>
                 </p-popover>
-                <div class="flex gap-1 flex align-items-stretch " style="height: 2.4rem">
+                <div class="flex gap-1 align-items-stretch " style="height: 2.4rem">
                     <ng-container *ngIf="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)">
                         <!-- Data -->
                         <div class="flex align-items-center mr-2">
                             <label for="data" class="mr-1">Data: </label>
                             <p-datepicker 
-                                            (onBlur)="dataSelect(dataNgModel)"
+                                          (onBlur)="dataSelect(dataNgModel)"
                                           #dataNgModel="ngModel"
                                           [(ngModel)]="data"
                                           [showIcon]="true"

@@ -157,7 +157,6 @@ export class EventoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-
         var roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res.filter(x => x.active == true));
         this.subscription.push(roteiros);
 
@@ -221,7 +220,6 @@ export class EventoComponent implements OnDestroy {
         });
         this.subscription.push(evento);
 
-
         setTimeout(() => {
             if (!this.evento) {
                 this.visible = false;
@@ -242,11 +240,9 @@ export class EventoComponent implements OnDestroy {
         }
     }
 
-
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
-
 
     async verificaDisponibilidade() {
         var valid = true;
@@ -267,7 +263,6 @@ export class EventoComponent implements OnDestroy {
         this.validaAlunos();
 
         return valid
-
     }
 
     validaSalaAulas() {
@@ -305,7 +300,6 @@ export class EventoComponent implements OnDestroy {
         this.router.navigate(['calendario', 'aluno', this.crypto.encrypt(aluno.aluno_Id)]);
     }
 
-
     async goToIniciarChamada(e: any) {
         this.isChamadaPage = true;
         this.evento.alunos
@@ -321,10 +315,9 @@ export class EventoComponent implements OnDestroy {
                 return item;
             });
 
-
         this.service.setEvento(this.evento)
-
         var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
+
         switch (this.evento.evento_Tipo_Id) {
             case EventoTipo.Aula: route = 'aula'; break;
             case EventoTipo.AulaZero: route = 'aula-zero'; break;
@@ -339,9 +332,6 @@ export class EventoComponent implements OnDestroy {
     }
 
     finalizarConfirmation(e: any) {
-
-        // playAlert();
-
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
@@ -364,10 +354,9 @@ export class EventoComponent implements OnDestroy {
         var response: RequestResponse = await lastValueFrom(this.request()).catch(res => {
             this.loading = false;
             return res;
-
         })
-        if (response.success) {
 
+        if (response.success) {
             this.evento.id = response.object.id;
             this.evento.alunos = this.evento.alunos.map(participacao => {
                 var participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
@@ -402,7 +391,6 @@ export class EventoComponent implements OnDestroy {
                         participacao_Id: item.id,
                         observacao: item.observacao,
                         presente: true,
-
                     }
                 })
             };
@@ -426,9 +414,6 @@ export class EventoComponent implements OnDestroy {
                     this.service.calendarioReload.emit(this.evento.id);
                     this.markChecklistAsDone();
 
-                    // playSuccess();
-
-
                     this.toastrService.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
                 })
                 .catch(res => {
@@ -439,13 +424,10 @@ export class EventoComponent implements OnDestroy {
         }
     }
 
-
     sendConfirmation(e: any, form: NgForm) {
         if (form.invalid) {
             return this.showError('OPA!', `Não foi possível salvar! \n Preencha os dados corretamente para continuar`, e);
         }
-
-        // playAlert();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -464,7 +446,6 @@ export class EventoComponent implements OnDestroy {
             reject: () => {
             }
         });
-
     }
 
     async send(e: any) {
@@ -477,8 +458,6 @@ export class EventoComponent implements OnDestroy {
                 this.toastrService.success('Dados atualizados com sucesso.')
                 this.router.navigate(['', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute, replaceUrl: true });
                 this.loading = false;
-                // playSuccess();
-
             })
             .catch(res => {
                 this.loading = false;
@@ -560,6 +539,4 @@ export class EventoComponent implements OnDestroy {
             return this.service.createOficina(request);
         return this.service.editOficina(request);
     }
-
-
 }

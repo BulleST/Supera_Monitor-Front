@@ -272,7 +272,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             }
             var color = this.calendarioUtils.getTextColor(backgroundColor)
             var event: any = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 backgroundColor: backgroundColor,
                 borderColor: backgroundColor,
                 textColor: color,
@@ -294,7 +294,7 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
             };
 
             var event = {
-                id: this.calendarioUtils.eventRamdomId(),
+                id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',

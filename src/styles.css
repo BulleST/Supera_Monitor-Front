@@ -195,6 +195,10 @@ a {
     width: 100% !important;
 }
 
+.fc-timegrid-axis-cushion {
+    display: none;
+}
+
 .fc .fc-button-primary {
     background-color: var(--p-button-secondary-background);
     border-color: var(--p-button-secondary-border-color);
