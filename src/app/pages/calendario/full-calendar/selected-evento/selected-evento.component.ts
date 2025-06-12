@@ -267,7 +267,7 @@ export class SelectedEventoComponent implements OnChanges {
                     participacao.checklistCompleto = aluno.checklistCompleto;
                     participacao.checklist_Id = aluno.checklist_Id;
                     participacao.checklist = aluno.checklist;
-                    participacao.presente = aluno.active && true;
+                    participacao.presente = this.evento?.finalizado ? participacao.presente : true;
                 }
 
                 return participacao;
