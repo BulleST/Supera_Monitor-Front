@@ -1,0 +1,145 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
+    <ng-template #message let-message>
+        <div>
+            <div class=" flex align-items-center gap-2">
+                <span class="text-4xl mr-2 text-primary-500">
+                    <i *ngIf="message.icon" [ngClass]="message.icon"></i>
+                    <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl "></i>
+                </span>
+                <div [innerHTML]="message.message"></div>
+            </div>
+            <div class="w-full flex-1 col-12 px-0">
+                <label for="checklistObservacao">Inserir observação: </label>
+                <textarea pTextarea
+                          class="w-full"
+                          name="checklistObservacao"
+                          id="checklistObservacao"
+                          [(ngModel)]="checklistObservacao"
+                          [rows]="2"></textarea>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+<p-confirmdialog key="checklistAluno">
+    <ng-template #headless let-message>
+        <div class="p-2 pb-4">
+            <div class="flex align-items-center justify-content-between px-2">
+                <h3 class="font-bold text-2xl">Jornada Supera</h3>
+                <p-button icon="pi pi-times"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    (onClick)="closeChecklist()"/>
+            </div>
+            <p-tabs [value]="checklistIndex" scrollable #tabs [scrollLeft]="scrollLeft">
+                <p-tablist style="max-width: 50rem;">
+                    <p-tab *ngFor="let checklist of item.checklistCompleto"
+                        [value]="checklist.id"
+                        #tab>
+                        <div class="flex align-items-center ">
+                            <span>{{checklist.nome}} </span>
+                            <div *ngIf="!loading" class="ml-2 font-bold">
+                                <!-- Finalizado -->
+                                <i *ngIf="checklist.finalizados.length == checklist.items.length" pTooltip="Finalizado" class="pi pi-check-circle text-green-500"></i>
+                                <!-- Atrasado -->
+                                <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length" pTooltip="Atrasado">
+                                    <span> - {{checklist.finalizados.length}}/{{checklist.items.length}} </span>
+                                    <i class="pi pi-times-circle text-red-500 ml-2 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                                </span>
+                                <!-- Pendentes da Semana -->
+                                <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length" pTooltip="Em andamento">
+                                    <span> - {{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-hourglass text-orange-500 ml-2"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </p-tab>
+                </p-tablist>
+                <p-tabpanels>
+                    <p-tabpanel *ngFor="let checklist of item.checklistCompleto" [value]="checklist.id">
+                        <div class="w-full -mb-6">
+                            <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                            <ul class="p-0 ml-0">
+                                <li *ngFor="let checklistItem of checklist.items; let i = index"
+                                    (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
+                                    (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined"
+                                    class="flex align-items-center gap-2 py-3 -mx-2 px-2 border-200"
+                                    [ngClass]="{
+                                        'border-bottom-1': i < checklist.items.length - 1,
+                                        'border-bottom-0': i == checklist.items.length - 1,
+                                        'surface-50': i % 2 == 0
+                                    }">
+                                    <p-checkbox #checkbox
+                                                [inputId]="'checklistitem-' + checklistItem.id"
+                                                [name]="'checklistitem-' + checklistItem.id"
+                                                #finalizado="ngModel"
+                                                [(ngModel)]="checklistItem.finalizado"
+                                                [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
+                                                [binary]="true"
+                                                [readonly]="checklistItem.finalizado"
+                                                (ngModelChange)="checkboxChange(checklistItem, checklist, finalizado, $event)" />
+                                    <div>
+                                        <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                                    </div>
+                                    <p-popover #checklistData styleClass="-mt-1">
+                                        <!-- <p>Prazo máximo: {{checklistItem.prazo | date : 'dd/MM/yyyy' }}</p> -->
+                                        <ng-template [ngIf]="checklistItem.finalizado">
+                                            <p *ngIf="checklistItem.dataFinalizacao">Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }} por {{checklistItem.account_Finalizacao }}</p>
+                                        </ng-template>
+                                        <p>
+                                            <span>Observações: </span>
+                                            <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
+                                            <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma observação</span>
+                                        </p>
+                                    </p-popover>
+                                </li>
+                            </ul>
+                        </div>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
+        </div>
+    </ng-template>
+</p-confirmdialog>
+<ng-container *ngIf="aluno">
+    <div class="flex align-items-center gap-2 white-space-nowrap">
+        <ng-container *ngIf="atrasado">
+            <div>
+                <!-- Atrasado -->
+                <span pTooltip="Esse aluno está atrasado na jornada">
+                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                </span>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="checklist">
+            <div class="font-bold" *ngIf="!atrasado">
+                <!-- Finalizado -->
+                <i *ngIf="checklist.finalizados.length == checklist.items.length"
+                   pTooltip="Finalizado"
+                   class="pi pi-check-circle text-green-500"></i>
+                <!-- Atrasado -->
+                <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Atrasado">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                </span>
+                <!-- Pendentes da Semana -->
+                <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Em andamento">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                </span>
+            </div>
+            <span>{{checklist.nome }}</span>
+        </ng-container>
+        <ng-container *ngIf="!checklist">
+            <span>{{textoChecklist }}</span>
+        </ng-container>
+        <ng-container *ngIf="loading">
+            <div pTooltip="Carregando">
+                <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>
