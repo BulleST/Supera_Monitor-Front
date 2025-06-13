@@ -2,7 +2,7 @@ import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { CalendarioAlunoChecklistView } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
-import { Dashboard } from "./dashboard.model";
+import { Dashboard_Aula_Participacao } from "./dashboard.model";
 import { Evento } from "./evento.model";
 
 export class AlunoRequest {
@@ -97,11 +97,10 @@ export class Aluno {
     checklist_Id?: number = '' as any;
     checklist?: string = '';
     
-    aulas: Dashboard[] = [];
+    aulas: Dashboard_Aula_Participacao[] = [];
     disponivel?: boolean;
     disponivelEvent?: Evento;
     aulasParaRepor: Evento[] = []
-
     
     primeiraAula_Id?: number;
     primeiraAula?: Evento;

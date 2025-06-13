@@ -1,15 +1,4 @@
-import { Evento_Participacao_Aluno } from "./evento-participacao-aluno.model";
-import { Evento } from "./evento.model";
 import { Roteiro } from "./roteiro.model";
-
-export class Dashboard {
-    show: boolean = false;
-    aluno_Id: number = 0;
-    roteiro_Id: number = 0;
-    primeiraAula: boolean = false;
-    aula: Evento = new Evento;
-    participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
-}
 
 export class DashboardRequest {
     ano: number = new Date().getFullYear();
@@ -19,58 +8,97 @@ export class DashboardRequest {
     aluno_Id?: number;
 }
 
-// export class Dashboard_Aulas { 
-//     id: number = 0; 
-//     show: boolean = true;
-//     aluno_Id: number = 0; 
-//     aluno: string = ''; 
-//     celular?: string;
-//     checklist?: string;
-//     checklist_Id?: number;
-//     evento_Id: number = 0; 
-//     evento_Tipo_Id: number = 0; 
-//     data: Date = new Date; 
-//     descricao: string = ''; 
-//     numeroSala: string = ''; 
-//     andar: number = 0 
-//     sala_Id: number = 0; 
-//     duracaoMinutos: number = 0; 
-//     capacidadeMaximaAlunos: number = 0; 
-//     finalizado?: boolean;
-//     roteiro_Id: number = 0; 
-//     turma?: string = ''; 
-//     turma_Id?: number = 0; 
-//     professor: string = ''; 
-//     professor_Id: number = 0; 
-//     corLegenda: string = ''; 
-//     reposicaoDe_Evento_Id?: number = 0; 
-//     reagendamentoDe_Evento_Id?: number = 0; 
-//     presente?: boolean;
-//     numeroPaginaAbaco?: number = 0
-//     numeroPaginaAH?: number = 0
-//     apostila_Abaco?: string = ''; 
-//     apostila_AH?: string = ''; 
-//     apostila_Abaco_Id?: number = 0; 
-//     apostila_AH_Id?: number = 0; 
-//     observacao: string = ''; 
-// }
+export class Dashboard_Response {
+    alunos: Dashboard_Aluno[] = [];
+    roteiros: Dashboard_Roteiro[] = [];
+}
+
+export class Dashboard_Aula_Participacao {
+    show: boolean = true;
+    aula: Dashboard_Aula = new Dashboard_Aula;
+    participacao: Dashboard_Participacao = new Dashboard_Participacao;
+}
+
+export class Dashboard_Aula {
+    id: number = 0;
+    evento_Tipo_Id: number = 0;
+    Evento_Tipo: string = '';
+    data: Date = new Date;
+    descricao: string = '';
+    observacao: string = '';
+    duracaoMinutos: number = 0;
+    finalizado: boolean = false;
+    active: boolean = false;
+
+    account_Created_Id?: number;
+    account_Created: string = '';
+    created: Date = new Date;
+    lastUpdated?: Date;
+    deactivated?: Date;
+    reagendamentoDe_Evento_Id?: number;
+    reagendamentoDe_Evento?: Dashboard_Aula;
+    reagendamentoPara_Evento_Id?: number;
+    reagendamentoPara_Evento?: Dashboard_Aula;
+
+    sala_Id?: number;
+    andar?: number;
+    numeroSala?: number;
+
+    roteiro_Id?: number;
+    tema: string = '';
+    semana?: number;
+
+    turma_Id?: number;
+    turma: string = '';
+    capacidadeMaximaAlunos: number = 0;
+
+    professor_Id?: number;
+    professor: string = '';
+    corLegenda: string = '';
+}
+
+export class Dashboard_Participacao {
+    id: number = 0;
+    aluno_Id: number = 0;
+    evento_Id: number = 0;
+    reposicaoDe_Evento_Id?: number;
+    reposicaoDe_Evento?: Dashboard_Aula;
+    reposicaoPara_Evento_Id?: number;
+    reposicaoPara_Evento?: Dashboard_Aula;
+    presente?: boolean;
+    apostila_Abaco?: string;
+    apostila_AH?: string;
+    apostila_Abaco_Id?: number;
+    apostila_AH_Id?: number;
+    numeroPaginaAbaco?: number;
+    numeroPaginaAH?: number;
+    observacao?: string;
+    deactivated?: Date;
+    active: boolean = true;
+}
+
+export class Dashboard_Roteiro {
+    id: number = 0;
+    tema: string = '';
+    semana: number = 0;
+    dataInicio: Date = new Date;
+    dataFim: Date = new Date;
+    corLegenda: string = '';
+}
+
+export class Dashboard_Aluno {
+    id: number = 0;
+    nome?: string;
+    celular?: string;
+    checklist_Id?: number;
+    primeiraAula_Id?: number;
+    aulaZero_Id?: number;
+    dataNascimento?: Date;
+    aulas: Dashboard_Aula_Participacao[] = [];
+}
+
 export class Dashboard_Mes {
     mes: number = 0;
     mesString: string = '';
     roteiros: Roteiro[] = [];
 }
-
-// export class Evento_Roteiro {
-//     id: number = 0;
-//     semana: number = 0;
-//     tema: string = '';
-//     dataInicio: Date = new Date;
-//     dataFim: Date = new Date;
-//     corLegenda: string = '';
-//     account_Created_Id: number = 0;
-//     account_Created: string = '';
-//     created: Date = new Date;
-//     lastUpdated?: Date;
-//     deactivated?: Date;
-//     aulas: CalendarioParticipacaoAluno[] = []
-// }

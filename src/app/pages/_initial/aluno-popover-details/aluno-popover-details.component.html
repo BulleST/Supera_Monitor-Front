@@ -1,9 +1,14 @@
 <p-popover #popover appendTo="body" styleClass="-mt-1 max-w-screen" [dismissable]="true">
     <div class="flex pl-2 pr-4">
+<<<<<<< Updated upstream
         <div class="relative flex align-items-center justify-content-center border-circle overflow-hidden border-primary-500 border-1 w-9rem h-9rem my-auto p-1">
             <i class="pi pi-user text-xl" *ngIf="!aluno.aluno_Foto"></i>
+=======
+        <div class="relative my-auto flex align-items-center justify-content-center border-circle overflow-hidden border-primary-500 border-1 w-9rem h-9rem p-1">
+            <i class="pi pi-user text-xl" *ngIf="!aluno.aluno_Foto && !loadingFoto"></i>
+            <i class="pi pi-spin pi-spinner text-xl" *ngIf="loadingFoto"></i>
+>>>>>>> Stashed changes
             <div *ngIf="aluno.aluno_Foto" class="w-full h-full bg-cover	bg-center border-circle" [style]="{ backgroundImage: 'url(' + aluno.aluno_Foto + ')'}"></div>
-
         </div>
         <p-divider styleClass="mx-4 my-4" layout="vertical" />
         <div class=" flex flex-column py-3 gap-1">
@@ -11,26 +16,37 @@
                 <p class="text-xl text-primary-500 font-bold">{{ aluno.nome }} </p>
             </div>
             <p><b>Turma: </b>{{ aluno.turma }} </p>
-            <p *ngIf="aluno.apostila_Abaco"><b>Apostila Ábaco: </b>{{ aluno.apostila_Abaco }} / <b>Página: </b>{{ aluno.numeroPaginaAbaco }}</p>
-            <p *ngIf="aluno.apostila_AH"><b>Apostila AH: </b>{{ aluno.apostila_AH }} / <b>Página: </b>{{ aluno.numeroPaginaAH }}</p>
-            
+            <p *ngIf="aluno.apostila_Abaco">
+                <b>Apostila Ábaco: </b>
+                <span>{{ aluno.apostila_Abaco }}</span>
+                <span> / </span>
+                <b>Página: </b>
+                <span>{{ aluno.numeroPaginaAbaco }}</span>
+            </p>
+            <p *ngIf="aluno.apostila_AH">
+                <b>Apostila AH: </b>
+                <span>{{ aluno.apostila_AH }}</span>
+                <span> / </span>
+                <b>Página: </b>
+                <span>{{ aluno.numeroPaginaAH }}</span>
+            </p>
             <ng-container *ngIf="showChecklist">
-                <div class="gap-1 flex align-items-center" (click)="alunoChecklistComponent.show()" >
+                <div class="gap-1 flex align-items-center" (click)="alunoChecklistComponent.show()">
                     <b>Jornada Supera: </b>
-                    <app-aluno-checklist #alunoChecklistComponent [aluno]="aluno"></app-aluno-checklist>
+                    <app-aluno-popover-checklist #alunoChecklistComponent [aluno]="aluno"></app-aluno-popover-checklist>
                 </div>
             </ng-container>
-            
             <div class="flex align-items-center gap-2 mt-2 ">
-                <p-button label="Ver aluno"
+                <p-button label="Editar aluno"
                           [rounded]="true"
                           icon="pi pi-user-edit"
                           styleClass="white-space-nowrap"
                           (onClick)="goToAluno(aluno)" />
+
                 <a *ngIf="aluno.celular"
                    target="_blank"
                    rel="noopener noreferrer"
-                   [href]="enviarMensagem(aluno.nome, aluno.celular)" 
+                   [href]="enviarMensagem(aluno.nome, aluno.celular)"
                    class="p-component p-ripple p-button p-button-success p-button-rounded  white-space-nowrap">
                     <span class="pi pi-whatsapp p-button-icon p-button-icon-left "></span>
                     <span class="p-button-label">Enviar mensagem</span>

@@ -21,6 +21,8 @@ export class AlunoPopoverDetailsComponent implements OnChanges {
     loading = false;
     EventoTipo = EventoTipo;
 
+    loadingFoto = false;
+
     @ViewChild('popover') popover!: Popover
 
     constructor(
@@ -56,12 +58,16 @@ export class AlunoPopoverDetailsComponent implements OnChanges {
     }
     
     goToAluno(aluno: Aluno) {
-        this.router.navigate(['alunos', this.crypto.encrypt(aluno.id)])
+        this.router.navigate(['alunos', 'editar', this.crypto.encrypt(aluno.id)])
     }
 
     getFoto() {
+        this.loadingFoto = true;
         lastValueFrom(this.alunoService.getFoto(this.aluno.id))
-            .then(res => this.aluno.aluno_Foto = res)
+            .then(res => {
+                this.aluno.aluno_Foto = res;
+                this.loadingFoto = false;
+            })
     }
 
 }

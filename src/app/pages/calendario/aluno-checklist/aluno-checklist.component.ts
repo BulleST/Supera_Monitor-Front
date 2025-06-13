@@ -51,7 +51,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
         private toastrService: ToastrService,
         private service: ChecklistService,
         private userService: UserService,
-        private checklistService: ChecklistService
     ) {
         var checklist = this.service.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklist);
@@ -63,6 +62,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             this.participacao = changes['participacao'].currentValue as Evento_Participacao_Aluno;
             this.item = this.participacao;
         }
+        
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue as Aluno;
             this.item = this.aluno;
@@ -73,9 +73,9 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                 || !this.item.checklistCompleto
                 || !this.item.checklistCompleto.length)) {
                 await this.loadChecklistAluno();
-                this.setChecklist()
+                this.setChecklist();
             } else {
-                this.setChecklist()
+                this.setChecklist();
             }
 
     }

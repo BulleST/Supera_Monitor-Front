@@ -1,4 +1,4 @@
-<form #form="ngForm" (ngSubmit)="send()">
+<form #form="ngForm" (ngSubmit)="send($event)">
     <div class="formgrid grid">
         <div class="col-12 mb-4">
             <h3 class="text-3xl font-bold">Login</h3>
@@ -49,7 +49,7 @@
             </div>
         </div>
         <div class="field col-12 mb-1 mt-4">
-            <p class="text-red-500 mt-0 mb-2 text-center" *ngIf="error">{{error}}</p>
+            <p class="text-red-500 mt-0 mb-2 text-center" *ngIf="error" [innerHTML]="error">S</p>
             <p-button
                       type="submit"
                       label="Entrar"

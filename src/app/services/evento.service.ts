@@ -8,7 +8,7 @@ import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
 import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { Dashboard, DashboardRequest} from '../models/dashboard.model';
+import { Dashboard_Response, DashboardRequest } from '../models/dashboard.model';
 import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -31,7 +31,7 @@ export class EventoService extends Service {
     evento = new BehaviorSubject<Evento | undefined>(undefined);
     eventos = new BehaviorSubject<Evento[]>([]);
     feriados = new BehaviorSubject<Feriado[]>([]);
-    dashboard = new BehaviorSubject<Dashboard[]>([]);
+    dashboard = new BehaviorSubject<Dashboard_Response>(new Dashboard_Response);
 
     
     calendarioReload = new EventEmitter<number>();
@@ -187,37 +187,76 @@ export class EventoService extends Service {
         }));
     }
 
-    getDashboard(request: DashboardRequest) {
-        return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, request)
-        .pipe(map(dashboardList => {
-            dashboardList = dashboardList.map(res => {
-                res.participacao.active = !res.participacao.deactivated;
-                res.aula.active = !res.aula.deactivated;
-                res.aula.data = moment(res.aula.data).toDate();
+    // getDashboard(request: DashboardRequest) {
+    //     return this.http.post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)
+    //     // return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, request)
+    //     .pipe(map(dashboardList => {
+    //         dashboardList = dashboardList.map(res => {
+    //             res.participacao.active = !res.participacao.deactivated;
+    //             res.aula.active = !res.aula.deactivated;
+    //             res.aula.data = moment(res.aula.data).toDate();
                 
-                // Procura se a aula foi reagendada
-                if (res.aula.reagendamentoPara_Evento_Id) {
-                    res.aula.reagendamentoPara_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoPara_Evento_Id)?.aula;
-                }
+    //             // Procura se a aula foi reagendada
+    //             if (res.aula.reagendamentoPara_Evento_Id) {
+    //                 res.aula.reagendamentoPara_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoPara_Evento_Id)?.aula;
+    //             }
 
-                // Procura se a aula é reagendamento de outra
-                if (res.aula.reagendamentoDe_Evento_Id) {
-                    res.aula.reagendamentoDe_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoDe_Evento_Id)?.aula;
-                }
+    //             // Procura se a aula é reagendamento de outra
+    //             if (res.aula.reagendamentoDe_Evento_Id) {
+    //                 res.aula.reagendamentoDe_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoDe_Evento_Id)?.aula;
+    //             }
                 
-                // Procura se a aula foi reposta
-                if (res.participacao.reposicaoPara_Evento_Id) {
-                    res.participacao.reposicaoPara_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoPara_Evento_Id)?.aula;
-                }
+    //             // Procura se a aula foi reposta
+    //             if (res.participacao.reposicaoPara_Evento_Id) {
+    //                 res.participacao.reposicaoPara_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoPara_Evento_Id)?.aula;
+    //             }
                 
-                // Procura se a aula foi reposicao de outra
-                if (res.participacao.reposicaoDe_Evento_Id) {
-                    res.participacao.reposicaoDe_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoDe_Evento_Id)?.aula;
-                }
-                return res;
-            });
+    //             // Procura se a aula foi reposicao de outra
+    //             if (res.participacao.reposicaoDe_Evento_Id) {
+    //                 res.participacao.reposicaoDe_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoDe_Evento_Id)?.aula;
+    //             }
+    //             return res;
+    //         });
             
-            return dashboardList;
+    //         return dashboardList;
+    //     }))
+    // }
+
+    
+    getDashboard(request: DashboardRequest) {
+        return this.http.post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)
+        .pipe(map(dashboard => {
+            dashboard.alunos = dashboard.alunos.map(aluno => {
+                aluno.aulas = aluno.aulas.map(aula => {
+                    aula.participacao.active = !aula.participacao.deactivated;
+                    aula.aula.active = !aula.aula.deactivated;
+                    aula.aula.data = moment(aula.aula.data).toDate();
+                    
+                    // Procura se a aula foi reagendada
+                    if (aula.aula.reagendamentoPara_Evento_Id) {
+                        aula.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoPara_Evento_Id)?.aula;
+                    }
+    
+                    // Procura se a aula é reagendamento de outra
+                    if (aula.aula.reagendamentoDe_Evento_Id) {
+                        aula.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoDe_Evento_Id)?.aula;
+                    }
+                    
+                    // Procura se a aula foi reposta
+                    if (aula.participacao.reposicaoPara_Evento_Id) {
+                        aula.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoPara_Evento_Id)?.aula;
+                    }
+                    
+                    // Procura se a aula foi reposicao de outra
+                    if (aula.participacao.reposicaoDe_Evento_Id) {
+                        aula.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoDe_Evento_Id)?.aula;
+                    }
+                    return aula;
+                });
+                return aluno;
+            })
+            
+            return dashboard;
         }))
     }
     

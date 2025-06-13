@@ -3,13 +3,38 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { playError } from "./audio";
 import { ConfirmationService } from "primeng/api";
 
-export function showError(confirmationService: ConfirmationService, header: string, message: string, e: any) {
+export function showError(confirmationService: ConfirmationService, header: string, message: string, e: any, innerMessage?: string) {
     // playError();
+
+
+    if (innerMessage) {
+        message += `<br> Clique em "Ver detalhes" para exibir o log do erro.`
+    }
 
     confirmationService.confirm({
         target: e.target ?? e,
         message: message,
         header: header,
+        icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
+        acceptLabel: 'OK',
+        acceptButtonStyleClass: 'p-button-rounded',
+        acceptIcon: '',
+        rejectVisible: !!innerMessage,
+        rejectLabel: 'Ver detalhes',
+        rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+        reject: () => {
+            if (innerMessage) {
+                showInnerMessage(confirmationService, e, innerMessage);
+            }
+        }
+    })
+}
+
+function showInnerMessage(confirmationService: ConfirmationService, e: any, message: string) {
+    confirmationService.confirm({
+        target: e.target ?? e,
+        message: message,
+        header: 'Erro interno',
         icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
         acceptLabel: 'OK',
         acceptButtonStyleClass: 'p-button-rounded',
