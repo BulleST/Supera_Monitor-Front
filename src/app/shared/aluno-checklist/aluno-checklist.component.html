@@ -1,0 +1,48 @@
+<ng-container *ngIf="aluno">
+    
+    <app-confirm-dialog></app-confirm-dialog>
+    
+    <app-aluno-checklist-dialog #checklistDialog
+                                [aluno]="aluno"
+                                [loading]="loading"></app-aluno-checklist-dialog>
+
+    <div class="flex align-items-center gap-2 w-max white-space-nowrap">
+        
+        <ng-container *ngIf="checklist">
+            <ng-container *ngIf="!atrasado">
+                <span>{{checklist.nome }}</span>
+
+                <!-- Finalizado -->
+                <i *ngIf="checklist.finalizados.length == checklist.items.length"
+                   pTooltip="Finalizado"
+                   class="pi pi-check-circle text-green-500"></i>
+                <!-- Atrasado -->
+                <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Atrasado">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                </span>
+                <!-- Pendentes da Semana -->
+                <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                      pTooltip="Em andamento">
+                    <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                    <i class="pi pi-exclamation-triangle text-orange-500"></i>
+                </span>
+            </ng-container>
+        </ng-container>
+        <ng-container *ngIf="!checklist">
+            <span>{{ textoChecklist }}</span>
+        </ng-container>
+        <ng-container *ngIf="atrasado">
+            <!-- Atrasado -->
+            <span pTooltip="Esse aluno está atrasado na jornada">
+                <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+            </span>
+        </ng-container>
+        <ng-container *ngIf="loading">
+            <div pTooltip="Carregando">
+                <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
+            </div>
+        </ng-container>
+    </div>
+</ng-container>

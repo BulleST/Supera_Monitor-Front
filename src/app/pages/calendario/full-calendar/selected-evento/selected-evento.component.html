@@ -109,7 +109,7 @@
                         <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
                     </a>
                     <ng-template #alunoItem let-aluno="aluno">
-                        <app-aluno-popover #popoverAluno [aluno]="aluno" [evento]="evento"></app-aluno-popover>
+                        <app-aluno-popover-calendario #popoverAluno [aluno]="aluno" [evento]="evento"></app-aluno-popover-calendario>
                         <div class="w-full flex align-items-center justify-content-start p-1 border-round-md"
                              [ngClass]="{
                                 'bg-white': i % 2 == 0,

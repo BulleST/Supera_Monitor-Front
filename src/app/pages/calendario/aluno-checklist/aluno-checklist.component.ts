@@ -1,7 +1,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
-import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
+import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import { NgModel } from '@angular/forms';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
@@ -17,7 +17,7 @@ import { showError } from '../../../utils';
 import { Aluno } from '../../../models/alunos.model';
 
 @Component({
-    selector: 'app-aluno-checklist',
+    selector: 'app-aluno-checklist-calendario',
     standalone: false,
     templateUrl: './aluno-checklist.component.html',
     styleUrl: './aluno-checklist.component.css',
@@ -40,7 +40,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
 
     textoChecklist = '';
     checklistObservacao = '';
-    checklist?: CalendarioAlunoChecklistView;
+    checklist?: AlunoChecklistCompleto;
     atrasado = false;
 
     checklistIndex: number = 0;
@@ -109,7 +109,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                     });
                 this.item.checklistCompleto = this.checklists
                     .map(checklist => {
-                        var checklistAluno = new CalendarioAlunoChecklistView;
+                        var checklistAluno = new AlunoChecklistCompleto;
                         checklistAluno.id = checklist.id;
                         checklistAluno.nome = checklist.nome;
                         checklistAluno.items = res.filter(x => x.checklist_Id == checklist.id);
@@ -126,7 +126,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
     setChecklist() {
 
         if (this.item.checklist_Id) {
-            this.checklist = this.item.checklistCompleto.find(x => x.id == this.item.checklist_Id) as CalendarioAlunoChecklistView;
+            this.checklist = this.item.checklistCompleto.find(x => x.id == this.item.checklist_Id) as AlunoChecklistCompleto;
             this.checklistIndex = this.item.checklist_Id;
         }
         else if (!this.item.checklist_Id && this.item.checklistCompleto && this.item.checklistCompleto.length > 0) {
@@ -144,7 +144,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
     }
 
 
-    checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
+    checkboxChange(item: Aluno_CheckList_Item, checklist: AlunoChecklistCompleto, model: NgModel, e: any) {
         if (model.control.value) {
             if (moment(item.prazo).week() > moment(new Date).week()) {
                 this.showError('Checklist indisponível', 'Você não pode finalizar esse checklist ainda.', e);

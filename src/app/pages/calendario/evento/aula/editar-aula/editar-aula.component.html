@@ -448,11 +448,7 @@
     <ng-container *ngIf="[ScreenWidth.sm].includes(screen)">
       <div class="flex align-items-stretch flex-wrap surface-50 p-2 gap-2">
         <ng-container *ngFor="let item of evento.alunos; let i = index">
-          <app-aluno-popover
-            #popoverAluno
-            [aluno]="item"
-            [evento]="evento"
-          ></app-aluno-popover>
+                <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
           <!-- Card -->
           <div
             class="col h-full p-0"
@@ -545,10 +541,7 @@
                     class="cursor-pointer z-0 text-sm"
                     (click)="alunoChecklistComponent.show()"
                   >
-                    <app-aluno-checklist
-                      #alunoChecklistComponent
-                      [participacao]="item"
-                    ></app-aluno-checklist>
+                    <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="item"></app-aluno-checklist-calendario>
                   </div>
                 </div>
               </header>
@@ -786,11 +779,7 @@
           let-editing="editing"
           let-rowIndex="rowIndex"
         >
-          <app-aluno-popover
-            #popoverAluno
-            [aluno]="item"
-            [evento]="evento"
-          ></app-aluno-popover>
+                <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
           <tr>
             <!-- Nome -->
             <td class="w-8rem sticky left-0 z-2">
@@ -798,14 +787,12 @@
                 <div
                   class="inline-flex w-2rem h-2rem -ml-2 flex-none align-items-center"
                 >
-                  <a
-                    *ngIf="item.celular"
+                  <a *ngIf="item.celular"
                     [href]="enviarMensagem(item.aluno, item.celular)"
                     pTooltip="Enviar mensagem"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="pi pi-whatsapp p-2 flex text-green-500 border-circle hover:bg-green-500 hover:text-white"
-                  >
+                    class="pi pi-whatsapp p-2 flex text-green-500 border-circle hover:bg-green-500 hover:text-white">
                   </a>
                   <a
                     *ngIf="!item.celular"
@@ -875,10 +862,10 @@
                 class="cursor-pointer z-0"
                 (click)="alunoChecklistComponent.show()"
               >
-                <app-aluno-checklist
+                <app-aluno-checklist-calendario
                   #alunoChecklistComponent
                   [aluno]="item"
-                ></app-aluno-checklist>
+                ></app-aluno-checklist-calendario>
               </div>
             </td>
             <!-- Apostila -->

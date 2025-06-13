@@ -75,40 +75,40 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     }
 
-    // onLoading() {
-    //     this.loadingRoteiros = true;
-    //     var index = -1;
-    //     this.mesesAno = Array.from({ length: 12 }, (v, i) => {
-    //         index++;
-    //         return {
-    //             mes: i,
-    //             mesString: moment().month(i).format('MMMM'),
-    //             roteiros: Array.from({ length: 4 }, (vv, ii) => {
-    //                 return {
-    //                     id: -1,
-    //                     semana: ii + 1,
-    //                     tema: 'Carregando...',
-    //                     dataInicio: moment().set({
-    //                         month: i,
-    //                         year: this.request.ano,
-    //                         day: 1,
-    //                         week: index
-    //                     }).toDate(),
-    //                     dataFim: moment().set({
-    //                         month: i,
-    //                         year: this.request.ano,
-    //                         day: 6,
-    //                         week: index
-    //                     }).toDate(),
-    //                 } as Roteiro;
-    //             })
-    //         } as Dashboard_Mes;
-    //     })
-    //     this.alunosList = [];
-    // }
+    onLoading() {
+        this.loading = true;
+        var index = -1;
+        this.mesesAno = Array.from({ length: 12 }, (v, i) => {
+            index++;
+            return {
+                mes: i,
+                mesString: moment().month(i).format('MMMM'),
+                roteiros: Array.from({ length: 4 }, (vv, ii) => {
+                    return {
+                        id: -1,
+                        semana: ii + 1,
+                        tema: 'Carregando...',
+                        dataInicio: moment().set({
+                            month: i,
+                            year: this.request.ano,
+                            day: 1,
+                            week: index
+                        }).toDate(),
+                        dataFim: moment().set({
+                            month: i,
+                            year: this.request.ano,
+                            day: 6,
+                            week: index
+                        }).toDate(),
+                    } as Roteiro;
+                })
+            } as Dashboard_Mes;
+        })
+        this.alunos = [];
+    }
 
     async update() {
-        console.log('update')
+        this.onLoading();
 
         setTimeout(() => {
             var container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;

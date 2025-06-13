@@ -236,7 +236,7 @@
                 </tr>
             </ng-template>
             <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
-                <app-aluno-popover #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover>
+                <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
                 <tr>
                     <!-- Nome -->
                     <td class="sticky left-0 cursor-pointer">
@@ -259,7 +259,7 @@
                     </td>
                     <!-- checklist -->
                     <td (click)="loadingChecklist ? undefined : alunoChecklistComponent.show()" class="cursor-pointer">
-                        <app-aluno-checklist #alunoChecklistComponent [aluno]="item"></app-aluno-checklist>
+                        <app-aluno-checklist-calendario #alunoChecklistComponent [aluno]="item"></app-aluno-checklist-calendario>
                     </td>
                     <!-- Presente -->
                     <td [pEditableColumn]="item.presente"

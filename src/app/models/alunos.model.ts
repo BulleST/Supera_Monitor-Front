@@ -1,6 +1,6 @@
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
-import { CalendarioAlunoChecklistView } from "./calendario.model";
+import { AlunoChecklistCompleto } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
 import { Dashboard_Aula_Participacao } from "./dashboard.model";
 import { Evento } from "./evento.model";
@@ -36,8 +36,6 @@ export class AlunoRequest {
 export class Aluno {
     id: number = 0;
     rm: string = '';    
-    loginApp: string = '';    
-    senhaApp: string = '';
     pessoa_Id: number = 0
     nome: string = '';
     dataNascimento: Date = new Date;
@@ -90,7 +88,7 @@ export class Aluno {
     kit?: string = '' as any;
     apostila_Kit_Id?: number = undefined as any;
 
-    checklistCompleto: CalendarioAlunoChecklistView[] = [];
+    checklistCompleto: AlunoChecklistCompleto[] = [];
     alunoChecklist: Aluno_CheckList_Item[] = [];
     restricoes: Aluno_Restricao[] = [];
 

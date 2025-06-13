@@ -93,7 +93,7 @@ export class CalendarioAluno extends Basic_List {
     faltaMotivo?: Aula_Aluno_Falta;
     
     // from GET checklist/all/aula/aula_id
-    checklists: CalendarioAlunoChecklistView[] = [];
+    checklists: AlunoChecklistCompleto[] = [];
 
     checklist?: string;
     checklist_Id?: number;
@@ -101,7 +101,7 @@ export class CalendarioAluno extends Basic_List {
 
 }
 
-export class CalendarioAlunoChecklistView {
+export class AlunoChecklistCompleto {
     id: number = 0;
     nome: string = '';
     prazo: Date = new Date;

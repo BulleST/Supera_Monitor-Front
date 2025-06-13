@@ -3,13 +3,13 @@ import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-a
 import { Popover } from 'primeng/popover';
 import { ConfirmationService } from 'primeng/api';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Crypto } from '../../../utils';
 
 @Component({
-    selector: 'app-aluno-popover',
+    selector: 'app-aluno-popover-calendario',
     templateUrl: './aluno-popover.component.html',
     styleUrl: './aluno-popover.component.css',
     standalone: false,

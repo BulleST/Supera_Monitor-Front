@@ -1,5 +1,6 @@
 <app-filtro-popover #filtroPopover
-                    (applyFilter)="request = $event; update()"></app-filtro-popover>
+                    (applyFilter)="request = $event; update()">
+</app-filtro-popover>
 <div class="p-1">
     <p-toolbar styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
         <div class="p-toolbar-group-start w-full flex align-items-start justify-content-between">
@@ -7,19 +8,18 @@
                 <i class="bi bi-table mr-3 text-primary-500 text-2xl"></i>
                 <span class="text-2xl font-normal my-0 white-space-nowrap">Dashboard</span>
             </h2>
-            <p-button label="Ver filtros" 
-                icon="pi pi-filter" 
-                severity="secondary"
-                styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
-                (onClick)="filtroPopover.toggle($event)"
-                (mouseenter)="filtroPopover.show($event)"
-                [rounded]="true" />
+            <p-button label="Ver filtros"
+                      icon="pi pi-filter"
+                      severity="secondary"
+                      styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
+                      (onClick)="filtroPopover.toggle($event)"
+                      (mouseenter)="filtroPopover.show($event)"
+                      [rounded]="true" />
         </div>
     </p-toolbar>
     <div>
         <div class="flex justify-content-between align-itens-center">
             <h3>Legenda</h3>
-            <!-- <p *ngIf="!loadingAlunos && !loadingDashboard">{{alunosList.length}} alunos</p> -->
             <p *ngIf="!loading">{{alunos.length}} alunos</p>
         </div>
         <div class="my-2 p-4 flex align-items-center justify-content-between gap-2 flex-wrap bg-white shadow-1 border-round-md ">
@@ -151,7 +151,12 @@
                                 </a>
                             </span>
                             <p (click)="alunoPopover.show($event)" class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer">{{aluno.nome | nameAbv }}</p>
-                            <app-aluno-popover-details #alunoPopover [aluno]="aluno"></app-aluno-popover-details>
+                            <app-aluno-popover #alunoPopover [aluno_Id]="aluno.id"
+                                               [showChecklist]="true">
+                            </app-aluno-popover>
+                            <!-- (click)="alunoPopover.show($event)"  
+                                
+                                <app-aluno-popover-details #alunoPopover [aluno]="aluno"></app-aluno-popover-details> -->
                         </div>
                     </td>
                     <td class="white-space-nowrap px-2 py-1 z-2" [ngClass]="{ 'surface-100': i % 2 == 0, 'surface-50': i % 2 != 0 }">
@@ -167,10 +172,10 @@
                                 }"
                                 *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id">
                                 <!-- Aulas fora da vigencia do aluno não escreve -->
-                              
                                 <ng-container *ngIf="item.show == true">
-                                    <div class="cursor-pointer white-space-nowrap flex flex-column w-full"
-                                         (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)">
+                                    <div class="cursor-pointer white-space-nowrap flex flex-column w-full">
+                                        <!-- 
+                                         (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)" -->
                                         <!-- Cancelada -->
                                         <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoDe_Evento_Id">
                                             <div class="w-full surface-800 text-xs border-1 border-800 text-white text-center">
@@ -312,20 +317,32 @@
                             <td class="py-4" *ngFor="let roteiro of mes.roteiros"><p-skeleton height="1rem" width="6rem" /></td>
                         </ng-container>
                     </ng-container>
-                    
                 </tr>
             </ng-template>
             <ng-template #emptymessage>
                 <ng-container *ngIf="loading">
-                    <ng-container *ngFor="let item of [1,2,3,4,5]">
+                    <ng-container *ngFor="let item of [1,2,3,4,5]; let i = index;">
                         <tr style="height: 35px;">
-                            <td class="py-4" pFrozenColumn>
+                            <td class="py-4"
+                                pFrozenColumn
+                                [ngClass]="{
+                                    'surface-100': i % 2 == 0,
+                                    'surface-50': i % 2 != 0
+                                }">
                                 <div class="flex align-items-center gap-2">
                                     <p-skeleton width="15rem" height="1rem" />
                                 </div>
                             </td>
                             <ng-container *ngFor="let mes of mesesAno">
-                                <td class="py-4" *ngFor="let roteiro of mes.roteiros"><p-skeleton height="1rem" width="6rem" /></td>
+                                <ng-container *ngFor="let roteiro of mes.roteiros">
+                                    <td class="py-4"
+                                        [ngClass]="{
+                                            'surface-100': i % 2 == 0,
+                                            'surface-50': i % 2 != 0
+                                        }">
+                                        <p-skeleton height="1rem" width="6rem" />
+                                    </td>
+                                </ng-container>
                             </ng-container>
                         </tr>
                     </ng-container>

@@ -26,10 +26,13 @@ import { NameAbvPipe } from '../utils/name.pipe';
 import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
 import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/evento-item-hover/evento-item-hover.component';
 import { AlunoPopoverComponent as CalendarioAlunoPopover } from '../pages/calendario/aluno-popover/aluno-popover.component';
-import { AlunoChecklistComponent } from '../pages/calendario/aluno-checklist/aluno-checklist.component';
+import { AlunoChecklistComponent as CalendarioAlunoChecklistComponent } from '../pages/calendario/aluno-checklist/aluno-checklist.component';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
+import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
+import { AlunoChecklistDialogComponent } from './aluno-checklist-dialog/aluno-checklist-dialog.component';
+import { AlunoChecklistComponent } from './aluno-checklist/aluno-checklist.component';
 
 @NgModule({
     declarations: [
@@ -37,12 +40,14 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         ChangePasswordComponent,
 
         // Alunos
-        AlunoChecklistComponent,
+        CalendarioAlunoChecklistComponent,
         CalendarioAlunoPopover,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoCalendarioComponent,
         AlunoHistoricoComponent,
+        AlunoPopoverComponent,
+        AlunoChecklistComponent,
         // End Alunos
 
         AgendarReposicaoAlunoComponent,
@@ -50,6 +55,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         SalaAulaComponent,
         EventoItemComponent,
         EventoItemHoverComponent,
+        AlunoChecklistDialogComponent,
     ],
     exports: [
         FormsModule,
@@ -71,12 +77,14 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
         // DragScrollItemDirective,
         
         // Alunos
-        AlunoChecklistComponent,
+        CalendarioAlunoChecklistComponent,
         CalendarioAlunoPopover,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoCalendarioComponent,
+        AlunoPopoverComponent,
         AlunoHistoricoComponent,
+        AlunoChecklistComponent,
         // End Alunos
         
         AgendarReposicaoAlunoComponent,

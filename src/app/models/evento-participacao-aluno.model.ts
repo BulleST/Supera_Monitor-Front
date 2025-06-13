@@ -1,6 +1,6 @@
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { Apostila } from "./apostila.model";
-import { CalendarioAlunoChecklistView } from "./calendario.model";
+import { AlunoChecklistCompleto } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
 import { Evento } from "./evento.model";
 import { PseudoEvento } from "./reposicao.model";
@@ -55,7 +55,7 @@ export class Evento_Participacao_Aluno {
     loadingFoto?: boolean = false;
     
     // from GET checklist/all/aula/aula_id
-    checklistCompleto: CalendarioAlunoChecklistView[] = [];
+    checklistCompleto: AlunoChecklistCompleto[] = [];
     alunoChecklist: Aluno_CheckList_Item[] = [];
     
     created: Date = new Date;

@@ -10,7 +10,7 @@ import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restri
 import { getError } from '../utils';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';
-import { CalendarioAlunoChecklistView } from '../models/calendario.model';
+import { AlunoChecklistCompleto } from '../models/calendario.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
@@ -67,7 +67,7 @@ export class AlunoService extends Service {
         })
         aluno.checklistCompleto = this.checklists
             .map(checklist => {
-                var checklistAluno = new CalendarioAlunoChecklistView;
+                var checklistAluno = new AlunoChecklistCompleto;
                 checklistAluno.id = checklist.id;
                 checklistAluno.nome = checklist.nome;
                 checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
@@ -162,7 +162,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({
                 next: res => {
-                    return res;
+                    return this.mapAluno(res);
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)

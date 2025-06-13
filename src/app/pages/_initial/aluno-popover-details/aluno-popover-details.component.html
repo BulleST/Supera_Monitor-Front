@@ -1,13 +1,8 @@
 <p-popover #popover appendTo="body" styleClass="-mt-1 max-w-screen" [dismissable]="true">
     <div class="flex pl-2 pr-4">
-<<<<<<< Updated upstream
-        <div class="relative flex align-items-center justify-content-center border-circle overflow-hidden border-primary-500 border-1 w-9rem h-9rem my-auto p-1">
-            <i class="pi pi-user text-xl" *ngIf="!aluno.aluno_Foto"></i>
-=======
         <div class="relative my-auto flex align-items-center justify-content-center border-circle overflow-hidden border-primary-500 border-1 w-9rem h-9rem p-1">
             <i class="pi pi-user text-xl" *ngIf="!aluno.aluno_Foto && !loadingFoto"></i>
             <i class="pi pi-spin pi-spinner text-xl" *ngIf="loadingFoto"></i>
->>>>>>> Stashed changes
             <div *ngIf="aluno.aluno_Foto" class="w-full h-full bg-cover	bg-center border-circle" [style]="{ backgroundImage: 'url(' + aluno.aluno_Foto + ')'}"></div>
         </div>
         <p-divider styleClass="mx-4 my-4" layout="vertical" />

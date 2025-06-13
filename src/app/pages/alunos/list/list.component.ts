@@ -10,7 +10,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import { Aluno, alunosColumns } from '../../../models/alunos.model';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { ChecklistService } from '../../../services/checklist.service';
-import { CalendarioAlunoChecklistView } from '../../../models/calendario.model';
+import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import moment from 'moment';
 import { NgModel } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -47,7 +47,7 @@ export class ListComponent implements OnDestroy {
     loadingChecklist = false;
     checklistObservacao = '';
 
-    selectedChecklist?: CalendarioAlunoChecklistView;
+    selectedChecklist?: AlunoChecklistCompleto;
     @ViewChild('popoverChecklist') popoverChecklist!: Popover;
 
 
@@ -231,7 +231,7 @@ export class ListComponent implements OnDestroy {
         return aluno.checklistCompleto.find(x => x.id == checklist.id);
     }
 
-    checkboxChange(item: Aluno_CheckList_Item, checklist: CalendarioAlunoChecklistView, model: NgModel, e: any) {
+    checkboxChange(item: Aluno_CheckList_Item, checklist: AlunoChecklistCompleto, model: NgModel, e: any) {
 
         if (model.control.value) {
             model.control.setValue(false);
@@ -282,7 +282,7 @@ export class ListComponent implements OnDestroy {
         }
     }
 
-    popoverChecklistOpen(e: any, item: CalendarioAlunoChecklistView, aluno: Aluno) {
+    popoverChecklistOpen(e: any, item: AlunoChecklistCompleto, aluno: Aluno) {
         this.popoverChecklist.show(e)
         this.selectedChecklist = item;
         this.tableSelectedItem = aluno
