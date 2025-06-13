@@ -68,7 +68,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     textoChecklist = '';
 
     constructor(
-
         private service: AlunoService,
         private restricaoService: AlunoRestricaoService,
         private turmaService: TurmaService,
@@ -242,6 +241,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
+        console.log('Log: Aluno tentando mudar de turma - turmaChanged')
+
         if (this.selectedTurma) {
             if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
                 this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> porque o limite de alunos foi alcançado.`, e);
@@ -285,7 +286,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
-                this.turmaChangedConfirm(e, model);
+                this.turmaAccept();
             },
             reject: () => {
                 this.turmaReject(model);
@@ -294,11 +295,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChangedConfirm(e: any, model: NgModel) {
+        // console.log('Log: Aluno tentando mudar de turma - turmaChangedConfirm')
+
         var mensagem = 'Continuar com transferência de turma?';
         var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
+
         if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
-            mensagem = 'O perfil dessa turma é diferente desse aluno. <br>' + mensagem
+            mensagem = 'O perfil dessa turma é diferente desse aluno.<br>' + mensagem
         }
+
         this.confirmationService.confirm({
             target: e.target,
             message: mensagem,
@@ -311,15 +316,18 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
+                console.log("Mudança de turma aceita")
                 this.turmaAccept();
             },
             reject: () => {
+                console.log("Mudança de turma rejeitada")
                 this.turmaReject(model);
             },
         })
     }
 
     turmaReject(model: NgModel) {
+        // console.log("Log: Mudança de turma rejeitada - turmaReject")
         var turma = this.turmas.find(x => x.id == this.oldTurmaId);
         this.object.turma = turma?.nome as any;
         this.object.turma_Id = turma?.id as any;
@@ -330,6 +338,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaAccept() {
+        // console.log("Log: Mudança de turma aceita - turmaAccept")
         var turma = this.selectedTurma as Turma;
         this.object.turma = turma.nome;
         this.object.turma_Id = turma.id;
@@ -342,8 +351,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
-        // playAlert();
-
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
             message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
