@@ -244,18 +244,17 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
         if (this.selectedTurma) {
             if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
-                this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> por que o limite de alunos foi alcançado.`, e);
+                this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> porque o limite de alunos foi alcançado.`, e);
                 this.turmaReject(model);
                 return;
             }
 
             if (this.object.restricoes.length > 0 || this.object.restricaoMobilidade) {
-                this.turmaChangedRestricaoConffirm(e, model);
+                this.turmaChangedRestricaoConfirm(e, model);
             }
             else {
-                this.turmaChangedConffirm(e, model);
+                this.turmaChangedConfirm(e, model);
             }
-
         } else {
             this.object.turma = '';
             this.object.turma_Id = undefined as any;
@@ -264,14 +263,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    turmaChangedRestricaoConffirm(e: any, model: NgModel) {
+    turmaChangedRestricaoConfirm(e: any, model: NgModel) {
         var message = 'O aluno apresenta as seguintes restrições: <ul>';
+        
         if (this.object.restricoes.length > 0) {
             message += `${this.object.restricoes.map(x => `<li>${x.descricao}.</li>`)}`
         }
+
         if (this.object.restricaoMobilidade) {
             message += `<li class="font-bold">Restrição de mobilidade.</li>`
-
         }
         message += `</ul> <p>Continuar com transferência de turma?</p>`;
         this.confirmationService.confirm({
@@ -285,7 +285,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
-                this.turmaChangedConffirm(e, model);
+                this.turmaChangedConfirm(e, model);
             },
             reject: () => {
                 this.turmaReject(model);
@@ -293,7 +293,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         })
     }
 
-    turmaChangedConffirm(e: any, model: NgModel) {
+    turmaChangedConfirm(e: any, model: NgModel) {
         var mensagem = 'Continuar com transferência de turma?';
         var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
         if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
@@ -337,12 +337,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.object.professor = turma.professor;
     }
 
-
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
-
-
 
     finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
         // playAlert();
@@ -385,7 +382,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 ngModel.control.setValue(false);
             }
         });
-
     }
 
     loadRestricoes() {
@@ -397,7 +393,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.getRestricoes();
             })
             .catch(res => this.loadingRestricoes = false);
-
     }
 
     generateRM() {
@@ -583,6 +578,4 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
     }
-
-
 }

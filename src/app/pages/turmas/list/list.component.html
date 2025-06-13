@@ -112,8 +112,8 @@
                     <ng-container *ngIf="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; context: { item: item, option: getOption(col, item) }"></ng-container>
                         <ng-template #tag let-item="item" let-option="option">
-                            <p class="white-space-nowrap">Option: {{option | json}}</p>
-                            <p class="white-space-nowrap">Item: {{item | json}}</p>
+                            <!-- <p class="white-space-nowrap">Option: {{option | json}}</p> -->
+                            <!-- <p class="white-space-nowrap">Item: {{item | json}}</p> -->
                             <p-tag *ngIf="option"
                                    styleClass="font-normal"
                                    [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"

@@ -120,18 +120,15 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         if (changes['currentTitle']) {
             this.currentTitle = changes['currentTitle'].currentValue;
         }
-
     }
 
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe());
     }
 
-
     updateCalendar() {
         this.update.emit(true)
     }
-
 
     async calendarViewChanged() {
         this.service.calendarView.emit(this.view);
@@ -142,5 +139,4 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         if (e.value.command)
             e.value.command(e);
     }
-
 }

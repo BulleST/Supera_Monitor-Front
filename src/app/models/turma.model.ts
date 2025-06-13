@@ -109,7 +109,7 @@ export var turmaColumns: ColumnTable[] = [
     },
     {
         field: 'linkGrupo',
-        label: 'Convite Whatsapp',
+        label: 'Convite WhatsApp',
         filterType: FilterType.text,
         displayType: DisplayType.link,
     },
