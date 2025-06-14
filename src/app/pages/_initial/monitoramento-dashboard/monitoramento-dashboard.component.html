@@ -1,6 +1,8 @@
-<app-filtro-popover #filtroPopover
-                    (applyFilter)="request = $event; update()">
-</app-filtro-popover>
+<app-filtro-popover 
+    #filtroPopover 
+    (applyFilter)="applyFilter($event)"
+></app-filtro-popover>
+
 <div class="p-1">
     <p-toolbar styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
         <div class="p-toolbar-group-start w-full flex align-items-start justify-content-between">
@@ -108,9 +110,11 @@
                 <tr>
                     <ng-container *ngFor="let mes of mesesAno">
                         <ng-container *ngFor="let roteiro of mes.roteiros; let i = index;">
-                            <th class="bg-primary-500 text-white px-2 capitalize text-center cursor-pointer" (mouseenter)="popoverRoteiro.show($event)" (click)="popoverRoteiro.show($event)" (mouseleave)="popoverRoteiro.hide()">
+                            <th class="bg-primary-500 text-white px-2 capitalize text-center cursor-pointer"
+                                (click)="popoverRoteiro.show($event)"
+                                (mouseenter)="closePopoverRoteiro(); popoverRoteiro.show($event)">
                                 <span>Semana {{roteiro.semana}}</span>
-                                <p-popover #popoverRoteiro styleClass="-mt-1">
+                                <p-popover #popoverRoteiro styleClass="-mt-1" appendTo="body">
                                     <div class="flex align-items-center gap-2">
                                         <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: roteiro.corLegenda  }"></i>
                                         <span class="font-bold text-base">Semana {{roteiro.semana}} - {{roteiro.tema}} </span>
@@ -130,7 +134,7 @@
                         [frozen]="true"
                         class="white-space-nowrap px-2 py-1 z-2"
                         [ngClass]="{
-                            'surface-100': i % 2 == 0, 
+                            'bg-white': i % 2 == 0, 
                             'surface-50': i % 2 != 0,
                         }">
                         <div class="flex align-items-center">
@@ -149,14 +153,27 @@
                                    class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text cursor-default ">
                                     <i class="pi pi-whatsapp p-button-icon text-500"></i>
                                 </a>
+                                <ng-container *ngTemplateOutlet="aniversario; 
+                                            context: { 
+                                                    ehAniversario: ehAniversario(hoje, aluno.dataNascimento), 
+                                                    data: hoje,
+                                                    aluno: aluno
+                                            }"></ng-container>
                             </span>
-                            <p (click)="alunoPopover.show($event)" class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer">{{aluno.nome | nameAbv }}</p>
+                            <p (click)="alunoPopover.show($event)" 
+                                class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
+                                <span>{{aluno.nome | nameAbv }}</span>
+                            </p>
                             <app-aluno-popover #alunoPopover [aluno_Id]="aluno.id"
                                                [showChecklist]="true">
                             </app-aluno-popover>
                         </div>
                     </td>
-                    <td class="white-space-nowrap px-2 py-1 z-2" [ngClass]="{ 'surface-100': i % 2 == 0, 'surface-50': i % 2 != 0 }">
+                    <td class="white-space-nowrap px-2 py-1 z-2" 
+                        [ngClass]="{ 
+                                'bg-white': i % 2 == 0, 
+                                'surface-50': i % 2 != 0 
+                        }">
                         <span class="w-1rem h-1rem inline-flex border-circle mr-2" [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></span>
                         <span>{{aluno.turma}}</span>
                     </td>
@@ -164,10 +181,16 @@
                         <ng-container *ngFor="let item of aluno.aulas">
                             <td class="p-1"
                                 [ngClass]="{
-                                    'surface-100': i % 2 == 0,
+                                    'bg-white': i % 2 == 0,
                                     'surface-50': i % 2 != 0
                                 }"
                                 *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id">
+                                <ng-container *ngTemplateOutlet="aniversario; 
+                                            context: { 
+                                                    ehAniversario: ehAniversario(item.aula.data, aluno.dataNascimento), 
+                                                    data: item.aula.data,
+                                                    aluno: aluno
+                                            }"></ng-container>
                                 <!-- Aulas fora da vigencia do aluno não escreve -->
                                 <ng-container *ngIf="item.show == true">
                                     <div class="cursor-pointer white-space-nowrap flex flex-column w-full"
@@ -313,7 +336,6 @@
                             <td class="py-4" *ngFor="let roteiro of mes.roteiros"><p-skeleton height="1rem" width="6rem" /></td>
                         </ng-container>
                     </ng-container>
-                    
                 </tr>
             </ng-template>
             <ng-template #emptymessage>
@@ -323,7 +345,7 @@
                             <td class="py-4"
                                 pFrozenColumn
                                 [ngClass]="{
-                                    'surface-100': i % 2 == 0,
+                                    'bg-white': i % 2 == 0,
                                     'surface-50': i % 2 != 0
                                 }">
                                 <div class="flex align-items-center gap-2">
@@ -334,7 +356,7 @@
                                 <ng-container *ngFor="let roteiro of mes.roteiros">
                                     <td class="py-4"
                                         [ngClass]="{
-                                            'surface-100': i % 2 == 0,
+                                            'bg-white': i % 2 == 0,
                                             'surface-50': i % 2 != 0
                                         }">
                                         <p-skeleton height="1rem" width="6rem" />
@@ -348,3 +370,17 @@
         </p-table>
     </div>
 </div>
+<ng-template #aniversario
+             let-ehAniversario="ehAniversario"
+             let-data="data"
+             let-aluno="aluno">
+    <div *ngIf="ehAniversario"
+         class="inline-flex align-items-center justify-content-center"
+         [pTooltip]="aniversarioTooltip"
+         tooltipPosition="top">
+        <i class="bi bi-cake-fill text-pink-500 fadein animation-duration-1000 animation-iteration-infinite"></i>
+    </div>
+    <ng-template #aniversarioTooltip>
+        {{ aluno.nome | firstWord }} faz aniversário de {{getIdade(data, aluno.dataNascimento)}} anos no dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM, EEEE '}}
+    </ng-template>
+</ng-template>

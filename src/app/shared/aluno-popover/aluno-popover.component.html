@@ -1,127 +1,169 @@
-
 <app-aluno-checklist-dialog #alunoChecklistDialog
                             [aluno]="aluno"
                             [loading]="loadingAluno"></app-aluno-checklist-dialog>
 <p-popover #popover
            appendTo="body"
-           styleClass="-mt-1 max-w-screen"
-           [dismissable]="true">
-        <div class="pl-2 pr-4 relative" >
-           <ng-container *ngIf="aluno">
-            <div class="flex flex-wrap sm:justify-content-start justify-content-center">
-                <!-- Foto -->
-                <div class="sm:col-3 col-12 flex-none ">
-                    <div [ngClass]="{
-                    'relative overflow-hidden my-auto p-1': true,
-                    'flex align-items-center justify-content-center': true,
-                    'border-circle border-primary-500 border-2': true,
-                    'sm:mx-0 sm:w-10rem sm:h-10rem': true,
-                    'mx-auto w-12rem h-12rem': true,
-                }">
-                        <i class="pi pi-user text-3xl text-400" *ngIf="!foto && !loadingFoto"></i>
-                        <i class="pi pi-spin pi-spinner text-2xl text-400" *ngIf="!foto && loadingFoto"></i>
-                        <div *ngIf="foto" class="w-full h-full bg-cover	bg-center border-circle fadein animation-duration-300" [style]="{ backgroundImage: 'url(' + foto + ')'}"></div>
-                    </div>
+           [dismissable]="true"
+           styleClass="mt-2">
+    <p-card *ngIf="!aluno && loadingAluno"
+            [style]="{ width: '22rem', overflow: 'hidden' }"
+            styleClass="shadow-none">
+        <section >
+            <div class="flex mb-4">
+                <p-skeleton width="20rem" height="10rem" />
+            </div>
+            <div class="flex mb-2">
+                <p-skeleton width="20rem" height="1.5rem" />
+            </div>
+            <div class="flex justify-content-between gap-2 mb-4">
+                <p-skeleton size="1.5rem" shape="circle" />
+                <p-skeleton width="18rem" height="1rem" />
+            </div>
+            <div class="flex justify-content-between gap-2 mb-2">
+                <p-skeleton width="15rem" height="1rem" />
+                <p-skeleton width="4.5rem" height="1rem" />
+            </div>
+            <div class="flex justify-content-between gap-2 mb-2">
+                <p-skeleton width="15rem" height="1rem" />
+                <p-skeleton width="4.5rem" height="1rem" />
+            </div>
+            <div class="flex justify-content-between mb-2">
+                <p-skeleton width="20rem" height="1rem" />
+            </div>
+        </section>
+        <ng-template #footer>
+            <div class="flex gap-3 mt-1 -mx-2">
+                <p-button label="Fechar"
+                          severity="secondary"
+                          class="w-full"
+                          [outlined]="true"
+                          styleClass="w-full"
+                          (onClick)="hide()" />
+                <p-skeleton width="10rem" height="2.3rem" />
+            </div>
+        </ng-template>
+    </p-card>
+    <p-card *ngIf="aluno"
+            [style]="{ width: '22rem', overflow: 'hidden' }"
+            styleClass="shadow-none">
+        <ng-template #header>
+            <ng-container *ngIf="loadingFoto">
+                <p-skeleton width="22rem" height="12rem" />
+            </ng-container>
+            <ng-container *ngIf="!loadingFoto">
+                <div class="w-full h-12rem surface-50 overflow-hidden flex align-items-center justify-content-center">
+                    <p-image *ngIf="foto"
+                             [src]="foto"
+                             [preview]="true"
+                             alt="Image"
+                             appendTo="body"
+                             styleClass="w-full h-auto">
+                        <ng-template #indicator>
+                            <i class="pi pi-search"></i>
+                        </ng-template>
+                        <ng-template #image>
+                            <img [src]="foto" alt="image" class="w-full h-auto" />
+                        </ng-template>
+                        <ng-template #preview let-style="style" let-previewCallback="previewCallback">
+                            <img [src]="foto" alt="image" class="w-full h-auto" [style]="style" (click)="previewCallback()" />
+                        </ng-template>
+                    </p-image>
+                    <i *ngIf="!foto && !loadingFoto" class="pi pi-user text-3xl text-400"></i>
+                    <i *ngIf="!foto && loadingFoto" class="pi pi-spin pi-spinner text-2xl text-400"></i>
                 </div>
-                <!-- Dados -->
-                <div class="sm:col-8 col-12 flex-none sm:text-left text-center">
-                    <p class="aluno-title">{{ aluno.nome }} </p>
-                    <p><b>Turma: </b>{{ aluno.turma }} </p>
-                    <p *ngIf="aluno.apostila_Abaco">
-                        <b>Apostila Ábaco: </b>
-                        <span>{{ aluno.apostila_Abaco }}</span>
-                        <span> / </span>
-                        <b>Página: </b>
-                        <span>{{ aluno.numeroPaginaAbaco }}</span>
-                    </p>
-                    <p *ngIf="aluno.apostila_AH">
-                        <b>Apostila AH: </b>
-                        <span>{{ aluno.apostila_AH }}</span>
-                        <span> / </span>
-                        <b>Página: </b>
-                        <span>{{ aluno.numeroPaginaAH }}</span>
-                    </p>
-                    <ng-container *ngIf="showChecklist; else elseTemplate">
-                        <div class="gap-1 flex align-items-center sm:justify-content-start justify-content-center">
-                            <b class="white-space-nowrap">Jornada Supera: </b>
-                            <app-aluno-checklist #alunoChecklist
-                                                 [aluno]="aluno"
-                                                 [aluno_Id]="aluno_Id"></app-aluno-checklist>
-                        </div>
-                        <div class="flex align-items-center gap-2 mt-4 sm:justify-content-start justify-content-center">
-                            <ng-container *ngTemplateOutlet="editarAlunoButton"></ng-container>
-                            <ng-container *ngTemplateOutlet="enviarMensagemButton"></ng-container>
-                            <p-button label="Jornada Supera"
-                                      [rounded]="true"
-                                      icon="pi pi-check-square"
-                                      severity="contrast"
-                                      styleClass="white-space-nowrap surface-800 border-800 hover:surface-700 hover:border-700"
-                                      (onClick)="alunoChecklistDialog.show()" />
-                        </div>
-                    </ng-container>
-                    <ng-template #elseTemplate>
-                        <div class="flex align-items-center gap-2 mt-4 sm:justify-content-start justify-content-center">
-                            <ng-container *ngTemplateOutlet="editarAlunoButton"></ng-container>
-                            <ng-container *ngTemplateOutlet="enviarMensagemButton"></ng-container>
+            </ng-container>
+        </ng-template>
+        <ng-template #title>
+            <p class="text-primary-500 font-bold capitalize">{{ aluno.nome | nameAbv }}</p>
+        </ng-template>
+        <ng-template #subtitle>
+            <p class="flex align-items-center">
+                <span class="w-1rem h-1rem inline-flex border-circle mr-2" [style]="{ backgroundColor: aluno.corLegenda }"></span>
+                <span><b>Turma: </b>{{ aluno.turma }} </span>
+            </p>
+        </ng-template>
+        <section class="-mx-1">
+            <p *ngIf="aluno.apostila_Abaco">
+                <b>Apostila Ábaco: </b>
+                <span>{{ aluno.apostila_Abaco }}</span>
+                <span> / </span>
+                <b>Página: </b>
+                <span>{{ aluno.numeroPaginaAbaco }}</span>
+            </p>
+            <p *ngIf="aluno.apostila_AH">
+                <b>Apostila AH: </b>
+                <span>{{ aluno.apostila_AH }}</span>
+                <span> / </span>
+                <b>Página: </b>
+                <span>{{ aluno.numeroPaginaAH }}</span>
+            </p>
+            <p class="gap-1 flex align-items-center">
+                <b class="white-space-nowrap" *ngIf="showChecklist">Jornada Supera: </b>
+                <app-aluno-checklist #alunoChecklist
+                                     [aluno]="aluno"
+                                     [aluno_Id]="aluno_Id"
+                                     [showChecklist]="showChecklist"></app-aluno-checklist>
+            </p>
+        </section>
+        <ng-template #footer>
+            <div class="flex gap-3 mt-1 -mx-2 -mb-2">
+                <p-button label="Fechar"
+                          severity="secondary"
+                          class="w-full"
+                          [outlined]="true"
+                          styleClass="w-full"
+                          (onClick)="hide()" />
+                <p-select value="'Opções'"
+                          [options]="menuItems"
+                          [styleClass]="'w-full bg-primary-500 hover:bg-primary-600 border-primary-500 hover:border-primary-600 text-white flex align-items-center p-select-small'"
+                          appendTo="body"
+                          dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
+                          optionLabel="label"
+                          (onChange)="menuItemChanged($event)">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2 text-center text-base">Opções</div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                            <i [class]="item.icon"></i>
+                            <a class="ml-2">{{ item.label }}</a>
                         </div>
                     </ng-template>
-                </div>
+                </p-select>
+                <!-- <p-button label="Editar aluno"
+                          [rounded]="true"
+                          icon="pi pi-user-edit"
+                          styleClass="white-space-nowrap"
+                          (onClick)="goToAluno()"
+                          size="small" />
+                <a *ngIf="aluno.celular"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   [href]="enviarMensagem()">
+                    <p-button label="Enviar mensagem"
+                              [rounded]="true"
+                              icon="pi pi-whatsapp"
+                              severity="success"
+                              styleClass="white-space-nowrap"
+                              size="small" />
+                </a>
+                <p-button *ngIf="!aluno.celular"
+                          label="Enviar mensagem"
+                          [rounded]="true"
+                          icon="pi pi-whatsapp"
+                          severity="secondary"
+                          styleClass="white-space-nowrap surface-100 border-100"
+                          [disabled]="true"
+                          size="small" />
+                <p-button *ngIf="showChecklist"
+                          label="Jornada Supera"
+                          [rounded]="true"
+                          icon="pi pi-check-square"
+                          severity="contrast"
+                          styleClass="white-space-nowrap surface-800 border-800 hover:surface-700 hover:border-700"
+                          (onClick)="alunoChecklistDialog.show()"
+                          size="small" /> -->
             </div>
-        </ng-container>
-        <ng-container *ngIf="loadingAluno && !aluno">
-            <div class="flex justify-content-start">
-                <!-- Foto -->
-                <div class="flex-none col">
-                   <p-skeleton shape="circle" size="10rem" />
-                </div>
-                <!-- Dados -->
-                <div class="sm:col-8 col-12 flex-none sm:text-left text-center">
-                    <p-skeleton width="20rem" height="1.5rem" styleClass="mb-4" borderRadius="1rem"/>
-                    <p-skeleton width="12rem" height="1rem"  styleClass="mb-2" />
-                    <div class="flex mb-2">
-                        <p-skeleton width="14rem" height="1rem" styleClass="mr-1" />
-                        <p-skeleton width="5rem" height="1rem" />
-                    </div>
-                    <div class="flex mb-2">
-                        <p-skeleton width="14rem" height="1rem" styleClass="mr-1" />
-                        <p-skeleton width="5rem" height="1rem" />
-                    </div>
-                    <p-skeleton width="22rem" height="1.2rem" styleClass="mb-2" *ngIf="showChecklist"/>
-                    <div class="flex mt-4">
-                        <p-skeleton width="8rem" height="2rem" borderRadius="1rem" styleClass="mr-2" />
-                        <p-skeleton width="8rem" height="2rem" borderRadius="1rem" styleClass="mr-2" />
-                        <p-skeleton width="8rem" height="2rem" borderRadius="1rem" styleClass="mr-2" />
-                    </div>
-                </div>
-            </div>
-        </ng-container>
-    </div>
+        </ng-template>
+    </p-card>
 </p-popover>
-<ng-template #editarAlunoButton>
-    <p-button label="Editar aluno"
-              [rounded]="true"
-              icon="pi pi-user-edit"
-              styleClass="white-space-nowrap"
-              (onClick)="goToAluno()" />
-</ng-template>
-<ng-template #enviarMensagemButton>
-    <a *ngIf="aluno.celular"
-       target="_blank"
-       rel="noopener noreferrer"
-       [href]="enviarMensagem()">
-        <p-button label="Enviar mensagem"
-                  [rounded]="true"
-                  icon="pi pi-whatsapp"
-                  severity="success"
-                  styleClass="white-space-nowrap"
-                  [pTooltip]="'Clique para enviar uma mensagem'"
-                  tooltipPosition="top" />
-    </a>
-    <p-button *ngIf="!aluno.celular"
-              label="Enviar mensagem"
-              [rounded]="true"
-              icon="pi pi-whatsapp"
-              severity="secondary"
-              styleClass="white-space-nowrap surface-100 border-100"
-              [disabled]="true" />
-</ng-template>

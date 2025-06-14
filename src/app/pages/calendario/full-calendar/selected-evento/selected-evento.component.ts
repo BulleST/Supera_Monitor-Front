@@ -26,7 +26,6 @@ import { CalendarioUtils } from '../../../../utils/calendario-utils';
     templateUrl: './selected-evento.component.html',
     styleUrl: './selected-evento.component.css',
     providers: [ConfirmationService],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SelectedEventoComponent implements OnChanges {
     @Input() evento?: Evento;

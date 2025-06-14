@@ -27,6 +27,6 @@ export class NameAbvPipe implements PipeTransform
             lastName = nameArray[nameArray.length-1];
         }
 
-        return `${firstName} ${middleNames.join(' ').toUpperCase()} ${lastName}`
+        return `${firstName.toLowerCase()} ${middleNames.join(' ').toLowerCase()} ${lastName.toLowerCase()}`
     }
 }

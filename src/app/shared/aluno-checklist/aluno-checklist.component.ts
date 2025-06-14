@@ -18,6 +18,7 @@ import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-c
 export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     @Input() aluno_Id!: number;
     @Input() aluno!: Aluno;
+    @Input() showChecklist = false;
 
     textoChecklist = '';
     atrasado = false;
@@ -34,22 +35,28 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     constructor(
         private checklistService: ChecklistService,
     ) {
+        if(this.showChecklist) {
 
-        var checklists = checklistService.list.subscribe(res => this.checklists = res);
-        this.subscription.push(checklists)
-
-        if (!this.checklists.length) {
-            this.loadingChecklist = true;
-            lastValueFrom(this.checklistService.getList())
-                .then(res => this.loadingChecklist = false)
-                .catch(res => this.loadingChecklist = false);
+            var checklists = checklistService.list.subscribe(res => this.checklists = res);
+            this.subscription.push(checklists)
+    
+            if (!this.checklists.length) {
+                this.loadingChecklist = true;
+                lastValueFrom(this.checklistService.getList())
+                    .then(res => this.loadingChecklist = false)
+                    .catch(res => this.loadingChecklist = false);
+            }
         }
+
 
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
+        }
+        if (changes['showChecklist']) {
+            this.showChecklist = changes['showChecklist'].currentValue;
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
@@ -62,6 +69,8 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     }
 
     async loadChecklist() {
+        if(this.showChecklist) {
+            
         this.loading = true;
 
         let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
@@ -102,6 +111,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
         }
 
         this.loading = false;
+        }
     }
 
     showDialog() {

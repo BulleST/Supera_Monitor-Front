@@ -30,23 +30,20 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     mesesAno: Dashboard_Mes[] = [];
     meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    tableHeight = 0;
     @ViewChild('toolbar') toolbar!: ElementRef;
 
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
+    @ViewChildren('popoverRoteiro') popoverRoteiro!: QueryList<Popover>;
 
     request: DashboardRequest = new DashboardRequest;
     PseudoEvento = PseudoEvento;
 
     loadingRequests = new EventEmitter<number>();
+    hoje = new Date;
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
-        // private roteiroService: RoteiroService,
-        // private alunoService: AlunoService,
-        private toastr: ToastrService,
-        private calendarioUtils: CalendarioUtils,
         private crypto: Crypto,
     ) {
 
@@ -54,8 +51,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.update();
-        this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
     }
 
     randomDate(start: Date, end: Date) {
@@ -94,7 +89,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.alunos = [];
     }
 
-    async update() {
+    update() {
         this.onLoading();
 
         setTimeout(() => {
@@ -127,13 +122,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
             })
     }
 
-  
-    @HostListener('window:resize', ['$event'])
-    onResize(event: any) {
-        this.tableHeight = window.innerHeight - (document.querySelector('.p-toolbar')?.clientHeight ?? 0) - 50 - 18 - 18
-
-    }
-
     enviarMensagem(nome: string, celular: string) {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
@@ -162,4 +150,27 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         return ['alunos', this.crypto.encrypt(aluno.id)]
     }
 
+    closePopoverRoteiro() {
+        this.popoverRoteiro.forEach((item: Popover) => {
+            item.hide();
+        })
+    }
+
+    ehAniversario(data: Date, dataNascimento?: Date) {
+        if (!dataNascimento) {
+            return false;
+        } else {
+            return moment(data).week() == moment(dataNascimento).week();
+        }
+    }
+
+    getIdade(data: Date, dataNascimento: Date) {
+        return moment(data).diff(dataNascimento, 'years');
+    }
+
+    applyFilter(request: DashboardRequest) {
+        console.log('applyFilter', request)
+        this.request = request;
+        this.update();
+    }
 }

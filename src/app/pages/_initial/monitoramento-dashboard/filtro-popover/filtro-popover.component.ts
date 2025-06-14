@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { DashboardRequest } from '../../../../models/dashboard.model';
 import { AccountService } from '../../../../services/account.service';
 import { ProfessorService } from '../../../../services/professor.service';
@@ -14,15 +14,15 @@ import { AlunoService } from '../../../../services/alunos.service';
 @Component({
   selector: 'app-filtro-popover',
   standalone: false,
-  
   templateUrl: './filtro-popover.component.html',
   styleUrl: './filtro-popover.component.css'
 })
-export class FiltroPopoverComponent  implements OnChanges, OnDestroy {
-    subscription: Subscription[] = [];
-
-    @Input() request = new DashboardRequest;
+export class FiltroPopoverComponent  implements OnChanges, OnDestroy, AfterViewInit {
+    
     @Output() applyFilter = new EventEmitter<DashboardRequest>();
+    
+    subscription: Subscription[] = [];
+    request = new DashboardRequest;
     anos: number[] = []
 
     professores: Professor[] = [];
@@ -43,6 +43,8 @@ export class FiltroPopoverComponent  implements OnChanges, OnDestroy {
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
     ) {
+        this.applyFilter = new EventEmitter<DashboardRequest>();
+
         var professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
@@ -97,10 +99,19 @@ export class FiltroPopoverComponent  implements OnChanges, OnDestroy {
             this.anos.push(ano)
         }
 
-    }
 
+        console.log(this.request)
+        console.log(this.request)
+        
+    }
+    ngAfterViewInit(): void {
+        this.filter()
+    }
+    
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['request']) this.request = changes['request'].currentValue;
+        // if (changes['request']) {
+        //     this.request = changes['request'].currentValue;
+        // }
     }
 
     ngOnDestroy(): void {
@@ -112,10 +123,12 @@ export class FiltroPopoverComponent  implements OnChanges, OnDestroy {
     }
     
     toggle(e: any) {
+        if (this.popover)
         this.popover.toggle(e);
     }
 
     hide() {
+        if (this.popover)
         this.popover.hide();
     }
 

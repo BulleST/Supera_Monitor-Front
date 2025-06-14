@@ -3,11 +3,13 @@ import { AlunoService } from '../../services/alunos.service';
 import { ChecklistService } from '../../services/checklist.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../models/alunos.model';
-import { Aluno_CheckList_Item, Checklist } from '../../models/checklist.model';
 import { Popover } from 'primeng/popover';
 import { Crypto, MensagemWhatsapp } from '../../utils';
 import { Router } from '@angular/router';
 import { EventoService } from '../../services/evento.service';
+import { MenuItem } from 'primeng/api';
+import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
+import { SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-aluno-popover',
@@ -29,6 +31,10 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     foto?: string;
 
     @ViewChild('popover') popover!: Popover;
+    @ViewChild('alunoChecklistDialog') alunoChecklistDialog!: AlunoChecklistDialogComponent;
+
+
+    menuItems: MenuItem[] = []
 
     constructor(
         private alunoService: AlunoService,
@@ -61,6 +67,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.loadingAluno = false;
                 this.aluno = res;
 
+                this.loadMenuItems();
                 this.loadAulaZero();
                 this.loadPrimeiraAula();
             })
@@ -94,6 +101,42 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.aluno.primeiraAula = res;
             })
         }
+    }
+
+    loadMenuItems() {
+        this.menuItems = [];
+
+        this.menuItems.push({
+            label: 'Editar aluno',
+            icon: 'pi pi-user-edit text-primary-500 ',
+            styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100',
+            command: () => this.goToAluno(),
+        })
+        this.menuItems.push({
+            label: 'Enviar mensagem',
+            icon: 'pi pi-whatsapp text-green-500',
+            styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
+            disabled: !this.aluno.celular,
+            command: () => {
+                window.open(this.enviarMensagem(), '_blank');
+            },
+        })
+        if (this.showChecklist) {
+            this.menuItems.push({
+                label: 'Jornada Supera',
+                icon: 'pi pi-check-square text-500',
+                styleClass: 'text-500 surface-50 hover:surface-100',
+                command: () => {
+                    this.alunoChecklistDialog.show();
+                },
+            })
+        }
+    }
+
+        
+    menuItemChanged(e: SelectChangeEvent) {
+        if (e.value.command)
+            e.value.command(e);
     }
 
     show(e: any) {

@@ -26,6 +26,7 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { IconFieldModule } from 'primeng/iconfield';
+import { ImageModule } from 'primeng/image';
 import { InplaceModule } from 'primeng/inplace';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputGroupModule } from 'primeng/inputgroup';
@@ -103,6 +104,7 @@ import { SelectModule } from 'primeng/select';
         FileUploadModule,
         FloatLabelModule,
         IconFieldModule,
+        ImageModule,
         InplaceModule,
         InputIconModule,
         InputGroupModule,
@@ -178,6 +180,7 @@ import { SelectModule } from 'primeng/select';
         FileUploadModule,
         FloatLabelModule,
         IconFieldModule,
+        ImageModule,
         InplaceModule,
         InputIconModule,
         InputGroupModule,

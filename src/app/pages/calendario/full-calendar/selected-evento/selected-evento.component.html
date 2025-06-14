@@ -109,7 +109,11 @@
                         <ng-container *ngTemplateOutlet="alunoItem; context: { aluno: aluno }"></ng-container>
                     </a>
                     <ng-template #alunoItem let-aluno="aluno">
-                        <app-aluno-popover-calendario #popoverAluno [aluno]="aluno" [evento]="evento"></app-aluno-popover-calendario>
+
+                        <app-aluno-popover #alunoPopover 
+                            [aluno_Id]="aluno.aluno_Id"
+                            [showChecklist]="true"></app-aluno-popover>
+
                         <div class="w-full flex align-items-center justify-content-start p-1 border-round-md"
                              [ngClass]="{
                                 'bg-white': i % 2 == 0,
@@ -128,7 +132,7 @@
                                     'text-pink-500': !evento.finalizado && getPrimeiraAula(aluno, evento),
                                 }"
                                       [pTooltip]="aluno.nome"
-                                      (click)="showAluno($event, aluno, popoverAluno)">
+                                      (click)="alunoPopover.show($event)">
                                     <span class="font-bold">{{ aluno.aluno | nameAbv }}</span>
                                 </span>
                                 <p-badge *ngIf="aluno.reposicaoDe_Evento_Id"
