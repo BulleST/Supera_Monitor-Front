@@ -1,3 +1,7 @@
+
+<app-aluno-checklist-dialog #alunoChecklistDialog
+                            [aluno]="aluno"
+                            [loading]="loadingAluno"></app-aluno-checklist-dialog>
 <p-popover #popover
            appendTo="body"
            styleClass="-mt-1 max-w-screen"
@@ -52,7 +56,7 @@
                                       icon="pi pi-check-square"
                                       severity="contrast"
                                       styleClass="white-space-nowrap surface-800 border-800 hover:surface-700 hover:border-700"
-                                      (onClick)="alunoChecklist.showDialog()" />
+                                      (onClick)="alunoChecklistDialog.show()" />
                         </div>
                     </ng-container>
                     <ng-template #elseTemplate>

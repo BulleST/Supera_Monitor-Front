@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno } from '../../models/alunos.model';
 import { showError } from '../../utils';
 import { ChecklistService } from '../../services/checklist.service';
@@ -17,7 +17,7 @@ import $ from 'jquery';
     standalone: false,
     templateUrl: './aluno-checklist-dialog.component.html',
     styleUrl: './aluno-checklist-dialog.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [ConfirmationService],
 })
 export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
 
@@ -26,7 +26,6 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
 
     visible = false;
     checklistObservacao = '';
-    checklistIndex: number = 0;
     scrollLeft: number = 0;
 
     constructor(
@@ -40,10 +39,11 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['aluno']) this.aluno = changes['aluno'].currentValue;
+        if (changes['aluno']) {
+            this.aluno = changes['aluno'].currentValue;
+        }
         if (changes['loading']) this.loading = changes['loading'].currentValue;
 
-        this.checklistIndex = this.aluno.checklist_Id ?? 0;
     }
 
     ngOnDestroy(): void {
@@ -52,7 +52,7 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
 
     visibleChanged() {
         if (this.visible) {
-            var tab = $(`p-tab[ng-reflect-value="${this.checklistIndex}"]`).last()
+            var tab = $(`p-tab[ng-reflect-value="${this.aluno.checklist_Id ?? 1}"]`).last()
             this.scrollLeft = $(tab).offset()?.left ?? 0
             $('.p-tablist-viewport').animate({
                 scrollLeft: this.scrollLeft
@@ -62,7 +62,6 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
 
     show() {
         this.visible = true;
-        
     }
 
     hide() {
@@ -83,7 +82,6 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
                 key: 'checklistConfirmation',
                 message: `Tem certeza que deseja marcar etapa como realizada?.`,
                 header: 'Finalizar etapa',
-                icon: 'pi pi-comment-dots text-4xl mr-2',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Finalizar',
                 rejectIcon: 'pi pi-times',

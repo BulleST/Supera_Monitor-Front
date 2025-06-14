@@ -14,7 +14,6 @@ import { EventoService } from '../../services/evento.service';
     standalone: false,
     templateUrl: './aluno-popover.component.html',
     styleUrl: './aluno-popover.component.css',
-    // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
@@ -38,18 +37,12 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         private router: Router,
         private crypto: Crypto,
     ) {
-        // var alunos = alunoService.list.subscribe(res => this.alunos = res);
-        // this.subscription.push(alunos)
-
-        console.log('aluno popover constructor')
-
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
-            console.log('aluno popover aluno_Id', this.aluno_Id, this.aluno)
         }
         if (changes['showChecklist']) {
             this.showChecklist = changes['showChecklist'].currentValue;
@@ -67,7 +60,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
             .then(res => {
                 this.loadingAluno = false;
                 this.aluno = res;
-                console.log('aluno popover loadAluno', this.aluno_Id, this.aluno)
 
                 this.loadAulaZero();
                 this.loadPrimeiraAula();
@@ -82,8 +74,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.loadingFoto = false;
                 this.aluno.aluno_Foto = res;
                 this.foto = res;
-                console.log('aluno popover loadFoto', this.aluno_Id, res)
-
             })
             .catch(res => this.loadingFoto = false);
     }
@@ -108,9 +98,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     show(e: any) {
         this.popover.show(e);
-
-        console.log('aluno popover show', this.aluno)
-
 
         this.loadAluno();
         this.loadFoto();

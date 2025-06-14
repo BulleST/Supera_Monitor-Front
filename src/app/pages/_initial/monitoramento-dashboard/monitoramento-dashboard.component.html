@@ -154,9 +154,6 @@
                             <app-aluno-popover #alunoPopover [aluno_Id]="aluno.id"
                                                [showChecklist]="true">
                             </app-aluno-popover>
-                            <!-- (click)="alunoPopover.show($event)"  
-                                
-                                <app-aluno-popover-details #alunoPopover [aluno]="aluno"></app-aluno-popover-details> -->
                         </div>
                     </td>
                     <td class="white-space-nowrap px-2 py-1 z-2" [ngClass]="{ 'surface-100': i % 2 == 0, 'surface-50': i % 2 != 0 }">
@@ -173,9 +170,8 @@
                                 *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id">
                                 <!-- Aulas fora da vigencia do aluno não escreve -->
                                 <ng-container *ngIf="item.show == true">
-                                    <div class="cursor-pointer white-space-nowrap flex flex-column w-full">
-                                        <!-- 
-                                         (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)" -->
+                                    <div class="cursor-pointer white-space-nowrap flex flex-column w-full"
+                                         (click)="selectAlunoAula( $event, popoverSelectedAlunoAula)">
                                         <!-- Cancelada -->
                                         <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoDe_Evento_Id">
                                             <div class="w-full surface-800 text-xs border-1 border-800 text-white text-center">
@@ -317,6 +313,7 @@
                             <td class="py-4" *ngFor="let roteiro of mes.roteiros"><p-skeleton height="1rem" width="6rem" /></td>
                         </ng-container>
                     </ng-container>
+                    
                 </tr>
             </ng-template>
             <ng-template #emptymessage>

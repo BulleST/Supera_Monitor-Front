@@ -441,6 +441,14 @@ input.ng-invalid.ng-touched {
     box-shadow: 0 0 3px 1px #ff00006c;
 }
 
+.p-iconfield .p-textarea {
+    padding-left: 27px;
+}
+
+.p-iconfield .p-inputicon.p-iconfield-textarea {
+    top: 14px;
+}
+
 @keyframes shadowInvalid {
     0% {
         box-shadow: 0 0 0 0 transparent;

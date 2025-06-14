@@ -14,8 +14,6 @@ import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-c
     standalone: false,
     templateUrl: './aluno-checklist.component.html',
     styleUrl: './aluno-checklist.component.css',
-    providers: [ConfirmationService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     @Input() aluno_Id!: number;
@@ -55,7 +53,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            console.log('aluno', this.aluno)
             this.loadChecklist();
         }
     }

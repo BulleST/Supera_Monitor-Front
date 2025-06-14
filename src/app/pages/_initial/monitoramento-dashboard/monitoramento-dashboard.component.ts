@@ -25,23 +25,10 @@ import { CalendarioUtils, Crypto } from '../../../utils';
     providers: [ConfirmationService],
 })
 export class MonitoramentoDashboardComponent implements AfterViewInit {
-
-    // roteiros: Roteiro[] = [];
-    // loadingRoteiros = false;
-
-    // alunos: Aluno[] = [];
-    // loadingAlunos = false;
-    // alunosList: Aluno[] = [];
-
-    // dashboard: Dashboard[] = [];
-    // loadingDashboard = false;
-
     alunos: Dashboard_Aluno[] = [];
     loading = false;
     mesesAno: Dashboard_Mes[] = [];
     meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-
-
 
     tableHeight = 0;
     @ViewChild('toolbar') toolbar!: ElementRef;
@@ -123,7 +110,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.loading = true;
         lastValueFrom(this.service.getDashboard(this.request))
             .then(res => {
-                console.log('response', res)
 
                 // Seta meses do ano
                 this.mesesAno = this.meses.map((mesString, index) => {
