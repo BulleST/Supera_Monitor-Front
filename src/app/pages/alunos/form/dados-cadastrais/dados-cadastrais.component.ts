@@ -68,7 +68,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     textoChecklist = '';
 
     constructor(
-
         private service: AlunoService,
         private restricaoService: AlunoRestricaoService,
         private turmaService: TurmaService,
@@ -242,20 +241,21 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
+        console.log('Log: Aluno tentando mudar de turma - turmaChanged')
+
         if (this.selectedTurma) {
             if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
-                this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> por que o limite de alunos foi alcançado.`, e);
+                this.showError('Não há vagas', `Não foi possível inserir o(a) aluno(a) na turma <b class="text-primary-500">${this.selectedTurma.nome}</b> porque o limite de alunos foi alcançado.`, e);
                 this.turmaReject(model);
                 return;
             }
 
             if (this.object.restricoes.length > 0 || this.object.restricaoMobilidade) {
-                this.turmaChangedRestricaoConffirm(e, model);
+                this.turmaChangedRestricaoConfirm(e, model);
             }
             else {
-                this.turmaChangedConffirm(e, model);
+                this.turmaChangedConfirm(e, model);
             }
-
         } else {
             this.object.turma = '';
             this.object.turma_Id = undefined as any;
@@ -264,46 +264,21 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    turmaChangedRestricaoConffirm(e: any, model: NgModel) {
+    turmaChangedRestricaoConfirm(e: any, model: NgModel) {
         var message = 'O aluno apresenta as seguintes restrições: <ul>';
+        
         if (this.object.restricoes.length > 0) {
             message += `${this.object.restricoes.map(x => `<li>${x.descricao}.</li>`)}`
         }
+
         if (this.object.restricaoMobilidade) {
             message += `<li class="font-bold">Restrição de mobilidade.</li>`
-
         }
         message += `</ul> <p>Continuar com transferência de turma?</p>`;
         this.confirmationService.confirm({
             target: e.target,
             message: message,
             header: 'Transferência de turma',
-            acceptIcon: 'pi pi-check',
-            acceptLabel: 'Sim',
-            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                this.turmaChangedConffirm(e, model);
-            },
-            reject: () => {
-                this.turmaReject(model);
-            },
-        })
-    }
-
-    turmaChangedConffirm(e: any, model: NgModel) {
-        var mensagem = 'Continuar com transferência de turma?';
-        var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
-        if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
-            mensagem = 'O perfil dessa turma é diferente desse aluno. <br>' + mensagem
-        }
-        this.confirmationService.confirm({
-            target: e.target,
-            message: mensagem,
-            header: 'Transferência de turma',
-            icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
             acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
@@ -319,7 +294,40 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         })
     }
 
+    turmaChangedConfirm(e: any, model: NgModel) {
+        // console.log('Log: Aluno tentando mudar de turma - turmaChangedConfirm')
+
+        var mensagem = 'Continuar com transferência de turma?';
+        var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
+
+        if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
+            mensagem = 'O perfil dessa turma é diferente desse aluno.<br>' + mensagem
+        }
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: mensagem,
+            header: 'Transferência de turma',
+            icon: 'pi pi-exclamation-triangle',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Sim',
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Não',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: () => {
+                console.log("Mudança de turma aceita")
+                this.turmaAccept();
+            },
+            reject: () => {
+                console.log("Mudança de turma rejeitada")
+                this.turmaReject(model);
+            },
+        })
+    }
+
     turmaReject(model: NgModel) {
+        // console.log("Log: Mudança de turma rejeitada - turmaReject")
         var turma = this.turmas.find(x => x.id == this.oldTurmaId);
         this.object.turma = turma?.nome as any;
         this.object.turma_Id = turma?.id as any;
@@ -330,6 +338,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaAccept() {
+        // console.log("Log: Mudança de turma aceita - turmaAccept")
         var turma = this.selectedTurma as Turma;
         this.object.turma = turma.nome;
         this.object.turma_Id = turma.id;
@@ -337,16 +346,11 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.object.professor = turma.professor;
     }
 
-
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
 
-
-
     finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
-        // playAlert();
-
         this.confirmationService.confirm({
             key: 'checklistConfirmation',
             message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
@@ -385,7 +389,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 ngModel.control.setValue(false);
             }
         });
-
     }
 
     loadRestricoes() {
@@ -397,7 +400,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.getRestricoes();
             })
             .catch(res => this.loadingRestricoes = false);
-
     }
 
     generateRM() {
@@ -583,6 +585,4 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
     }
-
-
 }

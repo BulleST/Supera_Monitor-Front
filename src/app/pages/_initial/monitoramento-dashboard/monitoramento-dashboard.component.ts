@@ -169,7 +169,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     }
 
     applyFilter(request: DashboardRequest) {
-        console.log('applyFilter', request)
         this.request = request;
         this.update();
     }

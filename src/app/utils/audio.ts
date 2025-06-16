@@ -12,7 +12,6 @@ export function playSuccess(rate = 1) {
     success.play();
 }
 
-
 export function playError(rate = 1) {
     error.playbackRate = rate;
     error.play();

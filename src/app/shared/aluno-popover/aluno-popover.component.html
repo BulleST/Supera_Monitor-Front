@@ -113,13 +113,24 @@
                           [outlined]="true"
                           styleClass="w-full"
                           (onClick)="hide()" />
+                <!-- <p-button label="Opções"
+                          severity="primary"
+                          icon="bi bi-chevron-down"
+                          iconPos="right"
+                          class="w-full"
+                          styleClass="w-full"
+                          (onClick)="hide()" />
+                <p-popover #menuPopover>
+
+                </p-popover> -->
                 <p-select value="'Opções'"
                           [options]="menuItems"
-                          [styleClass]="'w-full bg-primary-500 hover:bg-primary-600 border-primary-500 hover:border-primary-600 text-white flex align-items-center p-select-small'"
+                          [styleClass]="'p-select-aluno-menu p-select-small'"
                           appendTo="body"
                           dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
                           optionLabel="label"
-                          (onChange)="menuItemChanged($event)">
+                          (onChange)="menuItemChanged($event)"
+                        [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
                     <ng-template let-selectedOption #selectedItem>
                         <div class="text-white -mr-2 text-center text-base">Opções</div>
                     </ng-template>
@@ -130,39 +141,6 @@
                         </div>
                     </ng-template>
                 </p-select>
-                <!-- <p-button label="Editar aluno"
-                          [rounded]="true"
-                          icon="pi pi-user-edit"
-                          styleClass="white-space-nowrap"
-                          (onClick)="goToAluno()"
-                          size="small" />
-                <a *ngIf="aluno.celular"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   [href]="enviarMensagem()">
-                    <p-button label="Enviar mensagem"
-                              [rounded]="true"
-                              icon="pi pi-whatsapp"
-                              severity="success"
-                              styleClass="white-space-nowrap"
-                              size="small" />
-                </a>
-                <p-button *ngIf="!aluno.celular"
-                          label="Enviar mensagem"
-                          [rounded]="true"
-                          icon="pi pi-whatsapp"
-                          severity="secondary"
-                          styleClass="white-space-nowrap surface-100 border-100"
-                          [disabled]="true"
-                          size="small" />
-                <p-button *ngIf="showChecklist"
-                          label="Jornada Supera"
-                          [rounded]="true"
-                          icon="pi pi-check-square"
-                          severity="contrast"
-                          styleClass="white-space-nowrap surface-800 border-800 hover:surface-700 hover:border-700"
-                          (onClick)="alunoChecklistDialog.show()"
-                          size="small" /> -->
             </div>
         </ng-template>
     </p-card>

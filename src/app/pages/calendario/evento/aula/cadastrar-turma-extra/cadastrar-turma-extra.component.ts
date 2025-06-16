@@ -489,7 +489,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         if (aluno.restricoes.filter(x => x.active).length || aluno.restricaoMobilidade) {
 
-            playAlert(1);
+            // playAlert(1);
 
             var message = 'Esse aluno possui as seguintes restrições. <div>';
 

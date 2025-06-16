@@ -14,8 +14,8 @@
     background-color: var(--surface-50);
     flex-wrap: wrap;
     padding: .5rem;
-    
 }
+
 .aluno-foto-container {
     position: relative;
     width: 100%;
@@ -32,7 +32,7 @@
     border-radius: 50%;
 }
 
-::ng-deep .aluno-foto-container .p-image-preview ,
+::ng-deep .aluno-foto-container .p-image-preview,
 ::ng-deep .aluno-foto-container p-image {
     width: 100%;
     height: 100%;
@@ -52,4 +52,22 @@
     background-position: center;
     animation-duration: 300ms;
     border-radius: 50%;
+}
+
+::ng-deep .p-select-aluno-menu {
+    width: 100%;
+    background-color: var(--primary-500);
+    border: 1px var(--primary-500) solid;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+::ng-deep .p-select-aluno-menu:hover {
+    background-color: var(--primary-600);
+    border: 1px var(--primary-600) solid;
+}
+
+::ng-deep .p-select-aluno-menu-overlay .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
+    background-color: transparent !important;
 }

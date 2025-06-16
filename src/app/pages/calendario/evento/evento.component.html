@@ -1,134 +1,165 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-dialog #dialog
-          [maximizable]="true"
-          [draggable]="true"
-          [modal]="true"
-          [(visible)]="visible"
-          (visibleChange)="visibleChange()"
-          [style]="{ width: width, maxWidth: '95vw', maxHeight: '95vh' }"
-          appendTo="body">
-    <ng-template #header>
-        <div class="w-full flex align-items-center ">
-            <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
-            <span class="p-dialog-title capitalize">{{tipoString}}</span>
-        </div>
-    </ng-template>
-    <form #aulaForm #form="ngForm" *ngIf="evento">
-        <div [ngSwitch]="evento.evento_Tipo_Id">
-            <div *ngSwitchCase="tipo.Aula" class="aula">
-                <app-editar-aula #componentForm
-                                 [evento]="evento"
-                                 [professores]="professores"
-                                 [loadingProfessores]="loadingProfessores"
-                                 [salaAulas]="salaAulas"
-                                 [loadingSalaAulas]="loadingSalaAulas"
-                                 [roteiros]="roteiros"
-                                 [loadingRoteiros]="loadingRoteiros"
-                                 [duracaoEvento]="duracaoEvento"
-                                 [isChamadaPage]="isChamadaPage"
-                                 (validaProfessor)="professorChanged($event)"
-                                 (validaSala)="salaAulaChanged($event)"
-                                 (width)="width = $event"></app-editar-aula>
-            </div>
-            <div *ngSwitchCase="tipo.AulaZero" class="aula">
-                <app-editar-aula-0 #componentForm [evento]="evento"
-                                   [evento]="evento"
-                                   [professores]="professores"
-                                   [loadingProfessores]="loadingProfessores"
-                                   [salaAulas]="salaAulas"
-                                   [loadingSalaAulas]="loadingSalaAulas"
-                                   [duracaoEvento]="duracaoEvento"
-                                   [isChamadaPage]="isChamadaPage"
-                                   (validaProfessor)="professorChanged($event)"
-                                   (validaSala)="salaAulaChanged($event)"
-                                   (width)="width = $event"></app-editar-aula-0>
-            </div>
-            <div *ngSwitchCase="tipo.AulaExtra" class="aula">
-                <app-editar-aula #componentForm [evento]="evento"
-                                 [evento]="evento"
-                                 [professores]="professores"
-                                 [loadingProfessores]="loadingProfessores"
-                                 [salaAulas]="salaAulas"
-                                 [loadingSalaAulas]="loadingSalaAulas"
-                                 [roteiros]="roteiros"
-                                 [loadingRoteiros]="loadingRoteiros"
-                                 [duracaoEvento]="duracaoEvento"
-                                 [isChamadaPage]="isChamadaPage"
-                                 (validaProfessor)="professorChanged($event)"
-                                 (validaSala)="salaAulaChanged($event)"
-                                 (width)="width = $event"></app-editar-aula>
-            </div>
-            <div *ngSwitchCase="tipo.Superacao" class="aula">
-                <app-editar-superacao #componentForm [evento]="evento"
-                                      [evento]="evento"
-                                      [professores]="professores"
-                                      [loadingProfessores]="loadingProfessores"
-                                      [salaAulas]="salaAulas"
-                                      [loadingSalaAulas]="loadingSalaAulas"
-                                      [duracaoEvento]="duracaoEvento"
-                                      [isChamadaPage]="isChamadaPage"
-                                      (validaProfessor)="professorChanged($event)"
-                                      (validaSala)="salaAulaChanged($event)"
-                                      (width)="width = $event"></app-editar-superacao>
-            </div>
-            <div *ngSwitchCase="tipo.Oficina" class="aula">
-                <app-editar-oficina #componentForm
-                                    [evento]="evento"
-                                    [professores]="professores"
-                                    [loadingProfessores]="loadingProfessores"
-                                    [salaAulas]="salaAulas"
-                                    [loadingSalaAulas]="loadingSalaAulas"
-                                    [duracaoEvento]="duracaoEvento"
-                                    [isChamadaPage]="isChamadaPage"
-                                    (validaProfessor)="professorChanged($event)"
-                                    (validaSala)="salaAulaChanged($event)"
-                                    (width)="width = $event"></app-editar-oficina>
-            </div>
-            <div *ngSwitchCase="tipo.Reuniao" class="aula">
-                <app-editar-reuniao #componentForm
-                                    [evento]="evento"
-                                    [professores]="professores"
-                                    [loadingProfessores]="loadingProfessores"
-                                    [salaAulas]="salaAulas"
-                                    [loadingSalaAulas]="loadingSalaAulas"
-                                    [duracaoEvento]="duracaoEvento"
-                                    [isChamadaPage]="isChamadaPage"
-                                    (validaProfessor)="professorChanged($event)"
-                                    (validaSala)="salaAulaChanged($event)"
-                                    (width)="width = $event"></app-editar-reuniao>
-            </div>
-        </div>
-        <ng-template [ngIf]="evento.finalizado == false">
-            <div class="col-12 px-0 flex align-items-center justify-content-end">
-                <ng-template [ngIf]="!isChamadaPage">
-                    <!-- <p-button type="button"
-                              (onClick)="goToIniciarChamada($event)"
-                              styleClass="mr-2 px-3 border-2 border-primary-500"
-                              label="Iniciar chamada"
-                              icon="pi pi-list-check text-lg"
-                              [outlined]="true"
-                              [loading]="loading"
-                              [rounded]="true" /> -->
-                    <p-button type="button"
-                              (onClick)="sendConfirmation($event, form)"
-                              styleClass="px-3 mr-2"
-                              label="Salvar dados"
-                              icon="pi pi-check"
-                              [loading]="loading"
-                              [rounded]="true"
-                              [disabled]="form.invalid || loading" />
-                </ng-template>
-                <ng-template [ngIf]="isChamadaPage">
-                    <p-button type="button"
-                              (onClick)="finalizar($event)"
-                              styleClass="w-full px-3"
-                              label="Finalizar {{tipoString}}"
-                              icon="pi pi-check"
-                              [loading]="loading"
-                              [rounded]="true"
-                              [disabled]="form.invalid || loading" />
-                </ng-template>
-            </div>
+<p-dialog
+  #dialog
+  [maximizable]="true"
+  [draggable]="true"
+  [modal]="true"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange()"
+  [style]="{ width: width, maxWidth: '95vw', maxHeight: '95vh' }"
+  appendTo="body">
+  <ng-template #header>
+    <div class="w-full flex gap-2 align-items-center">
+      <i
+        class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+      <div class="mt-1">
+        <span class="p-dialog-title capitalize">{{ tipoString }}</span>
+        <span
+          *ngIf="!evento.active"
+          class="block text-red-500 p-dialog-subtitle font-semibold"
+          [pTooltip]="getDeactivatedInformation(evento)"
+          tooltipPosition="bottom"
+          >Este evento foi desativado</span
+        >
+      </div>
+    </div>
+  </ng-template>
+  <form
+    #aulaForm
+    #form="ngForm"
+    *ngIf="evento">
+    <div [ngSwitch]="evento.evento_Tipo_Id">
+      <div
+        *ngSwitchCase="tipo.Aula"
+        class="aula">
+        <app-editar-aula
+          #componentForm
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [roteiros]="roteiros"
+          [loadingRoteiros]="loadingRoteiros"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-aula>
+      </div>
+      <div
+        *ngSwitchCase="tipo.AulaZero"
+        class="aula">
+        <app-editar-aula-0
+          #componentForm
+          [evento]="evento"
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-aula-0>
+      </div>
+      <div
+        *ngSwitchCase="tipo.AulaExtra"
+        class="aula">
+        <app-editar-aula
+          #componentForm
+          [evento]="evento"
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [roteiros]="roteiros"
+          [loadingRoteiros]="loadingRoteiros"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-aula>
+      </div>
+      <div
+        *ngSwitchCase="tipo.Superacao"
+        class="aula">
+        <app-editar-superacao
+          #componentForm
+          [evento]="evento"
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-superacao>
+      </div>
+      <div
+        *ngSwitchCase="tipo.Oficina"
+        class="aula">
+        <app-editar-oficina
+          #componentForm
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-oficina>
+      </div>
+      <div
+        *ngSwitchCase="tipo.Reuniao"
+        class="aula">
+        <app-editar-reuniao
+          #componentForm
+          [evento]="evento"
+          [professores]="professores"
+          [loadingProfessores]="loadingProfessores"
+          [salaAulas]="salaAulas"
+          [loadingSalaAulas]="loadingSalaAulas"
+          [duracaoEvento]="duracaoEvento"
+          [isChamadaPage]="isChamadaPage"
+          (validaProfessor)="professorChanged($event)"
+          (validaSala)="salaAulaChanged($event)"
+          (width)="width = $event"></app-editar-reuniao>
+      </div>
+    </div>
+    <ng-template [ngIf]="evento.finalizado == false">
+      <div class="col-12 px-0 flex align-items-center justify-content-end">
+        <ng-template [ngIf]="!isChamadaPage">
+          <p-button
+            type="button"
+            (onClick)="sendConfirmation($event, form)"
+            styleClass="px-3 mr-2"
+            label="Salvar dados"
+            icon="pi pi-check"
+            [loading]="loading"
+            [rounded]="true"
+            [disabled]="form.invalid || loading" />
         </ng-template>
-    </form>
+        <ng-template [ngIf]="isChamadaPage">
+          <p-button
+            type="button"
+            (onClick)="finalizar($event)"
+            styleClass="w-full px-3"
+            label="Finalizar {{ tipoString }}"
+            icon="pi pi-check"
+            [loading]="loading"
+            [rounded]="true"
+            [pTooltip]="evento.active ? undefined : 'Evento está desativado'"
+            tooltipPosition="top"
+            [disabled]="form.invalid || loading || !evento.active" />
+        </ng-template>
+      </div>
+    </ng-template>
+  </form>
 </p-dialog>

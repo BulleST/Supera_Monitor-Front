@@ -449,16 +449,33 @@
                           (onChange)="turmaChanged(turma_Id, $event)">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div class="w-full">
+                            <div class="w-full shadow-sm">
                                 <p class="font-bold">{{ item.nome }}</p>
-                                <div class="flex align-items-center justify-content-between mt-1">
+                                <!-- <div class="flex align-items-center justify-content-between mt-1">
                                     <p class="text-sm">
                                         <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
                                         <span>{{ item.professor }}</span>
                                     </p>
                                     <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vagas</span>
-                                    <p class="text-sm">{{item.perfilCognitivo[0].nome}}</p>
+                                    <p class="text-xs">{{item.perfilCognitivo[0]?.nome ?? "Sem perfil cognitivo"}}</p>
+                                </div> -->
+                                <div class="flex align-items-center justify-content-between mt-1">
+                                    <p class="flex items-center justify-center">
+                                        <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                        <span>{{ item.professor }}</span>
+                                    </p>
+                                    <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
                                 </div>
+                                <p class="text-xs mt-1">
+                                    <ng-container *ngIf="item.perfilCognitivo?.length > 0; else semPerfil">
+                                        <span *ngFor="let perfil of item.perfilCognitivo">
+                                            {{ perfil.nome }}
+                                        </span>
+                                    </ng-container>
+                                    <ng-template #semPerfil>
+                                        Sem perfil cognitivo associado
+                                    </ng-template>
+                                </p>
                             </div>
                         </div>
                     </ng-template>

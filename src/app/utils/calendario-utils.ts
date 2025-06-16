@@ -76,7 +76,7 @@ export class CalendarioUtils {
     getEventStyles(item: Evento): { backgroundColor: string, textColor: string, borderColor: string, zIndex: number } {
         const MEETING_COLOR = '#F37435'
         const DEFAULT_COLOR = '#2E2E2E'
-        const DIM_COLOR = '#3F3F46'
+        const DIM_COLOR = '#D6D6DB'
 
         let backgroundColor = DEFAULT_COLOR
         let borderColor = DEFAULT_COLOR

@@ -15,7 +15,6 @@
                       severity="secondary"
                       styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
                       (onClick)="filtroPopover.toggle($event)"
-                      (mouseenter)="filtroPopover.show($event)"
                       [rounded]="true" />
         </div>
     </p-toolbar>
@@ -63,7 +62,7 @@
                  dataKey="id"
                  [showGridlines]="false"
                  [virtualScroll]="true"
-                 virtualScrollItemSize="31"
+                 virtualScrollItemSize="46"
                  scrollHeight="500px"
                  [scrollable]="true">
             <ng-template #header let-columns>
@@ -128,7 +127,7 @@
                 </tr>
             </ng-template>
             <ng-template #body let-aluno let-i="rowIndex">
-                <tr>
+                <tr style="height: 46px" >
                     <td pFrozenColumn
                         alignFrozen="left"
                         [frozen]="true"
@@ -185,6 +184,14 @@
                                     'surface-50': i % 2 != 0
                                 }"
                                 *ngIf="!item.aula.reagendamentoPara_Evento_Id && !item.participacao.reposicaoPara_Evento_Id">
+                                
+                                <!-- <ng-container *ngTemplateOutlet="dataTemplate"></ng-container> -->
+                                <ng-template #dataTemplate>
+                                    <div class="flex w-full">
+                                        <p class="px-2 flex-1 bg-white text-center text-xs border-1 border-200 border-top-none border-right-none">{{item.aula.data | date: 'dd/MM'}} </p>
+                                        <p class="px-2 flex-1 bg-white text-center text-xs border-1 border-200 border-top-none">{{item.aula.data | date: 'HH\'h\'mm'}}</p>
+                                    </div>
+                                </ng-template>
                                 <ng-container *ngTemplateOutlet="aniversario; 
                                             context: { 
                                                     ehAniversario: ehAniversario(item.aula.data, aluno.dataNascimento), 
@@ -269,12 +276,6 @@
                                              tooltipPosition="top">
                                             <span>Aula 1</span>
                                         </div>
-                                        <ng-template #dataTemplate>
-                                            <div class="flex w-full">
-                                                <p class="px-2 flex-1 bg-white text-center text-xs border-1 border-200 border-top-none border-right-none">{{item.aula.data | date: 'dd/MM'}} </p>
-                                                <p class="px-2 flex-1 bg-white text-center text-xs border-1 border-200 border-top-none">{{item.aula.data | date: 'HH\'h\'mm'}}</p>
-                                            </div>
-                                        </ng-template>
                                         <p-popover #popoverSelectedAlunoAula
                                                    id="roteiro-aula-{{item.participacao.id}}"
                                                    (onHide)="unselectAlunoAula(popoverSelectedAlunoAula)"
@@ -299,13 +300,11 @@
                                                         <span>Reposição da aula do dia {{item.participacao.reposicaoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
                                                     </p>
                                                 </div>
-                                                <p-badge *ngIf="item.primeiraAula"
+                                                <p-badge *ngIf="aluno.primeiraAula_Id == item.aula.id"
                                                          styleClass=" bg-pink-500 border-pink-500"
                                                          value="Aula 1"
                                                          size="small"
-                                                         severity="danger"
-                                                         [pTooltip]="'Primeira aula'"
-                                                         tooltipPosition="top" />
+                                                         severity="danger" />
                                                 <p class="flex gap-2">
                                                     <span class="font-bold">Data:</span>
                                                     <span>{{item.aula.data | date:'dd/MM/yy '}}</span>
