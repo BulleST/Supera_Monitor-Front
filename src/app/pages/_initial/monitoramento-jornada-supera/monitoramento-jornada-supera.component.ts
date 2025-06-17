@@ -74,6 +74,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                     }
                     return checklist;
                 });
+                aluno = this.alunoService.mapAluno(aluno)
                 return aluno;
             })
         });
