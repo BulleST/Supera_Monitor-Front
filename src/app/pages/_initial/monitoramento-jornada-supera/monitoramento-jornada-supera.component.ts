@@ -9,6 +9,8 @@ import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../../../models/aluno-checklist-item-list.model';
+import { UserService } from '../../../services/user.service';
+import { AccountService } from '../../../services/account.service';
 
 @Component({
     selector: 'app-monitoramento-jornada-supera',
@@ -39,7 +41,8 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     constructor(
         private service: ChecklistService,
         private alunoService: AlunoService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private accountService: AccountService
     ) {
         var onFinish = this.service.onFinish.subscribe(res => {
             this.checklists = this.checklists.map((checklist, indexChecklist) => {
@@ -60,8 +63,14 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
                     let index = checklist.items.findIndex(x => x.id == res);
                     if (index != -1) {
-                         console.log(index,checklist.items[index] )
-                        checklist.items.splice(index, 1);
+
+                        var item = checklist.items[index];
+                        item.finalizado = true;
+                        item.dataFinalizacao = new Date;
+                        item.account_Finalizacao_Id = this.accountService.accountValue?.id,
+                        item.account_Finalizacao = this.accountService.accountValue?.name,
+
+                        checklist.items.splice(index, 1, item);
                     }
                     return checklist;
                 });
