@@ -20,7 +20,7 @@ import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/f
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 // End Alunos
 import { RouterModule } from '@angular/router';
-import { AgendarReposicaoAlunoComponent } from '../pages/calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
+// import { AgendarReposicaoAlunoComponent } from '../pages/calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { NameAbvPipe } from '../utils/name.pipe';
 import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
@@ -30,9 +30,10 @@ import { AlunoChecklistComponent as CalendarioAlunoChecklistComponent } from '..
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
-import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
-import { AlunoChecklistDialogComponent } from './aluno-checklist-dialog/aluno-checklist-dialog.component';
-import { AlunoChecklistComponent } from './aluno-checklist/aluno-checklist.component';
+import { AlunoPopoverComponent } from './aluno/aluno-popover/aluno-popover.component';
+import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/aluno-checklist-dialog.component';
+import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
+import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
 
 @NgModule({
     declarations: [
@@ -48,46 +49,44 @@ import { AlunoChecklistComponent } from './aluno-checklist/aluno-checklist.compo
         AlunoHistoricoComponent,
         AlunoPopoverComponent,
         AlunoChecklistComponent,
+        AlunoChecklistDialogComponent,
+        AlunoReposicaoDialogComponent,
         // End Alunos
-
-        AgendarReposicaoAlunoComponent,
+        
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
         EventoItemHoverComponent,
-        AlunoChecklistDialogComponent,
     ],
     exports: [
         FormsModule,
         PrimengModule,
         ToastrModule,
         FontAwesomeModule,
+        DragDropModule,
+        ScrollingModule,
+        FullCalendarModule,
         NgxMaskDirective,
         FormsModule,
         NgxMaskPipe,
         NameAbvPipe,
 
-
         ProfileComponent,
         ChangePasswordComponent,
-        DragDropModule,
-        ScrollingModule,
-        FullCalendarModule,
-        // DragScrollComponent, 
-        // DragScrollItemDirective,
-        
+
         // Alunos
         CalendarioAlunoChecklistComponent,
         CalendarioAlunoPopover,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoCalendarioComponent,
-        AlunoPopoverComponent,
         AlunoHistoricoComponent,
+        AlunoPopoverComponent,
         AlunoChecklistComponent,
+        AlunoChecklistDialogComponent,
+        AlunoReposicaoDialogComponent,
         // End Alunos
         
-        AgendarReposicaoAlunoComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,

@@ -33,7 +33,7 @@ const routes: Routes = [{
         { path: ':evento_nome/reagendar/:evento_id', component: ReagendarEventoComponent },
         { path: ':evento_nome/cancelar/:evento_id', component: CancelarEventoComponent },
         
-        { path: 'aluno/reposicao/:aluno_id', component: AgendarReposicaoAlunoComponent },
+        { path: 'agendar-reposicao/:aluno_id', component: AgendarReposicaoAlunoComponent },
         { path: 'aluno/:aluno_id', component: AlunoFormComponent }
     ]
 },];

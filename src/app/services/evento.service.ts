@@ -32,7 +32,6 @@ export class EventoService extends Service {
     eventos = new BehaviorSubject<Evento[]>([]);
     feriados = new BehaviorSubject<Feriado[]>([]);
     dashboard = new BehaviorSubject<Dashboard_Response>(new Dashboard_Response);
-
     
     calendarioReload = new EventEmitter<number>();
     calendarView = new EventEmitter<CalendarioView>();

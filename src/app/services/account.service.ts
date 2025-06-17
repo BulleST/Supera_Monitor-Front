@@ -26,7 +26,7 @@ export class AccountService {
         private activatedRoute: ActivatedRoute,
         private http: HttpClient,
     ) {
-        this.url = environment.url ;
+        this.url = environment.url;
 
         this.account = this.accountSubject.asObservable();
 
@@ -45,7 +45,7 @@ export class AccountService {
 
     public get accountValue() {
         return this.accountSubject.value;
-  }
+    }
 
     login(model: Login) {
         return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
@@ -117,20 +117,12 @@ export class AccountService {
     private startRefreshTokenTimer() {
         try {
             if (this.accountValue) {
-                /** atop is not depreciated
-                 * ignore de typescrypt warning
-                 */
                 const jwtToken = JSON.parse(atob(this.accountValue.jwtToken.split('.')[1]));
-
-                // set a timeout to refresh the token a minute before it expires
                 const expires = new Date(jwtToken.exp * 1000);
-                console.log('expires', expires)
                 const timeout = expires.getTime() - Date.now() - (60 * 1000);
-                console.log('timeout', timeout)
                 this.refreshTokenTimeout = setTimeout(() => this.refreshToken('startRefreshTokenTimer'), timeout);
             }
         } catch (e) {
-
         }
     }
 

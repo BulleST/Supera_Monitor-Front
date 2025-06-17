@@ -25,13 +25,10 @@ import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
 import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
-// import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
-// import { AlunoChecklistComponent } from './aluno-checklist/aluno-checklist.component';
+import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
 
 @NgModule({
     declarations: [
-        // AlunoChecklistComponent,
-        // AlunoPopoverComponent,
         CalendarioComponent,
         CadastrarSuperacaoComponent,
         CadastrarOficinaComponent,
@@ -53,6 +50,7 @@ import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.comp
         CalculoPerfilCognitivoComponent,
         ReposicaoComponent,
         InserirAlunoComponent,
+        AgendarReposicaoAlunoComponent,
         
     ],
     imports: [

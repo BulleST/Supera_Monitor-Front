@@ -1,15 +1,16 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
-import { AlunoService } from '../../services/alunos.service';
-import { ChecklistService } from '../../services/checklist.service';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { AlunoService } from '../../../services/alunos.service';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Aluno } from '../../models/alunos.model';
+import { Aluno } from '../../../models/alunos.model';
 import { Popover } from 'primeng/popover';
-import { Crypto, MensagemWhatsapp } from '../../utils';
+import { Crypto, MensagemWhatsapp } from '../../../utils';
 import { Router } from '@angular/router';
-import { EventoService } from '../../services/evento.service';
+import { EventoService } from '../../../services/evento.service';
 import { MenuItem } from 'primeng/api';
 import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
 import { SelectChangeEvent } from 'primeng/select';
+import { Evento } from '../../../models/evento.model';
+import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 
 @Component({
     selector: 'app-aluno-popover',
@@ -21,12 +22,12 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     @Input() aluno_Id!: number;
     @Input() showChecklist: boolean = false;
+    @Input() evento?: Evento;
+    @Input() participacao?: Evento_Participacao_Aluno;
 
     subscription: Subscription[] = [];
     aluno!: Aluno;
     loadingAluno = false;
-    // alunos: Aluno[] = [];
-
     loadingFoto = false;
     foto?: string;
 
@@ -46,9 +47,14 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
+        }
+        if (changes['evento']) {
+            this.evento = changes['evento'].currentValue;
+        }
+        if (changes['participacao']) {
+            this.participacao = changes['participacao'].currentValue;
         }
         if (changes['showChecklist']) {
             this.showChecklist = changes['showChecklist'].currentValue;
@@ -131,6 +137,18 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 },
             })
         }
+        if (this.evento 
+                && this.participacao 
+                && (this.participacao.presente != true)) {
+            this.menuItems.push({
+                label: 'Agendar reposição',
+                icon: 'pi pi-calendar text-500',
+                styleClass: 'text-500 surface-50 hover:surface-100',
+                command: () => {
+                    this.goToAgendarReposicao();
+                },
+            })
+        }
     }
 
         
@@ -164,10 +182,25 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
     }
 
+    goToAgendarReposicao() {
+        console.log('goToAgendarReposicao');
+        this.eventoService.setEvento(this.evento);
+        this.router.navigate(['calendario', 'agendar-reposicao', this.crypto.encrypt(this.aluno_Id)]);
+    }
+
     enviarMensagem() {
         if (this.aluno && this.aluno.celular) {
             return this.mensagemWhatsapp.enviarMensagem(this.aluno.nome, this.aluno.celular)
         }
         return;
+    }
+
+    alunoChanged(aluno: Aluno) {
+        this.aluno = aluno;
+        this.alunoChecklistDialog.aluno = aluno;
+    }
+
+    padStartPage(numero: any, length: number, fill: string) {
+        return numero.toString().padStart(length, fill);
     }
 }

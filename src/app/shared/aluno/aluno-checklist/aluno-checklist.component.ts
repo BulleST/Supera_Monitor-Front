@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Aluno_CheckList_Item, Checklist } from '../../models/checklist.model';
-import { ChecklistService } from '../../services/checklist.service';
-import { Aluno } from '../../models/alunos.model';
-import { AlunoChecklistCompleto } from '../../models/calendario.model';
+import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
+import { ChecklistService } from '../../../services/checklist.service';
+import { Aluno } from '../../../models/alunos.model';
+import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
 import { Dialog } from 'primeng/dialog';
@@ -32,22 +32,21 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
 
     @ViewChild('checklistDialog') checklistDialog!: AlunoChecklistDialogComponent;
 
+    @Output() alunoChanged = new EventEmitter<Aluno>();
+
     constructor(
         private checklistService: ChecklistService,
     ) {
-        if(this.showChecklist) {
 
-            var checklists = checklistService.list.subscribe(res => this.checklists = res);
-            this.subscription.push(checklists)
-    
-            if (!this.checklists.length) {
-                this.loadingChecklist = true;
-                lastValueFrom(this.checklistService.getList())
-                    .then(res => this.loadingChecklist = false)
-                    .catch(res => this.loadingChecklist = false);
-            }
+        var checklists = checklistService.list.subscribe(res => this.checklists = res);
+        this.subscription.push(checklists)
+
+        if (!this.checklists.length) {
+            this.loadingChecklist = true;
+            lastValueFrom(this.checklistService.getList())
+                .then(res => this.loadingChecklist = false)
+                .catch(res => this.loadingChecklist = false);
         }
-
 
     }
 
@@ -97,6 +96,9 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
                 return checklistAluno;
             });
 
+            console.log('aluno checklist before emit', this.aluno, this.checklists) 
+        this.alunoChanged.emit(this.aluno);
+
         this.checklist = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id);
 
         var pendentesDaSemana = this.aluno.checklistCompleto.filter(x => x.pendentesDaSemana.length)
@@ -104,7 +106,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
         this.atrasado = atrasados.length > 0;
 
         if (atrasados.length > 0){
-             this.textoChecklist = '90 dias encerrados com itens em atraso';
+             this.textoChecklist = '90 dias vencidos com pendências';
         }
         if (atrasados.length == 0 && pendentesDaSemana.length == 0) {
             this.textoChecklist = '90 dias concluídos';
@@ -114,7 +116,4 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
         }
     }
 
-    showDialog() {
-        this.checklistDialog.show()
-    }
 }

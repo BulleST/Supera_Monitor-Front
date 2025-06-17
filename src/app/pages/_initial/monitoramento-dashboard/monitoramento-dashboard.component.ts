@@ -16,6 +16,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import { ToastrService } from 'ngx-toastr';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { CalendarioUtils, Crypto } from '../../../utils';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-monitoramento-dashboard',
@@ -45,8 +46,9 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
         private crypto: Crypto,
+        private router: Router,
+        private activatedRoute: ActivatedRoute,
     ) {
-
 
     }
 
@@ -171,5 +173,9 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     applyFilter(request: DashboardRequest) {
         this.request = request;
         this.update();
+    }
+
+    goToReposicao(aluno_Id: number, evento_Id: number) {
+        this.router.navigate(['agendar-reposicao', this.crypto.encrypt(aluno_Id), this.crypto.encrypt(evento_Id)])
     }
 }

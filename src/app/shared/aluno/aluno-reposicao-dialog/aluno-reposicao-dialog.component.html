@@ -1,0 +1,118 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-dialog [header]="'Agendar reposição'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '850px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title"><i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Agendar reposição</span>
+        </div>
+    </ng-template>
+    <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+        <div class="formgrid grid">
+            <div class="field col-12"> <!-- Aluno -->
+                <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
+                <p-select [options]="alunos"
+                          [loading]="loadingAlunos"
+                          name="aluno_Id"
+                          inputId="aluno_Id"
+                          #aluno_Id="ngModel"
+                          [(ngModel)]="alunoSelected"
+                          styleClass="w-full"
+                          class="w-full"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome,turma,professor"
+                          [virtualScroll]="true"
+                          [virtualScrollItemSize]="43"
+                          optionDisabled="deactivated"
+                          [readonly]="blockAlunoField"
+                          [disabled]="blockAlunoField"
+                          placeholder="Selecione um aluno"
+                          appendTo="body">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center">
+                            <div class="w-2rem h-2rem mr-2">
+                                <a *ngIf="item.celular"
+                                   [href]="enviarMensagem(item)"
+                                   pTooltip="Enviar mensagem"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
+                                </a>
+                                <a *ngIf="!item.celular"
+                                   pTooltip="Nenhum celular cadastrado"
+                                   tooltipPosition="top"
+                                   class="p-2 flex align-items-center justify-content-center text-300 border-circle pi pi-whatsapp">
+                                </a>
+                            </div>
+                            <p class="capitalize">{{item.nome | nameAbv }}</p>
+                        </div>
+                        <div class="flex align-items-center">
+                            <div class="w-2rem h-2rem flex align-items-center">
+                                <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                <span>{{item.turma}}</span>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                </div>
+            </div>
+            <div class="field col-12"> <!-- EventoReposicao -->
+                <label for="eventoReposicao_Id">Qual aula o aluno deseja repor? <span class="text-red-500">*</span></label>
+                <p-select [options]="eventosReposicao"
+                          [loading]="loadingEventosRepor"
+                          name="eventoReposicao_Id"
+                          inputId="eventoReposicao_Id"
+                          #eventoReposicao_Id="ngModel"
+                          [(ngModel)]="eventoReposicaoSelected"
+                          styleClass="w-full"
+                          class="w-full"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="descricao,turma,professor,data,sala"
+                          optionDisabled="deactivated"
+                          [readonly]="blockAlunoField"
+                          [disabled]="blockAlunoField"
+                          placeholder="Selecione uma aula para repor"
+                          appendTo="body">
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center">
+                            <span>{{item.turma ?? item.descricao}}</span>
+                            <span class="ml-2">Data: {{item.data | date : 'dd/MM HH:mm'}}</span>
+                        </div>
+                        <p class="flex align-items-center">
+                            <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                            <span>{{item.professor}}</span>
+                            <span>Sala: </span>
+                            <app-sala-aula [andar]="item.andar"
+                                           [numeroSala]="item.numeroSala"
+                                           [sala_Id]="item.sala_Id"></app-sala-aula>
+                        </p>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                </div>
+            </div>
+            <div class="col-12 px-1 flex align-items-center justify-content-end">
+                <p-button type="submit"
+                          styleClass="w-full px-3"
+                          label="Finalizar agendamento"
+                          icon="pi pi-check"
+                          [loading]="loading"
+                          [rounded]="true"
+                          [disabled]="form.invalid || loading" />
+            </div>
+        </div>
+    </form>
+</p-dialog>

@@ -1,6 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-popover
-           #popover
+<p-popover #popover
            styleClass="z-2 -mt-1"
            (onHide)="onHide()"
            [dismissable]="true">
@@ -9,21 +8,14 @@
          class="p-2 flex flex-column row-gap-1 -m-2 max-w-fit">
         <div class="p-2 white-space-normal">
             <div class="flex align-items-center gap-2">
-                <ng-container
-                              *ngIf="
-            evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento
-          ">
-                    <div
-                         [tooltipPosition]="tooltipPosition()"
+                <ng-container *ngIf="evento.reagendamentoDe_Evento_Id && evento.reagendamentoDe_Evento">
+                    <div [tooltipPosition]="tooltipPosition()"
                          [pTooltip]="tooltipTemplate">
-                        <span
-                              class="text-primary-500 text-base font-bold border-circle border-2 border-primary-500 w-2rem h-2rem flex align-items-center justify-content-center">R</span>
+                        <span class="text-primary-500 text-base font-bold border-circle border-2 border-primary-500 w-2rem h-2rem flex align-items-center justify-content-center">R</span>
                     </div>
                     <ng-template #tooltipTemplate>
                         <p>
-                            {{ evento.reagendamentoDe_Evento.turma }} - {{ evento.reagendamentoDe_Evento.data
-                  | date : "dd/MM/yyyy 'às' HH:mm"
-              }}
+                            {{ evento.reagendamentoDe_Evento.turma }} - {{ evento.reagendamentoDe_Evento.data | date : "dd/MM/yyyy 'às' HH:mm" }}
                         </p>
                     </ng-template>
                 </ng-container>
@@ -155,37 +147,27 @@
                      [ngClass]="{ 'cursor-disabled': aluno.presente && evento.finalizado }"
                      class="p-0 m-0">
                     <div *cdkDragPlaceholder></div>
-                    <div
-                         *cdkDragPreview
+                    <div *cdkDragPreview
                          class="p-2">
                         <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
                         <div class="shadow-2">
-                            <ng-container
-                                          *ngTemplateOutlet="
-                  alunoItem;
-                  context: { aluno: aluno }
-                "></ng-container>
+                            <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
                         </div>
                     </div>
                     <a class="cursor-pointer">
-                        <ng-container
-                                      *ngTemplateOutlet="
-                alunoItem;
-                context: { aluno: aluno }
-              "></ng-container>
+                        <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
                     </a>
-                    <ng-template
-                                 #alunoItem
-                                 let-aluno="aluno">
-                        <app-aluno-popover-calendario #popoverAluno
-                                           [aluno]="aluno"
-                                           [evento]="evento"></app-aluno-popover-calendario>
-                        <div
-                             class="w-full flex align-items-center justify-content-start p-1 border-round-md"
+                    <ng-template #participacaoItem let-participacao="participacao">
+                        <app-aluno-popover #popoverAluno
+                                           [aluno_Id]="participacao.aluno_Id"
+                                           [showChecklist]="true"
+                                           [evento]="evento"
+                                           [participacao]="participacao"></app-aluno-popover>
+                        <div class="w-full flex align-items-center justify-content-start p-1 border-round-md"
                              [ngClass]="{
-                'bg-white': i % 2 == 0,
-                'surface-50': i % 2 != 0
-              }">
+                                'bg-white': i % 2 == 0,
+                                'surface-50': i % 2 != 0
+                            }">
                             <div
                                  class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
                                 <i class="pi pi-user text-primary text-xs"></i>
@@ -194,25 +176,26 @@
                                 <span
                                       class="hover:underline hover:text-primary-500"
                                       [ngClass]="{
-                                    'text-green-500': evento.finalizado && aluno.presente == true,
-                                    'text-red-500': evento.finalizado && aluno.presente == false,
-                                    'text-800': !evento.finalizado && !aluno.reposicaoDe_Evento_Id,
-                                    'text-purple-500': !evento.finalizado && aluno.reposicaoDe_Evento_Id,
-                                    'text-pink-500': !evento.finalizado && getPrimeiraAula(aluno, evento),
+                                    'text-green-500': evento.finalizado && participacao.presente == true,
+                                    'text-red-500': evento.finalizado && participacao.presente == false,
+                                    'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
+                                    'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
+                                    'text-pink-500': !evento.finalizado && getPrimeiraAula(participacao, evento),
                                 }"
-                                      [pTooltip]="aluno.nome"
-                                      (click)="showAluno($event, aluno, popoverAluno)">
-                                    <span class="font-bold">{{ aluno.aluno | nameAbv }}</span>
+                                      [pTooltip]="participacao.nome"
+                                      (click)="popoverAluno.show($event)">
+                                    <!-- showAluno($event, aluno, popoverAluno) -->
+                                    <span class="font-bold capitalize">{{ participacao.aluno | nameAbv }}</span>
                                 </span>
                                 <p-badge
-                                         *ngIf="aluno.reposicaoDe_Evento_Id"
+                                         *ngIf="participacao.reposicaoDe_Evento_Id"
                                          styleClass="ml-2 bg-purple-500"
                                          value="Reposição"
                                          size="small"
                                          [pTooltip]="reposicaoDe_Evento"
                                          tooltipPosition="bottom" />
                                 <p-badge
-                                         *ngIf="primeiraAula(aluno, evento)"
+                                         *ngIf="primeiraAula(participacao, evento)"
                                          styleClass="ml-2 bg-pink-500"
                                          value="Aula 1"
                                          size="small"
@@ -222,44 +205,44 @@
                                       *ngIf="evento.finalizado"
                                       class="ml-2">
                                     <span
-                                          *ngIf="aluno.presente == true"
+                                          *ngIf="participacao.presente == true"
                                           class="pi pi-check text-green-500"
                                           pTooltip="Presente"></span>
                                     <span
-                                          *ngIf="aluno.presente == false"
+                                          *ngIf="participacao.presente == false"
                                           class="pi pi-thumbs-down-fill text-red-500"
                                           pTooltip="Faltou"></span>
                                 </span>
                                 <ng-template #reposicaoDe_Evento>
                                     <div
-                                         *ngIf="aluno.reposicaoDe_Evento"
+                                         *ngIf="participacao.reposicaoDe_Evento"
                                          class="w-15rem">
-                                        <p> Data: {{ aluno.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm'
+                                        <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm'
                       }}
                                         </p>
-                                        <p> Semana: {{ aluno.reposicaoDe_Evento.semana }} - {{ aluno.reposicaoDe_Evento.tema }}
+                                        <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}
                                         </p>
-                                        <p *ngIf="aluno.reposicaoDe_Evento.turma"> Turma: {{ aluno.reposicaoDe_Evento.turma }}
+                                        <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}
                                         </p>
-                                        <p *ngIf="aluno.reposicaoDe_Evento.professor">
+                                        <p *ngIf="participacao.reposicaoDe_Evento.professor">
                                             <span
                                                   class="inline-flex w-1rem h-1rem border-circle mr-2"
                                                   [style]="{
-                          backgroundColor: aluno.reposicaoDe_Evento.corLegenda
+                          backgroundColor: participacao.reposicaoDe_Evento.corLegenda
                         }"></span>
-                                            <span>Educador: {{ aluno.reposicaoDe_Evento.professor }}</span>
+                                            <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
                                         </p>
                                     </div>
                                 </ng-template>
                             </span>
                             <p class="ml-auto pl-2">
                                 <a
-                                   *ngIf="aluno.celular"
-                                   [href]="enviarMensagem(aluno)"
+                                   *ngIf="participacao.celular"
+                                   [href]="enviarMensagem(participacao)"
                                    target="_blank"
                                    class="pi pi-whatsapp border-circle text-green-500 hover:bg-green-500 hover:text-white p-1"
                                    tooltipPosition="top"
-                                   pTooltip="Falar com {{ aluno.aluno }}"></a>
+                                   pTooltip="Falar com {{ participacao.aluno }}"></a>
                             </p>
                         </div>
                     </ng-template>

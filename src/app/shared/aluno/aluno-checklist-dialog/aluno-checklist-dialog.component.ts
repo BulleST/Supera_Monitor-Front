@@ -1,14 +1,14 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
-import { Aluno } from '../../models/alunos.model';
-import { showError } from '../../utils';
-import { ChecklistService } from '../../services/checklist.service';
-import { UserService } from '../../services/user.service';
+import { Aluno } from '../../../models/alunos.model';
+import { showError } from '../../../utils';
+import { ChecklistService } from '../../../services/checklist.service';
+import { UserService } from '../../../services/user.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import moment from 'moment';
 import { lastValueFrom } from 'rxjs';
-import { Aluno_CheckList_Item } from '../../models/checklist.model';
-import { AlunoChecklistCompleto } from '../../models/calendario.model';
+import { Aluno_CheckList_Item } from '../../../models/checklist.model';
+import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import { NgModel } from '@angular/forms';
 import $ from 'jquery';
 
@@ -41,6 +41,7 @@ export class AlunoChecklistDialogComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
+            console.log('aluno-checklist-dialog aluno', this.aluno)
         }
         if (changes['loading']) this.loading = changes['loading'].currentValue;
 

@@ -113,46 +113,47 @@ export class AgendarReposicaoAlunoComponent implements OnDestroy, AfterViewInit 
         private calendarioUtils: CalendarioUtils,
     ) {
 
-        var params = this.activatedRoute.params.subscribe(res => {
-            if (!res['aluno_id']) {
-                this.visible = false;
-                this.visibleChange();
-            } else {
-                this.participacao.aluno_Id = this.crypto.decrypt(res['aluno_id']);
-                this.aluno.id = this.participacao.aluno_Id;
-                this.loadAluno();
-            }
-        });
-        this.subscription.push(params);
+        this.visible = true;
+        // var params = this.activatedRoute.params.subscribe(res => {
+        //     if (!res['aluno_id']) {
+        //         this.visible = false;
+        //         this.visibleChange();
+        //     } else {
+        //         this.participacao.aluno_Id = this.crypto.decrypt(res['aluno_id']);
+        //         this.aluno.id = this.participacao.aluno_Id;
+        //         this.loadAluno();
+        //     }
+        // });
+        // this.subscription.push(params);
 
-        var evento = this.service.evento.subscribe(res => {
-            if (!res) {
-                try {
-                    var evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                    this.service.setEvento(evento)
-                }
-                catch (e) {
-                    this.visible = false;
-                    this.visibleChange();
-                }
-                return;
-            }
-            if (res) {
-                this.evento = res;
-                this.tipoString = this.getTipo(this.evento);
-                this.participacao = this.evento.alunos.find(x => x.aluno_Id == this.participacao.aluno_Id) as Evento_Participacao_Aluno;
-                this.visible = true;
-            }
-        });
-        this.subscription.push(evento);
+        // var evento = this.service.evento.subscribe(res => {
+        //     if (!res) {
+        //         try {
+        //             var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+        //             this.service.setEvento(evento)
+        //         }
+        //         catch (e) {
+        //             this.visible = false;
+        //             this.visibleChange();
+        //         }
+        //         return;
+        //     }
+        //     if (res) {
+        //         this.evento = res;
+        //         this.tipoString = this.getTipo(this.evento);
+        //         this.participacao = this.evento.alunos.find(x => x.aluno_Id == this.participacao.aluno_Id) as Evento_Participacao_Aluno;
+        //         this.visible = true;
+        //     }
+        // });
+        // this.subscription.push(evento);
 
 
-        setTimeout(() => {
-            if (!this.evento) {
-                this.visible = false;
-                this.visibleChange();
-            }
-        }, 1000);
+        // setTimeout(() => {
+        //     if (!this.evento) {
+        //         this.visible = false;
+        //         this.visibleChange();
+        //     }
+        // }, 1000);
 
     }
 
