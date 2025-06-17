@@ -1,0 +1,5 @@
+::ng-deep .p-accordionpanel,
+::ng-deep .p-accordionpanel.p-accordionheader {
+    margin-bottom: 1rem;
+    border-bottom: none!important;
+}

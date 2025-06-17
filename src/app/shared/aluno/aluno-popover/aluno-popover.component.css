@@ -68,6 +68,14 @@
     border-color: var(--primary-600);
 }
 
+::ng-deep .p-select.p-select-aluno-menu .p-select-label.p-placeholder {
+    color: white;
+    text-align: center;
+    margin-right: -0.5rem !important;
+    font-size: 1rem !important;
+}
+
+
 ::ng-deep .p-select.p-select-aluno-menu-overlay .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
     background-color: transparent !important;
 }

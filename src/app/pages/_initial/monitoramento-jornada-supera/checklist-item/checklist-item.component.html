@@ -1,0 +1,59 @@
+<p-accordion-panel [value]="index" #panel >
+    <p-accordion-header>
+        <p [ngClass]="{
+            'text-primary-500': index == activeIndex
+        }">{{item.nome}}</p>
+    </p-accordion-header>
+    <p-accordion-content>
+        <p-table [value]="item.alunos"
+                 [scrollable]="true"
+                 [scrollHeight]="'200px'"
+                 [virtualScroll]="true"
+                 [virtualScrollDelay]="0"
+                 [virtualScrollItemSize]="55"
+                 stripedRows>
+            <ng-template #body let-aluno let-index="rowIndex">
+                <tr style="height: 55px;">
+                    <td [ngClass]="{
+                        'surface-100': index % 2 == 0,
+                        'surface-50': index % 2 != 0,
+                        }">
+                        <app-checklist-item-aluno [checklist]="checklist"
+                                                  [item]="item"
+                                                  [alunoChecklistItem]="aluno"
+                                                  [loading]="loading">
+                        </app-checklist-item-aluno>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template #emptymessage>
+                <ng-container *ngIf="loading">
+                    <tr *ngFor="let item of [1,2,3,4]"
+                        style="height: 55px;">
+                        <td [ngClass]="{
+                                        'surface-100': item % 2 == 0,
+                                        'surface-50': item % 2 != 0,
+                                    }">
+                            <div class="flex align-items-center mb-2 gap-2">
+                                <p-skeleton size="1rem" shape="circle" />
+                                <p-skeleton width="10rem" height="1rem" borderRadius="2rem" />
+                            </div>
+                            <div class="flex align-items-center gap-2">
+                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem" />
+                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem"
+                                            class="ml-auto" />
+                                <p-skeleton size="1rem" shape="circle" />
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+                <ng-container *ngIf="!loading">
+                    <tr style="height: 35px;">
+                        <td class="text-500 py-0">Nenhum aluno nessa etapa</td>
+                    </tr>
+                </ng-container>
+            </ng-template>
+        </p-table>
+    </p-accordion-content>
+</p-accordion-panel>

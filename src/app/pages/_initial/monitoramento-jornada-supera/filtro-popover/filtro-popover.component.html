@@ -1,0 +1,153 @@
+<p-popover appendTo="body" #popover styleClass="w-25rem">
+    <div class="w-full flex align-items-center ">
+        <span class="p-dialog-title">
+            <i
+               class="pi pi-filter mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+            <span>Filtrar</span>
+        </span>
+    </div>
+    <div class="formgrid grid p-3">
+        <!-- Turma -->
+        <div class="field col-12">
+            <label for="turma_Id" class="white-space-nowrap mr-2">Turma: </label>
+            <p-select
+                      [options]="turmas"
+                      [(ngModel)]="request.turma_Id"
+                      [loading]="loadingTurmas"
+                      (ngModelChange)="turmaChanged()"
+                      #turma_Id="ngModel"
+                      [style]="{width: '100%'}"
+                      name="turma_Id"
+                      inputId="turma_Id"
+                      optionLabel="nome"
+                      optionValue="id"
+                      [filter]="true"
+                      filterBy="nome"
+                      placeholder="Selecione uma turma"
+                      [showClear]="true"
+                      appendTo="body"
+                      optionDisabled="disabled">
+                <ng-template let-item #item>
+                    <div class="flex align-items-center justify-content-between w-full gap-2">
+                        <div class="w-full">
+                            <p class="font-bold">{{ item.nome }}</p>
+                            <div class="flex align-items-center justify-content-between">
+                                <p class="text-sm">
+                                    <span class="w-1rem h-1rem inline-flex mr-1 border-circle"
+                                          [style]="{ backgroundColor: item.corLegenda }"></span>
+                                    <span>{{ item.professor }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+        <!-- Educador -->
+        <div class="field col-12">
+            <label for="professor_Id" class="white-space-nowrap mr-2">Educador:</label>
+            <p-select
+                      [options]="professores"
+                      [(ngModel)]="request.professor_Id"
+                      [loading]="loadingProfessores"
+                      (ngModelChange)="professorChanged()"
+                      #professor_Id="ngModel"
+                      [style]="{width: '100%'}"
+                      name="professor_Id"
+                      inputId="professor_Id"
+                      optionLabel="nome"
+                      optionValue="id"
+                      [filter]="true"
+                      filterBy="nome"
+                      placeholder="Selecione um educador"
+                      [showClear]="true"
+                      appendTo="body">
+                <ng-template let-item #item>
+                    <div class="flex align-items-center justify-content-between w-full gap-2">
+                        <div>
+                            <p class="font-bold mb-1 flex align-items-center ">
+                                <span class="w-1rem h-1rem border-circle flex mr-2"
+                                      [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                <span class="mr-2">{{ item.nome }}</span>
+                            </p>
+                            <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às
+                                    {{item.expedienteFim | date : 'HH:mm'}}</p>
+                            </ng-container>
+                        </div>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+        <!-- Aluno -->
+        <div class="field col-12">
+            <label for="aluno_Id" class="white-space-nowrap mr-2">Aluno: </label>
+            <p-select [options]="alunos"
+                      [loading]="loadingAlunos"
+                      [(ngModel)]="request.aluno_Id"
+                      (ngModelChange)="alunoChanged()"
+                      [style]="{width: '100%'}"
+                      optionLabel="nome"
+                      optionValue="id"
+                      name="aluno_Id"
+                      inputId="aluno_Id"
+                      [filter]="true"
+                      filterBy="nome,turma"
+                      [virtualScroll]="true"
+                      [virtualScrollItemSize]="43"
+                      [showClear]="true"
+                      optionDisabled="disabled"
+                      appendTo="body">
+                <ng-template let-item #item>
+                    <div>
+                        <div class="flex align-items-center w-full gap-1">
+                            <div class="w-2rem h-2rem">
+                                <a *ngIf="item.celular"
+                                   [href]="enviarMensagem(item.nome, item.celular)"
+                                   pTooltip="Enviar mensagem"
+                                   tooltipPosition="top"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-green-500 hover:bg-green-500 hover:text-white ">
+                                </a>
+                                <a *ngIf="!item.celular"
+                                   class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-400 pointer-event-none">
+                                </a>
+                            </div>
+                            <p>{{item.nome | nameAbv }}</p>
+                        </div>
+                        <p class="text-sm">
+                            <span class="w-2rem h-2rem p-2 inline-flex align-itens-center mr-1">
+                                    <span class="w-1rem h-1rem border-circle inline-flex"
+                                          [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                            </span>
+                            <span>Turma: {{ item.turma }}</span>
+                        </p>
+                    </div>
+                </ng-template>
+            </p-select>
+        </div>
+
+        <div class="field col-12 flex flex-row align-items-center">
+            <p-checkbox inputId="pendentesSemana"
+                        name="pendentesSemana"
+                        [(ngModel)]="request.pendentesSemana"
+                        [binary]="true"
+                        styleClass="flex align-items-center" />
+            <label for="pendentesSemana" class="ml-2 mb-0">Exibir apenas pendentes da semana</label>
+        </div>
+
+        <!-- Botão aplicar filtro -->
+        <div class=" col-12 flex justify-content-between mt-2">
+            <p-button type="button"
+                      (onClick)="filter()"
+                      class="w-full"
+                      styleClass="w-full px-3"
+                      label="Aplicar Filtro"
+                      icon="pi pi-filter"
+                      pTooltip="Aplicar filtro"
+                      tooltipPosition="top"
+                      [rounded]="true" />
+        </div>
+    </div>
+</p-popover>

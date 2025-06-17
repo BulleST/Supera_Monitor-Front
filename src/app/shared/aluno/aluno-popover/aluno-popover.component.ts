@@ -11,6 +11,9 @@ import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-c
 import { SelectChangeEvent } from 'primeng/select';
 import { Evento } from '../../../models/evento.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Aluno_Checklist_Item_View } from '../../../models/aluno-checklist-item-list.model';
+import { AlunoChecklistOnConfirmDialogComponent } from '../aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { Aluno_CheckList_Item } from '../../../models/checklist.model';
 
 @Component({
     selector: 'app-aluno-popover',
@@ -24,15 +27,19 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     @Input() showChecklist: boolean = false;
     @Input() evento?: Evento;
     @Input() participacao?: Evento_Participacao_Aluno;
+    @Input() alunoChecklistItem?: Aluno_CheckList_Item | Aluno_Checklist_Item_View;
 
+    checklistObservacao = '';
     subscription: Subscription[] = [];
     aluno!: Aluno;
     loadingAluno = false;
     loadingFoto = false;
     foto?: string;
+    visible = false;
 
     @ViewChild('popover') popover!: Popover;
     @ViewChild('alunoChecklistDialog') alunoChecklistDialog!: AlunoChecklistDialogComponent;
+    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
 
 
     menuItems: MenuItem[] = []
@@ -60,7 +67,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
             this.showChecklist = changes['showChecklist'].currentValue;
         }
     }
-
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
@@ -94,18 +100,18 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     loadAulaZero() {
         if (this.aluno && this.aluno.aulaZero_Id) {
             lastValueFrom(this.eventoService.get(this.aluno.aulaZero_Id))
-            .then(res => {
-                this.aluno.aulaZero = res;
-            })
+                .then(res => {
+                    this.aluno.aulaZero = res;
+                })
         }
     }
 
     loadPrimeiraAula() {
         if (this.aluno && this.aluno.primeiraAula_Id) {
             lastValueFrom(this.eventoService.get(this.aluno.primeiraAula_Id))
-            .then(res => {
-                this.aluno.primeiraAula = res;
-            })
+                .then(res => {
+                    this.aluno.primeiraAula = res;
+                })
         }
     }
 
@@ -122,7 +128,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
             label: 'Enviar mensagem',
             icon: 'pi pi-whatsapp text-green-500',
             styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
-            disabled: !this.aluno.celular,
+            disabled: !this.aluno?.celular,
             command: () => {
                 window.open(this.enviarMensagem(), '_blank');
             },
@@ -137,9 +143,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 },
             })
         }
-        if (this.evento 
-                && this.participacao 
-                && (this.participacao.presente != true)) {
+        if (this.evento
+            && this.participacao
+            && (this.participacao.presente != true)) {
             this.menuItems.push({
                 label: 'Agendar reposição',
                 icon: 'pi pi-calendar text-500',
@@ -149,9 +155,19 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 },
             })
         }
+        if (this.alunoChecklistItem && !this.alunoChecklistItem.finalizado) {
+            this.menuItems.push({
+                label: 'Finalizar checklist',
+                icon: 'pi pi-check text-primary-500',
+                styleClass: 'text-primary-500 bg-primary-100 hover:bg-primary-200',
+                command: () => {
+                    this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem as Aluno_CheckList_Item;
+                    this.alunoChecklistOnConfirmDialog.show();
+                },
+            })
+        }
     }
 
-        
     menuItemChanged(e: SelectChangeEvent) {
         if (e.value.command)
             e.value.command(e);
@@ -159,12 +175,14 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     show(e: any) {
         this.popover.show(e);
+        this.visible = true;
 
         this.loadAluno();
         this.loadFoto();
     }
 
     toggle(e: any) {
+        this.visible = !this.visible;
         this.popover.toggle(e);
         if (this.popover.overlayVisible) {
             this.loadAluno();
@@ -173,6 +191,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     hide() {
+        this.visible = false;
         this.popover.hide();
     }
 
@@ -183,7 +202,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     goToAgendarReposicao() {
-        console.log('goToAgendarReposicao');
         this.eventoService.setEvento(this.evento);
         this.router.navigate(['calendario', 'agendar-reposicao', this.crypto.encrypt(this.aluno_Id)]);
     }
@@ -197,10 +215,16 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     alunoChanged(aluno: Aluno) {
         this.aluno = aluno;
-        this.alunoChecklistDialog.aluno = aluno;
+        if (this.alunoChecklistDialog) {
+            this.alunoChecklistDialog.aluno = aluno;
+        }
     }
 
     padStartPage(numero: any, length: number, fill: string) {
         return numero.toString().padStart(length, fill);
+    }
+
+    onSuccess() {
+        this.alunoChecklistOnConfirmDialog.hide();
     }
 }

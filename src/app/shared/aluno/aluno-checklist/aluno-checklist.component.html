@@ -13,7 +13,7 @@
             <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
                     pTooltip="Atrasado">
                 <span>{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                <i class="pi pi-times-circle text-red-500 fadeout animation-duration-300 animation-iteration-infinite"></i>
+                <i class="pi pi-times-circle text-red-500"></i>
             </span>
             <!-- Pendentes da Semana -->
             <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"

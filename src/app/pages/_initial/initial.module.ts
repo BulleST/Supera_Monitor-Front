@@ -9,13 +9,17 @@ import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
 import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
 import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
-import { FiltroPopoverComponent } from './monitoramento-dashboard/filtro-popover/filtro-popover.component';
 import { NameFirstWordPipe } from '../../utils/name-first-word.pipe';
-// import { AlunoPopoverComponent } from '../../shared/aluno-popover/aluno-popover.component';
-// import { AlunoPopoverChecklistComponent } from './aluno-popover-checklist/aluno-popover-checklist.component';
-// import { AlunoPopoverDetailsComponent } from './aluno-popover-details/aluno-popover-details.component';
-// import { AlunoPopoverComponent } from './aluno-popover/aluno-popover.component';
-// import { AlunoPopoverChecklistComponent } from './aluno-popover-checklist/aluno-popover-checklist.component';
+import { AulaParticipacaoPopoverComponent } from './monitoramento-dashboard/aula-participacao-popover/aula-participacao-popover.component';
+import { FiltroPopoverComponent as FiltroJornadaSupera_Component } from './monitoramento-dashboard/filtro-popover/filtro-popover.component';
+import { FiltroPopoverComponent as FiltroMonitoramento_Component } from './monitoramento-jornada-supera/filtro-popover/filtro-popover.component';
+import { LegendaPopoverComponent } from './monitoramento-dashboard/legenda-popover/legenda-popover.component';
+import { ChecklistComponent } from './monitoramento-jornada-supera/checklist/checklist.component';
+import { ChecklistItemComponent } from './monitoramento-jornada-supera/checklist-item/checklist-item.component';
+import { ChecklistItemAlunoComponent } from './monitoramento-jornada-supera/checklist-item-aluno/checklist-item-aluno.component';
+import { ExibicaoCardsComponent } from './monitoramento-jornada-supera/exibicao-cards/exibicao-cards.component';
+import { ExibicaoListaComponent } from './monitoramento-jornada-supera/exibicao-lista/exibicao-lista.component';
+import { ChecklistPopoverComponent } from './monitoramento-jornada-supera/exibicao-lista/checklist-popover/checklist-popover.component';
 
 @NgModule({
     declarations: [
@@ -24,7 +28,16 @@ import { NameFirstWordPipe } from '../../utils/name-first-word.pipe';
         NavMenuComponent,
         MonitoramentoJornadaSuperaComponent,
         MonitoramentoDashboardComponent,
-        FiltroPopoverComponent,
+        FiltroJornadaSupera_Component,
+        FiltroMonitoramento_Component,
+        AulaParticipacaoPopoverComponent,
+        LegendaPopoverComponent,
+        ChecklistComponent,
+        ChecklistItemComponent,
+        ChecklistItemAlunoComponent,
+        ExibicaoCardsComponent,
+        ExibicaoListaComponent,
+        ChecklistPopoverComponent,
     ],
     imports: [
         CommonModule,

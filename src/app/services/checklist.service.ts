@@ -1,9 +1,12 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, of, tap } from 'rxjs';
+import { EventEmitter, Injectable } from '@angular/core';
+import { BehaviorSubject, of, subscribeOn, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Aluno_CheckList_Item, Checklist } from '../models/checklist.model';
 import { RequestResponse } from '../helpers/request-response.interface';
+import { Aluno_Checklist_Item_View } from '../models/aluno-checklist-item-list.model';
+import { ToastrService } from 'ngx-toastr';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root',
@@ -11,6 +14,16 @@ import { RequestResponse } from '../helpers/request-response.interface';
 })
 export class ChecklistService extends Service {
     override list = new BehaviorSubject<Checklist[]>([]);
+
+    onFinish = new EventEmitter<number>();
+
+    constructor(
+        http: HttpClient,
+        toastrService: ToastrService,
+    ) {
+        super(http, toastrService);
+        this.onFinish.subscribe()
+    }
     
     getList() {
         return this.http.get<Checklist[]>(`${this.url}/checklist/all/`).pipe(tap({
@@ -64,7 +77,8 @@ export class ChecklistService extends Service {
         return this.http.patch<RequestResponse>(`${this.url}/checklist/toggle-item`, request)
             .pipe(tap({
                 next: res => {
-                    this.toastrService.success(`Checklist finalizado`, 'Sucesso')
+                    this.toastrService.success(`Checklist finalizado`, 'Sucesso');
+                    this.onFinish.emit(id)
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível finalizar item da jornada. \n ${getError(err)}`);

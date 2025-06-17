@@ -1,0 +1,167 @@
+<div class="bg-white w-full overflow-hidden">
+    <p-table #dt
+             [value]="alunos"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100, 1000]"
+             [paginator]="alunos.length > 50"
+             dataKey="id"
+             stripedRows
+             showGridlines
+             [rowHover]="alunos.length > 0"
+             [virtualScroll]="true"
+             [virtualScrollDelay]="0"
+             virtualScrollItemSize="37px"
+             [scrollable]="true"
+             scrollHeight="600px"
+             >
+        <ng-template pTemplate="header">
+            <tr>
+                <!-- Aluno -->
+                <th [pSortableColumn]="'nome'"
+                    class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 pl-5 surface-900 py-0 border-none text-white white-space-nowrap p-3">
+                    <div class="flex align-items-center">
+                        <span>Aluno</span>
+                        <div class="flex align-items-center">
+                            <p-columnFilter [type]="'text'"
+                                            [field]="'nome'"
+                                            display="menu" />
+                            <p-sortIcon [field]="'nome'" />
+                        </div>
+                    </div>
+                </th>
+                <!-- Turma -->
+                <th [pSortableColumn]="'turma'" class="surface-900 py-0 border-none text-white white-space-nowrap p-3">
+                    <div class="flex align-items-center">
+                        <span>Turma</span>
+                        <div class="flex align-items-center">
+                            <p-columnFilter [type]="'text'"
+                                            [field]="'turma'"
+                                            display="menu" />
+                            <p-sortIcon [field]="'turma'" />
+                        </div>
+                    </div>
+                </th>
+                <th *ngFor="let checklist of checklists"
+                    class="w-3rem surface-900 px-1 border-none text-white text-center white-space-nowrap py-2">
+                    {{checklist.nome}}
+                </th>
+                <th class="surface-900 py-0 border-bottom-none text-white"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-aluno let-rowIndex="rowIndex">
+            <tr class="cursor-pointer" style="height: 37px;">
+                <!-- Nome -->
+                <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2">
+                    <div class="flex align-items-center white-space-nowrap gap-2">
+                        <ng-container *ngIf="aluno.celular">
+                            <a [href]="enviarMensagem(aluno)"
+                               target="_blank"
+                               pTooltip="Enviar mensagem"
+                               tooltipPosition="top"
+                               class="text-green-500 pi pi-whatsapp hover:bg-green-200"></a>
+                        </ng-container>
+                        <ng-container *ngIf="!aluno.celular">
+                            <a pTooltip="Nenhum celular cadastrado"
+                               tooltipPosition="top"
+                               class="text-600 pi pi-whatsapp cursor-auto"></a>
+                        </ng-container>
+                        <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
+                             [pTooltip]="aluno.nome"
+                             tooltipPosition="top"
+                             (click)="showAlunoPopover($event, aluno)">{{ aluno.nome | nameAbv }}</span>
+                    </div>
+                </td>
+                <td class="white-space-nowrap">
+                    <div class="flex aliign-items-center">
+                        <span class="w-1rem h-1rem inline-flex border-circle flex-none mr-2"
+                              [pTooltip]="aluno.professor"
+                              [style]="{ 
+                                backgroundColor: aluno.corLegenda, 
+                                borderColor: aluno.corLegenda 
+                            }"></span>
+                        <span>{{aluno.turma}}</span>
+                    </div>
+                </td>
+                <ng-container *ngFor="let checklist of aluno.checklistCompleto">
+                    <td *ngIf="!checklist"></td>
+                    <td *ngIf="checklist" (click)="showChecklistPopover($event, aluno, checklist)"
+                        class="white-space-nowrap  border-left-none border-right-none text-center px-3">
+                        <div class="flex align-items-center justify-content-center gap-2">
+                            <!-- Finalizado -->
+                            <span *ngIf="checklist.finalizados.length == checklist.items.length">
+                                <span class="flex align-items-center text-green-600">
+                                    <span>Finalizado</span>
+                                    <i class="pi pi-check-circle  ml-auto pl-2 "></i>
+                                </span>
+                            </span>
+                            <!-- Atrasado -->
+                            <span *ngIf="checklist.atrasados.length > 0 
+                            && checklist.finalizados.length < checklist.items.length">
+                                <span class="flex align-items-center text-red-600 ">
+                                    <span> Atrasado </span>
+                                    <span
+                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-times-circle ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Em Andamento -->
+                            <span *ngIf="checklist.pendentesDaSemana.length > 0 
+                            && checklist.finalizados.length < checklist.items.length">
+                                <span class="flex align-items-center text-orange-500">
+                                    <span>Em Andamento </span>
+                                    <span
+                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-hourglass ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Futuro -->
+                            <span *ngIf="checklist.pendentesDaSemana.length == 0 
+                                    && checklist.atrasados.length == 0 
+                                    && checklist.prazo
+                                    && checklist.finalizados.length != checklist.items.length">
+                                <!-- && checklist.finalizados.length == 0  -->
+                                <span class="flex align-items-center text-blue-500 font-extrabold">
+                                    <span>Futuro </span>
+                                    <span
+                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-clock  ml-1 "></i>
+                                </span>
+                            </span>
+                            <!-- Indefinido -->
+                            <span *ngIf="!checklist.prazo 
+                                && checklist.finalizados.length != checklist.items.length">
+                                <span class="flex align-items-center text-purple-500 ">
+                                    <span> Indefinido </span>
+                                    <span
+                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                    <i class="pi pi-question  ml-1 "></i>
+                                </span>
+                            </span>
+                        </div>
+                    </td>
+                </ng-container>
+                <td class="border-none px-0"></td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <ng-container *ngIf="loading; else elseTemplate">
+                <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+                    <td class="border-none"><p-skeleton /></td>
+                    <td class="border-none"><p-skeleton /></td>
+                    <td class="border-none"><p-skeleton /></td>
+                    <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
+                    <td class="border-none"><p-skeleton /></td>
+                </tr>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <tr class="p-datatable-empty-text">
+                    <td [attr.colspan]="3 + checklists.length">Nenhum item encontrado.</td>
+                </tr>
+            </ng-template>
+        </ng-template>
+    </p-table>
+
+    <app-checklist-popover-jornada #popoverChecklist></app-checklist-popover-jornada>
+    <app-aluno-popover #popoverAluno></app-aluno-popover>
+
+</div>

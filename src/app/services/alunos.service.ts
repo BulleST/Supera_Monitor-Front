@@ -14,7 +14,7 @@ import { AlunoChecklistCompleto } from '../models/calendario.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
-import { AlunoChecklistItemList, AlunoChecklistItemList_Request } from '../models/aluno-checklist-item-list.model';
+import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../models/aluno-checklist-item-list.model';
 
 @Injectable({
     providedIn: 'root',
@@ -71,7 +71,7 @@ export class AlunoService extends Service {
                 checklistAluno.id = checklist.id;
                 checklistAluno.nome = checklist.nome;
                 checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-                checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
+                checklistAluno.prazo = checklistAluno.items[0].prazo;
                 checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                 checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
                 checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
@@ -95,12 +95,13 @@ export class AlunoService extends Service {
             }));
     }
 
-    getListWithChecklist() {
-        return this.http.get<Aluno[]>(`${this.url}/alunos/all/with-checklist`)
+    getListWithChecklist(request?: JornadaSuperaRequest) {
+        request = request ?? new JornadaSuperaRequest
+        return this.http.post<Aluno[]>(`${this.url}/alunos/all/with-checklist`, request)
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
-                    this.list.next(list);
+                    // this.list.next(list);
                     return of(list);
                 },
                 error: err => {
@@ -109,8 +110,8 @@ export class AlunoService extends Service {
             }));
     }
 
-    getChecklist(request: AlunoChecklistItemList_Request) {
-        return this.http.post<AlunoChecklistItemList[]>(`${this.url}/alunos/checklists/all`, request)
+    getChecklist(request: JornadaSuperaRequest) {
+        return this.http.post<Aluno_Checklist_Item_View[]>(`${this.url}/alunos/checklists/all`, request)
             .pipe(tap({
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar jornada supera. \n ${getError(err)}`)
@@ -168,19 +169,6 @@ export class AlunoService extends Service {
                     this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
                 }
             }));
-        // return new Promise<Aluno>(async (resolve, reject) => {
-        //     if (this.list.value.length == 0) {
-        //         await lastValueFrom(this.getListWithChecklist());
-        //     }
-
-        //     var item = this.list.value.find(x => x.id == id) as Aluno;
-        //     if (!item) {
-        //         this.toastrService.error(`Aluno não encontrado.'. `);
-        //         return reject('Aluno não encontrado.')
-        //     }
-
-        //     return resolve(item);
-        // })
     }
 
     edit(model: Aluno) {

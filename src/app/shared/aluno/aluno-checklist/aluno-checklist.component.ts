@@ -96,7 +96,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
                 return checklistAluno;
             });
 
-            console.log('aluno checklist before emit', this.aluno, this.checklists) 
         this.alunoChanged.emit(this.aluno);
 
         this.checklist = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id);

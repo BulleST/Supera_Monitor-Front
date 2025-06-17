@@ -1,0 +1,48 @@
+<p-dialog [modal]="true"
+          [(visible)]="visible"
+          (onHide)="onHide()"
+          [style]="{ maxWidth: '95vw', width: '400px' }"
+          appendTo="body"
+          [draggable]="true"
+          [maximizable]="true">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">
+                <i
+                   class="pi pi-check mr-2 text-base w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Finalizar Checklist</span>
+            </span>
+        </div>
+    </ng-template>
+    <form (ngSubmit)="send($event)">
+        <div class="flex align-items-center gap-2">
+            <p>Tem certeza que deseja marcar essa etapa como concluída?</p>
+        </div>
+        <div class="w-full flex-1 col-12 px-0">
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-comment p-iconfield-textarea" />
+                <textarea pTextarea
+                          class="w-full"
+                          name="observacao"
+                          id="observacao"
+                          [(ngModel)]="observacao"
+                          placeholder="Escreva aqui alguma observação..."
+                          [rows]="2"></textarea>
+            </p-iconfield>
+        </div>
+        <div class="w-full flex align-items-center justify-content-end gap-2">
+            <p-button type="button"
+                      label="Ainda não"
+                      icon="pi pi-times"
+                      styleClass="w-full"
+                      [outlined]="true"
+                      [rounded]="true"
+                      (onClick)="hide()" />
+            <p-button type="submit"
+                      label="Finalizar"
+                      icon="pi pi-check"
+                      styleClass="w-full"
+                      [rounded]="true" />
+        </div>
+    </form>
+</p-dialog>

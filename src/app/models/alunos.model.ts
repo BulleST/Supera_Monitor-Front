@@ -151,13 +151,6 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         options: undefined,
     },
-    // {
-    //     field: 'turmaDesc',
-    //     label: 'Dias de Aula',
-    //     filterType: FilterType.text,
-    //     displayType: DisplayType.text,
-    //     options: undefined,
-    // },
     {
         field: 'turma',
         label: 'Turma',

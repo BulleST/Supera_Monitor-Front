@@ -1,4 +1,4 @@
-export class AlunoChecklistItemList {
+export class Aluno_Checklist_Item_View {
     id: number = 0;
     aluno_Id: number = 0;
     checklist_Id: number = 0;
@@ -24,7 +24,7 @@ export class AlunoChecklistItemList {
     linkGrupo?: string;
 }
 
-export class AlunoChecklistItemList_Request {
+export class JornadaSuperaRequest {
     aluno_Id?: number;
     turma_Id?: number;
     professor_Id?: number;

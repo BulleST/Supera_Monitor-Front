@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, EventEmitter,OnDestroy, Output, ViewChild } from '@angular/core';
-import { DashboardRequest } from '../../../../models/dashboard.model';
+import { AfterViewInit, Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
 import { AccountService } from '../../../../services/account.service';
 import { ProfessorService } from '../../../../services/professor.service';
 import { TurmaService } from '../../../../services/turma.service';
@@ -10,20 +9,21 @@ import { Aluno } from '../../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../../utils';
 import { Popover } from 'primeng/popover';
 import { AlunoService } from '../../../../services/alunos.service';
+import { JornadaSuperaRequest } from '../../../../models/aluno-checklist-item-list.model';
 
 @Component({
-  selector: 'app-filtro-popover',
-  standalone: false,
-  templateUrl: './filtro-popover.component.html',
-  styleUrl: './filtro-popover.component.css'
+    selector: 'app-filtro-popover-jornada-supera',
+    standalone: false,
+    templateUrl: './filtro-popover.component.html',
+    styleUrl: './filtro-popover.component.css'
 })
-export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
-    
-    @Output() applyFilter = new EventEmitter<DashboardRequest>();
-    
+export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
+
+    @Output() applyFilter = new EventEmitter<JornadaSuperaRequest>();
+    @Output() applyPendentesSemana = new EventEmitter<boolean>();
+
     subscription: Subscription[] = [];
-    request = new DashboardRequest;
-    anos: number[] = []
+    request = new JornadaSuperaRequest;
 
     professores: Professor[] = [];
     loadingProfessores = false;
@@ -43,7 +43,7 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
     ) {
-        this.applyFilter = new EventEmitter<DashboardRequest>();
+        this.applyFilter = new EventEmitter<JornadaSuperaRequest>();
 
         var professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
@@ -93,13 +93,11 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
             this.request.aluno_Id = parseInt(localStorage.getItem('aluno_Id')!)
         }
 
-        var anoMin = 2025;
-        var currentAno = new Date().getFullYear();
-        for (let ano = anoMin; ano <= currentAno; ano++) {
-            this.anos.push(ano)
+        if (localStorage.getItem('pendentesSemana')) {
+            this.request.pendentesSemana = localStorage.getItem('pendentesSemana') == 'true' ? true : false;
         }
-        
     }
+
     ngAfterViewInit(): void {
         this.filter()
     }
@@ -111,15 +109,15 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
     show(e: any) {
         this.popover.show(e);
     }
-    
+
     toggle(e: any) {
         if (this.popover)
-        this.popover.toggle(e);
+            this.popover.toggle(e);
     }
 
     hide() {
         if (this.popover)
-        this.popover.hide();
+            this.popover.hide();
     }
 
     filter() {
@@ -210,16 +208,18 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
         } else {
             localStorage.removeItem('aluno_Id');
         }
+        localStorage.setItem('pendentesSemana', this.request.pendentesSemana.toString());
 
-    }
-
-    getCorTurma(turma_Id: number) {
-        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
     }
 
     enviarMensagem(nome: string, celular: string) {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular);
     }
 
+    filtrarPendentesSemana() {
+        this.applyPendentesSemana.emit(this.request.pendentesSemana)
+
+    }
 
 }
+

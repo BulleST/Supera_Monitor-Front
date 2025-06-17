@@ -1,22 +1,21 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
-import { RoteiroService } from '../../../services/roteiro.service';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Evento } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard_Response, Dashboard_Mes, DashboardRequest, Dashboard_Aluno } from '../../../models/dashboard.model';
+import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
+import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Crypto } from '../../../utils';
+import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
 import 'moment/locale/pt-br';
-import { AlunoService } from '../../../services/alunos.service';
-import { ToastrService } from 'ngx-toastr';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
-import { CalendarioUtils, Crypto } from '../../../utils';
-import { ActivatedRoute, Router } from '@angular/router';
+import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
+import { AulaParticipacaoPopoverComponent } from './aula-participacao-popover/aula-participacao-popover.component';
 
 @Component({
     selector: 'app-monitoramento-dashboard',
@@ -31,11 +30,14 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     mesesAno: Dashboard_Mes[] = [];
     meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-    @ViewChild('toolbar') toolbar!: ElementRef;
-
+    
     @ViewChildren('popoverSelectedAlunoAula') popoverSelectedAlunoAula!: QueryList<Popover>;
     @ViewChildren('popoverRoteiro') popoverRoteiro!: QueryList<Popover>;
 
+    @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent ;
+    @ViewChild('selectedAulaComponent') selectedAulaComponent!: AulaParticipacaoPopoverComponent ;
+    @ViewChild('toolbar') toolbar!: ElementRef;
+    
     request: DashboardRequest = new DashboardRequest;
     PseudoEvento = PseudoEvento;
 
@@ -52,8 +54,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
 
     }
 
-    ngAfterViewInit(): void {
-    }
+    ngAfterViewInit(): void { }
 
     randomDate(start: Date, end: Date) {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
@@ -176,6 +177,17 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     }
 
     goToReposicao(aluno_Id: number, evento_Id: number) {
-        this.router.navigate(['agendar-reposicao', this.crypto.encrypt(aluno_Id), this.crypto.encrypt(evento_Id)])
+        this.router.navigate(['./', 'agendar-reposicao', this.crypto.encrypt(aluno_Id), this.crypto.encrypt(evento_Id)])
+    }
+
+    showAluno(aluno_Id: number, event: any) {
+        this.alunoPopover.aluno_Id = aluno_Id;
+        this.alunoPopover.show(event)
+    }
+    
+    showAula(aluno: Dashboard_Aluno, item: Dashboard_Aula_Participacao, event: any) {
+        this.selectedAulaComponent.aluno = aluno;
+        this.selectedAulaComponent.item = item;
+        this.selectedAulaComponent.show(event);
     }
 }

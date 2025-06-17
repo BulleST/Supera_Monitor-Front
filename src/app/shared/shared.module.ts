@@ -34,6 +34,7 @@ import { AlunoPopoverComponent } from './aluno/aluno-popover/aluno-popover.compo
 import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/aluno-checklist-dialog.component';
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
 import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
+import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 
 @NgModule({
     declarations: [
@@ -50,6 +51,7 @@ import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/al
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,
+        AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
         // End Alunos
         
@@ -84,6 +86,7 @@ import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/al
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,
+        AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
         // End Alunos
         
