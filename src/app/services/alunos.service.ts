@@ -6,7 +6,7 @@ import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { ReposicaoAlunoRequest } from '../models/reposicao.model';
-import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restricao.model';
+import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { getError } from '../utils';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';
@@ -50,6 +50,15 @@ export class AlunoService extends Service {
         aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
         aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
 
+        aluno.turma = aluno.turma ?? 'Indefinido';
+        aluno.perfilCognitivo = aluno.perfilCognitivo ?? 'Indefinido';
+        aluno.kit = aluno.kit ?? 'Indefinido';
+        aluno.rm = aluno.rm ?? 'Indefinido';
+        aluno.rm = aluno.rm ?? 'Indefinido';
+
+        console.log('kit', aluno.kit)
+
+
         // Nuláveis
         aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
         aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
@@ -59,24 +68,26 @@ export class AlunoService extends Service {
             aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
         }
 
-        if (aluno.alunoChecklist && aluno.alunoChecklist.length) {
+        aluno.alunoChecklist = aluno.alunoChecklist ?? [];
+        aluno.checklistCompleto = aluno.checklistCompleto ?? [];
 
-        aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
-            checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
-            return checklistAluno
-        })
-        aluno.checklistCompleto = this.checklists
-            .map(checklist => {
-                var checklistAluno = new AlunoChecklistCompleto;
-                checklistAluno.id = checklist.id;
-                checklistAluno.nome = checklist.nome;
-                checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-                checklistAluno.prazo = checklistAluno.items[0].prazo;
-                checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
-                checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-                return checklistAluno;
-            });
+        if (aluno.alunoChecklist && aluno.alunoChecklist.length) {
+                aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
+                checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
+                return checklistAluno
+            })
+            aluno.checklistCompleto = this.checklists
+                .map(checklist => {
+                    var checklistAluno = new AlunoChecklistCompleto;
+                    checklistAluno.id = checklist.id;
+                    checklistAluno.nome = checklist.nome;
+                    checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
+                    checklistAluno.prazo = checklistAluno.items[0].prazo;
+                    checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                    checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
+                    checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                    return checklistAluno;
+                });
         }
 
         return aluno;
@@ -86,7 +97,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
                 next: list => {
-                    // list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
                 },
                 error: err => {

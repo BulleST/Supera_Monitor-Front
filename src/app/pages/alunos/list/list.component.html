@@ -1,21 +1,10 @@
-<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
+<p-contextmenu #cm
+               [model]="tableMenu"
+               (onHide)="tableSelectedItem = null"
+               appendTo="body"
+               triggerEvent="onclick" />
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
-    <ng-template #message let-message>
-        <div>
-            <div [innerHTML]="message.message"></div>
-            <div class="w-full flex-1 col-12">
-                <label for="checklistObservacao">Inserir observação: </label>
-                <textarea pTextarea
-                          class="w-full"
-                          name="checklistObservacao"
-                          id="checklistObservacao"
-                          [(ngModel)]="checklistObservacao"
-                          [rows]="5"></textarea>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
+<app-aluno-popover #popoverAluno></app-aluno-popover>
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -30,12 +19,11 @@
              (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
              dataKey="id"
              stripedRows
-             showGridlines
              [rowHover]="list.length > 0">
         <ng-template pTemplate="caption">
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
-                    <h2 class="flex align-items-center ">
+                    <h2 class="flex align-items-center">
                         <i class="fa-solid fa-user-graduate mr-3 text-primary text-2xl"></i>
                         <span class="text-2xl font-normal my-0">Alunos</span>
                     </h2>
@@ -54,8 +42,7 @@
                                    (input)="dt.filterGlobal(tableSearch, 'contains')"
                                    placeholder="Pesquisar" />
                         </p-iconfield>
-                        <p-button
-                                  icon="pi pi-filter-slash text-sm text-white"
+                        <p-button icon="pi pi-filter-slash text-sm text-white"
                                   (onClick)="clear(dt)"
                                   severity="secondary"
                                   [text]="true"
@@ -63,8 +50,7 @@
                                   tooltipPosition="top"
                                   class="mr-2"
                                   styleClass="h-full bg-black-alpha-80" />
-                        <p-button
-                                  icon="pi pi-sync text-sm text-white"
+                        <p-button icon="pi pi-sync text-sm text-white"
                                   (onClick)="update()"
                                   severity="secondary"
                                   [text]="true"
@@ -72,30 +58,19 @@
                                   tooltipPosition="top"
                                   class="mr-2"
                                   styleClass="h-full bg-black-alpha-80" />
-                        <!-- <p-button
-                                  icon="pi pi-plus text-sm"
-                                  label="Cadastrar"
-                                  pTooltip="Cadastrar aluno"
-                                  tooltipPosition="top"
-                                  [routerLink]="['cadastrar']"
-                                  [rounded]="true"
-                                  styleClass="h-full px-3" /> -->
                     </div>
                 </div>
             </p-toolbar>
         </ng-template>
         <ng-template pTemplate="header">
-            <ng-template [ngIf]="(!tableLoading && list.length > 0) || tableLoading">
+            <ng-container *ngIf="(!tableLoading && list.length > 0) || tableLoading">
                 <tr>
                     <th *ngFor="let col of tableColumns"
                         [pSortableColumn]="col.field"
-                        class="surface-900 py-0 border-none text-white white-space-nowrap p-3"
-                        [ngClass]="{
-                            'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 pl-5': col.field == 'nome',
-                        }">
+                        class="surface-900 py-0 border-none text-white white-space-nowrap p-3">
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
-                            <ng-template [ngIf]="col.filterType != FilterType.none">
+                            <ng-container *ngIf="col.filterType != FilterType.none">
                                 <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
                                     <p-columnFilter
                                                     [type]="col.filterType"
@@ -103,51 +78,135 @@
                                                     display="menu" />
                                     <p-sortIcon [field]="col.field" />
                                 </div>
-                            </ng-template>
+                            </ng-container>
                         </div>
                     </th>
-                    <th *ngFor="let checklist of checklists" class="w-3rem surface-900 px-1 border-none text-white text-center white-space-nowrap py-2"> {{checklist.nome}} </th>
                     <th class="surface-900 py-0 border-bottom-none text-white"></th>
                 </tr>
-            </ng-template>
+            </ng-container>
         </ng-template>
         <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
-            <tr [pContextMenuRow]="item"
+            <tr class="white-space-nowrap">
+                <td pFrozenColumn alignFrozen="left">
+                    <div class="flex align-items-center gap-2">  
+                        <span class="inline-flex w-2rem h-2rem align-items-center">
+                                <ng-container *ngIf="item?.celular">
+                                    <a [href]="enviarMensagem(item)" 
+                                        target="_blank"
+                                        pTooltip="Enviar mensagem"
+                                        tooltipPosition="top"
+                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text p-button-sm">
+                                        <span class="pi pi-whatsapp p-button-icon"></span>
+                                    </a>
+                                </ng-container>
+                                <ng-container *ngIf="!item?.celular">
+                                    <a pTooltip="Nenhum celular cadastrado"
+                                        tooltipPosition="top"
+                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-secondary p-button-text p-button-sm cursor-none bg-transparent">
+                                        <span class="pi pi-whatsapp p-button-icon"></span>
+                                    </a>
+                                </ng-container>
+                        </span>
+                        <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer" 
+                            pTooltip="{{item.nome}}" 
+                            tooltipPosition="top"
+                            (click)="showPopoverAluno(item, $event)">{{ item.nome | nameAbv }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="flex align-items-center gap-2">
+                        <span class="w-1rem h-1rem inline-flex border-circle"
+                                [style]="{ 
+                                    backgroundColor: item.corLegenda, 
+                                    borderColor: item.corLegenda 
+                                }"></span>
+                        <span>{{item.turma}}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="flex align-items-center gap-2">
+                        <span class="w-1rem h-1rem inline-flex border-circle"
+                                [pTooltip]="item.professor"
+                                tooltipPosition="top"
+                                [style]="{ 
+                                    backgroundColor: item.corLegenda, 
+                                    borderColor: item.corLegenda 
+                                }"></span>
+                        <span>{{item.professor}}</span>
+                    </div>
+                </td>
+                <td>
+                    {{item.perfilCognitivo}}
+                </td>
+                <td>
+                    {{item.kit}}
+                </td>
+                <td class="w-5rem">
+                    <ng-container *ngIf="item.active">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                            icon="pi pi-check mr-2 text-xs"
+                            value="Ativo"
+                            severity="success"
+                            [pTooltip]="'Ativo'" />
+                    </ng-container>
+                    <ng-container *ngIf="!item.active">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                            icon="pi pi-times mr-2 text-xs"
+                            value="Inativo"
+                            severity="danger"
+                            [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
+                    </ng-container>
+                </td>
+                <td></td>
+            </tr>
+            <!-- <tr [pContextMenuRow]="item"
                 class="cursor-pointer"
                 [ngClass]="{ 'bg-primary-50': item == tableSelectedItem,}">
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="rowIndex"
                     [ngClass]="{
-                    'white-space-nowrap  border-left-none border-right-none': true,
-                    'w-5rem': col.displayType == DisplayType.options,
-                    'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2': col.field == 'nome',
+                        'white-space-nowrap  border-left-none border-right-none captalize': true,
+                        'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2': col.field == 'nome',
+                        'w-5rem': col.displayType == DisplayType.options,
                     }"
                     (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
-                    <div class="flex align-items-center">
-                        <ng-template [ngIf]="col.field == 'nome'">
-                            <ng-container *ngTemplateOutlet="corLegenda; context: { corLegenda: getCorLegenda(item.professor_Id) }"></ng-container>
-                            <ng-template #corLegenda let-corLegenda="corLegenda">
-                                <span class="w-1rem h-1rem inline-flex border-circle " [pTooltip]="item.professor" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                            </ng-template>
-                            <span class="inline-flex w-2rem h-2rem mr-2 align-items-center">
-                                <p-button *ngIf="item && item.celular"
-                                          [link]="true"
-                                          routerLink="{{enviarMensagem(item)}}"
-                                          icon="pi pi-whatsapp"
-                                          severity="success"
-                                          pTooltip="Enviar mensagem para {{item.celular | mask : '+00 (00) 0.0000-0000' }}"
-                                          tooltipPosition="top"
-                                          [text]="true"
-                                          size="small" />
+                    <div class="flex align-items-center gap-2">
+                        <ng-container *ngIf="col.field == 'nome'">
+                            <span class="inline-flex w-2rem h-2rem align-items-center">
+                                <ng-container *ngIf="item?.celular">
+                                    <a [href]="enviarMensagem(item)" 
+                                        target="_blank"
+                                        pTooltip="Enviar mensagem"
+                                        tooltipPosition="top"
+                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text p-button-sm">
+                                        <span class="pi pi-whatsapp p-button-icon"></span>
+                                    </a>
+                                </ng-container>
+                                <ng-container *ngIf="!item?.celular">
+                                    <a pTooltip="Nenhum celular cadastrado"
+                                        tooltipPosition="top"
+                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-secondary p-button-text p-button-sm cursor-none bg-transparent">
+                                        <span class="pi pi-whatsapp p-button-icon"></span>
+                                    </a>
+                                </ng-container>
                             </span>
-                        </ng-template>
-                        <ng-template [ngIf]="col.displayType == DisplayType.options">
+                        </ng-container>
+                         <ng-container *ngIf="col.field == 'professor' || col.field == 'turma'">
+                            <span class="w-1rem h-1rem inline-flex border-circle"
+                                    [pTooltip]="item.professor"
+                                    tooltipPosition="top"
+                                    [style]="{ 
+                                        backgroundColor: item.corLegenda, 
+                                        borderColor: item.corLegenda 
+                                    }"></span>
+                        </ng-container>
+                        <ng-container *ngIf="col.displayType == DisplayType.options">
                             <ng-container *ngTemplateOutlet="tag; 
-                            context: { 
-                                item: item,
-                                option: getOption(col, item)
-                            }">
+                                context: { 
+                                    item: item,
+                                    option: getOption(col, item)
+                                }">
                             </ng-container>
                             <ng-template #tag let-item="item" let-option="option">
                                 <p-tag *ngIf="option"
@@ -157,76 +216,29 @@
                                        [severity]="option.severity ? option.severity : 'secondary'"
                                        [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
                             </ng-template>
-                        </ng-template>
-                        <ng-template [ngIf]="col.displayType == DisplayType.text">
-                            <span *ngIf="col.field != 'nome'">{{ item[col.field] }}</span>
-                            <span *ngIf="col.field == 'nome'" pTooltip="{{item.nome}}">{{ item.nome | nameAbv }}</span>
-                        </ng-template>
-                        <ng-template [ngIf]="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-template>
-                        <ng-template [ngIf]="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
-                        <ng-template [ngIf]="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-template>
+                        </ng-container>
+                        <ng-container *ngIf="col.displayType == DisplayType.text">
+                            <ng-container *ngIf="col.field != 'nome'">
+                                <span>{{ item[col.field] }}</span>
+                            </ng-container>
+                            <ng-container *ngIf="col.field == 'nome'">
+                                <span pTooltip="{{item.nome}}" class="capitalize">{{ item.nome | nameAbv }}</span>
+                            </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
+                        <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+                        <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+                       
                     </div>
                 </td>
-                <ng-container *ngFor="let checklist of item.checklistCompleto">
-                    <td *ngIf="!checklist"></td>
-                    <td *ngIf="checklist"
-                        (click)="popoverChecklistOpen($event, checklist, item)"
-                        class="white-space-nowrap  border-left-none border-right-none text-center px-1 w-3rem">
-                        <div class="flex align-items-center justify-content-center gap-2">
-                            <!-- Finalizado -->
-                            <span *ngIf="checklist.finalizados.length == checklist.items.length">
-                                <span class="flex align-items-center text-green-600 font-medium">
-                                    <span>Finalizado</span>
-                                    <i class="pi pi-check-circle  ml-auto pl-2 "></i>
-                                </span>
-                            </span>
-                            <!-- Atrasado -->
-                            <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length">
-                                <span class="flex align-items-center text-red-600 font-bold">
-                                    <span> Atrasado </span>
-                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-times-circle ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Em Andamento -->
-                            <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length">
-                                <span class="flex align-items-center text-orange-500 font-medium">
-                                    <span>Em Andamento </span>
-                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-hourglass ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Futuro -->
-                            <span *ngIf="checklist.pendentesDaSemana.length == 0 
-                                    && checklist.atrasados.length == 0 
-                                    && checklist.prazo">
-                                <!-- && checklist.finalizados.length == 0  -->
-                                <span class="flex align-items-center text-blue-500 font-extrabold">
-                                    <span>Futuro </span>
-                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-clock  ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Indefinido -->
-                            <span *ngIf="!checklist.prazo">
-                                <span class="flex align-items-center text-purple-500 font-bold">
-                                    <span> Indefinido </span>
-                                    <span class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-question  ml-1 "></i>
-                                </span>
-                            </span>
-                        </div>
-                    </td>
-                </ng-container>
                 <td class="border-none px-0"></td>
-            </tr>
+            </tr> -->
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">
                 <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
                     <td class="border-none"><p-skeleton /></td>
                     <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
                     <td class="border-none"><p-skeleton /></td>
                 </tr>
             </ng-container>
@@ -242,72 +254,5 @@
             </ng-template>
         </ng-template>
     </p-table>
-    <p-popover #popoverChecklist
-               (onHide)="popoverChecklistClosed()"
-               [dismissable]="true"
-               styleClass="-mt-2"
-               appendTo="body">
-        <div class="w-full" *ngIf="selectedChecklist">
-            <div class="flex align-items-center justify-content-between w-full">
-                <p class="mb-2">
-                    <span>Prazo máximo: </span>
-                    <b>
-                        <span *ngIf="selectedChecklist.prazo">{{selectedChecklist.prazo | date : 'dd/MM/yyyy'}}</span>
-                        <span *ngIf="!selectedChecklist.prazo">Indefinido</span>
-                    </b>
-                </p>
-                <a *ngIf="tableSelectedItem && tableSelectedItem.celular"
-                   class="p-button p-button-text p-button-success"
-                   pTooltip="Enviar mensagem para {{tableSelectedItem.celular | mask : '+00 (00) 0.0000-0000'}}"
-                   [href]="enviarMensagem(tableSelectedItem)">
-                    <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                </a>
-            </div>
-            <ul class="p-0 ml-0">
-                <li *ngFor="let checklistItem of selectedChecklist.items"
-                    class="flex align-items-center gap-2 py"
-                    (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
-                    (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
-                    <p-checkbox *ngIf="!checklistItem.finalizado"
-                                #checkbox
-                                [inputId]="'checklistitem-' + checklistItem.id"
-                                [name]="'checklistitem-' + checklistItem.id"
-                                #finalizado="ngModel"
-                                [ngModel]="checklistItem.finalizado"
-                                [binary]="true"
-                                [readonly]="checklistItem.finalizado"
-                                (onChange)="checkboxChange(checklistItem, selectedChecklist, finalizado, $event)" />
-                    <div *ngIf="checklistItem.finalizado" class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
-                        <div class="p-checkbox-box">
-                            <i class="pi pi-check p-checkbox-icon "></i>
-                        </div>
-                    </div>
-                    <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                    <ng-container *ngIf="tableSelectedItem 
-                                        && tableSelectedItem.celular 
-                                        && checklistItem.finalizado == false 
-                                        && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                        <a [href]="enviarMensagemCondicao(checklistItem, tableSelectedItem)"
-                            target="_blank"
-                            class="p-button p-button-sm p-button-rounded p-button-success py-1 px-3 ml-auto">
-                            <span class="p-button-label">Enviar mensagem</span>
-                            <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                        </a>
-                    </ng-container>
-                    <p-popover #checklistData appendTo="body">
-                        <p>
-                            <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
-                            <span *ngIf="checklistItem.account_Finalizacao"> por <b>{{checklistItem.account_Finalizacao }}</b></span>
-                        </p>
-                        <p class="mt-2">
-                            <span class="font-medium">Observações: </span>
-                            <span *ngIf="checklistItem.observacoes" [innerHTML]="checklistItem.observacoes"></span>
-                            <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
-                        </p>
-                    </p-popover>
-                </li>
-            </ul>
-        </div>
-    </p-popover>
 </div>
 <router-outlet></router-outlet>

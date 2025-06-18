@@ -1,11 +1,8 @@
 <app-confirm-dialog></app-confirm-dialog>
-
 <app-filtro-popover-jornada-supera
                                    #filtroPopover
                                    (applyFilter)="applyFilter($event)"
                                    (applyPendentesSemana)="applyPendentesSemana($event)"></app-filtro-popover-jornada-supera>
-
-
 <div class="bg">
     <div style="background-image: url(assets/images/account-bg-1.png);"
          class="inner-bg absolute bg-contain bg-no-repeat top-0   right-0 z-0 -mb-5 rotate-90"></div>
@@ -13,7 +10,6 @@
          class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
 </div>
 <div class="w-full h-full flex flex-column">
-
     <p-toolbar styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
         <div class="p-toolbar-group-start w-full flex align-items-center justify-content-between">
             <h2 class="flex align-items-center">
@@ -38,7 +34,6 @@
                     </ng-template>
                 </p-selectbutton>
             </div>
-
             <p-button label="Ver filtros"
                       icon="pi pi-filter"
                       severity="secondary"
@@ -47,27 +42,13 @@
                       [rounded]="true" />
         </div>
     </p-toolbar>
-
-    <div class="relative w-full overfow-hidden h-full">
-
-        <div class="w-full animation-duration-1000 absolute top-0 left-0"
-             [ngClass]="{
-                'opacity-100 fadein': modoExibicao == true,
-                'opacity-0 fadeout ': modoExibicao == false,
-            }">
-            <app-exibicao-cards [loading]="loading"
-                                [checklists]="checklists"></app-exibicao-cards>
-        </div>
-
-        <div class="w-full animation-duration-1000 absolute top-0 left-0"
-             [ngClass]="{
-        'opacity-100 ': modoExibicao == false,
-        'opacity-0': modoExibicao == true,
-    }">
-            <app-exibicao-lista [loading]="loadingAlunos"
-                                [checklists]="checklists"
-                                [alunos]="alunos"></app-exibicao-lista>
-        </div>
+    <div class="relative w-full overflow-hidden h-full">
+        <app-exibicao-cards *ngIf="modoExibicao"
+                            [loading]="loading"
+                            [checklists]="checklists"></app-exibicao-cards>
+        <app-exibicao-lista *ngIf="!modoExibicao"
+                            [loading]="loadingAlunos"
+                            [checklists]="checklists"
+                            [alunos]="alunos"></app-exibicao-lista>
     </div>
-
 </div>

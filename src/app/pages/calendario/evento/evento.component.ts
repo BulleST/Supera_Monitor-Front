@@ -7,7 +7,6 @@ import {
 } from '@angular/core'
 import {
   Evento,
-  EventoQueryParams,
   EventoTipo,
 } from '../../../models/evento.model'
 import { ConfirmationService } from 'primeng/api'
@@ -152,7 +151,7 @@ export class EventoComponent implements OnDestroy {
 
     if (this.professores.length == 0) {
       this.loadingProfessores = true
-      lastValueFrom(this.professorService.getList())
+      lastValueFrom(this.professorService.getList('calendario/evento/evento.component'))
         .then((res) => (this.loadingProfessores = false))
         .catch((res) => (this.loadingProfessores = false))
     }

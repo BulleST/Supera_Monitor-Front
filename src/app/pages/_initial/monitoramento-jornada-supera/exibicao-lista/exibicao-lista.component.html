@@ -12,13 +12,13 @@
              [virtualScrollDelay]="0"
              virtualScrollItemSize="37px"
              [scrollable]="true"
-             scrollHeight="600px"
-             >
+             scrollHeight="600px">
         <ng-template pTemplate="header">
             <tr>
                 <!-- Aluno -->
                 <th [pSortableColumn]="'nome'"
-                    class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 pl-5 surface-900 py-0 border-none text-white white-space-nowrap p-3">
+                    pFrozenColumn
+                    class="surface-900 text-white white-space-nowrap ">
                     <div class="flex align-items-center">
                         <span>Aluno</span>
                         <div class="flex align-items-center">
@@ -58,17 +58,17 @@
                                target="_blank"
                                pTooltip="Enviar mensagem"
                                tooltipPosition="top"
-                               class="text-green-500 pi pi-whatsapp hover:bg-green-200"></a>
+                               class="pi pi-whatsapp text-green-500 hover:bg-green-200"></a>
                         </ng-container>
                         <ng-container *ngIf="!aluno.celular">
                             <a pTooltip="Nenhum celular cadastrado"
                                tooltipPosition="top"
-                               class="text-600 pi pi-whatsapp cursor-auto"></a>
+                               class="pi pi-whatsapp text-600 cursor-auto"></a>
                         </ng-container>
                         <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
-                             [pTooltip]="aluno.nome"
-                             tooltipPosition="top"
-                             (click)="showAlunoPopover($event, aluno)">{{ aluno.nome | nameAbv }}</span>
+                              [pTooltip]="aluno.nome"
+                              tooltipPosition="top"
+                              (click)="showAlunoPopover($event, aluno)">{{ aluno.nome | nameAbv }}</span>
                     </div>
                 </td>
                 <td class="white-space-nowrap">
@@ -82,62 +82,10 @@
                         <span>{{aluno.turma}}</span>
                     </div>
                 </td>
-                <ng-container *ngFor="let checklist of aluno.checklistCompleto">
-                    <td *ngIf="!checklist"></td>
-                    <td *ngIf="checklist" (click)="showChecklistPopover($event, aluno, checklist)"
+                <ng-container *ngFor="let checklist of aluno.checklistCompleto; trackBy: trackByChecklistId">
+                    <td (click)="showChecklistPopover($event, aluno, checklist)"
                         class="white-space-nowrap  border-left-none border-right-none text-center px-3">
-                        <div class="flex align-items-center justify-content-center gap-2">
-                            <!-- Finalizado -->
-                            <span *ngIf="checklist.finalizados.length == checklist.items.length">
-                                <span class="flex align-items-center text-green-600">
-                                    <span>Finalizado</span>
-                                    <i class="pi pi-check-circle  ml-auto pl-2 "></i>
-                                </span>
-                            </span>
-                            <!-- Atrasado -->
-                            <span *ngIf="checklist.atrasados.length > 0 
-                            && checklist.finalizados.length < checklist.items.length">
-                                <span class="flex align-items-center text-red-600 ">
-                                    <span> Atrasado </span>
-                                    <span
-                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-times-circle ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Em Andamento -->
-                            <span *ngIf="checklist.pendentesDaSemana.length > 0 
-                            && checklist.finalizados.length < checklist.items.length">
-                                <span class="flex align-items-center text-orange-500">
-                                    <span>Em Andamento </span>
-                                    <span
-                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-hourglass ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Futuro -->
-                            <span *ngIf="checklist.pendentesDaSemana.length == 0 
-                                    && checklist.atrasados.length == 0 
-                                    && checklist.prazo
-                                    && checklist.finalizados.length != checklist.items.length">
-                                <!-- && checklist.finalizados.length == 0  -->
-                                <span class="flex align-items-center text-blue-500 font-extrabold">
-                                    <span>Futuro </span>
-                                    <span
-                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-clock  ml-1 "></i>
-                                </span>
-                            </span>
-                            <!-- Indefinido -->
-                            <span *ngIf="!checklist.prazo 
-                                && checklist.finalizados.length != checklist.items.length">
-                                <span class="flex align-items-center text-purple-500 ">
-                                    <span> Indefinido </span>
-                                    <span
-                                          class="ml-auto pl-2">{{checklist.finalizados.length}}/{{checklist.items.length}}</span>
-                                    <i class="pi pi-question  ml-1 "></i>
-                                </span>
-                            </span>
-                        </div>
+                        <app-checklist-status [checklist]="checklist"></app-checklist-status>
                     </td>
                 </ng-container>
                 <td class="border-none px-0"></td>
@@ -160,8 +108,6 @@
             </ng-template>
         </ng-template>
     </p-table>
-
     <app-checklist-popover-jornada #popoverChecklist></app-checklist-popover-jornada>
-    <app-aluno-popover #popoverAluno></app-aluno-popover>
-
+    <app-aluno-popover #alunoPopover></app-aluno-popover>
 </div>

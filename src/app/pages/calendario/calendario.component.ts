@@ -716,7 +716,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.legenda = [];
         var professores = this.professorService.list.value;
         if (professores.length == 0)
-            await lastValueFrom(this.professorService.getList()).then(res => professores = res);
+            await lastValueFrom(this.professorService.getList('calendario setLegenda')).then(res => professores = res);
 
         this.legenda = professores.map(item => ({
             label: item.nome,

@@ -20,6 +20,7 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { ProfessorService } from '../../../services/professor.service';
 import { Professor } from '../../../models/professor.model';
 import { playAlert, playSuccess, showError } from '../../../utils';
+import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 
 @Component({
     selector: 'app-list',
@@ -42,14 +43,8 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
-    professores: Professor[] = [];
-    checklists: Checklist[] = [];
-    loadingChecklist = false;
-    checklistObservacao = '';
 
-    selectedChecklist?: AlunoChecklistCompleto;
-    @ViewChild('popoverChecklist') popoverChecklist!: Popover;
-
+    @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
 
 
     constructor(
@@ -59,11 +54,7 @@ export class ListComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private mobileService: MobileService,
-        private checklistService: ChecklistService,
-        private toastrService: ToastrService,
-        private userService: UserService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private professorService: ProfessorService,
 
     ) {
         this.tableColumns = alunosColumns;
@@ -73,26 +64,8 @@ export class ListComponent implements OnDestroy {
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(alunos => {
-            this.list = alunos.map(aluno => {
-                // var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-                // aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
-
-                // aluno.created = moment(aluno.created).toDate();
-                // aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-                // aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
-                // // Nuláveis
-                // aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
-                // aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
-                // aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
-
-                return aluno;
-            });
-        });
+        var list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
-
-        var checklist = this.checklistService.list.subscribe(res => this.checklists = res);
-        this.subscription.push(checklist);
 
         this.update()
     }
@@ -105,27 +78,14 @@ export class ListComponent implements OnDestroy {
     async update() {
         this.list = [];
         this.tableLoading = true;
-        if (this.checklists.length == 0) {
-            await lastValueFrom(this.checklistService.getList()).then(res => this.checklists = res);
-        }
 
-        if (this.professores.length == 0) {
-            await lastValueFrom(this.professorService.getList()).then(res => this.professores = res);
-        }
-
-        if (!this.checklistService.list.value.length)
-            await lastValueFrom(this.checklistService.getList())
-
-
-        lastValueFrom(this.service.getListWithChecklist())
+        lastValueFrom(this.service.getList())
             .then(async alunos => {
                 this.tableLoading = false;
-                this.loadingChecklist = true
                 this.list = alunos
             })
             .catch(res => {
                 this.tableLoading = false;
-
             });
     }
 
@@ -170,12 +130,6 @@ export class ListComponent implements OnDestroy {
     }
 
 
-    getCorLegenda(professor_Id: number) {
-        var professor = this.professores.find(x => x.id == professor_Id);
-        if (professor)
-            return professor.corLegenda;
-        return ''
-    }
 
     edit(item: any) {
         var encrypted = this.crypto.encrypt(item.id);
@@ -231,125 +185,15 @@ export class ListComponent implements OnDestroy {
         return aluno.checklistCompleto.find(x => x.id == checklist.id);
     }
 
-    checkboxChange(item: Aluno_CheckList_Item, checklist: AlunoChecklistCompleto, model: NgModel, e: any) {
-
-        if (model.control.value) {
-            model.control.setValue(false);
-
-            // playAlert();
-            this.confirmationService.confirm({
-                key: 'checklistConfirmation',
-                message: `Tem certeza que deseja marcar item da jornada como realizada?.`,
-                header: 'Finalizar item da jornada',
-                acceptIcon: 'pi pi-check',
-                acceptLabel: 'Finalizar',
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Cancelar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: async () => {
-                    this.loadingChecklist = true;
-                    item.observacoes = this.checklistObservacao
-                    lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
-                        .then(res => {
-                            this.checklistObservacao = '';
-                            model.control.setValue(true);
-                            this.loadingChecklist = false;
-                            this.toastrService.success(`Checklist ${item.nome} finalizado com sucesso!`);
-                            // playSuccess();
-                            item.finalizado = true;
-                            item.dataFinalizacao = res.object.dataFinalizacao;
-                            item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
-
-                            checklist.prazo = checklist.items[0].prazo;
-                            checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
-                            checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-                            checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-
-                            this.userService.get(item.account_Finalizacao_Id!)
-                                .then(res => item.account_Finalizacao = res.name);
-
-                        })
-                        .catch(res => {
-                            this.showError('Erro', getError(res), e);
-                        })
-                },
-                reject: () => {
-                    model.control.setValue(false);
-                },
-
-            });
-        }
-    }
-
-    popoverChecklistOpen(e: any, item: AlunoChecklistCompleto, aluno: Aluno) {
-        this.popoverChecklist.show(e)
-        this.selectedChecklist = item;
-        this.tableSelectedItem = aluno
-        if (this.popoverChecklist.container) this.popoverChecklist.align()
-    }
-
-    popoverChecklistClosed() {
-        this.selectedChecklist = undefined;
-        this.tableSelectedItem = undefined;
-    }
-    enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item, aluno: Aluno) {
-        // Apresentação do Diretor Franqueado 
-        if (checklistItem.checklist_Item_Id == 8) {
-            return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
-            // Confirmação da adequação do aluno ao perfil da turma 
-        } else if (checklistItem.checklist_Item_Id == 9) {
-            return this.enviarMensagemAdequacaoTurma(aluno);
-            // Agendar 1ª Oficina 
-        } else if (checklistItem.checklist_Item_Id == 12) {
-            return this.enviarMensagemLembreteOficina(aluno);
-            // Feedback pós venda 
-        } else if (checklistItem.checklist_Item_Id == 13) {
-            return this.enviarMensagemFeedbackPosVenda(aluno);
-            // Confirmação de preeechimento do feedback pós venda 
-        } else if (checklistItem.checklist_Item_Id == 32) {
-            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
-            // Mensagem de boas-vindas 
-        } else if (checklistItem.checklist_Item_Id == 37) {
-            return this.enviarMensagemBoasVindas(aluno);
-            // Agendar Superação 
-        } else if (checklistItem.checklist_Item_Id == 22) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Superação 
-        } else if (checklistItem.checklist_Item_Id == 29) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Oficina 
-        } else if (checklistItem.checklist_Item_Id == 23) {
-            return this.enviarMensagemLembreteOficina(aluno);
-        } else {
-            return this.enviarMensagem(aluno);
-        }
-    }
-
     enviarMensagem(aluno: Aluno) {
         return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
     }
 
-    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
-    }
-    enviarMensagemBoasVindas(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
-    }
-    enviarMensagemAdequacaoTurma(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
-    }
-    enviarMensagemLembreteOficina(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
-    }
-    enviarMensagemLembreteSuperacao(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
-    }
-    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
-    }
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
+    showPopoverAluno(aluno: Aluno, e: any) {
+        this.popoverAluno.aluno_Id = aluno.id;
+        this.popoverAluno.aluno = aluno;
+        this.popoverAluno.showChecklist = true;
+        this.popoverAluno.show(e);
     }
 
 }

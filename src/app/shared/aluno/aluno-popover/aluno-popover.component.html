@@ -1,20 +1,19 @@
-<app-aluno-checklist-dialog #alunoChecklistDialog
-                            *ngIf="visible"
-                            [aluno]="aluno"
-                            [loading]="loadingAluno"></app-aluno-checklist-dialog>
-
-<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
-                                       *ngIf="alunoChecklistItem"
-                                       [alunoChecklistItem]="alunoChecklistItem"
-                                       (onSuccess)="hide()"
-                                       (onCancel)="hide()"></app-aluno-checklist-on-confirm-dialog>
 
 <p-popover #popover
-           appendTo="body"
-           [dismissable]="true"
-           styleClass="mt-2"
-           [dismissable]="!alunoChecklistOnConfirmDialog?.visible && !alunoChecklistDialog?.visible">
-    <p-card *ngIf="loadingAluno"
+appendTo="body"
+styleClass="mt-2"
+[dismissable]="!alunoChecklistDialog?.visible && (alunoChecklistItem && !alunoChecklistOnConfirmDialog?.visible)">
+<ng-container *ngIf="visible">
+        <app-aluno-checklist-dialog #alunoChecklistDialog
+                                    [aluno]="aluno"
+                                    [loading]="loadingAluno"></app-aluno-checklist-dialog>
+        
+        <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
+                                               *ngIf="alunoChecklistItem"
+                                               [alunoChecklistItem]="alunoChecklistItem"
+                                               (onSuccess)="hide()"
+                                               (onCancel)="hide()"></app-aluno-checklist-on-confirm-dialog>
+        <p-card *ngIf="loadingAluno"
             [style]="{maxWidth: '960vw', width: '20rem', overflow: 'hidden' }"
             styleClass="shadow-none">
         <section>
@@ -159,33 +158,35 @@
             <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
         </ng-template>
     </p-card>
+    </ng-container>
+    
 </p-popover>
-        <ng-template #footerTemplate>
-            <div class="flex gap-3 -mx-2 -mb-2 mt-2">
-                <p-button label="Fechar"
-                          severity="secondary"
-                          class="w-full"
-                          [outlined]="true"
-                          styleClass="w-full"
-                          (onClick)="hide()" />
-                <p-select value="Opções"
-                          [options]="menuItems"
-                          [styleClass]="'p-select-aluno-menu p-select-small'"
-                          appendTo="body"
-                          dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
-                          optionLabel="label"
-                          placeholder="Opções"
-                          (onChange)="menuItemChanged($event)"
-                          [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
-                    <ng-template let-selectedOption #selectedItem>
-                        <div class="text-white -mr-2 text-center text-base">Opções</div>
-                    </ng-template>
-                    <ng-template let-item #item>
-                        <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
-                            <i [class]="item.icon"></i>
-                            <a class="ml-2">{{ item.label }}</a>
-                        </div>
-                    </ng-template>
-                </p-select>
-            </div>
-        </ng-template>
+<ng-template #footerTemplate>
+    <div class="flex gap-3 -mx-2 -mb-2 mt-2">
+        <p-button label="Fechar"
+                    severity="secondary"
+                    class="w-full"
+                    [outlined]="true"
+                    styleClass="w-full"
+                    (onClick)="hide()" />
+        <p-select value="Opções"
+                    [options]="menuItems"
+                    [styleClass]="'p-select-aluno-menu p-select-small'"
+                    appendTo="body"
+                    dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
+                    optionLabel="label"
+                    placeholder="Opções"
+                    (onChange)="menuItemChanged($event)"
+                    [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
+            <ng-template let-selectedOption #selectedItem>
+                <div class="text-white -mr-2 text-center text-base">Opções</div>
+            </ng-template>
+            <ng-template let-item #item>
+                <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                    <i [class]="item.icon"></i>
+                    <a class="ml-2">{{ item.label }}</a>
+                </div>
+            </ng-template>
+        </p-select>
+    </div>
+</ng-template>

@@ -74,7 +74,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
 
         let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
 
-        if (!this.aluno.alunoChecklist.length && this.aluno_Id) {
+        if (!this.aluno.alunoChecklist?.length && this.aluno_Id) {
             alunoChecklist = await lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
         }
 

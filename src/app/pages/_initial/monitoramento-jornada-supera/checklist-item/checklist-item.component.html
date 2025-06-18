@@ -1,32 +1,28 @@
 <p-accordion-panel [value]="index" #panel >
     <p-accordion-header>
-        <p [ngClass]="{
-            'text-primary-500': index == activeIndex
-        }">{{item.nome}}</p>
+        <div class="flex justify-content-between w-full -mt-1">
+            <p>{{item.nome}}</p>
+            <p class="font-normal px-2 white-space-nowrap">{{item.alunos?.length ?? 0}} alunos</p>
+        </div>
     </p-accordion-header>
     <p-accordion-content>
-        <p-table [value]="item.alunos"
+        <p-table *ngIf="activeIndex == index" 
+                [value]="item.alunos"
                  [scrollable]="true"
                  [scrollHeight]="'200px'"
                  [virtualScroll]="true"
-                 [virtualScrollDelay]="0"
+                 [virtualScrollDelay]="100"
                  [virtualScrollItemSize]="55"
-                 stripedRows>
+                 [virtualScrollOptions]="{  }"
+                 stripedRows
+                 tableStyleClass="checklist-item-alunos">
             <ng-template #body let-aluno let-index="rowIndex">
                 <tr style="height: 55px;">
-                    <td [ngClass]="{
-                        'surface-100': index % 2 == 0,
-                        'surface-50': index % 2 != 0,
-                        }">
-                        <app-checklist-item-aluno [checklist]="checklist"
-                                                  [item]="item"
-                                                  [alunoChecklistItem]="aluno"
-                                                  [loading]="loading">
-                        </app-checklist-item-aluno>
+                    <td>
+                        <app-checklist-item-aluno [item]="item" [alunoChecklistItem]="aluno"></app-checklist-item-aluno>
                     </td>
                 </tr>
             </ng-template>
-
             <ng-template #emptymessage>
                 <ng-container *ngIf="loading">
                     <tr *ngFor="let item of [1,2,3,4]"
@@ -54,6 +50,6 @@
                     </tr>
                 </ng-container>
             </ng-template>
-        </p-table>
+        </p-table> 
     </p-accordion-content>
 </p-accordion-panel>

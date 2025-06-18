@@ -1,39 +1,62 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../../models/checklist.model';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno_Checklist_Item_View } from '../../../../models/aluno-checklist-item-list.model';
 import { MensagemWhatsapp } from '../../../../utils';
 import { Aluno } from '../../../../models/alunos.model';
+import { Checklist_Item } from '../../../../models/checklist.model';
+import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { ChecklistService } from '../../../../services/checklist.service';
 
 @Component({
     selector: 'app-checklist-item-aluno',
     standalone: false,
     templateUrl: './checklist-item-aluno.component.html',
-    styleUrl: './checklist-item-aluno.component.css'
+    styleUrl: './checklist-item-aluno.component.css',
+    // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChecklistItemAlunoComponent implements OnChanges {
 
-    @Input() checklist!: Checklist;
-    @Input() item!: Checklist_Item;
     @Input() alunoChecklistItem!: Aluno_Checklist_Item_View;
-    @Input() loading: boolean = true;
+    @Input() item!: Checklist_Item;
+
+    @ViewChild('alunoChecklistOnConfirm') alunoChecklistOnConfirm!: AlunoChecklistOnConfirmDialogComponent
+    icon: string = '';
+    text: string = '';
+    textColor: string = '';
+    urlEnviarMensagem = '';
 
     constructor(
-        private mensagemWhatsapp: MensagemWhatsapp,) {
+        private mensagemWhatsapp: MensagemWhatsapp,
+        private checklistService: ChecklistService,
+    ) {
 
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes['alunoChecklistItem']) {
+            this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
+            this.setComponent();
+            this.urlEnviarMensagem = this.enviarMensagemCondicao(this.alunoChecklistItem);
+        }
         if (changes['item']) {
             this.item = changes['item'].currentValue;
         }
-        if (changes['checklist']) {
-            this.checklist = changes['checklist'].currentValue;
+    }
+
+    setComponent() {
+        if (this.alunoChecklistItem.status == 'Atrasado') {
+            this.icon = 'pi pi-times-circle';
+            this.textColor = 'text-red-500';
+            this.text = 'Atrasado';
         }
-        if (changes['alunoChecklistItem']) {
-            this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
+        else if (this.alunoChecklistItem.status == 'Pendente') {
+            this.icon = 'pi pi-hourglass';
+            this.textColor = 'text-orange-500';
+            this.text = 'Em Andamento';
         }
-        if (changes['loading']) {
-            this.loading = changes['loading'].currentValue;
+        else if (this.alunoChecklistItem.status == 'Finalizado') {
+            this.icon = 'pi pi-check-circle';
+            this.textColor = 'text-green-500';
+            this.text = 'Finalizado';
         }
     }
 
@@ -42,36 +65,40 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     }
 
     enviarMensagemCondicao(aluno: Aluno_Checklist_Item_View) {
-        // Apresentação do Diretor Franqueado 
-        if (aluno.checklist_Item_Id == 8) {
-            return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
-            // Confirmação da adequação do aluno ao perfil da turma 
-        } else if (aluno.checklist_Item_Id == 9) {
-            return this.enviarMensagemAdequacaoTurma(aluno);
-            // Agendar 1ª Oficina 
-        } else if (aluno.checklist_Item_Id == 12) {
-            return this.enviarMensagemLembreteOficina(aluno);
-            // Feedback pós venda 
-        } else if (aluno.checklist_Item_Id == 13) {
-            return this.enviarMensagemFeedbackPosVenda(aluno);
-            // Confirmação de preeechimento do feedback pós venda 
-        } else if (aluno.checklist_Item_Id == 32) {
-            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
-            // Mensagem de boas-vindas 
-        } else if (aluno.checklist_Item_Id == 37) {
-            return this.enviarMensagemBoasVindas(aluno);
-            // Agendar Superação 
-        } else if (aluno.checklist_Item_Id == 22) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Superação 
-        } else if (aluno.checklist_Item_Id == 29) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Oficina 
-        } else if (aluno.checklist_Item_Id == 23) {
-            return this.enviarMensagemLembreteOficina(aluno);
-        } else {
-            return this.enviarMensagem(aluno);
+        if (aluno.celular) {
+            // Apresentação do Diretor Franqueado 
+            if (aluno.checklist_Item_Id == 8) {
+                return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
+                // Confirmação da adequação do aluno ao perfil da turma 
+            } else if (aluno.checklist_Item_Id == 9) {
+                return this.enviarMensagemAdequacaoTurma(aluno);
+                // Agendar 1ª Oficina 
+            } else if (aluno.checklist_Item_Id == 12) {
+                return this.enviarMensagemLembreteOficina(aluno);
+                // Feedback pós venda 
+            } else if (aluno.checklist_Item_Id == 13) {
+                return this.enviarMensagemFeedbackPosVenda(aluno);
+                // Confirmação de preeechimento do feedback pós venda 
+            } else if (aluno.checklist_Item_Id == 32) {
+                return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
+                // Mensagem de boas-vindas 
+            } else if (aluno.checklist_Item_Id == 37) {
+                return this.enviarMensagemBoasVindas(aluno);
+                // Agendar Superação 
+            } else if (aluno.checklist_Item_Id == 22) {
+                return this.enviarMensagemLembreteSuperacao(aluno);
+                // Agendar 2ª Superação 
+            } else if (aluno.checklist_Item_Id == 29) {
+                return this.enviarMensagemLembreteSuperacao(aluno);
+                // Agendar 2ª Oficina 
+            } else if (aluno.checklist_Item_Id == 23) {
+                return this.enviarMensagemLembreteOficina(aluno);
+            } else {
+                return this.enviarMensagem(aluno);
+            }
+
         }
+        return '';
     }
 
     enviarMensagem(aluno: Aluno_Checklist_Item_View) {
@@ -104,5 +131,18 @@ export class ChecklistItemAlunoComponent implements OnChanges {
 
     enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno_Checklist_Item_View) {
         return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.aluno, aluno.celular);
+    }
+
+    showAlunoChecklistOnConfirm() {
+        this.alunoChecklistOnConfirm.show();
+        var onFinish = this.checklistService.onFinish.subscribe(res => {
+            console.log('onFinish')
+            this.alunoChecklistOnConfirm.hide();
+            console.log('onFinish', this.alunoChecklistOnConfirm.visible)
+            this.alunoChecklistOnConfirm.visible  = false;
+            console.log('onFinish', this.alunoChecklistOnConfirm.visible)
+
+            onFinish.unsubscribe();
+        })
     }
 }

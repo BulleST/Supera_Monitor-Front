@@ -1,12 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Checklist, Checklist_Item } from '../../../../models/checklist.model';
 
 @Component({
-  selector: 'app-checklist-item',
-  standalone: false,
-  
-  templateUrl: './checklist-item.component.html',
-  styleUrl: './checklist-item.component.css'
+    selector: 'app-checklist-item',
+    standalone: false,
+    templateUrl: './checklist-item.component.html',
+    styleUrl: './checklist-item.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChecklistItemComponent implements OnChanges {
 

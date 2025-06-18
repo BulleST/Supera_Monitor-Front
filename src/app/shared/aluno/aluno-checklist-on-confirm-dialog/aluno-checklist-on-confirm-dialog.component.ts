@@ -1,14 +1,10 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Aluno_CheckList_Item, Checklist_Item } from '../../../models/checklist.model';
-import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmationService } from 'primeng/api';
-import moment from 'moment';
 import { showError } from '../../../utils';
-import { NgModel } from '@angular/forms';
 import { lastValueFrom } from 'rxjs';
-import { UserService } from '../../../services/user.service';
 import { Aluno_Checklist_Item_View } from '../../../models/aluno-checklist-item-list.model';
 
 @Component({
@@ -25,7 +21,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
     loading = false;
 
     @Input() alunoChecklistItem!: Aluno_CheckList_Item | Aluno_Checklist_Item_View;
-    @Input() item!: Checklist_Item
+    @Input() item!: Checklist_Item;
 
     @Output() onCancel = new EventEmitter<boolean>();
 
@@ -33,6 +29,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
         private service: ChecklistService,
         private toastr: ToastrService,
         private confirmationService: ConfirmationService,
+        private cdr: ChangeDetectorRef,
     ) {
 
     }
@@ -52,12 +49,12 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
     }
 
     hide() {
-        console.log('hide')
         this.visible = false;
+        this.cdr.markForCheck(); // Marca para verificação na próxima detecção
+        this.cdr.detectChanges()
     }
 
     onHide() {
-        console.log('onHide')
         this.onCancel.emit(false);
     }
 

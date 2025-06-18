@@ -1,19 +1,26 @@
-<ng-container *ngIf="!loading && alunoChecklistItem">
+<ng-container *ngIf="alunoChecklistItem">
     <div class="flex align-items-center gap-2">
-        <ng-container *ngIf="alunoChecklistItem.celular">
-            <a [href]="enviarMensagemCondicao(alunoChecklistItem)"
+        <ng-container *ngIf="urlEnviarMensagem">
+            <a [href]="urlEnviarMensagem"
                target="_blank"
                pTooltip="Enviar mensagem"
                tooltipPosition="top"
                class="text-green-500 pi pi-whatsapp hover:bg-green-200"></a>
         </ng-container>
-        <ng-container *ngIf="!alunoChecklistItem.celular">
+        <ng-container *ngIf="!urlEnviarMensagem">
             <a pTooltip="Nenhum celular cadastrado"
                tooltipPosition="top"
                class="text-600 pi pi-whatsapp cursor-auto"></a>
         </ng-container>
         <p class="hover:text-primary hover:underline cursor-pointer capitalize"
-           (click)="alunoPopover.show($event)">{{ alunoChecklistItem.aluno | nameAbv }}</p>
+            (click)="alunoPopover.show($event)">
+            {{ alunoChecklistItem.aluno | nameAbv }}
+        </p>
+        <p (click)="showAlunoChecklistOnConfirm()"
+            class="cursor-pointer text-primary-500 flex align-items-center gap-2 hover:underline hover:font-bold ml-auto">
+            <span>Clique para finalizar</span>
+            <i class="pi pi-check no-underline hoveer:no-underline"></i>
+        </p>
     </div>
     <div class="flex align-items-center justify-content-between">
         <p class="flex">
@@ -21,20 +28,9 @@
             <span>{{alunoChecklistItem.prazo | date : 'dd/MM/yy'}}</span>
         </p>
         <p class="ml-auto">
-            <!-- Atrasado -->
-            <span *ngIf="alunoChecklistItem.status == 'Atrasado'" class="flex align-items-center line-height-1">
-                <span class="text-red-600 ">Atrasado</span>
-                <i class="pi pi-times-circle text-red-500 ml-2 mt-1"></i>
-            </span>
-            <!-- Pendentes da Semana -->
-            <span *ngIf="alunoChecklistItem.status == 'Pendente'" class="flex align-items-center line-height-1">
-                <span class="text-orange-500 font-medium">Em Andamento</span>
-                <i class="pi pi-hourglass text-orange-500 ml-2 mt-1"></i>
-            </span>
-            <!-- Finalizado -->
-            <span *ngIf="alunoChecklistItem.status == 'Finalizado'" class="flex align-items-center line-height-1">
-                <span class="text-green-500 ">Finalizado</span>
-                <i class="pi pi-check-circle text-green-500 ml-2 mt-1"></i>
+            <span class="flex align-items-center line-height-1">
+                <span [class]="textColor">{{text}}</span>
+                <i  class="{{textColor}} {{icon}} ml-2 mt-1"></i>
             </span>
         </p>
     </div>
@@ -42,4 +38,8 @@
                        [aluno_Id]="alunoChecklistItem.aluno_Id"
                        [alunoChecklistItem]="alunoChecklistItem"
                        [showChecklist]="true"></app-aluno-popover>
+    <app-aluno-checklist-on-confirm-dialog
+        #alunoChecklistOnConfirm
+        [alunoChecklistItem]="alunoChecklistItem"
+        [item]="item"></app-aluno-checklist-on-confirm-dialog>
 </ng-container>

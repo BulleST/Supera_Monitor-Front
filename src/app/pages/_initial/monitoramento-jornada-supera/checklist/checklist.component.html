@@ -1,12 +1,11 @@
-<div style="width: 250px;"
-     class="pr-3">
+<div class="pr-3" style="width: 350px;">
     <p-tag [value]="checklist.nome"
            severity="contrast"
            class="mr-auto"
            styleClass="sticky top-0 left-0 z-2" />
     <div class="mt-2">
         <p-accordion [(value)]="activeIndex">
-            <ng-container *ngFor="let item of checklist.items; let index = index;">
+            <ng-container *ngFor="let item of checklist.items; trackBy: trackByChecklistItemId let index = index;">
                 <app-checklist-item [item]="item"
                                     [checklist]="checklist"
                                     [index]="index"

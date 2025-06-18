@@ -1,5 +1,5 @@
 <section class="w-full overflow-auto flex h-full">
-    <ng-container *ngFor="let checklist of checklists">
+    <ng-container *ngFor="let checklist of checklists; trackBy: trackByChecklistId">
         <app-checklist-component [checklist]="checklist" [loading]="loading"></app-checklist-component>
     </ng-container>
 </section>

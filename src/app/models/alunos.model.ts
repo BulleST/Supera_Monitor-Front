@@ -121,29 +121,6 @@ export interface Pessoa_Origem_Categoria extends Pessoa_DropDown { }
 export interface Pessoa_Status extends Pessoa_DropDown { }
 
 export var alunosColumns: ColumnTable[] = [
-    // {
-    //     field: 'rm',
-    //     label: 'Matrícula',
-    //     filterType: FilterType.text,
-    //     displayType: DisplayType.text,
-    //     options: undefined,
-    // },
-    // {
-    //     field: 'dataNascimento',
-    //     label: 'Data de Nascimento',
-    //     filterType: FilterType.date,
-    //     displayType: DisplayType.date,
-    //     options: {
-    //         format: 'dd/MM/yyyy'
-    //     },
-    // },
-    // {
-    //     field: 'professor',
-    //     label: 'Educador',
-    //     filterType: FilterType.text,
-    //     displayType: DisplayType.color,
-    //     options: undefined,
-    // },
     {
         field: 'nome',
         label: 'Nome',
@@ -158,13 +135,13 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         options: undefined,
     },
-    // {
-    //     field: 'professor',
-    //     label: 'Educador',
-    //     filterType: FilterType.text,
-    //     displayType: DisplayType.text,
-    //     options: undefined,
-    // },
+    {
+        field: 'professor',
+        label: 'Educador',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
     {
         field: 'perfilCognitivo',
         label: 'Perfil Cognitivo',
@@ -172,13 +149,13 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         options: undefined,
     },
-    // {
-    //     field: 'kit',
-    //     label: 'Kit',
-    //     filterType: FilterType.text,
-    //     displayType: DisplayType.text,
-    //     options: undefined,
-    // },
+    {
+        field: 'kit',
+        label: 'Kit',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        options: undefined,
+    },
     // {
     //     field: 'apostila_Abaco',
     //     label: 'Apostila Ábaco',

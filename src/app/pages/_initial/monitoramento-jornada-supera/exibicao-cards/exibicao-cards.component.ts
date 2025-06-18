@@ -1,12 +1,12 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { ChecklistService } from '../../../../services/checklist.service';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Checklist } from '../../../../models/checklist.model';
 
 @Component({
     selector: 'app-exibicao-cards',
     standalone: false,
     templateUrl: './exibicao-cards.component.html',
-    styleUrl: './exibicao-cards.component.css'
+    styleUrl: './exibicao-cards.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExibicaoCardsComponent implements OnChanges {
     @Input() checklists!: Checklist[];
@@ -20,5 +20,10 @@ export class ExibicaoCardsComponent implements OnChanges {
             this.loading = changes['loading'].currentValue;
         }
     }
+    
+    trackByChecklistId(index: number, item: Checklist) {
+        return item.id;
+    }
+
 
 }

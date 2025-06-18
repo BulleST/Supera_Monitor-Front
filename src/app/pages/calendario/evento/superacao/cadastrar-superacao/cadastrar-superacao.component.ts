@@ -7,7 +7,7 @@ import { Crypto, getError } from '../../../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoSuperacaoRequest } from '../../../../../models/evento-superacao.model';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAula } from '../../../../../models/sala-aula.model';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { ProfessorService } from '../../../../../services/professor.service';
 import { AlunoService } from '../../../../../services/alunos.service';
@@ -116,7 +116,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
+            lastValueFrom(this.professorService.getList('cadastrar-superacao.component'))
                 .then(res => this.loadingProfessores = false)
                 .catch(res => this.loadingProfessores = false);
         }

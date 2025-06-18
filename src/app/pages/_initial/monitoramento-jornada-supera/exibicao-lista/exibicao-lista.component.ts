@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
 import { Aluno, alunosColumns } from '../../../../models/alunos.model';
 import { AlunoService } from '../../../../services/alunos.service';
@@ -10,9 +10,9 @@ import { AlunoPopoverComponent } from '../../../../shared/aluno/aluno-popover/al
 @Component({
     selector: 'app-exibicao-lista',
     standalone: false,
-
     templateUrl: './exibicao-lista.component.html',
-    styleUrl: './exibicao-lista.component.css'
+    styleUrl: './exibicao-lista.component.css',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExibicaoListaComponent implements OnChanges {
     @Input() checklists!: Checklist[];
@@ -21,7 +21,7 @@ export class ExibicaoListaComponent implements OnChanges {
 
 
     @ViewChild('popoverChecklist') popoverChecklist!: ChecklistPopoverComponent;
-    @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
+    @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent;
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -112,9 +112,10 @@ export class ExibicaoListaComponent implements OnChanges {
 
 
     showAlunoPopover(e: any, aluno: Aluno) {
-        this.popoverAluno.aluno_Id = aluno.id;
-        this.popoverAluno.showChecklist = false;
-        this.popoverAluno.show(e);
+        this.alunoPopover.aluno_Id = aluno.id;
+        this.alunoPopover.aluno = aluno;
+        this.alunoPopover.showChecklist = false;
+        this.alunoPopover.show(e);
     }
 
     showChecklistPopover(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
@@ -125,7 +126,10 @@ export class ExibicaoListaComponent implements OnChanges {
 
     hideChecklistPopover() {
         this.popoverChecklist.hide();
+    }
 
+    trackByChecklistId(index: number, item: Checklist) {
+        return item.id;
     }
 
 }

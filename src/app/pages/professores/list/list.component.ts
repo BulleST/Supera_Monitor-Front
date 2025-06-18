@@ -64,7 +64,7 @@ export class ListComponent implements OnDestroy {
     update() {
         this.list = [];
         this.tableLoading = true;
-        lastValueFrom(this.service.getList())
+        lastValueFrom(this.service.getList('professot/list.component'))
             .then(res => this.tableLoading = false)
             .catch(res => {
                 this.tableLoading = false;

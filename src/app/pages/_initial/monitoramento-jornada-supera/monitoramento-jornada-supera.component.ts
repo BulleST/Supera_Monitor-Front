@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Checklist, Checklist_Item } from '../../../models/checklist.model';
+import { Checklist } from '../../../models/checklist.model';
 import { getError, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ChecklistService } from '../../../services/checklist.service';
@@ -7,9 +7,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import { Aluno } from '../../../models/alunos.model';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
-import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../../../models/aluno-checklist-item-list.model';
-import { UserService } from '../../../services/user.service';
 import { AccountService } from '../../../services/account.service';
 
 @Component({
@@ -36,7 +34,9 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     listFiltered: Aluno_Checklist_Item_View[] = [];
     loading = false;
 
-    modoExibicao: boolean = false;
+    // true - cards
+    // false - lista
+    modoExibicao: boolean = true;
 
     constructor(
         private service: ChecklistService,

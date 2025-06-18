@@ -3,3 +3,11 @@
     margin-bottom: 1rem;
     border-bottom: none!important;
 }
+
+::ng-deep .p-accordionpanel:not(.p-disabled).p-accordionpanel-active > .p-accordionheader {
+    color: var(--primary-500)!important;
+}
+
+::ng-deep .p-accordionpanel > .p-accordionheader {
+    align-items: start;
+}

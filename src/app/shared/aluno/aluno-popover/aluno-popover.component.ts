@@ -174,9 +174,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     show(e: any) {
-        this.popover.show(e);
         this.visible = true;
-
+        
+        this.popover.show(e);
         this.loadAluno();
         this.loadFoto();
     }

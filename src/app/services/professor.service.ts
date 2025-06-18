@@ -24,7 +24,8 @@ export class ProfessorService extends Service {
 
  
 
-    getList() {
+    getList(where?: string) {
+        console.log('professor.service getList', where)
         return this.http.get<Professor[]>(`${this.url}/professor/all/`)
             .pipe(tap({
                 next: list => {
@@ -50,7 +51,7 @@ export class ProfessorService extends Service {
     get(id: number) {
         return new Promise<Professor>(async (resolve, reject) => {
             if (this.list.value.length == 0)
-                await lastValueFrom(this.getList());
+                await lastValueFrom(this.getList('get'));
 
             var item = this.list.value.find(x => x.id == id) as Professor;
             if (!item){

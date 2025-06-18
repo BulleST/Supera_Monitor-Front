@@ -112,7 +112,7 @@ export class CalendarioComponent {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
+            lastValueFrom(this.professorService.getList('turmas/calendario/calendario.component'))
                 .then(res => this.loadingProfessores = false)
                 .catch(res => this.loadingProfessores = false);
         }
