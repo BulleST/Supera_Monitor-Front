@@ -44,17 +44,18 @@
         </div>
         <div class="sm:col col flex-grow-0 px-1 py-0">
             <!-- Agendar -->
-            <p-select value="'Agendar'"
+            {{agendarValue|json}}
+            <p-select [(ngModel)]="agendarValue"
                       [options]="agendarMenuItem"
-                      [styleClass]="'bg-primary-500 hover:bg-primary-600 border-primary-500 hover:border-primary-600 text-white flex align-items-center ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "
+                      [styleClass]="'p-select-menu ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "
                       appendTo="body"
-                      (onChange)="agendarEvento($event)"
+                      placeholder="Agendar"
+                      (onChange)="agendarEvento($event, agendar)"
                       scrollHeight="250px"
-                      dropdownIcon="pi pi-angle-down">
+                      dropdownIcon="pi pi-angle-down"
+                      #agendar="ngModel">
                 <ng-template let-selectedOption #selectedItem>
-                    <div class="text-white -mr-2">
-                        <span class="ml-2">Agendar</span>
-                    </div>
+                    <div class="text-white -mr-2 text-center text-base">Agendar</div>
                 </ng-template>
                 <ng-template let-item #item>
                     <div class="w-10rem">

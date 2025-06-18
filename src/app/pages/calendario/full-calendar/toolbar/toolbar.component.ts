@@ -1,20 +1,20 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { CalendarioRequest, CalendarioView } from '../../../../models/calendario.model';
+import { CalendarioView } from '../../../../models/calendario.model';
 import { EventoService } from '../../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { Router } from '@angular/router';
 import { MobileService } from '../../../../utils';
 import { ScreenWidth } from '../../../../utils/mobile';
 import { Subscription } from 'rxjs';
-import { SelectChangeEvent } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
+import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-toolbar',
     standalone: false,
     templateUrl: './toolbar.component.html',
     styleUrl: './toolbar.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToolbarComponent implements OnChanges, OnDestroy {
     @Input() currentTitle: string = '';
@@ -37,6 +37,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         }
     ];
 
+    agendarValue?: MenuItem;
     agendarMenuItem: MenuItem[] = [
         {
             label: 'Aula 0',
@@ -106,6 +107,8 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         private service: EventoService,
         private mobileService: MobileService,
         private router: Router,
+        private cdr: ChangeDetectorRef,
+        
     ) {
 
         var screen = this.mobileService.get().subscribe(res => {
@@ -134,9 +137,18 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.service.calendarView.emit(this.view);
     }
 
-    agendarEvento(e: SelectChangeEvent) {
-        this.router.navigateByUrl(e.value.routerLink);
-        if (e.value.command)
-            e.value.command(e);
+    agendarEvento(e: SelectChangeEvent, select: NgModel) {
+        if (this.agendarValue) {
+            this.router.navigateByUrl(this.agendarValue.routerLink);
+            if (this.agendarValue.command) {
+                this.agendarValue.command(e);
+            }
+            delete this.agendarValue;
+            select.control.setValue(undefined)
+            select.control.updateValueAndValidity();
+            
+            this.cdr.markForCheck(); // Marca para verificação na próxima detecção
+            this.cdr.detectChanges()
+        }
     }
 }

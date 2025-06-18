@@ -8,12 +8,13 @@ import { Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
 import { MenuItem } from 'primeng/api';
 import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
-import { SelectChangeEvent } from 'primeng/select';
+import { Select, SelectChangeEvent } from 'primeng/select';
 import { Evento } from '../../../models/evento.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_Checklist_Item_View } from '../../../models/aluno-checklist-item-list.model';
 import { AlunoChecklistOnConfirmDialogComponent } from '../aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { Aluno_CheckList_Item } from '../../../models/checklist.model';
+import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-aluno-popover',
@@ -41,7 +42,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     @ViewChild('alunoChecklistDialog') alunoChecklistDialog!: AlunoChecklistDialogComponent;
     @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
 
-
+    menuOptionsValue: any;
     menuItems: MenuItem[] = []
 
     constructor(
@@ -168,9 +169,12 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
     }
 
-    menuItemChanged(e: SelectChangeEvent) {
-        if (e.value.command)
+    menuItemChanged(e: SelectChangeEvent, select: NgModel) {
+        if (e.value && e.value.command) {
             e.value.command(e);
+            select.control.setValue(undefined)
+            select.control.updateValueAndValidity();
+        }
     }
 
     show(e: any) {
