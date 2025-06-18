@@ -3,8 +3,10 @@
                (onHide)="tableSelectedItem = null"
                appendTo="body"
                triggerEvent="onclick" />
+
 <app-confirm-dialog></app-confirm-dialog>
 <app-aluno-popover #popoverAluno></app-aluno-popover>
+
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -14,9 +16,6 @@
              [paginator]="list.length > 50"
              [columns]="tableColumns"
              [globalFilterFields]="tableGlobalFilterFields"
-             [(contextMenuSelection)]="tableSelectedItem"
-             [contextMenu]="cm"
-             (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
              dataKey="id"
              stripedRows
              [rowHover]="list.length > 0">
@@ -81,7 +80,9 @@
                             </ng-container>
                         </div>
                     </th>
-                    <th class="surface-900 py-0 border-bottom-none text-white"></th>
+                    <th pFrozenColumn 
+                        alignFrozen="right" 
+                        class="surface-900 py-0 border-bottom-none text-white"></th>
                 </tr>
             </ng-container>
         </ng-template>
@@ -157,7 +158,19 @@
                             [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
                     </ng-container>
                 </td>
-                <td></td>
+                <td pFrozenColumn 
+                    alignFrozen="right">
+                    <p-button 
+                        [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-ellipsis-h'"
+                        [severity]="'secondary'"
+                        pRipple
+                        severity="secondary"
+                        [raised]="true"
+                        [rounded]="true"
+                        title="Ver mais"
+                        styleClass="surface-50 border-50"
+                        (onClick)="showContextMenu($event, item)"/>
+                </td>
             </tr>
             <!-- <tr [pContextMenuRow]="item"
                 class="cursor-pointer"

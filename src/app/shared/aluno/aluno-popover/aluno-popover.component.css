@@ -68,7 +68,7 @@
     border-color: var(--primary-600);
 }
 
-::ng-deep .p-select.p-select-aluno-menu .p-select-label.p-placeholder {
+::ng-deep .p-select.p-select-menu .p-select-label.p-placeholder {
     color: white;
     text-align: center;
     margin-right: -0.5rem !important;

@@ -93,7 +93,7 @@
         <p-divider layout="vertical" class="hidden md:block h-full min-h-0 mt-2 mb-5"></p-divider>
         <div class="formgrid grid pl-2 sm:px-3">
             <!-- Nome -->
-            <div class="field lg:col-4 md:col-6 sm:col-8 xs:col-8 col-12">
+            <div class="field lg:col-4 md:col-6 sm:col-6 xs:col-8 col-12">
                 <label for="nome">Nome: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -108,7 +108,7 @@
                 </div>
             </div>
             <!-- RM -->
-            <div class="field lg:col-2 md:col-2 sm:col-6 xs:col-4 col-12">
+            <div class="field lg:col-2 md:col-2 sm:col-2 xs:col-4 col-12">
                 <label for="rm">RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
                 <input type="text"
                        pInputText
@@ -142,7 +142,7 @@
                 </div>
             </div>
             <!-- Gênero -->
-            <div class="field lg:col-3 md:col-6 sm:col-3 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-4 sm:col-3 xs:col-6 col-12">
                 <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="sexos"
@@ -163,7 +163,7 @@
                 </div>
             </div>
             <!-- Telefone -->
-            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12">
+            <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
                 <p-inputmask
                              #telefone="ngModel"
@@ -181,7 +181,7 @@
                 </div>
             </div>
             <!-- Celular -->
-            <div class="field lg:col-3 sm:col-3 xs:col-6 col-12">
+            <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="celular">Celular: <span class="text-red-500">*</span></label>
                 <p-inputmask
                              #celular="ngModel"
@@ -199,7 +199,7 @@
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field sm:col-6 xs:col-12 col-12">
+            <div class="field md:col-6 sm:col-12 xs:col-12 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -432,7 +432,7 @@
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
                 <p-select
-                          [options]="turmas"
+                          [options]="turmasFiltered"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
                           #turma_Id="ngModel"

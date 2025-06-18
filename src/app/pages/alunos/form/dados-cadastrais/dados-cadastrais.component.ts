@@ -13,7 +13,7 @@ import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../../services/user.service';
-import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
+import { PerfilCognitivo, PerfilCognitivo_Calculo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
@@ -44,6 +44,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     oldTurmaId?: number;
     selectedTurma?: Turma;
     turmas: Turma[] = [];
+    turmasFiltered: Turma[] = [];
     loadingTurmas = false;
 
     sexos: Pessoa_Sexo[] = [];
@@ -110,6 +111,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
+        if (!this.turmas.length) {
+            this.loadTurmas();
+        }
+
         var checklists = this.checklistService.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklists);
 
@@ -121,16 +126,38 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
+            console.log('object', this.object);
 
-            console.log('object', this.object)
             this.loadFoto();
 
-            if (this.turmas.length == 0)
-                await this.loadTurmas();
+            // Filtra turmas que o aluno poderia participar
+            // Ou a turma atual
+            // Ou alguma turma do mesmo perfil cognitivo
+            // E turmas com vagas
+            this.turmasFiltered = this.turmas.filter(turma => {
+                var alunoTemTurma = !!this.object.turma_Id;
+                var alunoTemPerfil = !!this.object.perfilCognitivo_Id;
+                var ehTurmaDoAluno = turma.id == this.object.turma_Id;
+                var ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
+                var temVagas = (!ehTurmaDoAluno && turma.alunosAtivos < turma.capacidadeMaximaAlunos) || ehTurmaDoAluno;
 
-            this.loadingTurmas = false
-            this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
-            this.oldTurmaId = this.selectedTurma?.id;
+                // Ou o aluno tem perfil definido e nesse caso só exibe as turmas com perfil selecionado
+                // Ou o aluno não tem perfil
+                return (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas)
+                    && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas)
+
+                // return ((!alunoTemTurma ) || (alunoTemTurma && turmaAluno)) && perfilAluno;
+            });
+            console.log(this.turmasFiltered)
+
+            if (this.object.turma_Id) {
+                this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
+                this.oldTurmaId = this.selectedTurma?.id;
+            }
+
+            if (this.object.perfilCognitivo_Id) {
+
+            }
 
             if (this.object.id) {
                 this.loadRestricoes();
@@ -154,13 +181,37 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    async loadTurmas() {
-        await lastValueFrom(this.turmaService.getList())
-            .then(res => {
-                this.turmas = res;
-                this.loadingTurmas = false;
-            })
+    loadTurmas() {
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => this.loadingTurmas = false)
             .catch(res => this.loadingTurmas = false);
+    }
+
+    loadFoto() {
+        if (this.object.id) {
+            this.loadingFile = true;
+
+            lastValueFrom(this.service.getFoto(this.object.id))
+                .then(res => {
+                    this.object.aluno_Foto = res;
+                    this.loadingFile = false;
+                })
+                .catch(res => {
+                    this.loadingFile = false;
+                })
+        }
+    }
+
+    loadRestricoes() {
+        this.loadingRestricoes = true;
+        lastValueFrom(this.restricaoService.getList(this.object.id))
+            .then(res => {
+                this.object.restricoes = res;
+                this.loadingRestricoes = false;
+                this.getRestricoes();
+            })
+            .catch(res => this.loadingRestricoes = false);
     }
 
     choose(fileUpload: FileUpload) {
@@ -199,21 +250,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         })
         this.object.aluno_Foto = base64;
         this.loadingFile = false;
-    }
-
-    loadFoto() {
-        if (this.object.id) {
-            this.loadingFile = true;
-
-            lastValueFrom(this.service.getFoto(this.object.id))
-                .then(res => {
-                    this.object.aluno_Foto = res;
-                    this.loadingFile = false;
-                })
-                .catch(res => {
-                    this.loadingFile = false;
-                })
-        }
     }
 
     kitChanged(model: NgModel, e: SelectChangeEvent) {
@@ -389,17 +425,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 ngModel.control.setValue(false);
             }
         });
-    }
-
-    loadRestricoes() {
-        this.loadingRestricoes = true;
-        lastValueFrom(this.restricaoService.getList(this.object.id))
-            .then(res => {
-                this.object.restricoes = res;
-                this.loadingRestricoes = false;
-                this.getRestricoes();
-            })
-            .catch(res => this.loadingRestricoes = false);
     }
 
     generateRM() {

@@ -21,6 +21,7 @@ import { ProfessorService } from '../../../services/professor.service';
 import { Professor } from '../../../models/professor.model';
 import { playAlert, playSuccess, showError } from '../../../utils';
 import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
+import { ContextMenu } from 'primeng/contextmenu';
 
 @Component({
     selector: 'app-list',
@@ -45,6 +46,7 @@ export class ListComponent implements OnDestroy {
 
 
     @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
+    @ViewChild('cm') cm!: ContextMenu;
 
 
     constructor(
@@ -89,7 +91,10 @@ export class ListComponent implements OnDestroy {
             });
     }
 
-    contextMenuSelectionChange(item: any) {
+    showContextMenu(e: any, item: Aluno) {
+        const toggle = this.tableSelectedItem?.id == item.id;
+        
+        this.tableSelectedItem = item;
         this.tableMenu = [
             {
 
@@ -108,8 +113,13 @@ export class ListComponent implements OnDestroy {
                 icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
                 command: (event: any) => this.deactivated(event, item)
             }
-
         ];
+
+        if (toggle) {
+            this.cm.toggle(e);
+        } else {
+            this.cm.show(e);
+        }
     }
 
     clear(dt: Table) {
