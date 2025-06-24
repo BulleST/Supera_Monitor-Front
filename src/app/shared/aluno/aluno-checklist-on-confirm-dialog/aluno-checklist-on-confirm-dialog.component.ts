@@ -47,20 +47,16 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
         if (changes['alunoChecklistItem']) {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
             this.celular = this.alunoChecklistItem?.celular;
-            console.log('changes alunoChecklistItem', this.alunoChecklistItem)
         }
         if (changes['item']) {
             this.item = changes['item'].currentValue;
-            console.log('changes item', this.item)
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
             this.celular = this.aluno?.celular;
-            console.log('changes aluno', this.aluno)
-                this.cdr.markForCheck(); // Marca para verificação na próxima detecção
-                this.cdr.detectChanges(); 
+            this.cdr.markForCheck(); // Marca para verificação na próxima detecção
+            this.cdr.detectChanges();
         }
-        console.log('changes celular', this.celular)
     }
 
     show() {
@@ -86,18 +82,17 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
 
     async loadAluno() {
         this.loading = true;
-        
+
         await lastValueFrom(this.alunoService.get(this.alunoChecklistItem.aluno_Id))
-        .then(res => {
-            this.aluno = res;
-            this.celular = res.celular;
-            console.log('loadAluno', this.aluno)
-            this.loading = false;
-        })
-        .catch(res => {
-            console.error('Não foi possível carregar aluno em aluno-checklist-on-confirm-dialog.component.ts')
-            this.loading = false;
-        });
+            .then(res => {
+                this.aluno = res;
+                this.celular = res.celular;
+                this.loading = false;
+            })
+            .catch(res => {
+                console.error('Não foi possível carregar aluno em aluno-checklist-on-confirm-dialog.component.ts')
+                this.loading = false;
+            });
 
         this.cdr.markForCheck(); // Marca para verificação na próxima detecção
         this.cdr.detectChanges()
@@ -106,7 +101,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
     send(e: any) {
         this.loading = true;
         this.alunoChecklistItem.observacoes = this.observacao
-        lastValueFrom(this.service.markAsDone( this.alunoChecklistItem.id,  this.alunoChecklistItem.observacoes))
+        lastValueFrom(this.service.markAsDone(this.alunoChecklistItem.id, this.alunoChecklistItem.observacoes))
             .then(res => {
                 this.observacao = '';
                 this.loading = false;
@@ -114,10 +109,11 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
                 this.hide();
 
                 this.userService.get(res.object.account_Finalizacao_Id)
-                .then(user => {
-                    res.object.account_Finalizacao = user.name;
-                    this.onFinish.emit(res.object);
-                });
+                    .then(user => {
+                        res.object.account_Finalizacao = user.name;
+                        this.onFinish.emit(res.object);
+                        this.service.onFinish.emit(res.object)
+                    });
 
             })
             .catch(res => {
@@ -127,94 +123,93 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
             });
     }
 
-    
-        enviarMensagemAluno() {
-            var nome = this.aluno.nome;
-            return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
-        }
-    
-        enviarMensagemCondicao() {
-            if (this.alunoChecklistItem && this.aluno) {
-                var id = this.alunoChecklistItem.checklist_Item_Id;
-                console.log('id', id)
-                // Apresentação do Diretor Franqueado 
-                if (id == 8) {
-                    return this.enviarMensagemApresentacaoDiretorFranqueado();
-                    // Confirmação da adequação do aluno ao perfil da turma 
-                } else if (id == 9) {
-                    return this.enviarMensagemAdequacaoTurma();
-                    // Agendar 1ª Oficina 
-                } else if (id == 12) {
-                    return this.enviarMensagemLembreteOficina();
-                    // Feedback pós venda 
-                } else if (id == 13) {
-                    return this.enviarMensagemFeedbackPosVenda();
-                    // Confirmação de preeechimento do feedback pós venda 
-                } else if (id == 32) {
-                    return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda();
-                    // Mensagem de boas-vindas 
-                } else if (id == 37) {
-                    return this.enviarMensagemBoasVindas();
-                    // Agendar Superação 
-                } else if (id == 22) {
-                    return this.enviarMensagemLembreteSuperacao();
-                    // Agendar 2ª Superação 
-                } else if (id == 29) {
-                    return this.enviarMensagemLembreteSuperacao();
-                    // Agendar 2ª Oficina 
-                } else if (id == 23) {
-                    return this.enviarMensagemLembreteOficina();
-                } else {
-                    return this.enviarMensagem();
-                }
+
+    enviarMensagemAluno() {
+        var nome = this.aluno.nome;
+        return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
+    }
+
+    enviarMensagemCondicao() {
+        if (this.alunoChecklistItem && this.aluno) {
+            var id = this.alunoChecklistItem.checklist_Item_Id;
+            // Apresentação do Diretor Franqueado 
+            if (id == 8) {
+                return this.enviarMensagemApresentacaoDiretorFranqueado();
+                // Confirmação da adequação do aluno ao perfil da turma 
+            } else if (id == 9) {
+                return this.enviarMensagemAdequacaoTurma();
+                // Agendar 1ª Oficina 
+            } else if (id == 12) {
+                return this.enviarMensagemLembreteOficina();
+                // Feedback pós venda 
+            } else if (id == 13) {
+                return this.enviarMensagemFeedbackPosVenda();
+                // Confirmação de preeechimento do feedback pós venda 
+            } else if (id == 32) {
+                return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda();
+                // Mensagem de boas-vindas 
+            } else if (id == 37) {
+                return this.enviarMensagemBoasVindas();
+                // Agendar Superação 
+            } else if (id == 22) {
+                return this.enviarMensagemLembreteSuperacao();
+                // Agendar 2ª Superação 
+            } else if (id == 29) {
+                return this.enviarMensagemLembreteSuperacao();
+                // Agendar 2ª Oficina 
+            } else if (id == 23) {
+                return this.enviarMensagemLembreteOficina();
+            } else {
+                return this.enviarMensagem();
             }
-            return this.enviarMensagem();
         }
-    
-        enviarMensagem() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem?.aluno;
-            return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
-        }
-    
-        enviarMensagemApresentacaoDiretorFranqueado() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(nome, this.celular);
-        }
-    
-        enviarMensagemBoasVindas() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            var email = this.aluno?.email ?? this.alunoChecklistItem.email;
-            var diaSemana = this.aluno?.diaSemana ?? this.alunoChecklistItem.diaSemana;
-            var horario = this.aluno?.horario ?? this.alunoChecklistItem.horario;
-            var professor = this.aluno?.professor ?? this.alunoChecklistItem.professor;
-            var linkGrupo = this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo;
-            return this.mensagemWhatsapp.enviarMensagemBoasVindas(nome, this.celular, email, diaSemana, horario, professor, linkGrupo);
-        }
-    
-        enviarMensagemAdequacaoTurma() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(nome, this.celular);
-        }
-    
-        enviarMensagemLembreteOficina() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemLembreteOficina(nome, this.celular);
-        }
-    
-        enviarMensagemLembreteSuperacao() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(nome, this.celular);
-        }
-    
-        enviarMensagemFeedbackPosVenda() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(nome, this.celular);
-        }
-    
-        enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda() {
-            var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-            return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(nome, this.celular);
-        }
-    
-    
+        return this.enviarMensagem();
+    }
+
+    enviarMensagem() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem?.aluno;
+        return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
+    }
+
+    enviarMensagemApresentacaoDiretorFranqueado() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(nome, this.celular);
+    }
+
+    enviarMensagemBoasVindas() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        var email = this.aluno?.email ?? this.alunoChecklistItem.email;
+        var diaSemana = this.aluno?.diaSemana ?? this.alunoChecklistItem.diaSemana;
+        var horario = this.aluno?.horario ?? this.alunoChecklistItem.horario;
+        var professor = this.aluno?.professor ?? this.alunoChecklistItem.professor;
+        var linkGrupo = this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo;
+        return this.mensagemWhatsapp.enviarMensagemBoasVindas(nome, this.celular, email, diaSemana, horario, professor, linkGrupo);
+    }
+
+    enviarMensagemAdequacaoTurma() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(nome, this.celular);
+    }
+
+    enviarMensagemLembreteOficina() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(nome, this.celular);
+    }
+
+    enviarMensagemLembreteSuperacao() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(nome, this.celular);
+    }
+
+    enviarMensagemFeedbackPosVenda() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(nome, this.celular);
+    }
+
+    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda() {
+        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
+        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(nome, this.celular);
+    }
+
+
 }

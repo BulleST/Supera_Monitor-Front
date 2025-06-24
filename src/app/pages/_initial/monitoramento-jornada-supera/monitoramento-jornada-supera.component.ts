@@ -44,41 +44,39 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private accountService: AccountService
     ) {
-        // var onFinish = this.service.onFinish.subscribe(res => {
-        //     this.checklists = this.checklists.map((checklist, indexChecklist) => {
-        //         checklist.items = checklist.items.map((item, indexItem) => {
-        //             let index = item.alunos.findIndex(x => x.id == res);
-        //             if (index != -1) {
-        //                 item.alunos.splice(index, 1);
-        //             }
-        //             return item;
-        //         });
-        //         return checklist;
-        //     });
+        var onFinish = this.service.onFinish.subscribe(res => {
 
-        //     console.log('id', res)
-        //     console.log(this.alunos)
+            this.checklists = this.checklists.map((checklist, indexChecklist) => {
+                checklist.items = checklist.items.map((item, indexItem) => {
+                    let index = item.alunos.findIndex(x => x.id == res.id);
+                    if (index != -1) {
+                        item.alunos.splice(index, 1);
+                    }
+                    return item;
+                });
+                return checklist;
+            });
 
-        //     this.alunos.map((aluno, alunoIndex) => {
-        //         aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
-        //             let index = checklist.items.findIndex(x => x.id == res);
-        //             if (index != -1) {
+            this.alunos.map((aluno, alunoIndex) => {
+                aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
+                    let index = checklist.items.findIndex(x => x.id == res.id);
+                    if (index != -1) {
 
-        //                 var item = checklist.items[index];
-        //                 item.finalizado = true;
-        //                 item.dataFinalizacao = new Date;
-        //                 item.account_Finalizacao_Id = this.accountService.accountValue?.id,
-        //                 item.account_Finalizacao = this.accountService.accountValue?.name,
+                        var item = checklist.items[index];
+                        item.finalizado = true;
+                        item.dataFinalizacao = res.datafinalizacao;
+                        item.account_Finalizacao_Id = res.account_Finalizacao_Id;
+                        item.account_Finalizacao = res.account_Finalizacao;
 
-        //                 checklist.items.splice(index, 1, item);
-        //             }
-        //             return checklist;
-        //         });
-        //         aluno = this.alunoService.mapAluno(aluno)
-        //         return aluno;
-        //     })
-        // });
-        // this.subscription.push(onFinish);
+                        checklist.items.splice(index, 1, item);
+                    }
+                    return checklist;
+                });
+                aluno = this.alunoService.mapAluno(aluno)
+                return aluno;
+            })
+        });
+        this.subscription.push(onFinish);
     }
 
     ngOnDestroy(): void {

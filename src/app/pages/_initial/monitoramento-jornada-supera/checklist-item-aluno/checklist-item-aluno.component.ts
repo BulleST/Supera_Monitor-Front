@@ -26,7 +26,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
-        private checklistService: ChecklistService,
     ) {
 
     }

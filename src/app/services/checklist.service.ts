@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ChecklistService extends Service {
     override list = new BehaviorSubject<Checklist[]>([]);
+    onFinish = new EventEmitter<any>();
 
     constructor(
         http: HttpClient,
