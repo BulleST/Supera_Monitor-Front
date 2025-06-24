@@ -1,0 +1,189 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-confirmdialog
+  key="confirmarPrimeiraAula"
+  styleClass="w-32rem">
+  <ng-template
+    #message
+    let-message>
+    <div class="flex align-items-start">
+      <div>
+        <div class="flex flex-column flex-1 gap-2">
+          <p class="leading-relaxed text-justify">
+            Você está prestes a confirmar o agendamento de
+            <strong class="text-primary-700">primeira aula</strong> para o aluno
+            abaixo.<br />
+            Certifique-se de que todas as informações estão corretas.
+          </p>
+
+          <p-fieldset
+            legend="Dados do agendamento"
+            class="flex-1 w-full flex flex-column p-3 border rounded-md">
+            <div class="mt-1">
+              <div class="inline-flex gap-2">
+                <label>Título do evento: </label>
+                <p class="font-semibold text-primary-600">
+                  {{ selectedEvento?.descricao }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-1">
+              <div class="inline-flex gap-2">
+                <label>Data do evento: </label>
+                <p class="font-semibold text-primary-600">
+                  {{ selectedEvento?.data | date : 'dd/MM/yyyy - HH:mm' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-1">
+              <div class="inline-flex gap-2">
+                <label>Aluno:</label>
+                <p class="font-semibold text-primary-600">{{ object?.nome }}</p>
+              </div>
+            </div>
+
+            <div class="mt-1 flex gap-2 align-items-center font-medium">
+              <label>Perfil Cognitivo do aluno:</label>
+              <p-chip
+                [label]="object?.perfilCognitivo"
+                styleClass="inline text-sm px-2 py-0 border-2 rounded-full text-primary border-primary bg-primary" />
+            </div>
+
+            <div
+              class="mt-1 flex flex-wrap gap-2 align-items-center font-medium">
+              <label>Perfis Cognitivos do evento:</label>
+              <ng-container
+                *ngFor="let perfil of selectedEvento?.perfilCognitivo">
+                <p-chip
+                  [label]="perfil.nome"
+                  styleClass="text-sm px-2 py-0 border-2 rounded-full text-primary border-primary bg-primary" />
+              </ng-container>
+            </div>
+          </p-fieldset>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmdialog>
+
+<div class="flex-1 p-2">
+  <p-toolbar styleClass="border-none bg-transparent p-0 px-2">
+    <div class="p-toolbar-group-start flex-1">
+      <h2
+        class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+        <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
+        <span
+          class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
+          <span class="font-bold text-xl">{{ currentTitle }}</span>
+        </span>
+      </h2>
+    </div>
+    <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
+      <!-- Prev -->
+      <p-button
+        icon="pi pi-angle-left text-sm"
+        styleClass="w-full h-full surface-100 border-100"
+        [style]="{width: '2.4rem', overflow: 'hidden',}"
+        (onClick)="prev()"
+        [disabled]="!object"
+        severity="secondary"
+        iconPos="right"
+        pTooltip="Anterior"
+        tooltipPosition="top"
+        size="small" />
+      <!-- Hoje -->
+      <p-button
+        label="hoje"
+        styleClass="h-full surface-800 border-800"
+        (onClick)="today()"
+        [disabled]="!object"
+        severity="help"
+        pTooltip="Hoje"
+        tooltipPosition="top"
+        size="small" />
+      <!-- Next -->
+      <p-button
+        icon="pi pi-angle-right text-sm"
+        styleClass="w-full h-full surface-100 border-100"
+        [style]="{width: '2.4rem', overflow: 'hidden',}"
+        (onClick)="next()"
+        [disabled]="!object"
+        severity="secondary"
+        pTooltip="Próximo"
+        tooltipPosition="top"
+        size="small" />
+      <!-- Atualizar -->
+      <p-button
+        icon="pi pi-sync text-sm"
+        styleClass="w-full h-full surface-100 border-100"
+        (onClick)="update('button')"
+        [disabled]="!object"
+        severity="secondary"
+        label="atualizar"
+        pTooltip="Atualizar calendário"
+        tooltipPosition="top"
+        size="small" />
+    </div>
+  </p-toolbar>
+  <full-calendar
+    [options]="calendarioOptions"
+    #fullCalendar>
+    <ng-template
+      #eventContent
+      let-arg>
+      <ng-container
+        *ngTemplateOutlet="
+          eventoTemplate;
+          context: {
+            evento: arg.event.extendedProps,
+            arg: arg
+          }
+        "></ng-container>
+      <ng-template
+        #eventoTemplate
+        let-evento="evento"
+        let-arg="arg">
+        <ng-container *ngIf="!loading && evento">
+          <app-evento-item-hover
+            #eventoPopover
+            onclick=""
+            [evento]="evento"
+            [arg]="arg"></app-evento-item-hover>
+          <div
+            class="w-full flex flex-column p-1 overflow-hidden border-2 border-round-sm"
+            (mousedown)="selectEvent(evento)"
+            (mouseenter)="eventoPopover.show($event)"
+            (mouseleave)="eventoPopover.hide()"
+            [ngStyle]="{
+              backgroundColor: arg.backgroundColor,
+              borderColor: selectedAula && selectedAula.id == arg.event.id ? 'red' :  arg.backgroundColor,
+              color: arg.textColor,
+            }">
+            <ng-container
+              *ngIf="
+                evento.evento_Tipo_Id != EventoTipo.Feriado;
+                else feriadoTemplate
+              ">
+              <div class="flex align-items-center cursor-pointer">
+                <span class="text-sm mr-2">
+                  {{ evento.data | date : 'HH:mm' }}
+                </span>
+                <span
+                  class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">
+                  {{ evento.descricao }}
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #feriadoTemplate>
+              <p class="text-sm">Feriado</p>
+              <p class="text-sm">
+                {{ evento.descricao }}
+              </p>
+            </ng-template>
+          </div>
+        </ng-container>
+      </ng-template>
+    </ng-template>
+  </full-calendar>
+</div>

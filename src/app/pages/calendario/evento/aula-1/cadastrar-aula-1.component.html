@@ -1,0 +1,86 @@
+<p-dialog
+  [header]="'Agendar Primeira Aula'"
+  [maximizable]="true"
+  [draggable]="true"
+  [modal]="true"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange()"
+  [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+  appendTo="body">
+  <ng-template #header>
+    <div class="w-full flex align-items-center">
+      <span class="p-dialog-title flex align-items-center">
+        <i
+          class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <div class="flex flex-column">
+          <span>Agendar Primeira Aula</span>
+        </div>
+      </span>
+    </div>
+  </ng-template>
+
+  <div class="field col-12 col-span-4 mb-0">
+    <label for="aluno">Aluno:</label>
+    <p-select
+      [options]="alunos"
+      [(ngModel)]="selectedAluno"
+      [checkmark]="true"
+      optionLabel="nome"
+      [showClear]="true"
+      placeholder="Selecione um aluno"
+      class="w-full"
+      [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
+      [filter]="true"
+      filterPlaceholder="Digite o nome do aluno..."
+      [virtualScroll]="true"
+      [virtualScrollItemSize]="25"
+      [loading]="loadingAlunos"
+      (onChange)="onSelectAluno($event)"
+      appendTo="body">
+      <!-- Aluno selecionado -->
+      <ng-template
+        let-aluno
+        pTemplate="selectedItem">
+        <div
+          class="flex justify-between align-items-center items-center w-full">
+          <span class="flex-1 font-bold truncate">{{ aluno?.nome }}</span>
+          <p-chip
+            [label]="aluno?.perfilCognitivo"
+            class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
+        </div>
+      </ng-template>
+
+      <!-- Listagem de alunos -->
+      <ng-template
+        let-aluno
+        pTemplate="item">
+        <div
+          class="flex justify-between align-items-center items-center w-full py-1">
+          <div class="flex-1 truncate">
+            <span class="font-bold">{{ aluno.nome }}</span>
+          </div>
+          <div class="flex-shrink-0">
+            <p-chip
+              [label]="aluno.perfilCognitivo"
+              class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
+          </div>
+        </div>
+      </ng-template>
+    </p-select>
+
+    <div class="mt-1 h-full">
+      <app-calendario-aluno-options
+        [object]="selectedAluno"></app-calendario-aluno-options>
+    </div>
+  </div>
+  <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
+    <li>
+      Apenas eventos com o
+      <strong>perfil cognitivo correspondente ao aluno</strong> são exibidos.
+    </li>
+    <li>
+      Apenas alunos que
+      <strong>ainda não realizaram primeira aula</strong> são exibidos.
+    </li>
+  </ul>
+</p-dialog>

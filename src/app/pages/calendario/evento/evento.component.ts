@@ -276,9 +276,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   getDeactivatedInformation(evento: Evento) {
-    return `Desativado às ${moment(evento.deactivated!).format(
-      'DD/MM/YYYY HH:mm:ss',
-    )}`
+    return `${moment(evento.deactivated!).format('DD/MM/YYYY - HH:mm')}`
   }
 
   ngOnDestroy(): void {

@@ -229,6 +229,26 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
+    goToPrimeiraAula() {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+
+            var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
+            switch (this.evento.evento_Tipo_Id) {
+                case EventoTipo.Aula: route = 'aula'; break;
+                case EventoTipo.AulaZero: route = 'aula-zero'; break;
+                case EventoTipo.AulaExtra: route = 'aula'; break;
+                case EventoTipo.Superacao: route = 'superacao'; break;
+                case EventoTipo.Reuniao: route = 'reuniao'; break;
+                case EventoTipo.Oficina: route = 'oficina'; break;
+                default: route = 'aula'; break;
+            }
+
+            this.router.navigate(['calendario', route, 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
+            this.hidePopover();
+        }
+    }
+
     goToCancelamento() {
         if (this.evento) {
             this.service.setEvento(this.evento);

@@ -21,6 +21,11 @@ export class ReposicaoAlunoRequest {
     observacoes: string = '';
 }
 
+export class PrimeiraAulaRequest {
+    evento_Id: number = 0;
+    aluno_Id: number = 0;
+}
+
 export class ReagendarAulaView {
     id: number = PseudoEvento.EventoId;
     professor_Id: number = 0;

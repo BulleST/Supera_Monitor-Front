@@ -49,10 +49,10 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             }
         }, {
             label: 'Aula 1',
-            routerLink: 'calendario/aula-1/agendar',
+            routerLink: 'calendario/primeira-aula/agendar',
             command: () => {
                 var evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.AulaZero;
+                evento.evento_Tipo_Id = EventoTipo.Aula;
                 this.service.setEvento(evento);
             }
         },

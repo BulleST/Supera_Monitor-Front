@@ -26,6 +26,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
 import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agendar-reposicao-aluno.component';
+import { PrimeiraAulaAlunoComponent } from './primeira-aula-aluno/primeira-aula-aluno.component';
+import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
+import { CalendarioAlunoOptionsComponent } from './evento/aula-1/calendario/calendario.component';
 
 @NgModule({
     declarations: [
@@ -34,6 +37,7 @@ import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agenda
         CadastrarOficinaComponent,
         CadastrarReuniaoComponent,
         CadastrarAula0Component,
+        CadastrarAula1Component,
         CadastrarInscricaoComponent,
         CancelarEventoComponent,
         EventoComponent,
@@ -43,6 +47,8 @@ import { AgendarReposicaoAlunoComponent } from './agendar-reposicao-aluno/agenda
         EditarSuperacaoComponent,
         EditarReuniaoComponent,
         ReagendarEventoComponent,
+        PrimeiraAulaAlunoComponent,
+        CalendarioAlunoOptionsComponent,
         SelectedEventoComponent,
         CadastrarTurmaExtraComponent,
         ToolbarComponent,

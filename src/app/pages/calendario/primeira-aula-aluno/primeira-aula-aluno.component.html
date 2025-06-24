@@ -1,0 +1,110 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-dialog
+  [header]="'Agendar primeira aula'"
+  [maximizable]="true"
+  [draggable]="true"
+  [modal]="true"
+  [(visible)]="visible"
+  (visibleChange)="visibleChange()"
+  [style]="{ width: '480px', maxWidth: '95vw', maxHeight: '95vh' }"
+  appendTo="body"
+  id="reposicao">
+  <ng-template #header>
+    <div class="w-full flex align-items-center">
+      <span class="p-dialog-title">
+        <i
+          class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        Agendar primeira aula</span
+      >
+    </div>
+  </ng-template>
+  <div class="formgrid grid">
+    <div class="field col-6">
+      <label for="turma">Turma:</label>
+      <p-iconfield>
+        <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+        <input
+          type="text"
+          pInputText
+          [value]="evento.descricao"
+          class="w-full"
+          readonly />
+      </p-iconfield>
+    </div>
+    <div class="field col-6">
+      <label for="turma">Data:</label>
+      <p-iconfield>
+        <p-inputicon styleClass="fa-solid fa-calendar" />
+        <input
+          type="text"
+          pInputText
+          [value]="formatDate(evento)"
+          class="w-full"
+          readonly />
+      </p-iconfield>
+    </div>
+
+    <div class="field col-12 col-span-4 mb-0">
+      <label for="aluno">Aluno:</label>
+      <p-select
+        [options]="alunos"
+        [(ngModel)]="selectedAluno"
+        [checkmark]="true"
+        optionLabel="nome"
+        [showClear]="true"
+        placeholder="Selecione um aluno"
+        class="w-full"
+        [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
+        [filter]="true"
+        filterPlaceholder="Digite o nome do aluno..."
+        [virtualScroll]="true"
+        [virtualScrollItemSize]="25"
+        [loading]="loadingAlunos"
+        appendTo="body">
+      </p-select>
+
+      <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
+        <li>
+          Apenas alunos com o
+          <strong>perfil cognitivo correspondente ao evento</strong> são
+          exibidos.
+        </li>
+        <li>
+          Apenas alunos que
+          <strong>ainda não realizaram primeira aula</strong> são exibidos.
+        </li>
+      </ul>
+    </div>
+
+    <p-fieldset
+      legend="Perfil(is) cognitivo(s) do evento"
+      class="field col-12 col-span-4">
+      <div class="flex flex-wrap gap-2">
+        <p-chip
+          *ngFor="let perfil of evento.perfilCognitivo"
+          [label]="perfil.nome"
+          class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
+
+        <p *ngIf="evento.perfilCognitivo.length === 0">
+          Evento livre, não possui perfis cognitivos associados
+        </p>
+      </div>
+    </p-fieldset>
+
+    <div
+      class="col-12 px-0 gap-4 flex flex-wrap align-items-center justify-content-between">
+      <div class="sm:col-9 col-12"></div>
+      <div class="ml-auto">
+        <p-button
+          (onClick)="sendConfirmation($event)"
+          class="w-full"
+          styleClass="w-full px-3"
+          label="Agendar"
+          [icon]="'pi pi-check'"
+          [loading]="loading"
+          [rounded]="true"
+          size="small" />
+      </div>
+    </div>
+  </div>
+</p-dialog>

@@ -5,9 +5,9 @@ import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/aluno
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { ReposicaoAlunoRequest } from '../models/reposicao.model';
-import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { getError, insert, insertOrReplace, replace } from '../utils';
+import { PrimeiraAulaRequest, ReposicaoAlunoRequest } from '../models/reposicao.model';
+import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restricao.model';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';
 import { AlunoChecklistCompleto } from '../models/calendario.model';
@@ -227,6 +227,15 @@ export class AlunoService extends Service {
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar aluno. \n ${getError(err)}`)
+                }
+            }));
+    }
+    
+    primeiraAula(request: PrimeiraAulaRequest) {
+        return this.http.post<RequestResponse>(`${this.url}/alunos/primeira-aula`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível marcar primeira aula. \n ${getError(err)}`)
                 }
             }));
     }

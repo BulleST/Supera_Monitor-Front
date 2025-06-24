@@ -17,9 +17,8 @@
         <span
           *ngIf="!evento.active"
           class="block text-red-500 p-dialog-subtitle font-semibold"
-          [pTooltip]="getDeactivatedInformation(evento)"
-          tooltipPosition="bottom"
-          >Este evento foi desativado</span
+          >Esta {{ getTipo(evento) }} foi desativado no dia
+          {{ getDeactivatedInformation(evento) }}</span
         >
       </div>
     </div>
