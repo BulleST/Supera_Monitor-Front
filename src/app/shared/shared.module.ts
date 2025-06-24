@@ -35,6 +35,7 @@ import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/al
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
 import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
 import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 
 @NgModule({
     declarations: [
@@ -111,12 +112,14 @@ import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-
         FullCalendarModule,
         NameAbvPipe,
         NameFirstWordPipe,
+        SalaAulaPipe,
     ],
     providers: [
         provideHttpClient(withFetch()),
         provideHttpClient(withInterceptorsFromDi()),
         NameAbvPipe,
         NameFirstWordPipe,
+        SalaAulaPipe,
         
     ]
 })

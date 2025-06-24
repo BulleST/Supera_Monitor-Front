@@ -56,7 +56,6 @@
                        name="nome"
                        class="w-full"
                        [required]="true">
-                       {{object.nome}}
                 <div *ngIf="nome.touched && nome.invalid && nome.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -120,7 +119,7 @@
                           optionValue="id"
                           [required]="true"
                           [filter]="true"
-                          filterBy="nome"
+                          filterBy="description"
                           appendTo="body"
                           optionDisabled="deactivated">
                     <ng-template #selectedItem let-selectedOption>
@@ -130,9 +129,10 @@
                     </ng-template>
                     <ng-template let-item #item>
                         <span class="mr-2">
-                            <app-sala-aula [numeroSala]="item.numeroSala"
+                            {{item.description}}
+                            <!-- <app-sala-aula [numeroSala]="item.numeroSala"
                                            [andar]="item.andar"
-                                           [sala_Id]="item.id"></app-sala-aula>
+                                           [sala_Id]="item.id"></app-sala-aula> -->
                         </span>
                         <p-badge *ngIf="item.disponivel == false"
                                  value="Indisponível"
@@ -286,7 +286,7 @@
                         [(ngModel)]="object.linkGrupo"
                         class="w-full"/>
                 </p-iconfield>
-                <p class="text-sm text-primary-500 mt-1">Obs.: Esse link será enviado na mensagem de boas-vindas</p>
+                <p class="text-sm text-primary-500 mt-1 ml-1">Obs.: Esse link será enviado na mensagem de boas-vindas</p>
             </div>
         </div>
         <div class="col-12 px-0 gap-2 flex align-items-center flex-wrap justify-content-between">

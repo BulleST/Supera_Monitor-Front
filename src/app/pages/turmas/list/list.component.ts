@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core'
+import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { ConfirmationService, MenuItem } from 'primeng/api'
@@ -11,6 +11,7 @@ import { TurmaService } from '../../../services/turma.service'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ToastrService } from 'ngx-toastr'
 import { playAlert, playSuccess } from '../../../utils/audio'
+import { ContextMenu } from 'primeng/contextmenu'
 
 @Component({
     selector: 'app-list',
@@ -31,7 +32,9 @@ export class ListComponent implements OnDestroy {
     FilterType: typeof FilterType = FilterType
     Role: typeof Role = Role
     screen: ScreenWidth = ScreenWidth.lg
-    subscription: Subscription[] = []
+    subscription: Subscription[] = [];
+
+    @ViewChild('cm') cm!: ContextMenu;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -47,25 +50,10 @@ export class ListComponent implements OnDestroy {
 
         this.update()
 
-        var screen = this.mobileService
-            .get()
-            .subscribe((res) => (this.screen = res))
+        var screen = this.mobileService.get().subscribe((res) => (this.screen = res))
         this.subscription.push(screen)
 
-        var list = this.service.list.subscribe((res) => {
-            this.list = res.map((turma) => {
-                turma.perfilCognitivoString = turma.perfilCognitivo
-                    .map((x) => x.nome)
-                    .join(', ')
-                turma.active = !turma.deactivated
-
-                if (turma.numeroSala != 0 && turma.andar != 0)
-                    turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
-                else turma.salaDeAulaString = 'ONLINE'
-
-                return turma
-            })
-        })
+        var list = this.service.list.subscribe((res) => this.list = res);
         this.subscription.push(list)
     }
 
@@ -81,44 +69,6 @@ export class ListComponent implements OnDestroy {
             .catch((res) => (this.tableLoading = false))
     }
 
-    contextMenuSelectionChange(item: any) {
-        this.tableMenu = [
-            {
-                label: 'Menu',
-                disabled: true,
-                styleClass: 'text-500 font-bold opacity-100',
-            },
-            { separator: true },
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen text-orange-500',
-                command: () => {
-                    var encrypted = this.crypto.encrypt(item.id)
-                    this.router.navigate(['editar', encrypted], {
-                        relativeTo: this.activatedRoute,
-                    })
-                },
-            },
-            {
-                label: item.active ? 'Desabilitar' : 'Habilitar',
-                icon: item.active
-                    ? 'fa-solid fa-lock text-red-500'
-                    : 'fa-solid fa-lock-open text-green-400',
-                command: (event: any) => this.deactivated(event, item),
-            },
-            { separator: true },
-            {
-                label: 'Calendário de aulas',
-                icon: 'fa-solid fa-calendar',
-                command: () => {
-                    var encrypted = this.crypto.encrypt(item.id)
-                    this.router.navigate(['calendario', encrypted], {
-                        relativeTo: this.activatedRoute,
-                    })
-                },
-            },
-        ]
-    }
 
     clear(dt: Table) {
         this.tableSearch = ''
@@ -148,6 +98,9 @@ export class ListComponent implements OnDestroy {
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            
+            acceptIcon: deactivated ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock',
+            rejectIcon: 'pi pi-times',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             rejectLabel: 'Cancelar',
             accept: () => {
@@ -159,9 +112,6 @@ export class ListComponent implements OnDestroy {
                                     ? `O registro foi habilitado com sucesso.`
                                     : `O registro foi desabilitado com sucesso.`,
                             )
-                            item.active = res.object.active
-                            item.deactivated = res.object.deactivated
-                            insertOrReplace(this.service, item)
                             item = res.object
                             // playSuccess();
                         } else {
@@ -183,4 +133,42 @@ export class ListComponent implements OnDestroy {
         var item = col.options.items.find((x: any) => x.value == row[col.field])
         return item
     }
+
+
+    showContextMenu(e: any, item: Turma) {
+        const toggle = this.tableSelectedItem?.id == item.id;
+
+        this.tableSelectedItem = item;
+        this.tableMenu = [
+            {
+
+                label: 'Menu',
+                disabled: true,
+                styleClass: 'text-500 font-bold opacity-100',
+            },
+            { separator: true },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen text-orange-500',
+                command: () => this.edit(item)
+            },
+            {
+                label: item.active ? 'Desabilitar' : 'Habilitar',
+                icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
+                command: (event: any) => this.deactivated(event, item)
+            }
+        ];
+
+        if (toggle) {
+            this.cm.toggle(e);
+        } else {
+            this.cm.show(e);
+        }
+    }
+
+    edit(item: any) {
+        var encrypted = this.crypto.encrypt(item.id);
+        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+    }
+
 }

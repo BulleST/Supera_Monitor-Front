@@ -9,6 +9,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import { Popover } from 'primeng/popover';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../utils/audio';
+import { ChecklistService } from '../../../services/checklist.service';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class FormComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
         private service: AlunoService,
+        private checklistService: ChecklistService,
         private confirmationService: ConfirmationService,
     ) {
         this.loadPage();
@@ -44,12 +46,17 @@ export class FormComponent implements OnDestroy {
 
 
     loadPage() {
-        let params = this.activatedRoute.params.subscribe(res => {
+        let params = this.activatedRoute.params.subscribe(async res => {
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.visible = true;
                 this.loading = true;
                 this.aluno_Id = this.crypto.decrypt(res['aluno_id'])
+
+                if (!this.checklistService.list.value.length) {
+                    await lastValueFrom(this.checklistService.getList())
+                }
+
 
                 lastValueFrom(this.service.get(this.aluno_Id))
                     .then(res => {

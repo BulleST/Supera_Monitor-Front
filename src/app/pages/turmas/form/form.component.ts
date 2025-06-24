@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Crypto, insertOrReplace, showError } from '../../../utils';
@@ -64,6 +64,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     loadingEventos = false;
 
     @ViewChild('professor_Id') professor_Id!: NgModel;
+    @ViewChild('form') form!: NgForm;
 
     constructor(
         private router: Router,
@@ -244,9 +245,9 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     perfilChange(model: NgModel) {
-    // PRIMENG Multiselect já lida com quase todo o onChange
-    this.object.perfilCognitivo = model.value
-  }
+            // PRIMENG Multiselect já lida com quase todo o onChange
+        this.object.perfilCognitivo = model.value
+    }
 
     goToCalendario() {
         this.router.navigate(['turmas', 'calendario', this.crypto.encrypt(this.object.id)]);
@@ -260,7 +261,13 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         showError(this.confirmationService, header, message, e);
     }
 
-   async sendConfirmation(form: NgForm, e: any) {
+  @HostListener('keydown.enter', ['$event'])
+  onEnterKeydown(event: KeyboardEvent) {
+    console.log('Enter key pressed on the host element!', event);
+    // Add your desired logic here
+    this.sendConfirmation(this.form, event)
+  }
+    async sendConfirmation(form: NgForm, e: any) {
         var professorValido = await this.verificaDisponibilidade();
         if (form.invalid || professorValido == false) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
@@ -291,18 +298,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
-                    var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-                    res.object.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + res.object.horario);
-                    res.object.perfilCognitivoString = this.object.perfilCognitivo.map((x: PerfilCognitivo) => x.nome).join(', ')
-                    res.object.diasDeAulaString = semana[this.object.diaSemana] + ' às ' + moment(res.object.horario).format('HH[h]mm')
-
-                    if (res.object.numeroSala != 0 && res.object.andar != 0)
-                        res.object.salaDeAulaString = `${res.object.numeroSala} ${res.object.andar} º andar`
-                    else
-                        res.object.salaDeAulaString = 'ONLINE'
-
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
-                    insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
                     // playSuccess();

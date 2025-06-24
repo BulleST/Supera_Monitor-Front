@@ -7,7 +7,7 @@ import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { ReposicaoAlunoRequest } from '../models/reposicao.model';
 import { Aluno_Restricao } from '../models/aluno-restricao.model';
-import { getError } from '../utils';
+import { getError, insert, insertOrReplace, replace } from '../utils';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';
 import { AlunoChecklistCompleto } from '../models/calendario.model';
@@ -38,6 +38,7 @@ export class AlunoService extends Service {
             .then(res => this.checklists = res);
 
         checklistService.list.subscribe(res => {
+            console.log('res checklist', res)
             this.checklists = res;
         })
 
@@ -64,14 +65,24 @@ export class AlunoService extends Service {
             aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
         }
 
+
+        aluno.restricoes = aluno.restricoes ?? [];
+        aluno.restricoes = aluno.restricoes.map(item => {
+            item.active = !item.deactivated;
+            return item;
+        })
+
         aluno.alunoChecklist = aluno.alunoChecklist ?? [];
         aluno.checklistCompleto = aluno.checklistCompleto ?? [];
+
 
         if (aluno.alunoChecklist && aluno.alunoChecklist.length) {
                 aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
                 checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
                 return checklistAluno
             })
+
+            console.log('checklists', this.checklists)
             aluno.checklistCompleto = this.checklists
                 .map(checklist => {
                     var checklistAluno = new AlunoChecklistCompleto;
@@ -92,8 +103,10 @@ export class AlunoService extends Service {
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
-                next: list => {
-                    list = list.map(aluno => this.mapAluno(aluno));
+                next: async list => {
+                    await list.map(async aluno => {
+                        return await this.mapAluno(aluno)
+                    });
                     this.list.next(list);
                 },
                 error: err => {
@@ -108,7 +121,6 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
-                    // this.list.next(list);
                     return of(list);
                 },
                 error: err => {
@@ -190,6 +202,13 @@ export class AlunoService extends Service {
         request.primeiraAula_Id = model.primeiraAula_Id;
         return this.http.put<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
+                next: res => {
+                    if (res.success) {
+                        res.object = this.mapAluno(res.object)
+                        replace(this, res.object, 'list')
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível editar aluno. \n ${getError(err)}`)
                 }
@@ -199,6 +218,13 @@ export class AlunoService extends Service {
     deactivated(id: number, activated: boolean = true) {
         return this.http.patch<RequestResponse>(`${this.url}/alunos/toggle-active/${id}`, {})
             .pipe(tap({
+                next: res => {
+                    if (res.success) {
+                        res.object = this.mapAluno(res.object)
+                        replace(this, res.object, 'list')
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar aluno. \n ${getError(err)}`)
                 }

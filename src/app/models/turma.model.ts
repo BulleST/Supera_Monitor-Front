@@ -30,6 +30,7 @@ export class Turma extends Basic_List {
     perfilCognitivoString: string = '';
     diasDeAulaString: string = '';
     salaDeAulaString: string = '';
+    capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
 }
 
@@ -99,8 +100,8 @@ export var turmaColumns: ColumnTable[] = [
         displayType: DisplayType.text,
     },
     {
-        field: 'capacidadeMaximaAlunos',
-        label: 'Capacidade máxima',
+        field: 'capacidadeMaximaAlunosString',
+        label: 'Limite',
         filterType: FilterType.text,
         displayType: DisplayType.text,
         options: {
@@ -109,7 +110,7 @@ export var turmaColumns: ColumnTable[] = [
     },
     {
         field: 'linkGrupo',
-        label: 'Convite WhatsApp',
+        label: 'Grupo',
         filterType: FilterType.text,
         displayType: DisplayType.link,
     },

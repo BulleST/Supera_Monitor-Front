@@ -5,6 +5,9 @@ import { Service } from '../helpers/service.service';
 import { SalaAula } from '../models/sala-aula.model';
 import { MyMap } from '../utils/map';
 import { getError } from '../utils';
+import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
+import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 
 @Injectable({
     providedIn: 'root',
@@ -13,13 +16,23 @@ import { getError } from '../utils';
 export class SalaAulaService extends Service {
     override list = new BehaviorSubject<SalaAula[]>([]);
 
+    constructor(
+        http: HttpClient,
+        toastr: ToastrService,
+        private salaAulaPipe: SalaAulaPipe,
+    ) {
+        super(http, toastr)
+
+    }
+
     getList() {
         return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)
             .pipe(tap({
                 next: list => {
-                    list = list.map(x => {
-                        x.active = !x.deactivated
-                        return x;
+                    list = list.map(item => {
+                        item.active = !item.deactivated;
+                        item.description = this.salaAulaPipe.transform(item);
+                        return item;
                     })
                     this.list.next(list);
                     return of(list);

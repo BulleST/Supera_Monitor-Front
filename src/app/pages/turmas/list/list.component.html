@@ -1,4 +1,8 @@
-<p-contextmenu #cm [model]="tableMenu" (onHide)="tableSelectedItem = null" appendTo="body" triggerEvent="onclick" />
+<p-contextmenu #cm
+               [model]="tableMenu"
+               (onHide)="tableSelectedItem = null"
+               appendTo="body"
+               triggerEvent="onclick" />
 
 <app-confirm-dialog></app-confirm-dialog>
 
@@ -10,13 +14,9 @@
              [rowsPerPageOptions]="[50, 100, 1000]"
              [paginator]="list.length > 50"
              [columns]="tableColumns"
-             [globalFilterFields]="tableGlobalFilterFields" 
-             [(contextMenuSelection)]="tableSelectedItem"
-             (contextMenuSelectionChange)="contextMenuSelectionChange($event)"
-             [contextMenu]="cm"
+             [globalFilterFields]="tableGlobalFilterFields"
              dataKey="id"
              stripedRows
-             showGridlines
              [rowHover]="list.length > 0">
         <ng-template pTemplate="caption">
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
@@ -69,19 +69,17 @@
         </ng-template>
         <ng-template pTemplate="header">
             <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
-                <!-- <th class="surface-900 py-0 border-bottom-none text-white" style="width: 4rem"></th> -->
-                <th *ngFor="let col of tableColumns" 
+                <th *ngFor="let col of tableColumns"
                     [pSortableColumn]="col.field"
                     class="surface-900 py-0 border-none text-white white-space-nowrap"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
                     }">
-                    
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
                         <ng-container *ngIf="col.filterType != FilterType.none">
-                            <div class="flex align-items-center" 
-                                [ngClass]="{
+                            <div class="flex align-items-center"
+                                 [ngClass]="{
                                     'ml-3': col.displayType != DisplayType.options 
                                 }">
                                 <p-columnFilter [type]="col.filterType"
@@ -92,28 +90,23 @@
                         </ng-container>
                     </div>
                 </th>
-                <th class="surface-900 py-0 border-bottom-none text-white"></th>
+                <th pFrozenColumn
+                    alignFrozen="right"
+                    class="surface-900 py-0 border-bottom-none text-white"></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-item let-index="rowIndex">
-            <tr [pContextMenuRow]="item"
-                class="cursor-pointer border-top-1 border-bottom-1 border-primary-500 bg-primary-100"
-                [ngClass]="{ 
-                    'border-top-1 border-bottom-1 border-primary-500 bg-primary-100': item == tableSelectedItem,
-                }">
+            <tr class="white-space-nowrap">
                 <td *ngFor="let col of tableColumns"
                     [pSelectableRow]="item"
                     [pSelectableRowIndex]="index"
                     [pSelectableRowDisabled]="col.displayType == DisplayType.link"
-                    class="border-none white-space-nowrap"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
                     }">
                     <ng-container *ngIf="col.displayType == DisplayType.options">
                         <ng-container *ngTemplateOutlet="tag; context: { item: item, option: getOption(col, item) }"></ng-container>
                         <ng-template #tag let-item="item" let-option="option">
-                            <!-- <p class="white-space-nowrap">Option: {{option | json}}</p> -->
-                            <!-- <p class="white-space-nowrap">Item: {{item | json}}</p> -->
                             <p-tag *ngIf="option"
                                    styleClass="font-normal"
                                    [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
@@ -124,18 +117,47 @@
                         </ng-template>
                     </ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.color">
-                        <span class="w-1rem h-1rem flex border-circle" 
-                        [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+                        <span class="w-1rem h-1rem flex border-circle"
+                              [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
                     </ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
                     <ng-container *ngIf="col.displayType == DisplayType.link">
-                        <a *ngIf="item[col.field]" [href]="item[col.field]" target="_blank" class="text-primary-500 hover:underline hover:text-primary-400">Clique para abrir link</a>
+                        <ng-container *ngIf="item[col.field]">
+                            <a [href]="item[col.field]" 
+                                target="_blank">
+                                <p-button 
+                                    icon="pi pi-whatsapp"
+                                    label="Ver grupo"
+                                    [rounded]="true"
+                                    severity="success"/>
+                            </a>
+                        </ng-container>
+                        <ng-container *ngIf="!item[col.field]">
+                                <div pTooltip="Link para grupo não cadastrado" tooltipPosition="top">
+                                    <p-button 
+                                        icon="pi pi-whatsapp"
+                                        label="Ver grupo"
+                                        [rounded]="true"
+                                        severity="success"
+                                        [disabled]="true"/>
+                                </div>
+                        </ng-container>
+                        
                     </ng-container>
                 </td>
-                <td class="border-none px-0"></td>
+                <td pFrozenColumn
+                    alignFrozen="right">
+                    <p-button
+                              [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+                              [severity]="'secondary'"
+                              [rounded]="true"
+                              title="Ver mais"
+                              styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+                              (onClick)="showContextMenu($event, item)" />
+                </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">

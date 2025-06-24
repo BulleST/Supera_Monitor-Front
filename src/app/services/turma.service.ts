@@ -5,7 +5,10 @@ import { TurmaRequest, Turma } from '../models/turma.model';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { getError } from '../utils';
+import { getError, insert, replace } from '../utils';
+import { HttpClient } from '@angular/common/http';
+import { ToastrService } from 'ngx-toastr';
+import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 
 @Injectable({
     providedIn: 'root',
@@ -13,25 +16,33 @@ import { getError } from '../utils';
 export class TurmaService extends Service {
     override list = new BehaviorSubject<Turma[]>([]);
 
+    constructor(
+        http: HttpClient,
+        toastr: ToastrService,
+        private salaAulaPipe: SalaAulaPipe
+    ) {
+
+        super(http, toastr)
+    }
+
+    mapTurma(turma: Turma) {
+        var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
+        
+        turma.active = !turma.deactivated;
+        turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
+        turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
+        turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
+        turma.salaDeAulaString = this.salaAulaPipe.transform(turma);
+        turma.capacidadeMaximaAlunosString = `${turma.capacidadeMaximaAlunos} alunos`;
+
+        return turma;
+    }
+
     getList() {
         return this.http.get<Turma[]>(`${this.url}/turmas/all/`)
             .pipe(tap({
                 next: list => {                    
-                    
-                    var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
-                    list.map(turma => {
-                        turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
-                        turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
-                        turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
-                        turma.active = !turma.deactivated;
-                        
-                        if (turma.numeroSala != 0 && turma.andar != 0)
-                             turma.salaDeAulaString = `${turma.numeroSala} ${turma.andar} º andar`
-                        else turma.salaDeAulaString = 'ONLINE'
-
-                        return turma;
-                    })
-
+                    list.map(turma => this.mapTurma(turma))
                     this.list.next(list);
                     return of(list);
                 },
@@ -65,6 +76,13 @@ export class TurmaService extends Service {
 
         return this.http.post<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
+                next: (res) => {
+                    if (res.success) {
+                        res.object = this.mapTurma(res.object);
+                        insert(this, res.object, 'list');
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar turma. \n ${getError(err)}`);
                 }
@@ -80,6 +98,13 @@ export class TurmaService extends Service {
 
         return this.http.put<RequestResponse>(`${this.url}/turmas`, request)
             .pipe(tap({
+                next: (res) => {
+                    if (res.success) {
+                        res.object = this.mapTurma(res.object);
+                        replace(this, res.object, 'list');
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível editar turma. \n ${getError(err)}`);
                 }
@@ -89,6 +114,13 @@ export class TurmaService extends Service {
     deactivated(id: number, activated: boolean = true) {
         return this.http.patch<RequestResponse>(`${this.url}/turmas/toggle-active/${id}`, {})
             .pipe(tap({
+                next: (res) => {
+                    if (res.success) {
+                        res.object = this.mapTurma(res.object);
+                        replace(this, res.object, 'list');
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível habilitar/desabilitar turma. \n ${getError(err)}`);
                 }

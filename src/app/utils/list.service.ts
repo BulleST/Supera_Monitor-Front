@@ -7,6 +7,31 @@ export function remove(service: any, objeto: any, property = 'list') {
     service[property].next(list);
 }
 
+export function insert(service: Service, object: any, property = 'list') {
+    try {
+        var list = service.list.value as any[];
+        list.push(object);
+        service.list.next(list);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+
+export function replace(service: Service, object: any, property = 'list') {
+    try {
+        var list = service.list.value as any[];
+        var index = list.findIndex(x => x.id == object.id);
+        list.splice(index, 1, object);
+        service.list.next(list);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+
 export function insertOrReplace(service: Service, object: any, property: string = 'list') {
     try {
         var list = service.list.value as any[];

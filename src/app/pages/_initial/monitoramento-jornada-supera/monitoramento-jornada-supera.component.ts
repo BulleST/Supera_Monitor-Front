@@ -57,7 +57,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 return checklist;
             });
 
-            this.alunos.map((aluno, alunoIndex) => {
+            this.alunos.map(async (aluno, alunoIndex) => {
                 aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
                     let index = checklist.items.findIndex(x => x.id == res.id);
                     if (index != -1) {
@@ -72,7 +72,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                     }
                     return checklist;
                 });
-                aluno = this.alunoService.mapAluno(aluno)
+                aluno = await this.alunoService.mapAluno(aluno)
                 return aluno;
             })
         });

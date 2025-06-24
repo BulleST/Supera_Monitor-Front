@@ -3,10 +3,8 @@
                (onHide)="tableSelectedItem = null"
                appendTo="body"
                triggerEvent="onclick" />
-
 <app-confirm-dialog></app-confirm-dialog>
 <app-aluno-popover #popoverAluno></app-aluno-popover>
-
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -70,7 +68,8 @@
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
                             <ng-container *ngIf="col.filterType != FilterType.none">
-                                <div class="flex align-items-center" [class.ml-3]="col.displayType != DisplayType.options">
+                                <div class="flex align-items-center"
+                                     [class.ml-3]="col.displayType != DisplayType.options">
                                     <p-columnFilter
                                                     [type]="col.filterType"
                                                     [field]="col.field"
@@ -80,44 +79,44 @@
                             </ng-container>
                         </div>
                     </th>
-                    <th pFrozenColumn 
-                        alignFrozen="right" 
+                    <th pFrozenColumn
+                        alignFrozen="right"
                         class="surface-900 py-0 border-bottom-none text-white"></th>
                 </tr>
             </ng-container>
         </ng-template>
-        <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+        <ng-template pTemplate="body" let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td pFrozenColumn alignFrozen="left">
-                    <div class="flex align-items-center gap-2">  
+                    <div class="flex align-items-center gap-2">
                         <span class="inline-flex w-2rem h-2rem align-items-center">
-                                <ng-container *ngIf="item?.celular">
-                                    <a [href]="enviarMensagem(item)" 
-                                        target="_blank"
-                                        pTooltip="Enviar mensagem"
-                                        tooltipPosition="top"
-                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text p-button-sm">
-                                        <span class="pi pi-whatsapp p-button-icon"></span>
-                                    </a>
-                                </ng-container>
-                                <ng-container *ngIf="!item?.celular">
-                                    <a pTooltip="Nenhum celular cadastrado"
-                                        tooltipPosition="top"
-                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-secondary p-button-text p-button-sm cursor-none bg-transparent">
-                                        <span class="pi pi-whatsapp p-button-icon"></span>
-                                    </a>
-                                </ng-container>
+                            <ng-container *ngIf="item?.celular">
+                                <a [href]="enviarMensagem(item)"
+                                   target="_blank"
+                                   pTooltip="Enviar mensagem"
+                                   tooltipPosition="top"
+                                   class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text p-button-sm">
+                                    <span class="pi pi-whatsapp p-button-icon"></span>
+                                </a>
+                            </ng-container>
+                            <ng-container *ngIf="!item?.celular">
+                                <a pTooltip="Nenhum celular cadastrado"
+                                   tooltipPosition="top"
+                                   class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-secondary p-button-text p-button-sm cursor-none bg-transparent">
+                                    <span class="pi pi-whatsapp p-button-icon"></span>
+                                </a>
+                            </ng-container>
                         </span>
-                        <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer" 
-                            pTooltip="{{item.nome}}" 
-                            tooltipPosition="top"
-                            (click)="showPopoverAluno(item, $event)">{{ item.nome | nameAbv }}</span>
+                        <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
+                              pTooltip="{{item.nome}}"
+                              tooltipPosition="top"
+                              (click)="showPopoverAluno(item, $event)">{{ item.nome | nameAbv }}</span>
                     </div>
                 </td>
                 <td>
                     <div class="flex align-items-center gap-2">
                         <span class="w-1rem h-1rem inline-flex border-circle"
-                                [style]="{ 
+                              [style]="{ 
                                     backgroundColor: item.corLegenda, 
                                     borderColor: item.corLegenda 
                                 }"></span>
@@ -127,9 +126,9 @@
                 <td>
                     <div class="flex align-items-center gap-2">
                         <span class="w-1rem h-1rem inline-flex border-circle"
-                                [pTooltip]="item.professor"
-                                tooltipPosition="top"
-                                [style]="{ 
+                              [pTooltip]="item.professor"
+                              tooltipPosition="top"
+                              [style]="{ 
                                     backgroundColor: item.corLegenda, 
                                     borderColor: item.corLegenda 
                                 }"></span>
@@ -145,107 +144,30 @@
                 <td class="w-5rem">
                     <ng-container *ngIf="item.active">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                            icon="pi pi-check mr-2 text-xs"
-                            value="Ativo"
-                            severity="success"
-                            [pTooltip]="'Ativo'" />
+                               icon="pi pi-check mr-2 text-xs"
+                               value="Ativo"
+                               severity="success"
+                               [pTooltip]="'Ativo'" />
                     </ng-container>
                     <ng-container *ngIf="!item.active">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                            icon="pi pi-times mr-2 text-xs"
-                            value="Inativo"
-                            severity="danger"
-                            [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
+                               icon="pi pi-times mr-2 text-xs"
+                               value="Inativo"
+                               severity="danger"
+                               [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
                     </ng-container>
                 </td>
-                <td pFrozenColumn 
+                <td pFrozenColumn
                     alignFrozen="right">
-                    <p-button 
-                        [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-ellipsis-h'"
-                        [severity]="'secondary'"
-                        pRipple
-                        severity="secondary"
-                        [raised]="true"
-                        [rounded]="true"
-                        title="Ver mais"
-                        styleClass="surface-50 border-50"
-                        (onClick)="showContextMenu($event, item)"/>
+                    <p-button
+                              [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+                              [severity]="'secondary'"
+                              [rounded]="true"
+                              title="Ver mais"
+                              styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+                              (onClick)="showContextMenu($event, item)" />
                 </td>
             </tr>
-            <!-- <tr [pContextMenuRow]="item"
-                class="cursor-pointer"
-                [ngClass]="{ 'bg-primary-50': item == tableSelectedItem,}">
-                <td *ngFor="let col of tableColumns"
-                    [pSelectableRow]="item"
-                    [pSelectableRowIndex]="rowIndex"
-                    [ngClass]="{
-                        'white-space-nowrap  border-left-none border-right-none captalize': true,
-                        'w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2': col.field == 'nome',
-                        'w-5rem': col.displayType == DisplayType.options,
-                    }"
-                    (click)="dt.contextMenuSelection = item; tableSelectedItem = item;  dt.contextMenuSelectionChange.emit(item) ; cm.show($event);">
-                    <div class="flex align-items-center gap-2">
-                        <ng-container *ngIf="col.field == 'nome'">
-                            <span class="inline-flex w-2rem h-2rem align-items-center">
-                                <ng-container *ngIf="item?.celular">
-                                    <a [href]="enviarMensagem(item)" 
-                                        target="_blank"
-                                        pTooltip="Enviar mensagem"
-                                        tooltipPosition="top"
-                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text p-button-sm">
-                                        <span class="pi pi-whatsapp p-button-icon"></span>
-                                    </a>
-                                </ng-container>
-                                <ng-container *ngIf="!item?.celular">
-                                    <a pTooltip="Nenhum celular cadastrado"
-                                        tooltipPosition="top"
-                                        class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-secondary p-button-text p-button-sm cursor-none bg-transparent">
-                                        <span class="pi pi-whatsapp p-button-icon"></span>
-                                    </a>
-                                </ng-container>
-                            </span>
-                        </ng-container>
-                         <ng-container *ngIf="col.field == 'professor' || col.field == 'turma'">
-                            <span class="w-1rem h-1rem inline-flex border-circle"
-                                    [pTooltip]="item.professor"
-                                    tooltipPosition="top"
-                                    [style]="{ 
-                                        backgroundColor: item.corLegenda, 
-                                        borderColor: item.corLegenda 
-                                    }"></span>
-                        </ng-container>
-                        <ng-container *ngIf="col.displayType == DisplayType.options">
-                            <ng-container *ngTemplateOutlet="tag; 
-                                context: { 
-                                    item: item,
-                                    option: getOption(col, item)
-                                }">
-                            </ng-container>
-                            <ng-template #tag let-item="item" let-option="option">
-                                <p-tag *ngIf="option"
-                                       styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                       [icon]="option.icon ? (option.icon + ' mr-2 text-xs') : ''"
-                                       [value]="option.label"
-                                       [severity]="option.severity ? option.severity : 'secondary'"
-                                       [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                            </ng-template>
-                        </ng-container>
-                        <ng-container *ngIf="col.displayType == DisplayType.text">
-                            <ng-container *ngIf="col.field != 'nome'">
-                                <span>{{ item[col.field] }}</span>
-                            </ng-container>
-                            <ng-container *ngIf="col.field == 'nome'">
-                                <span pTooltip="{{item.nome}}" class="capitalize">{{ item.nome | nameAbv }}</span>
-                            </ng-container>
-                        </ng-container>
-                        <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
-                        <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-                        <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-                       
-                    </div>
-                </td>
-                <td class="border-none px-0"></td>
-            </tr> -->
         </ng-template>
         <ng-template pTemplate="emptymessage">
             <ng-container *ngIf="tableLoading; else elseTemplate">

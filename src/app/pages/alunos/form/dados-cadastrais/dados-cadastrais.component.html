@@ -153,17 +153,21 @@
             <!-- Telefone -->
             <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
-                <p-inputmask
-                             #telefone="ngModel"
-                             [(ngModel)]="object.telefone"
-                             mask="+99 (99) 9999-9999"
-                             placeholder="+55 (99) 9999-9999"
-                             [autoClear]="true"
-                             id="telefone"
-                             name="telefone"
-                             class="w-full"
-                             styleClass="w-full"
-                             [required]="true" />
+                <p-iconfield>
+                        <p-inputicon styleClass="pi pi-phone" />
+                        <p-inputmask
+                                     #telefone="ngModel"
+                                     [(ngModel)]="object.telefone"
+                                     mask="+99 (99) 9999-9999"
+                                     placeholder="+55 (99) 9999-9999"
+                                     [autoClear]="true"
+                                     id="telefone"
+                                     name="telefone"
+                                     class="w-full"
+                                     styleClass="w-full pl-5"
+                                     
+                                     [required]="true" />
+                </p-iconfield>
                 <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -171,17 +175,20 @@
             <!-- Celular -->
             <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="celular">Celular: <span class="text-red-500">*</span></label>
-                <p-inputmask
-                             #celular="ngModel"
-                             [(ngModel)]="object.celular"
-                             mask="+99 (99) 9.9999-9999"
-                             placeholder="+55 (99) 9.9999-9999"
-                             [autoClear]="true"
-                             id="celular"
-                             name="celular"
-                             class="w-full"
-                             styleClass="w-full"
-                             [required]="true" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-mobile" />
+                    <p-inputmask
+                                 #celular="ngModel"
+                                 [(ngModel)]="object.celular"
+                                 mask="+99 (99) 9.9999-9999"
+                                 placeholder="+55 (99) 9.9999-9999"
+                                 [autoClear]="true"
+                                 id="celular"
+                                 name="celular"
+                                 class="w-full"
+                                     styleClass="w-full pl-5"
+                                 [required]="true" />
+                </p-iconfield>
                 <div *ngIf="celular.touched && celular.invalid && celular.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -189,16 +196,20 @@
             <!-- E-mail -->
             <div class="field sm:col-6 xs:col-6 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
-                <input type="text"
-                       pInputText
-                       [email]="true"
-                       #email="ngModel"
-                       [(ngModel)]="object.email"
-                       id="email"
-                       name="email"
-                       class="w-full"
-                       [required]="true"
-                       placeholder="example@gmail.com">
+                
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-envelope" />
+                    <input type="text"
+                           pInputText
+                           [email]="true"
+                           #email="ngModel"
+                           [(ngModel)]="object.email"
+                           id="email"
+                           name="email"
+                           class="w-full"
+                           [required]="true"
+                           placeholder="example@gmail.com">
+                </p-iconfield>
                 <div *ngIf="email.touched && email.invalid && email.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -206,14 +217,17 @@
             <!-- Endereço -->
             <div class="field sm:col-6 xs:col-6 col-12">
                 <label for="endereco">Endereço: </label>
-                <input type="text"
-                       pInputText
-                       #endereco="ngModel"
-                       [(ngModel)]="object.endereco"
-                       id="endereco"
-                       name="endereco"
-                       class="w-full"
-                       placeholder="Rua das Pedras 123 - Vila das Amoras SP">
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-map-marker" />
+                    <input type="text"
+                           pInputText
+                           #endereco="ngModel"
+                           [(ngModel)]="object.endereco"
+                           id="endereco"
+                           name="endereco"
+                           class="w-full"
+                           placeholder="Rua das Pedras 123 - Vila das Amoras SP">
+                </p-iconfield>
                 <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -233,6 +247,7 @@
                               name="dataInicioVigencia"
                               class="w-full"
                               inputStyleClass="w-full"
+                              iconP
                               styleClass="w-full"
                               [required]="true"
                               appendTo="body" />
@@ -291,10 +306,11 @@
                            placeholder="Selecione"
                            [readonly]="true"
                            (focusin)="restricoes.show($event)"
+                           (click)="restricoes.show($event)"
                            (keydown.tab)="restricoes.hide()"
                         >
                 </p-iconfield>
-                <p-popover #restricoes >
+                <p-popover #restricoes appendTo="body">
                     <div class="p-2 border-bottom-1 border-200 ">
                         <p-iconfield>
                             <input type="text"
@@ -316,8 +332,7 @@
                                     <div class="flex align-items-center gap-2 p-2" [ngClass]="{
                                         'surface-50': i % 2 == 0
                                     }">
-                                        <p-checkbox
-                                                    [name]="'active-' + i"
+                                        <p-checkbox [name]="'active-' + i"
                                                     [inputId]="'active-' + i"
                                                     #checkbox="ngModel"
                                                     [(ngModel)]="item.active"
@@ -354,7 +369,8 @@
                     <app-aluno-checklist #alunoChecklist
                         [aluno_Id]="aluno_Id"
                         [aluno]="object"
-                        [showChecklist]="true"></app-aluno-checklist>
+                        [showChecklist]="true"
+                        (alunoChanged)="object = $event"></app-aluno-checklist>
                 </div>
                 <p-popover #checklistPopover appendTo="body">
                     <div [style]="{ maxHeight: '50vh', height: '50vh' }" class="overflow-auto">
@@ -435,14 +451,6 @@
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div class="w-full shadow-sm">
                                 <p class="font-bold">{{ item.nome }}</p>
-                                <!-- <div class="flex align-items-center justify-content-between mt-1">
-                                    <p class="text-sm">
-                                        <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
-                                        <span>{{ item.professor }}</span>
-                                    </p>
-                                    <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vagas</span>
-                                    <p class="text-xs">{{item.perfilCognitivo[0]?.nome ?? "Sem perfil cognitivo"}}</p>
-                                </div> -->
                                 <div class="flex align-items-center justify-content-between mt-1">
                                     <p class="flex items-center justify-center">
                                         <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
