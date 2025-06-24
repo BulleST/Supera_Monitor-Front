@@ -1,0 +1,508 @@
+.col {
+    flex-grow: 1;
+    flex-basis: 0;
+    padding: 0.5rem;
+}
+
+.col-fixed {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+}
+
+.col-1 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 8.3333%;
+}
+
+.col-2 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 16.6667%;
+}
+
+.col-3 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 25%;
+}
+
+.col-4 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 33.3333%;
+}
+
+.col-5 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 41.6667%;
+}
+
+.col-6 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 50%;
+}
+
+.col-7 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 58.3333%;
+}
+
+.col-8 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 66.6667%;
+}
+
+.col-9 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 75%;
+}
+
+.col-10 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 83.3333%;
+}
+
+.col-11 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 91.6667%;
+}
+
+.col-12 {
+    flex: 0 0 auto;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+
+@media screen and (min-width: 320px) {
+    .xs\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .xs\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .xs\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .xs\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .xs\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .xs\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .xs\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .xs\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .xs\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .xs\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .xs\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .xs\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .xs\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .xs\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 576px) {
+    .sm\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .sm\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .sm\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .sm\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .sm\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .sm\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .sm\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .sm\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .sm\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .sm\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .sm\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .sm\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .sm\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .sm\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .md\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .md\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .md\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .md\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .md\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .md\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .md\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .md\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .md\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .md\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .md\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .md\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .md\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .md\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .lg\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .lg\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .lg\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .lg\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .lg\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .lg\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .lg\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .lg\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .lg\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .lg\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .lg\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .lg\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .lg\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .lg\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .xl\:col {
+        flex-grow: 1;
+        flex-basis: 0;
+        padding: 0.5rem;
+    }
+
+    .xl\:col-fixed {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+    }
+
+    .xl\:col-1 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 8.3333%;
+    }
+
+    .xl\:col-2 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 16.6667%;
+    }
+
+    .xl\:col-3 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 25%;
+    }
+
+    .xl\:col-4 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 33.3333%;
+    }
+
+    .xl\:col-5 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 41.6667%;
+    }
+
+    .xl\:col-6 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 50%;
+    }
+
+    .xl\:col-7 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 58.3333%;
+    }
+
+    .xl\:col-8 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 66.6667%;
+    }
+
+    .xl\:col-9 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 75%;
+    }
+
+    .xl\:col-10 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 83.3333%;
+    }
+
+    .xl\:col-11 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 91.6667%;
+    }
+
+    .xl\:col-12 {
+        flex: 0 0 auto;
+        padding: 0.5rem;
+        width: 100%;
+    }
+}

@@ -54,10 +54,6 @@ export class AlunoService extends Service {
         aluno.perfilCognitivo = aluno.perfilCognitivo ?? 'Indefinido';
         aluno.kit = aluno.kit ?? 'Indefinido';
         aluno.rm = aluno.rm ?? 'Indefinido';
-        aluno.rm = aluno.rm ?? 'Indefinido';
-
-        console.log('kit', aluno.kit)
-
 
         // Nuláveis
         aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
@@ -83,9 +79,9 @@ export class AlunoService extends Service {
                     checklistAluno.nome = checklist.nome;
                     checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
                     checklistAluno.prazo = checklistAluno.items[0].prazo;
-                    checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                    checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
-                    checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                    checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                    checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
+                    checklistAluno.itensEmAndamento = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
                     return checklistAluno;
                 });
         }

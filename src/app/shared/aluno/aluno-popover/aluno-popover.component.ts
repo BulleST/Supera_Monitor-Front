@@ -140,6 +140,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-check-square text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: () => {
+                    this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
                     this.alunoChecklistDialog.show();
                 },
             })
@@ -163,6 +164,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 styleClass: 'text-primary-500 bg-primary-100 hover:bg-primary-200',
                 command: () => {
                     this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem as Aluno_CheckList_Item;
+                    this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
                     this.alunoChecklistOnConfirmDialog.show();
                 },
             })
@@ -228,7 +230,4 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         return numero.toString().padStart(length, fill);
     }
 
-    onSuccess() {
-        this.alunoChecklistOnConfirmDialog.hide();
-    }
 }

@@ -4,6 +4,7 @@ export class Aluno_Checklist_Item_View {
     checklist_Id: number = 0;
     checklist_Item_Id: number = 0;
     account_Finalizacao_Id: number = 0;
+    account_Finalizacao: string = '';
     professor_Id: number = 0;
     turma_Id: number = 0;
     aluno: string = '';

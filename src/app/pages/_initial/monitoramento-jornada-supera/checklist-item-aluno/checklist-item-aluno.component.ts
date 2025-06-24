@@ -18,7 +18,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     @Input() alunoChecklistItem!: Aluno_Checklist_Item_View;
     @Input() item!: Checklist_Item;
 
-    @ViewChild('alunoChecklistOnConfirm') alunoChecklistOnConfirm!: AlunoChecklistOnConfirmDialogComponent
+    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent
     icon: string = '';
     text: string = '';
     textColor: string = '';
@@ -134,15 +134,20 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     }
 
     showAlunoChecklistOnConfirm() {
-        this.alunoChecklistOnConfirm.show();
-        var onFinish = this.checklistService.onFinish.subscribe(res => {
-            console.log('onFinish')
-            this.alunoChecklistOnConfirm.hide();
-            console.log('onFinish', this.alunoChecklistOnConfirm.visible)
-            this.alunoChecklistOnConfirm.visible  = false;
-            console.log('onFinish', this.alunoChecklistOnConfirm.visible)
+        this.alunoChecklistOnConfirmDialog.show();
+        
+        var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
+            this.alunoChecklistOnConfirmDialog.hide();
+            onCancel.unsubscribe();
+        });
 
+        var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+            this.alunoChecklistItem.observacoes = res.observacoes;
+            this.alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
+            this.alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
+            this.alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
             onFinish.unsubscribe();
-        })
+        });
+        
     }
 }

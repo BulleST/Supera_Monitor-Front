@@ -22,8 +22,6 @@ export class ProfessorService extends Service {
             }));
     }
 
- 
-
     getList(where?: string) {
         console.log('professor.service getList', where)
         return this.http.get<Professor[]>(`${this.url}/professor/all/`)

@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
 import { Turma } from '../../../../models/turma.model';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
@@ -8,7 +8,7 @@ import { AlunoService } from '../../../../services/alunos.service';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import { Aluno_Restricao, Aluno_Restricao_Request } from '../../../../models/aluno-restricao.model';
 import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
-import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../../models/checklist.model';
 import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
@@ -22,6 +22,8 @@ import { getError, MensagemWhatsapp, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../../utils/audio';
 import { Popover } from 'primeng/popover';
+import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { AlunoChecklistComponent } from '../../../calendario/aluno-checklist/aluno-checklist.component';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -29,14 +31,17 @@ import { Popover } from 'primeng/popover';
     templateUrl: './dados-cadastrais.component.html',
     styleUrl: './dados-cadastrais.component.css',
     providers: [ConfirmationService],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }] // Permite validação de form pai em input de componente filho
 })
 export class DadosCadastraisComponent implements OnChanges, OnDestroy {
-    @Input() object = new Aluno;
+    @Input() object!: Aluno;
     @Input() isEditPage = false;
+    @Input() aluno_Id!: number;
     subscription: Subscription[] = [];
 
     file?: File;
+    foto?: string;
     totalSize: number = 0;
     totalSizePercent: number = 0;
     loadingFile = false;
@@ -67,6 +72,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     maxDate: Date = new Date();
     checklistObservacao: string = '';
     textoChecklist = '';
+
+    @ViewChild('alunoChecklist') alunoChecklist!: AlunoChecklistComponent;
+    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
 
     constructor(
         private service: AlunoService,
@@ -100,13 +108,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             .catch(res => this.loadingSexos = false);
 
 
-        this.loadingKits = true;
-        lastValueFrom(this.apostilaService.getKit())
-            .then(res => {
-                this.kits = res;
-                this.loadingKits = false;
-            })
-            .catch(res => this.loadingKits = false);
+        var listKits = this.apostilaService.listKits.subscribe(res => this.kits = res);
+        this.subscription.push(listKits);
+
+        if (this.kits.length == 0) {
+            this.loadingKits = true;
+            lastValueFrom(this.apostilaService.getKit())
+                .then(res => this.loadingKits = false)
+                .catch(res => this.loadingKits = false);
+        }
 
         var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
@@ -124,51 +134,54 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (changes['isEditPage']) {
             this.isEditPage = changes['isEditPage'].currentValue;
         }
+        if (changes['aluno_Id']) {
+            this.aluno_Id = changes['aluno_Id'].currentValue;
+            this.loadFoto();
+
+        }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
             console.log('object', this.object);
+            
+            if (this.object) {
 
-            this.loadFoto();
+                // Filtra turmas que o aluno poderia participar
+                // Ou a turma atual
+                // Ou alguma turma do mesmo perfil cognitivo
+                // E turmas com vagas
+                this.turmasFiltered = this.turmas.filter(turma => {
+                    console.group(turma.nome)
+                    var alunoTemTurma = !!this.object.turma_Id;
+                    var alunoTemPerfil = !!this.object.perfilCognitivo_Id;
+                    var ehTurmaDoAluno = turma.id == this.object.turma_Id;
+                    var ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
+                    var temVagas = (!ehTurmaDoAluno && turma.alunosAtivos < turma.capacidadeMaximaAlunos) || ehTurmaDoAluno;
+                    
+                    console.log('alunoTemTurma', alunoTemTurma)
+                    console.log('alunoTemPerfil', alunoTemPerfil)
+                    console.log('ehTurmaDoAluno', ehTurmaDoAluno)
+                    console.log('ehPerfilDoAluno', ehPerfilDoAluno)
+                    console.log('temVagas', temVagas)
+                    console.log('condicaoFinal', (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas)
+                        && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas))
+                    
+                    console.groupEnd();
+                    // Ou o aluno tem perfil definido e nesse caso só exibe as turmas com perfil selecionado
+                    // Ou o aluno não tem perfil
+                    return (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas)
+                        && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas)
+    
+                    // return ((!alunoTemTurma ) || (alunoTemTurma && turmaAluno)) && perfilAluno;
+                });
+                console.log(this.turmasFiltered)
+    
+                if (this.object.turma_Id) {
+                    this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
+                    this.oldTurmaId = this.selectedTurma?.id;
+                }
 
-            // Filtra turmas que o aluno poderia participar
-            // Ou a turma atual
-            // Ou alguma turma do mesmo perfil cognitivo
-            // E turmas com vagas
-            this.turmasFiltered = this.turmas.filter(turma => {
-                var alunoTemTurma = !!this.object.turma_Id;
-                var alunoTemPerfil = !!this.object.perfilCognitivo_Id;
-                var ehTurmaDoAluno = turma.id == this.object.turma_Id;
-                var ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
-                var temVagas = (!ehTurmaDoAluno && turma.alunosAtivos < turma.capacidadeMaximaAlunos) || ehTurmaDoAluno;
-
-                // Ou o aluno tem perfil definido e nesse caso só exibe as turmas com perfil selecionado
-                // Ou o aluno não tem perfil
-                return (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas)
-                    && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas)
-
-                // return ((!alunoTemTurma ) || (alunoTemTurma && turmaAluno)) && perfilAluno;
-            });
-            console.log(this.turmasFiltered)
-
-            if (this.object.turma_Id) {
-                this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
-                this.oldTurmaId = this.selectedTurma?.id;
-            }
-
-            if (this.object.perfilCognitivo_Id) {
-
-            }
-
-            if (this.object.id) {
-                this.loadRestricoes();
                 this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
 
-                if (!this.object.checklist && this.object.checklistCompleto) {
-                    var atrasados = this.object.checklistCompleto.filter(x => x.atrasados.length)
-                    var pendentesDaSemana = this.object.checklistCompleto.filter(x => x.pendentesDaSemana.length)
-                    if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
-                    if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
-                }
                 if (!this.object.rm) {
                     this.object.rm = this.generateRM()
                 }
@@ -188,30 +201,34 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             .catch(res => this.loadingTurmas = false);
     }
 
+    loadChecklist() {
+
+
+        // this.loadingChecklists = true;
+        // lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
+        //     .then(res => {
+        //         this.object.alunoChecklist = res;
+        //         this.object = this.service.mapAluno(this.object);
+        //         this.loadingChecklists = false;
+                
+        //     })
+        //     .catch(res => this.loadingChecklists = false);
+    }
+
     loadFoto() {
-        if (this.object.id) {
+        if (this.aluno_Id) {
             this.loadingFile = true;
 
-            lastValueFrom(this.service.getFoto(this.object.id))
+            lastValueFrom(this.service.getFoto(this.aluno_Id))
                 .then(res => {
+                    this.foto = res;
                     this.object.aluno_Foto = res;
                     this.loadingFile = false;
                 })
                 .catch(res => {
                     this.loadingFile = false;
-                })
+                });
         }
-    }
-
-    loadRestricoes() {
-        this.loadingRestricoes = true;
-        lastValueFrom(this.restricaoService.getList(this.object.id))
-            .then(res => {
-                this.object.restricoes = res;
-                this.loadingRestricoes = false;
-                this.getRestricoes();
-            })
-            .catch(res => this.loadingRestricoes = false);
     }
 
     choose(fileUpload: FileUpload) {
@@ -250,6 +267,27 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         })
         this.object.aluno_Foto = base64;
         this.loadingFile = false;
+    }
+
+
+    checklistMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
+        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
+        this.alunoChecklistOnConfirmDialog.show();
+
+        var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
+            model.control.setValue(false);
+            model.control.updateValueAndValidity();
+            this.alunoChecklistOnConfirmDialog.hide();
+            onCancel.unsubscribe();
+        });
+
+        var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+            alunoChecklistItem.observacoes = res.observacoes;
+            alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
+            alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
+            alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+            onFinish.unsubscribe();
+        });
     }
 
     kitChanged(model: NgModel, e: SelectChangeEvent) {

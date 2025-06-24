@@ -1,3 +1,4 @@
+
 @import 'ngx-toastr/toastr';
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
@@ -7,6 +8,7 @@
 @import '@fortawesome/fontawesome-free/css/regular.css';
 /* @import 'quill/dist/quill.snow.css'; */
 @import 'primeflex/themes/primeone-light.scss';
+@import 'assets/responsive.css';
 
 /* @tailwind base; */
 /* @tailwind components; */
@@ -172,10 +174,13 @@ a {
 .p-datatable-hoverable .p-datatable-tbody>tr:nth-child(even):hover {
     background: var(--p-primary-200) !important;
 } */
-
 .p-inputtext:disabled {
     background-color: var(--surface-100) !important;
     cursor: default;
+}
+
+.p-inputtext {
+    height: 30px
 }
 
 .p-dialog-maximized {
@@ -374,21 +379,14 @@ a {
 
 .p-popover:after,
 .p-popover:before {
-    /* bottom: 100%;
-    left: calc(var(--overlayArrowLeft) + 60px);
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none; */
     display: none;
 }
 
-
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(odd) td {
-    background-color:white;
+.p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(odd) td {
+    background-color: white;
 }
-.p-datatable.p-datatable-striped .p-datatable-tbody > tr:nth-child(even) td {
+
+.p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(even) td {
     background-color: var(--surface-100);
 }
 
@@ -456,90 +454,5 @@ input.ng-invalid.ng-touched {
 
     50% {
         box-shadow: 0 0 3px 1px #ff0000a6
-    }
-}
-
-@media screen and (min-width: 320px) and (max-width: 570px) {
-    .xs\:col {
-        flex-grow: 1;
-        flex-basis: 0;
-        padding: 0.5rem;
-    }
-
-    .xs\:col-fixed {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-    }
-
-    .xs\:col-1 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 8.3333%;
-    }
-
-    .xs\:col-2 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 16.6667%;
-    }
-
-    .xs\:col-3 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 25%;
-    }
-
-    .xs\:col-4 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 33.3333%;
-    }
-
-    .xs\:col-5 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 41.6667%;
-    }
-
-    .xs\:col-6 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 50%;
-    }
-
-    .xs\:col-7 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 58.3333%;
-    }
-
-    .xs\:col-8 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 66.6667%;
-    }
-
-    .xs\:col-9 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 75%;
-    }
-
-    .xs\:col-10 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 83.3333%;
-    }
-
-    .xs\:col-11 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 91.6667%;
-    }
-
-    .xs\:col-12 {
-        flex: 0 0 auto;
-        padding: 0.5rem;
-        width: 100%;
     }
 }

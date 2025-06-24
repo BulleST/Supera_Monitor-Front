@@ -1,13 +1,10 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {  Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno_CheckList_Item, Checklist } from '../../../models/checklist.model';
 import { ChecklistService } from '../../../services/checklist.service';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import moment from 'moment';
-import { ConfirmationService } from 'primeng/api';
-import { Dialog } from 'primeng/dialog';
-import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
 
 @Component({
     selector: 'app-aluno-checklist',
@@ -19,19 +16,21 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     @Input() aluno_Id!: number;
     @Input() aluno!: Aluno;
     @Input() showChecklist = false;
-
-    textoChecklist = '';
+    
     atrasado = false;
     subscription: Subscription[] = [];
-    checklist?: AlunoChecklistCompleto;
     loading = false;
     visibleDialog = false;
+    checklistVigente?: AlunoChecklistCompleto;
 
     checklists: Checklist[] = [];
     loadingChecklist = false;
 
-    @ViewChild('checklistDialog') checklistDialog!: AlunoChecklistDialogComponent;
-
+    status = '';
+    texto = '';
+    icon = '';
+    textColor = '';
+    
     @Output() alunoChanged = new EventEmitter<Aluno>();
 
     constructor(
@@ -68,50 +67,78 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     }
 
     async loadChecklist() {
-        if(this.showChecklist) {
-            
-        this.loading = true;
+        if (this.showChecklist) {
 
-        let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
+            this.loading = true;
 
-        if (!this.aluno.alunoChecklist?.length && this.aluno_Id) {
-            alunoChecklist = await lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
-        }
+            let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
 
-        this.aluno.alunoChecklist = alunoChecklist.map(checklistAluno => {
-            checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
-            return checklistAluno
-        });
+            if (!this.aluno.alunoChecklist?.length && this.aluno_Id) {
+                alunoChecklist = await lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
+            }
 
-        this.aluno.checklistCompleto = this.checklists
-            .map(checklist => {
-                var checklistAluno = new AlunoChecklistCompleto;
-                checklistAluno.id = checklist.id;
-                checklistAluno.nome = checklist.nome;
-                checklistAluno.items = alunoChecklist.filter(x => x.checklist_Id == checklist.id);
-                checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
-                checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
-                checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
-                return checklistAluno;
+            this.aluno.alunoChecklist = alunoChecklist.map(checklistAluno => {
+                checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
+                return checklistAluno
             });
 
-        this.alunoChanged.emit(this.aluno);
+            this.aluno.checklistCompleto = this.checklists
+                .map(checklist => {
+                    var checklistAluno = new AlunoChecklistCompleto;
+                    checklistAluno.id = checklist.id;
+                    checklistAluno.nome = checklist.nome;
+                    checklistAluno.items = alunoChecklist.filter(x => x.checklist_Id == checklist.id);
+                    checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
+                    checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                    checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
+                    checklistAluno.itensEmAndamento = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                    return checklistAluno;
+                });
 
-        this.checklist = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id);
+            this.alunoChanged.emit(this.aluno);
 
-        var pendentesDaSemana = this.aluno.checklistCompleto.filter(x => x.pendentesDaSemana.length)
-        var atrasados = this.aluno.checklistCompleto.filter(x => x.atrasados.length > 0);
-        this.atrasado = atrasados.length > 0;
+            this.checklistVigente = this.aluno.checklistCompleto.find(x => x.id == this.aluno.checklist_Id);
 
-        if (atrasados.length > 0){
-             this.textoChecklist = '90 dias vencidos com pendências';
-        }
-        if (atrasados.length == 0 && pendentesDaSemana.length == 0) {
-            this.textoChecklist = '90 dias concluídos';
-        }
+            const itensEmAndamento = this.aluno.checklistCompleto.filter(x => x.itensEmAndamento.length)
+            const itensAtrasados = this.aluno.checklistCompleto.filter(x => x.itensAtrasados.length > 0);
+            this.atrasado = itensAtrasados.length > 0;
 
-        this.loading = false;
+            //  Se tem um checklist vigente
+            if (this.checklistVigente) {
+                this.texto = this.checklistVigente.nome;
+                
+                // Finalizado
+                if (this.checklistVigente.itensFinalizados.length == this.checklistVigente.items.length) {
+                    this.status = 'Finalizado';
+                    this.textColor = 'text-green-500';
+                    this.icon = 'pi pi-check-circle';
+                } 
+                // Em andamento
+                else if (this.checklistVigente.itensEmAndamento.length > 0 && this.checklistVigente.itensFinalizados.length < this.checklistVigente.items.length) {
+                    this.status = 'Em andamento';
+                    this.textColor = 'text-orange-500';
+                    this.icon = 'pi pi-exclamation-triangle';
+                }
+            }
+            // Se não tem um checklist vigente e o aluno possui checklist em atraso
+            else if (!this.checklistVigente && itensAtrasados.length > 0) {
+                this.texto = '90 dias vencidos com pendências';
+            }
+            // Se não tem checklist vigente e o aluno não possui checklist em atraso
+            else if (!this.checklistVigente && itensAtrasados.length == 0 && itensEmAndamento.length == 0) {
+                this.texto = '90 dias concluídos';
+            }
+        
+            // Atrasado
+            if (this.atrasado 
+                || (this.checklistVigente 
+                && this.checklistVigente.itensAtrasados.length > 0 
+                && this.checklistVigente.itensFinalizados.length < this.checklistVigente.items.length)) {
+                this.status = 'Atrasado';
+                this.textColor = 'text-red-500';
+                this.icon = 'pi pi-times-circle';
+            }             
+            this.loading = false;
         }
     }
 

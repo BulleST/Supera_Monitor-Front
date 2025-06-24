@@ -157,9 +157,9 @@ export class MensagemWhatsapp {
         return link
     }
 
-    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: Date, professor?: string, linkGrupo?: string) {
+    enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: any, professor?: string, linkGrupo?: string) {
+        horario = horario ? new Date().toISOString().substring(0,10) + 'T' + horario : undefined;
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-
         var array = nome.split(' ');
         nome = array[0];
         var celular = celular.replace(/\D/g, '')

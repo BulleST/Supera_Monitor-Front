@@ -44,41 +44,41 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private accountService: AccountService
     ) {
-        var onFinish = this.service.onFinish.subscribe(res => {
-            this.checklists = this.checklists.map((checklist, indexChecklist) => {
-                checklist.items = checklist.items.map((item, indexItem) => {
-                    let index = item.alunos.findIndex(x => x.id == res);
-                    if (index != -1) {
-                        item.alunos.splice(index, 1);
-                    }
-                    return item;
-                });
-                return checklist;
-            });
+        // var onFinish = this.service.onFinish.subscribe(res => {
+        //     this.checklists = this.checklists.map((checklist, indexChecklist) => {
+        //         checklist.items = checklist.items.map((item, indexItem) => {
+        //             let index = item.alunos.findIndex(x => x.id == res);
+        //             if (index != -1) {
+        //                 item.alunos.splice(index, 1);
+        //             }
+        //             return item;
+        //         });
+        //         return checklist;
+        //     });
 
-            console.log('id', res)
-            console.log(this.alunos)
+        //     console.log('id', res)
+        //     console.log(this.alunos)
 
-            this.alunos.map((aluno, alunoIndex) => {
-                aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
-                    let index = checklist.items.findIndex(x => x.id == res);
-                    if (index != -1) {
+        //     this.alunos.map((aluno, alunoIndex) => {
+        //         aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
+        //             let index = checklist.items.findIndex(x => x.id == res);
+        //             if (index != -1) {
 
-                        var item = checklist.items[index];
-                        item.finalizado = true;
-                        item.dataFinalizacao = new Date;
-                        item.account_Finalizacao_Id = this.accountService.accountValue?.id,
-                        item.account_Finalizacao = this.accountService.accountValue?.name,
+        //                 var item = checklist.items[index];
+        //                 item.finalizado = true;
+        //                 item.dataFinalizacao = new Date;
+        //                 item.account_Finalizacao_Id = this.accountService.accountValue?.id,
+        //                 item.account_Finalizacao = this.accountService.accountValue?.name,
 
-                        checklist.items.splice(index, 1, item);
-                    }
-                    return checklist;
-                });
-                aluno = this.alunoService.mapAluno(aluno)
-                return aluno;
-            })
-        });
-        this.subscription.push(onFinish);
+        //                 checklist.items.splice(index, 1, item);
+        //             }
+        //             return checklist;
+        //         });
+        //         aluno = this.alunoService.mapAluno(aluno)
+        //         return aluno;
+        //     })
+        // });
+        // this.subscription.push(onFinish);
     }
 
     ngOnDestroy(): void {
@@ -165,57 +165,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
-    }
-
-    finalizarChecklist(e: any, item: Aluno_Checklist_Item_View) {
-        // playAlert();
-
-        this.confirmationService.confirm({
-            key: 'checklistConfirmation',
-            message: `Tem certeza que deseja marcar o item <b>"${item.checklist_Item}"</b> para o(a) aluno(a) <b>${item.aluno}</b> como finalizado?`,
-            header: 'Finalizar item da jornada',
-            icon: 'pi pi-exclamation-triangle',
-            acceptIcon: 'pi pi-check',
-            acceptLabel: 'Finalizar',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: true,
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: async () => {
-                this.loading = true;
-                item.observacoes = this.checklistObservacao
-                lastValueFrom(this.service.markAsDone(item.id, this.checklistObservacao))
-                    .then(res => {
-                        // playSuccess();
-
-                        this.checklistObservacao = '';
-
-                        let checklistIndex = this.checklists.findIndex(x => x.id == item.checklist_Id);
-                        let checklist = this.checklists.find(x => x.id == item.checklist_Id);
-                        if (checklistIndex != -1 && checklist) {
-                            let checklistItemIndex = checklist.items.findIndex(x => x.id == item.checklist_Item_Id);
-                            let checklistItem = checklist.items.find(x => x.id == item.checklist_Item_Id);
-
-                            if (checklistItem && checklistItemIndex != -1) {
-                                let aluno = checklistItem.alunos.find(x => x.aluno_Id == item.aluno_Id);
-                                let alunoIndex = checklistItem.alunos.findIndex(x => x.aluno_Id == item.aluno_Id);
-                                if (aluno && alunoIndex != -1) {
-                                    checklistItem.alunos.splice(alunoIndex, 1);
-                                }
-                            }
-                        }
-
-                    })
-                    .catch(res => {
-                        this.loading = false;
-                        this.showError('Não foi possível finalizar checklist.', getError(res), e);
-                    })
-            },
-            reject: () => {
-            }
-        });
-
     }
     
     applyFilter(request: JornadaSuperaRequest) {

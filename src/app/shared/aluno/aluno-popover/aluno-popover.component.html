@@ -1,18 +1,17 @@
 
 <p-popover #popover
 appendTo="body"
-styleClass="mt-2"
-[dismissable]="!alunoChecklistDialog?.visible && (alunoChecklistItem && !alunoChecklistOnConfirmDialog?.visible)">
+styleClass="mt-2">
+
+<app-aluno-checklist-dialog #alunoChecklistDialog
+                            [aluno]="aluno"
+                            [loading]="loadingAluno"></app-aluno-checklist-dialog>
+
+<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
+                            [alunoChecklistItem]="alunoChecklistItem"
+                            [aluno]="aluno"></app-aluno-checklist-on-confirm-dialog>
+
 <ng-container *ngIf="visible">
-        <app-aluno-checklist-dialog #alunoChecklistDialog
-                                    [aluno]="aluno"
-                                    [loading]="loadingAluno"></app-aluno-checklist-dialog>
-        
-        <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
-                                               *ngIf="alunoChecklistItem"
-                                               [alunoChecklistItem]="alunoChecklistItem"
-                                               (onSuccess)="hide()"
-                                               (onCancel)="hide()"></app-aluno-checklist-on-confirm-dialog>
         <p-card *ngIf="loadingAluno"
             [style]="{maxWidth: '960vw', width: '20rem', overflow: 'hidden' }"
             styleClass="shadow-none">

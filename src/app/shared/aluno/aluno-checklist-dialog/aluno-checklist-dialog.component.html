@@ -1,9 +1,4 @@
-
-<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
-                                       (onSuccess)="hide()"
-                                       (onCancel)="hide()"></app-aluno-checklist-on-confirm-dialog>
-
-
+<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
 <p-dialog [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChanged()"
@@ -29,19 +24,19 @@
                         <div *ngIf="!loading"
                              class="ml-2 font-bold">
                             <!-- Finalizado -->
-                            <i *ngIf="checklist.finalizados.length == checklist.items.length"
+                            <i *ngIf="checklist.itensFinalizados.length == checklist.items.length"
                                pTooltip="Finalizado"
                                class="pi pi-check-circle text-green-500"></i>
                             <!-- Atrasado -->
-                            <span *ngIf="checklist.atrasados.length > 0 && checklist.finalizados.length < checklist.items.length"
+                            <span *ngIf="checklist.itensAtrasados.length > 0 && checklist.itensFinalizados.length < checklist.items.length"
                                   pTooltip="Atrasado">
-                                <span> - {{checklist.finalizados.length}}/{{checklist.items.length}} </span>
+                                <span> - {{checklist.itensFinalizados.length}}/{{checklist.items.length}} </span>
                                 <i class="pi pi-times-circle text-red-500 ml-2"></i>
                             </span>
                             <!-- Pendentes da Semana -->
-                            <span *ngIf="checklist.pendentesDaSemana.length > 0 && checklist.finalizados.length < checklist.items.length"
+                            <span *ngIf="checklist.itensEmAndamento.length > 0 && checklist.itensFinalizados.length < checklist.items.length"
                                   pTooltip="Em andamento">
-                                <span> - {{checklist.finalizados.length}}/{{checklist.items.length}}</span>
+                                <span> - {{checklist.itensFinalizados.length}}/{{checklist.items.length}}</span>
                                 <i class="pi pi-hourglass text-orange-500 ml-2"></i>
                             </span>
                         </div>
@@ -69,37 +64,66 @@
                                             [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
                                             [binary]="true"
                                             [readonly]="checklistItem.finalizado"
-                                            (ngModelChange)="checkboxMark(checklistItem)" />
+                                            (ngModelChange)="checkboxMark(checklistItem, finalizado)" />
                                 <label class="font-medium  mt-2"
                                        [for]="'checklistitem-' + checklistItem.id">
                                     {{ checklistItem.nome }}
                                 </label>
-                                <p-button *ngIf="checklistItem.finalizado"
-                                          severity="secondary"
-                                          icon="pi pi-info-circle "
-                                          label="Detalhes"
-                                          rounded
-                                          size="small"
-                                          styleClass="ml-2"
-                                          class="ml-auto"
-                                          pTooltip="Clique para ver detalhes"
-                                          tooltipPosition="top"
-                                          (onClick)="checklistData.toggle($event)" />
-                                <p-popover #checklistData
-                                           styleClass="-mt-1">
-                                    <ng-template [ngIf]="checklistItem.finalizado">
-                                        <p *ngIf="checklistItem.dataFinalizacao"> Finalizado em
-                                            {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }} por
-                                            {{checklistItem.account_Finalizacao }}
+                                <ng-container *ngIf="checklistItem.finalizado">
+                                    <p-button label="Detalhes"
+                                              icon="pi pi-info-circle "
+                                              severity="secondary"
+                                              rounded
+                                              size="small"
+                                              styleClass="ml-2"
+                                              class="ml-auto"
+                                              pTooltip="Clique para ver detalhes"
+                                              tooltipPosition="top"
+                                              (onClick)="checklistData.toggle($event)" />
+                                    <p-popover #checklistData
+                                               styleClass="-mt-1">
+                                        <ng-template [ngIf]="checklistItem.finalizado">
+                                            <p *ngIf="checklistItem.dataFinalizacao"> Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }} por {{checklistItem.account_Finalizacao }}
+                                            </p>
+                                        </ng-template>
+                                        <p>
+                                            <span>Observações: </span>
+                                            <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
+                                            <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma observação</span>
                                         </p>
-                                    </ng-template>
-                                    <p>
-                                        <span>Observações: </span>
-                                        <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
-                                        <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma
-                                            observação</span>
-                                    </p>
-                                </p-popover>
+                                    </p-popover>
+                                </ng-container>
+                                <ng-container *ngIf="!checklistItem.finalizado">
+                                    <ng-container *ngIf="[8,9,12,13,32,37,22,29,23].includes(checklistItem.checklist_Item_Id)">
+                                        <div class="ml-auto">
+                                            <ng-container *ngIf="aluno.celular">
+                                                <a [href]="enviarMensagemCondicao(checklistItem)"
+                                                   target="_blank"
+                                                   pTooltip="Enviar mensagem"
+                                                   tooltipPosition="top"
+                                                   [ngClass]="{'pointer-events-none': loading}">
+                                                    <p-button icon="pi pi-whatsapp"
+                                                              label="Enviar mensagem"
+                                                              severity="success"
+                                                              [rounded]="true"
+                                                              [loading]="loading"
+                                                              [disabled]="loading" />
+                                                </a>
+                                            </ng-container>
+                                            <ng-container *ngIf="!aluno.celular">
+                                                <a pTooltip="Nenhum celular cadastrado"
+                                                   tooltipPosition="top"
+                                                   class="cursor-auto">
+                                                    <p-button icon="pi pi-whatsapp"
+                                                              label="Enviar mensagem"
+                                                              severity="secondary"
+                                                              [rounded]="true"
+                                                              [disabled]="true" />
+                                                </a>
+                                            </ng-container>
+                                        </div>
+                                    </ng-container>
+                                </ng-container>
                             </li>
                         </ul>
                     </div>

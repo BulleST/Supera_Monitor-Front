@@ -15,14 +15,12 @@ import { HttpClient } from '@angular/common/http';
 export class ChecklistService extends Service {
     override list = new BehaviorSubject<Checklist[]>([]);
 
-    onFinish = new EventEmitter<number>();
-
     constructor(
         http: HttpClient,
         toastrService: ToastrService,
     ) {
         super(http, toastrService);
-        this.onFinish.subscribe()
+
     }
     
     getList() {
@@ -78,7 +76,6 @@ export class ChecklistService extends Service {
             .pipe(tap({
                 next: res => {
                     this.toastrService.success(`Checklist finalizado`, 'Sucesso');
-                    this.onFinish.emit(id)
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível finalizar item da jornada. \n ${getError(err)}`);

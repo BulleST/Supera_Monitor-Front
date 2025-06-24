@@ -3,8 +3,8 @@
           (onHide)="onHide()"
           [style]="{ maxWidth: '95vw', width: '400px' }"
           appendTo="body"
-          [draggable]="true"
-          [maximizable]="true">
+          [draggable]="false"
+          [maximizable]="false">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">
@@ -28,10 +28,37 @@
                           [(ngModel)]="observacao"
                           placeholder="Escreva aqui alguma observação..."
                           [rows]="2"
-                            [disabled]="loading"></textarea>
+                          [disabled]="loading"></textarea>
             </p-iconfield>
         </div>
         <div class="w-full flex align-items-center justify-content-end gap-2">
+            <ng-container *ngIf="[8,9,12,13,32,37,22,29,23].includes(alunoChecklistItem?.checklist_Item_Id ?? 0)">
+                <ng-container *ngIf="celular">
+                    <a [href]="enviarMensagemCondicao()"
+                       target="_blank"
+                       pTooltip="Enviar mensagem"
+                       tooltipPosition="top"
+                       [ngClass]="{'pointer-events-none': loading}">
+                        <p-button icon="pi pi-whatsapp"
+                                  label="Enviar mensagem"
+                                  severity="success"
+                                  [rounded]="true"
+                                  [loading]="loading"
+                                  [disabled]="loading" />
+                    </a>
+                </ng-container>
+                <ng-container *ngIf="!celular">
+                    <a pTooltip="Nenhum celular cadastrado"
+                       tooltipPosition="top"
+                       class="cursor-auto">
+                        <p-button icon="pi pi-whatsapp"
+                                  label="Enviar mensagem"
+                                  severity="secondary"
+                                  [rounded]="true"
+                                  [disabled]="true" />
+                    </a>
+                </ng-container>
+            </ng-container>
             <p-button type="button"
                       label="Ainda não"
                       icon="pi pi-times"

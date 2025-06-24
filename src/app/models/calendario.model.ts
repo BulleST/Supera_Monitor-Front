@@ -105,9 +105,9 @@ export class AlunoChecklistCompleto {
     id: number = 0;
     nome: string = '';
     prazo: Date = new Date;
-    finalizados: Aluno_CheckList_Item[] = [];
-    pendentesDaSemana: Aluno_CheckList_Item[] = [];
-    atrasados: Aluno_CheckList_Item[] = [];
+    itensFinalizados: Aluno_CheckList_Item[] = [];
+    itensEmAndamento: Aluno_CheckList_Item[] = [];
+    itensAtrasados: Aluno_CheckList_Item[] = [];
     items: Aluno_CheckList_Item[] = [];
 }
 

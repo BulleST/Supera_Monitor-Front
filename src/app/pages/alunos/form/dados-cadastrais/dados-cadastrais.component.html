@@ -1,31 +1,11 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="checklistConfirmation" styleClass="w-30rem">
-    <ng-template #message let-message>
-        <div>
-            <div class=" flex align-items-center gap-2">
-                <span class="text-4xl mr-2 text-primary-500">
-                    <i *ngIf="message.icon" [ngClass]="message.icon"></i>
-                    <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl "></i>
-                </span>
-                <div [innerHTML]="message.message"></div>
-            </div>
-            <div class="w-full flex-1 col-12 px-0">
-                <label for="checklistObservacao">Inserir observação: </label>
-                <textarea pTextarea
-                          class="w-full"
-                          name="checklistObservacao"
-                          id="checklistObservacao"
-                          [(ngModel)]="checklistObservacao"
-                          [rows]="2"></textarea>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
+
+<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
+
 <div class="formgrid grid">
     <!-- Foto -->
     <div class="lg:col-3 md:col-3 col-12 px-0 flex overflow-hidden">
-        <p-fileupload
-                      #fileUpload
+        <p-fileupload #fileUpload
                       class="w-full"
                       styleclass="gap-0 w-full"
                       name="myfile[]"
@@ -48,15 +28,22 @@
                               icon="pi pi-images"
                               [rounded]="true"
                               label="Selecionar foto"
-                              size="small"
                               class="-mb-5 relative z-2" />
                     <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
-                        <div *ngIf="loadingFile" class="w-full flex align-items-center justify-content-center absolute z-1">
-                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
-                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" style="font-size: 2rem"></i>
+                        <div *ngIf="loadingFile" 
+                            class="w-full flex align-items-center justify-content-center absolute z-1">
+                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" 
+                                style="padding-top: 100%; height: 0"></div>
+                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
+                            style="font-size: 2rem"></i>
                         </div>
-                        <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                             [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + object.aluno_Foto + ')' }">
+                        <div id="divImage"
+                             class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                             [ngStyle]="{ 
+                                paddingTop: '100%', 
+                                height: '0', 
+                                backgroundImage: 'url(' + foto + ')' 
+                            }">
                         </div>
                     </div>
                 </div>
@@ -67,28 +54,29 @@
                               icon="pi pi-images"
                               [rounded]="true"
                               label="Selecionar foto"
-                              size="small"
                               class="-mb-5 relative z-2" />
                     <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
-                        <div *ngIf="loadingFile" class="w-full flex align-items-center justify-content-center absolute z-1">
-                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
-                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" style="font-size: 2rem"></i>
-                        </div>
-                        <ng-template [ngIf]="!object.aluno_Foto">
+                        <ng-container *ngIf="loadingFile">
+                            <div class="w-full flex align-items-center justify-content-center absolute z-1">
+                                <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
+                                <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
+                                style="font-size: 2rem"></i>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!foto">
                             <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
                             <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
-                        </ng-template>
-                        <ng-template [ngIf]="object.aluno_Foto">
+                        </ng-container>
+                        <ng-container *ngIf="foto">
                             <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                                 [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + object.aluno_Foto + ')' }">
+                                 [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + foto + ')' }">
                             </div>
-                        </ng-template>
+                        </ng-container>
                     </div>
                 </div>
             </ng-template>
         </p-fileupload>
     </div>
-    <!-- <div class="col-12 px-0 flex align-items-start"> -->
     <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
         <p-divider layout="vertical" class="hidden md:block h-full min-h-0 mt-2 mb-5"></p-divider>
         <div class="formgrid grid pl-2 sm:px-3">
@@ -108,7 +96,7 @@
                 </div>
             </div>
             <!-- RM -->
-            <div class="field lg:col-2 md:col-2 sm:col-2 xs:col-4 col-12">
+            <div class="field lg:col-2 md:col-3 sm:col-2 xs:col-4 col-12">
                 <label for="rm">RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
                 <input type="text"
                        pInputText
@@ -142,7 +130,7 @@
                 </div>
             </div>
             <!-- Gênero -->
-            <div class="field lg:col-3 md:col-4 sm:col-3 xs:col-6 col-12">
+            <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="pessoa_Sexo_Id">Gênero: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="sexos"
@@ -199,7 +187,7 @@
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field md:col-6 sm:col-12 xs:col-12 col-12">
+            <div class="field sm:col-6 xs:col-6 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -216,7 +204,7 @@
                 </div>
             </div>
             <!-- Endereço -->
-            <div class="field col-12">
+            <div class="field sm:col-6 xs:col-6 col-12">
                 <label for="endereco">Endereço: </label>
                 <input type="text"
                        pInputText
@@ -231,7 +219,7 @@
                 </div>
             </div>
             <!-- Início Vigência -->
-            <div class="field lg:col-2 md:col-4 sm:col-4 xs:col-6 col-12">
+            <div class="field md:col-2 xs:col-6 col-12">
                 <label for="dataInicioVigencia">Início Vigência: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicioVigencia="ngModel"
@@ -253,7 +241,7 @@
                 </div>
             </div>
             <!-- Fim Vigência -->
-            <div class="field lg:col-2 md:col-4 sm:col-4 xs:col-6 col-12">
+            <div class="field md:col-2 xs:col-6 col-12">
                 <label for="dataFimVigencia">Fim Vigência: </label>
                 <p-datepicker
                               #dataFimVigencia="ngModel"
@@ -271,27 +259,22 @@
                               appendTo="body" />
             </div>
             <!-- Restrições -->
-            <div class="field lg-col-4 sm:col-4 col-12">
+            <div class="field md:col-4 xs:col-6 col-12">
                 <div class="flex align-items-center gap-2 justify-content-between mb-1">
                     <label for="restricoes">Restrições: </label>
-                    <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1" (click)="popoverExplicacaoRestricoes.show($event)">
+                    <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1" 
+                        (click)="popoverExplicacaoRestricoes.show($event)">
                         <span>Info</span>
-                        <span class="pi pi-question-circle" ></span>
+                        <span class="pi pi-question-circle"></span>
                     </div>
-                    <p-popover #popoverExplicacaoRestricoes appendTo="body" styleClass="w-30rem ">
-                        
-                        <div class="max-h-20rem overflow-auto">
-                            <p>As restrições identificam as dificuldades que o aluno tem.</p>
-                        <p class="mt-2 mb-2">Podem ser restrições de:</p>
-                        <p class="ml-2">• Problemas auditivos e/ou visuais</p>
-                        <p class="ml-2">• Dificuldades motoras</p>
-                        <p class="ml-2">• Outras</p>
-                        <p class="mt-2">Essas restrições <b>NÃO</b> são necessariamente limitantes para o agendamento de reposição ou transferência de turma mas devem ser levadas em consideração sempre que realizar alguma ação.</p>
-                        <p>Uma mensagem de alerta será exibida para as restrições do aluno.</p>
-                        <p class="text-red-500 font-bold mt-4">ATENÇÃO:</p>
-                        <p>A restrição de <b>mobilidade reduzida</b> deve ser marcada no campo checkbox abaixo.</p>
-                        <p>Ela impõe limitações para inserir reposições ou transferencia de turma.</p>
-                        <p>Você será impedido de realizar essas ações e será avisado por isso.</p>
+                    <p-popover #popoverExplicacaoRestricoes appendTo="body" styleClass="w-30rem max-w-screen">
+                        <div class="max-h-20rem overflow-auto text-lg ">
+                            <p class="text-red-500 font-bold mb-4">ATENÇÃO:</p>
+                            <p>As restrições indicam dificuldades do aluno, como problemas auditivos, visuais, motores etc.</p>
+                            <p>Elas <b>NÃO</b> impedem o agendamento de reposição ou transferência de turma, mas devem sempre ser consideradas.</p>
+                            <p>Um alerta será exibido ao identificar essas restrições.</p>
+                            <p class="mt-4">A restrição <b>Mobilidade Reduzida</b> deve ser marcada no campo checkbox abaixo.</p>
+                            <p>Ela <b>IMPÕE</b> limitações para inserir reposições ou transferências de turma.</p>
                         </div>
                     </p-popover>
                 </div>
@@ -302,16 +285,16 @@
                            [value]="restricoesText"
                            id="restricoes"
                            name="restricoes"
-                           class="w-full"
+                           class="w-full pr-7"
                            [ngClass]="{ 'pointer-events-none': isEditPage == false }"
                            [required]="true"
                            placeholder="Selecione"
-                           [disabled]="!isEditPage"
                            [readonly]="true"
-                           (focus)="isEditPage ? restricoes.show($event) : undefined"
-                           (onBlur)="isEditPage ? restricoes.hide() : undefined">
+                           (focusin)="restricoes.show($event)"
+                           (keydown.tab)="restricoes.hide()"
+                        >
                 </p-iconfield>
-                <p-popover #restricoes styleClass="-mt-1">
+                <p-popover #restricoes >
                     <div class="p-2 border-bottom-1 border-200 ">
                         <p-iconfield>
                             <input type="text"
@@ -360,52 +343,54 @@
                 </div>
             </div>
             <!-- Etapa da jornada -->
-            <div class="field lg:col-4 sm:col-5 col-12">
+            <div class="field md:col-4 xs:col-6 col-12">
                 <label for="etapaChecklist">Etapa da jornada: </label>
-                <input type="text"
-                       pInputText
-                       [value]="object.checklist ?? textoChecklist"
-                       class="w-full"
-                       readonly
-                       [required]="true"
-                       [disabled]="!isEditPage"
-                       (onBlur)="checklistPopover.hide()"
-                       (click)="checklistPopover.show($event) ">
+                <div tabindex="0"
+                    id="etapaChecklist"
+                    style="height: 29px"
+                    class="p-inputtext w-full outline-none hover:border-500 focus:border-primary-500" 
+                    (focusin)="checklistPopover.show($event)"
+                    (keydown.tab)="checklistPopover.hide()">
+                    <app-aluno-checklist #alunoChecklist
+                        [aluno_Id]="aluno_Id"
+                        [aluno]="object"
+                        [showChecklist]="true"></app-aluno-checklist>
+                </div>
                 <p-popover #checklistPopover appendTo="body">
-                    <div [style]="{ maxHeight: '50vh', height: '50vh', width: '350px' }" class="overflow-auto">
+                    <div [style]="{ maxHeight: '50vh', height: '50vh' }" class="overflow-auto">
                         <ng-container *ngFor="let checklist of object.checklistCompleto">
-                            <div class="my-2" *ngIf="checklist">
-                                <div class="flex p-2 "
-                                     [ngClass]="{
-                                        'bg-orange-100': checklist.id == object.checklist_Id,
-                                        'bg-red-200': checklist.atrasados.length > 0 && checklist.id != object.checklist_Id,
-                                        'surface-50': checklist.id != object.checklist_Id,
-                                    }">
+                            <div class="my-2 border-100 border-bottom-1 pb-4" *ngIf="checklist">
+                                <div class="flex p-2">
                                     <p><b>{{checklist.nome}}</b></p>
                                     <p class="ml-2"> - Prazo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
                                     <p class="pl-2 ml-auto text-orange-500" *ngIf="checklist.id == object.checklist_Id"> Em Andamento <i class="pi pi-hourglass ml-2"></i> </p>
-                                    <p class="pl-2 ml-auto text-red-500" *ngIf="checklist.atrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times ml-2"></i> </p>
-                                    <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.finalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
+                                    <p class="pl-2 ml-auto text-red-500" *ngIf="checklist.itensAtrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times-circle ml-2"></i> </p>
+                                    <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.itensFinalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
                                 </div>
-                                <ng-container *ngFor="let checklistItem of checklist.items">
-                                    <div class="flex flex-column align-items-start">
-                                        <div class="flex align-items-center gap-2 my-1 w-min-content pr-3"
-                                             [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
-                                             tooltipPosition="top">
+                                <div class="px-2">
+                                    
+                                    <ng-container *ngFor="let checklistItem of checklist.items; let index = index">
+                                        <div class="flex align-items-baseline gap-2 my-1 w-min-content pr-3 p-2"
+                                                [ngClass]="{
+                                                    'surface-50': index % 2 == 0,
+                                                    'bg-white': index % 2 != 0,
+                                                }"
+                                                [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
+                                                tooltipPosition="top">
                                             <p-checkbox *ngIf="!checklistItem.finalizado"
                                                         [inputId]="'checklistitem-' + checklistItem.id"
                                                         [name]="'checklistitem-' + checklistItem.id"
                                                         #checkboxModel="ngModel"
                                                         [(ngModel)]="checklistItem.finalizado"
                                                         [binary]="true"
-                                                        (ngModelChange)="finalizarChecklist($event, checklistItem, checkboxModel)" />
-                                            <div *ngIf="checklistItem.finalizado" class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
+                                                        (ngModelChange)="checklistMark(checklistItem, checkboxModel)" />
+                                            <div *ngIf="checklistItem.finalizado" 
+                                                class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
                                                 <div class="p-checkbox-box">
                                                     <i class="pi pi-check p-checkbox-icon "></i>
                                                 </div>
                                             </div>
                                             <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                                            
                                             <ng-container *ngIf="object.celular 
                                                             && checklistItem.finalizado == false 
                                                             && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
@@ -416,13 +401,12 @@
                                                     <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
                                                 </a>
                                             </ng-container>
-                                            
                                             <ng-template #finalizadoTooltip>
                                                 <p class="ml-auto pl-2" *ngIf="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao">Finalizado por <b>{{checklistItem.account_Finalizacao}}</b> em <b>{{checklistItem.dataFinalizacao | date : 'dd/mm/yy'}}</b></p>
                                             </ng-template>
                                         </div>
-                                    </div>
-                                </ng-container>
+                                    </ng-container>
+                                </div>
                             </div>
                         </ng-container>
                     </div>
@@ -472,9 +456,7 @@
                                             {{ perfil.nome }}
                                         </span>
                                     </ng-container>
-                                    <ng-template #semPerfil>
-                                        Sem perfil cognitivo associado
-                                    </ng-template>
+                                    <ng-template #semPerfil> Sem perfil cognitivo associado </ng-template>
                                 </p>
                             </div>
                         </div>
@@ -484,13 +466,20 @@
             <!-- Educador -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="professor">Educador: </label>
-                <input type="text"
-                       pInputText
-                       [value]="object.professor ?? 'Selecione a turma para definir o educador'"
-                       id="professor"
-                       name="professor"
-                       class="w-full"
-                       readonly>
+                <p-iconfield>
+                    <p-inputicon *ngIf="selectedTurma">
+                        <span class="w-1rem h-1rem inline-flex mr-2 border-circle" [style]="{
+                            backgroundColor: selectedTurma.corLegenda
+                        }"></span>
+                    </p-inputicon>
+                    <input type="text"
+                           pInputText
+                           [value]="selectedTurma?.professor ?? 'Selecione a turma para definir o educador'"
+                           id="professor"
+                           name="professor"
+                           class="w-full"
+                           readonly>
+                </p-iconfield>
             </div>
             <!-- Perfil Cognitivo -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
@@ -507,7 +496,7 @@
                           optionLabel="nome"
                           optionValue="id"
                           [showClear]="true"
-                          appendTo="body"/>
+                          appendTo="body" />
             </div>
             <!-- KIT Apostila -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
@@ -530,12 +519,7 @@
                     <ng-template let-item #item>
                         <div class="flex flex-column">
                             <p class="font-bold">{{ item.nome }}</p>
-                            <div class="flex flex-column">
-                                <p class="font-bold">Apostilas:</p>
-                                <p *ngFor="let apostila of item.apostilas">
-                                    <span>{{apostila.nome}} - <b>Total de Páginas </b>{{apostila.numeroTotalPaginas}}</span>
-                                </p>
-                            </div>
+                            <p>Total de apostilas: {{item.apostilas.length}}</p>
                         </div>
                     </ng-template>
                 </p-select>

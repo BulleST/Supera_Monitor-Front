@@ -114,9 +114,9 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                         checklistAluno.nome = checklist.nome;
                         checklistAluno.items = res.filter(x => x.checklist_Id == checklist.id);
                         checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
-                        checklistAluno.finalizados = checklistAluno.items.filter((x: any) => x.finalizado)
-                        checklistAluno.atrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
-                        checklistAluno.pendentesDaSemana = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                        checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
+                        checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
+                        checklistAluno.itensEmAndamento = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
                         return checklistAluno;
                     });
                 this.loading = false;
@@ -134,8 +134,8 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
             this.checklist = this.item.checklistCompleto[this.item.checklistCompleto.length - 1]
             this.checklistIndex = this.checklist.id;
 
-            var pendentesDaSemana = this.item.checklistCompleto.filter(x => x.pendentesDaSemana.length)
-            var atrasados = this.item.checklistCompleto.filter(x => x.atrasados.length > 0);
+            var pendentesDaSemana = this.item.checklistCompleto.filter(x => x.itensEmAndamento.length)
+            var atrasados = this.item.checklistCompleto.filter(x => x.itensAtrasados.length > 0);
             this.atrasado = atrasados.length > 0;
             if (atrasados.length > 0) this.textoChecklist = '90 dias encerrados com itens em atraso';
             if (atrasados.length == 0 && pendentesDaSemana.length == 0) this.textoChecklist = '90 dias concluídos';
@@ -179,9 +179,9 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy, AfterViewI
                             item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
 
                             checklist.prazo = checklist.items[0].prazo;
-                            checklist.finalizados = checklist.items.filter((x: any) => x.finalizado)
-                            checklist.atrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
-                            checklist.pendentesDaSemana = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+                            checklist.itensFinalizados = checklist.items.filter((x: any) => x.finalizado)
+                            checklist.itensAtrasados = checklist.items.filter((x: any) => moment(x.prazo).isSameOrBefore(new Date, 'dates') && !x.finalizado && moment(x.prazo).week() != moment(new Date).week());
+                            checklist.itensEmAndamento = checklist.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
 
                             this.userService.get(item.account_Finalizacao_Id!)
                                 .then(res => item.account_Finalizacao = res.name);

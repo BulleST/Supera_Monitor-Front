@@ -4,9 +4,10 @@ import { Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../../utils';
 import { Aluno } from '../../../../../models/alunos.model';
 import { AlunoChecklistCompleto } from '../../../../../models/calendario.model';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist_Item } from '../../../../../models/checklist.model';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { NgModel } from '@angular/forms';
+import { ChecklistService } from '../../../../../services/checklist.service';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
@@ -26,6 +27,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
+        private checklistService: ChecklistService,
     ) {
     }
 
@@ -126,23 +128,32 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     }
 
 
-    onHide() {
+    checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
+        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
 
-    }
+        var checklists = this.checklistService.list.value;
+        var item = checklists.flatMap(x => x.items).find(x => x.id == alunoChecklistItem.checklist_Item_Id) as Checklist_Item;
+        this.alunoChecklistOnConfirmDialog.item = item;
 
-    checkboxMark(item: Aluno_CheckList_Item, model: NgModel) {
-        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = item;
         this.alunoChecklistOnConfirmDialog.show();
 
         var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
             model.control.setValue(false);
             model.control.updateValueAndValidity();
-            this.alunoChecklistOnConfirmDialog.hide()
+            this.alunoChecklistOnConfirmDialog.hide();
             onCancel.unsubscribe();
         });
 
+        var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
 
-        // this.subscription.push(onCancel)
+            alunoChecklistItem.observacoes = res.observacoes;
+            alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
+            alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
+            alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+
+            onFinish.unsubscribe();
+        });
+
     }
 
 

@@ -1,34 +1,16 @@
-<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
-                                       (onSuccess)="hide()"
-                                       (onCancel)="hide()"></app-aluno-checklist-on-confirm-dialog>
+<app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
 <p-popover #popover
-           (onHide)="onHide()"
            [dismissable]="true"
            styleClass="-mt-2"
            appendTo="body">
     <div class="w-full" *ngIf="checklist">
-        <div class="flex align-items-center justify-content-between w-full">
-            <!-- <p class="mb-2">
-                <span>Prazo máximo: </span>
-                <b>
-                    <span *ngIf="checklist.prazo">{{checklist.prazo | date : 'dd/MM/yyyy'}}</span>
-                    <span *ngIf="!checklist.prazo">Indefinido</span>
-                </b>
-            </p> -->
-            <!-- <a *ngIf="aluno && aluno.celular"
-               class="p-button p-button-text p-button-success"
-               pTooltip="Enviar mensagem para {{aluno.celular | mask : '+00 (00) 0.0000-0000'}}"
-               [href]="enviarMensagem(aluno)">
-                <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-            </a> -->
-        </div>
         <ul class="p-0 m-0">
             <li>
                 <p-table [value]="checklist.items">
                     <ng-template pTemplate="header">
                         <tr>
                             <td colspan="3" class="white-space-nowrap py-">
-                                <span>Prazo máximo:</span> 
+                                <span>Prazo máximo:</span>
                                 <b>
                                     <span *ngIf="checklist.prazo">{{checklist.prazo | date : 'dd/MM/yyyy'}}</span>
                                     <span *ngIf="!checklist.prazo">Indefinido</span>
@@ -36,7 +18,6 @@
                             </td>
                         </tr>
                     </ng-template>
-
                     <ng-template pTemplate="body" let-checklistItem let-index="rowIndex">
                         <tr
                             [ngClass]="{
@@ -47,20 +28,23 @@
                             (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
                             <td class="pr-1">
                                 <p-popover #checklistData appendTo="body">
-                                    <p>
-                                        <span *ngIf="checklistItem.dataFinalizacao">Finalizado em
-                                            <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
-                                        <span *ngIf="checklistItem.account_Finalizacao"> por
-                                            <b>{{checklistItem.account_Finalizacao }}</b></span>
-                                    </p>
-                                    <p class="mt-2">
-                                        <span class="font-medium">Observações: </span>
-                                        <span *ngIf="checklistItem.observacoes"
-                                              [innerHTML]="checklistItem.observacoes"></span>
-                                        <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
-                                    </p>
-                                </p-popover>
+                                    <ng-container *ngIf="checklistItem.finalizado">
+                                      <p>
+                                          <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
+                                          <span *ngIf="!checklistItem.dataFinalizacao">Agora, há poucos minutos <i class="pi pi-clock text-400 ml-2"></i></span>
 
+                                          <span *ngIf="checklistItem.account_Finalizacao"> por <b>{{checklistItem.account_Finalizacao }}</b></span>
+                                          <span *ngIf="!checklistItem.account_Finalizacao"> por você.</span>
+                                      </p>
+                                      <p class="mt-2">
+                                          <span class="font-medium">Observações: </span>
+                                          <span *ngIf="checklistItem.observacoes"
+                                                [innerHTML]="checklistItem.observacoes"></span>
+                                          <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
+                                      </p>
+                                    </ng-container>
+                                    
+                                </p-popover>
                                 <p-checkbox *ngIf="!checklistItem.finalizado"
                                             #checkbox
                                             [inputId]="'checklistitem-' + checklistItem.id"
@@ -84,7 +68,6 @@
                             <td class="p-0 pr-2">
                                 <ng-container *ngIf="checklistItem.finalizado == false 
                                     && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-
                                     <a *ngIf="aluno && aluno.celular"
                                        [href]="enviarMensagemCondicao(checklistItem, aluno)"
                                        target="_blank"
@@ -104,60 +87,7 @@
                         </tr>
                     </ng-template>
                 </p-table>
-
             </li>
-            <!-- <li *ngFor="let checklistItem of checklist.items; let index = index"
-                class="flex align-items-center gap-2 p-2"
-                [ngClass]="{
-                    'surface-100': index % 2 == 0,
-                    'surface-50': index % 2 != 0,
-                }"
-                (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
-                (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
-                <p-checkbox *ngIf="!checklistItem.finalizado"
-                            #checkbox
-                            [inputId]="'checklistitem-' + checklistItem.id"
-                            [name]="'checklistitem-' + checklistItem.id"
-                            #finalizado="ngModel"
-                            [ngModel]="checklistItem.finalizado"
-                            [binary]="true"
-                            [readonly]="checklistItem.finalizado"
-                            (ngModelChange)="checkboxMark(checklistItem)" />
-                <div *ngIf="checklistItem.finalizado"
-                     class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
-                    <div class="p-checkbox-box">
-                        <i class="pi pi-check p-checkbox-icon "></i>
-                    </div>
-                </div>
-                <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                <ng-container
-                              *ngIf="aluno 
-                                        && aluno.celular 
-                                        && checklistItem.finalizado == false 
-                                        && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                    <a [href]="enviarMensagemCondicao(checklistItem, aluno)"
-                       target="_blank"
-                       class="bg-transparent ml-auto text-green-600 hover:text-green-700 hover:underline hover:font-bold flex align-items-center gap-2 white-space-nowrap" >
-                        <span class="p-button-label">Enviar mensagem</span>
-                        <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                    </a>
-                </ng-container>
-
-
-                <p-popover #checklistData appendTo="body">
-                    <p>
-                        <span *ngIf="checklistItem.dataFinalizacao">Finalizado em
-                            <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
-                        <span *ngIf="checklistItem.account_Finalizacao"> por
-                            <b>{{checklistItem.account_Finalizacao }}</b></span>
-                    </p>
-                    <p class="mt-2">
-                        <span class="font-medium">Observações: </span>
-                        <span *ngIf="checklistItem.observacoes" [innerHTML]="checklistItem.observacoes"></span>
-                        <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
-                    </p>
-                </p-popover>
-            </li> -->
         </ul>
     </div>
 </p-popover>

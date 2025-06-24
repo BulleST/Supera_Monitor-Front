@@ -20,6 +20,7 @@ import { playAlert, playSuccess } from '../../../utils/audio';
 })
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
+    aluno_Id: number = 0;
     object: Aluno = new Aluno;
     loading = false;
     error: string = '';
@@ -46,16 +47,14 @@ export class FormComponent implements OnDestroy {
         let params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
+                this.visible = true;
                 this.loading = true;
-                let aluno_id = this.crypto.decrypt(res['aluno_id'])
+                this.aluno_Id = this.crypto.decrypt(res['aluno_id'])
 
-                // this.service.get(aluno_id)
-                lastValueFrom(this.service.get(aluno_id))
+                lastValueFrom(this.service.get(this.aluno_Id))
                     .then(res => {
                         this.object = res;
-                        console.log('form object', this.object)
                         this.loading = false;
-                        this.visible = true;
                     })
                     .catch(res => {
                         this.visible = false;
@@ -63,8 +62,7 @@ export class FormComponent implements OnDestroy {
                     });
 
             } else {
-                // this.visible = false;
-                this.visible = true;
+                this.visible = false;
                 this.visibleChange();
             }
         })
