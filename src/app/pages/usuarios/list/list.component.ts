@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
@@ -12,6 +12,7 @@ import { AccountResponse, Account, userColumns } from '../../../models/account.m
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../utils/audio';
+import { ContextMenu } from 'primeng/contextmenu';
 
 @Component({
     selector: 'app-list',
@@ -34,6 +35,8 @@ export class ListComponent implements OnDestroy {
     Role: typeof Role = Role;
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
+
+    @ViewChild('cm') cm!: ContextMenu;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -77,9 +80,111 @@ export class ListComponent implements OnDestroy {
             });
     }
 
-    contextMenuSelectionChange(item: any) {
+    clear(dt: Table) {
+        this.tableSearch = '';
+        dt.clear();
+    }
+
+    @HostListener('keydown.escape', ['$event'])
+    onKeydownHandler(event: KeyboardEvent) {
+        this.unselectItems();
+    }
+
+    selectionChange(e: any) {
+    }
+
+    unselectItems() {
+        this.tableSelectedItem = undefined;
+    }
+
+
+    deactivated(e: any, item: any) {
+        var deactivated = !item.active;
+        // playAlert();
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
+                      ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
+            header: deactivated ? 'Habilitar' : 'Desabilitar',
+            
+            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
+            rejectLabel: 'Cancelar',
+            
+            acceptIcon: deactivated ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock',
+            rejectIcon: 'pi pi-times',
+            
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: () => {
+                lastValueFrom(this.service.deactivated(item.id, deactivated))
+                    .then(res => {
+                        if (res.success) {
+                            this.toastrService.success(deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
+                            insertOrReplace(this.service, res.object);
+                            item = res.object;
+                            // playSuccess();
+                        } else {
+                            setTimeout(() => {
+                                this.showError('Erro', res.message, e);
+                            }, 300);
+                        }
+                    })
+                    .catch((res: HttpErrorResponse) => {
+                        this.showError('Erro', res.error.message, e);
+                    })
+            },
+        });
+    }
+
+    resetPassword(e: any, item: any) {
+
+        // playAlert();
+
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja resetar a senha deste usuário? 
+                        Uma mensagem com a nova senha será enviada para o e-mail cadastrado.`,
+            header: 'Resetar Senha?',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Resetar Senha',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: () => {
+                lastValueFrom(this.service.resetPassword(item.id))
+                    .then(res => {
+                        if (res.success) {
+                            item = res.object;
+                            this.toastrService.success(`Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
+                            // playSuccess()
+                        } else {
+                            this.showError('Erro', res.message, e);
+                        }
+                    })
+                    .catch((res: HttpErrorResponse) => {
+                        this.showError('Erro', res.error.message, e);
+                    });
+            },
+        });
+    }
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
+
+    getOption(col: ColumnTable, row: any) {
+        var item = col.options.items.find((x: any) => x.value == row[col.field]);
+        return item;
+    }
+
+
+    showContextMenu(e: any, item: Account) {
+        const toggle = this.tableSelectedItem?.id == item.id;
+
+        this.tableSelectedItem = item;
         this.tableMenu = [
             {
+
                 label: 'Menu',
                 disabled: true,
                 styleClass: 'text-500 font-bold opacity-100',
@@ -102,102 +207,16 @@ export class ListComponent implements OnDestroy {
             }
 
         ];
-    }
 
-
-    clear(dt: Table) {
-        this.tableSearch = '';
-        dt.clear();
-    }
-
-    @HostListener('keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
-        this.unselectItems();
-    }
-
-    selectionChange(e: any) {
-    }
-
-    unselectItems() {
-        this.tableSelectedItem = undefined;
+        if (toggle) {
+            this.cm.toggle(e);
+        } else {
+            this.cm.show(e);
+        }
     }
 
     edit(item: any) {
         var encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
-    }
-
-    deactivated(e: any, item: any) {
-        var deactivated = !item.active;
-            // playAlert();
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o usuário selecionado? 
-                      ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
-            header: deactivated ? 'Habilitar' : 'Desabilitar',
-            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            rejectLabel: 'Cancelar',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                lastValueFrom(this.service.deactivated(item.id, deactivated))
-                    .then(res => {
-                        if (res.success) {                            
-                            this.toastrService.success( deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
-                            insertOrReplace(this.service, res.object);
-                            item = res.object;
-                            // playSuccess();
-                        } else {
-                            setTimeout(() => {
-                                this.showError('Erro', res.message, e);
-                            }, 300);
-                        }
-                    })
-                    .catch((res: HttpErrorResponse) => {
-                        this.showError('Erro', res.error.message, e);
-                    })
-            },
-        });
-    }
-
-    resetPassword(e: any, item: any) {
-        
-        // playAlert();
-
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Tem certeza que deseja resetar a senha deste usuário? 
-                        Uma mensagem com a nova senha será enviada para o e-mail cadastrado.`,
-            header: 'Resetar Senha?',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Resetar Senha',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                lastValueFrom(this.service.resetPassword(item.id))
-                    .then(res => {
-                        if (res.success) {
-                            item = res.object;
-                            this.toastrService.success( `Senha resetada com sucesso e enviada para a caixa de email cadastrado.`);
-                            // playSuccess()
-                        } else {
-                            this.showError('Erro', res.message, e);
-                        }
-                    })
-                    .catch((res: HttpErrorResponse) => {
-                        this.showError('Erro', res.error.message, e);
-                    });
-            },
-        });
-    }
-
-    showError(header: string, message: string, e: any) {
-        showError(this.confirmationService, header, message, e);
-    }
-
-    getOption(col: ColumnTable, row: any) {
-        var item = col.options.items.find((x: any) => x.value == row[col.field]);
-        return item;
     }
 }
