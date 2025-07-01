@@ -60,14 +60,20 @@
             </div>
             <div class="field sm:col-4 col-6"> <!-- Celular -->
                 <label for="phone">Celular: <span class="text-red-500">*</span></label>
-                <p-inputmask type="text"
-                        #phone="ngModel"
-                        [(ngModel)]="object.phone"
-                        id="phone"
-                        name="phone"
-                        [required]="true" 
-                        mask="+55 (99) 9.9999-9999" 
-                        placeholder="+55 (99) 9.9999-9999" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-mobile" />
+                    <p-inputmask
+                                inputId="phone"
+                                name="phone"
+                                 #phone="ngModel"
+                                 [(ngModel)]="object.phone"
+                                 mask="+99 (99) 9.9999-9999"
+                                 placeholder="+55 (99) 9.9999-9999"
+                                 [autoClear]="true"
+                                 class="w-full"
+                                styleClass="w-full pl-5"
+                                 [required]="true" />
+                </p-iconfield>
                 <div *ngIf="phone.touched && phone.invalid && phone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="phone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -84,18 +90,21 @@
             </div>
             <div class="field col-12"> <!-- E-mail -->
                 <label for="email">E-mail: <span *ngIf="!isEditPage" class="text-red-500">*</span></label>
-                <input type="email"
-                        [email]="true"
-                        pInputText
-                        #email="ngModel"
-                        [(ngModel)]="object.email"
-                        id="email"
-                        name="email"
-                        class="w-full"
-                        [required]="true"
-                        [pattern]="emailPattern"
-                        placeholder="example@gmail.com"
-                        [readonly]="isEditPage">
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-envelope" />
+                    <input type="email"
+                            [email]="true"
+                            pInputText
+                            #email="ngModel"
+                            [(ngModel)]="object.email"
+                            id="email"
+                            name="email"
+                            class="w-full"
+                            [required]="true"
+                            [pattern]="emailPattern"
+                            placeholder="example@gmail.com"
+                            [readonly]="isEditPage">
+                </p-iconfield>
                 <div *ngIf="email.touched && email.invalid && email.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email'] || email.errors['pattern']">E-mail inválido.</p>

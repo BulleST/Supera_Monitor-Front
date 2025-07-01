@@ -156,13 +156,13 @@
                 <p-iconfield>
                         <p-inputicon styleClass="pi pi-phone" />
                         <p-inputmask
+                                    inputId="telefone"
+                                    name="telefone"
                                      #telefone="ngModel"
                                      [(ngModel)]="object.telefone"
                                      mask="+99 (99) 9999-9999"
                                      placeholder="+55 (99) 9999-9999"
                                      [autoClear]="true"
-                                     id="telefone"
-                                     name="telefone"
                                      class="w-full"
                                      styleClass="w-full pl-5"
                                      
@@ -178,13 +178,13 @@
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-mobile" />
                     <p-inputmask
+                                inputId="celular"
+                                name="celular"
                                  #celular="ngModel"
                                  [(ngModel)]="object.celular"
                                  mask="+99 (99) 9.9999-9999"
                                  placeholder="+55 (99) 9.9999-9999"
                                  [autoClear]="true"
-                                 id="celular"
-                                 name="celular"
                                  class="w-full"
                                      styleClass="w-full pl-5"
                                  [required]="true" />
@@ -196,16 +196,15 @@
             <!-- E-mail -->
             <div class="field sm:col-6 xs:col-6 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
-                
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-envelope" />
                     <input type="text"
                            pInputText
                            [email]="true"
-                           #email="ngModel"
-                           [(ngModel)]="object.email"
                            id="email"
                            name="email"
+                           #email="ngModel"
+                           [(ngModel)]="object.email"
                            class="w-full"
                            [required]="true"
                            placeholder="example@gmail.com">

@@ -123,7 +123,6 @@ export class FormComponent implements OnDestroy {
                 this.loading = false;
                 if (res.success) {
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
-                    insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
                     // playSuccess();

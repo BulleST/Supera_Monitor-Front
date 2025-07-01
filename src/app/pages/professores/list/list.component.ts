@@ -1,16 +1,18 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, MenuItem } from 'primeng/api';
+import { ConfirmationService, FilterMatchMode, FilterService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace, showError } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
-import { Professor, professorColumns } from '../../../models/professor.model';
+import { Professor, Professor_NivelCertificacao, professorColumns } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { UserService } from '../../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { playAlert, playSuccess } from '../../../utils/audio';
+import { ContextMenu } from 'primeng/contextmenu';
+import moment from 'moment';
 
 @Component({
     selector: 'app-list',
@@ -33,6 +35,11 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
+    @ViewChild('cm') cm!: ContextMenu;
+
+    nivelCertificados: Professor_NivelCertificacao[] = []
+    loadingNivelCertificados = true;
+
     constructor(
         private confirmationService: ConfirmationService,
         private service: ProfessorService,
@@ -45,7 +52,29 @@ export class ListComponent implements OnDestroy {
     ) {
         this.tableColumns = professorColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
+        
+        this.loadingNivelCertificados = true;
+        lastValueFrom(this.service.getNivelCertificacao())
+        .then(res => {
+            this.nivelCertificados = res;
+            this.loadingNivelCertificados = false;
 
+            var columnIndex = professorColumns.findIndex(x => x.field == 'professor_NivelCertificacao')
+            console.log('columnIndex', columnIndex)
+            var column = professorColumns[columnIndex];
+            console.log('column', column)
+            
+            column.filterOptions!.primeElementOptions.options = res.map(x => {
+                return {
+                    label: x.descricao,
+                    value: x.descricao,
+                }
+            });
+            console.log('column2', column)
+            professorColumns[columnIndex] = column
+            this.tableColumns = professorColumns;
+        })
+        
         this.update();
 
         var screen = this.mobileService.get().subscribe(res => this.screen = res);
@@ -151,19 +180,23 @@ export class ListComponent implements OnDestroy {
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o professor selecionado? 
                       ${deactivated ? 'Esse usuário poderá acessar novamente a plataforma.' : 'Esse usuário será deslogado e não poderá acessar novamente enquanto estiver inativo.'} `,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
+
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Cancelar',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+
+            acceptIcon: deactivated ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock',
+            rejectIcon: 'pi pi-times',
+
+            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
+            rejectLabel: 'Cancelar',
+
             accept: () => {
                 lastValueFrom(this.userService.deactivated(item.account_Id, deactivated))
                     .then(res => {
                         if (res.success) {
-                            this.toastrService.success(deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
-                            item.active = res.object.active;
-                            item.deactivated = res.object.deactivated;
-                            insertOrReplace(this.service, item);
+                            this.toastrService.success(deactivated 
+                                ? `O registro foi habilitado com sucesso.` 
+                                : `O registro foi desabilitado com sucesso.`);
                             item = res.object;
                             // playSuccess();
                         } else {
@@ -206,6 +239,77 @@ export class ListComponent implements OnDestroy {
                     });
             },
         });
+
+    }
+
+    showContextMenu(e: any, item: Professor) {
+        const toggle = this.tableSelectedItem?.id == item.id;
+
+        this.tableSelectedItem = item;
+        this.tableMenu = [
+            {
+                label: 'Menu',
+                disabled: true,
+                styleClass: 'text-500 font-bold opacity-100',
+            },
+            { separator: true },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen text-orange-500',
+                command: () => this.edit(item)
+            },
+            {
+                label: item.active ? 'Desabilitar' : 'Habilitar',
+                icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
+                command: (event: any) => this.deactivated(event, item)
+            },
+            {
+                label: 'Resetar Senha',
+                icon: 'fa-solid fa-key text-grey-400',
+                command: (event: any) => this.resetPassword(event, item)
+            },
+            { separator: true },
+            {
+                label: 'Calendário de aulas',
+                icon: 'fa-solid fa-calendar',
+                command: () => {
+                    var encrypted = this.crypto.encrypt(item.id);
+                    this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
+                }
+            },
+        ];
+
+        if (toggle) {
+            this.cm.toggle(e);
+        } else {
+            this.cm.show(e);
+        }
+    }
+
+    edit(item: any) {
+        var encrypted = this.crypto.encrypt(item.id);
+        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+    }
+
+    filterDateTime(value: any, col: ColumnTable, callback: Function, dt: Table) {
+        console.log('value', value)
+        console.log('callback', callback)
+        console.log('col', col)
+        console.log('dt', dt)
+
+        let filterService = dt.filterService;
+        let filterDt: any = dt.filters[col.field];
+        let matchMode = filterDt['matchMode'];
+        let filter: any = dt.filters[col.field];
+        console.log('filter', filter)
+        var a = filter(value)
+        console.log('a', a)
+
+
+
+
+
+
     }
 
 }

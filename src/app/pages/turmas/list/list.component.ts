@@ -105,6 +105,7 @@ export class ListComponent implements OnDestroy {
 
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             rejectLabel: 'Cancelar',
+
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then((res) => {
@@ -113,8 +114,8 @@ export class ListComponent implements OnDestroy {
                                 deactivated
                                     ? `O registro foi habilitado com sucesso.`
                                     : `O registro foi desabilitado com sucesso.`,
-                            )
-                            item = res.object
+                            );
+                            item = res.object;
                             // playSuccess();
                         } else {
                             this.showError('Erro', res.message, e)

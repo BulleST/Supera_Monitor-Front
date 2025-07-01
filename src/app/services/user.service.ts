@@ -5,7 +5,7 @@ import { AccountRole } from '../models/account-perfil.model';
 import { Account, AccountRequest } from '../models/account.model';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { getError } from '../utils';
+import { getError, insert, replace } from '../utils';
 
 @Injectable({
     providedIn: 'root',
@@ -47,7 +47,6 @@ export class UserService extends Service {
                return reject('Usuário não encontrado.')
             }
 
-
             return resolve(item);
         })
     }
@@ -56,6 +55,13 @@ export class UserService extends Service {
         var request = MyMap(model, new AccountRequest)
         return this.http.post<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
+                next: res => {
+                    if (res.success) {
+                        // res.object = this.mapAluno(res.object)
+                        insert(this, res.object, 'list')
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível cadastrar usuário. \n ${getError(err)}`);
                 }
@@ -66,6 +72,13 @@ export class UserService extends Service {
         var request = MyMap(model, new AccountRequest)
         return this.http.put<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
+                next: res => {
+                    if (res.success) {
+                        // res.object = this.mapAluno(res.object)
+                        replace(this, res.object, 'list')
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível editar usuário. \n ${getError(err)}`);
                 }
@@ -75,6 +88,13 @@ export class UserService extends Service {
     deactivated(id: number, activated: boolean = true) {
         return this.http.patch<RequestResponse>(`${this.url}/users/toggle-active/${id}`, {})
             .pipe(tap({
+                next: res => {
+                    if (res.success) {
+                        // res.object = this.mapAluno(res.object)
+                        replace(this, res.object, 'list')
+                    }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível ${(activated ? 'desabilitar' : 'habilitar')}  usuário`);
                 }
@@ -84,6 +104,13 @@ export class UserService extends Service {
     resetPassword(id: number) {
         return this.http.patch<RequestResponse>(`${this.url}/users/reset-password/${id}`, {})
             .pipe(tap({
+                next: res => {
+                    // if (res.success) {
+                    //     res.object = this.mapAluno(res.object)
+                    //     replace(this, res.object, 'list')
+                    // }
+                    return res;
+                },
                 error: err => {
                     this.toastrService.error(`Não foi possível alterar senha. \n ${getError(err)}`);
                 }

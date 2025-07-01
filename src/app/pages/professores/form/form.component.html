@@ -1,8 +1,4 @@
-<p-confirmdialog styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div [innerHTML]="message.message"></div>
-    </ng-template>
-</p-confirmdialog>
+<app-confirm-dialog></app-confirm-dialog>
 <p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
           [maximizable]="true"
           [draggable]="true"
@@ -95,7 +91,7 @@
                 </div>
             </ng-container>
             <!-- Nome -->
-            <div class="field sm:col-3 col-8"> 
+            <div class="field sm:col-3 col-8">
                 <label for="nome">Nome do educador: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -110,53 +106,65 @@
                 </div>
             </div>
             <!-- Celular -->
-            <div class="field sm:col-3 col-4"> 
+            <div class="field sm:col-3 col-4">
                 <label for="telefone">Celular: <span class="text-red-500">*</span></label>
-                <p-inputmask type="text"
-                             #telefone="ngModel"
-                             [(ngModel)]="object.telefone"
-                             id="telefone"
-                             name="telefone"
-                             styleClass="w-full"
-                             [required]="true"
-                             mask="+55 (99) 9.9999-9999"
-                             placeholder="+55 (99) 9.9999-9999" />
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-mobile" />
+                    <p-inputmask
+                                 inputId="telefone"
+                                 name="telefone"
+                                 #telefone="ngModel"
+                                 [(ngModel)]="object.telefone"
+                                 mask="+99 (99) 9.9999-9999"
+                                 placeholder="+55 (99) 9.9999-9999"
+                                 [autoClear]="true"
+                                 class="w-full"
+                                 styleClass="w-full pl-5"
+                                 [required]="true" />
+                </p-iconfield>
                 <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field sm:col-6 col-12"> 
+            <div class="field sm:col-6 col-12">
                 <label for="email">E-mail: <span class="text-red-500" *ngIf="!isEditPage && !accountsSelected">* <small class="text-black">(Não é possível alterar o e-mail após o primeiro cadastro)</small></span> </label>
-                <ng-template [ngIf]="!isEditPage && !accountsSelected">
-                    <input type="email"
-                           [email]="true"
-                           pInputText
-                           #email="ngModel"
-                           [(ngModel)]="object.email"
-                           id="email"
-                           name="email"
-                           class="w-full"
-                           [required]="true"
-                           [pattern]="emailPattern"
-                           placeholder="example@gmail.com">
+                <ng-container *ngIf="!isEditPage && !accountsSelected">
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-envelope" />
+                        <input type="email"
+                               [email]="true"
+                               pInputText
+                               #email="ngModel"
+                               [(ngModel)]="object.email"
+                               id="email"
+                               name="email"
+                               class="w-full"
+                               [required]="true"
+                               [pattern]="emailPattern"
+                               placeholder="example@gmail.com"
+                               [readonly]="isEditPage">
+                    </p-iconfield>
                     <div *ngIf="email.touched && email.invalid && email.errors">
                         <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
                         <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['email']">E-mail inválido.</p>
                         <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['pattern']">E-mail inválido.</p>
                     </div>
-                </ng-template>
-                <ng-template [ngIf]="isEditPage || accountsSelected">
-                    <input type="email"
-                           pInputText
-                           [value]="object.email"
-                           id="email"
-                           class="w-full"
-                           readonly>
-                </ng-template>
+                </ng-container>
+                <ng-container *ngIf="isEditPage || accountsSelected">
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-envelope" />
+                        <input type="email"
+                               pInputText
+                               [value]="object.email"
+                               id="email"
+                               class="w-full"
+                               readonly>
+                    </p-iconfield>
+                </ng-container>
             </div>
             <!-- Data de Nascimento -->
-            <div class="field sm:col-4 col-4"> 
+            <div class="field sm:col-4 col-4">
                 <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataNascimento="ngModel"
@@ -178,7 +186,7 @@
                 </div>
             </div>
             <!-- Data de Início -->
-            <div class="field sm:col-4 col-4"> 
+            <div class="field sm:col-4 col-4">
                 <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
@@ -200,7 +208,7 @@
                 </div>
             </div>
             <!-- Nível Certificação -->
-            <div class="field sm:col-4 col-4"> 
+            <div class="field sm:col-4 col-4">
                 <label for="professor_NivelCertificacao_Id">Nível de Certificação: <span class="text-red-500">*</span></label>
                 <p-select
                           [loading]="loadingNivelCertificacao"
@@ -221,59 +229,66 @@
                 </div>
             </div>
             <!-- Início Expediente -->
-            <div class="field sm:col-6 col-6"> 
+            <div class="field sm:col-6 col-6">
                 <label for="expedienteInicio">Início Expediente: <span class="text-red-500">*</span></label>
-                <!-- <p-iconfield> -->
-                    <p-datepicker #expedienteInicio="ngModel"
-                                  [(ngModel)]="object.expedienteInicio"
-                                  (onBlur)="expedienteChanged($event)"
-                                  [showIcon]="false"
-                                  [icon]="'pi pi-clock'"
-                                  [iconDisplay]="'input'"
-                                  [showTime]="true"
-                                  [hourFormat]="'24'"
-                                  [timeOnly]="true"
-                                  inputId="expedienteInicio"
-                                  name="expedienteInicio"
-                                  class="w-full"
-                                  styleClass="w-full"
-                                  inputStyleClass="w-full"
-                                  [required]="true"
-                                  appendTo="body" />
-                    <!-- <p-inputicon styleClass="pi pi-clock" />
-                </p-iconfield> -->
+                <p-datepicker #expedienteInicio="ngModel"
+                            inputId="expedienteInicio"
+                            name="expedienteInicio"
+                              [(ngModel)]="object.expedienteInicio"
+                              (onBlur)="expedienteChanged($event)"
+                              [minDate]="inicioExpedienteMin"
+                              [maxDate]="inicioExpedienteMax"
+                              [showIcon]="true"
+                              [icon]="'pi pi-clock'"
+                              [iconDisplay]="'input'"
+                              [showTime]="true"
+                              [hourFormat]="'24'"
+                              [timeOnly]="true"
+                              class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
+                              [required]="true"
+                              appendTo="body">
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
                 <div *ngIf="expedienteInicio.touched && expedienteInicio.invalid && expedienteInicio.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteInicio.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Fim Expediente -->
-            <div class="field sm:col-6 col-6"> 
+            <div class="field sm:col-6 col-6">
                 <label for="expedienteFim">Fim Expediente: <span class="text-red-500">*</span></label>
-                <!-- <p-iconfield> -->
-                    <p-datepicker #expedienteFim="ngModel"
-                                  [(ngModel)]="object.expedienteFim"
-                                  (onBlur)="expedienteChanged($event)"
-                                  [showIcon]="true"
-                                  [iconDisplay]="'input'"
-                                  [icon]="'pi pi-clock'"
-                                  [showTime]="true"
-                                  [hourFormat]="'24'"
-                                  [timeOnly]="true"
-                                  inputId="expedienteFim"
-                                  name="expedienteFim"
-                                  class="w-full"
-                                  styleClass="w-full"
-                                  inputStyleClass="w-full"
-                                  [required]="true"
-                                  appendTo="body" />
-                    <!-- <p-inputicon styleClass="pi pi-clock" />
-                </p-iconfield> -->
+                <p-datepicker #expedienteFim="ngModel"
+                                inputId="expedienteFim"
+                                name="expedienteFim"
+                              [(ngModel)]="object.expedienteFim"
+                              (onBlur)="expedienteChanged($event)"
+                              [minDate]="fimExpedienteMin"
+                              [maxDate]="fimExpedienteMax"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              [icon]="'pi pi-clock'"
+                              [showTime]="true"
+                              [hourFormat]="'24'"
+                              [timeOnly]="true"
+                              class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
+                              [required]="true"
+                              appendTo="body" >
+                    <ng-template #inputicon let-clickCallBack="clickCallBack">
+                        <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
+                    </ng-template>
+                </p-datepicker>
+
                 <div *ngIf="expedienteFim.touched && expedienteFim.invalid && expedienteFim.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteFim.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Legenda -->
-            <div class="field col-12 "> 
+            <div class="field col-12 ">
                 <div>
                     <label for="corLegenda">Legenda: <span class="text-red-500">*</span></label>
                     <div class="flex align-items-center my-3 mt-2 -ml-2">
@@ -296,7 +311,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+        <div class="col-12 px-0 gap-2 flex flex-wrap align-items-center justify-content-between">
             <div class="col">
                 <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                 <p class="text-red-500" *ngIf="error">{{error}}</p>

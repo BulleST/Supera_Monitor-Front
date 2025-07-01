@@ -73,9 +73,9 @@
         <ng-template pTemplate="header">
             <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
                 <th *ngFor="let col of tableColumns" 
-                [pSortableColumn]="col.field"class="surface-900 py-0 border-none text-white white-space-nowrap" 
-                [style]="{ 
-                        width: col.options && col.options.width ? col.options.width : ''
+                    [pSortableColumn]="col.field"class="surface-900 border-none text-white white-space-nowrap" 
+                    [style]="{ 
+                            width: col.options && col.options.width ? col.options.width : ''
                     }">
                     <div class="flex align-items-center">
                         <span>{{ col.label }}</span>
@@ -92,7 +92,7 @@
                 </th>
                 <th pFrozenColumn
                     alignFrozen="right"
-                    class="surface-900 py-0 border-bottom-none text-white"></th>
+                    class="surface-900 border-bottom-none text-white"></th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-item let-index="rowIndex">

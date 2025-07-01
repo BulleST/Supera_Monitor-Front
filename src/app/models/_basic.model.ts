@@ -1,8 +1,9 @@
 export class Basic_List  {
     id: number = 0;
 
+    activeString?: string = '';
     active?: boolean = false;
-    created?: Date = undefined as unknown as Date;
+    created?: Date = new Date
     lastUpdated?: Date;
     deactivated?: Date;
 

@@ -64,7 +64,7 @@
                 <tr>
                     <th *ngFor="let col of tableColumns"
                         [pSortableColumn]="col.field"
-                        class="surface-900 py-0 border-none text-white white-space-nowrap p-3">
+                        class="surface-900 border-none text-white white-space-nowrap p-3">
                         <div class="flex align-items-center">
                             <span>{{ col.label }}</span>
                             <ng-container *ngIf="col.filterType != FilterType.none">
@@ -81,7 +81,7 @@
                     </th>
                     <th pFrozenColumn
                         alignFrozen="right"
-                        class="surface-900 py-0 border-bottom-none text-white"></th>
+                        class="surface-900 border-bottom-none text-white"></th>
                 </tr>
             </ng-container>
         </ng-template>

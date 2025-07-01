@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Crypto } from './crypto';
+import { FilterMatchMode } from 'primeng/api';
 
 @Injectable({
     providedIn: 'root'
@@ -40,11 +41,25 @@ export enum FilterType {
     none = 'none',
 }
 
+
 export class ColumnTable {
     field: string = '';
     label: string = '';
     filterType: FilterType = FilterType.text;
     displayType?: DisplayType = DisplayType.text;
+    filterMatchMode?: string = FilterMatchMode.CONTAINS.toString();
     options?: any;
+    filterValue?: any = '';
+    filterOptions?: FilterOptions;
+    sortable?: boolean = true;
+}
+
+export interface FilterOptions {
+    icon?: string;
+    value?: any;
+    matchMode: string;
+    type: string;
+    primeElement: 'inputtext' | 'datepicker' | 'inputmask' | 'select' | 'multiselect';
+    primeElementOptions: any;
 }
 

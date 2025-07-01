@@ -120,7 +120,6 @@ export class ListComponent implements OnDestroy {
                     .then(res => {
                         if (res.success) {
                             this.toastrService.success(deactivated ? `O registro foi habilitado com sucesso.` : `O registro foi desabilitado com sucesso.`);
-                            insertOrReplace(this.service, res.object);
                             item = res.object;
                             // playSuccess();
                         } else {

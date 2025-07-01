@@ -10,6 +10,7 @@ import { Popover } from 'primeng/popover';
 import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../utils/audio';
 import { ChecklistService } from '../../../services/checklist.service';
+import { ToastrService } from 'ngx-toastr';
 
 
 @Component({
@@ -25,7 +26,7 @@ export class FormComponent implements OnDestroy {
     object: Aluno = new Aluno;
     loading = false;
     error: string = '';
-    isEditPage = false;
+    isEditPage = true;
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
 
@@ -36,6 +37,7 @@ export class FormComponent implements OnDestroy {
         private service: AlunoService,
         private checklistService: ChecklistService,
         private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
     ) {
         this.loadPage();
     }
@@ -56,7 +58,6 @@ export class FormComponent implements OnDestroy {
                 if (!this.checklistService.list.value.length) {
                     await lastValueFrom(this.checklistService.getList())
                 }
-
 
                 lastValueFrom(this.service.get(this.aluno_Id))
                     .then(res => {
@@ -116,25 +117,10 @@ export class FormComponent implements OnDestroy {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
+                    this.toastrService.success(`Registro atualizado com sucesso.`);
                     this.visible = false;
                     this.visibleChange();
                     // playSuccess();
-
-                    let list = this.service.list.value;
-                    let index = list.findIndex(x => x.id == this.object.id);
-
-                    let object = list[index];
-
-                    // Inserir aqui os itens que aparecem nas colunas da tabela
-                    object.nome = res.object.nome;
-                    object.restricaoMobilidade = res.object.restricaoMobilidade;
-                    object.turma = res.object.turma;
-                    object.turma_Id = res.object.turma_Id;
-                    object.perfilCognitivo_Id = res.object.perfilCognitivo_Id;
-                    object.perfilCognitivo = res.object.perfilCognitivo;
-
-                    list.splice(index, 1, object);
-                    this.service.list.next(list);
 
                 }
                 else {

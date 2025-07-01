@@ -41,6 +41,12 @@ export class FormComponent implements OnDestroy {
     maxDate: Date = new Date();
 
 
+    inicioExpedienteMin = new Date;
+    inicioExpedienteMax = new Date;
+
+    fimExpedienteMin = new Date;
+    fimExpedienteMax = new Date;
+
     turmas: Turma[] = [];
     loadingTurmas = false;
 
@@ -133,6 +139,19 @@ export class FormComponent implements OnDestroy {
     }
 
     expedienteChanged(e: any) {
+
+        this.inicioExpedienteMin = this.object.expedienteFim ? 
+                    moment(this.object.expedienteFim).subtract(8, 'hours').toDate()
+                    : moment(new Date).set('hours', 8).toDate();
+        this.inicioExpedienteMax = this.object.expedienteFim ?? moment(new Date).set('hours', 19).toDate();
+        
+        this.fimExpedienteMin = this.object.expedienteInicio ?? moment(new Date).set('hours', 8).toDate();
+        this.fimExpedienteMax = this.object.expedienteInicio ? 
+                                moment(this.object.expedienteInicio).add(8, 'hours').toDate()
+                                : moment(new Date).set('hours', 19).toDate();
+        
+        this.fimExpedienteMin = moment(new Date).set('hours', 8).toDate();
+
         if (this.isEditPage) {
             var mensagem = '';
             if (this.object.expedienteInicio) {
@@ -204,7 +223,6 @@ export class FormComponent implements OnDestroy {
                 this.loading = false;
                 if (res.success) {
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
-                    insertOrReplace(this.service, res.object);
                     this.visible = false;
                     this.visibleChange();
                     // playSuccess();
