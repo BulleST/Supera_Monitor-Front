@@ -16,6 +16,7 @@
     import { RequestResponse } from '../../../helpers/request-response.interface';
     import { EventoAulaRequest } from '../../../models/evento-aula.model';
     import { MyMap } from '../../../utils/map';
+import { SelectChangeEvent } from 'primeng/select';
 
     @Component({
         selector: 'app-aluno-reposicao-dialog',
@@ -71,7 +72,7 @@
                     this.loadEventosReposicao();
                 }
                 else {
-                    var alunos = alunoService.list.subscribe(res => this.alunos = res);
+                    var alunos = alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active));
                     this.subscription.push(alunos)
             
                     if (!this.alunos.length) {
@@ -119,26 +120,30 @@
             return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         }
 
-        loadAluno() {
-            if (this.aluno_Id) {
-                
+        loadAluno(aluno?: Aluno) {
+            if (aluno) {
+                this.alunoSelected = aluno;
+                this.loadingAlunos = false;
+                return;
+            }
+            else if (this.aluno_Id) {
                 this.loadingAlunos = true;
                 lastValueFrom(this.alunoService.get(this.aluno_Id))
                 .then(res => {
                     this.alunoSelected = res;
                     this.loadingAlunos = false;
-
-                    })
-                    .catch(res => {
-                        this.loadingAlunos = false;
-                        this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-                    })
+                })
+                .catch(res => {
+                    this.loadingAlunos = false;
+                    this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
+                })
             }
+
         }
 
         loadEventosReposicao() {
+            console.log('loadEventosReposicao', this.aluno_Id   );
             if (this.aluno_Id) {
-                
                 let request: CalendarioRequest = {
                     aluno_Id: this.aluno_Id,
                     intervaloDe: moment().subtract(1, 'month').toDate(),
@@ -215,7 +220,8 @@
         }
 
 
-        alunoChanged() {
+        alunoChanged(e: SelectChangeEvent, model: NgModel) {
+            this.aluno_Id = e.value.id;
             this.loadAluno();
             this.loadEventosReposicao();
         }
@@ -285,6 +291,11 @@
                 numeroSala: evento.numeroSala,
                 andar: evento.andar
             })
+        }
+
+        getRestricoes(aluno: Aluno) {
+            var restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
+            return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
         }
 
         showError(header: string, message: string, e: any) {

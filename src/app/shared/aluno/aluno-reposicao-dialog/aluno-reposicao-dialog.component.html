@@ -31,19 +31,19 @@
                                             name="aluno_Id"
                                             inputId="aluno_Id"
                                             #aluno_Id="ngModel"
-                                            [(ngModel)]="aluno_Id"
+                                            [(ngModel)]="alunoSelected"
                                             [required]="true"
                                             [filter]="true"
                                             filterBy="nome,turma,professor"
                                             [virtualScroll]="true"
                                             [virtualScrollItemSize]="43"
-                                            optionValue="id"
-                                            optionDisabled="deactivated"
+                                            optionLabel="nome"
+                                            (onChange)="alunoChanged($event, aluno_Id)"
                                             [readonly]="blockAlunoField"
                                             [disabled]="blockAlunoField"
                                             placeholder="Selecione um aluno"
-                                            fluid
-                                            appendTo="body">
+                                            appendTo="body"
+                                            fluid>
                                         <ng-template let-item #item>
                                             <div class="flex flex-column">
                                                 <div class="flex align-items-center">
@@ -109,6 +109,45 @@
                                     <div class="flex align-items-center gap-2"> 
                                         <i class="fa-solid fa-brain"></i>
                                         <p>Perfil Cognitivo: {{alunoSelected.perfilCognitivo}}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="fa-solid fa-wheelchair"></i>
+                                        <p>Restrição de mobilidade: 
+                                            <span *ngIf="alunoSelected.restricaoMobilidade" class="text-red-500 zoomin animation-iteration-infinite animation-duration-500 font-bold">Sim</span> 
+                                            <span *ngIf="!alunoSelected.restricaoMobilidade">Não</span> 
+                                        </p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="pi pi-ban"></i>
+                                        <p>Outras restrições: {{ getRestricoes(alunoSelected) }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!alunoSelected && loadingAlunos">
+                            <div class="field sm:col-8 col-12 flex align-items-center gap-2">
+                                <p-divider layout="vertical" />
+                                <div class="flex flex-column gap-2" >
+                                    <div class="flex align-items-center gap-2">
+                                        <i class="fa-solid fa-users-between-lines"></i>
+                                        <p class="flex gap-2 align-items-center">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2">
+                                        <i class="fa-solid fa-person-chalkboard"></i>
+                                        <p class="flex gap-2 align-items-center">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                        <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="fa-solid fa-brain"></i>
+                                        <p class="flex gap-2 align-items-center">Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="fa-solid fa-wheelchair"></i>
+                                        <p class="flex gap-2 align-items-center">Restrição de mobilidade: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="pi pi-ban"></i>
+                                        <p class="flex gap-2 align-items-center">Outras restrições: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                     </div>
                                 </div>
                             </div>
@@ -262,6 +301,82 @@
                                 </div>
                             </div>
                         </ng-container>
+                        <ng-container *ngIf="!eventoReposicaoSelected && loadingEventosRepor">
+                            <div class="field sm:col-8 col-12 flex align-items-center">
+                                <p-divider layout="vertical" styleClass="mr-0" />
+                                <div class="flex flex-column white-space-nowrap ">
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-calendar text-base"></i>
+                                                </div>
+                                                <p>Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-clock text-base"></i>
+                                                </div>
+                                                <p>Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-users-between-lines text-base"></i>
+                                                </div>
+                                                <p>Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-building text-base"></i>
+                                                </div>
+                                                <p>Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-star text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-brain text-base"></i>
+                                                </div>
+                                                <p>Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
                     </div>
                 </p-fieldset>
             </div>
@@ -388,6 +503,82 @@
                                                     <i class="fa-solid fa-brain text-base"></i>
                                                 </div>
                                                 <p>Perfil Cognitivo: {{getPerfilCognitivo(eventoDisponivelSelected)}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!eventoDisponivelSelected && loadingEventosRepor">
+                            <div class="field sm:col-8 col-12 flex align-items-center">
+                                <p-divider layout="vertical" styleClass="mr-0" />
+                                <div class="flex flex-column white-space-nowrap ">
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-calendar text-base"></i>
+                                                </div>
+                                                <p>Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-clock text-base"></i>
+                                                </div>
+                                                <p>Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-users-between-lines text-base"></i>
+                                                </div>
+                                                <p>Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-building text-base"></i>
+                                                </div>
+                                                <p>Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-star text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-brain text-base"></i>
+                                                </div>
+                                                <p>Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                     </div>
