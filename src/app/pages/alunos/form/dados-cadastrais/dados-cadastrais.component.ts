@@ -23,7 +23,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { playAlert, playSuccess } from '../../../../utils/audio';
 import { Popover } from 'primeng/popover';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
-import { AlunoChecklistComponent } from '../../../calendario/aluno-checklist/aluno-checklist.component';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -73,7 +72,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     checklistObservacao: string = '';
     textoChecklist = '';
 
-    @ViewChild('alunoChecklist') alunoChecklist!: AlunoChecklistComponent;
     @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
 
     constructor(

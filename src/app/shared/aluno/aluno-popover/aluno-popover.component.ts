@@ -4,7 +4,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { Popover } from 'primeng/popover';
 import { Crypto, MensagemWhatsapp } from '../../../utils';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
 import { MenuItem } from 'primeng/api';
 import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
@@ -51,6 +51,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         private mensagemWhatsapp: MensagemWhatsapp,
         private router: Router,
         private crypto: Crypto,
+        private activatedRoute: ActivatedRoute,
     ) {
     }
 
@@ -153,6 +154,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: () => {
+                    console.log('goToAgendarReposicao')
                     this.goToAgendarReposicao();
                 },
             })
@@ -208,8 +210,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     goToAgendarReposicao() {
+        console.log('goToAgendarReposicao')
         this.eventoService.setEvento(this.evento);
-        this.router.navigate(['calendario', 'agendar-reposicao', this.crypto.encrypt(this.aluno_Id)]);
+        this.router.navigate(['reposicao', 'agendar', this.crypto.encrypt(this.aluno_Id)], { relativeTo: this.activatedRoute });
     }
 
     enviarMensagem() {

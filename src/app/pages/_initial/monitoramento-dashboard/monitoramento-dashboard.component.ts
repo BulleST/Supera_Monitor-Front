@@ -176,10 +176,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.update();
     }
 
-    goToReposicao(aluno_Id: number, evento_Id: number) {
-        this.router.navigate(['./', 'agendar-reposicao', this.crypto.encrypt(aluno_Id), this.crypto.encrypt(evento_Id)])
-    }
-
     showAluno(aluno_Id: number, event: any) {
         this.alunoPopover.aluno_Id = aluno_Id;
         this.alunoPopover.show(event)

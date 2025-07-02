@@ -236,7 +236,10 @@
                 </tr>
             </ng-template>
             <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
-                <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
+                <app-aluno-popover #popoverAluno 
+                        [aluno_Id]="item.aluno_Id" 
+                        [evento]="evento"
+                        [showChecklist]="true"></app-aluno-popover>
                 <tr>
                     <!-- Nome -->
                     <td class="sticky left-0 cursor-pointer">
@@ -250,17 +253,20 @@
                                    class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
                                 </a>
                             </div>
+                             <!-- -->
                             <div class="inline-flex p-button-link" (click)="popoverAluno.show($event)">
-                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.aluno">{{ item.aluno }}</span>
+                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.aluno">
+                                    {{ item.aluno }}
+                                </span>
                                 <p-badge *ngIf="item.reposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
                                 <p-badge *ngIf="item.flagNovo" styleClass="ml-2 " value="Aula 1" size="small"></p-badge>
                             </div>
                         </div>
                     </td>
                     <!-- checklist -->
-                    <td (click)="loadingChecklist ? undefined : alunoChecklistComponent.show()" class="cursor-pointer">
+                    <!-- <td (click)="loadingChecklist ? undefined : alunoChecklistComponent.show()" class="cursor-pointer">
                         <app-aluno-checklist-calendario #alunoChecklistComponent [aluno]="item"></app-aluno-checklist-calendario>
-                    </td>
+                    </td> -->
                     <!-- Presente -->
                     <td [pEditableColumn]="item.presente"
                         [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"

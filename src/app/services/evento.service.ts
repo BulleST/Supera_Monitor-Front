@@ -50,6 +50,15 @@ export class EventoService extends Service {
             lastValueFrom(roteiroService.getList('evento service'))
     }
 
+    getEvento() {
+        if (!this.evento.value) {
+            var eventoString = localStorage.getItem('evento');
+            var evento = eventoString ? JSON.parse(eventoString) : undefined;
+            this.evento.next(evento);
+        }
+        return this.evento;
+    }
+
     setEvento(value: Evento | undefined) {
         this.evento.next(value)
         if (value) localStorage.setItem('evento', JSON.stringify(value))
@@ -133,12 +142,14 @@ export class EventoService extends Service {
                         var index = list.findIndex(x => x.id == evento.id 
                                 && x.turma_Id == evento.turma_Id 
                                 && moment(x.data).isSame(evento.data));
+
                         if (index == -1) list.push(evento);
                         else list.splice(index, 1, evento);
                         return evento;
                     });
     
                     this.eventos.next(list);
+
                     return of(list);
                 },
                 error: err => {

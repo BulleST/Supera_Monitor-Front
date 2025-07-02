@@ -44,7 +44,6 @@
         </div>
         <div class="sm:col col flex-grow-0 px-1 py-0">
             <!-- Agendar -->
-            {{agendarValue|json}}
             <p-select [(ngModel)]="agendarValue"
                       [options]="agendarMenuItem"
                       [styleClass]="'p-select-menu ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "

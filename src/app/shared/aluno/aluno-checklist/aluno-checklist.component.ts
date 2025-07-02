@@ -52,17 +52,15 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
-            console.log('aluno-checklist.component aluno_Id', this.aluno_Id)
         }
         if (changes['showChecklist']) {
             this.showChecklist = changes['showChecklist'].currentValue;
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            if (this.aluno.id) {
-                console.log('aluno-checklist.component aluno', this.aluno)
-                this.loadChecklist();
-            }
+        }
+        if ((this.aluno && this.aluno.id) || this.aluno_Id) {
+            this.loadChecklist();
         }
     }
 
@@ -78,7 +76,6 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
             let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
 
             if (!this.aluno.alunoChecklist?.length && this.aluno_Id) {
-                console.log('if', JSON.parse(JSON.stringify(this.aluno_Id)), JSON.parse(JSON.stringify(this.aluno.alunoChecklist)))
                 alunoChecklist = await lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
             }
 

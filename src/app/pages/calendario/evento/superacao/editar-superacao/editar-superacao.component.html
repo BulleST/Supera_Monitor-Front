@@ -47,7 +47,7 @@
         <p-iconfield>
             <input type="text"
                    pInputText
-                   (click)="alunoChecklistComponent.show()"
+                   (click)="alunoPopover.show($event)"
                    [value]="alunoSelected.aluno"
                    styleClass="w-full"
                    class="w-full"
@@ -55,7 +55,12 @@
                    readonly />
             <p-inputicon styleClass="fa-solid fa-user-graduate" />
         </p-iconfield>
-        <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="alunoSelected"></app-aluno-checklist-calendario>
+        <app-aluno-popover #alunoPopover
+                    [aluno_Id]="alunoSelected.aluno_Id"
+                    [showChecklist]="true"
+                    [participacao]="alunoSelected"
+                    [evento]="evento"
+                    ></app-aluno-popover>
     </div>
     <!-- Educador -->
     <div class="field lg:col-5 sm:col-5  col-5">

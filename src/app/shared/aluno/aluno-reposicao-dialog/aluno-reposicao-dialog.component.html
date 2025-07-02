@@ -1,13 +1,13 @@
 <app-confirm-dialog></app-confirm-dialog>
 <p-dialog [header]="'Agendar reposição'"
-          [maximizable]="true"
-          [draggable]="true"
-          [modal]="true"
-          [(visible)]="visible"
-          (visibleChange)="visibleChange()"
-          [style]="{ width: '850px', maxWidth: '95vw', maxHeight: '95vh' }"
-          appendTo="body"
-          id="reposicao">
+        [maximizable]="true"
+        [draggable]="true"
+        [modal]="true"
+        [(visible)]="visible"
+        (visibleChange)="visibleChange()"
+        [style]="{ width: '850px', maxWidth: '95vw', maxHeight: '95vh' }"
+        appendTo="body"
+        id="reposicao">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title"><i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Agendar reposição</span>
@@ -15,103 +15,396 @@
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
-            <div class="field col-12"> <!-- Aluno -->
-                <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
-                <p-select [options]="alunos"
-                          [loading]="loadingAlunos"
-                          name="aluno_Id"
-                          inputId="aluno_Id"
-                          #aluno_Id="ngModel"
-                          [(ngModel)]="alunoSelected"
-                          styleClass="w-full"
-                          class="w-full"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="nome,turma,professor"
-                          [virtualScroll]="true"
-                          [virtualScrollItemSize]="43"
-                          optionDisabled="deactivated"
-                          [readonly]="blockAlunoField"
-                          [disabled]="blockAlunoField"
-                          placeholder="Selecione um aluno"
-                          appendTo="body">
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center">
-                            <div class="w-2rem h-2rem mr-2">
-                                <a *ngIf="item.celular"
-                                   [href]="enviarMensagem(item)"
-                                   pTooltip="Enviar mensagem"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                </a>
-                                <a *ngIf="!item.celular"
-                                   pTooltip="Nenhum celular cadastrado"
-                                   tooltipPosition="top"
-                                   class="p-2 flex align-items-center justify-content-center text-300 border-circle pi pi-whatsapp">
-                                </a>
-                            </div>
-                            <p class="capitalize">{{item.nome | nameAbv }}</p>
+            <!-- Aluno -->
+            <div class="field col-12">
+                <p-fieldset legend="Aluno">
+                    <div class="formgrid grid">
+                        <!-- Nome -->
+                        <div class="field lg:col-4 sm:col-4 col-6">
+                            <ng-container *ngIf="!blockAlunoField; else alunoSelecionadoTemplate">
+                                <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
+                                <p-iconfield>
+                                    <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user" />
+                                    <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
+                                    <p-select [options]="alunos"
+                                            [loading]="loadingAlunos"
+                                            name="aluno_Id"
+                                            inputId="aluno_Id"
+                                            #aluno_Id="ngModel"
+                                            [(ngModel)]="aluno_Id"
+                                            [required]="true"
+                                            [filter]="true"
+                                            filterBy="nome,turma,professor"
+                                            [virtualScroll]="true"
+                                            [virtualScrollItemSize]="43"
+                                            optionValue="id"
+                                            optionDisabled="deactivated"
+                                            [readonly]="blockAlunoField"
+                                            [disabled]="blockAlunoField"
+                                            placeholder="Selecione um aluno"
+                                            fluid
+                                            appendTo="body">
+                                        <ng-template let-item #item>
+                                            <div class="flex flex-column">
+                                                <div class="flex align-items-center">
+                                                    <div class="w-2rem h-2rem mr-2">
+                                                        <a *ngIf="item.celular"
+                                                        [href]="enviarMensagem(item)"
+                                                        pTooltip="Enviar mensagem"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
+                                                        </a>
+                                                        <a *ngIf="!item.celular"
+                                                        pTooltip="Nenhum celular cadastrado"
+                                                        tooltipPosition="top"
+                                                        class="p-2 flex align-items-center justify-content-center text-300 border-circle pi pi-whatsapp">
+                                                        </a>
+                                                    </div>
+                                                    <p class="capitalize">{{item.nome | nameAbv }}</p>
+                                                </div>
+                                                <div class="flex align-items-center">
+                                                    <div class="w-2rem h-2rem flex align-items-center">
+                                                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                        <span>{{item.turma}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </p-select>
+                                </p-iconfield>
+                                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                                </div>
+                            </ng-container>
+                            <ng-template #alunoSelecionadoTemplate>
+                                <label for="nome">Nome:</label>
+                                <p-iconfield>
+                                    <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user text-700" />
+                                    <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
+                                    <input type="text"
+                                        pInputText
+                                        [value]="alunoSelected?.nome"
+                                        id="nome"
+                                        name="nome"
+                                        fluid
+                                        readonly>
+                                </p-iconfield>
+                            </ng-template>
                         </div>
-                        <div class="flex align-items-center">
-                            <div class="w-2rem h-2rem flex align-items-center">
-                                <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                                <span>{{item.turma}}</span>
+                        <ng-container *ngIf="alunoSelected">
+                            <div class="field sm:col-8 col-12 flex align-items-center gap-2">
+                                <p-divider layout="vertical" />
+                                <div class="flex flex-column gap-2" >
+                                    <div class="flex align-items-center gap-2">
+                                        <i class="fa-solid fa-users-between-lines"></i>
+                                        <p>Turma: {{alunoSelected.turma}}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2">
+                                        <i class="fa-solid fa-person-chalkboard"></i>
+                                        <p>Educador(a): {{alunoSelected.professor}}</p>
+                                        <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: alunoSelected.corLegenda, borderColor: alunoSelected.corLegenda }"></span>
+                                    </div>
+                                    <div class="flex align-items-center gap-2"> 
+                                        <i class="fa-solid fa-brain"></i>
+                                        <p>Perfil Cognitivo: {{alunoSelected.perfilCognitivo}}</p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </ng-template>
-                </p-select>
-                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
-                </div>
+                        </ng-container>
+                    </div>
+                </p-fieldset>
             </div>
-            <div class="field col-12"> <!-- EventoReposicao -->
-                <label for="eventoReposicao_Id">Qual aula o aluno deseja repor? <span class="text-red-500">*</span></label>
-                <p-select [options]="eventosReposicao"
-                          [loading]="loadingEventosRepor"
-                          name="eventoReposicao_Id"
-                          inputId="eventoReposicao_Id"
-                          #eventoReposicao_Id="ngModel"
-                          [(ngModel)]="eventoReposicaoSelected"
-                          styleClass="w-full"
-                          class="w-full"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="descricao,turma,professor,data,sala"
-                          optionDisabled="deactivated"
-                          [readonly]="blockAlunoField"
-                          [disabled]="blockAlunoField"
-                          placeholder="Selecione uma aula para repor"
-                          appendTo="body">
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center">
-                            <span>{{item.turma ?? item.descricao}}</span>
-                            <span class="ml-2">Data: {{item.data | date : 'dd/MM HH:mm'}}</span>
+            <!-- Reposição de Evento -->
+            <div class="field col-12">
+                <p-fieldset legend="Reposição da aula">
+                    <div class="formgrid grid">
+                        <!-- Descrição -->
+                        <div class="field lg:col-4 sm:col-4 col-6">
+                            <ng-container *ngIf="!blockEventoField; else eventoSelecionadoTemplate">
+                                <label for="eventoReposicao_Id">Qual aula o aluno deseja repor? <span class="text-red-500">*</span></label>
+                                <p-iconfield>
+                                    <p-inputicon *ngIf="!loadingEventosRepor" styleClass="fa-solid fa-users-between-lines" />
+                                    <p-inputicon *ngIf="loadingEventosRepor" styleClass="pi pi-spinner pi-spin" />
+                                    <p-select [options]="eventosReposicao"
+                                            [loading]="loadingEventosRepor"
+                                            name="eventoReposicao_Id"
+                                            inputId="eventoReposicao_Id"
+                                            #eventoReposicao_Id="ngModel"
+                                            [(ngModel)]="eventoReposicaoSelected"
+                                            [required]="true"
+                                            [filter]="true"
+                                            filterBy="descricao,turma,professor,data,sala"
+                                            optionLabel="descricao"
+                                            optionDisabled="deactivated"
+                                            [readonly]="blockEventoField"
+                                            [disabled]="blockEventoField"
+                                            placeholder="Selecione uma aula para repor"
+                                            (onChange)="eventoReposicaoChanged()"
+                                            appendTo="body"
+                                            fluid>
+                                        <ng-template let-item #item>
+                                            <div class="flex flex-column gap-2" >
+                                                <div class="flex align-items-center gap-2">
+                                                    <i class="fa-solid fa-users-between-lines"></i>
+                                                    <span>{{item.turma ?? item.descricao}}</span>
+                                                    <i class="pi pi-calendar ml-2"></i>
+                                                    <span>Data: {{item.data | date : 'dd/MM \'às\' HH:mm'}}</span>
+                                                </div>
+                                                <p class="flex align-items-center gap-2">
+                                                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                    <span>{{item.professor}}</span>
+                                                    <span class="ml-2">Sala: </span>
+                                                    <app-sala-aula [andar]="item.andar"
+                                                                [numeroSala]="item.numeroSala"
+                                                                [sala_Id]="item.sala_Id"></app-sala-aula>
+                                                </p>
+                                            </div>
+                                        </ng-template>
+                                    
+                                    </p-select>
+                                </p-iconfield>
+                                <div *ngIf="eventoReposicao_Id.touched && eventoReposicao_Id.invalid && eventoReposicao_Id.errors">
+                                    <p class="text-red-500 mt-2 mb-0" *ngIf="eventoReposicao_Id.errors['required']">Esse campo é obrigatório.</p>
+                                    <p class="text-red-500 mt-2 mb-0" *ngIf="eventoReposicao_Id.errors['indisponivel']">Aluno indisponível.</p>
+                                </div>
+                            </ng-container>
+                            <ng-template #eventoSelecionadoTemplate>
+                                <label for="descricao">Turma:</label>
+                                <p-iconfield>
+                                    <p-inputicon *ngIf="!loadingEventosRepor" styleClass="fa-solid fa-users-between-lines" />
+                                    <p-inputicon *ngIf="loadingEventosRepor" styleClass="pi pi-spinner pi-spin" />
+            
+                                    <input type="text"
+                                        pInputText
+                                        [value]="eventoReposicaoSelected?.descricao"
+                                        id="descricao"
+                                        name="descricao"
+                                        fluid
+                                        readonly>
+                                </p-iconfield>
+                            </ng-template>
                         </div>
-                        <p class="flex align-items-center">
-                            <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                            <span>{{item.professor}}</span>
-                            <span>Sala: </span>
-                            <app-sala-aula [andar]="item.andar"
-                                           [numeroSala]="item.numeroSala"
-                                           [sala_Id]="item.sala_Id"></app-sala-aula>
-                        </p>
-                    </ng-template>
-                </p-select>
-                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
-                </div>
+                        <ng-container *ngIf="eventoReposicaoSelected">
+                            <div class="field sm:col-8 col-12 flex align-items-center">
+                                <p-divider layout="vertical" styleClass="mr-0" />
+                                <div class="flex flex-column white-space-nowrap ">
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-calendar text-base"></i>
+                                                </div>
+                                                <p>Data: {{eventoReposicaoSelected.data | date : 'dd \'de\' MMMM'}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-clock text-base"></i>
+                                                </div>
+                                                <p>Horário: {{eventoReposicaoSelected.data | date : 'HH:mm'}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-users-between-lines text-base"></i>
+                                                </div>
+                                                <p>Turma: {{eventoReposicaoSelected.turma}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Educador(a): {{eventoReposicaoSelected.professor}}</p>
+                                                    <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoSelected.corLegenda, borderColor: eventoReposicaoSelected.corLegenda }"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-building text-base"></i>
+                                                </div>
+                                                <p>Sala: {{getSalaAula(eventoReposicaoSelected)}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-star text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Roteiro: {{eventoReposicaoSelected.tema + ' - Semana ' + eventoReposicaoSelected.semana}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-brain text-base"></i>
+                                                </div>
+                                                <p>Perfil Cognitivo: {{getPerfilCognitivo(eventoReposicaoSelected)}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </p-fieldset>
+            </div>
+            <!-- Eventos disponível -->
+            <div class="field col-12">
+                <p-fieldset legend="Agendar reposição para">
+                    <div class="formgrid grid">
+                        <!-- Descrição -->
+                        <div class="field lg:col-4 sm:col-4 col-6">
+                            <label for="eventoDisponivel_Id">Para qual aula o aluno deseja agendar a reposição? <span class="text-red-500">*</span></label>
+                            <p-iconfield>
+                                <p-inputicon *ngIf="!loadingEventosDisponiveis" styleClass="fa-solid fa-users-between-lines" />
+                                <p-inputicon *ngIf="loadingEventosDisponiveis" styleClass="pi pi-spinner pi-spin" />
+                                <p-select [options]="eventosDisponiveis"
+                                        [loading]="loadingEventosDisponiveis"
+                                        name="eventoDisponivel_Id"
+                                        inputId="eventoDisponivel_Id"
+                                        #eventoDisponivel_Id="ngModel"
+                                        [(ngModel)]="eventoDisponivelSelected"
+                                        [required]="true"
+                                        [filter]="true"
+                                        filterBy="descricao,turma,professor,data,sala"
+                                        optionLabel="descricao"
+                                        optionDisabled="deactivated"
+                                        [readonly]="!eventoReposicaoSelected || loadingEventosDisponiveis"
+                                        [disabled]="!eventoReposicaoSelected || loadingEventosDisponiveis"
+                                        placeholder="Selecione uma aula para repor"
+                                        (onChange)="eventoDisponivelChanged($event, eventoDisponivel_Id)"
+                                        appendTo="body"
+                                        fluid>
+                                    <ng-template let-item #item>
+                                        <div class="flex flex-column gap-2" >
+                                            <div class="flex align-items-center gap-2">
+                                                <i class="fa-solid fa-users-between-lines"></i>
+                                                <span>{{item.turma ?? item.descricao}}</span>
+                                                <i class="pi pi-calendar ml-2"></i>
+                                                <span>Data: {{item.data | date : 'dd/MM \'às\' HH:mm'}}</span>
+                                            </div>
+                                            <p class="flex align-items-center gap-2">
+                                                <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                <span>{{item.professor}}</span>
+                                                <span class="ml-2">Sala: </span>
+                                                <app-sala-aula [andar]="item.andar"
+                                                            [numeroSala]="item.numeroSala"
+                                                            [sala_Id]="item.sala_Id"></app-sala-aula>
+                                            </p>
+                                        </div>
+                                    </ng-template>
+                                
+                                </p-select>
+                            </p-iconfield>
+                            <div *ngIf="eventoDisponivel_Id.touched && eventoDisponivel_Id.invalid && eventoDisponivel_Id.errors">
+                                <p class="text-red-500 mt-2 mb-0" *ngIf="eventoDisponivel_Id.errors['required']">Esse campo é obrigatório.</p>
+                                <p class="text-red-500 mt-2 mb-0" *ngIf="eventoDisponivel_Id.errors['indisponivel']">Aluno indisponível.</p>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="eventoDisponivelSelected">
+                            <div class="field sm:col-8 col-12 flex align-items-center">
+                                <p-divider layout="vertical" styleClass="mr-0" />
+                                <div class="flex flex-column white-space-nowrap ">
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-calendar text-base"></i>
+                                                </div>
+                                                <p>Data: {{eventoDisponivelSelected.data | date : 'dd \'de\' MMMM'}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="pi pi-clock text-base"></i>
+                                                </div>
+                                                <p>Horário: {{eventoDisponivelSelected.data | date : 'HH:mm'}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-users-between-lines text-base"></i>
+                                                </div>
+                                                <p>Turma: {{eventoDisponivelSelected.turma}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Educador(a): {{eventoDisponivelSelected.professor}}</p>
+                                                    <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoDisponivelSelected.corLegenda, borderColor: eventoDisponivelSelected.corLegenda }"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-building text-base"></i>
+                                                </div>
+                                                <p>Sala: {{getSalaAula(eventoDisponivelSelected)}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-star text-base"></i>
+                                                </div>
+                                                <div class="flex align-items-center gap-2">
+                                                    <p>Roteiro: {{eventoDisponivelSelected.tema + ' - Semana ' + eventoDisponivelSelected.semana}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="col-12 py-1">
+                                            <div class="flex align-items-center gap-2">
+                                                <div class="w-2rem text-center flex-none">
+                                                    <i class="fa-solid fa-brain text-base"></i>
+                                                </div>
+                                                <p>Perfil Cognitivo: {{getPerfilCognitivo(eventoDisponivelSelected)}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </p-fieldset>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"
-                          styleClass="w-full px-3"
-                          label="Finalizar agendamento"
-                          icon="pi pi-check"
-                          [loading]="loading"
-                          [rounded]="true"
-                          [disabled]="form.invalid || loading" />
+                        fluid
+                        label="Finalizar agendamento"
+                        icon="pi pi-check"
+                        [loading]="loading"
+                        [rounded]="true"
+                        [disabled]="form.invalid || loading" />
             </div>
         </div>
     </form>

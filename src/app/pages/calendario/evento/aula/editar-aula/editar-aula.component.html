@@ -371,7 +371,10 @@
         <ng-container *ngIf="[ScreenWidth.sm].includes(screen)">
             <div class="flex align-items-stretch flex-wrap surface-50 p-2 gap-2">
                 <ng-container *ngFor="let item of evento.alunos; let i = index">
-                    <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
+                    <app-aluno-popover #popoverAluno 
+                        [aluno_Id]="item.aluno_Id" 
+                        [evento]="evento"
+                        [showChecklist]="true"></app-aluno-popover>
                     <!-- Card -->
                     <div
                          class="col h-full p-0"
@@ -395,12 +398,11 @@
                                        class="-ml-1 p-2 flex text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
                                     </a>
                                 </div>
-                                <div
-                                     class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
-                                    <div class="flex align-items-center">
+                                <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
+                                    <div class="flex align-items-center"
+                                    (click)="popoverAluno.show($event)">
                                         <p
                                            class="p-button-link"
-                                           (click)="popoverAluno.toggle($event)"
                                            [pTooltip]="item.aluno">
                                             <span>{{ item.aluno | nameAbv }}</span>
                                         </p>
@@ -420,15 +422,13 @@
                                         <div
                                              *ngIf="item.reposicaoDe_Evento"
                                              class="w-25rem">
-                                            <p class="text-purple-500"> Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm'
-                        }}
+                                            <p class="text-purple-500"> Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}
                                             </p>
                                             <p *ngIf="item.reposicaoDe_Evento.roteiro_Id"> Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}
                                             </p>
                                             <p>
                                                 <span>Observações: </span>
-                                                <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao
-                        }}</span>
+                                                <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
                                                 <span
                                                       *ngIf="!item.reposicaoDe_Evento.observacao"
                                                       class="text-200">Nenhuma observação</span>
@@ -443,9 +443,9 @@
                                              severity="danger"
                                              [pTooltip]="'Primeira aula'" />
                                     <div
-                                         class="cursor-pointer z-0 text-sm"
-                                         (click)="alunoChecklistComponent.show()">
-                                        <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="item"></app-aluno-checklist-calendario>
+                                         class="cursor-pointer z-0 text-sm">
+                                        <!-- (click)="alunoChecklistComponent.show()" -->
+                                        <!-- <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="item"></app-aluno-checklist-calendario> -->
                                     </div>
                                 </div>
                             </header>
@@ -655,7 +655,10 @@
                              let-item
                              let-editing="editing"
                              let-rowIndex="rowIndex">
-                    <app-aluno-popover-calendario #popoverAluno [aluno]="item" [evento]="evento"></app-aluno-popover-calendario>
+                    <app-aluno-popover #popoverAluno 
+                        [aluno_Id]="item.aluno_Id" 
+                        [evento]="evento"
+                        [showChecklist]="true"></app-aluno-popover>
                     <tr>
                         <!-- Nome -->
                         <td class="w-8rem sticky left-0 z-2">
@@ -676,11 +679,9 @@
                                        class="pi pi-whatsapp p-2 flex text-gray-400 ponter-events-none">
                                     </a>
                                 </div>
-                                <div
-                                     class="inline-flex p-button-link w-full"
-                                     (click)="popoverAluno.show($event)">
-                                    <span
-                                          class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline"
+                                <div class="inline-flex p-button-link w-full">
+                                    <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline"
+                                    (click)="popoverAluno.show($event)"
                                           pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}
                                     </span>
                                     <p-badge
@@ -696,22 +697,18 @@
                                              styleClass="ml-2 bg-purple-500"
                                              value="Reposição"
                                              size="small"
-                                             [pTooltip]="
-                      item.reposicaoDe_Evento ? reposicaoTemplate : undefined
-                    "></p-badge>
+                                             [pTooltip]="item.reposicaoDe_Evento ? reposicaoTemplate : undefined"></p-badge>
                                     <ng-template #reposicaoTemplate>
                                         <div
                                              *ngIf="item.reposicaoDe_Evento"
                                              class="w-25rem">
-                                            <p class="text-purple-500"> Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm'
-                        }}
+                                            <p class="text-purple-500"> Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}
                                             </p>
                                             <p *ngIf="item.reposicaoDe_Evento.roteiro_Id"> Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}
                                             </p>
                                             <p>
                                                 <span>Observações: </span>
-                                                <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao
-                        }}</span>
+                                                <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
                                                 <span
                                                       *ngIf="!item.reposicaoDe_Evento.observacao"
                                                       class="text-200"> Nenhuma observação. </span>
@@ -720,22 +717,18 @@
                                     </ng-template>
                                 </div>
                             </div>
-                            <div
-                                 class="cursor-pointer z-0"
-                                 (click)="alunoChecklistComponent.show()">
-                                <app-aluno-checklist-calendario
+                            <div class="cursor-pointer z-0">
+                                <!-- (click)="alunoChecklistComponent.show()" -->
+                                <!-- <app-aluno-checklist-calendario
                                                                 #alunoChecklistComponent
-                                                                [aluno]="item"></app-aluno-checklist-calendario>
+                                                                [aluno]="item"></app-aluno-checklist-calendario> -->
                             </div>
                         </td>
                         <!-- Apostila -->
-                        <td
-                            #apostilaCell
+                        <td #apostilaCell
                             class="z-0"
                             [pEditableColumn]="item"
-                            [pEditableColumnDisabled]="
-                !isChamadaPage || evento.finalizado || !evento.active
-              "
+                            [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado || !evento.active"
                             pEditableColumnField=""
                             [class.cursor-default]="evento.finalizado">
                             <p-cellEditor>

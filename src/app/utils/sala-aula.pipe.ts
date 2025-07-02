@@ -2,11 +2,11 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { SalaAulaId } from '../models/sala-aula.model';
 
 @Pipe({
-    name: 'sala-aula'
+    name: 'salaAulaPipe'
 })
 
 export class SalaAulaPipe implements PipeTransform {
-    transform(value: any,  ...args: any[]): any {
+    transform(value: any): any {
         var id = 'sala_Id' in value ? value.sala_Id : value.id;
         if (SalaAulaId.online == id) {
             return 'Online'

@@ -3,7 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { CalendarioView } from '../../../../models/calendario.model';
 import { EventoService } from '../../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MobileService } from '../../../../utils';
 import { ScreenWidth } from '../../../../utils/mobile';
 import { Subscription } from 'rxjs';
@@ -68,11 +68,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         {
             label: 'Reposição',
             routerLink: 'calendario/reposicao/agendar',
-            command: () => {
-                var evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-                this.service.setEvento(evento);
-            }
         },
         {
             label: 'Superação',
@@ -107,6 +102,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         private service: EventoService,
         private mobileService: MobileService,
         private router: Router,
+        private activatedRoute: ActivatedRoute,
         private cdr: ChangeDetectorRef,
         
     ) {
@@ -137,12 +133,14 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.service.calendarView.emit(this.view);
     }
 
-    agendarEvento(e: SelectChangeEvent, select: NgModel) {
+    async agendarEvento(e: SelectChangeEvent, select: NgModel) {
+        console.log(this.agendarValue, select);
         if (this.agendarValue) {
-            this.router.navigateByUrl(this.agendarValue.routerLink);
             if (this.agendarValue.command) {
                 this.agendarValue.command(e);
             }
+            var a = await this.router.navigateByUrl(this.agendarValue.routerLink);
+            console.log(a);
             delete this.agendarValue;
             select.control.setValue(undefined)
             select.control.updateValueAndValidity();

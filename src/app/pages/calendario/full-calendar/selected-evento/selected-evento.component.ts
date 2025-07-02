@@ -16,9 +16,9 @@ import { Evento_Participacao_Professor } from '../../../../models/evento-partici
 import $ from 'jquery';
 import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAulaId } from '../../../../models/sala-aula.model';
-import { AlunoPopoverComponent } from '../../aluno-popover/aluno-popover.component';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
+import { AlunoPopoverComponent } from '../../../../shared/aluno/aluno-popover/aluno-popover.component';
 
 @Component({
     selector: 'app-selected-evento',
@@ -127,30 +127,6 @@ export class SelectedEventoComponent implements OnChanges {
 
     onHide() {
         this.aluno.emit(undefined);
-    }
-
-    async showAluno(e: MouseEvent, aluno: Evento_Participacao_Aluno, popoverComponent: AlunoPopoverComponent) {
-        if (aluno.reposicaoDe_Evento_Id) {
-            await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
-                .then(res => {
-                    this.aluno.emit(aluno)
-                })
-        }
-        aluno.loadingFoto = true;
-        lastValueFrom(this.alunoService.getFoto(aluno.aluno_Id))
-            .then(res => {
-                aluno.loadingFoto = false;
-                aluno.aluno_Foto = res;
-                this.aluno.emit(aluno)
-            })
-            .catch(res => {
-                aluno.loadingFoto = false;
-            })
-
-
-        popoverComponent.aluno = aluno;
-        popoverComponent.show(e);
-        popoverComponent.showChecklist = true;
     }
 
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {

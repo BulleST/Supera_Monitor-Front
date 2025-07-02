@@ -25,8 +25,6 @@ import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { NameAbvPipe } from '../utils/name.pipe';
 import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
 import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/evento-item-hover/evento-item-hover.component';
-import { AlunoPopoverComponent as CalendarioAlunoPopover } from '../pages/calendario/aluno-popover/aluno-popover.component';
-import { AlunoChecklistComponent as CalendarioAlunoChecklistComponent } from '../pages/calendario/aluno-checklist/aluno-checklist.component';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
@@ -43,8 +41,6 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         ChangePasswordComponent,
 
         // Alunos
-        CalendarioAlunoChecklistComponent,
-        CalendarioAlunoPopover,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoCalendarioComponent,
@@ -78,8 +74,6 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         ChangePasswordComponent,
 
         // Alunos
-        CalendarioAlunoChecklistComponent,
-        CalendarioAlunoPopover,
         AlunoFormComponent,
         AlunoDadosCadastraisComponent,
         AlunoCalendarioComponent,

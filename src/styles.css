@@ -475,3 +475,21 @@ input.ng-invalid.ng-touched {
     background-color: var(--surface-950);
     border-color: var(--surface-950);
 }
+
+/* Para PrimeNG Dropdown padrão */
+p-selectitem:nth-child(even) .p-select-option {
+    /* background-color: var(--surface-0); */
+    border-bottom: 1px solid var(--surface-200);
+}
+p-selectitem:nth-child(odd) .p-select-option {
+    background-color: var(--surface-50);
+    border-bottom: 1px solid var(--surface-200);
+}
+
+.p-iconfield.p-iconfield-left .p-select .p-select-label {
+    padding-left: 30px;
+}
+.p-fieldset-legend{
+    color: var(--p-primary-500);
+    padding-left: 0;
+}

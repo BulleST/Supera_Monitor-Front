@@ -47,15 +47,15 @@
         <p-iconfield>
             <input type="text"
                    pInputText
-                   (click)="alunoChecklistComponent.show()"
                    [value]="alunoSelected.aluno"
                    styleClass="w-full"
                    class="w-full"
                    id="aluno"
                    readonly />
-            <p-inputicon styleClass="fa-solid fa-user-graduate" />
-        </p-iconfield>
-        <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="alunoSelected"></app-aluno-checklist-calendario>
+                   <p-inputicon styleClass="fa-solid fa-user-graduate" />
+                </p-iconfield>
+                <!-- (click)="alunoChecklistComponent.show()" -->
+                <!-- <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="alunoSelected"></app-aluno-checklist-calendario> -->
     </div>
     <!-- Educador -->
     <div class="field lg:col-5 sm:col-5  col-5">

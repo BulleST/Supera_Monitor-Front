@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { InitialComponent } from './initial.component';
 import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
 import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
-import { AgendarReposicaoAlunoComponent } from '../calendario/agendar-reposicao-aluno/agendar-reposicao-aluno.component';
+import { AgendarReposicaoComponent } from '../calendario/agendar-reposicao/agendar-reposicao.component';
 
 const calendario = () => import('./../calendario/calendario.module').then(res => res.CalendarioModule);
 const alunos = () => import('./../alunos/alunos.module').then(res => res.AlunosModule);
@@ -17,7 +17,7 @@ const routes: Routes = [
         path: '', component: InitialComponent, children: [
             { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent },
             { path: 'dashboard', component: MonitoramentoDashboardComponent, children: [
-                { path: 'agendar-reposicao/:aluno_id/:eventoReposicao_Id', component: AgendarReposicaoAlunoComponent }
+                { path: 'agendar-reposicao/:aluno_id', component: AgendarReposicaoComponent }
             ] },
             { path: 'alunos', loadChildren: alunos },
             { path: 'calendario', loadChildren: calendario },
