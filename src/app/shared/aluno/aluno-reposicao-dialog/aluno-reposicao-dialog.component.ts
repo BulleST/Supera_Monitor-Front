@@ -222,7 +222,6 @@ import { SelectChangeEvent } from 'primeng/select';
 
         alunoChanged(e: SelectChangeEvent, model: NgModel) {
             this.aluno_Id = e.value.id;
-            this.loadAluno();
             this.loadEventosReposicao();
         }
 
@@ -248,7 +247,6 @@ import { SelectChangeEvent } from 'primeng/select';
                 });
             }
 
-            this.loadEventosDisponiveis();
         }
 
         confirmRestricaoMobilidade(e: any, model: NgModel) {

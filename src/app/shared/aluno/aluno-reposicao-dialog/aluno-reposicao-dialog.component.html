@@ -311,7 +311,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-calendar text-base"></i>
                                                 </div>
-                                                <p>Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
@@ -319,7 +319,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-clock text-base"></i>
                                                 </div>
-                                                <p>Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                     </div>
@@ -329,7 +329,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p>Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
@@ -338,7 +338,7 @@
                                                     <i class="fa-solid fa-person-chalkboard text-base"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
-                                                    <p>Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p class="flex align-items-center gap-2">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                                     <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
                                                 </div>
                                             </div>
@@ -350,7 +350,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
                                                 </div>
-                                                <p>Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
@@ -359,7 +359,7 @@
                                                     <i class="fa-solid fa-star text-base"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
-                                                    <p>Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p class="flex align-items-center gap-2">Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -370,7 +370,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
                                                 </div>
-                                                <p>Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                     </div>
@@ -509,7 +509,7 @@
                                 </div>
                             </div>
                         </ng-container>
-                        <ng-container *ngIf="!eventoDisponivelSelected && loadingEventosRepor">
+                        <ng-container *ngIf="!eventoDisponivelSelected && (loadingEventosRepor || loadingEventosDisponiveis)">
                             <div class="field sm:col-8 col-12 flex align-items-center">
                                 <p-divider layout="vertical" styleClass="mr-0" />
                                 <div class="flex flex-column white-space-nowrap ">
@@ -519,7 +519,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-calendar text-base"></i>
                                                 </div>
-                                                <p>Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Data: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
@@ -527,7 +527,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-clock text-base"></i>
                                                 </div>
-                                                <p>Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Horário: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                     </div>
@@ -537,7 +537,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p>Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
@@ -546,7 +546,7 @@
                                                     <i class="fa-solid fa-person-chalkboard text-base"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
-                                                    <p>Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p class="flex align-items-center gap-2">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                                     <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
                                                 </div>
                                             </div>
@@ -558,7 +558,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
                                                 </div>
-                                                <p>Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
@@ -567,7 +567,7 @@
                                                     <i class="fa-solid fa-star text-base"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
-                                                    <p>Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                    <p class="flex align-items-center gap-2">Roteiro: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                                 </div>
                                             </div>
                                         </div>
@@ -578,7 +578,7 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
                                                 </div>
-                                                <p>Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
                                     </div>
