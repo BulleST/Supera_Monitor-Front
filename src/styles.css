@@ -398,9 +398,10 @@ td.p-datatable-frozen-column {
 thead tr .fc-scroller,
 tbody tr:first-child .fc-scroller {
     overflow: hidden !important;
-    padding-right: 15px;
-    border-top: 1px #dddddd solid;
-    margin-bottom: -1px;
+    border-top: 1px #fafafa solid;
+    border-bottom: 1px #fafafa solid;
+    /* padding-right: 15px; */
+    /* margin-bottom: -1px; */
 }
 
 .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected,

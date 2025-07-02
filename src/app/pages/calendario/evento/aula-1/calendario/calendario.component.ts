@@ -174,7 +174,14 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
   }
 
   selectEvent(evento: Evento): void {
-    console.log('Evento selecionado:', evento)
+    if (evento.alunos.length >= evento.capacidadeMaximaAlunos) {
+      this.toastrService.error(
+        'Este evento está lotado. Não é possível agendar primeira aula.',
+        'Evento lotado',
+      )
+      return
+    }
+
     this.selectedEvento = evento
 
     this.confirmationService.confirm({

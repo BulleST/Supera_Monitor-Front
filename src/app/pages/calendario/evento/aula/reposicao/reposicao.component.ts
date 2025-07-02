@@ -163,7 +163,7 @@ export class ReposicaoComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['calendario']);
         }
     }
 
