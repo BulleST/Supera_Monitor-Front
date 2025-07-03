@@ -69,7 +69,7 @@ export class InserirAlunoComponent {
 
     ) {
 
-        var params = this.activatedRoute.snapshot.params;
+        let params = this.activatedRoute.snapshot.params;
         if (!params['evento_id'] || !params['evento_nome']
             || !['aula-zero', 'superacao', 'aula'].includes(params['evento_nome'])) {
             this.visible = false;
@@ -77,7 +77,7 @@ export class InserirAlunoComponent {
             return
         }
 
-        var turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
+        let turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -87,26 +87,29 @@ export class InserirAlunoComponent {
                 .catch((res) => (this.loadingTurmas = false));
         }
 
-        var alunos = this.alunoService.list.subscribe(res => {
+        let alunos = this.alunoService.list.subscribe(res => {
             this.alunos = res.filter(x => x.active == true);
+            if (params['evento_nome'] == 'aula-zero') {
+                this.alunos = this.alunos.filter(x => !x.aulaZero_Id);
+            }
             this.setAlunos();
         });
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getListWithChecklist())
+            lastValueFrom(this.alunoService.getList())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }
 
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
 
-        var evento = this.service.evento.subscribe(async res => {
+        let evento = this.service.evento.subscribe(async res => {
             if (!res) {
                 try {
-                    var decrypted = this.crypto.decrypt(params['evento_id']);
+                    let decrypted = this.crypto.decrypt(params['evento_id']);
                     if (params['evento_id'] && decrypted && decrypted != PseudoEvento.EventoId) {
                         await lastValueFrom(this.service.get(decrypted))
                             .then(res => {
@@ -118,7 +121,7 @@ export class InserirAlunoComponent {
                                 this.visibleChange();
                             })
                     } else {
-                        var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
                         this.service.setEvento(evento)
                     }
                 }
@@ -165,16 +168,19 @@ export class InserirAlunoComponent {
 
     setAlunos() {
         if (this.evento && this.alunos.length) {
-            var alunosInseridos = this.evento.alunos.map(x => x.aluno_Id);
+            let alunosInseridos = this.evento.alunos.map(x => x.aluno_Id);
             this.alunos = this.alunos.filter(x => x.active && !alunosInseridos.includes(x.id));
+            if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
+                this.alunos = this.alunos.filter(x => !x.aulaZero_Id);
+            }
         }
     }
 
     async verificaDisponibilidade() {
-        var valid = true;
+        let valid = true;
 
         this.loadingEventos = true;
-        var request: CalendarioRequest = new CalendarioRequest;
+        let request: CalendarioRequest = new CalendarioRequest;
 
         request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate();
         request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD').add(1, 'day').toDate();
@@ -190,13 +196,13 @@ export class InserirAlunoComponent {
     }
 
     validaAlunos() {
-        var data = this.evento.data;
+        let data = this.evento.data;
         this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
 
     alunoChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaAlunos();
-        var aluno = e.value as Aluno
+        let aluno = e.value as Aluno
 
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Aluno indisponível' });
@@ -224,7 +230,7 @@ export class InserirAlunoComponent {
 
     getRestricoes(e: any) {
         if (this.selectedAluno) {
-            var aluno = this.selectedAluno as Aluno;
+            let aluno = this.selectedAluno as Aluno;
             this.loadingAlunos = true;
             this.loading = true;
             lastValueFrom(this.alunoRestricaoService.getList(aluno.id))
@@ -235,7 +241,7 @@ export class InserirAlunoComponent {
 
                     if (aluno.restricoes.filter(x => x.active == true ).length > 0) {
 
-                        var mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
+                        let mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
                         mensagem += res.map(x => '• ' + x.descricao).join('<br>');
                         mensagem += `<br> Tem certeza que deseja inserir ele nessa ${this.tipoString}?`;
 
@@ -273,13 +279,13 @@ export class InserirAlunoComponent {
             this.showError('Erro', 'Nenhum celular cadastrado', aluno);
             return;
         }
-        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     enviarMensagemInscricao(aluno: Aluno) {
-        var object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
+        let object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
@@ -295,13 +301,13 @@ export class InserirAlunoComponent {
         }
 
         // playAlert();
-        var aluno = this.selectedAluno as Aluno;
+        let aluno = this.selectedAluno as Aluno;
 
         this.confirmationService.confirm({
             target: e.target,
             header: 'Inserir aluno',
             message: `Tem certeza que deseja inserir o aluno selecionado? <br> ${aluno}`,
-            acceptLabel: `Salvar e inserir`,
+            acceptLabel: `Sallet e inserir`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
@@ -316,8 +322,8 @@ export class InserirAlunoComponent {
     async send(e: any) {
 
         this.loading = true;
-        var response: RequestResponse = { success: false, message: '', object: undefined };
-        var aluno = this.selectedAluno as Aluno;
+        let response: RequestResponse = { success: false, message: '', object: undefined };
+        let aluno = this.selectedAluno as Aluno;
 
         if (this.evento.id == PseudoEvento.EventoId) {
             response = await lastValueFrom(this.request());
@@ -342,7 +348,7 @@ export class InserirAlunoComponent {
 
 
     sendMensagemAlunos(e: any) {
-        var aluno = this.selectedAluno as Aluno;
+        let aluno = this.selectedAluno as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
@@ -354,7 +360,7 @@ export class InserirAlunoComponent {
             rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
-                var object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
+                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
                 window.open(object.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 
@@ -370,13 +376,13 @@ export class InserirAlunoComponent {
 
 
     enviarMensagemAgendamento(aluno: Aluno) {
-        var evento = MyMap(this.evento, new Evento)
+        let evento = MyMap(this.evento, new Evento)
         evento.evento_Tipo_Id = EventoTipo.AulaExtra;
         return this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, evento);
     }
 
     markChecklistAsDone() {
-        var aluno = this.selectedAluno as Aluno;
+        let aluno = this.selectedAluno as Aluno;
         if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
             this.checklistAula0(aluno);
         } else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
@@ -385,10 +391,10 @@ export class InserirAlunoComponent {
     }
 
     checklistSuperacao(aluno: Aluno) {
-        var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+        let alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
 
         if (alunoChecklist) {
-            var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
+            let mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
             if (alunoChecklist && !alunoChecklist.finalizado) {
                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
             }
@@ -397,11 +403,11 @@ export class InserirAlunoComponent {
 
     checklistAula0(aluno: Aluno) {
         // Agendamento na aula 0
-        var id = 31;
-        var alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        let id = 31;
+        let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
 
         if (!alunoChecklist.finalizado) {
-            var mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
+            let mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
             if (alunoChecklist && !alunoChecklist.finalizado) {
                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
             }
@@ -419,7 +425,7 @@ export class InserirAlunoComponent {
     }
 
     requestAula0() {
-        var request = MyMap(this.evento, new EventoAula0Request);
+        let request = MyMap(this.evento, new EventoAula0Request);
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = [this.evento.professor_Id];
         if (this.evento.id == PseudoEvento.EventoId)
@@ -428,7 +434,7 @@ export class InserirAlunoComponent {
     }
 
     requestSuperacao() {
-        var request = MyMap(this.evento, new EventoSuperacaoRequest);
+        let request = MyMap(this.evento, new EventoSuperacaoRequest);
         request.alunos = this.evento.alunos.map(x => x.aluno_Id);
         request.professores = [this.evento.professor_Id];
         if (this.evento.id == PseudoEvento.EventoId)
