@@ -2,7 +2,7 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoReuniaoRequest } from '../../../../../models/evento-reuniao.model';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAula } from '../../../../../models/sala-aula.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +17,7 @@ import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
-import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, playAlert, playSuccess, Crypto, getError, showError } from '../../../../../utils';
+import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, getError, showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-cadastrar-reuniao',

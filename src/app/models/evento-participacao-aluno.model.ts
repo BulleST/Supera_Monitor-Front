@@ -61,7 +61,6 @@ export class Evento_Participacao_Aluno {
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;
-    primeiraAula?: Date;
 
     restricaoMobilidade: boolean = false;
     restricoes: Aluno_Restricao[] = []

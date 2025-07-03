@@ -1,6 +1,6 @@
 <div class="formgrid grid">
     <!-- Data -->
-    <div class="field lg:col-2 sm:col-3 col-5">
+    <div class="field lg:col-2 sm:col-4 col-5">
         <label for="data">Data:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
@@ -14,21 +14,21 @@
         </p-iconfield>
     </div>
     <!-- Horário -->
-    <div class="field lg:col-2 sm:col-3 col-5">
+    <div class="field lg:col-2 sm:col-4 col-5">
         <label for="horario">Horário:</label>
         <p-iconfield>
-            <input type="text"
-                pInputText
-                [value]="evento.data | date : 'HH:mm'"
-                id="horario"
-                name="horario"
-                readonly
-                fluid />
             <p-inputicon styleClass="pi pi-clock" />
+            <input type="text"
+                   pInputText
+                   [value]="evento.data | date : 'HH:mm'"
+                   id="horario"
+                   name="horario"
+                   readonly
+                   fluid />
         </p-iconfield>
     </div>
     <!-- Duração -->
-    <div class="field lg:col-2 sm:col-2 col-2">
+    <div class="field lg:col-2 sm:col-4 col-2">
         <label for="duracaoEvento">Duração:</label>
         <p-iconfield>
             <input type="text"
@@ -40,21 +40,8 @@
             <p-inputicon styleClass="pi pi-hourglass" />
         </p-iconfield>
     </div>
-    <!-- Aluno -->
-    <div class="field lg:col-6 sm:col-4 col-12">
-        <label for="aluno">Aluno: </label>
-        <p-iconfield>
-            <p-inputicon styleClass="fa-solid fa-user-graduate" />
-            <input type="text"
-                   pInputText
-                   [value]="alunoSelected.aluno"
-                   id="aluno"
-                   readonly
-                   fluid />
-        </p-iconfield>
-    </div>
     <!-- Educador -->
-    <div class="field lg:col-5 sm:col-5  col-5">
+    <div class="field lg:col-3 sm:col-6 col-12">
         <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="professores"
@@ -126,7 +113,7 @@
         </div>
     </div>
     <!-- Sala -->
-    <div class="field lg:col-5 sm:col-5  col-5">
+    <div class="field lg:col-3 sm:col-6 col-12">
         <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="salaAulas"
@@ -189,37 +176,6 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
         </div>
     </div>
-    <!-- Presente -->
-    <ng-container *ngIf="isChamadaPage && !evento.finalizado">
-        <div class="field flex">
-                                <p-button type="button" *ngIf="item.presente === false"
-                                    (onClick)="enviarMensagemFalta(item, $event)"
-                                    (auxclick)="enviarMensagemFalta(item, $event)"
-                                    (contextmenu)="enviarMensagemFalta(item, $event)"
-                                    [disabled]="!item.celular"
-                                    icon="pi pi-whatsapp"
-                                    severity="success"
-                                    [text]="true" />
-            <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
-                      [severity]="alunoSelected.presente ? 'success': 'danger'"
-                      [icon]="alunoSelected.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'"
-                      size="small"
-                      styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
-                      class="ml-auto mt-auto"
-                      (click)="isChamadaPage && !evento.finalizado ? undefined : presente(alunoSelected, $event)" />
-        </div>
-    </ng-container>
-    
-    <p-button
-              *ngIf="alunoSelected.presente === false"
-              [disabled]="!alunoSelected.celular"
-              label="Enviar mensagem"
-              icon="pi pi-whatsapp"
-              iconPos="right"
-              [pTooltip]="'Enviar mensagem de falta'"
-              tooltipPosition="bottom"
-              severity="info"
-              (onClick)="enviarMensagemFalta(alunoSelected, $event)"></p-button>
     <!-- Observações -->
     <div class="field col-12">
         <label for="observacao">Observações:</label>
@@ -228,7 +184,87 @@
                   name="observacao"
                   id="observacao"
                   [(ngModel)]="evento.observacao"
-                  [rows]="3"
-                  [readonly]="evento.finalizado"></textarea>
+                  [readonly]="evento.finalizado"
+                  [rows]="3"></textarea>
+    </div>
+    <!-- Alunos -->
+    <div class="col-12 flex align-items-stretch flex-wrap py-2">
+        <ng-container *ngFor="let item of evento.alunos; let i = index">
+            <app-aluno-popover #popoverAluno
+                               [aluno_Id]="item.aluno_Id"
+                               [evento]="evento"
+                               [showChecklist]="true"></app-aluno-popover>
+            <!-- Card -->
+            <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
+                <header class="flex align-items-center mb-2 p-3 surface-50">
+                    <p-button type="button"
+                              (onClick)="enviarMensagem(item)"
+                              (auxclick)="enviarMensagem(item)"
+                              (contextmenu)="enviarMensagem(item)"
+                              [disabled]="!item.celular"
+                              icon="pi pi-whatsapp"
+                              severity="success"
+                              [text]="true" />
+                    <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
+                        <div class="flex align-items-center">
+                            <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                                <span>{{ item.aluno | nameAbv }}</span>
+                            </p>
+                            <p-badge *ngIf="item.reposicaoDe_Evento_Id"
+                                     styleClass="ml-2 bg-purple-500"
+                                     value="Reposição"
+                                     size="small"
+                                     [pTooltip]="reposicaoTemplate"></p-badge>
+                        </div>
+                        <p class="text-500 text-sm line-height-1" [pTooltip]="item.turma">
+                            {{ item.turma }}
+                        </p>
+                        <ng-template #reposicaoTemplate>
+                            <div *ngIf="item.reposicaoDe_Evento" class="w-25rem">
+                                <p class="text-purple-500">Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
+                                <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}</p>
+                                <p>
+                                    <span>Observações: </span>
+                                    <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
+                                    <span *ngIf="!item.reposicaoDe_Evento.observacao" class="text-200">Nenhuma observação</span>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </div>
+                    <p-button type="button" *ngIf="item.presente === false"
+                              (onClick)="enviarMensagemFalta(item, $event)"
+                              (auxclick)="enviarMensagemFalta(item, $event)"
+                              (contextmenu)="enviarMensagemFalta(item, $event)"
+                              [disabled]="!item.celular"
+                              icon="pi pi-whatsapp"
+                              severity="success"
+                              [text]="true" />
+                    <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                              [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                              [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
+                              [outlined]="item.presente !== true && item.presente !== false"
+                              (onClick)="presente(item)"
+                              size="small"
+                              class="my-auto" />
+                </header>
+                <div class="formgrid grid px-3 bg-white">
+                    
+                    <!-- Observações -->
+                    <div class="field col-12">
+                        <label for="observacao[{{i}}]"></label>
+                        <textarea pTextarea
+                                  id="observacao[{{i}}]"
+                                  name="observacao[{{i}}]"
+                                  [(ngModel)]="item.observacao"
+                                  (focus)="inputFocus($event)"
+                                  [readonly]="!evento.finalizado"
+                                  [placeholder]="evento.finalizado ? 'Nenhuma observação' : 'Observações...'"
+                                  rows="2"
+                                  fluid></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- EndCard -->
+        </ng-container>
     </div>
 </div>

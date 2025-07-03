@@ -24,7 +24,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     @Input() evento: Evento = new Evento;
     @Input() duracaoEvento = '';
     @Input() loadingChecklist = false;
-    @Input() isChamadaPage = false;
 
     source: Professor[] = [];
     target: Professor[] = [];
@@ -57,6 +56,14 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
             this.evento = changes['evento'].currentValue;
             this.selected = this.evento.professores;
             this.setProfessores();
+            if (!this.evento.finalizado) {
+                this.evento.professores
+                .filter(x => x.active)
+                .map(x => {
+                    x.presente == true;
+                    return x;
+                });
+            }
         };
         if (changes['professores']){
             this.professores = changes['professores'].currentValue;
@@ -66,7 +73,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
-        if (changes['isChamadaPage']) this.isChamadaPage = changes['isChamadaPage'].currentValue;
         
         this.width.emit('600px');
 
@@ -105,6 +111,9 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
+        presente(item: Evento_Participacao_Professor) {
+            item.presente = !item.presente;
+        }
 
     enviarMensagem(professor: Evento_Participacao_Professor) {
         if (!professor.phone) {
@@ -120,71 +129,4 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     inputFocus(e: any) {
         e.target.select()
     }
-
-
-    onMoveToSource(e: any) {
-        this.evento.professores = this.target.map(x => ({
-            id: null as any,
-            professor_Id: x.id,
-            corLegenda: x.corLegenda,
-            evento_Id: this.evento.id,
-            observacao: '',
-            nome: x.nome,
-            presente: null as any,
-        }))
-    }
-
-    onMoveToTarget(e: PickListMoveAllToTargetEvent) {
-        var item = e.items[0] as Professor;
-        if (!item.disponivel) {
-            this.showError('Educador indisponível', 'Você não pode mover um educador indisponível.', { target: this.picklist.el.nativeElement });
-            var index = this.target.findIndex(x => x.id == item.id);
-            if (index != -1) {
-                this.target.splice(index, 1)
-                this.professores.push(item);
-
-            };
-        }
-        this.evento.professores = this.target.map(x => ({
-            id: null as any,
-            professor_Id: x.id,
-            corLegenda: x.corLegenda,
-            evento_Id: this.evento.id,
-            observacao: '',
-            nome: x.nome,
-            presente: null as any,
-        }))
-    }
-
-    onMoveAllToSource(e: any) {
-        this.evento.professores = this.target.map(x => ({
-            id: null as any,
-            professor_Id: x.id,
-            corLegenda: x.corLegenda,
-            evento_Id: this.evento.id,
-            observacao: '',
-            nome: x.nome,
-            presente: null as any,
-        }))
-
-    }
-
-    onMoveAllToTarget(e: any) {
-        var items = e.items as Professor[];
-        if (items.find(x => !x.disponivel)) {
-            this.showError('Educador indisponível', 'Você não pode mover educadores indisponíveis.', { target: this.picklist.el.nativeElement });
-            this.professores = items.filter(x => !x.disponivel);
-            this.target = items.filter(x => x.disponivel);
-        }
-        this.evento.professores = this.target.map(x => ({
-            id: null as any,
-            professor_Id: x.id,
-            corLegenda: x.corLegenda,
-            evento_Id: this.evento.id,
-            observacao: '',
-            nome: x.nome,
-            presente: null as any,
-        }))
-    }
-
 }

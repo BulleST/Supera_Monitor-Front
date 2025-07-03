@@ -45,30 +45,16 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
 
-    // object: EventoSuperacaoRequest = new EventoSuperacaoRequest;
-    object: EventoSuperacaoRequest = {
-        "id": -1,
-        "data": new Date("2025-05-17T12:00"),
-        "descricao": "Superação",
-        "observacao": "teste",
-        "duracaoMinutos": 60,
-        "sala_Id": 8,
-        "alunos": [
-        ],
-        "professores": [
-            32
-        ]
-    };
+    object: EventoSuperacaoRequest = new EventoSuperacaoRequest;
 
     data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
     blockAlunoField = false;
-    alunosSelected: Aluno[] = [];
+    selectedAlunos: Aluno[] = [];
     mensagensEnviadasAlunos: Aluno[] = [];
     alunos: Aluno[] = [];
-    groupedAlunos: SelectItemGroup[] = [];
     loadingAlunos = false;
 
     professorSelected?: Professor;
@@ -142,35 +128,12 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active == true);
-            var grouped = groupBy(this.alunos, 'turma_Id');
-
-            this.groupedAlunos = [];
-            for (let turma_Id in grouped) {
-                var alunosTurma = grouped[turma_Id] as Aluno[];
-                var turma = {
-                    nome: alunosTurma[0].turma,
-                    turmaDesc: alunosTurma[0].turmaDesc,
-                    turma_Id: alunosTurma[0].turma_Id,
-                    diaSemana: alunosTurma[0].diaSemana,
-                    horario: alunosTurma[0].horario,
-                    professor_Id: alunosTurma[0].professor_Id,
-                    professor: alunosTurma[0].professor,
-                    corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
-                }
-                this.groupedAlunos.push({
-                    label: turma.nome ?? 'Indefinido',
-                    value: turma,
-                    items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
-                });
-            }
-        });
+        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getListWithChecklist())
+            lastValueFrom(this.alunoService.getList())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }
@@ -178,16 +141,14 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         var eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
-
         this.loadFeriados();
-
         this.verificaDisponibilidade();
 
         this.activatedRoute.params.subscribe(res => {
             if (res['aluno_Id']) {
                 var aluno_Id = this.crypto.decrypt(res['aluno_Id']);
-                this.alunosSelected = this.alunos.filter(x => x.id = aluno_Id)
-                if (this.alunosSelected.length > 0) this.blockAlunoField = true;
+                this.selectedAlunos = this.alunos.filter(x => x.id = aluno_Id)
+                if (this.selectedAlunos.length > 0) this.blockAlunoField = true;
             }
         })
 
@@ -323,8 +284,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         if (alunos.length)
 
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-                var index = this.alunosSelected.findIndex(x => x.id == aluno.id);
-                if (index) this.alunosSelected.splice(index, 1);
+                var index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+                if (index) this.selectedAlunos.splice(index, 1);
 
                 this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
                 return;
@@ -339,7 +300,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                     rejectLabel: 'Não',
                     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     reject: () => {
-                        this.alunosSelected = [this.alunosSelected[0]]
+                        this.selectedAlunos = [this.selectedAlunos[0]]
                     },
                 });
             }
@@ -362,7 +323,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         if (form.invalid) {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
-        if (!this.alunosSelected || !this.alunosSelected.length)
+        if (!this.selectedAlunos || !this.selectedAlunos.length)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
         if (!this.professorSelected)
@@ -371,7 +332,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         // playAlert();
 
-        this.object.alunos = this.alunosSelected.map(x => x.id);
+        this.object.alunos = this.selectedAlunos.map(x => x.id);
         this.object.professores = [this.professorSelected.id];
 
         this.object.data = new Date(this.data);
@@ -406,7 +367,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 this.markChecklistAsDone();
                 // playSuccess();
 
-                if (this.alunosSelected.length == 1 && this.alunosSelected[0].celular) {
+                if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
                     this.sendMensagemAluno(e, res.object);
                 } else {
                     this.sendMensagemAlunos();
@@ -420,7 +381,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     sendMensagemAluno(e: any, evento: any) {
-        var aluno = this.alunosSelected[0] as Aluno;
+        var aluno = this.selectedAlunos[0] as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -449,7 +410,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         });
     }
     sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
             message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
@@ -497,7 +458,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     markChecklistAsDone() {
         // Agendar superação
         // Id 22 ou 29
-        this.alunosSelected.forEach(aluno => {
+        this.selectedAlunos.forEach(aluno => {
             var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
             var professor = this.professorSelected as Professor;
 

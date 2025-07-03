@@ -23,7 +23,6 @@ import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { HeaderComponent } from './full-calendar/header/header.component';
 import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-cognitivo/calculo-perfil-cognitivo.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
 import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 import { PrimeiraAulaAlunoComponent } from './primeira-aula-aluno/primeira-aula-aluno.component';
 import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
@@ -54,7 +53,6 @@ import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao
         ToolbarComponent,
         HeaderComponent,
         CalculoPerfilCognitivoComponent,
-        ReposicaoComponent,
         InserirAlunoComponent,
         AgendarReposicaoComponent,
         

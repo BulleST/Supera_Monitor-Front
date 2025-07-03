@@ -1,5 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-
 <p-dialog [header]="'Agendar Reunião'"
           [maximizable]="true"
           [draggable]="true"
@@ -28,8 +27,8 @@
                        [(ngModel)]="object.descricao"
                        id="descricao"
                        name="descricao"
-                       class="w-full"
-                       [required]="true">
+                       [required]="true"
+                       fluid>
                 <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -47,15 +46,13 @@
                               [minDate]="minData"
                               inputId="_data"
                               name="_data"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
                               [disabledDates]="feriadoDates"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -71,12 +68,10 @@
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               appendTo="body"
-                              [timeOnly]="true">
+                              [timeOnly]="true"
+                              fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -93,8 +88,6 @@
                           [loading]="loadingSalaAulas"
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="sala_Id"
                           inputId="sala_Id"
                           optionValue="id"
@@ -102,7 +95,8 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template #selectedItem let-selectedOption>
                         <app-sala-aula [numeroSala]="selectedOption.numeroSala"
                                        [andar]="selectedOption.andar"
@@ -149,11 +143,11 @@
             <div class="field col-12"> <!-- Observações -->
                 <label for="observacao">Observações:</label>
                 <textarea pTextarea
-                          class="w-full"
                           name="observacao"
                           id="observacao"
                           [(ngModel)]="object.observacao"
-                          [rows]="2"></textarea>
+                          [rows]="2"
+                          fluid></textarea>
             </div>
             <div class="field col-12"> <!-- Educadores -->
                 <label class="text-orange-500 font-bold">Selecione os Educadores</label>
@@ -178,7 +172,8 @@
                             stripedRows
                             breakpoint="500px"
                             emptymessagesource="Nenhum educador para selecionar"
-                            emptymessagetarget="Nenhum educador selecionado">
+                            emptymessagetarget="Nenhum educador selecionado"
+                            fluid>
                     <ng-template let-item #item>
                         <div>
                             <div class="flex align-items-center w-full">

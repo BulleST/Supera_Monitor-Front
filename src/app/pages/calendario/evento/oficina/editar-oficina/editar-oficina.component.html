@@ -8,52 +8,52 @@
                [(ngModel)]="evento.descricao"
                id="descricao"
                name="descricao"
-               class="w-full"
-               [required]="true">
+               [required]="true"
+               fluid>
         <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
         </div>
     </div>
     <!-- Data -->
     <div class="field md:col-3 sm:col-3 col-5">
-        <label for="dataInicio">Data:</label>
+        <label for="data">Data:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
             <input type="text"
                    pInputText
                    [value]="evento.data | date : 'dd/MM/yyyy'"
-                   styleClass="w-full"
-                   class="w-full"
-                   id="professor"
-                   readonly />
+                   id="data"
+                   name="data"
+                   readonly
+                   fluid />
         </p-iconfield>
     </div>
     <!-- Horário -->
     <div class="field md:col-3 sm:col-3 col-5">
         <label for="horario">Horário:</label>
         <p-iconfield>
+            <p-inputicon styleClass="pi pi-clock" />
             <input type="text"
                    pInputText
                    [value]="evento.data | date : 'HH:mm'"
-                   styleClass="w-full"
-                   class="w-full"
-                   id="v"
-                   readonly />
-            <p-inputicon styleClass="pi pi-clock" />
+                   id="horario"
+                   name="horario"
+                   readonly
+                   fluid />
         </p-iconfield>
     </div>
     <!-- Duração -->
     <div class="field md:col-2 sm:col-2 col-2">
         <label for="duracaoEvento">Duração:</label>
         <p-iconfield>
+            <p-inputicon styleClass="pi pi-hourglass" />
             <input type="text"
                    pInputText
                    [value]="duracaoEvento"
-                   styleClass="w-full"
-                   class="w-full"
                    id="duracaoEvento"
-                   readonly />
-            <p-inputicon styleClass="pi pi-hourglass" />
+                   name="duracaoEvento"
+                   readonly 
+                   fluid />
         </p-iconfield>
     </div>
     <!-- Limite de Alunos -->
@@ -64,9 +64,8 @@
                         id="capacidadeMaximaAlunos"
                         name="capacidadeMaximaAlunos"
                         class="w-full"
-                        styleClass="w-full"
-                        inputStyleClass="w-full"
-                        [required]="true" />
+                        [required]="true"
+                   fluid />
         <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
         </div>
@@ -80,8 +79,6 @@
                   [loading]="loadingProfessores"
                   (onChange)="professorChanged($event, professor_Id)"
                   #professor_Id="ngModel"
-                  styleClass="w-full"
-                  class="w-full"
                   name="professor_Id"
                   inputId="professor_Id"
                   optionLabel="nome"
@@ -89,10 +86,11 @@
                   [required]="true"
                   [filter]="true"
                   filterBy="nome"
-                  appendTo="body"
                   optionDisabled="deactivated"
                   [readonly]="evento.finalizado"
-                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
+                  appendTo="body"
+                   fluid>
             <ng-template let-item #item>
                 <div class="flex align-items-center justify-content-between w-full gap-2">
                     <div>
@@ -150,18 +148,17 @@
                   [loading]="loadingSalaAulas"
                   (onChange)="salaAulaChanged($event, sala_Id)"
                   #sala_Id="ngModel"
-                  styleClass="w-full"
-                  class="w-full"
                   name="sala_Id"
                   inputId="sala_Id"
                   optionValue="id"
                   [required]="true"
                   [filter]="true"
                   filterBy="nome"
-                  appendTo="body"
                   optionDisabled="deactivated"
                   [readonly]="evento.finalizado"
-                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
+                  appendTo="body"
+                  fluid>
             <ng-template #selectedItem let-selectedOption>
                 <app-sala-aula [numeroSala]="selectedOption.numeroSala"
                                [andar]="selectedOption.andar"
@@ -209,122 +206,90 @@
     <div class="field col-12">
         <label for="observacao">Observações:</label>
         <textarea pTextarea
-                  class="w-full"
                   name="observacao"
                   id="observacao"
                   [(ngModel)]="evento.observacao"
-                  [rows]="3"></textarea>
+                  [rows]="3"
+                  fluid></textarea>
     </div>
     <!-- Alunos -->
-    <div class="field col-12" *ngIf="isChamadaPage || evento.finalizado">
-        <p class="text-orange-500 font-bold">Alunos</p>
-        <hr class="mb-2 border-orange-500 border-1">
-        <p-table [value]="evento.alunos"
-                 dataKey="id"
-                 stripedRows
-                 emptymessage="Nenhum aluno inscrito">
-            <ng-template pTemplate="emptymessage">
-                <p class="text-400 p-1">Nenhum aluno inscrito</p>
-            </ng-template>
-            <ng-template #header>
-                <tr *ngIf="evento.alunos.length > 0">
-                    <!-- <th class="w-2rem"></th> -->
-                    <th class="sticky left-0">Nome</th>
-                    <th>Jornada Supera</th>
-                    <th class="w-4rem">Presença</th>
-                    <th class="w-4rem">Observação</th>
-                </tr>
-            </ng-template>
-            <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
-                <app-aluno-popover #popoverAluno 
-                        [aluno_Id]="item.aluno_Id" 
-                        [evento]="evento"
-                        [showChecklist]="true"></app-aluno-popover>
-                <tr>
-                    <!-- Nome -->
-                    <td class="sticky left-0 cursor-pointer">
+    <div class="col-12 flex align-items-stretch flex-wrap py-2">
+        <ng-container *ngFor="let item of evento.alunos; let i = index">
+            <app-aluno-popover #popoverAluno
+                               [aluno_Id]="item.aluno_Id"
+                               [evento]="evento"
+                               [showChecklist]="true"></app-aluno-popover>
+            <!-- Card -->
+            <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
+                <header class="flex align-items-center mb-2 p-3 surface-50">
+                    <p-button type="button"
+                              (onClick)="enviarMensagem(item)"
+                              (auxclick)="enviarMensagem(item)"
+                              (contextmenu)="enviarMensagem(item)"
+                              [disabled]="!item.celular"
+                              icon="pi pi-whatsapp"
+                              severity="success"
+                              [text]="true" />
+                    <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                         <div class="flex align-items-center">
-                            <p-button type="button"
-                                      (onClick)="enviarMensagem(item)"
-                                      (auxclick)="enviarMensagem(item)"
-                                      (contextmenu)="enviarMensagem(item)"
-                                      [disabled]="!item.celular"
-                                      icon="pi pi-whatsapp"
-                                      severity="success"
-                                      [text]="true"/>
-                            <div class="inline-flex p-button-link" (click)="popoverAluno.show($event)">
-                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.aluno">
-                                    {{ item.aluno }}
-                                </span>
-                                <p-badge *ngIf="item.reposicao" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
-                                <p-badge *ngIf="item.flagNovo" styleClass="ml-2 " value="Aula 1" size="small"></p-badge>
-                            </div>
+                            <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                                <span>{{ item.aluno | nameAbv }}</span>
+                            </p>
+                            <p-badge *ngIf="item.reposicaoDe_Evento_Id"
+                                     styleClass="ml-2 bg-purple-500"
+                                     value="Reposição"
+                                     size="small"
+                                     [pTooltip]="reposicaoTemplate"></p-badge>
                         </div>
-                    </td>
-                    <!-- checklist -->
-                    <td class="cursor-pointer">
-                        <app-aluno-checklist #alunoChecklistComponent 
-                            [aluno]="item" 
-                            [aluno_Id]="item.aluno_Id" 
-                            [showChecklist]="true"></app-aluno-checklist>
-                    </td>
-                    <!-- Presente -->
-                    <!-- <td [pEditableColumn]="item.presente"
-                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
-                        pEditableColumnField="presente"
-                        class="w-4rem text-center"
-                        [class.cursor-pointer]="isChamadaPage"
-                        [class.cursor-default]="!isChamadaPage"
-                        (click)="isChamadaPage && !evento.finalizado ? (item.presente = item.presente ?? true) : undefined ">
-                        <p-cellEditor>
-                            <ng-template #input>
-                                <p-button (onClick)="item.presente = !item.presente"
-                                          [label]="item.presente ? 'Presente': 'Faltou'"
-                                          [severity]="item.presente ? 'success': 'danger'"
-                                          [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                                          size="small"
-                                          styleClass="py-1 line-height-2" />
-                            </ng-template>
-                            <ng-template #output>
-                                <small *ngIf="item.presente == undefined && isChamadaPage" class="text-primary">Clique</small>
-                                <p-button *ngIf="item.presente != undefined && isChamadaPage"
-                                          (onClick)="item.presente = !item.presente"
-                                          [label]="item.presente ? 'Presente': 'Faltou'"
-                                          [severity]="item.presente ? 'success': 'danger'"
-                                          [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                                          size="small"
-                                          styleClass="py-1 line-height-2" />
-                            </ng-template>
-                        </p-cellEditor>
-                    </td> -->
+                        <p class="text-500 text-sm line-height-1" [pTooltip]="item.turma">
+                            {{ item.turma }}
+                        </p>
+                        <ng-template #reposicaoTemplate>
+                            <div *ngIf="item.reposicaoDe_Evento" class="w-25rem">
+                                <p class="text-purple-500">Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
+                                <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}</p>
+                                <p>
+                                    <span>Observações: </span>
+                                    <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
+                                    <span *ngIf="!item.reposicaoDe_Evento.observacao" class="text-200">Nenhuma observação</span>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </div>
+                    <p-button type="button" *ngIf="item.presente === false"
+                              (onClick)="enviarMensagemFalta(item, $event)"
+                              (auxclick)="enviarMensagemFalta(item, $event)"
+                              (contextmenu)="enviarMensagemFalta(item, $event)"
+                              [disabled]="!item.celular"
+                              icon="pi pi-whatsapp"
+                              severity="success"
+                              [text]="true" />
+                    <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                              [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                              [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
+                              [outlined]="item.presente !== true && item.presente !== false"
+                              (onClick)="presente(item)"
+                              size="small"
+                              class="my-auto" />
+                </header>
+                <div class="formgrid grid px-3 bg-white">
+                    
                     <!-- Observações -->
-                    <td [pEditableColumn]="item.observacao"
-                        [pEditableColumnDisabled]="!isChamadaPage || evento.finalizado"
-                        pEditableColumnField="observacao"
-                        class="w-5rem white-space-nowrap text-overflow-ellipsis"
-                        [class.cursor-default]="evento.finalizado">
-                        <p-cellEditor>
-                            <ng-template #input>
-                                <textarea pTextarea
-                                          [autoResize]="true"
-                                          placeholder="Insira as observações..."
-                                          [(ngModel)]="item.observacao"
-                                          (focus)="inputFocus($event)"
-                                          id="observacao"
-                                          name="observacao"
-                                          class="w-full"
-                                          rows="1"></textarea>
-                            </ng-template>
-                            <ng-template #output>
-                                <span class="flex w-full white-space-nowrap text-overflow-ellipsis">
-                                    <span *ngIf="!item.observacao" class="text-400">Nenhuma observação</span>
-                                    <span *ngIf="item.observacao">{{ item.observacao }}</span>
-                                </span>
-                            </ng-template>
-                        </p-cellEditor>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
+                    <div class="field col-12">
+                        <label for="observacao[{{i}}]"></label>
+                        <textarea pTextarea
+                                  id="observacao[{{i}}]"
+                                  name="observacao[{{i}}]"
+                                  [(ngModel)]="item.observacao"
+                                  (focus)="inputFocus($event)"
+                                  [readonly]="!evento.finalizado"
+                                  [placeholder]="evento.finalizado ? 'Nenhuma observação' : 'Observações...'"
+                                  rows="2"
+                                  fluid></textarea>
+                    </div>
+                </div>
+            </div>
+            <!-- EndCard -->
+        </ng-container>
     </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Evento, EventoQueryParams, EventoTipo } from '../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../../models/alunos.model';
 import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos, playSuccess, playAlert } from '../../../../utils';
@@ -51,8 +51,6 @@ export class InserirAlunoComponent {
 
     turmas: Turma[] = [];
     loadingTurmas = false;
-
-
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -166,7 +164,6 @@ export class InserirAlunoComponent {
     }
 
     setAlunos() {
-        console.log('setAlunos', this.evento, this.alunos.length)
         if (this.evento && this.alunos.length) {
             var alunosInseridos = this.evento.alunos.map(x => x.aluno_Id);
             this.alunos = this.alunos.filter(x => x.active && !alunosInseridos.includes(x.id));

@@ -381,14 +381,11 @@ th.p-datatable-frozen-column,
 td.p-datatable-frozen-column {
     position: sticky;
     margin-top: 1px;
-}
-
-thead tr .fc-scroller,
-tbody tr:first-child .fc-scroller {
-    overflow: hidden;
-    padding-right: 15px;
-    border-top: 1px #dddddd solid;
-    margin-bottom: -1px;
+    overflow: hidden !important;
+    border-top: 1px #fafafa solid;
+    border-bottom: 1px #fafafa solid;
+    /* padding-right: 15px; */
+    /* margin-bottom: -1px; */
 }
 
 .p-listbox .p-listbox-list .p-listbox-option.p-listbox-option-selected,

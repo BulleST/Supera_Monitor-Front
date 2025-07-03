@@ -25,7 +25,6 @@ import { showError } from '../../../../../utils';
 })
 export class EditarAula0Component implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
-    alunoSelected: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
 
     @Input() evento: Evento = new Evento;
     @Input() duracaoEvento = '';
@@ -57,18 +56,21 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            this.alunoSelected = this.evento.alunos[0];
             this.evento.professor_Id = this.evento.professores[0].professor_Id;
+            if (!this.evento.finalizado) {
+                this.evento.alunos
+                .filter(x => x.active)
+                .map(x => {
+                    x.presente == true;
+                    return x;
+                });
+            }
         }
         if (changes['professores']) this.professores = changes['professores'].currentValue;
         if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
-        if (changes['isChamadaPage']) {
-            this.isChamadaPage = changes['isChamadaPage'].currentValue
-            this.alunoSelected.presente = true;
-        };
         this.width.emit('700px')
     }
 
@@ -120,13 +122,24 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    presente(item: Evento_Participacao_Aluno, e: any) {
+    inputFocus(e: any) {
+        e.target.select()
+    }
+
+    presente(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
+
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
         if (!aluno.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
@@ -145,19 +158,19 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
     markChecklistAsDone() {
         // Comparecimento na aula 0
-        if (this.alunoSelected) {
-            var id = 33;
-            var alunoChecklist = this.alunoSelected.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            var mensagem = '';
+        this.evento.alunos
+        .filter(x => x.presente === true && x.active === true)
+        .forEach(aluno => {
+            let id = 33;
+            let alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+            let mensagem = '';
             
-            if (this.alunoSelected.presente && alunoChecklist && !alunoChecklist.finalizado) {
-
-                var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
-                
-                mensagem = `Aluno compareceu na aula do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${professor.nome}.\n Aula 0 finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
+            if (alunoChecklist && !alunoChecklist.finalizado) {
+                let professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
+                mensagem = `Aluno compareceu na aula 0 do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${professor.nome}.\n Aula 0 finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}`
                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
             }
-        }
+        })
     }
 
 

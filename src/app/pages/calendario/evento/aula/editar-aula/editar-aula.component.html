@@ -414,8 +414,8 @@
                                 <!-- Observações -->
                                 <div class="field col-12">
                                     <textarea pTextarea
-                                              id="observacao"
-                                              name="observacao"
+                                              id="observacao[{{i}}]"
+                                              name="observacao[{{i}}]"
                                               [(ngModel)]="item.observacao"
                                               (focus)="inputFocus($event)"
                                               [readonly]="!evento.finalizado"
@@ -614,8 +614,8 @@
                                           [(ngModel)]="item.observacao"
                                           (focus)="inputFocus($event)"
                                           [readonly]="!evento.active"
-                                          id="observacao"
-                                          name="observacao"
+                                          id="observacao[{{rowIndex}}]"
+                                          name="observacao[{{rowIndex}}]"
                                           class="mt-4"
                                           fluid
                                           [style]="{ heigth: '28px', width: '20vw' }"></textarea>

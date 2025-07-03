@@ -8,4 +8,8 @@ export interface Evento_Participacao_Professor {
     presente?: boolean;
     observacao?: string;
     corLegenda: string;
+
+    created: Date 
+    deactivated?: Date;
+    active: boolean ;
 }

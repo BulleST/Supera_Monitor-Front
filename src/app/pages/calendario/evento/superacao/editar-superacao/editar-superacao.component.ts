@@ -26,12 +26,10 @@ import { EventoService } from '../../../../../services/evento.service';
 })
 export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
-    alunoSelected: Evento_Participacao_Aluno = new Evento_Participacao_Aluno;
 
     @Input() evento: Evento = new Evento;
     @Input() duracaoEvento = '';
     @Input() loadingChecklist = false;
-    @Input() isChamadaPage = false;
 
     @Input() professores: Professor[] = [];
     @Input() loadingProfessores = false;
@@ -76,15 +74,20 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            this.alunoSelected = this.evento.alunos[0];
-            this.evento.professor_Id = this.evento.professores[0].professor_Id;
+            if (!this.evento.finalizado) {
+                this.evento.alunos
+                .filter(x => x.active)
+                .map(x => {
+                    x.presente == true;
+                    return x;
+                });
+            }
         }
         if (changes['professores']) this.professores = changes['professores'].currentValue;
         if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
-        if (changes['isChamadaPage']) this.isChamadaPage = changes['isChamadaPage'].currentValue;
         this.width.emit('700px')
     }
 
@@ -135,22 +138,26 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         return this.calendarioUtils.getEventoTipo(e);
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
+    inputFocus(e: any) {
+        e.target.select()
     }
 
-    presenteClick(e: any) {
-        if (this.alunoSelected.presente == undefined || this.alunoSelected.presente == null) {
-            this.alunoSelected.presente = true;
-        }
-        else {
-            this.alunoSelected.presente = !this.alunoSelected.presente;
-        }
+    presente(aluno: Evento_Participacao_Aluno) {
+        aluno.presente = !aluno.presente;
     }
 
-    enviarMensagemFalta(e: any) {
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    }
 
-        let aluno = this.alunoSelected as Evento_Participacao_Aluno;
+
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
         if (!aluno.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
             return;
@@ -160,7 +167,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
             return;
           }
       
-        let object = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento, []);
+        let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, []);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
@@ -168,18 +175,20 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     markChecklistAsDone() {
         // Comparecimento na superação
         // Id 35
-        var aluno = this.alunoSelected as Evento_Participacao_Aluno;
-        var id = 35;
-        var alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-        var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
-
-        if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
-            var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                                Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        this.evento.alunos.filter(x => x.active === true && x.presente === true)
+        .map(aluno => {
+            var id = 35;
+            var alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+            var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
+    
+            if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
+                var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
+                                    Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+                if (alunoChecklist && !alunoChecklist.finalizado) {
+                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+                }
             }
-        }
+        })
     }
 
 
