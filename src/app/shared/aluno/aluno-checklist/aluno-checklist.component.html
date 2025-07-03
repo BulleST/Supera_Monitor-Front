@@ -2,10 +2,10 @@
 
 <ng-container *ngIf="aluno && showChecklist">
     <ng-container *ngIf="!loading">
-        <div class="flex align-itens-center gap-2 w-full justify-content-between" [pTooltip]="status + ': ' + texto" tooltipPosition="top">
+        <div class="flex align-itens-center gap-2 w-full justify-content-between pr-2 line-height-1" [pTooltip]="status + ': ' + texto">
             <span class="w-full overflow-hidden text-overflow-ellipsis white-space-nowrap">{{texto}}</span>
 
-            <span class="{{textColor}} ml-auto">
+            <span class="{{textColor}} ml-auto flex align-items-center gap-2">
                 <span *ngIf="checklistVigente">
                     {{checklistVigente.itensFinalizados.length}}/{{checklistVigente.items.length}}
                 </span>

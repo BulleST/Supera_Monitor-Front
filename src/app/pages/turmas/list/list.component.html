@@ -17,8 +17,10 @@
              [globalFilterFields]="tableGlobalFilterFields"
              dataKey="id"
              stripedRows
+             [loading]="tableLoading"
+             [showLoader]="false"
              [rowHover]="list.length > 0">
-        <ng-template pTemplate="caption">
+        <ng-template #caption>
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
                     <h2 class="flex align-items-center ">
@@ -67,7 +69,7 @@
                 </div>
             </p-toolbar>
         </ng-template>
-        <ng-template pTemplate="header">
+        <ng-template #header>
             <tr>
                 <ng-container *ngFor="let col of tableColumns">
                     <th [pSortableColumn]="col.field">
@@ -201,7 +203,7 @@
                 <th pFrozenColumn alignFrozen="right"></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-item let-index="rowIndex">
+        <ng-template #body let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td *ngFor="let col of tableColumns"
                     [style]="{ 
@@ -263,28 +265,28 @@
                 </td>
             </tr>
         </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <ng-container *ngIf="tableLoading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
-                    <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-                    <td class="border-none"><p-skeleton /></td>
-                </tr>
-            </ng-container>
-            <ng-template #elseTemplate>
-                <tr class="p-datatable-empty-text">
-                    <td [attr.colspan]="tableColumns.length + 1">
-                        <div class="flex align-items-center" *ngIf="!tableSearch">
-                            <span>Nenhum item registrado. Clique</span>
-                            <p-button styleClass="text-orange-600 overflow-visible pointer-events-auto" class="pointer-events-auto" [link]="true" [routerLink]="['cadastrar' ]">
-                                <span class="p-overlay-badge">aqui <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
-                                </span>
-                            </p-button>
-                            <span> para cadastrar. </span>
-                        </div>
-                        <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
-                    </td>
-                </tr>
-            </ng-template>
+        <ng-template #loadingbody let-columns="columns">
+            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+                <td>
+                    <p-skeleton shape="circle" size="1rem" />
+                </td>
+                <td *ngFor="let col of [1,2,3,4,5,6,7,8]" >
+                    <p-skeleton />
+                </td>
+                <td>
+                    <p-skeleton shape="circle" size="1rem" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr class="p-datatable-empty-text">
+                <td [attr.colspan]="tableColumns.length + 1">
+                    <div class="flex align-items-center" *ngIf="!tableSearch">
+                        <span>Nenhum item registrado.</span>
+                    </div>
+                    <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
+                </td>
+            </tr>
         </ng-template>
     </p-table>
 </div>

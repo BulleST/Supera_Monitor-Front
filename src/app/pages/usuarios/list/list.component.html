@@ -17,8 +17,10 @@
         [globalFilterFields]="tableGlobalFilterFields"
         dataKey="id"
         stripedRows
+        [loading]="tableLoading"
+        [showLoader]="false"
         [rowHover]="list.length > 0">
-    <ng-template pTemplate="caption">
+    <ng-template #caption>
         <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
             <div class="p-toolbar-group-start">
                 <h2 class="flex align-items-center ">
@@ -70,7 +72,7 @@
             </div>
         </p-toolbar>
     </ng-template>
-    <ng-template pTemplate="header">
+    <ng-template #header>
         <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
             <th *ngFor="let col of tableColumns" 
             [pSortableColumn]="col.field"class="surface-900 border-none text-white white-space-nowrap" 
@@ -94,74 +96,71 @@
     alignFrozen="right"
     class="surface-900 border-bottom-none text-white"></th>
 </tr>
-</ng-template>
-<ng-template pTemplate="body" let-item let-index="rowIndex">
-    <tr class="white-space-nowrap">
-        <td *ngFor="let col of tableColumns"
-        [style]="{ 
-            width: col.options && col.options.width ? col.options.width : ''
-        }">
-        <ng-container *ngIf="col.displayType == DisplayType.options">
-            <ng-container *ngTemplateOutlet="tag; 
-            context: { 
-                item: item,
-                option: getOption(col, item)
+    </ng-template>
+    <ng-template #body let-item let-index="rowIndex">
+        <tr class="white-space-nowrap">
+            <td *ngFor="let col of tableColumns"
+            [style]="{ 
+                width: col.options && col.options.width ? col.options.width : ''
             }">
+            <ng-container *ngIf="col.displayType == DisplayType.options">
+                <ng-container *ngTemplateOutlet="tag; 
+                context: { 
+                    item: item,
+                    option: getOption(col, item)
+                }">
+            </ng-container>
+            <ng-template #tag let-item="item" let-option="option">
+                <p-tag *ngIf="option"
+                styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
+                [value]="option.label"
+                [severity]="option.severity ? option.severity : 'secondary'"
+                tooltipPosition="top"
+                [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+            </ng-template>
         </ng-container>
-        <ng-template #tag let-item="item" let-option="option">
-            <p-tag *ngIf="option"
-            styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-            [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
-            [value]="option.label"
-            [severity]="option.severity ? option.severity : 'secondary'"
-            tooltipPosition="top"
-            [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-        </ng-template>
-    </ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.color">
-        <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
-    </ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-    <ng-container *ngIf="col.displayType == DisplayType.mask">{{ item[col.field] | mask : col.options.format }}</ng-container>
-</td>
-<td pFrozenColumn
-alignFrozen="right">
-<p-button
-[icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
-[severity]="'secondary'"
-[rounded]="true"
-title="Ver mais"
-styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
-(onClick)="showContextMenu($event, item)" />
-</td>
-</tr>
-</ng-template>
-<ng-template pTemplate="emptymessage">
-    <ng-container *ngIf="tableLoading; else elseTemplate">
-        <tr *ngFor="let item of [1,2,3,4,5]" style="height: 43px;">
-            <td *ngFor="let col of tableColumns" class="border-none"><p-skeleton /></td>
-            <td class="border-none"><p-skeleton /></td>
+        <ng-container *ngIf="col.displayType == DisplayType.color">
+            <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
+        </ng-container>
+        <ng-container *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-container>
+        <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
+        <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+        <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
+        <ng-container *ngIf="col.displayType == DisplayType.mask">{{ item[col.field] | mask : col.options.format }}</ng-container>
+    </td>
+    <td pFrozenColumn
+    alignFrozen="right">
+    <p-button
+    [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+    [severity]="'secondary'"
+    [rounded]="true"
+    title="Ver mais"
+    styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+    (onClick)="showContextMenu($event, item)" />
+    </td>
+    </tr>
+    </ng-template>
+    <ng-template #loadingbody let-columns="columns">
+        <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+            <td *ngFor="let col of tableColumns" >
+                <p-skeleton />
+            </td>
+            <td>
+                <p-skeleton shape="circle" size="1rem" />
+            </td>
         </tr>
-    </ng-container>
-    <ng-template #elseTemplate>
+    </ng-template>
+    <ng-template #emptymessage>
         <tr class="p-datatable-empty-text">
             <td [attr.colspan]="tableColumns.length + 1">
                 <div class="flex align-items-center" *ngIf="!tableSearch">
-                    <span>Nenhum item registrado. Clique</span>
-                    <p-button styleClass="text-orange-600 overflow-visible" [link]="true" [routerLink]="['cadastrar' ]">
-                        <span class="p-overlay-badge">aqui <i class="p-badge bi bi-hand-index-thumb-fill bg-transparent text-primary top-auto bottom-0 -mr-1" style="rotate: -25deg;"></i>
-                        </span>
-                    </p-button>
-                    <span> para cadastrar. </span>
+                    <span>Nenhum item registrado.</span>
                 </div>
                 <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
             </td>
         </tr>
     </ng-template>
-</ng-template>
 </p-table>
 </div>
 <router-outlet></router-outlet>

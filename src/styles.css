@@ -243,7 +243,7 @@ a {
 }
 
 .p-fileupload-advanced {
-    background: transparent;
+    background-color: transparent!important;
 }
 
 .p-inputtext[readonly] {
@@ -404,8 +404,7 @@ td.p-datatable-frozen-column {
 }
 
 .p-select-small .p-select-label {
-    font-size: 10.5px;
-    padding: 3px 7px;
+    padding: 4px 7px;
 }
 
 .p-select-small .p-select-dropdown {
@@ -517,18 +516,15 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
 }
 
 .p-select.p-select-menu .p-select-dropdown-icon {
-    display: flex;
+    /* display: flex;
     align-items: center;
-    justify-content: center;
-    padding-top: 3px;
+    justify-content: center; */
 }
 
 .p-select.p-select-menu.p-select-small .p-select-dropdown-icon i {
-    font-size: 10px;
 }
 
 .p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {
-    font-size: 11px;
 }
 
 p-scroller{

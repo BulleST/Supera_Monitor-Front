@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Aluno } from '../../../models/alunos.model';
 import { Aluno_CheckList_Item } from '../../../models/checklist.model';
 import $ from 'jquery';
@@ -26,13 +26,14 @@ export class AlunoChecklistDialogComponent implements OnChanges {
     
     constructor(        
         private mensagemWhatsapp: MensagemWhatsapp,
+        private changeDetectorRef: ChangeDetectorRef,
     ) { 
     }
     
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            console.log('aluno', this.aluno);
+            console.log('aluno dialog', this.aluno);
             if (this.aluno && this.aluno.checklistCompleto) {
                 this.aluno.checklistCompleto = this.aluno.checklistCompleto.map(x => {
                     x.items = x.items.sort((a, b) => a.ordem - b.ordem);
@@ -54,12 +55,24 @@ export class AlunoChecklistDialogComponent implements OnChanges {
         }
     }
     
-    show() {
+    show(aluno: Aluno) {
+        this.aluno = aluno;
+        console.log('aluno show', this.aluno);
+
+        if (this.aluno && this.aluno.checklistCompleto) {
+            this.aluno.checklistCompleto = this.aluno.checklistCompleto.map(x => {
+                x.items = x.items.sort((a, b) => a.ordem - b.ordem);
+                return x;
+            });
+        }
         this.visible = true;
+        this.changeDetectorRef.markForCheck();
+        this.changeDetectorRef.detectChanges();
     }
     
     hide() {
         this.visible = false;
+        this.changeDetectorRef.detectChanges();
     }
     
     checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {

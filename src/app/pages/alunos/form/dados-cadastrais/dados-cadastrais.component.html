@@ -4,81 +4,82 @@
 
 <div class="formgrid grid">
     <!-- Foto -->
-    <div class="lg:col-3 md:col-3 col-12 px-0 flex overflow-hidden">
-        <p-fileupload #fileUpload
-                      class="w-full"
-                      styleclass="gap-0 w-full"
-                      name="myfile[]"
-                      accept="image/*"
-                      (onSelect)="onSelectedFiles($event)"
-                      styleClass="border-none"
-                      [showUploadButton]="false"
-                      [showCancelButton]="false"
-                      [chooseStyleClass]="'hidden'"
-                      headerTemplate="">
+    <div class="lg:col-3 md:col-3 col-12 px-0 ">
+            
+            <p-fileupload #fileUpload
+                    class="w-full"
+                    styleclass="gap-0 w-full bg-transparent"
+                    name="myfile[]"
+                    accept="image/*"
+                    (onSelect)="onSelectedFiles($event)"
+                    styleClass="border-none"
+                    [showUploadButton]="false"
+                    [showCancelButton]="false"
+                    [chooseStyleClass]="'hidden'"
+                    headerTemplate="">
             <ng-template #content
-                         let-files
-                         let-uploadedFiles="uploadedFiles"
-                         let-removeFileCallback="removeFileCallback"
-                         let-removeUploadedFileCallback="removeUploadedFileCallback">
+                    let-files
+                    let-uploadedFiles="uploadedFiles"
+                    let-removeFileCallback="removeFileCallback"
+                    let-removeUploadedFileCallback="removeUploadedFileCallback">
             </ng-template>
             <ng-template #file>
-                <div class="w-full flex flex-column align-items-center justify-content-center">
-                    <p-button (onClick)="choose(fileUpload)"
-                              icon="pi pi-images"
-                              [rounded]="true"
-                              label="Selecionar foto"
-                              class="-mb-5 relative z-2" />
-                    <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
-                        <div *ngIf="loadingFile" 
-                            class="w-full flex align-items-center justify-content-center absolute z-1">
-                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" 
-                                style="padding-top: 100%; height: 0"></div>
+            <div class="w-full flex flex-column align-items-center justify-content-center">
+                <p-button (onClick)="choose(fileUpload)"
+                            icon="pi pi-images"
+                            [rounded]="true"
+                            label="Selecionar foto"
+                            class="-mb-5 relative z-2" />
+                <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
+                    <div *ngIf="loadingFile" 
+                        class="w-full flex align-items-center justify-content-center absolute z-1">
+                        <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" 
+                            style="padding-top: 100%; height: 0"></div>
+                        <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
+                        style="font-size: 2rem"></i>
+                    </div>
+                    <div id="divImage"
+                        class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                        [ngStyle]="{ 
+                            paddingTop: '100%', 
+                            height: '0', 
+                            backgroundImage: 'url(' + foto + ')' 
+                        }">
+                    </div>
+                </div>
+            </div>
+            </ng-template>
+            <ng-template #empty>
+            <div class="w-full flex flex-column align-items-center justify-content-center">
+                <p-button (onClick)="choose(fileUpload)"
+                            icon="pi pi-images"
+                            [rounded]="true"
+                            label="Selecionar foto"
+                            class="-mb-5 relative z-2" />
+                <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
+                    <ng-container *ngIf="loadingFile">
+                        <div class="w-full flex align-items-center justify-content-center absolute z-1">
+                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
                             <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
                             style="font-size: 2rem"></i>
                         </div>
-                        <div id="divImage"
-                             class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                             [ngStyle]="{ 
-                                paddingTop: '100%', 
-                                height: '0', 
-                                backgroundImage: 'url(' + foto + ')' 
-                            }">
+                    </ng-container>
+                    <ng-container *ngIf="!foto">
+                        <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
+                        <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
+                    </ng-container>
+                    <ng-container *ngIf="foto">
+                        <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                            [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + foto + ')' }">
                         </div>
-                    </div>
+                    </ng-container>
                 </div>
+            </div>
             </ng-template>
-            <ng-template #empty>
-                <div class="w-full flex flex-column align-items-center justify-content-center">
-                    <p-button (onClick)="choose(fileUpload)"
-                              icon="pi pi-images"
-                              [rounded]="true"
-                              label="Selecionar foto"
-                              class="-mb-5 relative z-2" />
-                    <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
-                        <ng-container *ngIf="loadingFile">
-                            <div class="w-full flex align-items-center justify-content-center absolute z-1">
-                                <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
-                                <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
-                                style="font-size: 2rem"></i>
-                            </div>
-                        </ng-container>
-                        <ng-container *ngIf="!foto">
-                            <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
-                            <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
-                        </ng-container>
-                        <ng-container *ngIf="foto">
-                            <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                                 [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + foto + ')' }">
-                            </div>
-                        </ng-container>
-                    </div>
-                </div>
-            </ng-template>
-        </p-fileupload>
+            </p-fileupload>
     </div>
     <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
-        <p-divider layout="vertical" class="hidden md:block h-full min-h-0 mt-2 mb-5"></p-divider>
+        <div class="hidden md:block surface-300" style="height: 95%; width: 2px;"></div>
         <div class="formgrid grid pl-2 sm:px-3">
             <!-- Nome -->
             <div class="field lg:col-4 md:col-6 sm:col-6 xs:col-8 col-12">
@@ -364,10 +365,12 @@
                 <div tabindex="0"
                     id="etapaChecklist"
                     style="height: 29px"
-                    class="p-inputtext w-full outline-none hover:border-500 focus:border-primary-500" 
+                    class="p-inputtext flex align-items-center w-full outline-none hover:border-500 focus:border-primary-500" 
                     (focusin)="checklistPopover.show($event)"
                     (keydown.tab)="checklistPopover.hide()">
+                        
                     <app-aluno-checklist #alunoChecklist
+                    class="w-full"
                         [aluno_Id]="aluno_Id"
                         [aluno]="object"
                         [showChecklist]="true"
@@ -429,6 +432,11 @@
                     </div>
                 </p-popover>
             </div>
+        </div>
+    </div>
+    <div class="col-12 px-3 mt-2 flex overflow-hidden">
+
+        <div class="formgrid grid">
             <!-- Turma -->
             <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
@@ -436,6 +444,7 @@
                           [options]="turmasFiltered"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
+                          [showClear]="true"
                           #turma_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
@@ -491,6 +500,7 @@
                     <p-select [options]="perfisCognitivos"
                                 [(ngModel)]="object.perfilCognitivo_Id"
                                 [loading]="loadingPerfisCognitivos"
+                                [showClear]="true"
                                 #perfilCognitivo_Id="ngModel"
                                 styleClass="w-full"
                                 class="w-full"

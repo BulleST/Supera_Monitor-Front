@@ -25,7 +25,7 @@
                       [(ngModel)]="view"
                       (onChange)="calendarViewChanged()"
                       optionValue="value"
-                      styleClass="p-select-menu p-select-menu--dark {{ [ScreenWidth.sm].includes(screen) ? 'p-select-small' : '' }}"
+                      styleClass="p-select-menu p-select-menu--dark p-select-small"
                       appendTo="body">
                 <ng-template let-selectedOption #selectedItem>
                     <div class="text-white -mr-2">
@@ -47,7 +47,7 @@
             <p-select [options]="agendarMenuItem"
                       [(ngModel)]="agendarValue"
                       #agendar="ngModel"
-                        styleClass="p-select-menu {{ [ScreenWidth.sm].includes(screen) ? 'p-select-small' : '' }}"
+                        styleClass="p-select-menu p-select-small"
                       placeholder="Agendar"
                       (onChange)="agendarEvento($event, agendar)"
                       scrollHeight="250px"

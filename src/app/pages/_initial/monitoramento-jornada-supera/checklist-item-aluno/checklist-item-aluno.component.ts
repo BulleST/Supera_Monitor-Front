@@ -22,7 +22,8 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     icon: string = '';
     text: string = '';
     textColor: string = '';
-    urlEnviarMensagem: { link: string, mensagem: string } | null = null;
+
+    hide = false;
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -34,7 +35,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         if (changes['alunoChecklistItem']) {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
             this.setComponent();
-            this.urlEnviarMensagem = this.enviarMensagemCondicao(this.alunoChecklistItem);
 
         }
         if (changes['item']) {
@@ -60,85 +60,34 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         }
     }
 
-    enviarMensagemAluno() {
-        if (this.urlEnviarMensagem) {
-            window.open(this.urlEnviarMensagem.link, '_blank');
-            this.mensagemWhatsapp.copiarMensagem(this.urlEnviarMensagem.mensagem);
+    enviarMensagem() {
+        if (this.alunoChecklistItem) {
+            let object = this.mensagemWhatsapp.enviarMensagem(this.alunoChecklistItem.aluno, this.alunoChecklistItem.celular)
+            window.open(object.link, '_blank');
+            this.mensagemWhatsapp.copiarMensagem(object.mensagem);
         }
     }
 
-    enviarMensagemCondicao(aluno: Aluno_Checklist_Item_View) {
-        let object: { link: string, mensagem: string } | null = null;
-        if (aluno.celular) {
-            // Apresentação do Diretor Franqueado 
-            if (aluno.checklist_Item_Id == 8) {
-                object = this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
-                // Confirmação da adequação do aluno ao perfil da turma 
-            } else if (aluno.checklist_Item_Id == 9) {
-                object = this.enviarMensagemAdequacaoTurma(aluno);
-                // Agendar 1ª Oficina 
-            } else if (aluno.checklist_Item_Id == 12) {
-                object = this.enviarMensagemLembreteOficina(aluno);
-                // Feedback pós venda 
-            } else if (aluno.checklist_Item_Id == 13) {
-                object = this.enviarMensagemFeedbackPosVenda(aluno);
-                // Confirmação de preeechimento do feedback pós venda 
-            } else if (aluno.checklist_Item_Id == 32) {
-                object = this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
-                // Mensagem de boas-vindas 
-            } else if (aluno.checklist_Item_Id == 37) {
-                object = this.enviarMensagemBoasVindas(aluno);
-                // Agendar Superação 
-            } else if (aluno.checklist_Item_Id == 22) {
-                object = this.enviarMensagemLembreteSuperacao(aluno);
-                // Agendar 2ª Superação 
-            } else if (aluno.checklist_Item_Id == 29) {
-                object = this.enviarMensagemLembreteSuperacao(aluno);
-                // Agendar 2ª Oficina 
-            } else if (aluno.checklist_Item_Id == 23) {
-                object = this.enviarMensagemLembreteOficina(aluno);
-            } else {
-                object = this.enviarMensagem(aluno);
-            }
-
-        }
-        return object;
-    }
-
-    enviarMensagem(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemBoasVindas(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.aluno, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
-    }
-
-    enviarMensagemAdequacaoTurma(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemLembreteOficina(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemLembreteSuperacao(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemFeedbackPosVenda(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.aluno, aluno.celular);
-    }
-
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno_Checklist_Item_View) {
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.aluno, aluno.celular);
-    }
 
     showAlunoChecklistOnConfirm() {
-        this.alunoChecklistOnConfirmDialog.show();
+        let aluno: Aluno = {
+            id: this.alunoChecklistItem.aluno_Id,
+            nome: this.alunoChecklistItem.aluno,
+            celular: this.alunoChecklistItem.celular,
+            diaSemana: this.alunoChecklistItem.diaSemana,
+            corLegenda: this.alunoChecklistItem.corLegenda,
+            turma: this.alunoChecklistItem.turma,
+            turma_Id: this.alunoChecklistItem.turma_Id,
+            professor: this.alunoChecklistItem.professor,
+            professor_Id: this.alunoChecklistItem.professor_Id,
+            email: this.alunoChecklistItem.email,
+            linkGrupo: this.alunoChecklistItem.linkGrupo,
+            horario: this.alunoChecklistItem.horario,
+        } as Aluno
+
+        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem;
+        this.alunoChecklistOnConfirmDialog.aluno = aluno;
+        this.alunoChecklistOnConfirmDialog.show(aluno);
         
         var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
             this.alunoChecklistOnConfirmDialog.hide();
@@ -146,10 +95,15 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         });
 
         var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+            console.log('onFinish')
             this.alunoChecklistItem.observacoes = res.observacoes;
             this.alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
             this.alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
             this.alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+            this.hide = true;
+            setTimeout(() => {
+                this.alunoChecklistItem = undefined as any;
+            }, 1000);
             onFinish.unsubscribe();
         });
         

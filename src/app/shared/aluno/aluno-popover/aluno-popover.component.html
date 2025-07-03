@@ -83,7 +83,6 @@
                 value="Aula 1"
                 styleClass="bg-pink-500" />
             </div>
-            
         </div>
     </ng-template>
     <ng-template #subtitle>
@@ -129,15 +128,17 @@
                 }"></ng-container>
             </ng-container>
         </ng-template>
-        <p class="mt-2">
+        <div class="mt-2">
             <b class="white-space-nowrap" *ngIf="showChecklist">Jornada Supera: </b>
-            <app-aluno-checklist #alunoChecklist
-            *ngIf="visible"
-            [aluno]="aluno"
-            [aluno_Id]="aluno_Id"
-            [showChecklist]="showChecklist"
-            (alunoChanged)="alunoChanged($event)"></app-aluno-checklist>
-        </p>
+            <p class="w-min">
+                <app-aluno-checklist #alunoChecklist
+                *ngIf="visible"
+                [aluno]="aluno"
+                [aluno_Id]="aluno_Id"
+                [showChecklist]="showChecklist"
+                (alunoChanged)="alunoChanged($event)"></app-aluno-checklist>
+            </p>
+        </div   >
     </section>
     <ng-template #footer>
         <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>

@@ -150,7 +150,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 command: () => {
                     this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
                     this.alunoChecklistDialog.aluno = this.aluno;
-                    this.alunoChecklistDialog.show();
+                    this.alunoChecklistDialog.show(this.aluno);
                 },
             })
         }

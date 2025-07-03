@@ -1,0 +1,14 @@
+@keyframes zoomout {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: scale3d(.3, .3, .3);
+    }
+}
+
+
+.zoomout {
+    animation: zoomout .15s linear;
+}

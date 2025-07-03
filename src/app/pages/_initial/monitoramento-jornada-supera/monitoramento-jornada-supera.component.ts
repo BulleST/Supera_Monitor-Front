@@ -46,12 +46,12 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     ) {
         var onFinish = this.service.onFinish.subscribe(res => {
 
+            console.log('onFinish', res);
+
             this.checklists = this.checklists.map((checklist, indexChecklist) => {
                 checklist.items = checklist.items.map((item, indexItem) => {
-                    let index = item.alunos.findIndex(x => x.id == res.id);
-                    if (index != -1) {
-                        item.alunos.splice(index, 1);
-                    }
+              
+                    item.alunos = item.alunos.filter(x => x.id != res.id)
                     return item;
                 });
                 return checklist;

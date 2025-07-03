@@ -253,6 +253,7 @@ export var alunosColumns: ColumnTable[] = [
         label: 'Educador',
         filterType: FilterType.text,
         displayType: DisplayType.text,
+        sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
@@ -267,6 +268,7 @@ export var alunosColumns: ColumnTable[] = [
         label: 'Perfil Cognitivo',
         filterType: FilterType.text,
         displayType: DisplayType.text,
+        sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
@@ -281,6 +283,7 @@ export var alunosColumns: ColumnTable[] = [
         label: 'Kit',
         filterType: FilterType.text,
         displayType: DisplayType.text,
+        sortable: true, 
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),

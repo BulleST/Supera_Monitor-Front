@@ -1,10 +1,13 @@
-<ng-container *ngIf="alunoChecklistItem">
+<div [ngClass]="{
+            'zoomout animation-duration-500 ': !alunoChecklistItem
+        }">
+    <ng-container *ngIf="alunoChecklistItem">
     <div class="flex align-items-center">
         <p-button type="button"
-                  (onClick)="enviarMensagemAluno()"
-                  (auxclick)="enviarMensagemAluno()"
-                  (contextmenu)="enviarMensagemAluno()"
-                  [disabled]="!urlEnviarMensagem"
+                  (onClick)="enviarMensagem()"
+                  (auxclick)="enviarMensagem()"
+                  (contextmenu)="enviarMensagem()"
+                  [disabled]="!alunoChecklistItem.celular"
                   icon="pi pi-whatsapp"
                   severity="success"
                   [rounded]="true"
@@ -42,3 +45,5 @@
         [alunoChecklistItem]="alunoChecklistItem"
         [item]="item"></app-aluno-checklist-on-confirm-dialog>
 </ng-container>
+
+</div>
