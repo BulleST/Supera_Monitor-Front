@@ -20,17 +20,14 @@ import { Turma } from '../../../models/turma.model'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
 import { SalaAulaService } from '../../../services/sala-aula.service'
-import { Crypto, getError, showError } from '../../../utils'
+import { Crypto, getError, MensagemWhatsapp, showError } from '../../../utils'
 import { ProfessorService } from '../../../services/professor.service'
 import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
 import { TurmaService } from '../../../services/turma.service'
 import moment from 'moment'
 import { NgForm, NgModel } from '@angular/forms'
-import {
-  EventoTurmaExtraRequest,
-  EventoAulaRequest,
-} from '../../../models/evento-aula.model'
+import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model'
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model'
 import { MyMap } from '../../../utils/map'
@@ -66,7 +63,6 @@ export class EventoComponent implements OnDestroy {
   error: string = ''
   subscription: Subscription[] = []
   tipoString = ''
-  isChamadaPage = false
   duracaoEvento = ''
   width = '1000px'
   tipo = EventoTipo
@@ -107,6 +103,7 @@ export class EventoComponent implements OnDestroy {
     private turmaService: TurmaService,
     private roteiroService: RoteiroService,
     private calendarioUtils: CalendarioUtils,
+    private mensagemWhatsapp: MensagemWhatsapp,
   ) {
     var params = this.activatedRoute.snapshot.params
     if (
@@ -127,11 +124,7 @@ export class EventoComponent implements OnDestroy {
     }
 
     this.encryptedId = params['evento_id']
-    var url = this.activatedRoute.url.subscribe((res) => {
-      this.isChamadaPage = res.find((x) => x.path == 'chamada') ? true : false
-    })
-    this.subscription.push(url)
-
+  
     var roteiros = this.roteiroService.list.subscribe(
       (res) => (this.roteiros = res),
     )
@@ -285,7 +278,7 @@ export class EventoComponent implements OnDestroy {
 
   visibleChange() {
     if (!this.visible) {
-      var route = this.isChamadaPage ? '../../../' : '../../'
+      var route = '../../../';
       this.router.navigate([route], { relativeTo: this.activatedRoute })
     }
   }
@@ -369,62 +362,53 @@ export class EventoComponent implements OnDestroy {
     return this.calendarioUtils.getEventoTipo(e)
   }
 
+  enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
+    if (!aluno.celular) {
+      this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+      return;
+    }
+    if (aluno.presente) {
+      this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+      return;
+    }
+
+
+    lastValueFrom(this.service.calendario({
+        intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
+        intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+        perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+    })) 
+    .then(res => {
+        let sugestoes = res.filter(aula => {
+            const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
+            const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+            const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
+            const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+            const aulaNaoFinalizada = !aula.finalizado;
+            const aulaEstaAtiva = aula.active;
+            const naoEhFeriado = !aula.feriado;
+            
+            return alunoNaoEstaNaAula
+                && ehAula
+                && temVagas
+                && ehPerfilCognitivoCompativel
+                && aulaNaoFinalizada
+                && aulaEstaAtiva
+                && naoEhFeriado;
+        });
+
+        let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, sugestoes);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    })
+  }
+
   goToAluno(aluno: Evento_Participacao_Aluno) {
     this.router.navigate([
       'calendario',
       'aluno',
       this.crypto.encrypt(aluno.aluno_Id),
     ])
-  }
-
-  async goToIniciarChamada(e: any) {
-    this.isChamadaPage = true
-    this.evento.alunos
-      .filter((x) => x.active)
-      .map((item) => {
-        item.presente = true
-        return item
-      })
-
-    this.evento.professores.map((item) => {
-      item.presente = true
-      return item
-    })
-
-    this.service.setEvento(this.evento)
-    var route:
-      | 'aula'
-      | 'aula-zero'
-      | 'aula'
-      | 'superacao'
-      | 'reuniao'
-      | 'oficina' = 'aula'
-
-    switch (this.evento.evento_Tipo_Id) {
-      case EventoTipo.Aula:
-        route = 'aula'
-        break
-      case EventoTipo.AulaZero:
-        route = 'aula-zero'
-        break
-      case EventoTipo.AulaExtra:
-        route = 'aula'
-        break
-      case EventoTipo.Superacao:
-        route = 'superacao'
-        break
-      case EventoTipo.Reuniao:
-        route = 'reuniao'
-        break
-      case EventoTipo.Oficina:
-        route = 'oficina'
-        break
-      default:
-        route = 'aula'
-        break
-    }
-
-    this.router.navigate(['calendario', route, 'chamada', this.encryptedId])
   }
 
   finalizarConfirmation(e: any) {

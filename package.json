@@ -4,7 +4,13 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0",
-    "build": "ng build"
+    "start:fast": "ng serve --host 0.0.0.0 --configuration=development --poll=2000",
+    "build": "ng build",
+    "build:dev": "ng build --configuration=development",
+    "build:prod": "ng build --configuration=production",
+    "clean": "rimraf dist .angular/cache",
+    "clean:cache": "rimraf .angular/cache",
+    "optimize": "npm run clean:cache && npm start"
   },
   "private": true,
   "dependencies": {

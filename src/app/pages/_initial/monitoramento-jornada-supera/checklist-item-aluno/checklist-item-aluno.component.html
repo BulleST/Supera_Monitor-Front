@@ -1,17 +1,14 @@
 <ng-container *ngIf="alunoChecklistItem">
     <div class="flex align-items-center gap-2">
-        <ng-container *ngIf="urlEnviarMensagem">
-            <a [href]="urlEnviarMensagem"
-               target="_blank"
-               pTooltip="Enviar mensagem"
-               tooltipPosition="top"
-               class="text-green-500 pi pi-whatsapp hover:bg-green-200"></a>
-        </ng-container>
-        <ng-container *ngIf="!urlEnviarMensagem">
-            <a pTooltip="Nenhum celular cadastrado"
-               tooltipPosition="top"
-               class="text-600 pi pi-whatsapp cursor-auto"></a>
-        </ng-container>
+        <p-button type="button"
+                  (onClick)="enviarMensagemAluno()"
+                  (auxclick)="enviarMensagemAluno()"
+                  (contextmenu)="enviarMensagemAluno()"
+                  [disabled]="urlEnviarMensagem"
+                  icon="pi pi-whatsapp"
+                  severity="success"
+                  [rounded]="true"
+                  [text]="true"/>
         <p class="hover:text-primary hover:underline cursor-pointer capitalize"
             (click)="alunoPopover.show($event)">
             {{ alunoChecklistItem.aluno | nameAbv }}

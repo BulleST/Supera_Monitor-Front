@@ -30,6 +30,7 @@ import { MyMap } from '../../../../../utils/map';
 import { groupBy } from 'lodash'
 import $ from 'jquery';
 import { validaAlunos, validaProfessores, validaSalaAulas, CalendarioUtils, playAlert, playSuccess, showError } from '../../../../../utils';
+import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -433,12 +434,13 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemAgendamento(
+                var object = this.mensagemWhatsapp.enviarMensagemAgendamento(
                     aluno.nome,
                     aluno.celular,
                     evento
                 );
-                window.open(url, '_target');
+                window.open(object.link, '_target');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
             reject: () => {
                 this.visible = false;
@@ -483,7 +485,13 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     markChecklistAsDone() {

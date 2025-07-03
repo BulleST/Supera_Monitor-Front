@@ -176,8 +176,17 @@ export class CancelarEventoComponent implements OnDestroy {
         }
     }
 
-    enviarMensagemCancelamento(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagemCancelamento(nome, celular, this.evento);
+    enviarMensagemCancelamento(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.aluno, aluno.celular, this.evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+        if (index != -1)
+            this.mensagensEnviadasAlunos.splice(index, 1);
     }
 
     enviarMensagem(nome: string, celular: string) {
@@ -308,11 +317,4 @@ export class CancelarEventoComponent implements OnDestroy {
 
     }
 
-    removerAlunoLista(aluno: Evento_Participacao_Aluno, e: any) {
-        if (e.which == 2) {
-            var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-            if (index != -1)
-                this.mensagensEnviadasAlunos.splice(index, 1);
-        }
-    }
 }

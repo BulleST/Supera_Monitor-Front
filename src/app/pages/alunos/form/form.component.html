@@ -46,7 +46,7 @@
             <p-tabs [value]="0">
                 <p-tablist>
                     <p-tab [value]="0">Dados Cadastrais</p-tab>
-                    <p-tab [value]="1" *ngIf="isEditPage">Calendário</p-tab>
+                    <!-- <p-tab [value]="1" *ngIf="isEditPage">Calendário</p-tab> -->
                     <p-tab [value]="2" *ngIf="isEditPage">Histórico</p-tab>
                 </p-tablist>
                 <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
@@ -56,9 +56,9 @@
                             [isEditPage]="isEditPage"
                             [aluno_Id]="aluno_Id"></app-dados-cadastrais>
                     </p-tabpanel>
-                    <p-tabpanel [value]="1" *ngIf="isEditPage">
+                    <!-- <p-tabpanel [value]="1" *ngIf="isEditPage">
                         <app-calendario [object]="object"></app-calendario>
-                    </p-tabpanel>
+                    </p-tabpanel> -->
                     <p-tabpanel [value]="2" *ngIf="isEditPage">
                         <app-historico [object]="object"></app-historico>
                     </p-tabpanel>

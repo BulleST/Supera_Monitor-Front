@@ -232,7 +232,7 @@
                 </div>
             </div>
             <!-- Início Vigência -->
-            <div class="field md:col-2 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
                 <label for="dataInicioVigencia">Início Vigência: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicioVigencia="ngModel"
@@ -255,7 +255,7 @@
                 </div>
             </div>
             <!-- Fim Vigência -->
-            <div class="field md:col-2 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
                 <label for="dataFimVigencia">Fim Vigência: </label>
                 <p-datepicker
                               #dataFimVigencia="ngModel"
@@ -273,15 +273,17 @@
                               appendTo="body" />
             </div>
             <!-- Restrições -->
-            <div class="field md:col-4 xs:col-6 col-12">
-                <div class="flex align-items-center gap-2 justify-content-between mb-1">
+            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
+                <div class="flex align-items-center gap-2 justify-content-between mb-1 relative" #divRestricoes>
                     <label for="restricoes">Restrições: </label>
                     <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1" 
                         (click)="popoverExplicacaoRestricoes.show($event)">
                         <span>Info</span>
                         <span class="pi pi-question-circle"></span>
                     </div>
-                    <p-popover #popoverExplicacaoRestricoes appendTo="body" styleClass="w-30rem max-w-screen">
+                    <p-popover #popoverExplicacaoRestricoes 
+                    [appendTo]="divRestricoes" 
+                    styleClass="w-30rem max-w-screen -mt-1">
                         <div class="max-h-20rem overflow-auto text-lg ">
                             <p class="text-red-500 font-bold mb-4">ATENÇÃO:</p>
                             <p>As restrições indicam dificuldades do aluno, como problemas auditivos, visuais, motores etc.</p>
@@ -293,7 +295,8 @@
                     </p-popover>
                 </div>
                 <p-iconfield>
-                    <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pip-spinner" />
+                    <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pi-spinner" />
+                    <p-inputicon *ngIf="!loadingRestricoes" styleClass="pi pi-ban" />
                     <input type="text"
                            pInputText
                            [value]="restricoesText"
@@ -306,8 +309,7 @@
                            [readonly]="true"
                            (focusin)="restricoes.show($event)"
                            (click)="restricoes.show($event)"
-                           (keydown.tab)="restricoes.hide()"
-                        >
+                           (keydown.tab)="restricoes.hide()">
                 </p-iconfield>
                 <p-popover #restricoes appendTo="body">
                     <div class="p-2 border-bottom-1 border-200 ">
@@ -357,7 +359,7 @@
                 </div>
             </div>
             <!-- Etapa da jornada -->
-            <div class="field md:col-4 xs:col-6 col-12">
+            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
                 <label for="etapaChecklist">Etapa da jornada: </label>
                 <div tabindex="0"
                     id="etapaChecklist"
@@ -428,7 +430,7 @@
                 </p-popover>
             </div>
             <!-- Turma -->
-            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
                 <p-select
                           [options]="turmasFiltered"
@@ -447,25 +449,18 @@
                           optionDisabled="deactivated"
                           (onChange)="turmaChanged(turma_Id, $event)">
                     <ng-template let-item #item>
-                        <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div class="w-full shadow-sm">
-                                <p class="font-bold">{{ item.nome }}</p>
-                                <div class="flex align-items-center justify-content-between mt-1">
-                                    <p class="flex items-center justify-center">
-                                        <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
-                                        <span>{{ item.professor }}</span>
-                                    </p>
-                                    <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
-                                </div>
-                                <p class="text-xs mt-1">
-                                    <ng-container *ngIf="item.perfilCognitivo?.length > 0; else semPerfil">
-                                        <span *ngFor="let perfil of item.perfilCognitivo">
-                                            {{ perfil.nome }}
-                                        </span>
-                                    </ng-container>
-                                    <ng-template #semPerfil> Sem perfil cognitivo associado </ng-template>
+                        <div class="w-full">
+                            <div class="flex align-items-center justify-content-between">
+                                <p class="flex align-items-center">
+                                    <span class="w-1rem h-1rem flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                    <span>{{ item.nome }}</span>
                                 </p>
+                                <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
                             </div>
+                            <p class="text-xs mt-1">
+                                {{getPerfilCognitivo(item)}}
+                                <i class="fa-solid fa-brain ml-2"></i>
+                            </p>
                         </div>
                     </ng-template>
                 </p-select>
@@ -491,19 +486,21 @@
             <!-- Perfil Cognitivo -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="perfilCognitivo_Id">Perfil Cognitivo:</label>
-                <p-select
-                          [options]="perfisCognitivos"
-                          [(ngModel)]="object.perfilCognitivo_Id"
-                          [loading]="loadingPerfisCognitivos"
-                          #perfilCognitivo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="perfilCognitivo_Id"
-                          inputId="perfilCognitivo_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [showClear]="true"
-                          appendTo="body" />
+                <p-iconfield>
+                    <p-inputicon styleClass="fa-solid fa-brain" />
+                    <p-select [options]="perfisCognitivos"
+                                [(ngModel)]="object.perfilCognitivo_Id"
+                                [loading]="loadingPerfisCognitivos"
+                                #perfilCognitivo_Id="ngModel"
+                                styleClass="w-full"
+                                class="w-full"
+                                name="perfilCognitivo_Id"
+                                inputId="perfilCognitivo_Id"
+                                optionLabel="nome"
+                                optionValue="id"
+                                [showClear]="true"
+                                appendTo="body" />
+                </p-iconfield>
             </div>
             <!-- KIT Apostila -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">

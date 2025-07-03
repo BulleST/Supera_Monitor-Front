@@ -5,9 +5,9 @@ import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/aluno
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { getError, insert, insertOrReplace, replace } from '../utils';
+import { getError, replace } from '../utils';
 import { PrimeiraAulaRequest, ReposicaoAlunoRequest } from '../models/reposicao.model';
-import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restricao.model';
+import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';
 import { AlunoChecklistCompleto } from '../models/calendario.model';
@@ -37,15 +37,13 @@ export class AlunoService extends Service {
         lastValueFrom(this.checklistService.getList())
             .then(res => this.checklists = res);
 
-        checklistService.list.subscribe(res => {
-            console.log('res checklist', res)
-            this.checklists = res;
-        })
+        this.checklistService.list.subscribe(res => this.checklists = res);
 
     }
     mapAluno(aluno: Aluno) {
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
         aluno.active = !aluno.deactivated;
+        aluno.activeString = aluno.active ? 'Ativo' : 'Inativo';
 
         aluno.created = moment(aluno.created).toDate();
         aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
@@ -82,7 +80,6 @@ export class AlunoService extends Service {
                 return checklistAluno
             })
 
-            console.log('checklists', this.checklists)
             aluno.checklistCompleto = this.checklists
                 .map(checklist => {
                     var checklistAluno = new AlunoChecklistCompleto;

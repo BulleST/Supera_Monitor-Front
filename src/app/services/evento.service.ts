@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject,  lastValueFrom,  map,  of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest, EventoTipo } from '../models/evento.model';
@@ -22,13 +22,14 @@ import { MyMap } from '../utils/map';
 import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
 
-
 @Injectable({
     providedIn: 'root',
 })
 export class EventoService extends Service {
     
     evento = new BehaviorSubject<Evento | undefined>(undefined);
+    eventoReposicaoDe = new BehaviorSubject<Evento | undefined>(undefined);
+    eventoReposicaoPara = new BehaviorSubject<Evento | undefined>(undefined);
     eventos = new BehaviorSubject<Evento[]>([]);
     feriados = new BehaviorSubject<Feriado[]>([]);
     dashboard = new BehaviorSubject<Dashboard_Response>(new Dashboard_Response);
@@ -63,6 +64,18 @@ export class EventoService extends Service {
         this.evento.next(value)
         if (value) localStorage.setItem('evento', JSON.stringify(value))
         else localStorage.removeItem('evento');
+    }
+
+    setEventoReposicaoDe(value: Evento | undefined) {
+        this.eventoReposicaoDe.next(value)
+        if (value) localStorage.setItem('evento-reposicao-de', JSON.stringify(value))
+        else localStorage.removeItem('evento-reposicao-de');
+    }
+    
+    setEventoReposicaoPara(value: Evento | undefined) {
+        this.eventoReposicaoPara.next(value)
+        if (value) localStorage.setItem('evento-reposicao-para', JSON.stringify(value))
+        else localStorage.removeItem('evento-reposicao-para');
     }
 
     
@@ -196,42 +209,6 @@ export class EventoService extends Service {
             }
         }));
     }
-
-    // getDashboard(request: DashboardRequest) {
-    //     return this.http.post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)
-    //     // return this.http.post<Dashboard[]>(`${this.url}/eventos/dashboard`, request)
-    //     .pipe(map(dashboardList => {
-    //         dashboardList = dashboardList.map(res => {
-    //             res.participacao.active = !res.participacao.deactivated;
-    //             res.aula.active = !res.aula.deactivated;
-    //             res.aula.data = moment(res.aula.data).toDate();
-                
-    //             // Procura se a aula foi reagendada
-    //             if (res.aula.reagendamentoPara_Evento_Id) {
-    //                 res.aula.reagendamentoPara_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoPara_Evento_Id)?.aula;
-    //             }
-
-    //             // Procura se a aula é reagendamento de outra
-    //             if (res.aula.reagendamentoDe_Evento_Id) {
-    //                 res.aula.reagendamentoDe_Evento = dashboardList.find(x => x.aula.id == res.aula.reagendamentoDe_Evento_Id)?.aula;
-    //             }
-                
-    //             // Procura se a aula foi reposta
-    //             if (res.participacao.reposicaoPara_Evento_Id) {
-    //                 res.participacao.reposicaoPara_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoPara_Evento_Id)?.aula;
-    //             }
-                
-    //             // Procura se a aula foi reposicao de outra
-    //             if (res.participacao.reposicaoDe_Evento_Id) {
-    //                 res.participacao.reposicaoDe_Evento = dashboardList.find(x => x.aula.id == res.participacao.reposicaoDe_Evento_Id)?.aula;
-    //             }
-    //             return res;
-    //         });
-            
-    //         return dashboardList;
-    //     }))
-    // }
-
     
     getDashboard(request: DashboardRequest) {
         return this.http.post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)

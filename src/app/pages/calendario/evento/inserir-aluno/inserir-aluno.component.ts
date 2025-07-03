@@ -271,12 +271,20 @@ export class InserirAlunoComponent {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular)
+    enviarMensagem(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemInscricao(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagemInscricao(nome, celular, this.evento);
+    enviarMensagemInscricao(aluno: Aluno) {
+        var object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     sendConfirmation(form: NgForm, e: any) {
@@ -349,8 +357,9 @@ export class InserirAlunoComponent {
             rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
-                var url = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
-                window.open(url, '_blank')
+                var object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
+                window.open(object.link, '_blank');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 
                 this.visible = false
                 this.visibleChange();

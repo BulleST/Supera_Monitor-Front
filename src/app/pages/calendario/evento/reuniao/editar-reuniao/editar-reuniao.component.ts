@@ -106,9 +106,16 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
+    enviarMensagem(professor: Evento_Participacao_Professor) {
+        if (!professor.phone) {
+            this.showError('Erro', 'Nenhum celular cadastrado', professor);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(professor.nome, professor.phone);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
+
 
     inputFocus(e: any) {
         e.target.select()

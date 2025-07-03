@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
@@ -6,7 +6,6 @@ import { AlunoService } from '../../../../services/alunos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import { lastValueFrom } from 'rxjs';
-import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { Crypto, playAlert } from '../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
@@ -18,7 +17,7 @@ import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAulaId } from '../../../../models/sala-aula.model';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
-import { AlunoPopoverComponent } from '../../../../shared/aluno/aluno-popover/aluno-popover.component';
+import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
 
 @Component({
     selector: 'app-selected-evento',
@@ -58,6 +57,7 @@ export class SelectedEventoComponent implements OnChanges {
         private mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
         private calendarioUtils: CalendarioUtils,
+        private salaAulaPipe: SalaAulaPipe,
 
     ) {
 
@@ -129,13 +129,15 @@ export class SelectedEventoComponent implements OnChanges {
         this.aluno.emit(undefined);
     }
 
-    getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
-        return perfilCognitivo.map(x => x.nome).join(', ');
-    }
-
 
     enviarMensagem(aluno: Evento_Participacao_Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular!)
+        if (!aluno.celular) {
+            this.toastrService.error('Erro', 'Nenhum celular cadastrado');
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular!);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     goToInscricaoOficina() {
@@ -248,15 +250,14 @@ export class SelectedEventoComponent implements OnChanges {
     async goToEvento() {
         if (this.evento) {
             this.evento.data = new Date(this.evento.data);
-
             var alunos = this.alunoService.list.value;
 
-            if (!alunos.length)
+            if (!alunos.length) {
                 await lastValueFrom(this.alunoService.getListWithChecklist()).then(res => alunos = res);
+            }
 
             this.evento.alunos = this.evento.alunos.map(participacao => {
                 const aluno = alunos.find(x => x.id == participacao.aluno_Id);
-
                 if (aluno) {
                     participacao.alunoChecklist = aluno.alunoChecklist;
                     participacao.checklistCompleto = aluno.checklistCompleto;
@@ -264,15 +265,13 @@ export class SelectedEventoComponent implements OnChanges {
                     participacao.checklist = aluno.checklist;
                     participacao.presente = this.evento?.finalizado ? participacao.presente : true;
                 }
-
                 return participacao;
             });
 
-            this.evento.professores
-                .map(item => {
-                    item.presente = true;
-                    return item;
-                });
+            this.evento.professores.map(item => {
+                item.presente = true;
+                return item;
+            });
 
             this.service.setEvento(this.evento);
             var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
@@ -287,17 +286,18 @@ export class SelectedEventoComponent implements OnChanges {
                 default: route = 'aula'; break;
             }
 
-            this.router.navigate(['calendario', route, 'chamada', this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', route, this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
     }
 
     goToReposicao() {
         if (this.evento) {
-            this.service.setEvento(this.evento);
-            this.router.navigate(['aula', 'reposicao', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
+            this.service.setEventoReposicaoPara(this.evento);
+            this.router.navigate(['aula', 'reposicao', 'agendar'], { relativeTo: this.activatedRoute });
         }
     }
+
 
     loadReposicoes() {
         if (this.evento) {
@@ -337,5 +337,17 @@ export class SelectedEventoComponent implements OnChanges {
             return true;
         }
         return false;
+    }
+
+    getSalaAula(evento: Evento) {
+        return this.salaAulaPipe.transform({
+            sala_Id: evento.sala_Id,
+            numeroSala: evento.numeroSala,
+            andar: evento.andar,
+        })
+    }
+
+    getPerfilCognitivo(evento: Evento) {
+        return evento.perfilCognitivo.map(x => x.nome).join(', ');
     }
 }

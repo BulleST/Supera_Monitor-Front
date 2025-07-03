@@ -132,7 +132,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
             styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
             disabled: !this.aluno?.celular,
             command: () => {
-                window.open(this.enviarMensagem(), '_blank');
+                let object = this.mensagemWhatsapp.enviarMensagem(this.aluno.nome, this.aluno.celular);
+                window.open(object.link, '_blank');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
         })
         if (this.showChecklist) {
@@ -154,7 +156,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: () => {
-                    console.log('goToAgendarReposicao')
                     this.goToAgendarReposicao();
                 },
             })
@@ -210,16 +211,8 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     goToAgendarReposicao() {
-        console.log('goToAgendarReposicao')
-        this.eventoService.setEvento(this.evento);
+        this.eventoService.setEventoReposicaoDe(this.evento);
         this.router.navigate(['reposicao', 'agendar', this.crypto.encrypt(this.aluno_Id)], { relativeTo: this.activatedRoute });
-    }
-
-    enviarMensagem() {
-        if (this.aluno && this.aluno.celular) {
-            return this.mensagemWhatsapp.enviarMensagem(this.aluno.nome, this.aluno.celular)
-        }
-        return;
     }
 
     alunoChanged(aluno: Aluno) {

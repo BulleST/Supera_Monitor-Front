@@ -208,9 +208,6 @@
         <ng-template pTemplate="body" let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td *ngFor="let col of tableColumns"
-                    [pSelectableRow]="item"
-                    [pSelectableRowIndex]="index"
-                    [pSelectableRowDisabled]="col.displayType == DisplayType.link"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
                     }">

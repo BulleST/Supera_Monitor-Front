@@ -205,13 +205,25 @@ export class ReposicaoComponent implements OnDestroy {
 
 
     enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     enviarMensagemAgendamento(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
         var evento = MyMap(this.evento, new Evento)
         evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-        return this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
+        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     getTipo(e: Evento) {
@@ -338,8 +350,9 @@ export class ReposicaoComponent implements OnDestroy {
             accept: () => {
                 this.visible = false
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemReposicao(this.selectedAluno!.nome, this.selectedAluno!.celular, evento);
-                window.open(url, '_target');
+                let object = this.mensagemWhatsapp.enviarMensagemReposicao(this.selectedAluno!.nome, this.selectedAluno!.celular, evento);
+                window.open(object.link, '_target');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
             reject: () => {
                 this.visible = false

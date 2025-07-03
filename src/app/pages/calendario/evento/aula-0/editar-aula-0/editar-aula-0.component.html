@@ -1,16 +1,16 @@
 <div class="formgrid grid">
     <!-- Data -->
     <div class="field lg:col-2 sm:col-3 col-5">
-        <label for="dataInicio">Data:</label>
+        <label for="data">Data:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
             <input type="text"
                    pInputText
                    [value]="evento.data | date : 'dd/MM/yyyy'"
-                   styleClass="w-full"
-                   class="w-full"
-                   id="professor"
-                   readonly />
+                   id="data"
+                   name="data"
+                   readonly
+                   fluid />
         </p-iconfield>
     </div>
     <!-- Horário -->
@@ -18,12 +18,12 @@
         <label for="horario">Horário:</label>
         <p-iconfield>
             <input type="text"
-                   pInputText
-                   [value]="evento.data | date : 'HH:mm'"
-                   styleClass="w-full"
-                   class="w-full"
-                   id="v"
-                   readonly />
+                pInputText
+                [value]="evento.data | date : 'HH:mm'"
+                id="horario"
+                name="horario"
+                readonly
+                fluid />
             <p-inputicon styleClass="pi pi-clock" />
         </p-iconfield>
     </div>
@@ -34,10 +34,9 @@
             <input type="text"
                    pInputText
                    [value]="duracaoEvento"
-                   styleClass="w-full"
-                   class="w-full"
                    id="duracaoEvento"
-                   readonly />
+                   readonly
+                   fluid />
             <p-inputicon styleClass="pi pi-hourglass" />
         </p-iconfield>
     </div>
@@ -45,17 +44,14 @@
     <div class="field lg:col-6 sm:col-4 col-12">
         <label for="aluno">Aluno: </label>
         <p-iconfield>
+            <p-inputicon styleClass="fa-solid fa-user-graduate" />
             <input type="text"
                    pInputText
                    [value]="alunoSelected.aluno"
-                   styleClass="w-full"
-                   class="w-full"
                    id="aluno"
-                   readonly />
-                   <p-inputicon styleClass="fa-solid fa-user-graduate" />
-                </p-iconfield>
-                <!-- (click)="alunoChecklistComponent.show()" -->
-                <!-- <app-aluno-checklist-calendario #alunoChecklistComponent [participacao]="alunoSelected"></app-aluno-checklist-calendario> -->
+                   readonly
+                   fluid />
+        </p-iconfield>
     </div>
     <!-- Educador -->
     <div class="field lg:col-5 sm:col-5  col-5">
@@ -193,15 +189,37 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
         </div>
     </div>
-    <div class="field flex" *ngIf="isChamadaPage || evento.finalizado">
-        <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
-                  [severity]="alunoSelected.presente ? 'success': 'danger'"
-                  [icon]="alunoSelected.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                  size="small"
-                  styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
-                  class="ml-auto mt-auto"
-                  (click)="isChamadaPage && !evento.finalizado ? undefined : presenteClick( $event)" />
-    </div>
+    <!-- Presente -->
+    <ng-container *ngIf="isChamadaPage && !evento.finalizado">
+        <div class="field flex">
+                                <p-button type="button" *ngIf="item.presente === false"
+                                    (onClick)="enviarMensagemFalta(item, $event)"
+                                    (auxclick)="enviarMensagemFalta(item, $event)"
+                                    (contextmenu)="enviarMensagemFalta(item, $event)"
+                                    [disabled]="!item.celular"
+                                    icon="pi pi-whatsapp"
+                                    severity="success"
+                                    [text]="true" />
+            <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
+                      [severity]="alunoSelected.presente ? 'success': 'danger'"
+                      [icon]="alunoSelected.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'"
+                      size="small"
+                      styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
+                      class="ml-auto mt-auto"
+                      (click)="isChamadaPage && !evento.finalizado ? undefined : presente(alunoSelected, $event)" />
+        </div>
+    </ng-container>
+    
+    <p-button
+              *ngIf="alunoSelected.presente === false"
+              [disabled]="!alunoSelected.celular"
+              label="Enviar mensagem"
+              icon="pi pi-whatsapp"
+              iconPos="right"
+              [pTooltip]="'Enviar mensagem de falta'"
+              tooltipPosition="bottom"
+              severity="info"
+              (onClick)="enviarMensagemFalta(alunoSelected, $event)"></p-button>
     <!-- Observações -->
     <div class="field col-12">
         <label for="observacao">Observações:</label>

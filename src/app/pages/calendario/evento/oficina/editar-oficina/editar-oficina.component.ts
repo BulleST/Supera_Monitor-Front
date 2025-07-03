@@ -6,7 +6,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
-import { Evento, EventoQueryParams } from '../../../../../models/evento.model';
+import { Evento, EventoQueryParams, EventoTipo } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
@@ -14,6 +14,8 @@ import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
+import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
+import { EventoService } from '../../../../../services/evento.service';
 
 @Component({
     selector: 'app-editar-oficina',
@@ -47,6 +49,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
+        private service: EventoService,
     ) {
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
@@ -103,8 +106,14 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     inputFocus(e: any) {
@@ -125,5 +134,29 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
             }
         });
     }
+
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
+      if (!aluno.celular) {
+        this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+        return;
+      }
+      if (aluno.presente) {
+        this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+        return;
+      }
+  
+  
+      lastValueFrom(this.service.calendario({
+          intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
+          intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+          perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+      })) 
+      .then(res => {
+          let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, []);
+          window.open(object.link, '_blank');
+          this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+      })
+    }
+  
 
 }

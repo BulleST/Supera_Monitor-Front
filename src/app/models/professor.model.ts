@@ -19,6 +19,7 @@ export class Professor extends Basic_List {
     // Não mapeados
     disponivel?: boolean;
     disponivelEvent?: Evento;
+    
     // const getAge = birthDate => Math.floor((new Date() - new Date(birthDate).getTime()) / 3.15576e+10)
 }
 
@@ -248,7 +249,6 @@ export var professorColumns: ColumnTable[] = [
 
             }
         },
-
         options: {
             items: [
                 {

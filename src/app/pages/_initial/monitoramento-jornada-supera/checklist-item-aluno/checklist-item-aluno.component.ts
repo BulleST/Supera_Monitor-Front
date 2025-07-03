@@ -22,7 +22,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     icon: string = '';
     text: string = '';
     textColor: string = '';
-    urlEnviarMensagem = '';
+    urlEnviarMensagem: { link: string, mensagem: string } | null = null;
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -35,6 +35,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
             this.setComponent();
             this.urlEnviarMensagem = this.enviarMensagemCondicao(this.alunoChecklistItem);
+
         }
         if (changes['item']) {
             this.item = changes['item'].currentValue;
@@ -59,45 +60,49 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         }
     }
 
-    enviarMensagemAluno(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    enviarMensagemAluno() {
+        if (this.urlEnviarMensagem) {
+            window.open(this.urlEnviarMensagem.link, '_blank');
+            this.mensagemWhatsapp.copiarMensagem(this.urlEnviarMensagem.mensagem);
+        }
     }
 
     enviarMensagemCondicao(aluno: Aluno_Checklist_Item_View) {
+        let object: { link: string, mensagem: string } | null = null;
         if (aluno.celular) {
             // Apresentação do Diretor Franqueado 
             if (aluno.checklist_Item_Id == 8) {
-                return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
+                object = this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
                 // Confirmação da adequação do aluno ao perfil da turma 
             } else if (aluno.checklist_Item_Id == 9) {
-                return this.enviarMensagemAdequacaoTurma(aluno);
+                object = this.enviarMensagemAdequacaoTurma(aluno);
                 // Agendar 1ª Oficina 
             } else if (aluno.checklist_Item_Id == 12) {
-                return this.enviarMensagemLembreteOficina(aluno);
+                object = this.enviarMensagemLembreteOficina(aluno);
                 // Feedback pós venda 
             } else if (aluno.checklist_Item_Id == 13) {
-                return this.enviarMensagemFeedbackPosVenda(aluno);
+                object = this.enviarMensagemFeedbackPosVenda(aluno);
                 // Confirmação de preeechimento do feedback pós venda 
             } else if (aluno.checklist_Item_Id == 32) {
-                return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
+                object = this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
                 // Mensagem de boas-vindas 
             } else if (aluno.checklist_Item_Id == 37) {
-                return this.enviarMensagemBoasVindas(aluno);
+                object = this.enviarMensagemBoasVindas(aluno);
                 // Agendar Superação 
             } else if (aluno.checklist_Item_Id == 22) {
-                return this.enviarMensagemLembreteSuperacao(aluno);
+                object = this.enviarMensagemLembreteSuperacao(aluno);
                 // Agendar 2ª Superação 
             } else if (aluno.checklist_Item_Id == 29) {
-                return this.enviarMensagemLembreteSuperacao(aluno);
+                object = this.enviarMensagemLembreteSuperacao(aluno);
                 // Agendar 2ª Oficina 
             } else if (aluno.checklist_Item_Id == 23) {
-                return this.enviarMensagemLembreteOficina(aluno);
+                object = this.enviarMensagemLembreteOficina(aluno);
             } else {
-                return this.enviarMensagem(aluno);
+                object = this.enviarMensagem(aluno);
             }
 
         }
-        return '';
+        return object;
     }
 
     enviarMensagem(aluno: Aluno_Checklist_Item_View) {

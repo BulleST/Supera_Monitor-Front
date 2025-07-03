@@ -43,13 +43,15 @@
                             <div>
                                 <div class="flex align-items-center">
                                     <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
-                                        <a *ngIf="item.celular"
-                                           [href]="enviarMensagem(item.nome, item.celular)"
-                                           pTooltip="Enviar mensagem"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                        </a>
+                                        <p-button type="button"
+                                            icon="pi pi-whatsapp"
+                                            (onClick)="enviarMensagem(item)"
+                                            (auxclick)="enviarMensagem(item)"
+                                            (contextmenu)="enviarMensagem(item)"
+                                            pTooltip="Enviar mensagem"
+                                            tooltipPosition="top"
+                                            [disabled]="!item.celular" >
+                                        </p-button>
                                     </div>
                                     <p class="font-bold mb-1">
                                         <span class="mr-2">{{item.nome}}</span>

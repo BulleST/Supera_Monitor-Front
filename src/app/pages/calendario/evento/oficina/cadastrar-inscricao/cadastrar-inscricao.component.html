@@ -12,25 +12,15 @@
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let aluno of mensagensEnviadasAlunos">
-                        <a *ngIf="aluno.celular"
-                           title="Clique para enviar"
-                           (auxclick)="removerAlunoLista(aluno, $event)"
-                           [href]="enviarMensagemAgendamento(aluno)"
-                           pTooltip="Enviar mensagem"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
-                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
-                            <span class="p-button-label">{{aluno.nome}}</span>
-                        </a>
-                        <p-button *ngIf="!aluno.celular"
-                                  icon="pi pi-whatsapp opacity-0"
-                                  severity="secondary"
-                                  styleClass="white-space-nowrap -ml-1 "
-                                  pTooltip="Nenhum celular cadastrado"
+                        <p-button type="button"
+                                  (onClick)="enviarMensagemAgendamento(aluno)"
+                                  (auxclick)="enviarMensagemAgendamento(aluno)"
+                                  (contextmenu)="enviarMensagemAgendamento(aluno)"
+                                  [disabled]="!aluno.celular"
+                                  icon="pi pi-whatsapp"
+                                  severity="success"
                                   [label]="aluno.nome"
-                                  [text]="true"
-                                  [disabled]="true" />
+                                  [text]="true"/>
                     </div>
                 </div>
             </div>

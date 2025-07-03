@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
-import { Evento } from "../models/evento.model";
+import { Evento, EventoTipo } from "../models/evento.model";
 import moment from "moment";
 import { CalendarioUtils } from "./calendario-utils";
-import { Account } from "../models/account.model";
-import { Turma } from "../models/turma.model";
+import { ToastrService } from "ngx-toastr";
+import { Clipboard } from "@angular/cdk/clipboard";
 
 @Injectable({
     providedIn: 'root'
@@ -11,86 +11,130 @@ import { Turma } from "../models/turma.model";
 export class MensagemWhatsapp {
 
     constructor(
-        private calendarioUtils: CalendarioUtils
+        private calendarioUtils: CalendarioUtils,
+        private toastr: ToastrService,
+        private clipboard: Clipboard
     ) {
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        var array = nome.split(' ');
-        nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome}, tudo bem?`;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+    copiarMensagem(mensagem: string) {
+        navigator.clipboard.writeText(mensagem)
+        .then(() => {
+            this.toastr.info('Mensagem copiada para área de transferência');
+        })
+        .catch(() => {
+            this.toastr.error('Erro ao copiar mensagem');
+        });
     }
 
-
-
-    enviarMensagemFalta(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+    enviarMensagem(nome: string, celular: string) {
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome}, 
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome}, tudo bem?`;
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
+    }
+
+    enviarMensagemFalta(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
+        let array = nome.split(' ');
+        nome = array[0];
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome}, 
             \r\n Espero que esteja bem! 
             \r\nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY')} e gostaria de saber se houve um imprevisto. 
-            \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades. 
-            \r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. 
-            \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
-            \r\n
-            \r\nIremos aguardar sua resposta...`;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+            \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
+
+            if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.AulaExtra) {
+                mensagem += `\r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. `
+                if (sugestoes.length > 0) {
+                    mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
+                    \r\n `;
+                }
+                sugestoes.forEach(sugestao => {
+                    mensagem += `\r\n • ${moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm')} - Turma: ${sugestao.turma}`;
+                })
+                mensagem += `\r\n
+                    \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
+                    \r\n
+                    \r\nIremos aguardar sua resposta...`;
+            }
+            else if (evento.evento_Tipo_Id == EventoTipo.Oficina) {
+                mensagem += `\r\n O não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
+                \r\n
+                \r\nFico à disposição caso precise de algo`;
+            }
+
+            
+            
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemAgendamento(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome}, 
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome}, 
             \r\nEspero que esteja bem!
             \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
             \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
             \r\n
             \r\nNos vemos em breve! `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemReagendamento(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
             \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi reagendada para dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}. 
             \r\n
             \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
             \r\n
             \r\nNos vemos em breve!`;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemCancelamento(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
             \r\nInfelizmente sua ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi cancelada devido "${evento.observacao}". 
             \r\n
             \r\nPor favor, me avise sua disponibilidade para que possamos combinar um novo horário.
             \r\n
             \r\nAgradeço pela compreensão!`;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemReposicao(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
             \r\nConfirmo que a reposição da ${this.calendarioUtils.getEventoTipo(evento)} está agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
             \r\n
@@ -98,15 +142,18 @@ export class MensagemWhatsapp {
             \r\n
             \r\nNos vemos em breve!
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemInscricao(nome: string, celular: string, evento: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
             \r\nSua inscrição na oficina do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi confirmada.
             \r\n
@@ -114,25 +161,31 @@ export class MensagemWhatsapp {
             \r\n
             \r\nNos vemos em breve!
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemFeedbackPosVenda(nome: string, celular: string) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
            MENSAGEM DE FEEDBACK PÓS VENDA
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
     enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(nome: string, celular: string) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome}, 
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome}, 
                         \r\nEspero que esteja bem!
                         \r\nPassando para confirmar se você já conseguiu preencher o formulário que enviamos.
                         \r\nCaso ainda não tenha preenchido, posso te enviar novamente — é rapidinho! 😊
@@ -141,29 +194,35 @@ export class MensagemWhatsapp {
                         \r\n
                         \r\nFico no aguardo, tá bom?
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemApresentacaoDiretorFranqueado(nome: string, celular: string) {
 
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
            MENSAGEM DE APRESENTACAO DIRETOR FRANQUEADO
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: any, professor?: string, linkGrupo?: string) {
         horario = horario ? new Date().toISOString().substring(0,10) + 'T' + horario : undefined;
-        var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
-        var array = nome.split(' ');
+        let semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             \r\nTudo bem?
             \r\nMeu nome é Antonio Neto, coordenador pedagógico da Equipe Supera Paraíso!
             \r\n
@@ -214,15 +273,18 @@ export class MensagemWhatsapp {
             \r\nSUA SENHA: Super@123
             \r\n
             \r\nQualquer dúvida, estou à disposição!`;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
     enviarMensagemAdequacaoTurma(nome: string, celular: string) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
                         \r\nEspero que esteja bem!
                         \r\n
                         \r\nQueremos saber como você está se sentindo em relação à sua turma.
@@ -230,16 +292,19 @@ export class MensagemWhatsapp {
                         \r\n
                         \r\nConte com a gente! 😊
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
 
     enviarMensagemLembreteOficina(nome: string, celular: string, proximaOficina?: Evento) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
                 \r\nEspero que esteja bem!
                 \r\n
                 \r\nVenho te convidar para participar da nossa oficina Supera.
@@ -252,16 +317,19 @@ export class MensagemWhatsapp {
                 \r\n Atenção: o não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
 
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
 
     enviarMensagemLembreteSuperacao(nome: string, celular: string) {
-        var array = nome.split(' ');
+        let array = nome.split(' ');
         nome = array[0];
-        var celular = celular.replace(/\D/g, '')
-        var mensagem = `Olá ${nome},
+        celular = celular.replace(/\D/g, '')
+        let mensagem = `Olá ${nome},
             Espero que esteja bem!
             Não se esqueça de agendar sua Superação com a gente.
             
@@ -270,8 +338,11 @@ export class MensagemWhatsapp {
 
             Nos vemos em breve!
         `;
-        var link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return link
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
     }
 
 

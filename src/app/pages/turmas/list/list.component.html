@@ -67,7 +67,6 @@
                 </div>
             </p-toolbar>
         </ng-template>
-        
         <ng-template pTemplate="header">
             <tr>
                 <ng-container *ngFor="let col of tableColumns">
@@ -200,40 +199,9 @@
                 <th pFrozenColumn alignFrozen="right"></th>
             </tr>
         </ng-template>
-        <!-- <ng-template pTemplate="header">
-            <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
-                <th *ngFor="let col of tableColumns"
-                    [pSortableColumn]="col.field"
-                    class="surface-900 border-none text-white white-space-nowrap"
-                    [style]="{ 
-                        width: col.options && col.options.width ? col.options.width : ''
-                    }">
-                    <div class="flex align-items-center">
-                        <span>{{ col.label }}</span>
-                        <ng-container *ngIf="col.filterType != FilterType.none">
-                            <div class="flex align-items-center"
-                                 [ngClass]="{
-                                    'ml-3': col.displayType != DisplayType.options 
-                                }">
-                                <p-columnFilter [type]="col.filterType"
-                                                [field]="col.field"
-                                                display="menu" />
-                                <p-sortIcon [field]="col.field" />
-                            </div>
-                        </ng-container>
-                    </div>
-                </th>
-                <th pFrozenColumn
-                    alignFrozen="right"
-                    class="surface-900 border-bottom-none text-white"></th>
-            </tr>
-        </ng-template> -->
         <ng-template pTemplate="body" let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td *ngFor="let col of tableColumns"
-                    [pSelectableRow]="item"
-                    [pSelectableRowIndex]="index"
-                    [pSelectableRowDisabled]="col.displayType == DisplayType.link"
                     [style]="{ 
                         width: col.options && col.options.width ? col.options.width : ''
                     }">

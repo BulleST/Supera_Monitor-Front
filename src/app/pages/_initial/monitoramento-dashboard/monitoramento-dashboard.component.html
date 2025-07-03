@@ -49,7 +49,7 @@
                         alignFrozen="left"
                         [frozen]="true"
                         [pSortableColumn]="'nome'"
-                        class="bg-primary-500 text-white">
+                        class="bg-primary-500 border-bottom-1 border-primary-500 text-white">
                         <div class="flex align-items-center">
                             <span>Alunos</span>
                             <p-columnFilter class="ml-auto"
@@ -64,7 +64,7 @@
                     </th>
                     <th rowspan="2"
                         [pSortableColumn]="'turma'"
-                        class=" bg-primary-500 text-white">
+                        class=" bg-primary-500 border-bottom-1 border-primary-500 text-white">
                         <div class="flex align-items-center">
                             <span>Turma</span>
                             <p-columnFilter class="ml-auto"
@@ -79,7 +79,7 @@
                     </th>
                     <ng-container *ngFor="let mes of mesesAno; let i = index;">
                         <th [colSpan]="mes.roteiros.length"
-                            class="w-full bg-primary-500 capitalize text-white text-center z-0 border-1 border-primary-400 border-top-none border-bottom-none"
+                            class="w-full bg-primary-500 border-bottom-1 border-primary-500 capitalize text-white text-center z-0 border-1 border-primary-400 border-top-none border-bottom-none"
                             [attr.data-mes]="mes.mes"> {{mes.mesString}} </th>
                     </ng-container>
                 </tr>
@@ -109,21 +109,19 @@
                         [frozen]="true"
                         class="white-space-nowrap px-2 py-1 z-2">
                         <div class="flex align-items-center">
-                            <span class="flex w-2rem h-2rem mr-2">
-                                <a *ngIf="aluno && aluno.celular"
-                                   [href]="enviarMensagem(aluno.nome, aluno.celular)"
-                                   target="_blank"
-                                   pTooltip="Enviar mensagem"
-                                   tooltipPosition="top"
-                                   class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text ">
-                                    <i class="pi pi-whatsapp p-button-icon "></i>
-                                </a>
-                                <a *ngIf="!aluno || !aluno.celular"
-                                   pTooltip="Nenhum celular cadastrado"
-                                   tooltipPosition="top"
-                                   class="p-ripple p-button p-component p-button-icon-only p-button-link p-button-success p-button-text cursor-default ">
-                                    <i class="pi pi-whatsapp p-button-icon text-500"></i>
-                                </a>
+                            <span class="mr-2">
+                                <p-button 
+                                    icon="pi pi-whatsapp"
+                                    severity="success"
+                                    [rounded]="true"
+                                    [text]="true"
+                                    pTooltip="Enviar mensagem"
+                                    tooltipPosition="top"
+                                    (onClick)="enviarMensagem(aluno)"
+                                    (auxclick)="enviarMensagem(aluno)"
+                                    (contextmenu)="enviarMensagem(aluno)"
+                                    [disabled]="!aluno.celular"
+                                />
                             </span>
                             <p (click)="showAluno(aluno.id, $event)"
                                class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
@@ -196,13 +194,18 @@
          
                                              }">
                                                 <span>Faltou</span>
-                                                <a *ngIf="aluno && aluno.celular;"
-                                                   [href]="enviarMensagem(aluno.nome, aluno.celular)"
-                                                   target="_blank"
-                                                   pTooltip="Enviar mensagem"
-                                                   tooltipPosition="top"
-                                                   class="pi pi-whatsapp hover:bg-green-500 text-white border-circle text-xs">
-                                                </a>
+                                                <p-button 
+                                                    icon="pi pi-whatsapp"
+                                                    severity="success"
+                                                    [rounded]="true"
+                                                    [text]="true"
+                                                    pTooltip="Enviar mensagem"
+                                                    tooltipPosition="top"
+                                                    (onClick)="enviarMensagem(aluno)"
+                                                    (auxclick)="enviarMensagem(aluno)"
+                                                    (contextmenu)="enviarMensagem(aluno)"
+                                                    [disabled]="!aluno.celular"
+                                                />
                                             </div>
                                             <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                         </ng-container>

@@ -53,18 +53,15 @@
                 <!-- Nome -->
                 <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2">
                     <div class="flex align-items-center white-space-nowrap gap-2">
-                        <ng-container *ngIf="aluno.celular">
-                            <a [href]="enviarMensagem(aluno)"
-                               target="_blank"
-                               pTooltip="Enviar mensagem"
-                               tooltipPosition="top"
-                               class="pi pi-whatsapp text-green-500 hover:bg-green-200"></a>
-                        </ng-container>
-                        <ng-container *ngIf="!aluno.celular">
-                            <a pTooltip="Nenhum celular cadastrado"
-                               tooltipPosition="top"
-                               class="pi pi-whatsapp text-600 cursor-auto"></a>
-                        </ng-container>
+                        <p-button type="button"
+                                  (onClick)="enviarMensagem(aluno)"
+                                  (auxclick)="enviarMensagem(aluno)"
+                                  (contextmenu)="enviarMensagem(aluno)"
+                                  [disabled]="!aluno.celular"
+                                  icon="pi pi-whatsapp"
+                                  severity="success"
+                                  [rounded]="true"
+                                  [text]="true"/>
                         <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
                               [pTooltip]="aluno.nome"
                               tooltipPosition="top"

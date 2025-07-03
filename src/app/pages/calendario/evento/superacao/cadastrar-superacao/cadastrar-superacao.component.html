@@ -137,13 +137,14 @@
                                 </ng-template>
                             </p>
                             <div class=" w-2rem h-2rem ml-auto">
-                                <a *ngIf="item.value.celular"
-                                   [href]="enviarMensagem(item.value)"
-                                   pTooltip="Enviar mensagem"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="-ml-1 p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                </a>
+                                <p-button type="button"
+                                      (onClick)="enviarMensagem(item.value)"
+                                      (auxclick)="enviarMensagem(item.value)"
+                                      (contextmenu)="enviarMensagem(item.value)"
+                                      [disabled]="!item.value.celular"
+                                      icon="pi pi-whatsapp"
+                                      severity="success"
+                                      [text]="true"/>
                             </div>
                         </div>
                     </ng-template>

@@ -1,0 +1,10 @@
+.evento-tipo {
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--p-pink-500);
+}
+
+.evento-descricao {
+    font-weight: 700;
+    font-size: 1.125rem;
+}

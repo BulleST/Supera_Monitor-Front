@@ -13,7 +13,7 @@ import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../../services/user.service';
-import { PerfilCognitivo, PerfilCognitivo_Calculo } from '../../../../models/perfil-cognitivo.model';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { ApostilaService } from '../../../../services/apostila.service';
 import { Apostila_Kit } from '../../../../models/apostila.model';
@@ -145,7 +145,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
-            // console.log('object', this.object);
             
             if (this.object.id) {
                 this.loadTurmas();
@@ -167,38 +166,31 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     loadTurmas() {
-        if (this.object && this.turmas.length) {
+        console.log('Log: Carregando turmas')
+        if (this.object?.id && this.turmas.length) {
+            console.log('Log: if')
             
-                // console.log('turmas', this.turmas);
-                // Filtra turmas que o aluno poderia participar
-                // Ou a turma atual
-                // Ou alguma turma do mesmo perfil cognitivo
-                // E turmas com vagas
+            // Filtra turmas que o aluno poderia participar:
+            // Ou a turma atual
+            // Ou alguma turma do mesmo perfil cognitivo
+            // E turmas com vagas
                 this.turmasFiltered = this.turmas.filter(turma => {
-                    // console.group(turma.nome)
                     var alunoTemTurma = !!this.object.turma_Id;
                     var alunoTemPerfil = !!this.object.perfilCognitivo_Id;
                     var ehTurmaDoAluno = turma.id == this.object.turma_Id;
                     var ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
                     var temVagas = (!ehTurmaDoAluno && turma.alunosAtivos < turma.capacidadeMaximaAlunos) || ehTurmaDoAluno;
                     
-                    // console.log('alunoTemTurma', alunoTemTurma)
-                    // console.log('alunoTemPerfil', alunoTemPerfil)
-                    // console.log('ehTurmaDoAluno', ehTurmaDoAluno)
-                    // console.log('ehPerfilDoAluno', ehPerfilDoAluno)
-                    // console.log('temVagas', temVagas)
-                    // console.log('condicaoFinal', (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas) && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas))
-                    
-                    // console.groupEnd();
-                    // Ou o aluno tem perfil definido e nesse caso só exibe as turmas com perfil selecionado
-                    // Ou o aluno não tem perfil
-                    return (alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas)
-                        && (alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas)
-    
-                    // return ((!alunoTemTurma ) || (alunoTemTurma && turmaAluno)) && perfilAluno;
+                    // Se o aluno tem perfil definido e a turma tem o perfil, exibe a turma
+                    // Se o aluno não tem perfil definido e a turma tem vagas, exibe a turma
+                    // Se o aluno tem turma definida e a turma é a turma atual, exibe a turma
+                    // Se o aluno não tem turma definida e a turma tem vagas, exibe a turma
+                    return ((alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas))
+                    && ((alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas))
                 });
-                // console.log(this.turmasFiltered)
-    
+                
+                console.log('Turmas Filtradas: ', this.turmasFiltered)
+                
                 if (this.object.turma_Id) {
                     this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
                     this.oldTurmaId = this.selectedTurma?.id;
@@ -375,7 +367,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChangedConfirm(e: any, model: NgModel) {
-        // // console.log('Log: Aluno tentando mudar de turma - turmaChangedConfirm')
 
         var mensagem = 'Continuar com transferência de turma?';
         var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
@@ -407,7 +398,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaReject(model: NgModel) {
-        // // console.log("Log: Mudança de turma rejeitada - turmaReject")
         var turma = this.turmas.find(x => x.id == this.oldTurmaId);
         this.object.turma = turma?.nome as any;
         this.object.turma_Id = turma?.id as any;
@@ -418,7 +408,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaAccept() {
-        // // console.log("Log: Mudança de turma aceita - turmaAccept")
         var turma = this.selectedTurma as Turma;
         this.object.turma = turma.nome;
         this.object.turma_Id = turma.id;
@@ -430,52 +419,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         showError(this.confirmationService, header, message, e);
     }
 
-    // finalizarChecklist(e: any, item: Aluno_CheckList_Item, ngModel: NgModel) {
-    //     this.confirmationService.confirm({
-    //         key: 'checklistConfirmation',
-    //         message: `Tem certeza que deseja finalizar item<b>"${item.nome}"</b>?`,
-    //         header: 'Finalizar item',
-    //         icon: 'pi pi-comment-dots text-4xl mr-2',
-    //         acceptIcon: 'pi pi-check',
-    //         acceptLabel: 'Finalizar',
-    //         acceptButtonStyleClass: 'p-button-rounded',
-    //         rejectVisible: true,
-    //         rejectIcon: 'pi pi-times',
-    //         rejectLabel: 'Cancelar',
-    //         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-    //         accept: async () => {
-    //             this.loadingChecklists = true;
-    //             item.observacoes = this.checklistObservacao
-    //             lastValueFrom(this.checklistService.markAsDone(item.id, this.checklistObservacao))
-    //                 .then(res => {
-    //                     // playSuccess();
-    //                     this.checklistObservacao = '';
-
-    //                     this.loadingChecklists = false;
-    //                     item.finalizado = true;
-    //                     item.dataFinalizacao = res.object.dataFinalizacao;
-    //                     item.account_Finalizacao_Id = res.object.account_Finalizacao_Id;
-
-    //                     this.userService.get(item.account_Finalizacao_Id!)
-    //                         .then(res => item.account_Finalizacao = res.name);
-
-    //                 })
-    //                 .catch(res => {
-    //                     this.loadingChecklists = false;
-    //                     this.showError('Não foi possível finalizar checklist.', getError(res), e)
-    //                 })
-    //         },
-    //         reject: () => {
-    //             ngModel.control.setValue(false);
-    //         }
-    //     });
-    // }
-
     generateRM() {
         const min = 100000;
         const max = 999999;
         var rm = Math.floor(Math.random() * (max - min + 1)) + min
         return rm.toString();
+    }
+
+    getPerfilCognitivo(turma: Turma) {
+        return turma.perfilCognitivo.map(x => x.nome).join(', ');
     }
 
     getRestricoes() {

@@ -29,13 +29,13 @@ export class Evento_Participacao_Aluno {
     apostila_Abaco?: string;
     apostila_Abaco_Id?: number = undefined as any;
     numeroPaginaAbaco: number = 0;
-    apostilaAbacoObject: Apostila = new Apostila;
+    apostilaAbacoObject?: Apostila
     apostilasAbacoList: Apostila[] = [];
 
     apostila_AH?: string;
     apostila_AH_Id?: number = undefined as any;
     numeroPaginaAH: number = 0;
-    apostilaAHObject: Apostila = new Apostila;
+    apostilaAHObject?: Apostila;
     apostilasAHList: Apostila[] = [];
 
 

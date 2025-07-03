@@ -198,14 +198,24 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Turma indisponível.</p>
         </div>
     </div>
-    <div class="field flex" *ngIf="isChamadaPage || evento.finalizado">
-        <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
-                  [severity]="alunoSelected.presente ? 'success': 'danger'"
-                  [icon]="alunoSelected.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                  styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
-                  class="ml-auto mt-auto"
-                  (click)="evento.finalizado ? undefined : presenteClick( $event)" />
-    </div>
+    <ng-container *ngIf="isChamadaPage || evento.finalizado">
+        <div class="field flex gap-2">
+            <p-button [label]="alunoSelected.presente ? 'Presente': 'Faltou'"
+                [severity]="alunoSelected.presente ? 'success': 'danger'"
+                [icon]="alunoSelected.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
+                styleClass="py-0 line-height-2 h-3rem {{evento.finalizado ? 'pointer-events-none' : ''}}"
+                class="ml-auto mt-auto"
+                (click)="evento.finalizado ? undefined : presenteClick( $event)" />
+        </div>
+        <ng-container *ngIf="alunoSelected.presente === false">
+            <p-button [label]="'Enviar mensagem'"
+                [severity]="'success'"
+                [icon]="'pi pi-whatsapp'"
+                [rounded]="true"
+                [disabled]="!alunoSelected.celular"
+                (click)="enviarMensagemFalta($event)" />
+        </ng-container>
+    </ng-container>
     <!-- Observações -->
     <div class="field col-12">
         <label for="observacao">Observações:</label>

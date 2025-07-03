@@ -1,7 +1,6 @@
-import { HostListener, Injectable, Injector, afterNextRender, inject } from "@angular/core";
+import { HostListener, Injectable, Injector, inject } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import $ from 'jquery';
-// declare var $:any 
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +34,6 @@ export class MobileService {
         return this.value;
     }
 }
-
 
 export enum ScreenWidth {
     sm = 'sm',

@@ -59,7 +59,6 @@ export class CadastrarAula0Component implements OnDestroy {
 
     mensagensEnviadasAlunos: Aluno[] = [];
     selectedAlunos: Aluno[] = [];
-    groupedAlunos: SelectItemGroup[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -117,9 +116,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch((res) => (this.loadingProfessores = false));
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(
-            (res) => (this.salaAulas = res)
-        );
+        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
@@ -129,7 +126,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch((res) => (this.loadingSalaAulas = false));
         }
 
-        var turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
+        var turmas = this.turmaService.list.subscribe((res) => this.turmas = res);
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -139,35 +136,12 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch((res) => (this.loadingTurmas = false));
         }
 
-        var alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active == true);
-            var grouped = groupBy(this.alunos, 'turma_Id');
-
-            this.groupedAlunos = [];
-            for (let turma_Id in grouped) {
-                var alunosTurma = grouped[turma_Id] as Aluno[];
-                var turma = {
-                    nome: alunosTurma[0].turma,
-                    turmaDesc: alunosTurma[0].turmaDesc,
-                    turma_Id: alunosTurma[0].turma_Id,
-                    diaSemana: alunosTurma[0].diaSemana,
-                    horario: alunosTurma[0].horario,
-                    professor_Id: alunosTurma[0].professor_Id,
-                    professor: alunosTurma[0].professor,
-                    corLegenda: this.getCorTurma(alunosTurma[0].turma_Id)
-                }
-                this.groupedAlunos.push({
-                    label: turma.nome ?? "Indefinido",
-                    value: turma,
-                    items: alunosTurma.map(aluno => ({ label: aluno.nome.split(' ')[0], value: aluno }))
-                });
-            }
-        });
+        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active && !x.aulaZero_Id));
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getListWithChecklist())
+            lastValueFrom(this.alunoService.getList())
                 .then((res) => (this.loadingAlunos = false))
                 .catch((res) => (this.loadingAlunos = false));
         }
@@ -176,7 +150,6 @@ export class CadastrarAula0Component implements OnDestroy {
         this.subscription.push(eventos);
 
         this.loadFeriados();
-
         this.verificaDisponibilidade();
 
         this.activatedRoute.params.subscribe((res) => {
@@ -228,7 +201,14 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_target');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     async verificaDisponibilidade() {
@@ -501,8 +481,9 @@ export class CadastrarAula0Component implements OnDestroy {
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
-                window.open(url, '_target');
+                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
+                window.open(object.link, '_target');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
             reject: () => {
                 this.visible = false;
@@ -527,24 +508,25 @@ export class CadastrarAula0Component implements OnDestroy {
             },
         });
     }
-
-    removerAlunoLista(aluno: Aluno, e: any) {
-        if (e.which == 2) {
-            var index = this.mensagensEnviadasAlunos.findIndex(
-                (x) => x.id == aluno.id
-            );
-            if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
-        }
-    }
     enviarMensagemAgendamento(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
         var evento = MyMap(this.object, new Evento());
         evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-        return this.mensagemWhatsapp.enviarMensagemAgendamento(
+        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(
             aluno.nome,
             aluno.celular,
             evento
         );
+        window.open(object.link, '_target');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+        if (index != -1)
+            this.mensagensEnviadasAlunos.splice(index, 1);
     }
+
     markChecklistAsDone() {
         // Agendamento na aula 0
         if (this.selectedAlunos) {

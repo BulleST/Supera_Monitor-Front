@@ -4,8 +4,14 @@
 
 export const environment = {
   production: false,
-//   url: 'https://localhost:44334',
-//     url: 'https://localhost:7281/back'
+  development: true,
+  hmr: true,
+  cache: true,
+  // Configurações de otimização
+  enableSourceMaps: true,
+  enableOptimizations: false,
+  enableTreeShaking: false,
+  // URL da API
   url: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back',
 };
 

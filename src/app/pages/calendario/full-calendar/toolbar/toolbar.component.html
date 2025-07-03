@@ -25,7 +25,7 @@
                       [(ngModel)]="view"
                       (onChange)="calendarViewChanged()"
                       optionValue="value"
-                      [styleClass]="'surface-800 hover:surface-700 border-800 hover:border-700 text-white flex align-items-center ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "
+                      styleClass="p-select-menu p-select-menu--dark {{ [ScreenWidth.sm].includes(screen) ? 'p-select-small' : '' }}"
                       appendTo="body">
                 <ng-template let-selectedOption #selectedItem>
                     <div class="text-white -mr-2">
@@ -38,23 +38,22 @@
                     <span class="ml-2">{{ item.label }}</span>
                 </ng-template>
                 <ng-template #dropdownicon>
-                    <i class="bi bi-chevron-down text-white mt-1 mr-2"></i>
+                    <i class="bi bi-chevron-down text-white"></i>
                 </ng-template>
             </p-select>
         </div>
         <div class="sm:col col flex-grow-0 px-1 py-0">
             <!-- Agendar -->
-            <p-select [(ngModel)]="agendarValue"
-                      [options]="agendarMenuItem"
-                      [styleClass]="'p-select-menu ' + ([ScreenWidth.sm].includes(screen) ? 'p-select-small' : '') "
-                      appendTo="body"
+            <p-select [options]="agendarMenuItem"
+                      [(ngModel)]="agendarValue"
+                      #agendar="ngModel"
+                        styleClass="p-select-menu {{ [ScreenWidth.sm].includes(screen) ? 'p-select-small' : '' }}"
                       placeholder="Agendar"
                       (onChange)="agendarEvento($event, agendar)"
                       scrollHeight="250px"
-                      dropdownIcon="pi pi-angle-down"
-                      #agendar="ngModel">
+                      appendTo="body">
                 <ng-template let-selectedOption #selectedItem>
-                    <div class="text-white -mr-2 text-center text-base">Agendar</div>
+                    <div class="text-white -mr-2">Agendar</div>
                 </ng-template>
                 <ng-template let-item #item>
                     <div class="w-10rem">
@@ -62,7 +61,7 @@
                     </div>
                 </ng-template>
                 <ng-template #dropdownicon>
-                    <i class="bi bi-chevron-down text-white mt-1 mr-2"></i>
+                    <i class="bi bi-chevron-down text-white"></i>
                 </ng-template>
             </p-select>
         </div>

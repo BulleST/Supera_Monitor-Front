@@ -1,50 +1,35 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// Módulos essenciais - baseado na análise dos templates HTML
 import { AccordionModule } from 'primeng/accordion';
-// import { AnimateOnScrollModule } from 'primeng/animateonscroll';
-import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
-import { ButtonGroupModule } from 'primeng/buttongroup';
-import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChipModule } from 'primeng/chip';
-import { ColorPickerModule } from 'primeng/colorpicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { DataViewModule } from 'primeng/dataview';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
-import { DragDropModule } from 'primeng/dragdrop';
-import { DropdownModule } from 'primeng/dropdown';
+// import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { FluidModule } from 'primeng/fluid';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ImageModule } from 'primeng/image';
-import { InplaceModule } from 'primeng/inplace';
 import { InputIconModule } from 'primeng/inputicon';
-import { InputGroupModule } from 'primeng/inputgroup';
-import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
-import { MegaMenuModule } from 'primeng/megamenu';
 import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { OrganizationChartModule } from 'primeng/organizationchart';
-import { OverlayBadgeModule } from 'primeng/overlaybadge';
-import { OverlayModule } from 'primeng/overlay';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
-import { PanelMenuModule } from 'primeng/panelmenu';
 import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { PickListModule } from 'primeng/picklist';
@@ -56,12 +41,10 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
-// import { SlideMenuModule } from 'primeng/slidemenu';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { SplitButtonModule } from 'primeng/splitbutton';
 import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
-// import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
@@ -76,21 +59,16 @@ import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
+
 @NgModule({
     imports: [
         CommonModule,
         AccordionModule,
-        // AnimateOnScrollModule,
-        AvatarModule,
         BadgeModule,
         ButtonModule,
-        ButtonGroupModule,
-        BreadcrumbModule,
-        CalendarModule,
         CardModule,
         CheckboxModule,
         ChipModule,
-        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -98,37 +76,26 @@ import { SelectModule } from 'primeng/select';
         DataViewModule,
         DialogModule,
         DividerModule,
-        DragDropModule,
-        DropdownModule,
+        // DropdownModule,
         EditorModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
-        FluidModule,
         IconFieldModule,
         ImageModule,
-        InplaceModule,
         InputIconModule,
-        InputGroupModule,
-        InputGroupAddonModule,
         InputMaskModule,
         InputNumberModule,
         InputSwitchModule,
         InputTextModule,
-        // InputTextareaModule,
-        MegaMenuModule,
         MenuModule,
         MenubarModule,
         MultiSelectModule,
-        OrganizationChartModule,
-        OverlayBadgeModule,
-        OverlayModule,
         OverlayPanelModule,
-        PanelMenuModule,
         PanelModule,
         PasswordModule,
-        PickListModule,
         PopoverModule,
+        PickListModule,
         ProgressBarModule,
         ProgressSpinnerModule,
         RippleModule,
@@ -137,13 +104,11 @@ import { SelectModule } from 'primeng/select';
         SelectModule,
         SidebarModule,
         SkeletonModule,
-        // SlideMenuModule,
         SliderModule,
         SplitButtonModule,
         SpeedDialModule,
         TableModule,
         TabsModule,
-        // TabViewModule,
         TagModule,
         TextareaModule,
         ToastModule,
@@ -157,17 +122,11 @@ import { SelectModule } from 'primeng/select';
     exports: [
         CommonModule,
         AccordionModule,
-        // AnimateOnScrollModule,
-        AvatarModule,
         BadgeModule,
         ButtonModule,
-        ButtonGroupModule,
-        BreadcrumbModule,
-        CalendarModule,
         CardModule,
         CheckboxModule,
         ChipModule,
-        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -175,37 +134,26 @@ import { SelectModule } from 'primeng/select';
         DataViewModule,
         DialogModule,
         DividerModule,
-        DragDropModule,
-        DropdownModule,
+        // DropdownModule,
         EditorModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
-        FluidModule,
         IconFieldModule,
         ImageModule,
-        InplaceModule,
         InputIconModule,
-        InputGroupModule,
-        InputGroupAddonModule,
         InputMaskModule,
         InputNumberModule,
         InputSwitchModule,
         InputTextModule,
-        // InputTextareaModule,
-        MegaMenuModule,
         MenuModule,
         MenubarModule,
         MultiSelectModule,
-        OrganizationChartModule,
-        OverlayBadgeModule,
-        OverlayModule,
         OverlayPanelModule,
-        PanelMenuModule,
         PanelModule,
         PasswordModule,
-        PickListModule,
         PopoverModule,
+        PickListModule,
         ProgressBarModule,
         ProgressSpinnerModule,
         RippleModule,
@@ -214,19 +162,17 @@ import { SelectModule } from 'primeng/select';
         SelectModule,
         SidebarModule,
         SkeletonModule,
-        // SlideMenuModule,
         SliderModule,
         SplitButtonModule,
         SpeedDialModule,
         TableModule,
         TabsModule,
-        // TabViewModule,
         TagModule,
         TextareaModule,
         ToastModule,
         ToolbarModule,
-        TooltipModule,
         ToggleButtonModule,
+        TooltipModule,
         TreeModule,
         TreeTableModule,
         TreeSelectModule,
@@ -238,12 +184,8 @@ import { SelectModule } from 'primeng/select';
 })
 export class PrimengModule {
     constructor(
-        // private config: PrimeNGConfig,
         private primeng: PrimeNG
     ) {
-        // this.translateService.setDefaultLang('pt-BR');
-        // this.translateService.use('pt-BR');
-
         this.primeng.setTranslation({
             startsWith: 'Começa com',
             contains: 'Contém',
@@ -252,10 +194,10 @@ export class PrimengModule {
             equals: 'Igual a',
             notEquals: 'Diferente de',
             noFilter: 'Sem filtro',
-            lt: 'Menor que', // Less Than
-            lte: 'Menor que ou igual a', // Less Than or Equal to
-            gt: 'Maior que', // Greater than
-            gte: 'Maior que ou igual a', // Greater than or equal to
+            lt: 'Menor que',
+            lte: 'Menor que ou igual a',
+            gt: 'Maior que',
+            gte: 'Maior que ou igual a',
             is: 'Igual a',
             isNot: 'Diferente de',
             before: 'Anterior a',
@@ -320,6 +262,5 @@ export class PrimengModule {
                 FilterMatchMode.NOT_EQUALS
             ]
         }
-
     }
 }

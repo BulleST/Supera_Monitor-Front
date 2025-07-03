@@ -88,12 +88,13 @@ export class Dashboard_Roteiro {
 
 export class Dashboard_Aluno {
     id: number = 0;
-    nome?: string;
-    celular?: string;
+    nome: string = '';
+    celular: string = '';
     checklist_Id?: number;
     primeiraAula_Id?: number;
     aulaZero_Id?: number;
     dataNascimento?: Date;
+    perfilCognitivo_Id: number = 0;
     aulas: Dashboard_Aula_Participacao[] = [];
 }
 

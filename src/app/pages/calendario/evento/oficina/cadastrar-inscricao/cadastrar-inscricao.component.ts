@@ -403,9 +403,13 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     enviarMensagemAgendamento(aluno: Aluno) {
-        var evento = MyMap(this.evento, new Evento)
-        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-        return this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, evento);
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     markChecklistAsDone() {

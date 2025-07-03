@@ -15,6 +15,7 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { showError, CalendarioUtils } from '../../../../../utils';
+import { EventoService } from '../../../../../services/evento.service';
 
 @Component({
     selector: 'app-editar-superacao',
@@ -55,6 +56,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
+        private service: EventoService,
     ) {
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
@@ -144,27 +146,23 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         else {
             this.alunoSelected.presente = !this.alunoSelected.presente;
         }
+    }
 
-        if (!this.alunoSelected.presente && this.alunoSelected.celular) {
-            var nome = this.alunoSelected.aluno.split(' ')[0];
-            this.confirmationService.confirm({
-                target: e.targer,
-                message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
-                header: 'Enviar whatsapp',
-                icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success',
-                acceptIcon: 'pi pi-whatsapp',
-                rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: () => {
-                    var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
-                    window.open(url, '_blank')
-                },
-            });
+    enviarMensagemFalta(e: any) {
 
+        let aluno = this.alunoSelected as Evento_Participacao_Aluno;
+        if (!aluno.celular) {
+            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+            return;
         }
-        return this.alunoSelected;
+        if (aluno.presente) {
+            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+            return;
+          }
+      
+        let object = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento, []);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     markChecklistAsDone() {

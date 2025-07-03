@@ -5,6 +5,7 @@ import { ChecklistService } from '../../../services/checklist.service';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import moment from 'moment';
+import { AlunoService } from '../../../services/alunos.service';
 
 @Component({
     selector: 'app-aluno-checklist',
@@ -35,6 +36,7 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
 
     constructor(
         private checklistService: ChecklistService,
+        private alunoService: AlunoService,
     ) {
 
         var checklists = checklistService.list.subscribe(res => this.checklists = res);
@@ -73,9 +75,13 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
 
             this.loading = true;
 
-            let alunoChecklist: Aluno_CheckList_Item[] = this.aluno.alunoChecklist;
+            if (!this.aluno) {
+                this.aluno = await lastValueFrom(this.alunoService.get(this.aluno_Id)) 
+            }
 
-            if (!this.aluno.alunoChecklist?.length && this.aluno_Id) {
+            let alunoChecklist: Aluno_CheckList_Item[] = this.aluno?.alunoChecklist ?? [];
+
+            if (!alunoChecklist.length && this.aluno_Id) {
                 alunoChecklist = await lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
             }
 

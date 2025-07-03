@@ -13,25 +13,14 @@
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let participacao of mensagensEnviadasAlunos">
-                        <a *ngIf="participacao.celular"
-                           (auxclick)="removerAlunoLista(participacao, $event)"
-                           [href]="enviarMensagemCancelamento(participacao.aluno, participacao.celular)"
-                           pTooltip="Enviar mensagem"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
-                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
-                            <span class="p-button-label">{{participacao.aluno}}</span>
-                        </a>
-                        <p-button *ngIf="!participacao.celular"
-                                  icon="pi pi-whatsapp opacity-0"
-                                  severity="secondary"
-                                  styleClass="white-space-nowrap -ml-1 "
-                                  pTooltip="Nenhum celular cadastrado"
-                                  [label]="participacao.aluno"
-                                  [text]="true"
-                                  size="small"
-                                  [disabled]="true" />
+                        <p-button type="button"
+                                  (onClick)="enviarMensagemCancelamento(participacao)"
+                                  (auxclick)="enviarMensagemCancelamento(participacao)"
+                                  (contextmenu)="enviarMensagemCancelamento(participacao)"
+                                  [disabled]="!participacao.celular"
+                                  icon="pi pi-whatsapp"
+                                  severity="success"
+                                  [label]="participacao.aluno"/>
                     </div>
                 </div>
             </div>

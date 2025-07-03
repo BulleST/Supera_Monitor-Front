@@ -29,6 +29,7 @@ export class TurmaService extends Service {
         var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
         
         turma.active = !turma.deactivated;
+        turma.activeString = turma.active ? 'Ativo' : 'Inativo';
         turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
         turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
         turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')

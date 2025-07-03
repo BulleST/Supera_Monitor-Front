@@ -30,7 +30,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     @Input() evento: Evento = new Evento;
     @Input() duracaoEvento = '';
     @Input() loadingChecklist = false;
-    @Input() isChamadaPage = false;
 
     @Input() professores: Professor[] = [];
     @Input() loadingProfessores = false;
@@ -125,36 +124,23 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         return this.mensagemWhatsapp.enviarMensagem(nome, celular!)
     }
 
-    presenteClick(e: any) {
-
-        if (this.alunoSelected.presente == undefined || this.alunoSelected.presente == null) {
-            this.alunoSelected.presente = true;
+    presente(item: Evento_Participacao_Aluno, e: any) {
+        item.presente = !item.presente;
+    }
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
+        if (!aluno.celular) {
+            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+            return;
         }
-        else {
-            this.alunoSelected.presente = !this.alunoSelected.presente;
+        if (aluno.presente) {
+            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+            return;
         }
 
-        if (!this.alunoSelected.presente && this.alunoSelected.celular) {
-            var nome = this.alunoSelected.aluno.split(' ')[0];
-            // playAlert();
-            this.confirmationService.confirm({
-                target: e.targer,
-                message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
-                header: 'Enviar whatsapp',
-                icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: ' p-button-rounded p-button-success',
-                acceptIcon: 'pi pi-whatsapp',
-                rejectLabel: 'Não enviar',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: () => {
-                    var url = this.mensagemWhatsapp.enviarMensagemFalta(this.alunoSelected.aluno, this.alunoSelected.celular!, this.evento);
-                    window.open(url, '_blank')
-                },
-            });
-
-        }
-        return this.alunoSelected;
+        let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, []);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        
     }
 
     markChecklistAsDone() {

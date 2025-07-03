@@ -41,8 +41,8 @@
     --surface-800: var(--p-surface-800);
     --surface-900: var(--p-surface-900);
     --surface-950: var(--p-surface-950);
-    --balloon-width: 5px !important;
-    --balloon-height: 5px !important;
+    --balloon-width: 5px;
+    --balloon-height: 5px;
     --yellow-50: #fffcf3;
     --yellow-100: #fff0c3;
     --yellow-200: #ffe494;
@@ -154,23 +154,15 @@ a {
 }
 
 .p-datatable-gridlines .p-datatable-header {
-    border-width: 0 !important;
+    border-width: 0;
 }
 
 .p-datatable-gridlines .p-datatable-thead>tr>th {
-    border-width: 0 !important;
+    border-width: 0;
 }
 
-/* .p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(odd) {
-    background: var(--p-datatable-row-striped-background);
-}
-
-.p-datatable-hoverable .p-datatable-tbody>tr:nth-child(odd):hover,
-.p-datatable-hoverable .p-datatable-tbody>tr:nth-child(even):hover {
-    background: var(--p-primary-200) !important;
-} */
 .p-inputtext:disabled {
-    background-color: var(--surface-100) !important;
+    background-color: var(--surface-100);
     cursor: default;
 }
 
@@ -179,20 +171,20 @@ a {
 }
 
 .p-dialog-maximized {
-    height: 95vh !important;
-    border-radius: var(--p-dialog-border-radius) !important;
+    height: 95vh;
+    border-radius: var(--p-dialog-border-radius);
 }
 
 .p-datatable-tbody .p-datatable-empty-text,
 .p-datatable-empty-text td {
     pointer-events: none;
-    border: none !important;
-    background-color: var(--surface-50) !important;
+    border: none;
+    background-color: var(--surface-50);
 }
 
 .fc-daygrid-body,
 .fc-daygrid-body table {
-    width: 100% !important;
+    width: 100%;
 }
 
 .fc-timegrid-axis-cushion {
@@ -231,8 +223,8 @@ a {
 
 .fc-event.selected,
 .fc-daygrid-event.selected {
-    border: 2px var(--p-primary-500) solid !important;
-    background-color: var(--p-primary-500) !important;
+    border: 2px var(--p-primary-500) solid;
+    background-color: var(--p-primary-500);
     color: #fff;
 }
 
@@ -241,17 +233,17 @@ a {
 }
 
 .p-fileupload-header {
-    display: none !important;
+    display: none;
 }
 
 .p-fileupload-content {
-    padding-top: 15px !important;
-    background-color: transparent !important;
-    border-color: var(--surface-50) !important;
+    padding-top: 15px;
+    background-color: transparent;
+    border-color: var(--surface-50);
 }
 
 .p-fileupload-advanced {
-    background: transparent !important;
+    background: transparent;
 }
 
 .p-inputtext[readonly] {
@@ -260,33 +252,33 @@ a {
 
 .p-datatable-column-filter-button:not(.p-column-filter-inline .p-datatable-column-filter-button) {
     margin-top: -3px;
-    color: white !important;
+    color: white;
     padding: 0 0;
 }
 
 .p-datatable-column-filter-button:not(.p-column-filter-inline .p-datatable-column-filter-button):hover,
 .p-datatable-column-filter-button:not(.p-column-filter-inline .p-datatable-column-filter-button):active {
-    background-color: var(--surface-700) !important;
+    background-color: var(--surface-700);
 }
 
 .p-tooltip .p-tooltip-text {
-    width: fit-content !important;
-    max-width: unset !important;
+    width: fit-content;
+    max-width: unset;
 }
 
 .surface-900.p-popover:before,
 .surface-900.p-popover:after {
-    border-bottom-color: var(--surface-900) !important;
+    border-bottom-color: var(--surface-900);
 }
 
 .fc-col-header,
 .fc-timegrid-body {
-    width: 100% !important;
+    width: 100%;
 }
 
 .fc-timegrid-body {
     table {
-        width: 100% !important;
+        width: 100%;
     }
 }
 
@@ -297,15 +289,15 @@ a {
 .fc-button {
     padding-block: 10px;
     padding-inline: 10px;
-    font-size: 1rem !important;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .fc .fc-multimonth-title {
-    padding: 0px 0 !important;
-    background-color: var(--surface-800) !important;
+    padding: 0px 0;
+    background-color: var(--surface-800);
     font-weight: 700;
     color: #fff;
 }
@@ -328,8 +320,8 @@ a {
 
 .p-multiselect-option.p-focus,
 .p-select-option.p-select-option-selected {
-    background-color: var(--p-primary-100) !important;
-    color: var(--p-primary-500) !important;
+    background-color: var(--p-primary-100);
+    color: var(--p-primary-500);
 }
 
 .fc-scrollgrid-sync-inner,
@@ -382,7 +374,7 @@ a {
 }
 
 .p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(even) td {
-    background-color: var(--surface-100);
+    background-color: var(--surface-50);
 }
 
 th.p-datatable-frozen-column,
@@ -393,7 +385,7 @@ td.p-datatable-frozen-column {
 
 thead tr .fc-scroller,
 tbody tr:first-child .fc-scroller {
-    overflow: hidden !important;
+    overflow: hidden;
     padding-right: 15px;
     border-top: 1px #dddddd solid;
     margin-bottom: -1px;
@@ -429,7 +421,7 @@ p-datepicker.ng-touched.ng-invalid .p-inputtext,
 p-inputmask.ng-touched.ng-invalid .p-inputtext,
 .p-inputtext.ng-touched.ng-invalid input,
 input.ng-invalid.ng-touched {
-    border: 1px #e93636 solid !important;
+    border: 1px #e93636 solid;
     animation: 0.6s shadowInvalid infinite;
     box-shadow: 0 0 3px 1px #ff00006c;
 }
@@ -461,31 +453,83 @@ input.ng-invalid.ng-touched {
     border-color: var(--surface-900);
     color: white;
 }
+
 .p-datatable-thead tr:first-child th:hover {
     background-color: var(--surface-950);
     border-color: var(--surface-950);
     color: white;
 }
-.p-datatable-thead > tr:first-child > th.p-datatable-column-sorted {
+
+.p-datatable-thead>tr:first-child>th.p-datatable-column-sorted {
     color: white;
     background-color: var(--surface-950);
     border-color: var(--surface-950);
 }
 
-/* Para PrimeNG Dropdown padrão */
-p-selectitem:nth-child(even) .p-select-option {
-    /* background-color: var(--surface-0); */
+form .field p-selectitem:nth-child(even) .p-select-option {
     border-bottom: 1px solid var(--surface-200);
 }
-p-selectitem:nth-child(odd) .p-select-option {
+
+form .field p-selectitem:nth-child(odd) .p-select-option {
     background-color: var(--surface-50);
     border-bottom: 1px solid var(--surface-200);
 }
 
-.p-iconfield.p-iconfield-left .p-inputicon ~ .p-select .p-select-label {
+.p-iconfield.p-iconfield-left .p-inputicon~.p-select .p-select-label {
     padding-left: 30px;
 }
-.p-fieldset-legend{
+
+.p-fieldset-legend {
     color: var(--p-primary-500);
     padding-left: 0;
+}
+
+.p-select.p-select-menu .p-select-label.p-placeholder {
+    color: white;
+    text-align: center;
+    margin-right: -0.5rem;
+    font-size: 1rem;
+}
+
+.p-select-menu {
+    width: 100%;
+    border: 1px var(--p-primary-500) solid;
+    background-color: var(--p-primary-500);
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+.p-select-menu:hover {
+    border: 1px var(--p-primary-500) solid;
+    background-color: var(--p-primary-500);
+}
+
+.p-select-menu.p-select-menu--dark {
+    border: 1px var(--p-surface-800) solid;
+    background-color: var(--p-surface-800);
+}
+
+.p-select-menu.p-select-menu--dark:hover {
+    border: 1px var(--p-surface-900) solid;
+    background-color: var(--p-surface-900);
+}
+
+.p-select-menu-overlay .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus {
+    background-color: transparent;
+}
+
+.p-select-menu .p-select-dropdown-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 3px;
+}
+
+.p-select-small.p-select-menu .p-select-dropdown-icon i {
+    font-size: 10px;
+}
+
+.p-select-small.p-select-menu .p-select-label.p-placeholder span {
+    font-size: 11px;
 }

@@ -210,15 +210,14 @@
                 <tr>
                     <td class="sticky left-0 cursor-pointer">
                         <div class="flex align-items-center">
-                            <div class="inline-flex w-2rem h-2rem mr-1 flex-none align-items-center">
-                                <a *ngIf="item.telefone"
-                                   [href]="enviarMensagem(item.nome, item.telefone)"
-                                   pTooltip="Enviar mensagem"
-                                   target="_blank"
-                                   rel="noopener noreferrer"
-                                   class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                </a>
-                            </div>
+                            <p-button type="button"
+                                      (onClick)="enviarMensagem(item)"
+                                      (auxclick)="enviarMensagem(item)"
+                                      (contextmenu)="enviarMensagem(item)"
+                                      [disabled]="!item.phone"
+                                      icon="pi pi-whatsapp"
+                                      severity="success"
+                                      [text]="true"/>
                             <div class="inline-flex p-button-link">
                                 <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.nome">{{ item.nome }}</span>
                             </div>

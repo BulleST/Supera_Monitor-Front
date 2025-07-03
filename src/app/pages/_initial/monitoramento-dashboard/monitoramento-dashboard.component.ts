@@ -4,10 +4,10 @@ import { lastValueFrom } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
-import { Evento } from '../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao } from '../../../models/dashboard.model';
+import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao, Dashboard_Aula } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Crypto } from '../../../utils';
@@ -125,14 +125,43 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
             })
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular);
+    enviarMensagem(aluno: Dashboard_Aluno) {
+        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemFalta(nome: string, celular: string, evento: Evento | any) {
-        return this.mensagemWhatsapp.enviarMensagemFalta(nome, celular, evento);
-    }
+    enviarMensagemFalta(evento: Dashboard_Aula, aluno: Dashboard_Aluno) {
+        lastValueFrom(this.service.calendario({
+            intervaloDe: moment(evento.data).toDate(),
+            intervaloAte: moment(evento.data).add(1, 'month').toDate(),
+            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+        }))
+        .then(res => {
+            let sugestoes = res.filter(aula => {
+                const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
+                const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
+                const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                const aulaNaoFinalizada = !aula.finalizado;
+                const aulaEstaAtiva = aula.active;
+                const naoEhFeriado = !aula.feriado;
+                
+                return alunoNaoEstaNaAula
+                && ehAula
+                && temVagas
+                && ehPerfilCognitivoCompativel
+                && aulaNaoFinalizada
+                && aulaEstaAtiva
+                && naoEhFeriado;
+            });
 
+            let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.nome, aluno.celular, evento as any, sugestoes);
+            window.open(object.link, '_blank');
+            this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        })
+
+    }
     selectAlunoAula(e: any, popoverSelectedAlunoAula: Popover) {
         this.popoverSelectedAlunoAula
             .filter(x => x.el.nativeElement.id != popoverSelectedAlunoAula.el.nativeElement.id)

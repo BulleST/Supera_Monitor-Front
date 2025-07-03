@@ -2,7 +2,7 @@
     <p-accordion-header>
         <div class="flex justify-content-between w-full -mt-1">
             <p>{{item.nome}}</p>
-            <p class="font-normal px-2 white-space-nowrap">{{item.alunos?.length ?? 0}} alunos</p>
+            <p class="font-normal px-2 white-space-nowrap" *ngIf="item.alunos">{{item.alunos.length}} alunos</p>
         </div>
     </p-accordion-header>
     <p-accordion-content>

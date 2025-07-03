@@ -227,21 +227,32 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    removerAlunoLista(aluno: Aluno, e: any) {
-        if (e.which == 2) {
-            var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-            if (index != -1)
-                this.mensagensEnviadasAlunos.splice(index, 1);
-        }
-    }
 
     enviarMensagemAgendamento(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
         var evento = MyMap(this.object, new Evento)
         evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-        return this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
+        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+
+        var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+        if (index != -1)
+            this.mensagensEnviadasAlunos.splice(index, 1);
+
+        return object;
     }
 
     async verificaDisponibilidade() {

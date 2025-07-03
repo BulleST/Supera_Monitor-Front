@@ -43,15 +43,14 @@
                     <ng-template let-item #item>
                         <div class="w-full">
                             <div class="flex align-items-center gap-2">
-                                <div class="w-2rem h-2rem">
-                                    <a *ngIf="item.celular"
-                                       [href]="enviarMensagem(item)"
-                                       pTooltip="Enviar mensagem"
-                                       target="_blank"
-                                       rel="noopener noreferrer"
-                                       class="p-2 flex align-items-center justify-content-center text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                    </a>
-                                </div>
+                                <p-button type="button"
+                                          (onClick)="enviarMensagem(item)"
+                                          (auxclick)="enviarMensagem(item)"
+                                          (contextmenu)="enviarMensagem(item)"
+                                          [disabled]="!item.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true"/>
                                 <p>
                                     <span class="mr-2">{{item.nome | nameAbv }}</span>
                                     <p-badge *ngIf="item.disponivel == false"
@@ -214,22 +213,14 @@
 <ng-template #alunoTemplate let-item="item">
     <div class="cursor-pointer">
         <div class="flex align-items-center gap-2">
-            <!-- Whatsapp -->
-            <div class="w-2rem h-2rem flex flex-none align-items-center justify-content-center">
-                <ng-container *ngIf="item.celular">
-                    <a [href]="enviarMensagem(item)"
-                       [pTooltip]="'Enviar mensagem'"
-                       target="_blank"
-                       rel="noopener noreferrer"
-                       class="pi pi-whatsapp p-1 text-green-500 hover:text-white hover:bg-green-500 border-circle">
-                    </a>
-                </ng-container>
-                <ng-container *ngIf="!item.celular">
-                    <a [pTooltip]="'Aluno não possui celular cadastrado'"
-                       class="pi pi-whatsapp p-1 text-200 border-circle pointer-events-none">
-                    </a>
-                </ng-container>
-            </div>
+            <p-button type="button"
+                      (onClick)="enviarMensagem(item)"
+                      (auxclick)="enviarMensagem(item)"
+                      (contextmenu)="enviarMensagem(item)"
+                      [disabled]="!item.celular"
+                      icon="pi pi-whatsapp"
+                      severity="success"
+                      [text]="true"/>
             <!-- Nome -->
             <p class="mr-2">{{ item.nome }}</p>
             <p-badge *ngIf="item.disponivel == false"

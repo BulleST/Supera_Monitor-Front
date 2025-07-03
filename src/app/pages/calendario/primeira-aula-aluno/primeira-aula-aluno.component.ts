@@ -256,12 +256,13 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
       accept: () => {
         this.visible = false
         this.visibleChange()
-        var url = this.mensagemWhatsapp.enviarMensagemReposicao(
+        let object = this.mensagemWhatsapp.enviarMensagemReposicao(
           this.aluno.nome,
           this.aluno.celular,
           evento,
         )
-        window.open(url, '_target')
+        window.open(object.link, '_target')
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
       },
       reject: () => {
         this.visible = false

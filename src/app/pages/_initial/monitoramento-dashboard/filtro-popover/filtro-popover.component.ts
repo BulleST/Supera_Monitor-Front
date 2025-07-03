@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter,OnDestroy, Output, ViewChild } from '@angular/core';
-import { DashboardRequest } from '../../../../models/dashboard.model';
+import { Dashboard_Aluno, DashboardRequest } from '../../../../models/dashboard.model';
 import { AccountService } from '../../../../services/account.service';
 import { ProfessorService } from '../../../../services/professor.service';
 import { TurmaService } from '../../../../services/turma.service';
@@ -217,8 +217,10 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
         return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular);
+    enviarMensagem(aluno: Aluno) {
+        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
 

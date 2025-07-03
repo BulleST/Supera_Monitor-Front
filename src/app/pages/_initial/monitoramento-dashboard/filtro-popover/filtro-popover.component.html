@@ -97,19 +97,16 @@
                 <ng-template let-item #item>
                     <div>
                         <div class="flex align-items-center w-full gap-1">
-                            <div class="w-2rem h-2rem">
-                                <a *ngIf="item.celular"
-                                    [href]="enviarMensagem(item.nome, item.celular)"
+                                <p-button type="button"
+                                    (onClick)="enviarMensagem(item)"
+                                    (auxclick)="enviarMensagem(item)"
+                                    (contextmenu)="enviarMensagem(item)"
+                                    [disabled]="!item.celular"
+                                    icon="pi pi-whatsapp"
+                                    severity="success"
+                                    [text]="true"
                                     pTooltip="Enviar mensagem"
-                                    tooltipPosition="top"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-green-500 hover:bg-green-500 hover:text-white ">
-                                </a>
-                                <a *ngIf="!item.celular"
-                                    class="pi pi-whatsapp p-2 flex align-items-center justify-content-center border-circle text-400 pointer-event-none">
-                                </a>
-                            </div>
+                                    tooltipPosition="top" />
                             <p class="capitalize">{{item.nome | nameAbv }}</p>
                         </div>
                         <p class="text-sm">

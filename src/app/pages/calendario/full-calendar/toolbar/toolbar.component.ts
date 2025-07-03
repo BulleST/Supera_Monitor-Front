@@ -107,10 +107,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         
     ) {
 
-        var screen = this.mobileService.get().subscribe(res => {
-            this.screen = res;
-            console.log(this.screen)
-        });
+        var screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
     }

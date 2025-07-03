@@ -32,7 +32,7 @@ import multiMonthPlugin from '@fullcalendar/multimonth';
 import listPlugin from '@fullcalendar/list';
 import moment from 'moment';
 import 'moment/locale/pt-br';
-import $ from 'jquery'
+import $ from 'jquery';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
@@ -398,8 +398,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
 
         var temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte));
-        console.log('temFeriadoNaSemana', temFeriadoNaSemana)
-
         if (temFeriadoNaSemana.length) {
             this.calendarioOptions.allDaySlot = true;
         } else {
@@ -676,8 +674,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 acceptButtonStyleClass: 'p-button-rounded p-button-success',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
-                    var url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
-                    window.open(url, '_target');
+                    let object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
+                    window.open(object.link, '_target');
+                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
                 },
             });
         }
