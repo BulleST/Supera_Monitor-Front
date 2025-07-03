@@ -9,7 +9,6 @@ import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
-import { TranslateModule } from '@ngx-translate/core';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -90,7 +89,6 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         NgxMaskDirective,
         FormsModule,
         NgxMaskPipe,
-        TranslateModule,
         DragDropModule,
         ScrollingModule,
         FullCalendarModule,

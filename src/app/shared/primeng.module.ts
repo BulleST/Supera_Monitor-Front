@@ -14,8 +14,6 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { DataViewModule } from 'primeng/dataview';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
-// import { DropdownModule } from 'primeng/dropdown';
-import { EditorModule } from 'primeng/editor';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FloatLabelModule } from 'primeng/floatlabel';
@@ -76,8 +74,6 @@ import { SelectModule } from 'primeng/select';
         DataViewModule,
         DialogModule,
         DividerModule,
-        // DropdownModule,
-        EditorModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
@@ -134,8 +130,6 @@ import { SelectModule } from 'primeng/select';
         DataViewModule,
         DialogModule,
         DividerModule,
-        // DropdownModule,
-        EditorModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,

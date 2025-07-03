@@ -21,22 +21,16 @@ import { SelectChangeEvent } from 'primeng/select';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
-import {
-    validaAlunos,
-    validaProfessores,
-    validaSalaAulas,
-} from '../../../../../utils/validacao';
+import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
-import { MyMap } from '../../../../../utils/map';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
-import { groupBy } from 'lodash';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playSuccess } from '../../../../../utils/audio';
 import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
+import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
+import { MyMap } from '../../../../../utils/map';
 
 @Component({
     selector: 'app-cadastrar-aula-0',

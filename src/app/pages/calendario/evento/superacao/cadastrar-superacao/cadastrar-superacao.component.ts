@@ -27,10 +27,8 @@ import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { MyMap } from '../../../../../utils/map';
-import { groupBy } from 'lodash'
 import $ from 'jquery';
-import { validaAlunos, validaProfessores, validaSalaAulas, CalendarioUtils, playAlert, playSuccess, showError } from '../../../../../utils';
-import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
+import { validaAlunos, validaProfessores, validaSalaAulas, CalendarioUtils, showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-cadastrar-superacao',
