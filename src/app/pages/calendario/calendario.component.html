@@ -214,25 +214,23 @@
             <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)" class="w-full overflow-auto">
                 <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar>
                     <ng-template #dayHeaderContent let-arg>
-                            <app-calculo-perfil-cognitivo #calculo
-                                [data]="arg.date"
-                                [eventos]="eventos"
-                                [feriados]="feriados"
-                                [perfilCoginitivo]="perfilCognitivo"
-                                [loadingPerfilCognitivo]="loadingPerfilCognitivo"></app-calculo-perfil-cognitivo>
-                                <div class="flex align-items-center justify-content-center gap-2">
-                                    <!-- <div class="w-1rem h-1rem bg-primary-500 border-circle" *ngIf="arg.isToday"></div> -->
-                                    <div class="flex flex-column gap-2 " 
-                                    [ngClass]="{ 'text-primary-500': calculo.visible }"
-                                        (mouseenter)="calculo.show($event)" 
-                                        (mouseleave)="calculo.hide()">
-                                        <!-- <div class="w-1rem h-1rem bg-primary-500 border-circle" *ngIf="arg.isToday"></div> -->
-                                        <p>{{arg.date | date : 'EE'}}</p>
-                                        <p class="p-1 border-circle w-2rem h-2rem flex align-items-center justify-content-center "
-                                                [ngClass]="{ 'bg-primary-500 text-white' : arg.isToday }"
-                                        >{{arg.date | date : 'dd'}}</p>
-                                    </div>
-                                </div>
+                        <app-calculo-perfil-cognitivo #calculo
+                            [data]="arg.date"
+                            [eventos]="eventos"
+                            [feriados]="feriados"
+                            [perfilCoginitivo]="perfilCognitivo"
+                            [loadingPerfilCognitivo]="loadingPerfilCognitivo"></app-calculo-perfil-cognitivo>
+                        <div class="w-full flex align-items-center justify-content-center gap-2" 
+                                [ngClass]="{ 'text-primary-500': calculo.visible }"
+                                (mouseenter)="calculo.show($event)" 
+                                (mouseleave)="calculo.hide()">
+                            <div class="flex flex-column gap-2">
+                                <p>{{arg.date | date : 'EE'}}</p>
+                                <p class="p-1 border-circle w-2rem h-2rem flex align-items-center justify-content-center "
+                                    [ngClass]="{ 'bg-primary-500 text-white' : arg.isToday }"
+                                >{{arg.date | date : 'dd'}}</p>
+                            </div>
+                        </div>
                     </ng-template>
                     <ng-template #eventContent let-arg>
                         <app-evento-item

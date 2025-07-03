@@ -55,9 +55,9 @@
         <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
             <div class="flex align-items-center justify-content-between px-2 py-2 w-full gap-2 border-bottom-2 border-primary-500">
                 <span class="font-bold block text-primary">
-                    <span *ngIf="evento.alunos.length != 1">Alunos</span>
+                    <span *ngIf="evento.alunos.length == 0">Nenhum aluno</span>
+                    <span *ngIf="evento.alunos.length > 1">Alunos</span>
                     <span *ngIf="evento.alunos.length == 1">Aluno</span>
-                    <span *ngIf="evento.evento_Tipo_Id == EventoTipo.Oficina"> inscritos</span>
                 </span>
                 <div class="flex flex-column align-items-end">
                     <div class="flex align-items-center">

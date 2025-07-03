@@ -297,9 +297,9 @@ export class CadastrarAula0Component implements OnDestroy {
         var item = this.salaAulas.find((x) => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível',`Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`,e.originalEvent);
+            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
-        } 
+        }
         else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
             this.showError('Restrição de Mobilidade', `O(s) aluno(s) ${alunosComRestricaoMobilidade.map(x => x.nome.split(' '[0])).join(', ')} tem restrição de mobilidade e não podem participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
@@ -334,6 +334,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
                 acceptLabel: `Sim`,
                 acceptButtonStyleClass: 'p-button-rounded',
+                rejectIcon: 'pi pi-times',
                 rejectLabel: 'Não',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
@@ -344,26 +345,36 @@ export class CadastrarAula0Component implements OnDestroy {
 
         model.control.updateValueAndValidity();
 
-        this.getRestricoes(e.originalEvent, aluno);
+        this.loadAluno(e.originalEvent, aluno);
     }
 
-    getRestricoes(e: any, aluno: Aluno) {
+    loadAluno(e: any, aluno: Aluno) {
         if (this.selectedAlunos) {
             this.loadingAlunos = true;
             this.loading = true;
-            lastValueFrom(this.alunoRestricaoService.getList(aluno.id))
+            lastValueFrom(this.alunoService.get(aluno.id))
                 .then(res => {
-                    aluno.restricoes = res;
+                    aluno = res;
+
                     let index = this.alunos.findIndex(x => x.id == aluno.id);
                     this.alunos.splice(index, 1, aluno);
 
                     index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
                     this.selectedAlunos.splice(index, 1, aluno);
 
-                    if (aluno.restricoes.filter(x => x.active == true).length > 0) {
+                    this.loadingAlunos = false;
+                    this.loading = false;
 
-                        var mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
-                        mensagem += res.map(x => '• ' + x.descricao).join('<br>');
+
+                    let restricoes = aluno.restricoes.filter(x => x.active === true);
+                    let restricaoMobilidade = aluno.restricaoMobilidade;
+                    if (restricoes.length > 0 || restricaoMobilidade) {
+                        var mensagem = 'Esse aluno possui algumas restrições: ';
+
+                        if (restricaoMobilidade)
+                            mensagem += '• Restrição de mobilidade <br>';
+
+                        mensagem += restricoes.map(x => '• ' + x.descricao).join('<br>');
                         mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
 
                         this.confirmationService.confirm({
@@ -373,6 +384,7 @@ export class CadastrarAula0Component implements OnDestroy {
                             acceptLabel: `Continuar`,
                             acceptIcon: 'pi pi-check',
                             acceptButtonStyleClass: 'p-button-rounded',
+                            rejectIcon: 'pi pi-times',
                             rejectLabel: 'Cancelar',
                             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                             accept: () => {
@@ -382,13 +394,17 @@ export class CadastrarAula0Component implements OnDestroy {
                                 this.selectedAlunos.splice(index, 1, aluno);
                             }
                         })
-
                     }
                 })
-
+                .catch(res => {
+                    this.showError('Erro', `Não foi possível carregar restrições de ${aluno.nome}`, e);
+                    this.loadingAlunos = false;
+                    this.loading = false;
+                })
         }
 
     }
+
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e);
@@ -407,11 +423,7 @@ export class CadastrarAula0Component implements OnDestroy {
         this.object.alunos = this.selectedAlunos.map((x) => x.id);
 
         this.object.data = new Date(this.data);
-        this.object.data.setHours(
-            this.horario.getHours(),
-            this.horario.getMinutes(),
-            0
-        );
+        this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0);
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
 
         var mensagem = ``;
@@ -429,6 +441,7 @@ export class CadastrarAula0Component implements OnDestroy {
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Não',
+            rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -476,6 +489,7 @@ export class CadastrarAula0Component implements OnDestroy {
             acceptButtonStyleClass:
                 ' p-button-rounded p-button-success  px-3 mr-0',
             acceptIcon: 'pi pi-whatsapp',
+            rejectIcon: 'pi pi-times',
             rejectLabel: 'Não enviar',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
@@ -500,6 +514,7 @@ export class CadastrarAula0Component implements OnDestroy {
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
             acceptButtonStyleClass: 'p-button-rounded',
+            rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
@@ -535,7 +550,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 var alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
                 var professor = this.professores.find((x) => x.id == this.object.professor_Id) as Professor;
 
-                if (!alunoChecklist.finalizado) {
+                if (alunoChecklist && !alunoChecklist.finalizado) {
                     var mensagem = `Aula 0 agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${professor.nome}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
                     if (alunoChecklist && !alunoChecklist.finalizado) {
                         lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
