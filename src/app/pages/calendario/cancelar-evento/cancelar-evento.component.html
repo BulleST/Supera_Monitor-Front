@@ -20,7 +20,9 @@
                                   [disabled]="!participacao.celular"
                                   icon="pi pi-whatsapp"
                                   severity="success"
-                                  [label]="participacao.aluno"/>
+                                  [label]="participacao.aluno"
+                                  [text]="true"
+                                  class="mt-1"/>
                     </div>
                 </div>
             </div>
@@ -46,7 +48,7 @@
     </ng-template>
     <form #form="ngForm" (submit)="sendConfirmation( $event, form)">
         <p class="text-lg mb-1">Tem certeza que deseja cancelar essa {{tipoEventoString}}? </p>
-        <p class="text-lg my-2 flex flex-wrap gap-2 align-items-center">
+        <p class="text-lg my-4 flex flex-wrap gap-2 align-items-center">
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
                 <i class="pi pi-calendar"></i>
                 <span class="font-bold">Data:</span> 
@@ -56,13 +58,6 @@
                 <i class="pi pi-clock"></i>
                 <span class="font-bold">Horário:</span> 
                 <span>{{evento.data | date : 'HH:mm'}}</span>
-            </span>
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
-                <i class="fa-solid fa-building text-base"></i>
-                <span class="font-bold">Sala: </span>
-                <app-sala-aula [sala_Id]="evento.sala_Id"
-                 [numeroSala]="evento.numeroSala"
-                  [andar]="evento.andar"></app-sala-aula>
             </span>
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2" *ngIf="evento.turma">
                 <i class="fa-solid fa-users-between-lines"></i>
@@ -75,8 +70,15 @@
                 <span>{{evento.professor}}</span>
                 <span class="flex w-1rem h-1rem border-circle " [style]="{ backgroundColor: evento.corLegenda }"></span>
             </span>
+            <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
+                <i class="fa-solid fa-building text-base"></i>
+                <span class="font-bold">Sala: </span>
+                <app-sala-aula [sala_Id]="evento.sala_Id"
+                 [numeroSala]="evento.numeroSala"
+                  [andar]="evento.andar"></app-sala-aula>
+            </span>
         </p>
-        <div class="formgrid grid mt-2">
+        <div class="formgrid grid mt-4">
             <div class="field col-12"> <!-- Observações -->
                 <label for="observacao" class="font-bold text-lg">Observações:<span class="text-red-500">*</span> <span class="text-400 text-sm font-normal ml-2">(motivo do cancelamento)</span></label>
                 <textarea pTextarea
@@ -106,15 +108,15 @@
                         'bg-white': i % 2 == 0,
                         'surface-50': i % 2 != 0 
                     }">
-                        <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
-                            <a *ngIf="item.celular"
-                               [href]="enviarMensagem(item.aluno, item.celular)"
-                               pTooltip="Enviar mensagem"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                            </a>
-                        </div>
+                        <p-button type="button"
+                                  (onClick)="enviarMensagem(item)"
+                                  (auxclick)="enviarMensagem(item)"
+                                  (contextmenu)="enviarMensagem(item)"
+                                  [disabled]="!item.celular"
+                                  icon="pi pi-whatsapp"
+                                  severity="success"
+                                  [text]="true"
+                                  [rounded]="true"/>
                         <p class="mr-2">{{ item.aluno }}</p>
                         <p-badge *ngIf="item.reposicaoDe_Evento_Id" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
 

@@ -189,8 +189,14 @@ export class CancelarEventoComponent implements OnDestroy {
             this.mensagensEnviadasAlunos.splice(index, 1);
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular);
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.aluno, aluno.celular, this.evento);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     sendConfirmation(e: any, form: NgForm) {
@@ -203,16 +209,18 @@ export class CancelarEventoComponent implements OnDestroy {
             target: e.target,
             header: `Cancelar ${this.tipoEventoString}`,
             message: `Tem certeza que deseja cancelar a ${this.tipoEventoString} do dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
-            acceptLabel: 'Não cancelar',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: `Cancelar ${this.tipoEventoString}`,
+            rejectLabel: 'Não cancelar',
+            rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            acceptIcon: 'pi pi-check',
+            acceptLabel: `Cancelar ${this.tipoEventoString}`,
+            acceptButtonStyleClass: 'p-button-rounded',
             accept: () => {
-                this.visible = false;
-                this.visibleChange();
+                this.send(e);
             },
             reject: () => {
-                this.send(e);
+                this.visible = false;
+                this.visibleChange();
             }
         })
 
@@ -307,6 +315,7 @@ export class CancelarEventoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
+            acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: false,
             accept: () => {
