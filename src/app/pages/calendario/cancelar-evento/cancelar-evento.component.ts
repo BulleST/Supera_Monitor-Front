@@ -259,7 +259,7 @@ export class CancelarEventoComponent implements OnDestroy {
                     }
                 })
                 .catch(res => {
-                    this.showError('Erro', `Não foi possível cancelar a ${this.tipoEventoString}. \n ${getError(res)}`, e);
+                    this.showError('Erro', `Não foi possível cancelar a ${this.tipoEventoString}. <br> ${getError(res)}`, e);
                 })
         }
     }

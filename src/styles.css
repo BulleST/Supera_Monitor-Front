@@ -530,3 +530,9 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
 .p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {
     font-size: 11px;
 }
+
+p-scroller{
+    max-height: 100%;
+    height: 100%;
+    display: block;
+}

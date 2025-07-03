@@ -124,92 +124,20 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
     }
 
 
-    enviarMensagemAluno() {
-        var nome = this.aluno.nome;
-        return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
-    }
-
-    enviarMensagemCondicao() {
-        if (this.alunoChecklistItem && this.aluno) {
-            var id = this.alunoChecklistItem.checklist_Item_Id;
-            // Apresentação do Diretor Franqueado 
-            if (id == 8) {
-                return this.enviarMensagemApresentacaoDiretorFranqueado();
-                // Confirmação da adequação do aluno ao perfil da turma 
-            } else if (id == 9) {
-                return this.enviarMensagemAdequacaoTurma();
-                // Agendar 1ª Oficina 
-            } else if (id == 12) {
-                return this.enviarMensagemLembreteOficina();
-                // Feedback pós venda 
-            } else if (id == 13) {
-                return this.enviarMensagemFeedbackPosVenda();
-                // Confirmação de preeechimento do feedback pós venda 
-            } else if (id == 32) {
-                return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda();
-                // Mensagem de boas-vindas 
-            } else if (id == 37) {
-                return this.enviarMensagemBoasVindas();
-                // Agendar Superação 
-            } else if (id == 22) {
-                return this.enviarMensagemLembreteSuperacao();
-                // Agendar 2ª Superação 
-            } else if (id == 29) {
-                return this.enviarMensagemLembreteSuperacao();
-                // Agendar 2ª Oficina 
-            } else if (id == 23) {
-                return this.enviarMensagemLembreteOficina();
-            } else {
-                return this.enviarMensagem();
-            }
-        }
-        return this.enviarMensagem();
-    }
-
     enviarMensagem() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem?.aluno;
-        return this.mensagemWhatsapp.enviarMensagem(nome, this.celular);
-    }
 
-    enviarMensagemApresentacaoDiretorFranqueado() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(nome, this.celular);
-    }
+        let id = this.alunoChecklistItem.checklist_Item_Id;
+        let aluno = {
+            nome: this.aluno?.nome ?? this.alunoChecklistItem.aluno,
+            celular: this.aluno?.celular ?? this.alunoChecklistItem.celular,
+            email: this.aluno?.email ?? this.alunoChecklistItem.email,
+            diaSemana: this.aluno?.diaSemana ?? this.alunoChecklistItem.diaSemana,
+            horario: this.aluno?.horario ?? this.alunoChecklistItem.horario,
+            professor: this.aluno?.professor ?? this.alunoChecklistItem.professor,
+            linkGrupo: this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo       
+        }
 
-    enviarMensagemBoasVindas() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        var email = this.aluno?.email ?? this.alunoChecklistItem.email;
-        var diaSemana = this.aluno?.diaSemana ?? this.alunoChecklistItem.diaSemana;
-        var horario = this.aluno?.horario ?? this.alunoChecklistItem.horario;
-        var professor = this.aluno?.professor ?? this.alunoChecklistItem.professor;
-        var linkGrupo = this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo;
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(nome, this.celular, email, diaSemana, horario, professor, linkGrupo);
+        this.mensagemWhatsapp.enviarMensagemCondicao(aluno, id);
     }
-
-    enviarMensagemAdequacaoTurma() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(nome, this.celular);
-    }
-
-    enviarMensagemLembreteOficina() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(nome, this.celular);
-    }
-
-    enviarMensagemLembreteSuperacao() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(nome, this.celular);
-    }
-
-    enviarMensagemFeedbackPosVenda() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(nome, this.celular);
-    }
-
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda() {
-        var nome = this.aluno?.nome ?? this.alunoChecklistItem.aluno;
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(nome, this.celular);
-    }
-
 
 }

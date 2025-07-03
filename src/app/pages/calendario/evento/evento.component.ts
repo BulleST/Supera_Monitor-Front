@@ -1,14 +1,5 @@
-import {
-  Component,
-  OnDestroy,
-  QueryList,
-  ViewChild,
-  ViewChildren,
-} from '@angular/core'
-import {
-  Evento,
-  EventoTipo,
-} from '../../../models/evento.model'
+import { Component, OnDestroy, QueryList, ViewChildren } from '@angular/core'
+import { Evento, EventoTipo } from '../../../models/evento.model'
 import { ConfirmationService } from 'primeng/api'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model'
@@ -26,7 +17,7 @@ import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
 import { TurmaService } from '../../../services/turma.service'
 import moment from 'moment'
-import { NgForm, NgModel } from '@angular/forms'
+import { NgForm  } from '@angular/forms'
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model'
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model'
@@ -39,13 +30,8 @@ import { EventoAula0Request } from '../../../models/evento-aula-0.model'
 import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model'
 import { RequestResponse } from '../../../helpers/request-response.interface'
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model'
-import {
-  validaAlunos,
-  validaProfessores,
-  validaSalaAulas,
-} from '../../../utils/validacao'
+import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao'
 import { CalendarioUtils } from '../../../utils/calendario-utils'
-import { playAlert, playSuccess } from '../../../utils/audio'
 
 @Component({
   selector: 'app-evento',
@@ -56,7 +42,6 @@ import { playAlert, playSuccess } from '../../../utils/audio'
 })
 export class EventoComponent implements OnDestroy {
   evento: Evento = new Evento()
-  // queryParams: EventoQueryParams = new EventoQueryParams;
 
   visible: boolean = false
   loading = false
@@ -68,7 +53,6 @@ export class EventoComponent implements OnDestroy {
   tipo = EventoTipo
   encryptedId = ''
 
-  @ViewChildren('componentForm') componentForm!: QueryList<any>
 
   selectedAluno?: Evento_Participacao_Aluno
   mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
@@ -89,6 +73,8 @@ export class EventoComponent implements OnDestroy {
 
   roteiros: Roteiro[] = []
   loadingRoteiros = false
+
+  @ViewChildren('componentForm') componentForm!: QueryList<any>
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -168,7 +154,7 @@ export class EventoComponent implements OnDestroy {
 
     if (this.alunos.length == 0) {
       this.loadingAlunos = true
-      lastValueFrom(this.alunoService.getListWithChecklist())
+      lastValueFrom(this.alunoService.getList())
         .then((res) => (this.loadingAlunos = false))
         .catch((res) => (this.loadingAlunos = false))
     }
@@ -510,7 +496,7 @@ export class EventoComponent implements OnDestroy {
           this.error = res.message
           this.showError(
             'Erro',
-            `Não foi possível finalizar ${this.tipoString}. \n ${getError(
+            `Não foi possível finalizar ${this.tipoString}. <br> ${getError(
               res,
             )}`,
             e,
@@ -522,11 +508,7 @@ export class EventoComponent implements OnDestroy {
 
   sendConfirmation(e: any, form: NgForm) {
     if (form.invalid) {
-      return this.showError(
-        'OPA!',
-        `Não foi possível salvar! \n Preencha os dados corretamente para continuar`,
-        e,
-      )
+      return this.showError('OPA!', `Não foi possível salvar! <br> Preencha os dados corretamente para continuar`, e);
     }
 
     this.confirmationService.confirm({
@@ -563,11 +545,7 @@ export class EventoComponent implements OnDestroy {
       })
       .catch((res) => {
         this.loading = false
-        this.showError(
-          'Ocorreu um erro',
-          `Não foi possível salvar dados. \n ${getError(res)}`,
-          e,
-        )
+        this.showError('OPA!',`Não foi possível salvar dados. <br> ${getError(res)}`, e)
       })
   }
 
@@ -600,9 +578,7 @@ export class EventoComponent implements OnDestroy {
   requestAulaTurma() {
     var request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = this.evento.professor_Id
-      ? [this.evento.professor_Id]
-      : []
+    request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
     request.perfilCognitivo = this.evento.perfilCognitivo.map((x) => x.id)
 
     if (this.evento.id == PseudoEvento.EventoId)

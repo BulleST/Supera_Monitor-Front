@@ -61,10 +61,9 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
                     let index = checklist.items.findIndex(x => x.id == res.id);
                     if (index != -1) {
-
                         var item = checklist.items[index];
                         item.finalizado = true;
-                        item.dataFinalizacao = res.datafinalizacao;
+                        item.dataFinalizacao = res.dataFinalizacao;
                         item.account_Finalizacao_Id = res.account_Finalizacao_Id;
                         item.account_Finalizacao = res.account_Finalizacao;
 
@@ -72,7 +71,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                     }
                     return checklist;
                 });
-                aluno = await this.alunoService.mapAluno(aluno)
+                aluno = await this.alunoService.mapAluno(aluno, 'monitoramento-jornada-supera')
                 return aluno;
             })
         });

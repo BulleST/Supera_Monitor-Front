@@ -199,20 +199,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
 
-    // loadChecklist() {
-
-
-        // this.loadingChecklists = true;
-        // lastValueFrom(this.checklistService.getChecklistAluno(this.aluno_Id))
-        //     .then(res => {
-        //         this.object.alunoChecklist = res;
-        //         this.object = this.service.mapAluno(this.object);
-        //         this.loadingChecklists = false;
-                
-        //     })
-        //     .catch(res => this.loadingChecklists = false);
-    // }
-
     loadFoto() {
         if (this.aluno_Id) {
             this.loadingFile = true;
@@ -547,6 +533,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             }
         });
     }
+
     enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item) {
         // Apresentação do Diretor Franqueado 
         if (checklistItem.checklist_Item_Id == 8) {

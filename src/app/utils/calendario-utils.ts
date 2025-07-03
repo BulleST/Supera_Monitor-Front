@@ -22,9 +22,11 @@ export class CalendarioUtils {
   feriados: Feriado[] = []
 
   constructor(private service: EventoService) {
+    console.log('calendario utils  ')
     this.service.feriados.subscribe((res) => (this.feriados = res))
-
+    
     this.service.eventos.subscribe((res) => {
+        console.log('calendario utils  eventos', res)
       var feriados = this.service.feriados.value
       var feriadosDates = feriados.map((x) =>
         moment(x.date).format('YYYY-MM-DD'),
@@ -139,7 +141,7 @@ export class CalendarioUtils {
   getEventoTipo(evento: Evento) {
     if (evento.evento_Tipo_Id == EventoTipo.Aula) return 'aula'
     else if (evento.evento_Tipo_Id == EventoTipo.AulaZero) return 'aula zero'
-    else if (evento.evento_Tipo_Id == EventoTipo.AulaExtra) return 'aula extra'
+    else if (evento.evento_Tipo_Id == EventoTipo.AulaExtra) return 'turma extra'
     else if (evento.evento_Tipo_Id == EventoTipo.Superacao) return 'superação'
     else if (evento.evento_Tipo_Id == EventoTipo.Oficina) return 'oficina'
     else if (evento.evento_Tipo_Id == EventoTipo.Reuniao) return 'reunião'
@@ -159,7 +161,7 @@ export class CalendarioUtils {
         var feriado = this.feriados.find((x) =>
           moment(x.date).isSame(data),
         ) as Feriado
-        evento.observacao = `Cancelamento automático \n Feriado: ${feriado.name}`
+        evento.observacao = `Cancelamento automático <br> Feriado: ${feriado.name}`
         this.cancelarEventoAutomaticamente(evento, feriado)
           .then((res) => {
             terminou.push(res)

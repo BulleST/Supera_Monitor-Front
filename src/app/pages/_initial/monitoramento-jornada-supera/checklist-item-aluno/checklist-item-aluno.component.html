@@ -1,14 +1,16 @@
 <ng-container *ngIf="alunoChecklistItem">
-    <div class="flex align-items-center gap-2">
+    <div class="flex align-items-center">
         <p-button type="button"
                   (onClick)="enviarMensagemAluno()"
                   (auxclick)="enviarMensagemAluno()"
                   (contextmenu)="enviarMensagemAluno()"
-                  [disabled]="urlEnviarMensagem"
+                  [disabled]="!urlEnviarMensagem"
                   icon="pi pi-whatsapp"
                   severity="success"
                   [rounded]="true"
-                  [text]="true"/>
+                  [text]="true"
+                  size="small"
+                  styleClass="-ml-2"/>
         <p class="hover:text-primary hover:underline cursor-pointer capitalize"
             (click)="alunoPopover.show($event)">
             {{ alunoChecklistItem.aluno | nameAbv }}

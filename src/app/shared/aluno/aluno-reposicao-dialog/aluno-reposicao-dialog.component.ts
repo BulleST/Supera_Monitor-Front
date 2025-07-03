@@ -67,7 +67,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 this.aluno_Id = this.crypto.decrypt(res['aluno_id']);
                 this.blockAlunoField = true;
                 this.loadAluno();
-                this.loadEventosReposicao();
+                this.loadEventosReposicaoDe();
             }
             else {
                 var alunos = alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active));
@@ -88,7 +88,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             if (res) {
                 this.eventoReposicaoDe = res;
                 this.blockReposicaoDeField = true;
-                this.loadEventosDisponiveis();
+                this.loadEventosReposicaoPara();
             }
         });
         this.subscription.push(eventoReposicaoDe);
@@ -96,7 +96,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         let eventoReposicaoPara = this.eventoService.eventoReposicaoPara.subscribe(res => {
             if (res) {
                 this.eventoReposicaoPara = res;
-                this.blockReposicaoDeField = true;
+                this.blockReposicaoParaField = true;
             }
         });
         this.subscription.push(eventoReposicaoPara);
@@ -109,7 +109,13 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
 
     visibleChange() {
-
+        if (!this.visible) {
+            let params = this.activatedRoute.snapshot.params;
+            let routeBack = ['../..'];
+            if (params['aluno_id']) 
+                routeBack = ['../../../'];
+            this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
+        }
     }
 
     show() {
@@ -127,7 +133,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    loadAluno(aluno?: Aluno) {
+    async loadAluno(aluno?: Aluno) {
         if (aluno) {
             this.alunoSelected = aluno;
             this.loadingAlunos = false;
@@ -135,7 +141,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         }
         else if (this.aluno_Id) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.get(this.aluno_Id))
+            await lastValueFrom(this.alunoService.get(this.aluno_Id))
                 .then(res => {
                     this.alunoSelected = res;
                     this.loadingAlunos = false;
@@ -148,7 +154,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
     }
 
-    loadEventosReposicao() {
+    loadEventosReposicaoDe() {
         if (this.aluno_Id) {
             let request: CalendarioRequest = {
                 aluno_Id: this.aluno_Id,
@@ -174,6 +180,12 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && naoGanhouPresenca
                     });
                     this.loadingEventosReposicaoDe = false;
+
+                    if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
+                        this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id 
+                                                                                            && moment( x.data).isSame(this.eventoReposicaoDe!.data)
+                                                                                            && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
+                    }
                 })
                 .catch(res => {
                     this.loadingEventosReposicaoDe = true;
@@ -182,19 +194,23 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         }
     }
 
-    loadEventosDisponiveis() {
-        if (this.aluno_Id
-            && this.alunoSelected
-            && this.eventoReposicaoDe) {
+    async loadEventosReposicaoPara() {
+        console.log('loadEventosReposicaoPara', this.aluno_Id, this.alunoSelected, this.eventoReposicaoDe)
+        if (!this.alunoSelected) {
+            await this.loadAluno();
+        }
+        if (this.aluno_Id && this.eventoReposicaoDe) {
             let request: CalendarioRequest = {
                 perfil_Cognitivo_Id: this.alunoSelected!.perfilCognitivo_Id,
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
                 intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
             }
+            console.log('request', request)
 
             this.loadingEventosReposicaoPara = true;
             lastValueFrom(this.eventoService.calendario(request))
                 .then(res => {
+                    console.log('res', res)
                     this.eventosReposicaoParaList = res.filter(aula => {
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
@@ -215,6 +231,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && naoEhFeriado;
 
                     });
+                    console.log('eventosReposicaoParaList', this.eventosReposicaoParaList)
+
                     this.loadingEventosReposicaoPara = false;
                 })
                 .catch(res => {
@@ -227,11 +245,11 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
     alunoChanged(e: SelectChangeEvent, model: NgModel) {
         this.aluno_Id = e.value.id;
-        this.loadEventosReposicao();
+        this.loadEventosReposicaoDe();
     }
 
     eventoReposicaoChanged() {
-        this.loadEventosDisponiveis();
+        this.loadEventosReposicaoPara();
     }
 
     eventoDisponivelChanged(e: any, model: NgModel) {
@@ -385,7 +403,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
+                this.showError('Erro', `Não foi possível agendar reposição. <br> ${getError(res)}`, e)
             })
     }
 

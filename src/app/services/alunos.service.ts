@@ -40,7 +40,8 @@ export class AlunoService extends Service {
         this.checklistService.list.subscribe(res => this.checklists = res);
 
     }
-    mapAluno(aluno: Aluno) {
+    mapAluno(aluno: Aluno, where: string) {
+        // console.log('mapAluno', where, aluno);
         var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
         aluno.active = !aluno.deactivated;
         aluno.activeString = aluno.active ? 'Ativo' : 'Inativo';
@@ -75,9 +76,9 @@ export class AlunoService extends Service {
 
 
         if (aluno.alunoChecklist && aluno.alunoChecklist.length) {
-                aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
+            aluno.alunoChecklist = aluno.alunoChecklist.map(checklistAluno => {
                 checklistAluno.finalizado = !!checklistAluno.dataFinalizacao;
-                return checklistAluno
+                return checklistAluno;
             })
 
             aluno.checklistCompleto = this.checklists
@@ -85,7 +86,9 @@ export class AlunoService extends Service {
                     var checklistAluno = new AlunoChecklistCompleto;
                     checklistAluno.id = checklist.id;
                     checklistAluno.nome = checklist.nome;
-                    checklistAluno.items = aluno.alunoChecklist.filter(x => x.checklist_Id == checklist.id);
+                    checklistAluno.items = aluno.alunoChecklist
+                        .filter(x => x.checklist_Id == checklist.id)
+                        .sort((x, y) => y.ordem - x.ordem);
                     checklistAluno.prazo = checklistAluno.items[0].prazo;
                     checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                     checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
@@ -102,7 +105,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: async list => {
                     await list.map(async aluno => {
-                        return await this.mapAluno(aluno)
+                        return await this.mapAluno(aluno, 'getList')
                     });
                     this.list.next(list);
                 },
@@ -117,7 +120,7 @@ export class AlunoService extends Service {
         return this.http.post<Aluno[]>(`${this.url}/alunos/all/with-checklist`, request)
             .pipe(tap({
                 next: list => {
-                    list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.map(aluno => this.mapAluno(aluno, 'getListWithChecklist'));
                     return of(list);
                 },
                 error: err => {
@@ -179,7 +182,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({
                 next: res => {
-                    return this.mapAluno(res);
+                    return this.mapAluno(res, 'get');
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
@@ -201,7 +204,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        res.object = this.mapAluno(res.object)
+                        res.object = this.mapAluno(res.object, 'edit')
                         replace(this, res.object, 'list')
                     }
                     return res;
@@ -217,7 +220,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        res.object = this.mapAluno(res.object)
+                        res.object = this.mapAluno(res.object, 'deactivated')
                         replace(this, res.object, 'list')
                     }
                     return res;

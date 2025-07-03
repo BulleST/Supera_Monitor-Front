@@ -3,16 +3,16 @@
            [dismissable]="true"
            styleClass="-mt-1"
            appendTo="body">
-    <div class="flex gap-2 flex-column" *ngIf="aluno && item">
+    <div class="flex gap-2 flex-column w-30rem" *ngIf="aluno && item">
         <div>
-<!-- Cancelada -->
+            <!-- Cancelada -->
             <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoPara_Evento_Id">
                 <p class="surface-800 text-base text-white py-1 px-2">
                     <i class="pi pi-times mr-2"></i>
                     <span>Aula Cancelada</span>
                 </p>
             </ng-container>
-<!-- Reagendada -->
+            <!-- Reagendada -->
             <ng-container *ngIf="item.aula.reagendamentoDe_Evento_Id && item.aula.reagendamentoDe_Evento">
                 <p class="bg-yellow-500 text-base text-900 py-1 px-2">
                     <i class="pi pi-exclamation-triangle mr-2"></i>
@@ -20,7 +20,7 @@
                         {{item.aula.reagendamentoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
                 </p>
             </ng-container>
-<!-- Reposição -->
+            <!-- Reposição -->
             <ng-container *ngIf="item.participacao.reposicaoDe_Evento_Id && item.participacao.reposicaoDe_Evento">
                 <p class="bg-purple-600 text-base text-white py-1 px-2">
                     <i class="pi pi-exclamation-triangle mr-2"></i>
@@ -62,11 +62,30 @@
              || item.participacao.presente != true)
              && !item.participacao.reposicaoDe_Evento_Id
              && !item.participacao.reposicaoPara_Evento_Id">
-            <p-button icon="pi pi-calendar"
-                      label="Agendar reposição"
-                      severity="secondary"
-                      rounded
-                      (onClick)="goToReposicao(aluno.id, item.aula.id)" />
+
+             <div class="flex align-items-center gap-2">
+                
+                <p-button type="button"
+                        icon="pi pi-calendar"
+                        label="Agendar reposição"
+                        severity="secondary"
+                        rounded
+                        (onClick)="goToReposicao(aluno.id, item.aula.id)" />
+                        
+                <ng-container  *ngIf="item.participacao.presente === false ">
+                    <p-button type="button"
+                            (onClick)="enviarMensagemFalta(item, aluno)"
+                            (auxclick)="enviarMensagemFalta(item, aluno)"
+                            (contextmenu)="enviarMensagemFalta(item, aluno)"
+                            [disabled]="!aluno.celular"
+                            icon="pi pi-whatsapp"
+                            severity="success"
+                            label="Enviar mensagem"
+                            [rounded]="true"
+                            pTooltip="Enviar mensagem de falta" />
+                </ng-container>
+             </div>
+             
         </ng-container>
     </div>
 </p-popover>

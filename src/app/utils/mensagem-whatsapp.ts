@@ -26,6 +26,50 @@ export class MensagemWhatsapp {
             this.toastr.error('Erro ao copiar mensagem');
         });
     }
+    
+    enviarMensagemCondicao(aluno: any, id: number) {
+        let object = null;
+                
+        if (id && aluno && aluno.celular) {
+            // Apresentação do Diretor Franqueado 
+            if (id == 8) {
+                object = this.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
+                // Confirmação da adequação do aluno ao perfil da turma 
+            } else if (id == 9) {
+                object = this.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
+                // Agendar 1ª Oficina 
+            } else if (id == 12) {
+                object = this.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
+                // Feedback pós venda 
+            } else if (id == 13) {
+                object = this.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
+                // Confirmação de preeechimento do feedback pós venda 
+            } else if (id == 32) {
+                object = this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
+                // Mensagem de boas-vindas 
+            } else if (id == 37) {
+                object = this.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
+                // Agendar Superação 
+            } else if (id == 22) {
+                object = this.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
+                // Agendar 2ª Superação 
+            } else if (id == 29) {
+                object = this.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
+                // Agendar 2ª Oficina 
+            } else if (id == 23) {
+                object = this.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
+            } else {
+                object = this.enviarMensagem(aluno.nome, aluno.celular);
+            }
+        }
+
+        if (object) {
+            window.open(object.link, '_target');
+            this.copiarMensagem(object.mensagem);
+        }
+
+        return object;
+    }
 
     enviarMensagem(nome: string, celular: string) {
         let array = nome.split(' ');
@@ -45,7 +89,7 @@ export class MensagemWhatsapp {
         celular = celular.replace(/\D/g, '')
         let mensagem = `Olá ${nome}, 
             \r\n Espero que esteja bem! 
-            \r\nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY')} e gostaria de saber se houve um imprevisto. 
+            \r\nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM [às] HH[h]mm')} e gostaria de saber se houve um imprevisto. 
             \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
 
             if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.AulaExtra) {

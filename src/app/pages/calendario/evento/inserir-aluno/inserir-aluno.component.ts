@@ -22,8 +22,9 @@ import { AccountService } from '../../../../services/account.service';
 import { ChecklistService } from '../../../../services/checklist.service';
 import { Turma } from '../../../../models/turma.model';
 import { TurmaService } from '../../../../services/turma.service';
-import { SalaAulaId } from '../../../../models/sala-aula.model';
+import { SalaAula, SalaAulaId } from '../../../../models/sala-aula.model';
 import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
+import { SalaAulaService } from '../../../../services/sala-aula.service';
 
 @Component({
     selector: 'app-inserir-aluno',
@@ -52,6 +53,9 @@ export class InserirAlunoComponent {
     turmas: Turma[] = [];
     loadingTurmas = false;
 
+    salas: SalaAula[] = [];
+    loadingSalas = false;
+
     constructor(
         private activatedRoute: ActivatedRoute,
         private router: Router,
@@ -66,12 +70,14 @@ export class InserirAlunoComponent {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private turmaService: TurmaService,
+        private salaAulaService: SalaAulaService,
+        
 
     ) {
 
         let params = this.activatedRoute.snapshot.params;
         if (!params['evento_id'] || !params['evento_nome']
-            || !['aula-zero', 'superacao', 'aula'].includes(params['evento_nome'])) {
+            || !['aula-zero', 'superacao'].includes(params['evento_nome'])) {
             this.visible = false;
             this.visibleChange();
             return
@@ -79,6 +85,16 @@ export class InserirAlunoComponent {
 
         let turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
         this.subscription.push(turmas);
+
+        if (this.turmas.length == 0) {
+            this.loadingTurmas = true;
+            lastValueFrom(this.turmaService.getList())
+                .then((res) => (this.loadingTurmas = false))
+                .catch((res) => (this.loadingTurmas = false));
+        }
+
+        let salas = this.salaAulaService.list.subscribe((res) => (this.salas = res));
+        this.subscription.push(salas);
 
         if (this.turmas.length == 0) {
             this.loadingTurmas = true;
@@ -136,7 +152,7 @@ export class InserirAlunoComponent {
                 this.evento = res;
                 this.visible = true;
                 this.verificaDisponibilidade();
-                this.tipoString = this.tipoString;
+                this.tipoString = this.getTipo(this.evento);
 
                 this.setAlunos();
             }
@@ -202,25 +218,75 @@ export class InserirAlunoComponent {
 
     alunoChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaAlunos();
-        let aluno = e.value as Aluno
-
+        let aluno = e.value as Aluno;
+        let salaAula =  this.salas.find(x => x.id == this.evento.sala_Id) as SalaAula;
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Aluno indisponível' });
+            console.log('aluno indisponivel', aluno)
+            this.selectedAluno = undefined;
             this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
-
-        if (aluno.restricaoMobilidade && this.evento.andar && this.evento.andar > 1) {
+        else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
+            console.log('aluno restricao mobilidade', aluno)
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
-            this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da ${this.tipoString} na sala ${this.evento.numeroSala} - ${this.evento.andar}º andar.`, e.originalEvent);
+            this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
             return;
         }
 
-        model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
 
-        this.getRestricoes(e.originalEvent);
+        this.loadAluno(e.originalEvent, aluno);
+    }
 
+    loadAluno(e: any, aluno: Aluno) {
+        this.loadingAlunos = true;
+        this.loading = true;
+        console.log('loadAluno', aluno)
+        lastValueFrom(this.alunoService.get(aluno.id))
+        .then(res => {
+                console.log('res', res)
+                aluno = res;
+
+                this.loadingAlunos = false;
+                this.loading = false;
+
+                let restricoes = aluno.restricoes.filter(x => x.active === true);
+                let restricaoMobilidade = aluno.restricaoMobilidade;
+                if (restricoes.length > 0 || restricaoMobilidade) {
+                    let mensagem = 'Esse aluno possui algumas restrições: ';
+
+                    if (restricaoMobilidade)
+                        mensagem += '• Restrição de mobilidade <br>';
+
+                    mensagem += restricoes.map(x => '• ' + x.descricao).join('<br>');
+                    mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
+                    console.log('if', aluno)
+
+                    this.confirmationService.confirm({
+                        target: e.target,
+                        header: 'Inserir aluno',
+                        message: mensagem,
+                        acceptLabel: `Continuar`,
+                        acceptIcon: 'pi pi-check',
+                        acceptButtonStyleClass: 'p-button-rounded',
+                        rejectIcon: 'pi pi-times',
+                        rejectLabel: 'Cancelar',
+                        rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                        accept: () => {
+                            console.log('accept')
+                        },
+                        reject: () => {
+                            console.log('reject')
+                            this.selectedAluno = undefined;
+                        }
+                    })
+                }
+            })
+            .catch(res => {
+                this.showError('Erro', `Não foi possível carregar restrições de ${aluno.nome}`, e);
+                this.loadingAlunos = false;
+                this.loading = false;
+            })
 
     }
 
@@ -228,46 +294,6 @@ export class InserirAlunoComponent {
         return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
     }
 
-    getRestricoes(e: any) {
-        if (this.selectedAluno) {
-            let aluno = this.selectedAluno as Aluno;
-            this.loadingAlunos = true;
-            this.loading = true;
-            lastValueFrom(this.alunoRestricaoService.getList(aluno.id))
-                .then(res => {
-                    aluno.restricoes = res;
-                    let index = this.alunos.findIndex(x => x.id == aluno.id);
-                    this.alunos.splice(index, 1, aluno);
-
-                    if (aluno.restricoes.filter(x => x.active == true ).length > 0) {
-
-                        let mensagem = 'Esse aluno possui algumas restrições atribuidas: ';
-                        mensagem += res.map(x => '• ' + x.descricao).join('<br>');
-                        mensagem += `<br> Tem certeza que deseja inserir ele nessa ${this.tipoString}?`;
-
-                        this.confirmationService.confirm({
-                            target: e.target,
-                            header: 'Inserir aluno',
-                            message: mensagem,
-                            acceptLabel: `Continuar`,
-                            acceptIcon: 'pi pi-check',
-                            acceptButtonStyleClass: 'p-button-rounded',
-                            rejectLabel: 'Cancelar',
-                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                            accept: () => {
-                                this.selectedAluno = aluno;
-                            },
-                            reject: () => {
-                                this.selectedAluno = undefined;
-                            }
-                        })
-
-                    }
-                })
-
-        }
-
-    }
 
 
     getTipo(e: Evento) {
@@ -306,11 +332,12 @@ export class InserirAlunoComponent {
         this.confirmationService.confirm({
             target: e.target,
             header: 'Inserir aluno',
-            message: `Tem certeza que deseja inserir o aluno selecionado? <br> ${aluno}`,
-            acceptLabel: `Sallet e inserir`,
+            message: `Tem certeza que deseja inserir o aluno selecionado? <br> ${aluno.nome}`,
+            acceptLabel: `Inserir`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -322,13 +349,7 @@ export class InserirAlunoComponent {
     async send(e: any) {
 
         this.loading = true;
-        let response: RequestResponse = { success: false, message: '', object: undefined };
         let aluno = this.selectedAluno as Aluno;
-
-        if (this.evento.id == PseudoEvento.EventoId) {
-            response = await lastValueFrom(this.request());
-            this.evento.id = response.object.id;
-        }
 
         lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
             .then(res => {
@@ -349,36 +370,32 @@ export class InserirAlunoComponent {
 
     sendMensagemAlunos(e: any) {
         let aluno = this.selectedAluno as Aluno;
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500 text-4xl',
-            acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: 'p-button-rounded p-button-primary',
-            acceptIcon: 'pi pi-whatsapp',
-            rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
-                window.open(object.link, '_blank');
-                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-
-                this.visible = false
-                this.visibleChange();
-            },
-            reject: () => {
-                this.visible = false
-                this.visibleChange();
-            }
-        });
-    }
-
-
-    enviarMensagemAgendamento(aluno: Aluno) {
-        let evento = MyMap(this.evento, new Evento)
-        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
-        return this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, evento);
+        if (aluno.celular) {
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
+                header: 'Enviar whatsapp',
+                icon: 'pi pi-whatsapp text-green-500 text-4xl',
+                acceptLabel: `Enviar mensagem`,
+                acceptButtonStyleClass: 'p-button-rounded p-button-success',
+                acceptIcon: 'pi pi-whatsapp',
+                rejectLabel: 'Não enviar',
+                rejectIcon: 'pi pi-times',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                accept: () => {
+                    let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
+                    window.open(object.link, '_blank');
+                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    
+                    this.visible = false
+                    this.visibleChange();
+                },
+                reject: () => {
+                    this.visible = false
+                    this.visibleChange();
+                }
+            });
+        }
     }
 
     markChecklistAsDone() {
@@ -393,11 +410,9 @@ export class InserirAlunoComponent {
     checklistSuperacao(aluno: Aluno) {
         let alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
 
-        if (alunoChecklist) {
+        if (alunoChecklist && !alunoChecklist.finalizado) {
             let mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-            }
+            lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
         }
     }
 
@@ -406,40 +421,12 @@ export class InserirAlunoComponent {
         let id = 31;
         let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
 
-        if (!alunoChecklist.finalizado) {
+        if (alunoChecklist && !alunoChecklist.finalizado) {
             let mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-            }
+            lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
         }
     }
 
 
-    request() {
-        this.evento.data = new Date(this.evento.data)
-        switch (this.evento.evento_Tipo_Id) {
-            case EventoTipo.AulaZero: return this.requestAula0();
-            case EventoTipo.Superacao: return this.requestSuperacao();
-            default: return this.requestSuperacao();
-        }
-    }
-
-    requestAula0() {
-        let request = MyMap(this.evento, new EventoAula0Request);
-        request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-        request.professores = [this.evento.professor_Id];
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createAula0(request);
-        return this.service.editAula0(request);
-    }
-
-    requestSuperacao() {
-        let request = MyMap(this.evento, new EventoSuperacaoRequest);
-        request.alunos = this.evento.alunos.map(x => x.aluno_Id);
-        request.professores = [this.evento.professor_Id];
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createSuperacao(request);
-        return this.service.editSuperacao(request);
-    }
 
 }

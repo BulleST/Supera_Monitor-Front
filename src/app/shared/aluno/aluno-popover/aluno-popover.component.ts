@@ -84,6 +84,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.loadMenuItems();
                 this.loadAulaZero();
                 this.loadPrimeiraAula();
+                
                 return this.aluno;
             })
             .catch(res => {
@@ -148,6 +149,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: () => {
                     this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
+                    this.alunoChecklistDialog.aluno = this.aluno;
                     this.alunoChecklistDialog.show();
                 },
             })

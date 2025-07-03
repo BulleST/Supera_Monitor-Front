@@ -188,15 +188,15 @@
                   [rows]="3"></textarea>
     </div>
     <!-- Alunos -->
-    <div class="col-12 flex align-items-stretch flex-wrap py-2">
+    <div class="col-12 flex flex-wrap py-2">
         <ng-container *ngFor="let item of evento.alunos; let i = index">
             <app-aluno-popover #popoverAluno
                                [aluno_Id]="item.aluno_Id"
                                [evento]="evento"
                                [showChecklist]="true"></app-aluno-popover>
             <!-- Card -->
-            <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
-                <header class="flex align-items-center mb-2 p-3 surface-50">
+            <div class="col bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 18rem">
+                <header class="flex align-items-center p-3 surface-50">
                     <p-button type="button"
                               (onClick)="enviarMensagem(item)"
                               (auxclick)="enviarMensagem(item)"
@@ -247,11 +247,10 @@
                               size="small"
                               class="my-auto" />
                 </header>
-                <div class="formgrid grid px-3 bg-white">
+                <div class="formgrid grid px-3 bg-white pt-3">
                     
                     <!-- Observações -->
                     <div class="field col-12">
-                        <label for="observacao[{{i}}]"></label>
                         <textarea pTextarea
                                   id="observacao[{{i}}]"
                                   name="observacao[{{i}}]"

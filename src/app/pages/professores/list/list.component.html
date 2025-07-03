@@ -111,7 +111,9 @@
                                                             [name]="col.field"
                                                             [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                                             (keydown.enter)="filter(col.filterOptions.value)"
-                                                            (onBlur)="filter(col.filterOptions.value)">
+                                                            (onBlur)="filter(col.filterOptions.value)"
+                                                            class="min-w-10rem"
+                                                            fluid>
                                                 </ng-container>
                                                 <ng-container *ngIf="col.filterOptions.primeElement == 'inputmask'">
                                                     <p-inputmask 

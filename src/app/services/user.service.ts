@@ -18,7 +18,7 @@ export class UserService extends Service {
         return this.http.get<AccountRole[]>(`${this.url}/users/roles`)
             .pipe(tap({
                 error: err => {
-                    this.toastrService.error(`Não foi possível carregar perfis. \n ${getError(err)}`);
+                    this.toastrService.error(`Não foi possível carregar perfis. <br> ${getError(err)}`);
                 }
             }));
     }

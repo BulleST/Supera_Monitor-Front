@@ -13,8 +13,8 @@
         <p-tabs *ngIf="aluno && aluno.checklistCompleto"
                 [value]="aluno.checklist_Id ?? 1"
                 scrollable
-                #tabs
-                [scrollLeft]="scrollLeft">
+                [scrollLeft]="scrollLeft"
+                #tabs>
             <p-tablist>
                 <p-tab *ngFor="let checklist of aluno.checklistCompleto"
                        [value]="checklist.id"
@@ -44,8 +44,7 @@
                 </p-tab>
             </p-tablist>
             <p-tabpanels>
-                <p-tabpanel *ngFor="let checklist of aluno.checklistCompleto"
-                            [value]="checklist.id">
+                <p-tabpanel *ngFor="let checklist of aluno.checklistCompleto" [value]="checklist.id">
                     <div class="w-full -mb-6">
                         <p class="mb-2">Prazo máximo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
                         <ul class="p-0 ml-0">
@@ -74,20 +73,21 @@
                                               icon="pi pi-info-circle "
                                               severity="secondary"
                                               rounded
-                                              size="small"
                                               styleClass="ml-2"
                                               class="ml-auto"
                                               pTooltip="Clique para ver detalhes"
-                                              tooltipPosition="top"
                                               (onClick)="checklistData.toggle($event)" />
                                     <p-popover #checklistData
                                                styleClass="-mt-1">
-                                        <ng-template [ngIf]="checklistItem.finalizado">
-                                            <p *ngIf="checklistItem.dataFinalizacao"> Finalizado em {{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }} por {{checklistItem.account_Finalizacao }}
+                                        <ng-container *ngIf="checklistItem.finalizado">
+                                            <p *ngIf="checklistItem.dataFinalizacao"> 
+                                                <span>Finalizado em </span> 
+                                                <span class="font-bold">{{checklistItem.dataFinalizacao | date : 'dd/MM/yy \'às\' HH:mm' }}</span> 
+                                                <span> por {{checklistItem.account_Finalizacao }}</span>
                                             </p>
-                                        </ng-template>
+                                        </ng-container>
                                         <p>
-                                            <span>Observações: </span>
+                                            <span class="font-bold">Observações: </span>
                                             <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
                                             <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma observação</span>
                                         </p>
@@ -96,31 +96,14 @@
                                 <ng-container *ngIf="!checklistItem.finalizado">
                                     <ng-container *ngIf="[8,9,12,13,32,37,22,29,23].includes(checklistItem.checklist_Item_Id)">
                                         <div class="ml-auto">
-                                            <ng-container *ngIf="aluno.celular">
-                                                <a [href]="enviarMensagemCondicao(checklistItem)"
-                                                   target="_blank"
-                                                   pTooltip="Enviar mensagem"
-                                                   tooltipPosition="top"
-                                                   [ngClass]="{'pointer-events-none': loading}">
-                                                    <p-button icon="pi pi-whatsapp"
-                                                              label="Enviar mensagem"
-                                                              severity="success"
-                                                              [rounded]="true"
-                                                              [loading]="loading"
-                                                              [disabled]="loading" />
-                                                </a>
-                                            </ng-container>
-                                            <ng-container *ngIf="!aluno.celular">
-                                                <a pTooltip="Nenhum celular cadastrado"
-                                                   tooltipPosition="top"
-                                                   class="cursor-auto">
-                                                    <p-button icon="pi pi-whatsapp"
-                                                              label="Enviar mensagem"
-                                                              severity="secondary"
-                                                              [rounded]="true"
-                                                              [disabled]="true" />
-                                                </a>
-                                            </ng-container>
+                                            <p-button label="Enviar mensagem"
+                                                icon="pi pi-whatsapp"
+                                                severity="success"
+                                                [rounded]="true"
+                                                [disabled]="!aluno.celular"
+                                                (onClick)="enviarMensagem(checklistItem, aluno )"
+                                                (auxclick)="enviarMensagem(checklistItem, aluno)"
+                                                (contextmenu)="enviarMensagem(checklistItem, aluno)"/>
                                         </div>
                                     </ng-container>
                                 </ng-container>

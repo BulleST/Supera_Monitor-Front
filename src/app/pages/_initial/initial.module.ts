@@ -21,6 +21,7 @@ import { ExibicaoCardsComponent } from './monitoramento-jornada-supera/exibicao-
 import { ExibicaoListaComponent } from './monitoramento-jornada-supera/exibicao-lista/exibicao-lista.component';
 import { ChecklistPopoverComponent } from './monitoramento-jornada-supera/exibicao-lista/checklist-popover/checklist-popover.component';
 import { ChecklistStatusComponent } from './monitoramento-jornada-supera/exibicao-lista/checklist-status/checklist-status.component';
+import { AgendarReposicaoComponent } from './monitoramento-dashboard/agendar-reposicao/agendar-reposicao.component';
 
 @NgModule({
     declarations: [
@@ -40,6 +41,7 @@ import { ChecklistStatusComponent } from './monitoramento-jornada-supera/exibica
         ExibicaoListaComponent,
         ChecklistPopoverComponent,
         ChecklistStatusComponent,
+        AgendarReposicaoComponent,
     ],
     imports: [
         CommonModule,

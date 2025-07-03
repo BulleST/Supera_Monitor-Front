@@ -43,6 +43,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
 
     loadingRequests = new EventEmitter<number>();
     hoje = new Date;
+    height = 'flex';
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -54,8 +55,20 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
 
     }
 
-    ngAfterViewInit(): void { }
+    ngAfterViewInit(): void {
+        this.calcHeight();
+     }
 
+
+    calcHeight() {
+        let header = document.querySelector('app-header') as HTMLElement;
+        let toolbar = document.querySelector('#toolbar') as HTMLElement;
+        let windowHeight = window.outerHeight;
+        let calculation = windowHeight - (header?.offsetHeight ?? 0) - (toolbar?.offsetHeight ?? 0) - 210;
+        this.height = calculation + 'px';
+        // let dashContent = document.querySelector('#dash-content') as HTMLElement;
+        // dashContent.style.height = calculation + 'px';
+    }
     randomDate(start: Date, end: Date) {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     }
@@ -131,37 +144,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemFalta(evento: Dashboard_Aula, aluno: Dashboard_Aluno) {
-        lastValueFrom(this.service.calendario({
-            intervaloDe: moment(evento.data).toDate(),
-            intervaloAte: moment(evento.data).add(1, 'month').toDate(),
-            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
-        }))
-        .then(res => {
-            let sugestoes = res.filter(aula => {
-                const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
-                const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
-                const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
-                const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
-                const aulaNaoFinalizada = !aula.finalizado;
-                const aulaEstaAtiva = aula.active;
-                const naoEhFeriado = !aula.feriado;
-                
-                return alunoNaoEstaNaAula
-                && ehAula
-                && temVagas
-                && ehPerfilCognitivoCompativel
-                && aulaNaoFinalizada
-                && aulaEstaAtiva
-                && naoEhFeriado;
-            });
-
-            let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.nome, aluno.celular, evento as any, sugestoes);
-            window.open(object.link, '_blank');
-            this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-        })
-
-    }
     selectAlunoAula(e: any, popoverSelectedAlunoAula: Popover) {
         this.popoverSelectedAlunoAula
             .filter(x => x.el.nativeElement.id != popoverSelectedAlunoAula.el.nativeElement.id)

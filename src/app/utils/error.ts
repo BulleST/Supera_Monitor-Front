@@ -1,4 +1,3 @@
-
 import { HttpErrorResponse } from "@angular/common/http";
 import { playError } from "./audio";
 import { ConfirmationService } from "primeng/api";
@@ -55,7 +54,7 @@ export function getError(res: HttpErrorResponse) {
     else if (res.message) 
         msg = res.message
     else 
-        msg = 'Ocorreu um erro. \n' + res.toString();
+        msg = 'Ocorreu um erro. <br>' + res.toString();
 
     return msg;
 }

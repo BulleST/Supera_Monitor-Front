@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
@@ -27,7 +27,7 @@ import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
     providers: [ConfirmationService],
 })
 export class SelectedEventoComponent implements OnChanges {
-    @Input() evento?: Evento;
+    @Input() evento!: Evento;
     @Input() cdkEventItensId: string[] = [];
     @Input() cdkDragCancel: boolean = false;
 
@@ -58,6 +58,7 @@ export class SelectedEventoComponent implements OnChanges {
         private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
         private salaAulaPipe: SalaAulaPipe,
+        private changeDetector: ChangeDetectorRef,
 
     ) {
 
@@ -66,7 +67,6 @@ export class SelectedEventoComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-
             if (this.evento) {
                 this.tipoEventoString = this.calendarioUtils.getEventoTipo(this.evento);
                 this.loadReposicoes();
@@ -111,8 +111,13 @@ export class SelectedEventoComponent implements OnChanges {
         $(parent).removeClass('shadow-2 border-3 border-red-500')
     }
 
-    showPopover(e: any) {
+    showPopover(e: any, evento: Evento) {
+        this.evento = evento;
+        this.tipoEventoString = this.calendarioUtils.getEventoTipo(this.evento);
+        this.loadReposicoes();
         this.popover.show(e);
+        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
         setTimeout(() => {
             if (this.popover.container) {
                 this.popover.align();
@@ -335,7 +340,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToReposicao() {
         if (this.evento) {
             this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate(['aula', 'reposicao', 'agendar'], { relativeTo: this.activatedRoute });
+            this.router.navigate([ 'reposicao', 'agendar'], { relativeTo: this.activatedRoute });
         }
     }
 

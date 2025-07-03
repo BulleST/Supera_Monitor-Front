@@ -1,86 +1,134 @@
 <p-dialog
-  [header]="'Agendar Primeira Aula'"
-  [maximizable]="true"
-  [draggable]="true"
-  [modal]="true"
-  [(visible)]="visible"
-  (visibleChange)="visibleChange()"
-  [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
-  appendTo="body">
-  <ng-template #header>
-    <div class="w-full flex align-items-center">
-      <span class="p-dialog-title flex align-items-center">
-        <i
-          class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
-        <div class="flex flex-column">
-          <span>Agendar Primeira Aula</span>
+          [header]="'Agendar Primeira Aula'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center">
+            <span class="p-dialog-title flex align-items-center">
+                <i
+                   class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <div class="flex flex-column">
+                    <span>Agendar Primeira Aula</span>
+                </div>
+            </span>
         </div>
-      </span>
+    </ng-template>
+
+    <!-- Aluno -->
+    <div class="field col-12">
+        <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
+        <p-select [options]="alunos"
+                  [loading]="loadingAlunos"
+                  [(ngModel)]="aluno_Id"
+                  (onChange)="alunoChanged($event, aluno_Id)"
+                  optionLabel="nome"
+                  optionValue="id"
+                  #_aluno_Id="ngModel"
+                  styleClass="w-full"
+                  class="w-full"
+                  name="aluno_Id"
+                  inputId="aluno_Id"
+                  [required]="true"
+                  [filter]="true"
+                  filterPlaceholder="Digite o nome do aluno..."
+                  filterBy="nome,turma,professor"
+                  appendTo="body"
+                  [virtualScroll]="true"
+                  virtualScrollItemSize="55"
+                  optionDisabled="deactivated,disponivel">
+            <ng-template let-aluno pTemplate="selectedItem">
+                <div class="flex justify-between align-items-center gap-2 w-full">
+                    <span class="flex-1 font-bold truncate">{{ aluno?.nome }}</span>
+                    <p-badge [value]="aluno.perfilCognitivo" />
+                </div>
+            </ng-template>
+
+            <ng-template let-item #item>
+                <div class="flex align-items-center justify-content-between w-full gap-2">
+                    <div>
+                        <div class="flex align-items-center">
+                            <p-button type="button"
+                                      icon="pi pi-whatsapp"
+                                      (onClick)="enviarMensagem(item)"
+                                      (auxclick)="enviarMensagem(item)"
+                                      (contextmenu)="enviarMensagem(item)"
+                                      severity="success"
+                                      [text]="true"
+                                      [rounded]="true"
+                                      [disabled]="!item.celular"
+                                      pTooltip="Enviar mensagem"
+                                      class="mr-2"
+                                      styleClass="w-auto h-auto p-1">
+                            </p-button>
+                            <p class="font-bold mb-1">
+                                <span class="mr-2">{{item.nome}}</span>
+                                <p-badge *ngIf="item.disponivel == false"
+                                         value="Indisponível"
+                                         severity="danger"
+                                         [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                                <ng-template #disponivelEvent>
+                                    <div class="w-25rem">
+                                        <p>
+                                            <span>Evento: </span>
+                                            <span
+                                                  class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
+                                            <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+                                        </p>
+                                        <p>{{item.disponivelEvent.descricao}}</p>
+                                        <p *ngIf="item.disponivelEvent.professor">
+                                            <span class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                                  [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                            <span>{{item.disponivelEvent.professor}}</span>
+                                        </p>
+                                        <p
+                                           *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
+                                            {{item.disponivelEvent.turma}} </p>
+                                        <p *ngIf="item.disponivelEvent.sala_Id">
+                                            <span>Sala: </span>
+                                            <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                           [andar]="item.disponivelEvent.andar"
+                                                           [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                        </p>
+                                    </div>
+                                </ng-template>
+                            </p>
+                        </div>
+                        <p class="mb-1 flex align-items-center ">
+                            <span class="w-1rem h-1rem border-circle flex mr-3 ml-1"
+                                  [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                            <span class="font-normal">Turma {{item.turma}}</span>
+                        </p>
+                    </div>
+                    <p-badge [value]="item.perfilCognitivo" />
+
+                </div>
+            </ng-template>
+        </p-select>
+        <div *ngIf="_aluno_Id.touched && _aluno_Id.invalid && _aluno_Id.errors">
+            <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['restricaoMobilidade']">
+                {{_aluno_Id.errors['restricaoMobilidade']}}.</p>
+        </div>
     </div>
-  </ng-template>
-
-  <div class="field col-12 col-span-4 mb-0">
-    <label for="aluno">Aluno:</label>
-    <p-select
-      [options]="alunos"
-      [(ngModel)]="selectedAluno"
-      [checkmark]="true"
-      optionLabel="nome"
-      [showClear]="true"
-      placeholder="Selecione um aluno"
-      class="w-full"
-      [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
-      [filter]="true"
-      filterPlaceholder="Digite o nome do aluno..."
-      [virtualScroll]="true"
-      [virtualScrollItemSize]="25"
-      [loading]="loadingAlunos"
-      (onChange)="onSelectAluno($event)"
-      appendTo="body">
-      <!-- Aluno selecionado -->
-      <ng-template
-        let-aluno
-        pTemplate="selectedItem">
-        <div
-          class="flex justify-between align-items-center items-center w-full">
-          <span class="flex-1 font-bold truncate">{{ aluno?.nome }}</span>
-          <p-chip
-            [label]="aluno?.perfilCognitivo"
-            class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
-        </div>
-      </ng-template>
-
-      <!-- Listagem de alunos -->
-      <ng-template
-        let-aluno
-        pTemplate="item">
-        <div
-          class="flex justify-between align-items-center items-center w-full py-1">
-          <div class="flex-1 truncate">
-            <span class="font-bold">{{ aluno.nome }}</span>
-          </div>
-          <div class="flex-shrink-0">
-            <p-chip
-              [label]="aluno.perfilCognitivo"
-              class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
-          </div>
-        </div>
-      </ng-template>
-    </p-select>
-
-    <div class="mt-1 h-full">
-      <app-calendario-aluno-options
-        [object]="selectedAluno"></app-calendario-aluno-options>
+    <!-- Calendario -->
+    <div class="mt-1 h-full" *ngIf="selectedAluno">
+      <app-calendario-aluno-options [aluno]="selectedAluno"
+      (onClose)="visible = false; visibleChange()"></app-calendario-aluno-options>
     </div>
-  </div>
-  <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
-    <li>
-      Apenas eventos com o
-      <strong>perfil cognitivo correspondente ao aluno</strong> são exibidos.
-    </li>
-    <li>
-      Apenas alunos que
-      <strong>ainda não realizaram primeira aula</strong> são exibidos.
-    </li>
-  </ul>
+    <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
+        <li>
+            Apenas eventos com o
+            <strong>perfil cognitivo correspondente ao aluno</strong> são exibidos.
+        </li>
+        <li>
+            Apenas alunos que
+            <strong>ainda não realizaram primeira aula</strong> são exibidos.
+        </li>
+    </ul>
 </p-dialog>

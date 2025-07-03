@@ -44,7 +44,6 @@ import { NgModel } from '@angular/forms';
     templateUrl: './calendario.component.html',
     styleUrl: './calendario.component.css',
     providers: [ConfirmationService],
-    // changeDetection: ChangeDetectionStrategy.OnPush,
 
 })
 export class CalendarioComponent implements OnDestroy, AfterViewInit {
@@ -113,7 +112,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         nowIndicator: true,
         events: [],
         scrollTime: '09:00:00',
-        scrollTimeReset: false,
+        scrollTimeReset: true,
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
@@ -128,6 +127,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         datesSet: this.datesSet.bind(this),
         dateClick: this.dateClick.bind(this),
         eventsSet: this.events.bind(this),
+        windowResize: this.calcHeight.bind(this),
     }
 
     constructor(
@@ -210,6 +210,21 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     ngAfterViewInit(): void {
         this.loadRoteiros('ngAfterViewInit');
+        this.calcHeight();
+    }
+
+
+    calcHeight() {
+        let header = document.querySelector('app-header') as HTMLElement;
+        let toolbar = document.querySelector('#toolbar') as HTMLElement;
+        let div = document.querySelector('#calendar-navigator') as HTMLElement;
+        let legenda = document.querySelector('#legenda') as HTMLElement;
+        let calendar = document.querySelector('full-calendar') as HTMLElement;
+
+        let windowHeight = window.outerHeight
+        let calculation = windowHeight - (header?.offsetHeight ?? 0) - (toolbar?.offsetHeight ?? 0) - (div?.offsetHeight ?? 0) - (legenda?.offsetHeight ?? 0);
+       
+        this.calendarioOptions.height = calculation + 'px';
     }
 
     async update(where: string) {
@@ -219,6 +234,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         await this.loadFeriados();
         await this.getCalendario('update');
         this.setCalendario();
+        this.calcHeight();
     }
 
     prev() {
@@ -289,54 +305,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
-                this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(res)}`);
+                this.toastrService.error(`Não foi possível carregar calendário. <br> ${getError(res)}`);
             })
     }
 
-    dimHexToRgba(hex: string, factor: number, opacity: number) {
-        // Ensure factor is between 0 and 1, and opacity is between 0 and 1
-        if (factor < 0 || factor > 1 || opacity < 0 || opacity > 1) {
-            throw new Error("Factor and opacity must be between 0 and 1.");
-        }
 
-        // Convert hex to RGB
-        let r = parseInt(hex.substring(1, 3), 16);
-        let g = parseInt(hex.substring(3, 5), 16);
-        let b = parseInt(hex.substring(5, 7), 16);
-
-        // Dim each channel
-        r = Math.max(0, Math.floor(r * factor));
-        g = Math.max(0, Math.floor(g * factor));
-        b = Math.max(0, Math.floor(b * factor));
-
-        // Return RGBA string
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-    
-    dimHexColor(hex: string, factor: number, alpha: number) {
-        // Ensure factor is between 0 and 1, and alpha is between 00 and FF
-        if (factor < 0 || factor > 1 || alpha < 0 || alpha > 255) {
-            throw new Error('Factor must be between 0 and 1. Alpha must be between 0 and 255.')
-        }
-
-        // Convert hex to RGB
-        let r = parseInt(hex.substring(1, 3), 16)
-        let g = parseInt(hex.substring(3, 5), 16)
-        let b = parseInt(hex.substring(5, 7), 16)
-
-        // Dim each channel
-        r = Math.max(0, Math.floor(r * factor))
-        g = Math.max(0, Math.floor(g * factor))
-        b = Math.max(0, Math.floor(b * factor))
-
-        // Convert alpha to hex
-        let alphaHex = alpha.toString(16).padStart(2, '0')
-
-        // Return 8-digit hex string
-        return `#${r.toString(16).padStart(2, '0')}${g
-            .toString(16)
-            .padStart(2, '0')}${b.toString(16).padStart(2, '0')}${alphaHex}`
-    }
 
     setCalendario() {  
         this.loading = true;
@@ -395,6 +368,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.calendarioOptions.events = events;
         this.fullCalendar.getApi().updateSize();
         this.loading = false;
+        this.calcHeight();
 
 
         var temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte));
@@ -427,8 +401,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     async selectEvento(e: any, item: Evento) {
+
         this.popoverComponent.hidePopover();
+        
         item = JSON.parse(JSON.stringify(item));
+
         if (item.reagendamentoDe_Evento_Id && !item.reagendamentoDe_Evento) {
             await lastValueFrom(this.service.get(item.reagendamentoDe_Evento_Id))
                 .then(res => {
@@ -450,13 +427,16 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.selectedEvento = item;
         this.popoverComponent.evento = item;
-        this.popoverComponent.showPopover(e);
+        this.popoverComponent.showPopover(e, item);
+
+        this.changeDetector.markForCheck();
+        this.changeDetector.detectChanges();
 
     }
 
     unselectAula() {
         this.selectedEvento = undefined;
-        this.popoverComponent.evento = undefined;
+        this.popoverComponent.evento = undefined as any;
         this.popoverComponent.hidePopover();
     }
 
@@ -580,6 +560,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             this.cdkCancelDrag('keyup')
         }
     }
+    @HostListener('window:resize', ['$event'])
+    onResize(event: Event) {
+      this.calcHeight();
+    }
 
     events(events: EventApi[]) {
         this.currentEvents.set(events);
@@ -657,7 +641,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. \n ${getError(res)}`, e)
+                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. <br> ${getError(res)}`, e)
             })
     }
 

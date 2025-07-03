@@ -12,7 +12,7 @@ import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.co
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
 import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
-import { PrimeiraAulaAlunoComponent } from './primeira-aula-aluno/primeira-aula-aluno.component';
+import { PrimeiraAulaAlunoComponent } from './evento/aula/primeira-aula-aluno/primeira-aula-aluno.component';
 import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
 
@@ -30,7 +30,7 @@ const routes: Routes = [{
         
         { path: 'reposicao/agendar', component: AgendarReposicaoComponent },
         { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
-        { path: ':evento_nome/reposicao/agendar', component: AgendarReposicaoComponent },
+        // { path: ':evento_nome/reposicao/agendar', component: AgendarReposicaoComponent },
         { path: 'aluno/:aluno_id', component: AlunoFormComponent },
 
         { path: ':evento_nome/:evento_id', component: EventoComponent },
