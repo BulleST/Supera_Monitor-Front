@@ -76,7 +76,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     loadAluno() {
         this.loadingAluno = true;
-        lastValueFrom(this.alunoService.get(this.aluno_Id))
+        return lastValueFrom(this.alunoService.get(this.aluno_Id))
             .then(res => {
                 this.loadingAluno = false;
                 this.aluno = res;
@@ -84,8 +84,12 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.loadMenuItems();
                 this.loadAulaZero();
                 this.loadPrimeiraAula();
+                return this.aluno;
             })
-            .catch(res => this.loadingAluno = false);
+            .catch(res => {
+                this.loadingAluno = false;
+                return undefined;
+            });
     }
 
     loadFoto() {

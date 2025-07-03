@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core'
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core'
 import { Evento, EventoTipo } from '../../../../../models/evento.model'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { Professor } from '../../../../../models/professor.model'
@@ -19,7 +19,8 @@ import { AlunoService } from '../../../../../services/alunos.service'
 import { CalendarioUtils } from '../../../../../utils/calendario-utils'
 import { ActivatedRoute, Router } from '@angular/router'
 import { EventoService } from '../../../../../services/evento.service'
-import { TableEditCancelEvent, TableEditCompleteEvent, TableEditInitEvent } from 'primeng/table'
+import { AlunoPopoverComponent } from '../../../../../shared/aluno/aluno-popover/aluno-popover.component'
+import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
 
 @Component({
     selector: 'app-editar-aula',
@@ -63,6 +64,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     ScreenWidth = ScreenWidth
     screen = ScreenWidth.lg
 
+
+    @ViewChildren('alunoPopover') alunoPopover!: QueryList<AlunoPopoverComponent>;
+
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
@@ -71,9 +75,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         private alunoService: AlunoService,
         private service: EventoService,
         private calendarioUtils: CalendarioUtils,
-        private router: Router,
-        private activatedRoute: ActivatedRoute,
-        private crypto: Crypto,
+        private nameFirstWordPipe: NameFirstWordPipe,
     ) {
         let screen = this.mobileService.get().subscribe((res) => (this.screen = res));
         this.subscription.push(screen);
@@ -165,22 +167,41 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         this.validaSala.emit(item)
 
         if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Sala indisponível' })
-            this.showError(
-                'Sala Indisponível',
-                `Essa sala está atribuída a outra ${this.getTipo(
-                    item.disponivelEvent,
-                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
-                    'HH[h]mm',
-                )}</b>.`,
-                e.originalEvent,
-            )
+            model.control.setErrors({ indisponivel: 'Sala indisponível' });
+            this.showError('Sala Indisponível',`Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            model.control.updateValueAndValidity();
             return
         } else {
-            model.control.setErrors({ indisponivel: null })
+            model.control.setErrors({ indisponivel: null });
+            model.control.updateValueAndValidity();
         }
-        model.control.updateValueAndValidity()
+
+        let restricoesMessage = '';
+        this.alunoPopover.forEach(async component => {
+            let aluno = await component.loadAluno();
+            if (aluno) {
+                let restricaoMobilidade = aluno.restricaoMobilidade;
+                let restricoes = aluno.restricoes.filter(x => x.active);
+
+                if (restricaoMobilidade || restricoes.length > 0) {
+                    restricoesMessage += `\n - ${this.nameFirstWordPipe.transform(aluno.nome)}`
+                    if (restricaoMobilidade) {
+                        restricoesMessage += `<pre>Restrição de mobilidade: Sim</pre>`
+                    }
+                    if (restricoes.length > 0) {
+                        restricoesMessage += `<pre>Outras Restrições: ${restricoes.map(x => x.descricao).join(', ')}</pre>`
+                    }
+                }
+            }
+        });
+
+        if (restricoesMessage) {
+            this.showError('Atenção', `Alguns alunos possuem restrições. \n${restricoesMessage} \n Tem certeza que deseja continuar?`, e);
+        }
+
     }
+
+
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
@@ -200,7 +221,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         e.target.select()
     }
 
-    presente(item: Evento_Participacao_Aluno, e: any) {
+    presente(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
 
@@ -242,57 +263,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 window.open(object.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             })
-    }
-
-    getContactTooltipMessage(presente: boolean) {
-        return presente ? 'Abrir WhatsApp' : 'Sem celular cadastrado'
-    }
-
-    faltou(item: Evento_Participacao_Aluno, e: any) {
-        item.presente = false
-        // if (item.celular) {
-        //   // playAlert();
-        //   let nome = item.aluno.split(' ')[0]
-        //   this.confirmationService.confirm({
-        //     target: e.targer,
-        //     message: `O aluno ${nome} faltou? <br> Envie uma mensagem para saber o que aconteceu.`,
-        //     header: 'Enviar whatsapp',
-        //     icon: 'pi pi-whatsapp text-green-500 text-4xl',
-        //     acceptLabel: `Enviar mensagem`,
-        //     acceptButtonStyleClass: ' p-button-rounded p-button-success',
-        //     acceptIcon: 'pi pi-whatsapp',
-        //     rejectLabel: 'Não enviar',
-        //     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-        //     accept: () => {
-        //       let url = this.mensagemWhatsapp.enviarMensagemFalta(
-        //         item.aluno,
-        //         item.celular!,
-        //         this.evento,
-        //       )
-        //       window.open(url, '_blank')
-        //     },
-        //   })
-        // }
-    }
-
-    presenteClick(item: Evento_Participacao_Aluno, e: any) {
-        item.presente = !item.presente
-        return item
-    }
-
-    // Dribla o PrimeNG pra mudar o estado do presente sem ter que dar 2 cliques
-    triggerEditAndClick(cell: any, item: any, event: Event): void {
-        cell.initCellEdit?.()
-
-        setTimeout(() => {
-            this.presenteClick(item, event)
-            cell.onEditorSubmit?.()
-            cell.closeCellEdit?.()
-        })
-    }
-
-    primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
-        return moment(aluno.primeiraAula).isSame(evento.data)
     }
 
     async setApostilasAlunos() {

@@ -186,13 +186,9 @@
                                                  && item.participacao.active == true ">
                                             <div class="w-full text-xs border-1 text-white text-center flex align-items-center justify-content-center gap-2"
                                                  [ngClass]="{
-                                                 'bg-red-500' : !item.participacao.reposicaoDe_Evento_Id,
-                                                 'bg-blue-500' : item.participacao.reposicaoDe_Evento_Id ,
-                                                 'border-pink-500' : item.primeiraAula,
-                                                 'border-red-500' : !item.primeiraAula && !item.participacao.reposicaoDe_Evento_Id,
-                                                 'border-blue-500' : !item.primeiraAula && item.participacao.reposicaoDe_Evento_Id,
-         
-                                             }">
+                                                    'bg-red-500' : !item.participacao.reposicaoDe_Evento_Id,
+                                                    'bg-blue-500' : item.participacao.reposicaoDe_Evento_Id,
+                                                }">
                                                 <span>Faltou</span>
                                                 <p-button 
                                                     icon="pi pi-whatsapp"

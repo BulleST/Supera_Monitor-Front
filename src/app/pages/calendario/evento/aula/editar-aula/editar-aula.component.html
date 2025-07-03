@@ -290,7 +290,7 @@
                                             </p>
                                         </div>
                                     </ng-template>
-                                    <p-badge *ngIf="primeiraAula(item, evento)"
+                                    <p-badge *ngIf="item.primeiraAula_Id == evento.id"
                                              styleClass="ml-2 bg-pink-500"
                                              value="Aula 1"
                                              size="small"
@@ -305,13 +305,14 @@
                                     [disabled]="!item.celular"
                                     icon="pi pi-whatsapp"
                                     severity="success"
+                                    pTooltip="Enviar mensagem de falta"
                                     [text]="true" />
                            
                                 <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                                           [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
                                           [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
                                           [outlined]="item.presente !== true && item.presente !== false"
-                                          (onClick)="presente(item, $event)"
+                                          (onClick)="presente(item)"
                                           size="small"
                                           class="my-auto" />
                             </header>
@@ -469,7 +470,7 @@
                                                   (click)="popoverAluno.show($event)"
                                                   pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
 
-                                                <p-badge *ngIf="primeiraAula(item, evento)"
+                                                <p-badge *ngIf="item.primeiraAula_Id == evento.id"
                                                         class="ml-auto"
                                                         styleClass="ml-2 bg-pink-500"
                                                         value="Aula 1"
@@ -587,24 +588,24 @@
                             </td>
                             <!-- Presente -->
                             <td class="w-full z-0">
-                                <div class="mt-4 flex align-items-start gap-1">
+                                <div class="mt-5 flex align-items-start gap-2">
                                     <p-button [disabled]=" evento.finalizado || !evento.active"
                                               [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : '?'"
                                               [severity]="item.presente === true ? 'success' : item.presente === false ? 'danger' : 'secondary'"
                                               [icon]="item.presente === true ? 'pi pi-check' : item.presente === false ? 'pi pi-thumbs-down-fill' : ''"
                                               iconPos="right"
-                                              (onClick)="presenteClick(item, $event)" />
-                                    <div class="ml-2 p-2">
-                                        <p-button *ngIf="item.presente === false"
-                                                  [disabled]="!item.celular"
-                                                  label="Enviar mensagem"
-                                                  icon="pi pi-whatsapp text-green-500"
-                                                  iconPos="right"
-                                                  [pTooltip]="'Enviar mensagem'"
-                                                  tooltipPosition="bottom"
-                                                  severity="secondary"
-                                                  (onClick)="enviarMensagemFalta(item, $event)"></p-button>
-                                    </div>
+                                              (onClick)="presente(item)" />
+                                    <p-button *ngIf="item.presente === false"
+                                                [disabled]="!item.celular"
+                                                label="Enviar mensagem"
+                                                icon="pi pi-whatsapp"
+                                                iconPos="right"
+                                                pTooltip="Enviar mensagem de falta"
+                                                severity="success"
+                                                (onClick)="enviarMensagemFalta(item, $event)"
+                                                (contextmenu)="enviarMensagemFalta(item, $event)"
+                                                (auxclick)="enviarMensagemFalta(item, $event)"></p-button>
+                                    <div *ngIf="item.presente !== false" style="width:134px"></div>
                                 </div>
                             </td>
                             <!-- Observações  -->

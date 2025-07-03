@@ -488,7 +488,7 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
     font-size: 1rem;
 }
 
-.p-select-menu {
+.p-select.p-select-menu {
     width: 100%;
     border: 1px var(--p-primary-500) solid;
     background-color: var(--p-primary-500);
@@ -497,17 +497,17 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
     align-items: center;
 }
 
-.p-select-menu:hover {
+.p-select.p-select-menu:hover {
     border: 1px var(--p-primary-500) solid;
     background-color: var(--p-primary-500);
 }
 
-.p-select-menu.p-select-menu--dark {
+.p-select.p-select-menu.p-select-menu--dark {
     border: 1px var(--p-surface-800) solid;
     background-color: var(--p-surface-800);
 }
 
-.p-select-menu.p-select-menu--dark:hover {
+.p-select.p-select-menu.p-select-menu--dark:hover {
     border: 1px var(--p-surface-900) solid;
     background-color: var(--p-surface-900);
 }
@@ -516,17 +516,17 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
     background-color: transparent;
 }
 
-.p-select-menu .p-select-dropdown-icon {
+.p-select.p-select-menu .p-select-dropdown-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     padding-top: 3px;
 }
 
-.p-select-small.p-select-menu .p-select-dropdown-icon i {
+.p-select.p-select-menu.p-select-small .p-select-dropdown-icon i {
     font-size: 10px;
 }
 
-.p-select-small.p-select-menu .p-select-label.p-placeholder span {
+.p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {
     font-size: 11px;
 }

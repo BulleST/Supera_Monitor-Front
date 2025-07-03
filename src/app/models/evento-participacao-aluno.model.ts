@@ -63,7 +63,11 @@ export class Evento_Participacao_Aluno {
     active: boolean = true;
 
     restricaoMobilidade: boolean = false;
-    restricoes: Aluno_Restricao[] = []
+    restricoes: Aluno_Restricao[] = [];
+
+
+    primeiraAula_Id?: number;
+    aulaZero_Id?: number;
 }
 
 export var alunoParticipacao: Evento_Participacao_Aluno[] = [];

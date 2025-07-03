@@ -107,9 +107,7 @@
                                [readonly]="blockAlunoField"
                                [disabled]="blockAlunoField"
                                (onChange)="alunoChanged($event, aluno_Id)"
-                               display="chip"
                                #aluno_Id="ngModel"
-                               styleClass="w-full"
                                optionLabel="nome"
                                name="aluno_Id"
                                inputId="aluno_Id"
@@ -125,20 +123,22 @@
                                fluid>
                     <ng-template let-item #item>
                         <div class="w-full flex flex-column align-items-stretch">
-                            <div class="flex align-items-center justify-content-between gap-2">
+                            <div class="flex align-items-center gap-2">
                                 <p-button type="button"
-                                          (onClick)="enviarMensagem(item.value)"
-                                          (auxclick)="enviarMensagem(item.value)"
-                                          (contextmenu)="enviarMensagem(item.value)"
-                                          [disabled]="!item.value.celular"
+                                          (onClick)="enviarMensagem(item)"
+                                          (auxclick)="enviarMensagem(item)"
+                                          (contextmenu)="enviarMensagem(item)"
+                                          [disabled]="!item.celular"
                                           icon="pi pi-whatsapp"
                                           severity="success"
-                                          [text]="true" />
-                                <span class="mr-2">{{item.nome | nameAbv }}</span>
+                                          [text]="true"
+                                          styleClass="px-0 w-auto" />
+                                <span class="mr-2 capitalize">{{item.nome | nameAbv }}</span>
                                 <p-badge *ngIf="item.disponivel == false"
                                          value="Indisponível"
                                          severity="danger"
-                                         [pTooltip]="indisponivelTemplate" />
+                                         [pTooltip]="indisponivelTemplate"
+                                         class="ml-auto" />
                                 <ng-template #indisponivelTemplate>
                                     <div class="w-25rem">
                                         <p>

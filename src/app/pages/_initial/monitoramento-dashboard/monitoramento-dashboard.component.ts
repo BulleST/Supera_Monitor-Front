@@ -174,10 +174,6 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         popoverSelectedAlunoAula.hide();
     }
 
-    primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
-        return moment(aluno.primeiraAula).isSame(evento.data)
-    }
-
     goToAluno(aluno: Aluno) {
         return ['alunos', this.crypto.encrypt(aluno.id)]
     }

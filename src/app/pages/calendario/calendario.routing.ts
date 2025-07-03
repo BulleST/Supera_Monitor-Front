@@ -11,7 +11,6 @@ import { CalendarioComponent } from './calendario.component';
 import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
-import { ReposicaoComponent } from './evento/aula/reposicao/reposicao.component';
 import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 import { PrimeiraAulaAlunoComponent } from './primeira-aula-aluno/primeira-aula-aluno.component';
 import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';

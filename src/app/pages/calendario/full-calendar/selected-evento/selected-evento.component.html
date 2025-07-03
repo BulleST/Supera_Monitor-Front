@@ -12,7 +12,7 @@
                     <i class="fa-solid fa-users-between-lines mr-2"></i>
                     <span>{{ evento.descricao }}</span>
                 </p>
-                <p class="evento-tipo ml-2 ">{{tipoEventoString}}</p>
+                <p class="evento-tipo ml-4">{{tipoEventoString}}</p>
             </div>
             <div class="flex flex-column gap-1 text-600">
                 <!-- Data -->
@@ -53,8 +53,7 @@
         </div>
         <!-- Alunos -->
         <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
-            <div
-                 class="flex align-items-center justify-content-between px-2 w-full gap-2">
+            <div class="flex align-items-center justify-content-between px-2 py-2 w-full gap-2 border-bottom-2 border-primary-500">
                 <span class="font-bold block text-primary">
                     <span *ngIf="evento.alunos.length != 1">Alunos</span>
                     <span *ngIf="evento.alunos.length == 1">Aluno</span>
@@ -106,7 +105,7 @@
                                            [showChecklist]="true"
                                            [evento]="participacao.reposicaoDe_Evento ? undefined : evento"
                                            [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
-                        <div class="w-full flex align-items-center justify-content-start p-2 pl-3 border-round-md"
+                        <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
                              [ngClass]="{
                                 'surface-50': i % 2 == 0,
                                 'surface-0': i % 2 != 0
@@ -123,7 +122,7 @@
                                         'text-red-500': evento.finalizado && participacao.presente == false,
                                         'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
                                         'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
-                                        'text-pink-500': !evento.finalizado && getPrimeiraAula(participacao, evento)
+                                        'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id == evento.id
                                     }">
                                     <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                 </span>
@@ -134,21 +133,18 @@
                                          size="small"
                                          [pTooltip]="reposicaoDe_Evento"
                                          tooltipPosition="bottom" />
-                                <p-badge
-                                         *ngIf="primeiraAula(participacao, evento)"
+                                <p-badge *ngIf="aluno.primeiraAula_Id == evento.id"
                                          styleClass="ml-2 bg-pink-500"
                                          value="Aula 1"
                                          size="small"
                                          severity="danger"
                                          [pTooltip]="'Primeira aula'" />
-                                <span
-                                      *ngIf="evento.finalizado"
-                                      class="ml-2">
-                                    <span *ngIf="participacao.presente == true"
-                                          class="pi pi-check text-green-500"
+                                <span *ngIf="evento.finalizado" class="ml-2">
+                                    <span *ngIf="participacao.presente === true"
+                                          class="pi pi-thumbs-up-fill text-green-500 p-2"
                                           pTooltip="Presente"></span>
-                                    <span *ngIf="participacao.presente == false"
-                                          class="pi pi-thumbs-down-fill text-red-500"
+                                    <span *ngIf="participacao.presente === false"
+                                          class="pi pi-thumbs-down-fill text-red-500 p-2"
                                           pTooltip="Faltou"></span>
                                 </span>
                                 <ng-template #reposicaoDe_Evento>
@@ -170,6 +166,7 @@
                             </span>
                             <p class="ml-auto pl-2">
                                 <p-button type="button"
+                                            *ngIf="!evento.finalizado || participacao.presente === true"
                                           (onClick)="enviarMensagem(participacao)"
                                           (auxclick)="enviarMensagem(participacao)"
                                           (contextmenu)="enviarMensagem(participacao)"
@@ -179,7 +176,21 @@
                                           [text]="true"
                                           [rounded]="true"
                                           size="small"
-                                          styleClass="p-0 h-auto w-auto" />
+                                          pTooltip="Enviar mensagem"
+                                          styleClass="p-1 h-auto w-auto" />
+                                <p-button type="button"
+                                            *ngIf="participacao.presente === false"
+                                          (onClick)="enviarMensagemFalta(participacao)"
+                                          (auxclick)="enviarMensagemFalta(participacao)"
+                                          (contextmenu)="enviarMensagemFalta(participacao)"
+                                          [disabled]="!participacao.celular"
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [text]="true"
+                                          [rounded]="true"
+                                          size="small"
+                                          pTooltip="Enviar mensagem de falta"
+                                          styleClass="p-1 h-auto w-auto" />
                             </p>
                         </div>
                     </ng-template>
@@ -224,15 +235,14 @@
                    styleClass="mb-0"
                    class="mb-0" />
         <div class="p-2 flex align-items-center gap-2">
-            <p-button icon="pi pi-cog"
-                      iconPos="right"
-                      severity="secondary"
-                      label="Opções"
-                      [rounded]="true"
-                      (onClick)="popoverMenu.toggle($event)" />
-
-            <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
-                <ng-container *ngIf="evento.finalizado == false && evento.active">
+            <ng-container *ngIf="!evento.finalizado && evento.active">
+                <p-button icon="pi pi-cog"
+                          iconPos="right"
+                          severity="secondary"
+                          label="Opções"
+                          [rounded]="true"
+                          (onClick)="popoverMenu.toggle($event)" />
+                <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
                     <div class="flex flex-column">
                         <div class="text-500 text-sm font-bold mb-2">Menu</div>
                         <div *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)" 
@@ -279,8 +289,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div *ngIf="evento.active"
-                            (click)="goToCancelamento()">
+                        <div (click)="goToCancelamento()">
                             <div class="cursor-pointer py-2 px-2 surface-50 hover:surface-100 border-round-md" >
                                 <div class="flex align-items-center gap-2">
                                     <div class="w-2rem flex justify-content-center">
@@ -291,86 +300,26 @@
                             </div>
                         </div>
                     </div>
-                </ng-container>
-            </p-popover>
+                </p-popover>
+            </ng-container>
+            <ng-container *ngIf="evento.finalizado">
+                <span class="mr-auto gap-2 flex align-items-center">
+                    <span class="font-bold">Finalizado</span>
+                    <i class="pi pi-check-circle text-green-500 text-lg"></i>
+                </span>
+            </ng-container>
+            <ng-container *ngIf="!evento.active">
+                <span class="mr-auto gap-2 flex align-items-center">
+                    <span class="font-bold">Cancelado</span>
+                    <i class="pi pi-times-circle text-red-500 text-lg"></i>
+                </span>
+            </ng-container>
             <p-button label="Ver {{ tipoEventoString }}"
                       icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "
                       iconPos="right"
                       [rounded]="true"
                       (onClick)="goToEvento()"
                       class="ml-auto" />
-            <!-- <ng-container *ngIf="evento.finalizado == false && evento.active">
-                <p-button *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)"
-                    [disabled]="evento.id == PseudoEvento.EventoId || evento.alunos.length >= evento.capacidadeMaximaAlunos"
-                    [pTooltip]="evento.id == PseudoEvento.EventoId ? 'Defina tema, educador e sala, para inserir aluno' : evento.alunos.length >= evento.capacidadeMaximaAlunos ? 'Limite de alunos atingido' : 'Inscrever aluno'"
-                    tooltipPosition="top"
-                    label="Inscrever"
-                    icon="pi pi-user-plus text-sm hover:underline "
-                    styleClass="surface-900 border-900 text-white hover:surface-700 hover:border-700"
-                    [rounded]="true"
-                    pRipple
-                    severity="secondary"
-                    size="small"
-                    (onClick)="goToInscricaoOficina()" />
-                <p-button *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)"
-                          [pTooltip]="'Inserir aluno'"
-                          tooltipPosition="top"
-                          label="Inserir"
-                          icon="pi pi-user-plus text-sm hover:underline "
-                          styleClass="surface-900 border-900 text-white hover:surface-700 hover:border-700"
-                          [rounded]="true"
-                          pRipple
-                          severity="secondary"
-                          size="small"
-                          (onClick)="goToInserirAlunoConfirm($event)" />
-                <p-button *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)"
-                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
-                          [pTooltip]="evento.alunos.length >= evento.capacidadeMaximaAlunos ? 'Limite de alunos atingido' : 'Inserir reposição'"
-                          tooltipPosition="top"
-                          label="Reposição"
-                          icon="pi pi-user-plus text-sm "
-                          styleClass="surface-900 border-900 text-white hover:surface-700 hover:border-700"
-                          [rounded]="true"
-                          pRipple
-                          severity="secondary"
-                          size="small"
-                          (onClick)="goToReposicao()" />
-                <div class="ml-auto flex gap-2">
-                    <p-button *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)"
-                              severity="secondary"
-                              icon="pi pi-calendar"
-                              label="Primeira Aula"
-                              variant="outlined"
-                              severity="help"
-                              tooltipPosition="top"
-                              pTooltip="Inserir primeira aula de um aluno"
-                              [rounded]="true"
-                              styleClass="bg-pink-500 border-pink-500 text-pink-50 hover:bg-pink-400 hover:border-pink-400"
-                              size="small"
-                              (onClick)="goToPrimeiraAula()" />
-                    <p-button severity="danger"
-                              icon="pi pi-times"
-                              label="Cancelar"
-                              tooltipPosition="top"
-                              pTooltip="Cancelar {{ tipoEventoString }}"
-                              [rounded]="true"
-                              size="small"
-                              styleClass="bg-red-500 border-red-500 text-red-50 hover:bg-red-400 hover:border-red-400"
-                              (onClick)="goToCancelamento()" />
-                </div>
-            </ng-container> -->
-            <span
-                  *ngIf="evento.finalizado"
-                  class="ml-auto gap-2 flex align-items-center">
-                <span class="font-bold">Finalizado</span>
-                <i class="pi pi-check-circle text-green-500 text-2xl"></i>
-            </span>
-            <span
-                  *ngIf="!evento.active"
-                  class="ml-auto gap-2 flex align-items-center">
-                <span class="font-bold">Cancelado</span>
-                <i class="pi pi-times-circle text-red-500 text-2xl"></i>
-            </span>
         </div>
     </div>
 </p-popover>

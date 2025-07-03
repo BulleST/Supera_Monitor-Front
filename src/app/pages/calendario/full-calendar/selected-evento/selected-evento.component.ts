@@ -55,7 +55,7 @@ export class SelectedEventoComponent implements OnChanges {
         private crypto: Crypto,
         private confirmationService: ConfirmationService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private toastrService: ToastrService,
+        private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
         private salaAulaPipe: SalaAulaPipe,
 
@@ -132,12 +132,53 @@ export class SelectedEventoComponent implements OnChanges {
 
     enviarMensagem(aluno: Evento_Participacao_Aluno) {
         if (!aluno.celular) {
-            this.toastrService.error('Erro', 'Nenhum celular cadastrado');
+            this.toastr.error('Erro', 'Nenhum celular cadastrado');
             return;
         }
         let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular!);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    }
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.toastr.error('O aluno não possui um número de celular cadastrado.', 'Celular não informado');
+            return;
+        }
+        if (aluno.presente) {
+            this.toastr.error('O aluno já está presente.', 'Aluno presente');
+            return;
+        }
+
+        let evento = this.evento as Evento;
+
+        lastValueFrom(this.service.calendario({
+            intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
+            intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+        }))
+            .then(res => {
+                let sugestoes = res.filter(aula => {
+                    const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
+                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                    const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
+                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                    const aulaNaoFinalizada = !aula.finalizado;
+                    const aulaEstaAtiva = aula.active;
+                    const naoEhFeriado = !aula.feriado;
+
+                    return alunoNaoEstaNaAula
+                        && ehAula
+                        && temVagas
+                        && ehPerfilCognitivoCompativel
+                        && aulaNaoFinalizada
+                        && aulaEstaAtiva
+                        && naoEhFeriado;
+                });
+
+                let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, evento, sugestoes);
+                window.open(object.link, '_blank');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+            })
     }
 
     goToInscricaoOficina() {
@@ -150,7 +191,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToInserirAlunoConfirm(e: any) {
         if (this.evento) {
             if (this.evento.alunos.length >= this.evento.capacidadeMaximaAlunos) {
-                
+
                 // playAlert();
 
                 this.confirmationService.confirm({
@@ -172,7 +213,7 @@ export class SelectedEventoComponent implements OnChanges {
             }
         }
     }
-    
+
     goToInserirAluno() {
         if (this.evento) {
             this.service.setEvento(this.evento);
@@ -314,9 +355,6 @@ export class SelectedEventoComponent implements OnChanges {
 
         }
     }
-    primeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
-        return moment(aluno.primeiraAula).isSame(evento.data)
-    }
 
     @HostListener('mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {
@@ -330,13 +368,6 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.mouse.x >= (width / 2))
             return 'right'
         return 'left'
-    }
-
-    getPrimeiraAula(aluno: Evento_Participacao_Aluno, evento: Evento) {
-        if (moment(aluno.primeiraAula).format('DD-MM-YYYY') == moment(evento.data).format('DD-MM-YYYY')) {
-            return true;
-        }
-        return false;
     }
 
     getSalaAula(evento: Evento) {
