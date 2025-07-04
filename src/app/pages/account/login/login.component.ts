@@ -6,6 +6,8 @@ import { getError, showError } from '../../../utils';
 import { Login } from '../../../models/accounts.model';
 import { playSuccess } from '../../../utils/audio';
 import { ConfirmationService } from 'primeng/api';
+import { EventoService } from '../../../services/evento.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-login',
@@ -23,6 +25,9 @@ export class LoginComponent {
         private accountService: AccountService,
         private loadingHelper: LoadingService,
         private confirmationService: ConfirmationService,
+        private eventoService: EventoService,
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
     ) {
         this.loadingHelper.loading.subscribe(res => this.loading = res);
     }
@@ -35,8 +40,24 @@ export class LoginComponent {
       this.loadingHelper.loading.next(true);
 
         lastValueFrom(this.accountService.login(this.object))
-            .then(res => {
+            .then(async res => {
+
+
+                try {
+                    
+                    await lastValueFrom(this.eventoService.cancelarEventos(new Date().getFullYear()))
+                    .then(res => {
+                        console.log('cancelarEventos', res)
+                    })
+                }
+                catch (error) {
+                    console.log('error', error)
+                }
+
                 this.loadingHelper.loading.next(false);
+                const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
+                this.router.navigateByUrl(returnUrl);
+                
                 // playSuccess();
                 // this.appinitService.initialized.next(true);
             })

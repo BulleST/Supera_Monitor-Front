@@ -47,8 +47,8 @@ export class EventoService extends Service {
 
         this.roteiroService.list.subscribe(res => this.roteiros = res);
 
-        if (roteiroService.list.value.length == 0) 
-            lastValueFrom(roteiroService.getList('evento service'))
+        // if (roteiroService.list.value.length == 0) 
+        //     lastValueFrom(roteiroService.getList('evento service'))
     }
 
     getEvento() {
@@ -108,7 +108,8 @@ export class EventoService extends Service {
     }
     
     getFeriados(ano: number = new Date().getFullYear()) {
-        var token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
+        let token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
+        token = '20487|fbPtn71wk6mjsGDWRdU8mGECDlNZhyM7';
         return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
         .pipe(tap({
             next: res => {
@@ -340,6 +341,10 @@ export class EventoService extends Service {
     
     oficinasFuturas() {
         return this.http.get<RequestResponse>(`${this.url}/eventos/oficinas/all`);
+    }
+    
+    cancelarEventos(ano: number) {
+        return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
     }
 
 }

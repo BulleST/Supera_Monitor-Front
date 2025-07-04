@@ -28,7 +28,9 @@
                             <i class="fa-solid fa-users-between-lines"></i>
                         </span>
                         <span>Sala: </span>
-                        <span>{{ getSalaAula(evento) }}</span>
+                            <app-sala-aula [sala_Id]="evento.sala_Id"
+                            [andar]="evento.andar"
+                            [numeroSala]="evento.numeroSala"></app-sala-aula>
                     </div>
                     <!-- Educador -->
                     <div class="flex align-items-center gap-2" *ngIf="![EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
@@ -36,17 +38,24 @@
                             <i class="fa-solid fa-person-chalkboard"></i>
                         </span>
                         <span>Educador(a): </span>
-                        <span>{{ evento.professor }}</span>
+                        <span *ngIf="evento.professor">{{ evento.professor }}</span>
+                        <span *ngIf="!evento.professor" class="font-bold" >Indefinido</span>
                         <span class="inline-flex w-1rem h-1rem border-circle ml-2"
                         [style]="{ backgroundColor: evento.corLegenda }"></span>
                     </div>
-                    <!-- Sala -->
+                    <!-- perfilCoginitivo -->
                     <div class="flex align-items-center gap-2">
                         <span class="flex w-2rem justify-content-center -ml-1">
                             <i class="fa-solid fa-brain"></i>
                         </span>
                         <span>Perfil Cognitivo: </span>
-                        <span>{{ getPerfilCognitivo(evento) }}</span>
+                        
+                        <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
+                        <ng-template #perfilCognitivoTemplate let-perfilCoginitivo>
+                            <span *ngIf="perfilCoginitivo">{{ perfilCoginitivo }}</span>
+                            <span *ngIf="!perfilCoginitivo" class="font-bold" >Indefinido</span>
+                        </ng-template>
+
                     </div>
                 </div>
             </div>

@@ -57,7 +57,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     selectedAluno?: Evento_Participacao_Aluno;
     selectedEvento?: Evento;
     cdkEventItensId: string[] = [];
-    legenda: { label: string, corLegenda: string, ativo: boolean }[] = [];
     loading = false;
     headerOpen = true;
     account?: AccountResponse;
@@ -77,6 +76,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     currentRoteiro?: Roteiro;
     roteiros: Roteiro[] = [];
     loadingRoteiro = false;
+
+
+    loadedAnos: number[] = [];
 
     dayView = false;
     currentTitle = '';
@@ -137,7 +139,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private service: EventoService,
         private alunoService: AlunoService,
         private alunoRestricaoService: AlunoRestricaoService,
-        private professorService: ProfessorService,
         private accountService: AccountService,
         private roteiroService: RoteiroService,
         private mobileService: MobileService,
@@ -145,8 +146,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
         private perfilCognitivoService: PerfilCognitivoService,
-
-
     ) {
         var screen = this.mobileService.get().subscribe(res => {
             this.screen = res;
@@ -174,6 +173,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         var perfilCognitivo = this.perfilCognitivoService.list.subscribe(res => this.perfilCognitivo = res);
         this.subscription.push(perfilCognitivo);
 
+        var feriados = this.service.feriados.subscribe(res => this.feriados = res);
+        this.subscription.push(feriados);
+
         if (this.perfilCognitivo.length == 0) {
             this.loadingPerfilCognitivo = true;
             lastValueFrom(this.perfilCognitivoService.getList('calendario'))
@@ -196,14 +198,15 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         })
         this.subscription.push(calendarView);
 
-        this.setLegenda();
 
 
         this.calendarioRequest.intervaloDe = moment(new Date).startOf('week').toDate();
         this.calendarioRequest.intervaloAte = moment(new Date).endOf('week').toDate();
+        this.loadedAnos = [];
 
 
     }
+    
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe());
     }
@@ -212,7 +215,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.loadRoteiros('ngAfterViewInit');
         this.calcHeight();
     }
-
 
     calcHeight() {
         let header = document.querySelector('app-header') as HTMLElement;
@@ -231,7 +233,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.unselectAula();
 
         this.loadRoteiros('update');
-        await this.loadFeriados();
+        await this.cancelarEventos();
         await this.getCalendario('update');
         this.setCalendario();
         this.calcHeight();
@@ -292,7 +294,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-
     async getCalendario(where: string) {
         this.loading = true;
 
@@ -308,8 +309,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 this.toastrService.error(`Não foi possível carregar calendário. <br> ${getError(res)}`);
             })
     }
-
-
 
     setCalendario() {  
         this.loading = true;
@@ -390,8 +389,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.calendarioRequest.intervaloDe = arg.view.currentStart;
         this.calendarioRequest.intervaloAte = arg.view.currentEnd;
-        await this.getCalendario('datesset');
+
         await this.loadFeriados();
+        await this.cancelarEventos();
+        await this.getCalendario('datesset');
         this.setCalendario();
 
     }
@@ -570,11 +571,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
 
-
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
-
 
     agendaReposicaoConfirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
         this.confirmationService.confirm({
@@ -666,7 +665,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-
     touchStartX: number = 0;
     touchStartY: number = 0;
     touchEndX: number = 0;
@@ -695,19 +693,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         // if (this.touchEndY === this.touchStartY) // Tap
     }
 
-    async setLegenda() {
-        this.legenda = [];
-        var professores = this.professorService.list.value;
-        if (professores.length == 0)
-            await lastValueFrom(this.professorService.getList('calendario setLegenda')).then(res => professores = res);
-
-        this.legenda = professores.map(item => ({
-            label: item.nome,
-            corLegenda: item.corLegenda,
-            ativo: true
-        }))
-    }
-
 
     getTemaSemana(arg: DatesSetArg) {
         if (this.roteiros.length) {
@@ -729,6 +714,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     loadRoteiros(where: string) {
+        console.log('loadRoteiros', where)
         this.loadingRoteiro = true;
         lastValueFrom(this.roteiroService.getList('loadRoteiros'))
             .then(res => {
@@ -741,30 +727,22 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     async loadFeriados() {
+        if (!this.loadedAnos.includes(moment(this.calendarioRequest.intervaloDe).year())) {
+            this.loadedAnos.push(moment(this.calendarioRequest.intervaloDe).year());
+            await lastValueFrom(this.service.getFeriados(moment(this.calendarioRequest.intervaloDe).year()))
+                .then(res => this.loadingFeriados = false)
+                .catch(res => this.loadingFeriados = false);
+        }
+
+        this.loadedAnos = [...new Set(this.loadedAnos)];
+
         this.loadingFeriados = true;
-        var ano = this.calendarioRequest.intervaloDe?.getFullYear();
-        await lastValueFrom(this.service.getFeriados(ano))
-            .then(res => {
-                res.forEach(item => {
-                    var index = this.feriados.findIndex(x => moment(x.date).isSame(item.date))
-                    if (index == -1) {
-                        this.feriados.push(item);
-                    }
-                    else {
-                        this.feriados.splice(index, 1, item)
-                    }
-                })
-                // this.feriados = res;
-                this.loadingFeriados = false;
-            })
-            .catch(res => this.loadingFeriados = false);
     }
 
 
     getEventoTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
-
 
     requestAulaTurma(evento: Evento) {
         var request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
@@ -777,6 +755,20 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return lastValueFrom(this.service.createAulaTurma(request));
         return lastValueFrom(this.service.editAulaTurma(request));
     }
+
+    async cancelarEventos() {
+
+        if (!this.loadedAnos.includes(moment(this.calendarioRequest.intervaloDe).year())) {
+            this.loadedAnos.push(moment(this.calendarioRequest.intervaloDe).year());
+            await lastValueFrom(this.service.cancelarEventos(moment(this.calendarioRequest.intervaloDe).year()))
+                .then(res => {
+                })
+        }
+
+        this.loadedAnos = [...new Set(this.loadedAnos)];
+
+        
+    }   
 
 }
 

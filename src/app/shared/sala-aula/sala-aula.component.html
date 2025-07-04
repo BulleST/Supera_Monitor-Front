@@ -5,7 +5,14 @@
 </ng-container>
 
 
-<ng-template #salaTemplate> {{numeroSala}} - {{andar}}º andar</ng-template>
+<ng-template #salaTemplate> 
+    <ng-container *ngIf="numeroSala !== undefined && numeroSala !== null && andar !== undefined && andar !== null; else indefinidoTemplate">
+        {{numeroSala}} - {{andar}}º andar
+    </ng-container>
+    <ng-template #indefinidoTemplate>
+        <b>Indefinido</b>
+    </ng-template>
+</ng-template>
 <ng-template #onlineTemplate>Online</ng-template>
 <ng-template #pedagogicaTemplate>Sala pedagógica</ng-template>
 <ng-template #financeiroTemplate>Sala do Financeiro</ng-template>

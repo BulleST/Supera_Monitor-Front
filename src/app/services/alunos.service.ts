@@ -34,8 +34,9 @@ export class AlunoService extends Service {
     ) {
         super(http, toastrService);
 
-        lastValueFrom(this.checklistService.getList())
-            .then(res => this.checklists = res);
+        console.log('AlunoService constructor');
+        // lastValueFrom(this.checklistService.getList())
+        //     .then(res => this.checklists = res);
 
         this.checklistService.list.subscribe(res => this.checklists = res);
 

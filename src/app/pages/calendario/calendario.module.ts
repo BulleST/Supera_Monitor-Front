@@ -28,6 +28,7 @@ import { PrimeiraAulaAlunoComponent } from './evento/aula/primeira-aula-aluno/pr
 import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
 import { CalendarioAlunoOptionsComponent } from './evento/aula-1/calendario/calendario.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
+import { LegendaComponent } from './full-calendar/legenda/legenda.component';
 
 @NgModule({
     declarations: [
@@ -55,6 +56,7 @@ import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao
         CalculoPerfilCognitivoComponent,
         InserirAlunoComponent,
         AgendarReposicaoComponent,
+        LegendaComponent,
         
     ],
     imports: [

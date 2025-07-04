@@ -65,7 +65,9 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
             header: 'Sair',
             closeOnEscape: true,
             acceptLabel: `Sair`,
+            acceptIcon: 'pi pi-sign-out',
             rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {

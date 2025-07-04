@@ -12,12 +12,11 @@ import { Evento_Participacao_Aluno } from '../../../../../models/evento-particip
 import { Apostila, ApostilaTipo } from '../../../../../models/apostila.model'
 import { ApostilaService } from '../../../../../services/apostila.service'
 import { Roteiro } from '../../../../../models/roteiro.model'
-import { Crypto, MobileService, showError } from '../../../../../utils'
+import {  MobileService, showError } from '../../../../../utils'
 import { ScreenWidth } from '../../../../../utils/mobile'
 import { Aluno } from '../../../../../models/alunos.model'
 import { AlunoService } from '../../../../../services/alunos.service'
 import { CalendarioUtils } from '../../../../../utils/calendario-utils'
-import { ActivatedRoute, Router } from '@angular/router'
 import { EventoService } from '../../../../../services/evento.service'
 import { AlunoPopoverComponent } from '../../../../../shared/aluno/aluno-popover/aluno-popover.component'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
@@ -450,5 +449,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
             }
             this.roteiro = roteiro
         }
+    }
+    showDivVaziaEnviarMensagemFalta(item: Evento_Participacao_Aluno) {
+        return this.evento.alunos.filter(x => x.presente === false).length > 0 && item.presente !== false
     }
 }

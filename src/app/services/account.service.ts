@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, EventEmitter, Inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, lastValueFrom, of, throwError } from 'rxjs';
 import { ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/accounts.model';
 import { catchError, tap } from 'rxjs/operators';
@@ -23,7 +23,6 @@ export class AccountService {
 
     constructor(
         private router: Router,
-        private activatedRoute: ActivatedRoute,
         private http: HttpClient,
     ) {
         this.url = environment.url;
@@ -50,9 +49,9 @@ export class AccountService {
     login(model: Login) {
         return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
             tap(async (account) => {
+                
+
                 this.setAccount('login', account);
-                const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';
-                this.router.navigateByUrl(returnUrl);
                 this.startRefreshTokenTimer();
                 return of(account);
             }),

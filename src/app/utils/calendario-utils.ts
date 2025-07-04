@@ -25,19 +25,22 @@ export class CalendarioUtils {
     console.log('calendario utils  ')
     this.service.feriados.subscribe((res) => (this.feriados = res))
     
-    this.service.eventos.subscribe((res) => {
-        console.log('calendario utils  eventos', res)
-      var feriados = this.service.feriados.value
-      var feriadosDates = feriados.map((x) =>
-        moment(x.date).format('YYYY-MM-DD'),
-      )
-      var eventosCancelar = res.filter(
-        (x) =>
-          x.active == true &&
-          feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')),
-      )
-      this.cancelarEventos(eventosCancelar)
-    })
+    //
+    // Não é mais necessário cancelar eventos, pois o back já faz isso
+    //
+    // this.service.eventos.subscribe((res) => {
+    //     console.log('calendario utils  eventos', res)
+    //   var feriados = this.service.feriados.value
+    //   var feriadosDates = feriados.map((x) =>
+    //     moment(x.date).format('YYYY-MM-DD'),
+    //   )
+    //   var eventosCancelar = res.filter(
+    //     (x) =>
+    //       x.active == true &&
+    //       feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')),
+    //   )
+    //   this.cancelarEventos(eventosCancelar)
+    // })
   }
 
   weekOfYear(date: Date) {

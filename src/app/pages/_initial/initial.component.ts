@@ -1,9 +1,11 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { AccountService } from '../../services/account.service';
 import { Header } from '../../utils';
 import { AccountResponse } from '../../models/account.model';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
+import { Checklist } from '../../models/checklist.model';
+import { ChecklistService } from '../../services/checklist.service';
 
 @Component({
     selector: 'app-initial',
@@ -23,6 +25,7 @@ export class InitialComponent implements OnDestroy {
         private accountService: AccountService,
         private header: Header,
         private mobileService: MobileService,
+        private checklistService: ChecklistService,
     ) {
         var open = this.header.menuAsideOpen.subscribe(res => this.navigationOpen = res);
         this.subscription.push(open);
@@ -32,6 +35,8 @@ export class InitialComponent implements OnDestroy {
         
         var screen = this.mobileService.get().subscribe(res => this.screen = res)
         this.subscription.push(screen);
+
+        lastValueFrom(this.checklistService.getList())
     }
 
     ngOnDestroy(): void {

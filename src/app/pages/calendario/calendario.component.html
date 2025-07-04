@@ -243,20 +243,7 @@
                 </full-calendar>
             </div>
             <!-- FIM CALENDARIO -->
-            <!-- LEGENDA --> @if(!loading) { <!--  -->
-            <div class="flex mt-2" id="legenda">
-                <div class="border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3" style="background-color: #f1f0f0 !important;">
-                    <div *ngFor="let item of legenda"
-                         (click)="item.ativo = !item.ativo"
-                         [ngClass]="{ 'line-through': !item.ativo }"
-                         class="my-1 flex align-items-center cursor-pointer">
-                        <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
-                        <span class="ml-2 hover:font-bold hover:text-primary-500 hover:underline">{{item.label}}</span>
-                    </div>
-                </div>
-            </div>
-            <!--  --> } <!--  -->
-            <!-- FIM LEGENDA -->
+          <app-legenda [eventos]="eventos"></app-legenda>
         </div>
     </div>
 </section>
