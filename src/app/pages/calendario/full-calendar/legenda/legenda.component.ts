@@ -24,11 +24,8 @@ export class LegendaComponent implements OnChanges {
         this.legenda = [];
 
         let legenda = this.eventos.map(x => JSON.stringify({ label: x.professor, corLegenda: x.corLegenda }))
-        console.log('legenda', legenda)
         legenda = [...new Set(legenda)]
-        console.log('legenda', legenda)
         legenda = legenda.map(x => JSON.parse(x))
-        console.log('legenda', legenda)
         this.legenda = legenda as any;
     }
 

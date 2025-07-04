@@ -106,7 +106,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     
     @HostListener('wheel', ['$event'])
     onWheel(event: WheelEvent): void {
-        console.log('onWheel', event)
+
         this.hide();
     }
 }

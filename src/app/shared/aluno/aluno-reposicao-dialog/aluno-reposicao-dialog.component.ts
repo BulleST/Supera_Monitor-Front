@@ -195,7 +195,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     async loadEventosReposicaoPara() {
-        console.log('loadEventosReposicaoPara', this.aluno_Id, this.alunoSelected, this.eventoReposicaoDe)
+
         if (!this.alunoSelected) {
             await this.loadAluno();
         }
@@ -205,12 +205,12 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
                 intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
             }
-            console.log('request', request)
+    
 
             this.loadingEventosReposicaoPara = true;
             lastValueFrom(this.eventoService.calendario(request))
                 .then(res => {
-                    console.log('res', res)
+            
                     this.eventosReposicaoParaList = res.filter(aula => {
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
@@ -231,7 +231,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && naoEhFeriado;
 
                     });
-                    console.log('eventosReposicaoParaList', this.eventosReposicaoParaList)
+            
 
                     this.loadingEventosReposicaoPara = false;
                 })

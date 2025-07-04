@@ -263,7 +263,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
   @HostListener('keydown.enter', ['$event'])
   onEnterKeydown(event: KeyboardEvent) {
-    console.log('Enter key pressed on the host element!', event);
+    
     // Add your desired logic here
     this.sendConfirmation(this.form, event)
   }

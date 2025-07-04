@@ -131,13 +131,13 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     async agendarEvento(e: SelectChangeEvent, select: NgModel) {
-        console.log(this.agendarValue, select);
+
         if (this.agendarValue) {
             if (this.agendarValue.command) {
                 this.agendarValue.command(e);
             }
             var a = await this.router.navigateByUrl(this.agendarValue.routerLink);
-            console.log(a);
+    
             delete this.agendarValue;
             select.control.setValue(undefined)
             select.control.updateValueAndValidity();

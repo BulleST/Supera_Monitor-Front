@@ -95,7 +95,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         });
 
         var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-            console.log('onFinish')
+    
             this.alunoChecklistItem.observacoes = res.observacoes;
             this.alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
             this.alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;

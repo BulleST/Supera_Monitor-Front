@@ -60,9 +60,9 @@ export class ListComponent implements OnDestroy {
             this.loadingNivelCertificados = false;
 
             var columnIndex = professorColumns.findIndex(x => x.field == 'professor_NivelCertificacao')
-            console.log('columnIndex', columnIndex)
+    
             var column = professorColumns[columnIndex];
-            console.log('column', column)
+    
             
             column.filterOptions!.primeElementOptions.options = res.map(x => {
                 return {
@@ -70,7 +70,7 @@ export class ListComponent implements OnDestroy {
                     value: x.descricao,
                 }
             });
-            console.log('column2', column)
+    
             professorColumns[columnIndex] = column
             this.tableColumns = professorColumns;
         })
@@ -292,18 +292,15 @@ export class ListComponent implements OnDestroy {
     }
 
     filterDateTime(value: any, col: ColumnTable, callback: Function, dt: Table) {
-        console.log('value', value)
-        console.log('callback', callback)
-        console.log('col', col)
-        console.log('dt', dt)
+
 
         let filterService = dt.filterService;
         let filterDt: any = dt.filters[col.field];
         let matchMode = filterDt['matchMode'];
         let filter: any = dt.filters[col.field];
-        console.log('filter', filter)
+
         var a = filter(value)
-        console.log('a', a)
+
 
 
 

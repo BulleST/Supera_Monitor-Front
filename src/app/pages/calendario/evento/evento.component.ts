@@ -42,6 +42,7 @@ import { CalendarioUtils } from '../../../utils/calendario-utils'
 })
 export class EventoComponent implements OnDestroy {
   evento: Evento = new Evento()
+  // queryParams: EventoQueryParams = new EventoQueryParams;
 
   visible: boolean = false
   loading = false

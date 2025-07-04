@@ -93,19 +93,28 @@
     </ng-template>
 <ng-template #eventFooter>
   <div class="event-footer flex-column">
-    
-    <!-- Se Finalizado, mostra o ícone de check -->
-    <ng-container *ngIf="evento.finalizado else notFinalizado">
-      <p class="event-check text-success flex align-items-center gap-1 text-base font-bold">
-        <i class="fa fa-check-circle text-lg mr-1"></i> Finalizado
+
+    <!-- Se Cancelado -->
+    <ng-container *ngIf="evento.deactivated; else checkFinalizado">
+      <p class="event-cancelado text-red-500 flex align-items-center gap-1 text-base font-bold">
+        <i class="fa fa-times-circle text-lg mr-1"></i> Cancelado
       </p>
     </ng-container>
+
+    <!-- Se Finalizado -->
+    <ng-template #checkFinalizado>
+      <ng-container *ngIf="evento.finalizado; else notFinalizado">
+        <p class="event-check flex align-items-center gap-1 text-base font-bold">
+          <i class="fa fa-check-circle text-lg mr-1"></i> Finalizado
+        </p>
+      </ng-container>
+    </ng-template>
 
     <!-- Caso não finalizado, renderiza o conteúdo padrão -->
     <ng-template #notFinalizado>
       <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
         <p class="event-alunos text-base mb-0 font-normal">
-          <span>{{alunosStr}}</span>
+          <span>{{ alunosStr }}</span>
         </p>
       </ng-container>
 

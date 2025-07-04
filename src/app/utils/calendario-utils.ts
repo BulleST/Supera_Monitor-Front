@@ -22,7 +22,7 @@ export class CalendarioUtils {
   feriados: Feriado[] = []
 
   constructor(private service: EventoService) {
-    console.log('calendario utils  ')
+
     this.service.feriados.subscribe((res) => (this.feriados = res))
     
     //

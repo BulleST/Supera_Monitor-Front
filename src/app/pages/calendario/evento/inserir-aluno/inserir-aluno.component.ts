@@ -221,13 +221,13 @@ export class InserirAlunoComponent {
         let aluno = e.value as Aluno;
         let salaAula =  this.salas.find(x => x.id == this.evento.sala_Id) as SalaAula;
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-            console.log('aluno indisponivel', aluno)
+    
             this.selectedAluno = undefined;
             this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
         else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
-            console.log('aluno restricao mobilidade', aluno)
+    
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
             this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
             return;
@@ -241,10 +241,10 @@ export class InserirAlunoComponent {
     loadAluno(e: any, aluno: Aluno) {
         this.loadingAlunos = true;
         this.loading = true;
-        console.log('loadAluno', aluno)
+
         lastValueFrom(this.alunoService.get(aluno.id))
         .then(res => {
-                console.log('res', res)
+        
                 aluno = res;
 
                 this.loadingAlunos = false;
@@ -260,7 +260,7 @@ export class InserirAlunoComponent {
 
                     mensagem += restricoes.map(x => '• ' + x.descricao).join('<br>');
                     mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
-                    console.log('if', aluno)
+            
 
                     this.confirmationService.confirm({
                         target: e.target,
@@ -273,7 +273,7 @@ export class InserirAlunoComponent {
                         rejectLabel: 'Cancelar',
                         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                         accept: () => {
-                            console.log('accept')
+                    
                         },
                         reject: () => {
                             console.log('reject')

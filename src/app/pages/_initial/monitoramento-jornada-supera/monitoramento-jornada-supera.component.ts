@@ -46,7 +46,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     ) {
         var onFinish = this.service.onFinish.subscribe(res => {
 
-            console.log('onFinish', res);
+    
 
             this.checklists = this.checklists.map((checklist, indexChecklist) => {
                 checklist.items = checklist.items.map((item, indexItem) => {
@@ -129,7 +129,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         lastValueFrom(this.alunoService.getListWithChecklist(this.request))
         .then(res => {
             this.alunos = res;
-            console.log('alunos', this.alunos);
+    
             this.alunosFiltered = res;
             this.loadingAlunos = false;
         })
@@ -158,7 +158,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     modoExibicaoChanged() {
-        console.log('modoExibicaoChanged', this.modoExibicao)
+
     }
 
     showError(header: string, message: string, e: any) {
