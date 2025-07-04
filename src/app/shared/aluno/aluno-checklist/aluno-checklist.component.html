@@ -1,5 +1,3 @@
-
-
 <ng-container *ngIf="aluno && showChecklist">
     <ng-container *ngIf="!loading">
         <div class="flex align-itens-center gap-2 w-full justify-content-between pr-2 line-height-1" [pTooltip]="status + ': ' + texto">
@@ -17,5 +15,13 @@
         <span pTooltip="Carregando">
             <i class="pi pi-spin pi-spinner" style="font-size: 1rem"></i>
         </span>
-    </ng-container>
+        <i class="{{ icon }}"></i>
+  </ng-container>
+  <ng-container *ngIf="loading">
+    <span pTooltip="Carregando">
+      <i
+        class="pi pi-spin pi-spinner"
+        style="font-size: 1rem"></i>
+    </span>
+  </ng-container>
 </ng-container>

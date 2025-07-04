@@ -453,4 +453,21 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     showDivVaziaEnviarMensagemFalta(item: Evento_Participacao_Aluno) {
         return this.evento.alunos.filter(x => x.presente === false).length > 0 && item.presente !== false
     }
+
+    get roteiroEvento(): Roteiro | undefined {
+        if (!this.evento?.roteiro_Id) return undefined;
+
+        return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
+    }
+
+    get roteiroTextColor(): string {
+        const bg = this.roteiroEvento?.corLegenda || '#ffffff';
+        // Luminance-based check
+        const r = parseInt(bg.slice(1, 3), 16);
+        const g = parseInt(bg.slice(3, 5), 16);
+        const b = parseInt(bg.slice(5, 7), 16);
+        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+        
+        return luminance > 150 ? '#000' : '#fff';
+    }
 }
