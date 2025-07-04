@@ -302,8 +302,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     apostilaAbacoChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
-        console.log('item', item)
-        console.log('clonedRow', this.clonedRow)
         let newApostila = item.apostilaAbacoObject as Apostila
         let oldApostila = this.clonedRow[item.aluno_Id].apostilaAbacoObject as Apostila
 
@@ -344,8 +342,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any) {
         let prev = this.clonedRow[item.aluno_Id]
         let current = item
-        console.log('numeroPaginaAbacoChange prev', prev)
-        console.log('numeroPaginaAbacoChange current', current)
+
         if (
             current.numeroPaginaAbaco <= prev.numeroPaginaAbaco &&
             prev.apostila_Abaco_Id == current.apostila_Abaco_Id
@@ -374,8 +371,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     apostilaAHChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
-        console.log('item', item)
-        console.log('clonedRow', this.clonedRow)
 
         let newApostila = this.apostilas.find(
             (x) => x.id == item.apostila_AH_Id,

@@ -47,11 +47,11 @@ export class LoginComponent {
                     
                     await lastValueFrom(this.eventoService.cancelarEventos(new Date().getFullYear()))
                     .then(res => {
-                        console.log('cancelarEventos', res)
+                
                     })
                 }
                 catch (error) {
-                    console.log('error', error)
+            
                 }
 
                 this.loadingHelper.loading.next(false);

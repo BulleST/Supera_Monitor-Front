@@ -162,9 +162,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     loadTurmas() {
-        console.log('Log: Carregando turmas')
+
         if (this.object?.id && this.turmas.length) {
-            console.log('Log: if')
+
             
             // Filtra turmas que o aluno poderia participar:
             // Ou a turma atual
@@ -185,7 +185,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                     && ((alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas))
                 });
                 
-                console.log('Turmas Filtradas: ', this.turmasFiltered)
+        
                 
                 if (this.object.turma_Id) {
                     this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);

@@ -17,7 +17,7 @@ import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
 import { TurmaService } from '../../../services/turma.service'
 import moment from 'moment'
-import { NgForm  } from '@angular/forms'
+import { NgForm } from '@angular/forms'
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
 import { EventoOficinaRequest } from '../../../models/evento-oficina.model'
 import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model'
@@ -34,528 +34,532 @@ import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils
 import { CalendarioUtils } from '../../../utils/calendario-utils'
 
 @Component({
-  selector: 'app-evento',
-  standalone: false,
-  templateUrl: './evento.component.html',
-  styleUrl: './evento.component.css',
-  providers: [ConfirmationService],
+    selector: 'app-evento',
+    standalone: false,
+    templateUrl: './evento.component.html',
+    styleUrl: './evento.component.css',
+    providers: [ConfirmationService],
 })
 export class EventoComponent implements OnDestroy {
-  evento: Evento = new Evento()
-  // queryParams: EventoQueryParams = new EventoQueryParams;
+    evento: Evento = new Evento()
+    // queryParams: EventoQueryParams = new EventoQueryParams;
 
-  visible: boolean = false
-  loading = false
-  error: string = ''
-  subscription: Subscription[] = []
-  tipoString = ''
-  duracaoEvento = ''
-  width = '1000px'
-  tipo = EventoTipo
-  encryptedId = ''
+    visible: boolean = false
+    loading = false
+    error: string = ''
+    subscription: Subscription[] = []
+    tipoString = ''
+    duracaoEvento = ''
+    width = '1000px'
+    tipo = EventoTipo
+    encryptedId = ''
 
+EventoTipo = EventoTipo;
+    selectedAluno?: Evento_Participacao_Aluno
+    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
+    alunos: Aluno[] = []
+    loadingAlunos = false
 
-  selectedAluno?: Evento_Participacao_Aluno
-  mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
-  alunos: Aluno[] = []
-  loadingAlunos = false
+    professores: Professor[] = []
+    loadingProfessores = false
 
-  professores: Professor[] = []
-  loadingProfessores = false
+    salaAulas: SalaAula[] = []
+    loadingSalaAulas = false
 
-  salaAulas: SalaAula[] = []
-  loadingSalaAulas = false
+    turmas: Turma[] = []
+    loadingTurmas = false
 
-  turmas: Turma[] = []
-  loadingTurmas = false
+    eventos: Evento[] = []
+    loadingEventos = false
 
-  eventos: Evento[] = []
-  loadingEventos = false
+    roteiros: Roteiro[] = []
+    loadingRoteiros = false
 
-  roteiros: Roteiro[] = []
-  loadingRoteiros = false
+    @ViewChildren('componentForm') componentForm!: QueryList<any>
 
-  @ViewChildren('componentForm') componentForm!: QueryList<any>
+    constructor(
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
+        private confirmationService: ConfirmationService,
+        private toastrService: ToastrService,
+        private crypto: Crypto,
+        private salaAulaService: SalaAulaService,
+        private professorService: ProfessorService,
+        private alunoService: AlunoService,
+        private service: EventoService,
+        private turmaService: TurmaService,
+        private roteiroService: RoteiroService,
+        private calendarioUtils: CalendarioUtils,
+        private mensagemWhatsapp: MensagemWhatsapp,
+    ) {
+        let params = this.activatedRoute.snapshot.params
+        if (!params['evento_id'] || !params['evento_nome'] || !['aula', 'aula-zero', 'aula', 'superacao', 'reuniao', 'oficina'].includes(params['evento_nome'])) {
+            this.visible = false
+            this.visibleChange()
+            return
+        }
 
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private confirmationService: ConfirmationService,
-    private toastrService: ToastrService,
-    private crypto: Crypto,
-    private salaAulaService: SalaAulaService,
-    private professorService: ProfessorService,
-    private alunoService: AlunoService,
-    private service: EventoService,
-    private turmaService: TurmaService,
-    private roteiroService: RoteiroService,
-    private calendarioUtils: CalendarioUtils,
-    private mensagemWhatsapp: MensagemWhatsapp,
-  ) {
-    let params = this.activatedRoute.snapshot.params
-    if ( !params['evento_id'] || !params['evento_nome'] || !['aula','aula-zero','aula','superacao','reuniao','oficina'].includes(params['evento_nome'])) {
-      this.visible = false
-      this.visibleChange()
-      return
-    }
+        this.encryptedId = params['evento_id']
 
-    this.encryptedId = params['evento_id']
-  
-    let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res)
-    this.subscription.push(roteiros)
+        let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res)
+        this.subscription.push(roteiros)
 
-    if (this.roteiros.length == 0) {
-      this.loadingRoteiros = true
-      lastValueFrom(this.roteiroService.getList())
-        .then((res) => (this.loadingRoteiros = false))
-        .catch((res) => (this.loadingRoteiros = false))
-    }
+        if (this.roteiros.length == 0) {
+            this.loadingRoteiros = true
+            lastValueFrom(this.roteiroService.getList())
+                .then((res) => (this.loadingRoteiros = false))
+                .catch((res) => (this.loadingRoteiros = false))
+        }
 
-    let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true))
-    this.subscription.push(professores)
+        let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true))
+        this.subscription.push(professores)
 
-    if (this.professores.length == 0) {
-      this.loadingProfessores = true
-      lastValueFrom(this.professorService.getList('calendario/evento/evento.component'))
-        .then((res) => (this.loadingProfessores = false))
-        .catch((res) => (this.loadingProfessores = false))
-    }
+        if (this.professores.length == 0) {
+            this.loadingProfessores = true
+            lastValueFrom(this.professorService.getList('calendario/evento/evento.component'))
+                .then((res) => (this.loadingProfessores = false))
+                .catch((res) => (this.loadingProfessores = false))
+        }
 
-    let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true))
-    this.subscription.push(salaAula)
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true))
+        this.subscription.push(salaAula)
 
-    if (this.salaAulas.length == 0) {
-      this.loadingSalaAulas = true
-      lastValueFrom(this.salaAulaService.getList())
-        .then((res) => (this.loadingSalaAulas = false))
-        .catch((res) => (this.loadingSalaAulas = false))
-    }
+        if (this.salaAulas.length == 0) {
+            this.loadingSalaAulas = true
+            lastValueFrom(this.salaAulaService.getList())
+                .then((res) => (this.loadingSalaAulas = false))
+                .catch((res) => (this.loadingSalaAulas = false))
+        }
 
-    let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true))
-    this.subscription.push(alunos)
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true))
+        this.subscription.push(alunos)
 
-    if (this.alunos.length == 0) {
-      this.loadingAlunos = true
-      lastValueFrom(this.alunoService.getList())
-        .then((res) => (this.loadingAlunos = false))
-        .catch((res) => (this.loadingAlunos = false))
-    }
+        if (this.alunos.length == 0) {
+            this.loadingAlunos = true
+            lastValueFrom(this.alunoService.getList())
+                .then((res) => (this.loadingAlunos = false))
+                .catch((res) => (this.loadingAlunos = false))
+        }
 
-    let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true))
-    this.subscription.push(turmas)
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true))
+        this.subscription.push(turmas)
 
-    if (this.turmas.length == 0) {
-      this.loadingTurmas = true
-      lastValueFrom(this.turmaService.getList())
-        .then((res) => (this.loadingTurmas = false))
-        .catch((res) => (this.loadingTurmas = false))
-    }
+        if (this.turmas.length == 0) {
+            this.loadingTurmas = true
+            lastValueFrom(this.turmaService.getList())
+                .then((res) => (this.loadingTurmas = false))
+                .catch((res) => (this.loadingTurmas = false))
+        }
 
-    let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true))
-    this.subscription.push(eventos)
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true))
+        this.subscription.push(eventos)
 
-    let evento = this.service.evento.subscribe(async (res) => {
-      if (!res) {
-        try {
-          let decrypted = this.crypto.decrypt(this.encryptedId)
-          if (this.encryptedId &&decrypted &&decrypted != PseudoEvento.EventoId) {
-            await lastValueFrom(this.service.get(decrypted))
-              .then((res) => {
-                this.service.setEvento(res)
+        let evento = this.service.evento.subscribe(async (res) => {
+            if (!res) {
+                try {
+                    let decrypted = this.crypto.decrypt(this.encryptedId)
+                    if (this.encryptedId && decrypted && decrypted != PseudoEvento.EventoId) {
+                        await lastValueFrom(this.service.get(decrypted))
+                            .then((res) => {
+                                this.service.setEvento(res)
+                                this.evento = res
+                            })
+                            .catch((res) => {
+                                this.visible = false
+                                this.visibleChange()
+                            })
+                    } else {
+                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
+                        this.service.setEvento(evento)
+                    }
+                } catch (e) {
+                    this.visible = false
+                    this.visibleChange()
+                }
+                return
+            }
+
+            if (res) {
                 this.evento = res
-              })
-              .catch((res) => {
+                this.visible = true
+                this.verificaDisponibilidade()
+                this.tipoString = this.getTipo(this.evento)
+                let alunosEvento = this.evento.alunos.map((x) => x.aluno_Id)
+                this.alunos = this.alunos.filter((x) => alunosEvento.includes(x.id))
+
+                if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
+                    let roteiro = this.roteiros.find((x) =>
+                        moment(this.evento.data).isBetween(x.dataInicio, x.dataFim),
+                    )
+                    this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
+                }
+
+                let minutos = this.evento.duracaoMinutos % 60
+                let horas = this.evento.duracaoMinutos / 60
+                let horaRedonda = horas - Math.floor(horas) == 0
+
+                this.duracaoEvento = horaRedonda
+                    ? horas.toString().padStart(2, '0') + 'h'
+                    : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
+            }
+        })
+        this.subscription.push(evento)
+
+        setTimeout(() => {
+            if (!this.evento) {
                 this.visible = false
                 this.visibleChange()
-              })
-          } else {
-            let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-            this.service.setEvento(evento)
-          }
-        } catch (e) {
-          this.visible = false
-          this.visibleChange()
+            }
+        }, 1000)
+    }
+
+    getDeactivatedInformation(evento: Evento) {
+        return `${moment(evento.deactivated!).format('DD/MM/YYYY - HH:mm')}`
+    }
+
+    get roteiroEvento(): Roteiro | undefined {
+        if (!this.evento?.roteiro_Id) return undefined;
+        return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
+    }
+    ngOnDestroy(): void {
+        this.subscription.forEach((e) => e.unsubscribe())
+    }
+
+    visibleChange() {
+        if (!this.visible) {
+            let route = '../../../';
+            this.router.navigate([route], { relativeTo: this.activatedRoute })
         }
-        return
-      }
+    }
 
-      if (res) {
-        this.evento = res
-        this.visible = true
-        this.verificaDisponibilidade()
-        this.tipoString = this.getTipo(this.evento)
-        let alunosEvento = this.evento.alunos.map((x) => x.aluno_Id)
-        this.alunos = this.alunos.filter((x) => alunosEvento.includes(x.id))
+    showError(header: string, message: string, e: any, innerMessage?: string) {
+        showError(this.confirmationService, header, message, e, innerMessage)
+    }
 
-        if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-          let roteiro = this.roteiros.find((x) =>
-            moment(this.evento.data).isBetween(x.dataInicio, x.dataFim),
-          )
-          this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
+    async verificaDisponibilidade() {
+        let valid = true
+
+        this.loadingEventos = true
+        let request: CalendarioRequest = new CalendarioRequest()
+
+        request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate()
+        request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD')
+            .add(1, 'day')
+            .toDate()
+
+        this.loadingEventos = true
+        await lastValueFrom(this.service.calendario(request))
+            .then((res) => (this.loadingEventos = false))
+            .catch((res) => (this.loadingEventos = false))
+
+        this.validaProfessores()
+        this.validaSalaAulas()
+        this.validaAlunos()
+
+        return valid
+    }
+
+    validaSalaAulas() {
+        let data = this.evento.data
+        this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined)
+    }
+
+    validaProfessores() {
+        let data = this.evento.data
+        this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, undefined)
+    }
+
+    validaAlunos() {
+        let data = this.evento.data
+        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined)
+    }
+
+    professorChanged(professor: Professor) {
+        this.validaProfessores()
+    }
+
+    salaAulaChanged(salaAula: SalaAula) {
+        this.validaSalaAulas()
+    }
+
+    alunoChanged(aluno: Aluno) {
+        this.validaAlunos()
+    }
+
+    getTipo(e: Evento) {
+        return this.calendarioUtils.getEventoTipo(e)
+    }
+
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
+        if (!aluno.celular) {
+            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+            return;
+        }
+        if (aluno.presente) {
+            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+            return;
         }
 
-        let minutos = this.evento.duracaoMinutos % 60
-        let horas = this.evento.duracaoMinutos / 60
-        let horaRedonda = horas - Math.floor(horas) == 0
 
-        this.duracaoEvento = horaRedonda 
-          ? horas.toString().padStart(2, '0') + 'h'
-          : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
-      }
-    })
-    this.subscription.push(evento)
+        lastValueFrom(this.service.calendario({
+            intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
+            intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+        }))
+            .then(res => {
+                let sugestoes = res.filter(aula => {
+                    const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
+                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                    const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
+                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                    const aulaNaoFinalizada = !aula.finalizado;
+                    const aulaEstaAtiva = aula.active;
+                    const naoEhFeriado = !aula.feriado;
 
-    setTimeout(() => {
-      if (!this.evento) {
-        this.visible = false
-        this.visibleChange()
-      }
-    }, 1000)
-  }
+                    return alunoNaoEstaNaAula
+                        && ehAula
+                        && temVagas
+                        && ehPerfilCognitivoCompativel
+                        && aulaNaoFinalizada
+                        && aulaEstaAtiva
+                        && naoEhFeriado;
+                });
 
-  getDeactivatedInformation(evento: Evento) {
-    return `${moment(evento.deactivated!).format('DD/MM/YYYY - HH:mm')}`
-  }
-
-  ngOnDestroy(): void {
-    this.subscription.forEach((e) => e.unsubscribe())
-  }
-
-  visibleChange() {
-    if (!this.visible) {
-      let route = '../../../';
-      this.router.navigate([route], { relativeTo: this.activatedRoute })
-    }
-  }
-
-  showError(header: string, message: string, e: any, innerMessage?: string) {
-    showError(this.confirmationService, header, message, e, innerMessage)
-  }
-
-  async verificaDisponibilidade() {
-    let valid = true
-
-    this.loadingEventos = true
-    let request: CalendarioRequest = new CalendarioRequest()
-
-    request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate()
-    request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD')
-      .add(1, 'day')
-      .toDate()
-
-    this.loadingEventos = true
-    await lastValueFrom(this.service.calendario(request))
-      .then((res) => (this.loadingEventos = false))
-      .catch((res) => (this.loadingEventos = false))
-
-    this.validaProfessores()
-    this.validaSalaAulas()
-    this.validaAlunos()
-
-    return valid
-  }
-
-  validaSalaAulas() {
-    let data = this.evento.data
-    this.salaAulas = validaSalaAulas(data,this.evento.duracaoMinutos,this.salaAulas,this.eventos,undefined,undefined)
-  }
-
-  validaProfessores() {
-    let data = this.evento.data
-    this.professores = validaProfessores(data,this.evento.duracaoMinutos,this.professores,this.eventos,undefined,undefined)
-  }
-
-  validaAlunos() {
-    let data = this.evento.data
-    this.alunos = validaAlunos(data,this.evento.duracaoMinutos,this.alunos,this.eventos,undefined,undefined)
-  }
-
-  professorChanged(professor: Professor) {
-    this.validaProfessores()
-  }
-
-  salaAulaChanged(salaAula: SalaAula) {
-    this.validaSalaAulas()
-  }
-
-  alunoChanged(aluno: Aluno) {
-    this.validaAlunos()
-  }
-
-  getTipo(e: Evento) {
-    return this.calendarioUtils.getEventoTipo(e)
-  }
-
-  enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-    if (!aluno.celular) {
-      this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
-      return;
-    }
-    if (aluno.presente) {
-      this.showError('Aluno presente', 'O aluno já está presente.', e.target);
-      return;
+                let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, sugestoes);
+                window.open(object.link, '_blank');
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+            })
     }
 
+    goToAluno(aluno: Evento_Participacao_Aluno) {
+        this.router.navigate([
+            'calendario',
+            'aluno',
+            this.crypto.encrypt(aluno.aluno_Id),
+        ])
+    }
 
-    lastValueFrom(this.service.calendario({
-        intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
-        intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
-        perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
-    })) 
-    .then(res => {
-        let sugestoes = res.filter(aula => {
-            const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
-            const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
-            const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
-            const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
-            const aulaNaoFinalizada = !aula.finalizado;
-            const aulaEstaAtiva = aula.active;
-            const naoEhFeriado = !aula.feriado;
-            
-            return alunoNaoEstaNaAula
-                && ehAula
-                && temVagas
-                && ehPerfilCognitivoCompativel
-                && aulaNaoFinalizada
-                && aulaEstaAtiva
-                && naoEhFeriado;
-        });
-
-        let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, sugestoes);
-        window.open(object.link, '_blank');
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-    })
-  }
-
-  goToAluno(aluno: Evento_Participacao_Aluno) {
-    this.router.navigate([
-      'calendario',
-      'aluno',
-      this.crypto.encrypt(aluno.aluno_Id),
-    ])
-  }
-
-  finalizarConfirmation(e: any) {
-    this.confirmationService.confirm({
-      target: e.target,
-      message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
-      header: `Finalizar ${this.tipoString}`,
-      acceptIcon: 'pi pi-check',
-      acceptLabel: `Finalizar`,
-      acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-      rejectIcon: 'pi pi-times',
-      rejectLabel: 'Ainda não',
-      rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-      accept: async () => {
-        this.finalizar(e)
-      },
-    })
-  }
-
-  async finalizar(e: any) {
-    this.loading = true
-
-    let response: RequestResponse = await lastValueFrom(this.request())
-    .catch(res => {
-      this.loading = false;
-      return res
-    })
-
-    if (response.success) {
-      this.evento.id = response.object.id
-      this.evento.alunos = this.evento.alunos.map((participacao) => {
-        let participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
-        participacao.id = participacaoResponse.id
-        participacao.evento_Id = participacaoResponse.evento_Id
-        participacao.presente = participacao.presente ?? false;
-        return participacao;
-      })
-
-      this.evento.professores = this.evento.professores.map((participacao) => {
-        let participacaoResponse = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == participacao.professor_Id) as Evento_Participacao_Professor;
-        participacao.id = participacaoResponse.id
-        participacao.evento_Id = participacaoResponse.evento_Id
-        participacao.presente = [EventoTipo.Reuniao].includes(this.evento.evento_Tipo_Id) ? participacao.presente ?? false : true;
-        return participacao;
-      })
-
-      let request: EventoChamadaRequest = {
-        evento_Id: this.evento.id,
-        observacao: this.evento.observacao,
-        alunos: this.evento.alunos.map((x) => {
-          return {
-            participacao_Id: x.id,
-            observacao: x.observacao,
-            presente: x.presente,
-            apostila_Abaco_Id: x.apostila_Abaco_Id,
-            apostila_AH_Id: x.apostila_AH_Id,
-            numeroPaginaAbaco: x.numeroPaginaAbaco,
-            numeroPaginaAH: x.numeroPaginaAH,
-          }
-        }),
-        professores: this.evento.professores.map((item) => {
-          return {
-            participacao_Id: item.id,
-            observacao: item.observacao,
-            presente: true,
-          }
-        }),
-      }
-
-      if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
-        request.professores = this.evento.professores.map((x) => {
-          return {
-            participacao_Id: x.id,
-            observacao: x.observacao,
-            presente: x.presente,
-          }
-        })
-      }
-
-      lastValueFrom(this.service.finalizar(request))
-        .then((res) => {
-          this.evento.finalizado = true
-          this.loading = false
-          this.visible = false
-          this.visibleChange()
-          this.service.calendarioReload.emit(this.evento.id)
-          this.markChecklistAsDone()
-
-          this.toastrService.success(
-            `${this.tipoString} finalizada com sucesso.`,
-            'Sucesso',
-          )
-        })
-        .catch((res) => {
-          this.error = res.message
-          this.showError('Erro',`Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
-          this.loading = false
+    finalizarConfirmation(e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
+            header: `Finalizar ${this.tipoString}`,
+            acceptIcon: 'pi pi-check',
+            acceptLabel: `Finalizar`,
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Ainda não',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.finalizar(e)
+            },
         })
     }
-  }
 
-  sendConfirmation(e: any, form: NgForm) {
-    if (form.invalid) {
-      return this.showError('OPA!', `Não foi possível salvar! <br> Preencha os dados corretamente para continuar`, e);
+    async finalizar(e: any) {
+        this.loading = true
+
+        let response: RequestResponse = await lastValueFrom(this.request())
+            .catch(res => {
+                this.loading = false;
+                return res
+            })
+
+        if (response.success) {
+            this.evento.id = response.object.id
+            this.evento.alunos = this.evento.alunos.map((participacao) => {
+                let participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
+                participacao.id = participacaoResponse.id
+                participacao.evento_Id = participacaoResponse.evento_Id
+                participacao.presente = participacao.presente ?? false;
+                return participacao;
+            })
+
+            this.evento.professores = this.evento.professores.map((participacao) => {
+                let participacaoResponse = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == participacao.professor_Id) as Evento_Participacao_Professor;
+                participacao.id = participacaoResponse.id
+                participacao.evento_Id = participacaoResponse.evento_Id
+                participacao.presente = [EventoTipo.Reuniao].includes(this.evento.evento_Tipo_Id) ? participacao.presente ?? false : true;
+                return participacao;
+            })
+
+            let request: EventoChamadaRequest = {
+                evento_Id: this.evento.id,
+                observacao: this.evento.observacao,
+                alunos: this.evento.alunos.map((x) => {
+                    return {
+                        participacao_Id: x.id,
+                        observacao: x.observacao,
+                        presente: x.presente,
+                        apostila_Abaco_Id: x.apostila_Abaco_Id,
+                        apostila_AH_Id: x.apostila_AH_Id,
+                        numeroPaginaAbaco: x.numeroPaginaAbaco,
+                        numeroPaginaAH: x.numeroPaginaAH,
+                    }
+                }),
+                professores: this.evento.professores.map((item) => {
+                    return {
+                        participacao_Id: item.id,
+                        observacao: item.observacao,
+                        presente: true,
+                    }
+                }),
+            }
+
+            if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
+                request.professores = this.evento.professores.map((x) => {
+                    return {
+                        participacao_Id: x.id,
+                        observacao: x.observacao,
+                        presente: x.presente,
+                    }
+                })
+            }
+
+            lastValueFrom(this.service.finalizar(request))
+                .then((res) => {
+                    this.evento.finalizado = true
+                    this.loading = false
+                    this.visible = false
+                    this.visibleChange()
+                    this.service.calendarioReload.emit(this.evento.id)
+                    this.markChecklistAsDone()
+
+                    this.toastrService.success(
+                        `${this.tipoString} finalizada com sucesso.`,
+                        'Sucesso',
+                    )
+                })
+                .catch((res) => {
+                    this.error = res.message
+                    this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
+                    this.loading = false
+                })
+        }
     }
 
-    this.confirmationService.confirm({
-      target: e.target,
-      message: `Tem certeza que deseja salvar?`,
-      header: `Sallet ${this.tipoString}`,
-      acceptIcon: 'pi pi-check',
-      acceptLabel: 'Salvar',
-      acceptButtonStyleClass: 'p-button-rounded',
-      rejectVisible: true,
-      rejectIcon: 'pi pi-times',
-      rejectLabel: 'Cancelar',
-      rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-      accept: async () => {
-        this.send(e)
-      },
-      reject: () => {},
-    })
-  }
+    sendConfirmation(e: any, form: NgForm) {
+        if (form.invalid) {
+            return this.showError('OPA!', `Não foi possível salvar! <br> Preencha os dados corretamente para continuar`, e);
+        }
 
-  async send(e: any) {
-    this.loading = true
-    lastValueFrom(this.request())
-      .then((res) => {
-        this.service.calendarioReload.emit(res.object.id)
-        this.evento.id = res.object.id
-        this.service.setEvento(this.evento)
-        this.toastrService.success('Dados atualizados com sucesso.')
-        this.router.navigate(['', this.crypto.encrypt(this.evento.id)], {
-          relativeTo: this.activatedRoute,
-          replaceUrl: true,
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja salvar?`,
+            header: `Sallet ${this.tipoString}`,
+            acceptIcon: 'pi pi-check',
+            acceptLabel: 'Salvar',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectVisible: true,
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Cancelar',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.send(e)
+            },
+            reject: () => { },
         })
-        this.loading = false
-      })
-      .catch((res) => {
-        this.loading = false
-        this.showError('OPA!',`Não foi possível salvar dados.`, e, getError(res))
-      })
-  }
-
-  markChecklistAsDone() {
-    this.componentForm.forEach((item) => {
-      item.onSave.emit(this.evento)
-    })
-  }
-
-  request() {
-    this.evento.data = new Date(this.evento.data)
-    switch (this.evento.evento_Tipo_Id) {
-      case EventoTipo.Aula:
-        return this.requestAulaTurma()
-      case EventoTipo.AulaZero:
-        return this.requestAula0()
-      case EventoTipo.AulaExtra:
-        return this.requestAulaExtra()
-      case EventoTipo.Superacao:
-        return this.requestSuperacao()
-      case EventoTipo.Reuniao:
-        return this.requestReuniao()
-      case EventoTipo.Oficina:
-        return this.requestOficina()
-      default:
-        return this.requestAulaTurma()
     }
-  }
 
-  requestAulaTurma() {
-    let request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
-    request.perfilCognitivo = this.evento.perfilCognitivo.map((x) => x.id)
+    async send(e: any) {
+        this.loading = true
+        lastValueFrom(this.request())
+            .then((res) => {
+                this.service.calendarioReload.emit(res.object.id)
+                this.evento.id = res.object.id
+                this.service.setEvento(this.evento)
+                this.toastrService.success('Dados atualizados com sucesso.')
+                this.router.navigate(['', this.crypto.encrypt(this.evento.id)], {
+                    relativeTo: this.activatedRoute,
+                    replaceUrl: true,
+                })
+                this.loading = false
+            })
+            .catch((res) => {
+                this.loading = false
+                this.showError('OPA!', `Não foi possível salvar dados.`, e, getError(res))
+            })
+    }
 
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createAulaTurma(request)
-    return this.service.editAulaTurma(request)
-  }
+    markChecklistAsDone() {
+        this.componentForm.forEach((item) => {
+            item.onSave.emit(this.evento)
+        })
+    }
 
-  requestAula0() {
-    let request = MyMap(this.evento, new EventoAula0Request())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = [this.evento.professor_Id]
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createAula0(request)
-    return this.service.editAula0(request)
-  }
+    request() {
+        this.evento.data = new Date(this.evento.data)
+        switch (this.evento.evento_Tipo_Id) {
+            case EventoTipo.Aula:
+                return this.requestAulaTurma()
+            case EventoTipo.AulaZero:
+                return this.requestAula0()
+            case EventoTipo.AulaExtra:
+                return this.requestAulaExtra()
+            case EventoTipo.Superacao:
+                return this.requestSuperacao()
+            case EventoTipo.Reuniao:
+                return this.requestReuniao()
+            case EventoTipo.Oficina:
+                return this.requestOficina()
+            default:
+                return this.requestAulaTurma()
+        }
+    }
 
-  requestAulaExtra() {
-    let request = MyMap(this.evento, new EventoTurmaExtraRequest())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = [this.evento.professor_Id]
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createAulaExtra(request)
-    return this.service.editAulaExtra(request)
-  }
+    requestAulaTurma() {
+        let request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
+        request.perfilCognitivo = this.evento.perfilCognitivo.map((x) => x.id)
 
-  requestSuperacao() {
-    let request = MyMap(this.evento, new EventoSuperacaoRequest())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = [this.evento.professor_Id]
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createSuperacao(request)
-    return this.service.editSuperacao(request)
-  }
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createAulaTurma(request)
+        return this.service.editAulaTurma(request)
+    }
 
-  requestReuniao() {
-    let request = MyMap(this.evento, new EventoReuniaoRequest())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = this.evento.professores.map((x) => x.professor_Id)
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createReuniao(request)
-    return this.service.editReuniao(request)
-  }
+    requestAula0() {
+        let request = MyMap(this.evento, new EventoAula0Request())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = [this.evento.professor_Id]
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createAula0(request)
+        return this.service.editAula0(request)
+    }
 
-  requestOficina() {
-    let request = MyMap(this.evento, new EventoOficinaRequest())
-    request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-    request.professores = [this.evento.professor_Id]
-    if (this.evento.id == PseudoEvento.EventoId)
-      return this.service.createOficina(request)
-    return this.service.editOficina(request)
-  }
+    requestAulaExtra() {
+        let request = MyMap(this.evento, new EventoTurmaExtraRequest())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = [this.evento.professor_Id]
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createAulaExtra(request)
+        return this.service.editAulaExtra(request)
+    }
+
+    requestSuperacao() {
+        let request = MyMap(this.evento, new EventoSuperacaoRequest())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = [this.evento.professor_Id]
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createSuperacao(request)
+        return this.service.editSuperacao(request)
+    }
+
+    requestReuniao() {
+        let request = MyMap(this.evento, new EventoReuniaoRequest())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = this.evento.professores.map((x) => x.professor_Id)
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createReuniao(request)
+        return this.service.editReuniao(request)
+    }
+
+    requestOficina() {
+        let request = MyMap(this.evento, new EventoOficinaRequest())
+        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
+        request.professores = [this.evento.professor_Id]
+        if (this.evento.id == PseudoEvento.EventoId)
+            return this.service.createOficina(request)
+        return this.service.editOficina(request)
+    }
 }

@@ -63,7 +63,7 @@
       </div>
 
       <!-- Educador -->
-      <div class="field sm:col-3 col-6">
+      <div class="field sm:col-4 col-6">
         <label for="professor_Id"
           >Educador:
           <span
@@ -171,7 +171,7 @@
         </div>
       </div>
       <!-- Sala -->
-      <div class="field sm:col-3 col-6">
+      <div class="field sm:col-4 col-6">
         <label for="sala_Id"
           >Sala:
           <span
@@ -265,7 +265,7 @@
         </div>
       </div>
       <!-- Semana -->
-      <div class="field sm:col-3 col-6">
+      <!-- <div class="field sm:col-3 col-6">
         <label for="roteiro">Roteiro da Semana:</label>
         <p-iconfield iconPosition="left">
           <p-inputicon
@@ -288,10 +288,10 @@
             iconPosition="right"
             [ngStyle]="{ color: roteiroEvento?.corLegenda || '#999' }" />
         </p-iconfield>
-      </div>
+      </div> -->
 
       <!-- Perfil Cognitivo -->
-      <div class="field sm:col-3 col-6">
+      <div class="field sm:col-4 col-12">
         <label for="perfilCognitivo_Id"
           >Perfil Cognitivo:
           <span
@@ -352,7 +352,7 @@
                                            [evento]="evento"
                                            [showChecklist]="true"></app-aluno-popover>
                         <!-- Card -->
-                        <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
+                        <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 22rem">
                             <header class="flex align-items-center mb-2 p-3 surface-50">
                                 <p-button type="button"
                                           (onClick)="enviarMensagem(item)"
@@ -373,7 +373,7 @@
                                                  size="small"
                                                  [pTooltip]="reposicaoTemplate"></p-badge>
                                     </div>
-                                    <p class="text-500 text-sm line-height-1" [pTooltip]="item.turma">
+                                    <p class="text-500 text-sm white-space-nowrap" [pTooltip]="item.turma">
                                         {{ item.turma }}
                                     </p>
                                     <ng-template #reposicaoTemplate>
@@ -405,13 +405,14 @@
                                     pTooltip="Enviar mensagem de falta"
                                     [text]="true" />
                            
-                                <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
-                                          [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
-                                          [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
-                                          [outlined]="item.presente !== true && item.presente !== false"
-                                          (onClick)="presente(item)"
-                                          size="small"
-                                          class="my-auto" />
+                                    <p-button  [disabled]=" evento.finalizado || !evento.active"
+                                    [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                                    [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                                    [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
+                                    [outlined]="item.presente == undefined || item.presente === null"
+                                    iconPos="right"
+                                    size="small"
+                                    (onClick)="presente(item)" />
                             </header>
                             <div class="formgrid grid px-3 bg-white">
                                 <!-- Ábaco -->
@@ -548,7 +549,7 @@
                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                         <tr class="static z-0">
                             <!-- Nome -->
-                            <td pFrozenColumn class="z-1">
+                            <td pFrozenColumn class="z-1 p-0">
                                 <app-aluno-popover #popoverAluno
                                                    [aluno_Id]="item.aluno_Id"
                                                    [evento]="evento"
@@ -602,7 +603,7 @@
                                 </div>
                             </td>
                             <!-- Apostila -->
-                            <td class="relative z-0">
+                            <td class="relative z-0 p-0">
                                 <div class="flex gap-2">
                                     <!-- Abaco -->
                                     <div class="flex flex-column gap-1">
@@ -686,14 +687,16 @@
                                 </div>
                             </td>
                             <!-- Presente -->
-                            <td class="relative z-0">
+                            <td class="relative z-0 py-0">
                                 <div class="mt-3 flex align-items-start gap-2">
-                                    <p-button [disabled]=" evento.finalizado || !evento.active"
-                                              [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : '?'"
-                                              [severity]="item.presente === true ? 'success' : item.presente === false ? 'danger' : 'secondary'"
-                                              [icon]="item.presente === true ? 'pi pi-check' : item.presente === false ? 'pi pi-thumbs-down-fill' : ''"
-                                              iconPos="right"
-                                              (onClick)="presente(item)" />
+                                <p-button  [disabled]=" evento.finalizado || !evento.active"
+                                    [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                                    [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                                    [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
+                                    [outlined]="item.presente == undefined || item.presente === null"
+                                    iconPos="right"
+                                    (onClick)="presente(item)" />
+
                                     <p-button *ngIf="item.presente === false"
                                                 [disabled]="!item.celular"
                                                 label="Enviar mensagem"
@@ -708,7 +711,7 @@
                                 </div>
                             </td>
                             <!-- Observações  -->
-                            <td class="relative z-0">
+                            <td class="relative z-0 p-0">
                                 <textarea pTextarea
                                           placeholder="Insira as observações..."
                                           [(ngModel)]="item.observacao"
@@ -716,8 +719,7 @@
                                           [readonly]="!evento.active"
                                           id="observacao[{{rowIndex}}]"
                                           name="observacao[{{rowIndex}}]"
-                                          class="mt-4"
-                                          fluid
+                                          class="mt-3"
                                           [style]="{ heigth: '28px', maxWidth: '20vw', width: '20vw' }"></textarea>
                             </td>
                         </tr>

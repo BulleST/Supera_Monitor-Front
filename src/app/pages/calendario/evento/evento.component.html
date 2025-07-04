@@ -10,17 +10,21 @@
   appendTo="body">
   <ng-template #header>
     <div class="w-full flex gap-2 align-items-center">
-      <i
-        class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
-      <div class="mt-1">
+      <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+      <div class="mt-1 w-full">
         <span class="p-dialog-title capitalize">{{ tipoString }}</span>
 
-        <span
-          *ngIf="!evento.active"
-          class="block text-red-500 p-dialog-subtitle font-semibold"
-          >Esta {{ getTipo(evento) }} foi desativado no dia {{ getDeactivatedInformation(evento) }}</span
-        >
-      </div>
+        <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+            <span class="flex align-items-center gap-2" >
+                <i class="pi pi-star-fill fadein" [style]="{ color: roteiroEvento?.corLegenda ?? '#000' }"></i>
+                <span>{{evento.tema}} - Semana: {{evento.semana}}</span>
+            </span>
+        </ng-container>
+
+
+
+        <p *ngIf="!evento.active" class="block text-red-500 p-dialog-subtitle font-semibold">Esta {{ getTipo(evento) }} foi desativado no dia {{ getDeactivatedInformation(evento) }}</p>
+    </div>
     </div>
   </ng-template>
   <form

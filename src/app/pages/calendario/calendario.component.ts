@@ -714,7 +714,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     loadRoteiros(where: string) {
-        console.log('loadRoteiros', where)
+
         this.loadingRoteiro = true;
         lastValueFrom(this.roteiroService.getList('loadRoteiros'))
             .then(res => {
