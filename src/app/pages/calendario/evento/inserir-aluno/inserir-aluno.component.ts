@@ -276,7 +276,7 @@ export class InserirAlunoComponent {
                     
                         },
                         reject: () => {
-                            console.log('reject')
+                    
                             this.selectedAluno = undefined;
                         }
                     })

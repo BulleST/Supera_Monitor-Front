@@ -235,7 +235,7 @@ requestPrimeiraAula(request: PrimeiraAulaRequest) {
 }
 
 requestAulaTurma(evento: Evento) {
-    console.log('Evento:', evento)
+    
     var request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
     request.alunos = evento.alunos.map((x) => x.aluno_Id)
     request.professores = evento.professor_Id ? [evento.professor_Id] : []
