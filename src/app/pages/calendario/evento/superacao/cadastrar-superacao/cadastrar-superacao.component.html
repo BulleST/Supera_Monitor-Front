@@ -95,11 +95,11 @@
                         <div class="w-full flex flex-column align-items-stretch">
                             <div class="flex align-items-center justify-content-between gap-2">
                                 <p-button type="button"
-                                          (onClick)="enviarMensagem(item.value)"
-                                          (auxclick)="enviarMensagem(item.value)"
-                                          (contextmenu)="enviarMensagem(item.value)"
-                                          [disabled]="!item.value.celular"
-                                          icon="pi pi-whatsapp"
+                                          (onClick)="enviarMensagem(item)"
+                                          (auxclick)="enviarMensagem(item)"
+                                          (contextmenu)="enviarMensagem(item)"
+                                          [disabled]="!item.celular"
+                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                           severity="success"
                                           [text]="true" />
                                 <span class="mr-2">{{item.nome | nameAbv }}</span>

@@ -33,13 +33,7 @@ export class AlunoChecklistDialogComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            console.log('aluno dialog', this.aluno);
-            if (this.aluno && this.aluno.checklistCompleto) {
-                this.aluno.checklistCompleto = this.aluno.checklistCompleto.map(x => {
-                    x.items = x.items.sort((a, b) => a.ordem - b.ordem);
-                    return x;
-                });
-            }
+          
         }
         if (changes['loading']) this.loading = changes['loading'].currentValue;
     }
@@ -57,14 +51,6 @@ export class AlunoChecklistDialogComponent implements OnChanges {
     
     show(aluno: Aluno) {
         this.aluno = aluno;
-        console.log('aluno show', this.aluno);
-
-        if (this.aluno && this.aluno.checklistCompleto) {
-            this.aluno.checklistCompleto = this.aluno.checklistCompleto.map(x => {
-                x.items = x.items.sort((a, b) => a.ordem - b.ordem);
-                return x;
-            });
-        }
         this.visible = true;
         this.changeDetectorRef.markForCheck();
         this.changeDetectorRef.detectChanges();

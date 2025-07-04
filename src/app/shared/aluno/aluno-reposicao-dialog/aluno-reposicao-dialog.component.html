@@ -48,7 +48,7 @@
                                             <div class="flex flex-column">
                                                 <div class="flex align-items-center">
                                                     <p-button 
-                                                        icon="pi pi-whatsapp"
+                                                        icon="pi pi-whatsapp  {{!item.celular ? 'text-300' : ''}}"
                                                         severity="success"
                                                         [rounded]="true"
                                                         (onClick)="enviarMensagem(item)"

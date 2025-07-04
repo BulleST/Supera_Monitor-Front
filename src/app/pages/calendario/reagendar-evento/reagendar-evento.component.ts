@@ -191,7 +191,7 @@ export class ReagendarEventoComponent implements OnDestroy {
         this.alunos = this.alunoService.list.value;
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            this.alunos = await lastValueFrom(this.alunoService.getListWithChecklist())
+            this.alunos = await lastValueFrom(this.alunoService.getList())
             this.loadingAlunos = false;
         }
 
@@ -329,12 +329,24 @@ export class ReagendarEventoComponent implements OnDestroy {
         }
     }
 
-    enviarMensagemReagendamento(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagemReagendamento(nome, celular, this.evento);
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.toastrService.error('Nenhum celular cadastrado');
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
-
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular!);
+    
+    enviarMensagemAluno(aluno:Aluno) {
+        if (!aluno.celular) {
+            this.toastrService.error('Nenhum celular cadastrado');
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
 

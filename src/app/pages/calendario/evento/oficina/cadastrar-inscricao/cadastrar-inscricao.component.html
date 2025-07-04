@@ -17,7 +17,7 @@
                                   (auxclick)="enviarMensagemAgendamento(aluno)"
                                   (contextmenu)="enviarMensagemAgendamento(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp"
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [label]="aluno.nome"
                                   [text]="true"/>

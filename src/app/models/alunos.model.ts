@@ -224,6 +224,7 @@ export var alunosColumns: ColumnTable[] = [
         filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
+        frozen: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),

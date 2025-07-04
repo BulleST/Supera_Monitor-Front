@@ -129,6 +129,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         lastValueFrom(this.alunoService.getListWithChecklist(this.request))
         .then(res => {
             this.alunos = res;
+            console.log('alunos', this.alunos);
             this.alunosFiltered = res;
             this.loadingAlunos = false;
         })

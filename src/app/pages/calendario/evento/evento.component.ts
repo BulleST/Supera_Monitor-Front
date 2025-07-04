@@ -91,19 +91,8 @@ export class EventoComponent implements OnDestroy {
     private calendarioUtils: CalendarioUtils,
     private mensagemWhatsapp: MensagemWhatsapp,
   ) {
-    var params = this.activatedRoute.snapshot.params
-    if (
-      !params['evento_id'] ||
-      !params['evento_nome'] ||
-      ![
-        'aula',
-        'aula-zero',
-        'aula',
-        'superacao',
-        'reuniao',
-        'oficina',
-      ].includes(params['evento_nome'])
-    ) {
+    let params = this.activatedRoute.snapshot.params
+    if ( !params['evento_id'] || !params['evento_nome'] || !['aula','aula-zero','aula','superacao','reuniao','oficina'].includes(params['evento_nome'])) {
       this.visible = false
       this.visibleChange()
       return
@@ -111,9 +100,7 @@ export class EventoComponent implements OnDestroy {
 
     this.encryptedId = params['evento_id']
   
-    var roteiros = this.roteiroService.list.subscribe(
-      (res) => (this.roteiros = res),
-    )
+    let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res)
     this.subscription.push(roteiros)
 
     if (this.roteiros.length == 0) {
@@ -123,9 +110,7 @@ export class EventoComponent implements OnDestroy {
         .catch((res) => (this.loadingRoteiros = false))
     }
 
-    var professores = this.professorService.list.subscribe(
-      (res) => (this.professores = res.filter((x) => x.active == true)),
-    )
+    let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true))
     this.subscription.push(professores)
 
     if (this.professores.length == 0) {
@@ -135,9 +120,7 @@ export class EventoComponent implements OnDestroy {
         .catch((res) => (this.loadingProfessores = false))
     }
 
-    var salaAula = this.salaAulaService.list.subscribe(
-      (res) => (this.salaAulas = res.filter((x) => x.active == true)),
-    )
+    let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true))
     this.subscription.push(salaAula)
 
     if (this.salaAulas.length == 0) {
@@ -147,9 +130,7 @@ export class EventoComponent implements OnDestroy {
         .catch((res) => (this.loadingSalaAulas = false))
     }
 
-    var alunos = this.alunoService.list.subscribe(
-      (res) => (this.alunos = res.filter((x) => x.active == true)),
-    )
+    let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true))
     this.subscription.push(alunos)
 
     if (this.alunos.length == 0) {
@@ -159,9 +140,7 @@ export class EventoComponent implements OnDestroy {
         .catch((res) => (this.loadingAlunos = false))
     }
 
-    var turmas = this.turmaService.list.subscribe(
-      (res) => (this.turmas = res.filter((x) => x.active == true)),
-    )
+    let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true))
     this.subscription.push(turmas)
 
     if (this.turmas.length == 0) {
@@ -171,32 +150,14 @@ export class EventoComponent implements OnDestroy {
         .catch((res) => (this.loadingTurmas = false))
     }
 
-    var roteiros = this.roteiroService.list.subscribe(
-      (res) => (this.roteiros = res.filter((x) => x.active == true)),
-    )
-    this.subscription.push(roteiros)
-
-    if (this.roteiros.length == 0) {
-      this.loadingRoteiros = true
-      lastValueFrom(this.roteiroService.getList())
-        .then((res) => (this.loadingRoteiros = false))
-        .catch((res) => (this.loadingRoteiros = false))
-    }
-
-    var eventos = this.service.eventos.subscribe(
-      (res) => (this.eventos = res.filter((x) => x.active == true)),
-    )
+    let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true))
     this.subscription.push(eventos)
 
-    var evento = this.service.evento.subscribe(async (res) => {
+    let evento = this.service.evento.subscribe(async (res) => {
       if (!res) {
         try {
-          var decrypted = this.crypto.decrypt(this.encryptedId)
-          if (
-            this.encryptedId &&
-            decrypted &&
-            decrypted != PseudoEvento.EventoId
-          ) {
+          let decrypted = this.crypto.decrypt(this.encryptedId)
+          if (this.encryptedId &&decrypted &&decrypted != PseudoEvento.EventoId) {
             await lastValueFrom(this.service.get(decrypted))
               .then((res) => {
                 this.service.setEvento(res)
@@ -207,7 +168,7 @@ export class EventoComponent implements OnDestroy {
                 this.visibleChange()
               })
           } else {
-            var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+            let evento = JSON.parse(localStorage.getItem('evento') ?? '')
             this.service.setEvento(evento)
           }
         } catch (e) {
@@ -222,26 +183,23 @@ export class EventoComponent implements OnDestroy {
         this.visible = true
         this.verificaDisponibilidade()
         this.tipoString = this.getTipo(this.evento)
-        var alunosEvento = this.evento.alunos.map((x) => x.aluno_Id)
+        let alunosEvento = this.evento.alunos.map((x) => x.aluno_Id)
         this.alunos = this.alunos.filter((x) => alunosEvento.includes(x.id))
 
         if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-          var roteiro = this.roteiros.find((x) =>
+          let roteiro = this.roteiros.find((x) =>
             moment(this.evento.data).isBetween(x.dataInicio, x.dataFim),
           )
           this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
         }
 
-        var minutos = this.evento.duracaoMinutos % 60
-        var horas = this.evento.duracaoMinutos / 60
-        var horaRedonda = horas - Math.floor(horas) == 0
+        let minutos = this.evento.duracaoMinutos % 60
+        let horas = this.evento.duracaoMinutos / 60
+        let horaRedonda = horas - Math.floor(horas) == 0
 
-        this.duracaoEvento = horaRedonda
+        this.duracaoEvento = horaRedonda 
           ? horas.toString().padStart(2, '0') + 'h'
-          : horas.toString().padStart(2, '0') +
-            'h' +
-            minutos.toString().padStart(2, '0') +
-            'm'
+          : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
       }
     })
     this.subscription.push(evento)
@@ -264,20 +222,20 @@ export class EventoComponent implements OnDestroy {
 
   visibleChange() {
     if (!this.visible) {
-      var route = '../../../';
+      let route = '../../../';
       this.router.navigate([route], { relativeTo: this.activatedRoute })
     }
   }
 
-  showError(header: string, message: string, e: any) {
-    showError(this.confirmationService, header, message, e)
+  showError(header: string, message: string, e: any, innerMessage?: string) {
+    showError(this.confirmationService, header, message, e, innerMessage)
   }
 
   async verificaDisponibilidade() {
-    var valid = true
+    let valid = true
 
     this.loadingEventos = true
-    var request: CalendarioRequest = new CalendarioRequest()
+    let request: CalendarioRequest = new CalendarioRequest()
 
     request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate()
     request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD')
@@ -297,39 +255,18 @@ export class EventoComponent implements OnDestroy {
   }
 
   validaSalaAulas() {
-    var data = this.evento.data
-    this.salaAulas = validaSalaAulas(
-      data,
-      this.evento.duracaoMinutos,
-      this.salaAulas,
-      this.eventos,
-      undefined,
-      undefined,
-    )
+    let data = this.evento.data
+    this.salaAulas = validaSalaAulas(data,this.evento.duracaoMinutos,this.salaAulas,this.eventos,undefined,undefined)
   }
 
   validaProfessores() {
-    var data = this.evento.data
-    this.professores = validaProfessores(
-      data,
-      this.evento.duracaoMinutos,
-      this.professores,
-      this.eventos,
-      undefined,
-      undefined,
-    )
+    let data = this.evento.data
+    this.professores = validaProfessores(data,this.evento.duracaoMinutos,this.professores,this.eventos,undefined,undefined)
   }
 
   validaAlunos() {
-    var data = this.evento.data
-    this.alunos = validaAlunos(
-      data,
-      this.evento.duracaoMinutos,
-      this.alunos,
-      this.eventos,
-      undefined,
-      undefined,
-    )
+    let data = this.evento.data
+    this.alunos = validaAlunos(data,this.evento.duracaoMinutos,this.alunos,this.eventos,undefined,undefined)
   }
 
   professorChanged(professor: Professor) {
@@ -417,35 +354,31 @@ export class EventoComponent implements OnDestroy {
   async finalizar(e: any) {
     this.loading = true
 
-    var response: RequestResponse = await lastValueFrom(this.request()).catch(
-      (res) => {
-        this.loading = false
-        return res
-      },
-    )
+    let response: RequestResponse = await lastValueFrom(this.request())
+    .catch(res => {
+      this.loading = false;
+      return res
+    })
 
     if (response.success) {
       this.evento.id = response.object.id
       this.evento.alunos = this.evento.alunos.map((participacao) => {
-        var participacaoResponse = response.object.alunos.find(
-          (x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id,
-        ) as Evento_Participacao_Aluno
+        let participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
         participacao.id = participacaoResponse.id
         participacao.evento_Id = participacaoResponse.evento_Id
-        participacao.presente = participacao.presente ?? false
-        return participacao
-      })
-      this.evento.professores = this.evento.professores.map((participacao) => {
-        var participacaoResponse = response.object.professores.find(
-          (x: Evento_Participacao_Professor) =>
-            x.professor_Id == participacao.professor_Id,
-        ) as Evento_Participacao_Professor
-        participacao.id = participacaoResponse.id
-        participacao.evento_Id = participacaoResponse.evento_Id
-        return participacao
+        participacao.presente = participacao.presente ?? false;
+        return participacao;
       })
 
-      var request: EventoChamadaRequest = {
+      this.evento.professores = this.evento.professores.map((participacao) => {
+        let participacaoResponse = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == participacao.professor_Id) as Evento_Participacao_Professor;
+        participacao.id = participacaoResponse.id
+        participacao.evento_Id = participacaoResponse.evento_Id
+        participacao.presente = [EventoTipo.Reuniao].includes(this.evento.evento_Tipo_Id) ? participacao.presente ?? false : true;
+        return participacao;
+      })
+
+      let request: EventoChamadaRequest = {
         evento_Id: this.evento.id,
         observacao: this.evento.observacao,
         alunos: this.evento.alunos.map((x) => {
@@ -494,13 +427,7 @@ export class EventoComponent implements OnDestroy {
         })
         .catch((res) => {
           this.error = res.message
-          this.showError(
-            'Erro',
-            `Não foi possível finalizar ${this.tipoString}. <br> ${getError(
-              res,
-            )}`,
-            e,
-          )
+          this.showError('Erro',`Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
           this.loading = false
         })
     }
@@ -514,7 +441,7 @@ export class EventoComponent implements OnDestroy {
     this.confirmationService.confirm({
       target: e.target,
       message: `Tem certeza que deseja salvar?`,
-      header: `Salvar ${this.tipoString}`,
+      header: `Sallet ${this.tipoString}`,
       acceptIcon: 'pi pi-check',
       acceptLabel: 'Salvar',
       acceptButtonStyleClass: 'p-button-rounded',
@@ -545,7 +472,7 @@ export class EventoComponent implements OnDestroy {
       })
       .catch((res) => {
         this.loading = false
-        this.showError('OPA!',`Não foi possível salvar dados. <br> ${getError(res)}`, e)
+        this.showError('OPA!',`Não foi possível salvar dados.`, e, getError(res))
       })
   }
 
@@ -576,7 +503,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestAulaTurma() {
-    var request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
+    let request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
     request.perfilCognitivo = this.evento.perfilCognitivo.map((x) => x.id)
@@ -587,7 +514,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestAula0() {
-    var request = MyMap(this.evento, new EventoAula0Request())
+    let request = MyMap(this.evento, new EventoAula0Request())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = [this.evento.professor_Id]
     if (this.evento.id == PseudoEvento.EventoId)
@@ -596,7 +523,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestAulaExtra() {
-    var request = MyMap(this.evento, new EventoTurmaExtraRequest())
+    let request = MyMap(this.evento, new EventoTurmaExtraRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = [this.evento.professor_Id]
     if (this.evento.id == PseudoEvento.EventoId)
@@ -605,7 +532,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestSuperacao() {
-    var request = MyMap(this.evento, new EventoSuperacaoRequest())
+    let request = MyMap(this.evento, new EventoSuperacaoRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = [this.evento.professor_Id]
     if (this.evento.id == PseudoEvento.EventoId)
@@ -614,7 +541,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestReuniao() {
-    var request = MyMap(this.evento, new EventoReuniaoRequest())
+    let request = MyMap(this.evento, new EventoReuniaoRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = this.evento.professores.map((x) => x.professor_Id)
     if (this.evento.id == PseudoEvento.EventoId)
@@ -623,7 +550,7 @@ export class EventoComponent implements OnDestroy {
   }
 
   requestOficina() {
-    var request = MyMap(this.evento, new EventoOficinaRequest())
+    let request = MyMap(this.evento, new EventoOficinaRequest())
     request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
     request.professores = [this.evento.professor_Id]
     if (this.evento.id == PseudoEvento.EventoId)

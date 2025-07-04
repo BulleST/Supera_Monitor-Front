@@ -19,11 +19,7 @@
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="body" let-checklistItem let-index="rowIndex">
-                        <tr
-                            [ngClass]="{
-                            'surface-100': index % 2 == 0,
-                            'surface-50': index % 2 != 0,
-                        }"
+                       <tr [ngClass]="{ 'surface-50': index % 2 != 0 }"
                             (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
                             (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
                             <td class="pr-1">
@@ -66,22 +62,19 @@
                                        [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
                             </td>
                             <td class="p-0 pr-2">
-                                <ng-container *ngIf="checklistItem.finalizado == false 
-                                    && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                                    <a *ngIf="aluno && aluno.celular"
-                                       [href]="enviarMensagemCondicao(checklistItem, aluno)"
-                                       target="_blank"
-                                       class="p-button p-button-icon-only p-button-text p-button-rounded p-button-success"
-                                       [pTooltip]="'Enviar mensagem'"
-                                       tooltipPosition="top">
-                                        <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                                    </a>
-                                    <a *ngIf="!aluno || !aluno.celular"
-                                       class="p-button p-button-icon-only p-button-text p-button-rounded p-button-secondary cursor-default"
-                                       [pTooltip]="'Nenhum celular cadastrado'"
-                                       tooltipPosition="top">
-                                        <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                                    </a>
+                                <ng-container *ngIf="checklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
+                                    
+                                    
+                                <p-button type="button"
+                                    icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                                    severity="success"
+                                    [disabled]="!aluno.celular"
+                                    [text]="true"
+                                    [rounded]="true"
+                                    pTooltip="Enviar mensagem"
+                                    (onClick)="enviarMensagemCondicao(checklistItem, aluno)"
+                                    (auxclick)="enviarMensagemCondicao(checklistItem, aluno)"
+                                    (contextmenu)="enviarMensagemCondicao(checklistItem, aluno)"/>
                                 </ng-container>
                             </td>
                         </tr>

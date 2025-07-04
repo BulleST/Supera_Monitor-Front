@@ -13,25 +13,17 @@
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let aluno of mensagensEnviadasAlunos">
-                        <a *ngIf="aluno.celular"
-                           (auxclick)="removerAlunoLista(aluno, $event)"
-                           [href]="enviarMensagemReagendamento(aluno.aluno, aluno.celular)"
-                           pTooltip="Enviar mensagem"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="p-ripple p-button p-component p-button-secondary p-button-text  white-space-nowrap -ml-1 hover:bg-primary-200 hover:text-primary-500 hover:underline">
-                            <span class="pi pi-whatsapp text-green-500 p-button-icon p-button-icon-left"></span>
-                            <span class="p-button-label">{{aluno.aluno}}</span>
-                        </a>
-                        <p-button *ngIf="!aluno.celular"
-                                  icon="pi pi-whatsapp opacity-0"
-                                  severity="secondary"
-                                  styleClass="white-space-nowrap -ml-1 "
-                                  pTooltip="Nenhum celular cadastrado"
-                                  [label]="aluno.aluno"
-                                  [text]="true"
-                                  
-                                  [disabled]="true" />
+                        <p-button type="button"
+                            (onClick)="enviarMensagem(aluno)"
+                            (auxclick)="enviarMensagem(aluno)"
+                            (contextmenu)="enviarMensagem(aluno)"
+                            [disabled]="!aluno.celular"
+                            icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                            styleClass="{{!aluno.celular ? 'text-300' : ''}}"
+                            [label]="aluno.aluno"
+                            severity="success"
+                            [rounded]="true"
+                            [text]="true"/>
                     </div>
                 </div>
             </div>
@@ -233,15 +225,16 @@
                     'surface-50': i % 2 == 0 
                 }">
                     <div class="flex align-items-center w-full p-2">
-                        <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
-                            <a *ngIf="item.celular"
-                               [href]="enviarMensagem(item.nome, item.celular)"
-                               pTooltip="Enviar mensagem"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                            </a>
-                        </div>
+                        
+                        <p-button type="button"
+                        (onClick)="enviarMensagemAluno(item)"
+                        (auxclick)="enviarMensagemAluno(item)"
+                        (contextmenu)="enviarMensagemAluno(item)"
+                        [disabled]="!item.celular"
+                        icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                        severity="success"
+                        [rounded]="true"
+                        [text]="true"/>
                         <p class="mr-2">{{ item.nome }}</p>
                         <ng-container *ngTemplateOutlet="indisponivel; context: { item: item }"></ng-container>
                     </div>

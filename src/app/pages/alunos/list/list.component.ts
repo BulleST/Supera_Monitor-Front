@@ -196,7 +196,9 @@ export class ListComponent implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object =  this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     showPopoverAluno(aluno: Aluno, e: any) {

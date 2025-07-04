@@ -10,7 +10,8 @@ import { MensagemWhatsapp } from '../../../../utils';
 import { Popover } from 'primeng/popover';
 import { AlunoService } from '../../../../services/alunos.service';
 import { JornadaSuperaRequest } from '../../../../models/aluno-checklist-item-list.model';
-
+import { ToastrService } from 'ngx-toastr';
+    
 @Component({
     selector: 'app-filtro-popover-jornada-supera',
     standalone: false,
@@ -42,6 +43,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
         private turmaService: TurmaService,
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private toastr: ToastrService,
     ) {
         this.applyFilter = new EventEmitter<JornadaSuperaRequest>();
 
@@ -212,8 +214,14 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
 
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular);
+    enviarMensagem(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.toastr.error('Nenhum celular cadastrado');
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     filtrarPendentesSemana() {

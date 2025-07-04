@@ -438,7 +438,7 @@ input.ng-invalid.ng-touched {
     0% {
         box-shadow: 0 0 0 0 transparent;
     }
-
+    
     50% {
         box-shadow: 0 0 3px 1px #ff0000a6
     }
@@ -532,3 +532,8 @@ p-scroller{
     height: 100%;
     display: block;
 }
+
+/* th.p-datatable-frozen-column.p-datatable-frozen-column-left, 
+td.p-datatable-frozen-column.p-datatable-frozen-column-left {
+    border-right: 2px var(--p-primary-color) solid !important;
+} */

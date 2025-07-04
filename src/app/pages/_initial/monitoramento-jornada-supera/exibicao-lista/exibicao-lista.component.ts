@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
-import { Aluno, alunosColumns } from '../../../../models/alunos.model';
-import { AlunoService } from '../../../../services/alunos.service';
-import { DisplayType, FilterType, MensagemWhatsapp } from '../../../../utils';
+import { Checklist } from '../../../../models/checklist.model';
+import { Aluno } from '../../../../models/alunos.model';
 import { AlunoChecklistCompleto } from '../../../../models/calendario.model';
 import { ChecklistPopoverComponent } from './checklist-popover/checklist-popover.component';
 import { AlunoPopoverComponent } from '../../../../shared/aluno/aluno-popover/aluno-popover.component';
+import { MensagemWhatsapp } from '../../../../utils';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-exibicao-lista',
@@ -25,6 +25,7 @@ export class ExibicaoListaComponent implements OnChanges {
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
+        private toastr: ToastrService,
     ) {
     }
 
@@ -41,6 +42,10 @@ export class ExibicaoListaComponent implements OnChanges {
     }
 
     enviarMensagem(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.toastr.error('Nenhum celular cadastrado');
+            return;
+        }
         var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);

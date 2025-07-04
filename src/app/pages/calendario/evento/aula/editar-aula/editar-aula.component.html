@@ -262,7 +262,7 @@
                                           (auxclick)="enviarMensagem(item)"
                                           (contextmenu)="enviarMensagem(item)"
                                           [disabled]="!item.celular"
-                                          icon="pi pi-whatsapp"
+                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                           severity="success"
                                           [text]="true" />
                                 <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
@@ -303,7 +303,7 @@
                                     (auxclick)="enviarMensagemFalta(item, $event)"
                                     (contextmenu)="enviarMensagemFalta(item, $event)"
                                     [disabled]="!item.celular"
-                                    icon="pi pi-whatsapp"
+                                    icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                     severity="success"
                                     pTooltip="Enviar mensagem de falta"
                                     [text]="true" />
@@ -462,7 +462,7 @@
                                               (auxclick)="enviarMensagem(item)"
                                               (contextmenu)="enviarMensagem(item)"
                                               [disabled]="!item.celular"
-                                              icon="pi pi-whatsapp"
+                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                               severity="success"
                                               [text]="true"
                                               class="-mt-1" />
@@ -603,7 +603,7 @@
                                                 icon="pi pi-whatsapp"
                                                 iconPos="right"
                                                 pTooltip="Enviar mensagem de falta"
-                                                severity="success"
+                                                [severity]="item.celuler ? 'success' : 'secondary'"
                                                 (onClick)="enviarMensagemFalta(item, $event)"
                                                 (contextmenu)="enviarMensagemFalta(item, $event)"
                                                 (auxclick)="enviarMensagemFalta(item, $event)"></p-button>

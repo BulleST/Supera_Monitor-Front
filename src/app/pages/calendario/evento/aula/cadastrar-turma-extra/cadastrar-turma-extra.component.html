@@ -18,7 +18,8 @@
                                   (auxclick)="enviarMensagemAgendamento(aluno)"
                                   (contextmenu)="enviarMensagemAgendamento(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp"
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                                  styleClass="{{!aluno.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [label]="aluno.nome"
                                   [text]="true"/>
@@ -563,7 +564,7 @@
                           (auxclick)="enviarMensagem(item)"
                           (contextmenu)="enviarMensagem(item)"
                           [disabled]="!item.celular"
-                          icon="pi pi-whatsapp"
+                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                           severity="success"
                           [text]="true"/>
             </div>

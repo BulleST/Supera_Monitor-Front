@@ -18,7 +18,8 @@
                                   (auxclick)="enviarMensagemCancelamento(participacao)"
                                   (contextmenu)="enviarMensagemCancelamento(participacao)"
                                   [disabled]="!participacao.celular"
-                                  icon="pi pi-whatsapp"
+                                  icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
+                                  styleClass="{{!participacao.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [label]="participacao.aluno"
                                   [text]="true"
@@ -113,7 +114,7 @@
                                   (auxclick)="enviarMensagem(item)"
                                   (contextmenu)="enviarMensagem(item)"
                                   [disabled]="!item.celular"
-                                  icon="pi pi-whatsapp"
+                                  icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [text]="true"
                                   [rounded]="true"/>

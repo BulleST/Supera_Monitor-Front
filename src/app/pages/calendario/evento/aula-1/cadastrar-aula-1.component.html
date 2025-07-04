@@ -53,7 +53,7 @@
                     <div>
                         <div class="flex align-items-center">
                             <p-button type="button"
-                                      icon="pi pi-whatsapp"
+                                      icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                       (onClick)="enviarMensagem(item)"
                                       (auxclick)="enviarMensagem(item)"
                                       (contextmenu)="enviarMensagem(item)"
@@ -63,7 +63,7 @@
                                       [disabled]="!item.celular"
                                       pTooltip="Enviar mensagem"
                                       class="mr-2"
-                                      styleClass="w-auto h-auto p-1">
+                                      styleClass="w-auto h-auto p-1 {{!item.celular ? 'text-300' : ''}}">
                             </p-button>
                             <p class="font-bold mb-1">
                                 <span class="mr-2">{{item.nome}}</span>

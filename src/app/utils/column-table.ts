@@ -52,6 +52,7 @@ export class ColumnTable {
     filterValue?: any = '';
     filterOptions?: FilterOptions;
     sortable?: boolean = true;
+    frozen?: boolean = false;
 }
 
 export interface FilterOptions {

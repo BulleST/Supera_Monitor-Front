@@ -1,8 +1,8 @@
 <app-confirm-dialog></app-confirm-dialog>
 <p-popover #popover
-    styleClass="z-2 -mt-1"
-    (onHide)="onHide()"
-    [dismissable]="true">
+           styleClass="z-2 -mt-1"
+           (onHide)="onHide()"
+           [dismissable]="true">
     <ng-container *ngIf="evento">
         <div class="p-2 flex flex-column row-gap-1 -m-2 max-w-fit">
             <div class="p-2 white-space-normal">
@@ -28,20 +28,21 @@
                             <i class="fa-solid fa-users-between-lines"></i>
                         </span>
                         <span>Sala: </span>
-                            <app-sala-aula [sala_Id]="evento.sala_Id"
-                            [andar]="evento.andar"
-                            [numeroSala]="evento.numeroSala"></app-sala-aula>
+                        <app-sala-aula [sala_Id]="evento.sala_Id"
+                                       [andar]="evento.andar"
+                                       [numeroSala]="evento.numeroSala"></app-sala-aula>
                     </div>
                     <!-- Educador -->
-                    <div class="flex align-items-center gap-2" *ngIf="![EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+                    <div class="flex align-items-center gap-2"
+                         *ngIf="![EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
                         <span class="flex w-2rem justify-content-center -ml-1">
                             <i class="fa-solid fa-person-chalkboard"></i>
                         </span>
                         <span>Educador(a): </span>
                         <span *ngIf="evento.professor">{{ evento.professor }}</span>
-                        <span *ngIf="!evento.professor" class="font-bold" >Indefinido</span>
+                        <span *ngIf="!evento.professor" class="font-bold">Indefinido</span>
                         <span class="inline-flex w-1rem h-1rem border-circle ml-2"
-                        [style]="{ backgroundColor: evento.corLegenda }"></span>
+                              [style]="{ backgroundColor: evento.corLegenda }"></span>
                     </div>
                     <!-- perfilCoginitivo -->
                     <div class="flex align-items-center gap-2">
@@ -49,11 +50,12 @@
                             <i class="fa-solid fa-brain"></i>
                         </span>
                         <span>Perfil Cognitivo: </span>
-                        
-                        <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
+
+                        <ng-container
+                                      *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
                         <ng-template #perfilCognitivoTemplate let-perfilCoginitivo>
                             <span *ngIf="perfilCoginitivo">{{ perfilCoginitivo }}</span>
-                            <span *ngIf="!perfilCoginitivo" class="font-bold" >Indefinido</span>
+                            <span *ngIf="!perfilCoginitivo" class="font-bold">Indefinido</span>
                         </ng-template>
 
                     </div>
@@ -61,7 +63,8 @@
             </div>
             <!-- Alunos -->
             <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
-                <div class="flex align-items-center justify-content-between px-2 py-2 w-full gap-2 border-bottom-2 border-primary-500">
+                <div
+                     class="flex align-items-center justify-content-between px-2 py-2 w-full gap-2 border-bottom-2 border-primary-500">
                     <span class="font-bold block text-primary">
                         <span *ngIf="evento.alunos.length == 0">Nenhum aluno</span>
                         <span *ngIf="evento.alunos.length > 1">Alunos</span>
@@ -70,15 +73,20 @@
                     <div class="flex flex-column align-items-end">
                         <div class="flex align-items-center">
                             <span class="ml-auto">
-                                <ng-container *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
+                                <ng-container
+                                              *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
                                     <span [ngSwitch]=" evento.capacidadeMaximaAlunos - evento.alunos.length">
-                                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{ evento.capacidadeMaximaAlunos }} vagas</span>
+                                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno /
+                                            {{ evento.capacidadeMaximaAlunos }} vagas</span>
                                         <span *ngSwitchCase="0">Não há vagas / {{ evento.alunos.length }} alunos</span>
                                         <span *ngSwitchCase="1">1 vaga / {{ evento.alunos.length }} alunos</span>
-                                        <span *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }} vagas / {{ evento.alunos.length }} alunos </span>
+                                        <span
+                                              *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }}
+                                            vagas / {{ evento.alunos.length }} alunos </span>
                                     </span>
                                 </ng-container>
-                                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                                <ng-container
+                                              *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                                     <span>{{ evento.alunos.length }} alunos</span>
                                 </ng-container>
                             </span>
@@ -88,125 +96,132 @@
                 </div>
                 <div class="max-h-15rem overflow-auto w-full">
                     <div *ngFor="let aluno of evento.alunos; let i = index"
-                    cdkDrag
-                    [cdkDragDisabled]="aluno.presente && evento.finalizado"
-                    [cdkDragData]="aluno"
-                    (cdkDragStarted)="cdkDragStarted($event)"
-                    (cdkDragEntered)="cdkDragEntered($event)"
-                    (cdkDragExited)="cdkDragExited($event)"
-                    [ngClass]="{ 'cursor-disabled': aluno.presente && evento.finalizado }"
-                    class="p-0 m-0">
-                    <div *cdkDragPlaceholder></div>
-                    <div *cdkDragPreview
-                    class="p-2">
-                    <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
-                    <div class="shadow-2">
-                        <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
-                    </div>
-                </div>
-                <a class="cursor-pointer">
-                    <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
-                </a>
-                <ng-template #participacaoItem let-participacao="participacao">
-                    <app-aluno-popover #popoverAluno
-                    [aluno_Id]="participacao.aluno_Id"
-                    [showChecklist]="true"
-                    [evento]="participacao.reposicaoDe_Evento ? undefined : evento"
-                    [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
-                    <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
-                    [ngClass]="{
+                         cdkDrag
+                         [cdkDragDisabled]="aluno.presente && evento.finalizado"
+                         [cdkDragData]="aluno"
+                         (cdkDragStarted)="cdkDragStarted($event)"
+                         (cdkDragEntered)="cdkDragEntered($event)"
+                         (cdkDragExited)="cdkDragExited($event)"
+                         [ngClass]="{ 'cursor-disabled': aluno.presente && evento.finalizado }"
+                         class="p-0 m-0">
+                        <div *cdkDragPlaceholder></div>
+                        <div *cdkDragPreview
+                             class="p-2">
+                            <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
+                            <div class="shadow-2">
+                                <ng-container
+                                              *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
+                            </div>
+                        </div>
+                        <a class="cursor-pointer">
+                            <ng-container
+                                          *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
+                        </a>
+                        <ng-template #participacaoItem let-participacao="participacao">
+                            <app-aluno-popover #popoverAluno
+                                               [aluno_Id]="participacao.aluno_Id"
+                                               [showChecklist]="true"
+                                               [evento]="participacao.reposicaoDe_Evento ? undefined : evento"
+                                               [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
+                            <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
+                                 [ngClass]="{
                         'surface-50': i % 2 == 0,
                         'surface-0': i % 2 != 0
                     }">
-                    <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
-                        <i class="pi pi-user text-primary text-sm"></i>
-                    </div>
-                    <span>
-                        <span class="hover:underline hover:text-primary-500 hover:font-bold"
-                        [pTooltip]="participacao.nome"
-                        (click)="popoverAluno.show($event)"
-                        [ngClass]="{
+                                <div
+                                     class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
+                                    <i class="pi pi-user text-primary text-sm"></i>
+                                </div>
+                                <span>
+                                    <span class="hover:underline hover:text-primary-500 hover:font-bold"
+                                          [pTooltip]="participacao.nome"
+                                          (click)="popoverAluno.show($event)"
+                                          [ngClass]="{
                             'text-green-500': evento.finalizado && participacao.presente == true,
                             'text-red-500': evento.finalizado && participacao.presente == false,
                             'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
                             'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
                             'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id == evento.id
                         }">
-                        <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
-                    </span>
-                    <p-badge
-                    *ngIf="participacao.reposicaoDe_Evento_Id"
-                    styleClass="ml-2 bg-purple-500"
-                    value="Reposição"
-                    size="small"
-                    [pTooltip]="reposicaoDe_Evento"
-                    tooltipPosition="bottom" />
-                    <p-badge *ngIf="aluno.primeiraAula_Id == evento.id"
-                    styleClass="ml-2 bg-pink-500"
-                    value="Aula 1"
-                    size="small"
-                    severity="danger"
-                    [pTooltip]="'Primeira aula'" />
-                    <span *ngIf="evento.finalizado" class="ml-2">
-                        <span *ngIf="participacao.presente === true"
-                        class="pi pi-thumbs-up-fill text-green-500 p-2"
-                        pTooltip="Presente"></span>
-                        <span *ngIf="participacao.presente === false"
-                        class="pi pi-thumbs-down-fill text-red-500 p-2"
-                        pTooltip="Faltou"></span>
-                    </span>
-                    <ng-template #reposicaoDe_Evento>
-                        <div *ngIf="participacao.reposicaoDe_Evento"
-                        class="w-15rem">
-                        <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}
-                        </p>
-                        <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}
-                        </p>
-                        <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}
-                        </p>
-                        <p *ngIf="participacao.reposicaoDe_Evento.professor">
-                            <span class="inline-flex w-1rem h-1rem border-circle mr-2"
-                            [style]="{backgroundColor: participacao.reposicaoDe_Evento.corLegenda}"></span>
-                            <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
-                        </p>
+                                        <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
+                                    </span>
+                                    <p-badge
+                                             *ngIf="participacao.reposicaoDe_Evento_Id"
+                                             styleClass="ml-2 bg-purple-500"
+                                             value="Reposição"
+                                             size="small"
+                                             [pTooltip]="reposicaoDe_Evento"
+                                             tooltipPosition="bottom" />
+                                    <p-badge *ngIf="aluno.primeiraAula_Id == evento.id"
+                                             styleClass="ml-2 bg-pink-500"
+                                             value="Aula 1"
+                                             size="small"
+                                             severity="danger"
+                                             [pTooltip]="'Primeira aula'" />
+                                    <span *ngIf="evento.finalizado" class="ml-2">
+                                        <span *ngIf="participacao.presente === true"
+                                              class="pi pi-thumbs-up-fill text-green-500 p-2"
+                                              pTooltip="Presente"></span>
+                                        <span *ngIf="participacao.presente === false"
+                                              class="pi pi-thumbs-down-fill text-red-500 p-2"
+                                              pTooltip="Faltou"></span>
+                                    </span>
+                                    <ng-template #reposicaoDe_Evento>
+                                        <div *ngIf="participacao.reposicaoDe_Evento"
+                                             class="w-15rem">
+                                            <p> Data:
+                                                {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}
+                                            </p>
+                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} -
+                                                {{ participacao.reposicaoDe_Evento.tema }}
+                                            </p>
+                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma:
+                                                {{ participacao.reposicaoDe_Evento.turma }}
+                                            </p>
+                                            <p *ngIf="participacao.reposicaoDe_Evento.professor">
+                                                <span class="inline-flex w-1rem h-1rem border-circle mr-2"
+                                                      [style]="{backgroundColor: participacao.reposicaoDe_Evento.corLegenda}"></span>
+                                                <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
+                                            </p>
+                                        </div>
+                                    </ng-template>
+                                </span>
+                                <p class="ml-auto pl-2">
+                                    <p-button type="button"
+                                              *ngIf="!evento.finalizado || participacao.presente === true"
+                                              (onClick)="enviarMensagem(participacao)"
+                                              (auxclick)="enviarMensagem(participacao)"
+                                              (contextmenu)="enviarMensagem(participacao)"
+                                              [disabled]="!participacao.celular"
+                                              icon="pi pi-whatsapp"
+                                              severity="success"
+                                              [text]="true"
+                                              [rounded]="true"
+                                              size="small"
+                                              pTooltip="Enviar mensagem"
+                                              styleClass="p-1 h-auto w-auto" />
+                                    <p-button type="button"
+                                              *ngIf="participacao.presente === false"
+                                              (onClick)="enviarMensagemFalta(participacao)"
+                                              (auxclick)="enviarMensagemFalta(participacao)"
+                                              (contextmenu)="enviarMensagemFalta(participacao)"
+                                              [disabled]="!participacao.celular"
+                                              icon="pi pi-whatsapp"
+                                              severity="success"
+                                              [text]="true"
+                                              [rounded]="true"
+                                              size="small"
+                                              pTooltip="Enviar mensagem de falta"
+                                              styleClass="p-1 h-auto w-auto" />
+                                </p>
+                            </div>
+                        </ng-template>
                     </div>
-                </ng-template>
-            </span>
-            <p class="ml-auto pl-2">
-                <p-button type="button"
-                *ngIf="!evento.finalizado || participacao.presente === true"
-                (onClick)="enviarMensagem(participacao)"
-                (auxclick)="enviarMensagem(participacao)"
-                (contextmenu)="enviarMensagem(participacao)"
-                [disabled]="!participacao.celular"
-                icon="pi pi-whatsapp"
-                severity="success"
-                [text]="true"
-                [rounded]="true"
-                size="small"
-                pTooltip="Enviar mensagem"
-                styleClass="p-1 h-auto w-auto" />
-                <p-button type="button"
-                *ngIf="participacao.presente === false"
-                (onClick)="enviarMensagemFalta(participacao)"
-                (auxclick)="enviarMensagemFalta(participacao)"
-                (contextmenu)="enviarMensagemFalta(participacao)"
-                [disabled]="!participacao.celular"
-                icon="pi pi-whatsapp"
-                severity="success"
-                [text]="true"
-                [rounded]="true"
-                size="small"
-                pTooltip="Enviar mensagem de falta"
-                styleClass="p-1 h-auto w-auto" />
-            </p>
-            </div>
-            </ng-template>
-            </div>
-            </div>
+                </div>
             </ng-container>
             <!-- Educadores -->
-            <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.professores && evento.professores.length > 1">
+            <ng-container
+                          *ngIf="[EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.professores && evento.professores.length > 1">
                 <div class="flex align-items-center justify-content-between px-2 w-full">
                     <span class="font-bold block text-primary">Educadores</span>
                     <span class="font-bold block ml-auto">
@@ -217,106 +232,108 @@
                 <div class="h-10rem overflow-auto w-full">
                     <div *ngFor="let professor of evento.professores; let i = index">
                         <div class="w-full flex align-items-center justify-content-start p-1"
-                        [ngClass]="{
+                             [ngClass]="{
                             'bg-white': i % 2 == 0,
                             'surface-50': i % 2 != 0
                         }">
-                        <span class="inline-flex w-1rem h-1rem border-circle mr-2"
-                        [style]="{ backgroundColor: professor.corLegenda }"></span>
-                        <span class="">{{ professor.nome }}</span>
-                        <span>
-                            <span *ngIf="evento.finalizado"
-                            class="ml-2">
-                            <span *ngIf="professor.presente == true"
-                            class="pi pi-check text-green-500"
-                            pTooltip="Presente"></span>
-                            <span *ngIf="professor.presente == false"
-                            class="pi pi-thumbs-down-fill text-red-500"
-                            pTooltip="Faltou"></span>
-                        </span>
-                    </span>
+                            <span class="inline-flex w-1rem h-1rem border-circle mr-2"
+                                  [style]="{ backgroundColor: professor.corLegenda }"></span>
+                            <span class="">{{ professor.nome }}</span>
+                            <span>
+                                <span *ngIf="evento.finalizado"
+                                      class="ml-2">
+                                    <span *ngIf="professor.presente == true"
+                                          class="pi pi-check text-green-500"
+                                          pTooltip="Presente"></span>
+                                    <span *ngIf="professor.presente == false"
+                                          class="pi pi-thumbs-down-fill text-red-500"
+                                          pTooltip="Faltou"></span>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
             </ng-container>
             <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
             <div class="p-2 flex align-items-center gap-2">
                 <ng-container *ngIf="!evento.finalizado && evento.active">
                     <p-button icon="pi pi-cog"
-                        iconPos="right"
-                        severity="secondary"
-                        label="Opções"
-                        [rounded]="true"
-                        (onClick)="popoverMenu.toggle($event)" />
+                              iconPos="right"
+                              severity="secondary"
+                              label="Opções"
+                              [rounded]="true"
+                              (onClick)="popoverMenu.toggle($event)" />
                     <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
                         <div class="flex flex-column">
                             <ng-container *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
                                 <p-button (onClick)="goToInscricaoOficina()"
-                                    label="Inscrever Aluno"
-                                    icon="pi pi-user-plus text-primary-500"
-                                    [text]="true"
-                                    [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
-                                    severity="secondary"
-                                    styleClass="justify-content-start surface-50"
-                                    fluid />
+                                          label="Inscrever Aluno"
+                                          icon="pi pi-user-plus text-primary-500"
+                                          [text]="true"
+                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
+                                          severity="secondary"
+                                          styleClass="justify-content-start surface-50"
+                                          fluid />
                             </ng-container>
-                            <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
+                            <ng-container
+                                          *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
                                 <p-button (onClick)="goToInserirAlunoConfirm($event)"
-                                    label="Inserir Aluno"
-                                    icon="pi pi-user-plus text-primary-500"
-                                    [text]="true"
-                                    severity="secondary"
-                                    styleClass="justify-content-start surface-50"
-                                    fluid />
+                                          label="Inserir Aluno"
+                                          icon="pi pi-user-plus text-primary-500"
+                                          [text]="true"
+                                          severity="secondary"
+                                          styleClass="justify-content-start surface-50"
+                                          fluid />
                             </ng-container>
-                            <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+                            <ng-container
+                                          *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
                                 <p-button (onClick)="goToReposicao()"
-                                    label="Agendar Reposição"
-                                    icon="pi pi-user-plus text-primary-500"
-                                    [text]="true"
-                                    [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
-                                    severity="secondary"
-                                    styleClass="justify-content-start surface-50"
-                                    fluid />
+                                          label="Agendar Reposição"
+                                          icon="pi pi-user-plus text-primary-500"
+                                          [text]="true"
+                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
+                                          severity="secondary"
+                                          styleClass="justify-content-start surface-50"
+                                          fluid />
                                 <p-button (onClick)="goToPrimeiraAula()"
-                                    label="Agendar 1ª Aula"
-                                    icon="pi pi-user-plus text-pink-500"
-                                    [text]="true"
-                                    [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
-                                    severity="secondary"
-                                    styleClass="justify-content-start surface-50"
-                                    fluid />
+                                          label="Agendar 1ª Aula"
+                                          icon="pi pi-user-plus text-pink-500"
+                                          [text]="true"
+                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
+                                          severity="secondary"
+                                          styleClass="justify-content-start surface-50"
+                                          fluid />
                             </ng-container>
                             <p-button (onClick)="goToCancelamento()"
-                                label="Cancelar"
-                                icon="pi pi-user-plus text-red-500"
-                                [text]="true"
-                                [disabled]="!evento.active"
-                                severity="secondary"
-                                styleClass="justify-content-start surface-50"
-                                fluid />
+                                      label="Cancelar"
+                                      icon="pi pi-user-plus text-red-500"
+                                      [text]="true"
+                                      [disabled]="!evento.active"
+                                      severity="secondary"
+                                      styleClass="justify-content-start surface-50"
+                                      fluid />
                         </div>
                     </p-popover>
-            </ng-container>
-            <ng-container *ngIf="evento.finalizado">
-                <span class="mr-auto gap-2 flex align-items-center">
-                    <span class="font-bold">Finalizado</span>
-                    <i class="pi pi-check-circle text-green-500 text-lg"></i>
-                </span>
-            </ng-container>
-            <ng-container *ngIf="!evento.active">
-                <span class="mr-auto gap-2 flex align-items-center">
-                    <span class="font-bold">Cancelado</span>
-                    <i class="pi pi-times-circle text-red-500 text-lg"></i>
-                </span>
-            </ng-container>
-            <p-button *ngIf="evento.active"
-                label="Ver {{ tipoEventoString }}"
-                icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "
-                iconPos="right"
-                [rounded]="true"
-                (onClick)="goToEvento()"
-                class="ml-auto" />
+                </ng-container>
+                <ng-container *ngIf="evento.finalizado">
+                    <span class="mr-auto gap-2 flex align-items-center">
+                        <span class="font-bold">Finalizado</span>
+                        <i class="pi pi-check-circle text-green-500 text-lg"></i>
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="!evento.active">
+                    <span class="mr-auto gap-2 flex align-items-center">
+                        <span class="font-bold">Cancelado</span>
+                        <i class="pi pi-times-circle text-red-500 text-lg"></i>
+                    </span>
+                </ng-container>
+                <p-button *ngIf="evento.active"
+                          label="Ver {{ tipoEventoString }}"
+                          icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "
+                          iconPos="right"
+                          [rounded]="true"
+                          (onClick)="goToEvento()"
+                          class="ml-auto" />
             </div>
         </div>
     </ng-container>

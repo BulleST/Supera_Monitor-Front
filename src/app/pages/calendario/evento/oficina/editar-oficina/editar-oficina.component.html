@@ -227,7 +227,7 @@
                               (auxclick)="enviarMensagem(item)"
                               (contextmenu)="enviarMensagem(item)"
                               [disabled]="!item.celular"
-                              icon="pi pi-whatsapp"
+                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                               severity="success"
                               [text]="true" />
                     <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
@@ -261,9 +261,10 @@
                               (auxclick)="enviarMensagemFalta(item, $event)"
                               (contextmenu)="enviarMensagemFalta(item, $event)"
                               [disabled]="!item.celular"
-                              icon="pi pi-whatsapp"
+                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                               severity="success"
                               [text]="true" />
+                              
                     <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                               [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
                               [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"

@@ -4,6 +4,8 @@
              [rows]="50"
              [rowsPerPageOptions]="[50, 100, 1000]"
              [paginator]="alunos.length > 50"
+             [loading]="loading"
+             [showLoader]="false"
              dataKey="id"
              stripedRows
              showGridlines
@@ -13,7 +15,7 @@
              virtualScrollItemSize="37px"
              [scrollable]="true"
              scrollHeight="600px">
-        <ng-template pTemplate="header">
+        <ng-template #header>
             <tr>
                 <!-- Aluno -->
                 <th [pSortableColumn]="'nome'"
@@ -45,10 +47,9 @@
                     class="w-3rem surface-900 px-1 border-none text-white text-center white-space-nowrap py-2">
                     {{checklist.nome}}
                 </th>
-                <th class="surface-900 py-0 border-bottom-none text-white"></th>
             </tr>
         </ng-template>
-        <ng-template pTemplate="body" let-aluno let-rowIndex="rowIndex">
+        <ng-template #body let-aluno let-rowIndex="rowIndex">
             <tr class="cursor-pointer" style="height: 37px;">
                 <!-- Nome -->
                 <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2">
@@ -58,10 +59,12 @@
                                   (auxclick)="enviarMensagem(aluno)"
                                   (contextmenu)="enviarMensagem(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp"
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [rounded]="true"
                                   [text]="true"/>
+
+                                  
                         <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
                               [pTooltip]="aluno.nome"
                               tooltipPosition="top"
@@ -85,24 +88,19 @@
                         <app-checklist-status [checklist]="checklist"></app-checklist-status>
                     </td>
                 </ng-container>
-                <td class="border-none px-0"></td>
             </tr>
         </ng-template>
-        <ng-template pTemplate="emptymessage">
-            <ng-container *ngIf="loading; else elseTemplate">
-                <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
-                    <td class="border-none"><p-skeleton /></td>
-                    <td class="border-none"><p-skeleton /></td>
-                    <td class="border-none"><p-skeleton /></td>
-                    <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
-                    <td class="border-none"><p-skeleton /></td>
-                </tr>
-            </ng-container>
-            <ng-template #elseTemplate>
-                <tr class="p-datatable-empty-text">
-                    <td [attr.colspan]="3 + checklists.length">Nenhum item encontrado.</td>
-                </tr>
-            </ng-template>
+        <ng-template #emptymessage>
+            <tr class="p-datatable-empty-text">
+                <td [attr.colspan]="2 + checklists.length">Nenhum item encontrado.</td>
+            </tr>
+        </ng-template>
+        <ng-template #loadingbody>
+            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+                <td class="border-none"><p-skeleton /></td>
+                <td class="border-none"><p-skeleton /></td>
+                <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
+            </tr>
         </ng-template>
     </p-table>
     <app-checklist-popover-jornada #popoverChecklist></app-checklist-popover-jornada>

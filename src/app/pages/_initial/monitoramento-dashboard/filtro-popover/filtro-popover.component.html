@@ -102,11 +102,10 @@
                                     (auxclick)="enviarMensagem(item)"
                                     (contextmenu)="enviarMensagem(item)"
                                     [disabled]="!item.celular"
-                                    icon="pi pi-whatsapp"
+                                    icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                     severity="success"
                                     [text]="true"
-                                    pTooltip="Enviar mensagem"
-                                    tooltipPosition="top" />
+                                    pTooltip="Enviar mensagem" />
                             <p class="capitalize">{{item.nome | nameAbv }}</p>
                         </div>
                         <p class="text-sm">

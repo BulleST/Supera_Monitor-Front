@@ -87,9 +87,9 @@ export class AlunoService extends Service {
                     var checklistAluno = new AlunoChecklistCompleto;
                     checklistAluno.id = checklist.id;
                     checklistAluno.nome = checklist.nome;
-                    checklistAluno.items = aluno.alunoChecklist
+                    checklistAluno.items = [...aluno.alunoChecklist]
                         .filter(x => x.checklist_Id == checklist.id)
-                        .sort((x, y) => y.ordem - x.ordem);
+                        .sort((x, y) => x.ordem - y.ordem);
                     checklistAluno.prazo = checklistAluno.items[0].prazo;
                     checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                     checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());

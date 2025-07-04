@@ -152,7 +152,7 @@
                                       (auxclick)="enviarMensagem(item)"
                                       (contextmenu)="enviarMensagem(item)"
                                       [disabled]="!item.phone"
-                                      icon="pi pi-whatsapp"
+                                      icon="pi pi-whatsapp {{!item.phone ? 'text-300' : ''}}"
                                       severity="success"
                                       [text]="true" />
                             <div class="inline-flex p-button-link">

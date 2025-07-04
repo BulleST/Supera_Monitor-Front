@@ -8,6 +8,7 @@ import { Aluno_CheckList_Item, Checklist_Item } from '../../../../../models/chec
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { NgModel } from '@angular/forms';
 import { ChecklistService } from '../../../../../services/checklist.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
@@ -28,6 +29,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private checklistService: ChecklistService,
+        private toastr: ToastrService,
     ) {
     }
 
@@ -58,75 +60,19 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             this.popover.hide();
     }
 
-    enviarMensagemAluno(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    enviarMensagem(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.toastr.error('Nenhum celular cadastrado');
+            return;
+        }
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        window.open(object.link, '_blank');
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
     enviarMensagemCondicao(item: Aluno_CheckList_Item, aluno: Aluno) {
-        // Apresentação do Diretor Franqueado 
-        if (item.checklist_Item_Id == 8) {
-            return this.enviarMensagemApresentacaoDiretorFranqueado(aluno);
-            // Confirmação da adequação do aluno ao perfil da turma 
-        } else if (item.checklist_Item_Id == 9) {
-            return this.enviarMensagemAdequacaoTurma(aluno);
-            // Agendar 1ª Oficina 
-        } else if (item.checklist_Item_Id == 12) {
-            return this.enviarMensagemLembreteOficina(aluno);
-            // Feedback pós venda 
-        } else if (item.checklist_Item_Id == 13) {
-            return this.enviarMensagemFeedbackPosVenda(aluno);
-            // Confirmação de preeechimento do feedback pós venda 
-        } else if (item.checklist_Item_Id == 32) {
-            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno);
-            // Mensagem de boas-vindas 
-        } else if (item.checklist_Item_Id == 37) {
-            return this.enviarMensagemBoasVindas(aluno);
-            // Agendar Superação 
-        } else if (item.checklist_Item_Id == 22) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Superação 
-        } else if (item.checklist_Item_Id == 29) {
-            return this.enviarMensagemLembreteSuperacao(aluno);
-            // Agendar 2ª Oficina 
-        } else if (item.checklist_Item_Id == 23) {
-            return this.enviarMensagemLembreteOficina(aluno);
-        } else {
-            return this.enviarMensagem(aluno);
-        }
+        this.mensagemWhatsapp.enviarMensagemCondicao(aluno, item.checklist_Item_Id);
     }
-
-    enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemBoasVindas(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
-    }
-
-    enviarMensagemAdequacaoTurma(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemLembreteOficina(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemLembreteSuperacao(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
-    }
-
 
     checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
         this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;

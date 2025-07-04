@@ -202,7 +202,7 @@
                               (auxclick)="enviarMensagem(item)"
                               (contextmenu)="enviarMensagem(item)"
                               [disabled]="!item.celular"
-                              icon="pi pi-whatsapp"
+                              icon="pi pi-whatsapp  {{!item.celular ? 'text-300' : ''}}"
                               severity="success"
                               [text]="true" />
                     <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">

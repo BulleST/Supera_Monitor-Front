@@ -24,19 +24,19 @@ export class ChecklistStatusComponent implements OnChanges {
         if (this.checklist.itensFinalizados.length == this.checklist.items.length) {
             this.icon = 'pi pi-check-circle';
             this.textColor = 'text-green-600';
-            this.text = 'Finalizado';
+            this.text = `Finalizado`;
         }
         else if (this.checklist.itensAtrasados.length > 0
             && this.checklist.itensFinalizados.length < this.checklist.items.length) {
             this.icon = 'pi pi-times-circle';
             this.textColor = 'text-red-500';
-            this.text = 'Atrasado';
+            this.text = `Atrasado ${this.checklist.itensFinalizados.length}/${this.checklist.items.length}`;
         }
         else if (this.checklist.itensEmAndamento.length > 0
             && this.checklist.itensFinalizados.length < this.checklist.items.length) {
             this.icon = 'pi pi-hourglass';
             this.textColor = 'text-orange-500';
-            this.text = 'Em Andamento';
+            this.text = `Em Andamento ${this.checklist.itensFinalizados.length}/${this.checklist.items.length}`;
         }
         else if (this.checklist.itensEmAndamento.length == 0
             && this.checklist.itensAtrasados.length == 0
@@ -44,12 +44,12 @@ export class ChecklistStatusComponent implements OnChanges {
             && this.checklist.itensFinalizados.length != this.checklist.items.length) {
             this.icon = 'pi pi-clock';
             this.textColor = 'text-blue-500';
-            this.text = 'Futuro';
+            this.text = `Futuro ${this.checklist.prazo}/${this.checklist.items.length}`;
         }
         else {
             this.icon = 'pi pi-question';
             this.textColor = 'text-purple-500';
-            this.text = 'Indefinido';
+            this.text = `Indefinido ${this.checklist.itensFinalizados.length}/${this.checklist.items.length}`;
         }
     }
 }
