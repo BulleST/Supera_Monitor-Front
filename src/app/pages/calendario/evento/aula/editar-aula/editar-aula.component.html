@@ -434,16 +434,18 @@
                 <p-table #table
                          [value]="evento.alunos"
                          dataKey="id"
-                         stripedRows>
+                         stripedRows
+                         [scrollable]="true"
+                         scrollHeight="300px">
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
                     <ng-template #header>
-                        <tr *ngIf="evento.alunos.length > 0">
-                            <th class="w-8rem z-2 sticky left-0">Nome</th>
-                            <th class="z-0"><span class="pl-2 w-20rem">Apostila</span></th>
-                            <th class="z-0 w-4rem">Presença</th>
-                            <th class="z-0 w-4rem">Observação</th>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Apostila</th>
+                            <th>Presença</th>
+                            <th>Observação</th>
                         </tr>
                     </ng-template>
                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">

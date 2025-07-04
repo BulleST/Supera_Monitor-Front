@@ -34,6 +34,7 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
+import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
 
 @NgModule({
     declarations: [
@@ -52,6 +53,7 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         SalaAulaComponent,
         EventoItemComponent,
         EventoItemHoverComponent,
+        LoadingBrainComponent,
     ],
     exports: [
         FormsModule,
@@ -79,6 +81,7 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         SalaAulaComponent,
         EventoItemComponent,
         EventoItemHoverComponent,
+        LoadingBrainComponent,
     ],
     imports: [
         CommonModule,

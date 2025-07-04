@@ -11,8 +11,7 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title"><i class="fa-solid fa-user-graduate mr-2 text-1xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Dados do Aluno</span>
-            <p-button *ngIf="isEditPage" 
-                    class="ml-auto"
+            <p-button class="ml-auto"
                       type="button"
                       icon="pi pi-exclamation-circle text-blue-500"
                       size="large"
@@ -21,7 +20,7 @@
                       severity="secondary"
                       (onClick)="op.toggle($event)" />
             <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white  min-w-w-20rem">
-                <div class="px-2">
+                <div class="px-2" *ngIf="object">
                     <h3 class="text-xl mb-2">Informações Adicionais</h3>
                     <table class="w-full">
                         <tr *ngIf="object.aspNetUsers_Created">
@@ -47,19 +46,15 @@
                 <p-tablist>
                     <p-tab [value]="0">Dados Cadastrais</p-tab>
                     <!-- <p-tab [value]="1" *ngIf="isEditPage">Calendário</p-tab> -->
-                    <p-tab [value]="2" *ngIf="isEditPage">Histórico</p-tab>
+                    <p-tab [value]="2">Histórico</p-tab>
                 </p-tablist>
                 <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
                     <p-tabpanel [value]="0">
-                        <app-dados-cadastrais 
+                        <app-dados-cadastrais *ngIf="object"
                             [object]="object" 
-                            [isEditPage]="isEditPage"
                             [aluno_Id]="aluno_Id"></app-dados-cadastrais>
                     </p-tabpanel>
-                    <!-- <p-tabpanel [value]="1" *ngIf="isEditPage">
-                        <app-calendario [object]="object"></app-calendario>
-                    </p-tabpanel> -->
-                    <p-tabpanel [value]="2" *ngIf="isEditPage">
+                    <p-tabpanel [value]="2" *ngIf="object">
                         <app-historico [object]="object"></app-historico>
                     </p-tabpanel>
                 </p-tabpanels>

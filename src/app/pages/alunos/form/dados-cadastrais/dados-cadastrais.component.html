@@ -1,7 +1,6 @@
 <app-confirm-dialog></app-confirm-dialog>
 
 <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
-
 <div class="formgrid grid">
     <!-- Foto -->
     <div class="lg:col-3 md:col-3 col-12 px-0 ">
@@ -304,7 +303,6 @@
                            id="restricoes"
                            name="restricoes"
                            class="w-full pr-7"
-                           [ngClass]="{ 'pointer-events-none': isEditPage == false }"
                            [required]="true"
                            placeholder="Selecione"
                            [readonly]="true"
@@ -369,8 +367,8 @@
                     (focusin)="checklistPopover.show($event)"
                     (keydown.tab)="checklistPopover.hide()">
                         
-                    <app-aluno-checklist #alunoChecklist
-                    class="w-full"
+                    <app-aluno-checklist #alunoChecklist *ngIf="object"
+                        class="w-full"
                         [aluno_Id]="aluno_Id"
                         [aluno]="object"
                         [showChecklist]="true"
@@ -467,8 +465,8 @@
                                 <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
                             </div>
                             <p class="text-xs mt-1">
+                                <i class="fa-solid fa-brain mr-2"></i>
                                 {{getPerfilCognitivo(item)}}
-                                <i class="fa-solid fa-brain ml-2"></i>
                             </p>
                         </div>
                     </ng-template>
@@ -479,9 +477,7 @@
                 <label for="professor">Educador: </label>
                 <p-iconfield>
                     <p-inputicon *ngIf="selectedTurma">
-                        <span class="w-1rem h-1rem inline-flex mr-2 border-circle" [style]="{
-                            backgroundColor: selectedTurma.corLegenda
-                        }"></span>
+                        <span class="w-1rem h-1rem inline-flex mr-2 border-circle" [style]="{ backgroundColor: selectedTurma.corLegenda}"></span>
                     </p-inputicon>
                     <input type="text"
                            pInputText
@@ -520,6 +516,7 @@
                           [(ngModel)]="selectedKit"
                           (onChange)="kitChanged(apostila_Kit_Id, $event)"
                           [loading]="loadingKits"
+                          [showClear]="true"
                           #apostila_Kit_Id="ngModel"
                           styleClass="w-full"
                           class="w-full"
@@ -546,7 +543,7 @@
                 <label for="apostila_Abaco">Apostila Ábaco: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.apostila_Abaco"
+                       [value]="object.apostila_Abaco ?? 'Indefinido'"
                        id="apostila_Abaco"
                        name="apostila_Abaco"
                        class="w-full"
@@ -557,7 +554,7 @@
                 <label for="numeroPaginaAbaco">Página: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.numeroPaginaAbaco"
+                       [value]="object.numeroPaginaAbaco ?? 'Indefinido'"
                        id="numeroPaginaAbaco"
                        name="numeroPaginaAbaco"
                        class="w-full"
@@ -568,7 +565,7 @@
                 <label for="apostila_AH">Apostila AH: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.apostila_AH"
+                       [value]="object.apostila_AH ?? 'Indefinido'"
                        id="apostila_AH"
                        name="apostila_AH"
                        class="w-full"
@@ -579,7 +576,7 @@
                 <label for="numeroPaginaAH">Página: </label>
                 <input type="text"
                        pInputText
-                       [value]="object.numeroPaginaAH"
+                       [value]="object.numeroPaginaAH ?? 'Indefinido'"
                        id="numeroPaginaAH"
                        name="numeroPaginaAH"
                        class="w-full"

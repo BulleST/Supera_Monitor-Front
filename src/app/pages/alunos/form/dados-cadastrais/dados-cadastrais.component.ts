@@ -35,7 +35,6 @@ import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno
 })
 export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     @Input() object!: Aluno;
-    @Input() isEditPage = false;
     @Input() aluno_Id!: number;
     subscription: Subscription[] = [];
 
@@ -135,9 +134,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
-        if (changes['isEditPage']) {
-            this.isEditPage = changes['isEditPage'].currentValue;
-        }
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
             this.loadFoto();
@@ -288,13 +284,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             this.object.apostila_Abaco = abaco?.nome;
             this.object.numeroPaginaAbaco = 0;
         } else {
-            delete this.object.apostila_Kit_Id;
-            delete this.object.apostila_AH_Id;
-            delete this.object.apostila_AH;
-            delete this.object.numeroPaginaAH;
-            delete this.object.apostila_Abaco_Id;
-            delete this.object.apostila_Abaco;
-            delete this.object.numeroPaginaAbaco;
+            // delete this.object.apostila_Kit_Id;
+            // delete this.object.apostila_AH_Id;
+            // delete this.object.apostila_AH;
+            // delete this.object.numeroPaginaAH;
+            // delete this.object.apostila_Abaco_Id;
+            // delete this.object.apostila_Abaco;
+            // delete this.object.numeroPaginaAbaco;
         }
     }
 

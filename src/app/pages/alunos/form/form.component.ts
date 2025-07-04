@@ -23,10 +23,9 @@ import { ToastrService } from 'ngx-toastr';
 export class FormComponent implements OnDestroy {
     visible: boolean = false;
     aluno_Id: number = 0;
-    object: Aluno = new Aluno;
+    object!: Aluno
     loading = false;
     error: string = '';
-    isEditPage = true;
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
 
@@ -49,7 +48,6 @@ export class FormComponent implements OnDestroy {
 
     loadPage() {
         let params = this.activatedRoute.params.subscribe(async res => {
-            this.isEditPage = !!res['aluno_id'];
             if (res['aluno_id']) {
                 this.visible = true;
                 this.loading = true;
@@ -79,8 +77,7 @@ export class FormComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            let route = this.isEditPage ? ['../../'] : ['../']
-            this.router.navigate(route, { relativeTo: this.activatedRoute });
+            this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
     }
 
