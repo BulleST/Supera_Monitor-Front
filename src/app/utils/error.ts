@@ -13,7 +13,7 @@ export function showError(confirmationService: ConfirmationService, header: stri
     confirmationService.confirm({
         target: e.target ?? e,
         message: message,
-        header: 'OPS!',
+        header: header,
         icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',
         acceptLabel: 'Fechar',
         acceptButtonStyleClass: 'p-button-rounded',

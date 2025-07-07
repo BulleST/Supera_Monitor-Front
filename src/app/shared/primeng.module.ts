@@ -125,7 +125,7 @@ import { ColorPickerModule } from 'primeng/colorpicker'
         BadgeModule,
         ButtonModule,
         CardModule,
-        CheckboxModule,ConfirmationService
+        CheckboxModule,
         ChipModule,
         ColorPickerModule,
         ConfirmDialogModule,

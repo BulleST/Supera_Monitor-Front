@@ -1,15 +1,14 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-dialog [header]="isEditPage ? 'Editar'  : 'Cadastrar'"
-          [maximizable]="true"
+<p-dialog [maximizable]="true"
           [draggable]="true"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '800px', maxWidth: '95vw', maxHeight: '95vh' }"
+          [style]="{ width: '500px', maxWidth: '95vw', maxHeight: '95vh' }"
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
-            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}} educador</span>
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
             <p-button *ngIf="isEditPage"
                       class="ml-auto"
                       type="button"
@@ -44,7 +43,7 @@
             </p-popover>
         </div>
     </ng-template>
-    <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
+    <form (ngSubmit)="sendConfirmation($event, form)" #form="ngForm" #formTag>
         <div class="formgrid grid">
             <!-- Account -->
             <ng-container *ngIf="!isEditPage">
@@ -91,7 +90,7 @@
                 </div>
             </ng-container>
             <!-- Nome -->
-            <div class="field sm:col-3 col-8">
+            <div class="field lg:col-7 md:col-12 sm:col-3 col-7">
                 <label for="nome">Nome do educador: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -106,7 +105,7 @@
                 </div>
             </div>
             <!-- Celular -->
-            <div class="field sm:col-3 col-4">
+            <div class="field lg:col-5 md:col-4 sm:col-4 col-5">
                 <label for="telefone">Celular: <span class="text-red-500">*</span></label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-mobile" />
@@ -127,7 +126,7 @@
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field sm:col-6 col-12">
+            <div class="field lg:col-6 md:col-8 sm:col-5 col-12">
                 <label for="email">E-mail: <span class="text-red-500" *ngIf="!isEditPage && !accountsSelected">* <small class="text-black">(Não é possível alterar o e-mail após o primeiro cadastro)</small></span> </label>
                 <ng-container *ngIf="!isEditPage && !accountsSelected">
                     <p-iconfield>
@@ -163,8 +162,29 @@
                     </p-iconfield>
                 </ng-container>
             </div>
+            <!-- Nível Certificação -->
+            <div class="field lg:col-6 md:col-4 sm:col-4 col-12">
+                <label for="professor_NivelCertificacao_Id">Nível de Certificação: <span class="text-red-500">*</span></label>
+                <p-select
+                          [loading]="loadingNivelCertificacao"
+                          [options]="nivelCertificacao"
+                          [(ngModel)]="object.professor_NivelCertificacao_Id"
+                          #professor_NivelCertificacao_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_NivelCertificacao_Id"
+                          inputId="professor_NivelCertificacao_Id"
+                          optionLabel="descricao"
+                          optionValue="id"
+                          [showClear]="true"
+                          appendTo="body"
+                          [required]="true" />
+                <div *ngIf="professor_NivelCertificacao_Id.touched && professor_NivelCertificacao_Id.invalid && professor_NivelCertificacao_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelCertificacao_Id.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
             <!-- Data de Nascimento -->
-            <div class="field sm:col-4 col-4">
+            <div class="field lg:col md:col-4 sm:col-4 col-6">
                 <label for="dataNascimento">Data de Nascimento: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataNascimento="ngModel"
@@ -186,7 +206,7 @@
                 </div>
             </div>
             <!-- Data de Início -->
-            <div class="field sm:col-4 col-4">
+            <div class="field lg:col md:col-4 sm:col-4 col-6">
                 <label for="dataInicio">Data de Início: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
@@ -207,42 +227,19 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <!-- Nível Certificação -->
-            <div class="field sm:col-4 col-4">
-                <label for="professor_NivelCertificacao_Id">Nível de Certificação: <span class="text-red-500">*</span></label>
-                <p-select
-                          [loading]="loadingNivelCertificacao"
-                          [options]="nivelCertificacao"
-                          [(ngModel)]="object.professor_NivelCertificacao_Id"
-                          #professor_NivelCertificacao_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
-                          name="professor_NivelCertificacao_Id"
-                          inputId="professor_NivelCertificacao_Id"
-                          optionLabel="descricao"
-                          optionValue="id"
-                          [showClear]="true"
-                          appendTo="body"
-                          [required]="true" />
-                <div *ngIf="professor_NivelCertificacao_Id.touched && professor_NivelCertificacao_Id.invalid && professor_NivelCertificacao_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_NivelCertificacao_Id.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
             <!-- Início Expediente -->
-            <div class="field sm:col-6 col-6">
-                <p>{{object.expedienteInicio}}</p>
+            <div class="field lg:col md:col-6 sm:col-6 col-6">
                 <label for="expedienteInicio">Início Expediente: <span class="text-red-500">*</span></label>
                 <p-datepicker #expedienteInicio="ngModel"
-                            inputId="expedienteInicio"
-                            name="expedienteInicio"
+                              inputId="expedienteInicio"
+                              name="expedienteInicio"
                               [(ngModel)]="object.expedienteInicio"
-                              (onBlur)="expedienteChanged($event)"
-                              [minDate]="inicioExpedienteMin"
-                              [maxDate]="inicioExpedienteMax"
+                              (onBlur)="expedienteChanged(expedienteInicio, expedienteFim)"
+                              [keepInvalid]="true"
+                              [minDate]="min"
+                              [maxDate]="max"
                               [showIcon]="true"
-                              icon="pi pi-clock"
                               iconDisplay="input"
-                              [showTime]="true"
                               hourFormat="24"
                               [timeOnly]="true"
                               [required]="true"
@@ -254,19 +251,20 @@
                 </p-datepicker>
                 <div *ngIf="expedienteInicio.touched && expedienteInicio.invalid && expedienteInicio.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteInicio.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteInicio.errors['expedienteInvalido']" [innerHTML]="expedienteInicio.errors['expedienteInvalido']"></p>
                 </div>
             </div>
             <!-- Fim Expediente -->
-            <div class="field sm:col-6 col-6">
-                <p>{{object.expedienteFim}}</p>
+            <div class="field lg:col md:col-6 sm:col-6 col-6">
                 <label for="expedienteFim">Fim Expediente: <span class="text-red-500">*</span></label>
                 <p-datepicker #expedienteFim="ngModel"
-                            inputId="expedienteFim"
-                            name="expedienteFim"
+                              inputId="expedienteFim"
+                              name="expedienteFim"
                               [(ngModel)]="object.expedienteFim"
-                              (onBlur)="expedienteChanged($event)"
-                              [minDate]="fimExpedienteMin"
-                              [maxDate]="fimExpedienteMax"
+                              (onBlur)="expedienteChanged(expedienteInicio, expedienteFim)"
+                              [keepInvalid]="true"
+                              [minDate]="min"
+                              [maxDate]="max"
                               [showIcon]="true"
                               iconDisplay="input"
                               icon="pi pi-clock"
@@ -274,24 +272,23 @@
                               hourFormat="24"
                               [timeOnly]="true"
                               [required]="true"
-                              appendTo="body" 
+                              appendTo="body"
                               fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
                 </p-datepicker>
-
                 <div *ngIf="expedienteFim.touched && expedienteFim.invalid && expedienteFim.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteFim.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="expedienteFim.errors['expedienteInvalido']" [innerHTML]="expedienteFim.errors['expedienteInvalido']"></p>
                 </div>
             </div>
             <!-- Legenda -->
-            <div class="field col-12 ">
+            <div class="field col-12">
                 <div>
                     <label for="corLegenda">Legenda: <span class="text-red-500">*</span></label>
                     <div class="flex align-items-center my-3 mt-2 -ml-2">
-                        <p-colorpicker
-                                       #corLegenda="ngModel"
+                        <p-colorpicker #corLegenda="ngModel"
                                        [(ngModel)]="object.corLegenda"
                                        inputId="corLegenda"
                                        name="corLegenda"

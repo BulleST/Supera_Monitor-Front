@@ -17,7 +17,6 @@ import { AccountResponse } from '../../models/account.model';
 import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
-import { ProfessorService } from '../../services/professor.service';
 import { PseudoEvento, ReposicaoAlunoRequest } from '../../models/reposicao.model';
 import { EventoAulaRequest } from '../../models/evento-aula.model';
 import { MyMap } from '../../utils/map';
@@ -28,8 +27,6 @@ import { Feriado } from '../../models/feriado.model';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import multiMonthPlugin from '@fullcalendar/multimonth';
-import listPlugin from '@fullcalendar/list';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import $ from 'jquery';
@@ -94,8 +91,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             dayGridPlugin,
             interactionPlugin,
             timeGridPlugin,
-            listPlugin,
-            multiMonthPlugin
+            // listPlugin,
+            // multiMonthPlugin
         ],
         hiddenDays: [0],
         dayHeaders: true,

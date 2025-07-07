@@ -1,8 +1,8 @@
-import { Component, inject, Injector, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, inject, Injector, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
 import { ProfessorService } from '../../../services/professor.service';
 import { Professor, Professor_NivelCertificacao } from '../../../models/professor.model';
 import { Account } from '../../../models/account.model';
@@ -21,7 +21,7 @@ import { Crypto, insertOrReplace, playAlert, playSuccess, showError } from '../.
     providers: [ConfirmationService],
     standalone: false
 })
-export class FormComponent implements OnDestroy {
+export class FormComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
     object = new Professor;
     loading = false;
@@ -40,15 +40,16 @@ export class FormComponent implements OnDestroy {
     minDate: Date = new Date(1950, 1, 1);
     maxDate: Date = new Date();
 
-
-    inicioExpedienteMin = new Date;
-    inicioExpedienteMax = new Date;
+    min = moment().set({ hour: 8, minute: 0, second: 0, millisecond: 0 }).toDate();
+    max = moment().set({ hour: 20, minute: 0, second: 0, millisecond: 0 }).toDate();
 
     fimExpedienteMin = new Date;
     fimExpedienteMax = new Date;
 
     turmas: Turma[] = [];
     loadingTurmas = false;
+
+    @ViewChild('formTag') formTag!: HTMLFormElement;
 
     constructor(
         private router: Router,
@@ -76,7 +77,8 @@ export class FormComponent implements OnDestroy {
             .catch(res => this.loadingAccounts = false)
 
 
-
+    }
+    ngAfterViewInit(): void {
         this.loadPage();
     }
 
@@ -90,15 +92,7 @@ export class FormComponent implements OnDestroy {
             if (this.isEditPage) {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id']);
-
-                this.loadingTurmas = true;
-                lastValueFrom(this.turmaService.getList())
-                    .then(res => {
-                        this.turmas = res.filter(x => x.professor_Id == id);
-                        this.loadingTurmas = false;
-                    })
-                    .catch(res => this.loadingTurmas = false);
-
+                this.loadTurmas(id);
 
                 this.service.get(id)
                     .then(res => {
@@ -107,8 +101,8 @@ export class FormComponent implements OnDestroy {
                         this.visible = true;
                     })
                     .catch(res => {
-                        this.visible = false;
-                        this.visibleChange();
+                        // this.visible = false;
+                        // this.visibleChange();
                     });
             } else {
                 this.visible = true;
@@ -122,6 +116,16 @@ export class FormComponent implements OnDestroy {
             var route = this.isEditPage ? ['../../'] : ['../'];
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
+    }
+
+    loadTurmas(professor_Id: number) {
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => {
+                this.turmas = res.filter(x => x.professor_Id == professor_Id);
+                this.loadingTurmas = false;
+            })
+            .catch(res => this.loadingTurmas = false);
     }
 
     accountSelectedChange(account?: Account) {
@@ -138,56 +142,81 @@ export class FormComponent implements OnDestroy {
         }
     }
 
-    expedienteChanged(e: any) {
+    formIsValid(form: NgForm) {
+        let valid = true;
+        if (form.invalid) {
+            valid = false
+        }
 
-        console.group('expedienteChanged', e.target.id);
-        console.log('expedienteInicio', this.object.expedienteInicio)
-        console.log('expedienteFim', this.object.expedienteFim)
-        
-        this.inicioExpedienteMin = this.object.expedienteFim ? moment(this.object.expedienteFim).subtract(8, 'hours').toDate() : moment(new Date).set('hours', 8).toDate();
-        this.inicioExpedienteMax = this.object.expedienteFim ?? moment(new Date).set('hours', 19).toDate();
+        if (this.loading) {
+            valid = false;
+        }
 
-        this.fimExpedienteMin = this.object.expedienteInicio ?? moment(new Date).set('hours', 8).toDate();
-        this.fimExpedienteMax = this.object.expedienteInicio ? moment(this.object.expedienteInicio).add(8, 'hours').toDate() : moment(new Date).set('hours', 19).toDate();
-        
-        // this.fimExpedienteMin = moment(new Date).set('hours', 8).toDate();
-
-
-        console.log('inicioExpedienteMin', this.inicioExpedienteMin)
-        console.log('inicioExpedienteMax', this.inicioExpedienteMax)
-        console.log('fimExpedienteMin', this.fimExpedienteMin)
-        console.log('fimExpedienteMax', this.fimExpedienteMax)
-
-        console.groupEnd();
-
-        // if (this.isEditPage) {
-        //     var mensagem = '';
-        //     if (this.object.expedienteInicio) {
-
-        //         let turmas = this.turmas.filter(x => x.active
-        //             && moment(x.horario).isBefore(this.object.expedienteInicio))
-        //         if (turmas.length > 0) {
-        //             mensagem = 'Existem turmas atribuídas a esse educador com horário iniciando antes do expediente escolhido.';
-        //             mensagem += `\n Turmas:  \n ${turmas.map(x => x.nome).join('\n ')}`
-        //         }
-        //     }
-
-
-        //     if (this.object.expedienteFim) {
-        //         let turmas = this.turmas.filter(x => x.active
-        //             && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
-        //                 || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
-        //         if (turmas.length > 0) {
-        //             mensagem += '\n Existem turmas atribuídas a esse educador com horário finalizando após o expediente escolhido.';
-        //             mensagem += `\n Turmas:  ${turmas.map(x => x.nome).join(', ')}`
-        //         }
-        //     }
-        //     if (mensagem) {
-        //         this.showError('Expediente inválido', mensagem, e)
-        //     }
-        // }
+        return valid;
 
     }
+
+    expedienteChanged(expedienteInicio: NgModel, expedienteFim: NgModel) {
+        let min = moment(this.min, 'HH:mm')
+        let max = moment(this.max, 'HH:mm')
+        let mensagem = '';
+        let titulo = '';
+
+        if (this.object.expedienteInicio) {
+            let turmas = this.turmas.filter(x => {
+                let ehAtiva = x.active;
+                let intervaloValido = moment(x.horario).isSameOrAfter(this.object.expedienteInicio, 'minutes') 
+                return ehAtiva && !intervaloValido;
+            });
+
+            if (!moment(this.object.expedienteInicio).isBetween(min, max, 'minutes', '[]')) {
+                mensagem = 'O expediente deve iniciar no mínimo às 8h da manhã.';
+                titulo = 'Início de expediente inválido'
+                expedienteInicio.control.setErrors({ 'expedienteInvalido': mensagem })
+            }
+            else if (turmas.length > 0) {
+                titulo = 'Início de expediente inválido'
+                mensagem = 'O educador tem turmas com horários que iniciam antes do expediente selecionado: <br>'
+                mensagem += turmas.map(x => '   • ' + x.nome).join('<br> ');
+                expedienteInicio.control.setErrors({ 'expedienteInvalido': mensagem })
+            } else {
+                expedienteInicio.control.setErrors(null)
+            }
+        }
+
+        if (this.object.expedienteFim) {
+            let turmas = this.turmas.filter(x => {
+                let intervaloAte = moment(x.horario).add(120, 'minutes');
+                let ehAtiva = x.active;
+                let intervaloValido = moment(intervaloAte).isSameOrBefore(this.object.expedienteFim);
+                return ehAtiva && !intervaloValido;
+            });
+                
+
+            if (!moment(this.object.expedienteFim).isBetween(this.min, this.max, 'minutes', '[]')) {
+                titulo = 'Fim de expediente inválido'
+                mensagem = 'O expediente deve finalizar até 20h da noite.';
+                expedienteFim.control.setErrors({ 'expedienteInvalido': mensagem });
+            } else if (turmas.length > 0) {
+                titulo = 'Fim de expediente inválido'
+                mensagem = 'O educador tem turmas com horários que se estendem ao expediente selecionado: <br>'
+                mensagem += turmas.map(x => '   • ' + x.nome).join('<br>');
+                expedienteFim.control.setErrors({ 'expedienteInvalido': mensagem })
+            } else {
+                expedienteFim.control.setErrors(null);
+            }
+        }
+        expedienteInicio.control.updateValueAndValidity();
+        expedienteFim.control.updateValueAndValidity();
+
+        if (mensagem) {
+            this.showError(titulo, mensagem, { target: this.formTag });
+            return false;
+        }
+
+        return true;
+    }
+
     goToCalendario() {
         this.router.navigate(['professores', 'calendario', this.crypto.encrypt(this.object.id)]);
     }
@@ -199,8 +228,8 @@ export class FormComponent implements OnDestroy {
 
 
 
-    async sendConfirmation(form: NgForm, e: any) {
-        if (form.invalid) {
+    async sendConfirmation(e: any, form: NgForm) {
+        if (!this.formIsValid(form)) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
 
