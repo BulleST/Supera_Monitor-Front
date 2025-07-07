@@ -170,7 +170,7 @@
                               #dataNascimento="ngModel"
                               [(ngModel)]="object.dataNascimento"
                               [showIcon]="true"
-                              [iconDisplay]="'input'"
+                              iconDisplay="input"
                               [selectOtherMonths]="true"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
@@ -192,7 +192,7 @@
                               #dataInicio="ngModel"
                               [(ngModel)]="object.dataInicio"
                               [showIcon]="true"
-                              [iconDisplay]="'input'"
+                              iconDisplay="input"
                               [selectOtherMonths]="true"
                               [minDate]="minDate"
                               [maxDate]="maxDate"
@@ -230,6 +230,7 @@
             </div>
             <!-- Início Expediente -->
             <div class="field sm:col-6 col-6">
+                <p>{{object.expedienteInicio}}</p>
                 <label for="expedienteInicio">Início Expediente: <span class="text-red-500">*</span></label>
                 <p-datepicker #expedienteInicio="ngModel"
                             inputId="expedienteInicio"
@@ -239,16 +240,14 @@
                               [minDate]="inicioExpedienteMin"
                               [maxDate]="inicioExpedienteMax"
                               [showIcon]="true"
-                              [icon]="'pi pi-clock'"
-                              [iconDisplay]="'input'"
+                              icon="pi pi-clock"
+                              iconDisplay="input"
                               [showTime]="true"
-                              [hourFormat]="'24'"
+                              hourFormat="24"
                               [timeOnly]="true"
-                              class="w-full"
-                              styleClass="w-full"
-                              inputStyleClass="w-full"
                               [required]="true"
-                              appendTo="body">
+                              appendTo="body"
+                              fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -259,25 +258,24 @@
             </div>
             <!-- Fim Expediente -->
             <div class="field sm:col-6 col-6">
+                <p>{{object.expedienteFim}}</p>
                 <label for="expedienteFim">Fim Expediente: <span class="text-red-500">*</span></label>
                 <p-datepicker #expedienteFim="ngModel"
-                                inputId="expedienteFim"
-                                name="expedienteFim"
+                            inputId="expedienteFim"
+                            name="expedienteFim"
                               [(ngModel)]="object.expedienteFim"
                               (onBlur)="expedienteChanged($event)"
                               [minDate]="fimExpedienteMin"
                               [maxDate]="fimExpedienteMax"
                               [showIcon]="true"
-                              [iconDisplay]="'input'"
-                              [icon]="'pi pi-clock'"
+                              iconDisplay="input"
+                              icon="pi pi-clock"
                               [showTime]="true"
-                              [hourFormat]="'24'"
+                              hourFormat="24"
                               [timeOnly]="true"
-                              class="w-full"
-                              styleClass="w-full"
-                              inputStyleClass="w-full"
                               [required]="true"
-                              appendTo="body" >
+                              appendTo="body" 
+                              fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -317,7 +315,7 @@
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
-                <p-button *ngIf="isEditPage"
+                <!-- <p-button *ngIf="isEditPage"
                           type="button"
                           (onClick)="goToCalendario()"
                           styleClass="border-2 px-3 mr-2"
@@ -325,7 +323,7 @@
                           icon="pi pi-calendar"
                           [rounded]="true"
                           [outlined]="true"
-                          size="small" />
+                          size="small" /> -->
                 <p-button
                           type="submit"
                           [disabled]="form.invalid || loading"
@@ -333,8 +331,7 @@
                           label="Salvar"
                           icon="pi pi-check"
                           [loading]="loading"
-                          [rounded]="true"
-                          size="small" />
+                          [rounded]="true" />
             </div>
         </div>
     </form>

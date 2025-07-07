@@ -17,6 +17,7 @@ import { DividerModule } from 'primeng/divider';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { FluidModule } from 'primeng/fluid';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ImageModule } from 'primeng/image';
 import { InputIconModule } from 'primeng/inputicon';
@@ -57,6 +58,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
+import { ColorPickerModule } from 'primeng/colorpicker'
 
 @NgModule({
     imports: [
@@ -67,6 +69,7 @@ import { SelectModule } from 'primeng/select';
         CardModule,
         CheckboxModule,
         ChipModule,
+        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -77,6 +80,7 @@ import { SelectModule } from 'primeng/select';
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
+        FluidModule,
         IconFieldModule,
         ImageModule,
         InputIconModule,
@@ -121,8 +125,9 @@ import { SelectModule } from 'primeng/select';
         BadgeModule,
         ButtonModule,
         CardModule,
-        CheckboxModule,
+        CheckboxModule,ConfirmationService
         ChipModule,
+        ColorPickerModule,
         ConfirmDialogModule,
         ConfirmPopupModule,
         ContextMenuModule,
@@ -133,6 +138,7 @@ import { SelectModule } from 'primeng/select';
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
+        FluidModule,
         IconFieldModule,
         ImageModule,
         InputIconModule,

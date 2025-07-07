@@ -127,15 +127,15 @@ export class ListComponent implements OnDestroy {
                 icon: 'fa-solid fa-key text-grey-400',
                 command: (event: any) => this.resetPassword(event, item)
             },
-            { separator: true },
-            {
-                label: 'Calendário de aulas',
-                icon: 'fa-solid fa-calendar',
-                command: () => {
-                    var encrypted = this.crypto.encrypt(item.id);
-                    this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
-                }
-            },
+            // { separator: true },
+            // {
+            //     label: 'Calendário de aulas',
+            //     icon: 'fa-solid fa-calendar',
+            //     command: () => {
+            //         var encrypted = this.crypto.encrypt(item.id);
+            //         this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
+            //     }
+            // },
 
 
         ];

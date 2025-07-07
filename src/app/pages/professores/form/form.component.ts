@@ -140,44 +140,52 @@ export class FormComponent implements OnDestroy {
 
     expedienteChanged(e: any) {
 
-        this.inicioExpedienteMin = this.object.expedienteFim ? 
-                    moment(this.object.expedienteFim).subtract(8, 'hours').toDate()
-                    : moment(new Date).set('hours', 8).toDate();
+        console.group('expedienteChanged', e.target.id);
+        console.log('expedienteInicio', this.object.expedienteInicio)
+        console.log('expedienteFim', this.object.expedienteFim)
+        
+        this.inicioExpedienteMin = this.object.expedienteFim ? moment(this.object.expedienteFim).subtract(8, 'hours').toDate() : moment(new Date).set('hours', 8).toDate();
         this.inicioExpedienteMax = this.object.expedienteFim ?? moment(new Date).set('hours', 19).toDate();
-        
+
         this.fimExpedienteMin = this.object.expedienteInicio ?? moment(new Date).set('hours', 8).toDate();
-        this.fimExpedienteMax = this.object.expedienteInicio ? 
-                                moment(this.object.expedienteInicio).add(8, 'hours').toDate()
-                                : moment(new Date).set('hours', 19).toDate();
+        this.fimExpedienteMax = this.object.expedienteInicio ? moment(this.object.expedienteInicio).add(8, 'hours').toDate() : moment(new Date).set('hours', 19).toDate();
         
-        this.fimExpedienteMin = moment(new Date).set('hours', 8).toDate();
-
-        if (this.isEditPage) {
-            var mensagem = '';
-            if (this.object.expedienteInicio) {
-
-                let turmas = this.turmas.filter(x => x.active
-                    && moment(x.horario).isBefore(this.object.expedienteInicio))
-                if (turmas.length > 0) {
-                    mensagem = 'Existem turmas atribuídas a esse educador com horário iniciando antes do expediente escolhido.';
-                    mensagem += `\n Turmas:  \n ${turmas.map(x => x.nome).join('\n ')}`
-                }
-            }
+        // this.fimExpedienteMin = moment(new Date).set('hours', 8).toDate();
 
 
-            if (this.object.expedienteFim) {
-                let turmas = this.turmas.filter(x => x.active
-                    && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
-                        || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
-                if (turmas.length > 0) {
-                    mensagem += '\n Existem turmas atribuídas a esse educador com horário finalizando após o expediente escolhido.';
-                    mensagem += `\n Turmas:  ${turmas.map(x => x.nome).join(', ')}`
-                }
-            }
-            if (mensagem) {
-                this.showError('Expediente inválido', mensagem, e)
-            }
-        }
+        console.log('inicioExpedienteMin', this.inicioExpedienteMin)
+        console.log('inicioExpedienteMax', this.inicioExpedienteMax)
+        console.log('fimExpedienteMin', this.fimExpedienteMin)
+        console.log('fimExpedienteMax', this.fimExpedienteMax)
+
+        console.groupEnd();
+
+        // if (this.isEditPage) {
+        //     var mensagem = '';
+        //     if (this.object.expedienteInicio) {
+
+        //         let turmas = this.turmas.filter(x => x.active
+        //             && moment(x.horario).isBefore(this.object.expedienteInicio))
+        //         if (turmas.length > 0) {
+        //             mensagem = 'Existem turmas atribuídas a esse educador com horário iniciando antes do expediente escolhido.';
+        //             mensagem += `\n Turmas:  \n ${turmas.map(x => x.nome).join('\n ')}`
+        //         }
+        //     }
+
+
+        //     if (this.object.expedienteFim) {
+        //         let turmas = this.turmas.filter(x => x.active
+        //             && (moment(x.horario).isSameOrAfter(this.object.expedienteFim)
+        //                 || moment(x.horario).add(120, 'minutes').isAfter(this.object.expedienteFim)))
+        //         if (turmas.length > 0) {
+        //             mensagem += '\n Existem turmas atribuídas a esse educador com horário finalizando após o expediente escolhido.';
+        //             mensagem += `\n Turmas:  ${turmas.map(x => x.nome).join(', ')}`
+        //         }
+        //     }
+        //     if (mensagem) {
+        //         this.showError('Expediente inválido', mensagem, e)
+        //     }
+        // }
 
     }
     goToCalendario() {
