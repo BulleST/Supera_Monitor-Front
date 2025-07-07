@@ -290,47 +290,6 @@ EventoTipo = EventoTipo;
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        if (!aluno.celular) {
-            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
-            return;
-        }
-        if (aluno.presente) {
-            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
-            return;
-        }
-
-
-        lastValueFrom(this.service.calendario({
-            intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
-            intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
-            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
-        }))
-            .then(res => {
-                let sugestoes = res.filter(aula => {
-                    const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
-                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
-                    const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
-                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
-                    const aulaNaoFinalizada = !aula.finalizado;
-                    const aulaEstaAtiva = aula.active;
-                    const naoEhFeriado = !aula.feriado;
-
-                    return alunoNaoEstaNaAula
-                        && ehAula
-                        && temVagas
-                        && ehPerfilCognitivoCompativel
-                        && aulaNaoFinalizada
-                        && aulaEstaAtiva
-                        && naoEhFeriado;
-                });
-
-                let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, sugestoes);
-                window.open(object.link, '_blank');
-                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-            })
-    }
-
     goToAluno(aluno: Evento_Participacao_Aluno) {
         this.router.navigate([
             'calendario',

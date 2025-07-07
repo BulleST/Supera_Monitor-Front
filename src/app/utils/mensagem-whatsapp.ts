@@ -4,6 +4,12 @@ import moment from "moment";
 import { CalendarioUtils } from "./calendario-utils";
 import { ToastrService } from "ngx-toastr";
 import { Clipboard } from "@angular/cdk/clipboard";
+import { EventoService } from "../services/evento.service";
+import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
+import { Aluno } from "../models/alunos.model";
+import { showError } from "./error";
+import { ConfirmationService } from "primeng/api";
+import { lastValueFrom } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +19,15 @@ export class MensagemWhatsapp {
     constructor(
         private calendarioUtils: CalendarioUtils,
         private toastr: ToastrService,
-        private clipboard: Clipboard
+        private clipboard: Clipboard,
+        private eventoService: EventoService,
+        private confirmationService: ConfirmationService,
     ) {
+    }
+
+    showError(header: string, message: string, e: any) {
+        this.toastr.error(message, header)
+        showError(this.confirmationService, header, message, e)
     }
 
     copiarMensagem(mensagem: string) {
@@ -25,6 +38,48 @@ export class MensagemWhatsapp {
         .catch(() => {
             this.toastr.error('Erro ao copiar mensagem');
         });
+    }
+
+    enviarMensagemFalta(evento: Evento, aluno: Evento_Participacao_Aluno, e: any) {
+        if (!aluno.celular) {
+            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
+            return;
+        }
+
+        if (aluno.presente) {
+            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
+            return;
+        }
+
+        lastValueFrom(this.eventoService.calendario({
+            intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
+            intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+        }))
+            .then(res => {
+                let sugestoes = res.filter(aula => {
+                    const alunosAtivos = aula.alunos.filter(x => x.active);
+                    const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == aluno.id);
+                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                    const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
+                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                    const aulaNaoFinalizada = !aula.finalizado;
+                    const aulaEstaAtiva = aula.active;
+                    const naoEhFeriado = !aula.feriado;
+
+                    return alunoNaoEstaNaAula
+                        && ehAula
+                        && temVagas
+                        && ehPerfilCognitivoCompativel
+                        && aulaNaoFinalizada
+                        && aulaEstaAtiva
+                        && naoEhFeriado;
+                });
+
+                let object = this.enviarMensagemFaltaSend(aluno.aluno, aluno.celular!, evento, sugestoes);
+                window.open(object.link, '_blank');
+                this.copiarMensagem(object.mensagem);
+            })
     }
     
     enviarMensagemCondicao(aluno: any, id: number) {
@@ -83,7 +138,7 @@ export class MensagemWhatsapp {
         };
     }
 
-    enviarMensagemFalta(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
+    enviarMensagemFaltaSend(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')

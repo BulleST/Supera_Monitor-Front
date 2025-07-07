@@ -128,11 +128,11 @@
       </div>
     </div>
     <ng-container *ngIf="evento.finalizado == false">
-      <div class="col-12 px-0 flex align-items-center justify-content-end">
+      <div class="col-12 px-0 gap-2 flex align-items-center justify-content-end">
         <p-button
           type="button"
           (onClick)="sendConfirmation($event, form)"
-          styleClass="px-3 mr-2"
+          styleClass="px-3"
           label="Salvar dados"
           icon="pi pi-check"
           severity="contrast"
@@ -143,7 +143,7 @@
         <p-button
           type="button"
           (onClick)="finalizar($event)"
-          styleClass="w-full px-3"
+          styleClass="px-3"
           label="Salvar e finalizar"
           icon="pi pi-check"
           [loading]="loading"

@@ -74,9 +74,9 @@
                         
                 <ng-container  *ngIf="item.participacao.presente === false ">
                     <p-button type="button"
-                            (onClick)="enviarMensagemFalta(item, aluno)"
-                            (auxclick)="enviarMensagemFalta(item, aluno)"
-                            (contextmenu)="enviarMensagemFalta(item, aluno)"
+                            (onClick)="enviarMensagemFalta(item, aluno, $event)"
+                            (auxclick)="enviarMensagemFalta(item, aluno, $event)"
+                            (contextmenu)="enviarMensagemFalta(item, aluno, $event)"
                             [disabled]="!aluno.celular"
                             icon="pi pi-whatsapp"
                             severity="success"

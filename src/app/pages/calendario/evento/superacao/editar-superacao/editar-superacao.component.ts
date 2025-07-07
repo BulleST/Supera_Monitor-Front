@@ -156,21 +156,10 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        if (!aluno.celular) {
-            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
-            return;
-        }
-        if (aluno.presente) {
-            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
-            return;
-          }
-      
-        let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, []);
-        window.open(object.link, '_blank');
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
+
 
     markChecklistAsDone() {
         // Comparecimento na superação

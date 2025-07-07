@@ -12,7 +12,7 @@ import { Evento_Participacao_Aluno } from '../../../../../models/evento-particip
 import { Apostila, ApostilaTipo } from '../../../../../models/apostila.model'
 import { ApostilaService } from '../../../../../services/apostila.service'
 import { Roteiro } from '../../../../../models/roteiro.model'
-import {  MobileService, showError } from '../../../../../utils'
+import { MobileService, showError } from '../../../../../utils'
 import { ScreenWidth } from '../../../../../utils/mobile'
 import { Aluno } from '../../../../../models/alunos.model'
 import { AlunoService } from '../../../../../services/alunos.service'
@@ -167,7 +167,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível',`Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             model.control.updateValueAndValidity();
             return
         } else {
@@ -225,43 +225,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        if (!aluno.celular) {
-            this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
-            return;
-        }
-        if (aluno.presente) {
-            this.showError('Aluno presente', 'O aluno já está presente.', e.target);
-            return;
-        }
-
-        lastValueFrom(this.service.calendario({
-            intervaloDe: moment(this.evento.data, 'YYYY-MM-DD').toDate(),
-            intervaloAte: moment(this.evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
-            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
-        }))
-            .then(res => {
-                let sugestoes = res.filter(aula => {
-                    const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == aluno.id);
-                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
-                    const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
-                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
-                    const aulaNaoFinalizada = !aula.finalizado;
-                    const aulaEstaAtiva = aula.active;
-                    const naoEhFeriado = !aula.feriado;
-
-                    return alunoNaoEstaNaAula
-                        && ehAula
-                        && temVagas
-                        && ehPerfilCognitivoCompativel
-                        && aulaNaoFinalizada
-                        && aulaEstaAtiva
-                        && naoEhFeriado;
-                });
-
-                let object = this.mensagemWhatsapp.enviarMensagemFalta(aluno.aluno, aluno.celular!, this.evento, sugestoes);
-                window.open(object.link, '_blank');
-                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-            })
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
     async setApostilasAlunos() {
@@ -277,7 +241,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         this.evento.alunos.forEach((aluno) => {
             if (aluno.apostila_Abaco_Id) {
-                aluno.apostilaAbacoObject = this.apostilas.find((x) => x.id == aluno.apostila_Abaco_Id ) as Apostila;
+                aluno.apostilaAbacoObject = this.apostilas.find((x) => x.id == aluno.apostila_Abaco_Id) as Apostila;
                 aluno.apostilasAbacoList = this.apostilas.filter((x) => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == ApostilaTipo.Abaco);
                 aluno.numeroPaginaAbaco = aluno.numeroPaginaAbaco ?? 0;
             }
@@ -462,7 +426,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         const g = parseInt(bg.slice(3, 5), 16);
         const b = parseInt(bg.slice(5, 7), 16);
         const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-        
+
         return luminance > 150 ? '#000' : '#fff';
     }
 }
