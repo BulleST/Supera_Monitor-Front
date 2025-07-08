@@ -11,7 +11,7 @@
                 <!-- Alunos -->
                 <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length"> Alunos </p>
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
-                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
+                    <p class="font-medium text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let participacao of mensagensEnviadasAlunos">
                         <p-button type="button"
                                   (onClick)="enviarMensagemCancelamento(participacao)"
@@ -89,7 +89,6 @@
                           #observacao="ngModel"
                           [(ngModel)]="evento.observacao"
                           placeholder="Aproveite para contar o motivo do cancelamento"
-                          [rows]="3"
                           [required]="true"
                           [rows]="3"></textarea>
                 <div *ngIf="observacao.touched && observacao.invalid && observacao.errors">
@@ -118,7 +117,7 @@
                                   severity="success"
                                   [text]="true"
                                   [rounded]="true"/>
-                        <p class="mr-2">{{ item.aluno }}</p>
+                        <p class="ml-2">{{ item.aluno }}</p>
                         <p-badge *ngIf="item.reposicaoDe_Evento_Id" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
 
                     </div>
