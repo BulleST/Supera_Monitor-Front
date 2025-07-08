@@ -93,7 +93,7 @@ export class ListComponent implements OnDestroy {
 
     showContextMenu(e: any, item: Aluno) {
         const toggle = this.tableSelectedItem?.id == item.id;
-        
+
         this.tableSelectedItem = item;
         this.tableMenu = [
             {
@@ -196,7 +196,7 @@ export class ListComponent implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        let object =  this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
@@ -207,5 +207,4 @@ export class ListComponent implements OnDestroy {
         this.popoverAluno.showChecklist = true;
         this.popoverAluno.show(e);
     }
-
 }

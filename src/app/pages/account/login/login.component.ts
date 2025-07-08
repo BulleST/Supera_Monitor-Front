@@ -41,18 +41,10 @@ export class LoginComponent {
 
         lastValueFrom(this.accountService.login(this.object))
             .then(async res => {
-
-
                 try {
-                    
                     await lastValueFrom(this.eventoService.cancelarEventos(new Date().getFullYear()))
-                    .then(res => {
-                
-                    })
                 }
-                catch (error) {
-            
-                }
+                catch (error) {}
 
                 this.loadingHelper.loading.next(false);
                 const returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/';

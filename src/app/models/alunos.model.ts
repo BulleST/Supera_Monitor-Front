@@ -11,7 +11,7 @@ export class AlunoRequest {
     rm: string = '';    
     pessoa_Id: number = 0
     nome: string = '';
-    dataNascimento: Date = new Date;
+    dataNascimento?: Date;
     celular: string = '';
     telefone: string = '';
     email: string = '';
@@ -39,7 +39,9 @@ export class Aluno {
     rm: string = '';    
     pessoa_Id: number = 0
     nome: string = '';
-    dataNascimento: Date = new Date;
+    dataNascimento?: Date;
+    idade?: number;
+    ehAniversario?: boolean;
     celular: string='';
     telefone: string = '';
     email: string = '';
@@ -122,102 +124,8 @@ export interface Pessoa_Origem_Canal extends Pessoa_DropDown { }
 export interface Pessoa_Origem_Categoria extends Pessoa_DropDown { }
 export interface Pessoa_Status extends Pessoa_DropDown { }
 
-export var turmaColumns: ColumnTable[] = [
-    {
-        field: 'corLegenda',
-        label: '',
-        filterType: FilterType.none,
-        displayType: DisplayType.color,
-        sortable: false,
-    },
-    {
-        field: 'professor',
-        label: 'Educador(a)',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        }
-
-    },
-    {
-        field: 'diasDeAulaString',
-        label: 'Dias de Aula',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        }
-    },
-    {
-        field: 'salaDeAulaString',
-        label: 'Sala',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        }
-    },
-    {
-        field: 'perfilCognitivoString',
-        label: 'Perfil Cognitivo',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        }
-    },
-    {
-        field: 'capacidadeMaximaAlunosString',
-        label: 'Limite',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        },
-        options: {
-            width: '15px'
-        },
-    },
-    {
-        field: 'linkGrupo',
-        label: 'Grupo',
-        filterType: FilterType.text,
-        displayType: DisplayType.link,
-        sortable: true,
-    },
-];
 export var alunosColumns: ColumnTable[] = [
+    
     {
         field: 'nome',
         label: 'Nome',
@@ -250,21 +158,6 @@ export var alunosColumns: ColumnTable[] = [
         }
     },
     {
-        field: 'professor',
-        label: 'Educador',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
-            icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
-        }
-    },
-    {
         field: 'perfilCognitivo',
         label: 'Perfil Cognitivo',
         filterType: FilterType.text,
@@ -280,6 +173,21 @@ export var alunosColumns: ColumnTable[] = [
         }
     },
     {
+        field: 'idade',
+        label: 'Idade',
+        filterType: FilterType.numeric,
+        displayType: DisplayType.mask,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputnumber',
+            primeElementOptions: {}
+        }
+    },
+    {
         field: 'kit',
         label: 'Kit',
         filterType: FilterType.text,
@@ -291,6 +199,66 @@ export var alunosColumns: ColumnTable[] = [
             value: '',
             icon: undefined,
             primeElement: 'inputtext',
+            primeElementOptions: {}
+        }
+    },
+    {
+        field: 'apostila_Abaco',
+        label: 'Ábaco',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        sortable: true, 
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.CONTAINS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputtext',
+            primeElementOptions: {}
+        }
+    },
+    {
+        field: 'numeroPaginaAbaco',
+        label: 'Página',
+        filterType: FilterType.numeric,
+        displayType: DisplayType.mask,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputnumber',
+            primeElementOptions: {}
+        }
+    },
+    {
+        field: 'apostila_AH',
+        label: 'AH',
+        filterType: FilterType.text,
+        displayType: DisplayType.text,
+        sortable: true, 
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.CONTAINS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputtext',
+            primeElementOptions: {}
+        }
+    },
+    {
+        field: 'numeroPaginaAH',
+        label: 'Página',
+        filterType: FilterType.numeric,
+        displayType: DisplayType.mask,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputnumber',
             primeElementOptions: {}
         }
     },

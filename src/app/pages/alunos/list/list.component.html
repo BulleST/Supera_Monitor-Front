@@ -24,12 +24,12 @@
                 <div class="p-toolbar-group-start">
                     <h2 class="flex align-items-center">
                         <i class="fa-solid fa-user-graduate mr-3 text-primary text-2xl"></i>
-                        <span class="text-2xl font-normal my-0">Alunos</span>
+                        <span class="text-2xl font-normal my-0 fadein">Alunos</span>
                     </h2>
                 </div>
                 <div class="p-toolbar-group-center"></div>
                 <div class="p-toolbar-group-end items-stretch">
-                    <div class="flex align-items-strech">
+                    <div class="flex align-items-strech fadein">
                         <p-iconfield class="mr-2">
                             <p-inputicon styleClass="pi pi-search" />
                             <input type="text"
@@ -48,7 +48,7 @@
                                   pTooltip="Limpar filtro"
                                   tooltipPosition="top"
                                   class="mr-2"
-                                  styleClass="h-full bg-black-alpha-80" />
+                                  styleClass="h-full bg-black-alpha-80 fadein" />
                         <p-button icon="pi pi-sync text-sm text-white"
                                   (onClick)="update()"
                                   severity="secondary"
@@ -56,13 +56,13 @@
                                   pTooltip="Atualizar alunos"
                                   tooltipPosition="top"
                                   class="mr-2"
-                                  styleClass="h-full bg-black-alpha-80" />
+                                  styleClass="h-full bg-black-alpha-80 fadein" />
                     </div>
                 </div>
             </p-toolbar>
         </ng-template>
         <ng-template #header>
-            <tr>
+            <tr class="fadein">
                 <ng-container *ngFor="let col of tableColumns">
                     <ng-container *ngIf="col.frozen === true">
                         <th pFrozenColumn [pSortableColumn]="col.field">
@@ -120,15 +120,33 @@
                                                         [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                                         (keydown.enter)="filter(col.filterOptions.value)"
                                                         (onBlur)="filter(col.filterOptions.value)"
-                                                        class="min-w-10rem"
+                                                        style="min-width: 5rem;"
                                                         fluid>
+                                            </ng-container>
+                                            <ng-container *ngIf="col.filterOptions.primeElement == 'inputnumber'">
+                                                <p-inputnumber 
+                                                [showButtons]="true"
+                                                [step]="1"
+                                                [useGrouping]="false"
+                                                [(ngModel)]="col.filterOptions.value"
+                                                [id]="col.field"
+                                                [name]="col.field"
+                                                [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                                (keydown.enter)="filter(col.filterOptions.value)"
+                                                (onBlur)="filter(col.filterOptions.value)"
+                                                [style]="{'min-width': '7rem'}"
+                                                [suffix]="col.filterOptions.primeElementOptions.suffix ?? ''"
+                                                [prefix]="col.filterOptions.primeElementOptions.prefix ?? ''"
+                                                fluid
+                                                 />
+
                                             </ng-container>
                                             <ng-container *ngIf="col.filterOptions.primeElement == 'inputmask'">
                                                 <p-inputmask 
                                                         [mask]="col.filterOptions.primeElementOptions.format" 
                                                         [unmask]="true"
                                                         [(ngModel)]="col.filterOptions.value" 
-                                                        [id]="col.field"
+                                                        [inputId]="col.field"
                                                         [name]="col.field"
                                                         [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                                         (keydown.enter)="filter(col.filterOptions.value)"
@@ -165,6 +183,8 @@
                                                     <p-select 
                                                         [options]="col.filterOptions.primeElementOptions.options" 
                                                         [(ngModel)]="col.filterOptions.value" 
+                                                        [inputId]="col.field"
+                                                        [name]="col.field"
                                                         [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'" 
                                                         optionLabel="label"
                                                         optionValue="value"
@@ -187,6 +207,8 @@
                                                 <p-multiselect 
                                                             [options]="col.filterOptions.primeElementOptions.options" 
                                                             [(ngModel)]="col.filterOptions.value" 
+                                                            [inputId]="col.field"
+                                                            [name]="col.field"
                                                             [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'" 
                                                             optionLabel="label"
                                                             optionValue="value"
@@ -205,6 +227,15 @@
                                                             </ng-template>
                                                     </p-multiselect>
                                             </ng-container>
+                                            <ng-container *ngIf="col.filterOptions.primeElement == 'toggleswitch'">
+                                                <p-toggleswitch 
+                                                    #toggleSwitch
+                                                    [(ngModel)]="col.filterOptions.value"
+                                                    [inputId]="col.field"
+                                                    [name]="col.field"
+                                                    (onChange)="filter(col.filterOptions.value)">
+                                                </p-toggleswitch>
+                                            </ng-container>
                                         </ng-container>
                                     </p-iconfield>
                                 </ng-template>
@@ -217,7 +248,8 @@
             </tr>
         </ng-template>
         <ng-template #body let-item let-index="rowIndex">
-            <tr class="white-space-nowrap">
+            <tr class="white-space-nowrap fadein" pAnimateOnScroll>
+                
                 <td pFrozenColumn alignFrozen="left">
                     <div class="flex align-items-center gap-2">
                         <p-button type="button"
@@ -236,6 +268,10 @@
                               pTooltip="{{item.nome}}"
                               tooltipPosition="top"
                               (click)="showPopoverAluno(item, $event)">{{ item.nome | nameAbv }}</span>
+
+                        <i *ngIf="item.ehAniversario" 
+                            pTooltip="{{item.nome | firstWord}} faz aniversário dia {{item.dataNascimento | date : 'dd \'de\' MMMM'}}"
+                            class="bi bi-cake-fill text-pink-500 fadein"></i>
                     </div>
                 </td>
                 <td>
@@ -249,22 +285,27 @@
                     </div>
                 </td>
                 <td>
-                    <div class="flex align-items-center gap-2">
-                        <span class="w-1rem h-1rem inline-flex border-circle"
-                              [pTooltip]="item.professor"
-                              tooltipPosition="top"
-                              [style]="{ 
-                                    backgroundColor: item.corLegenda, 
-                                    borderColor: item.corLegenda 
-                                }"></span>
-                        <span>{{item.professor}}</span>
-                    </div>
-                </td>
-                <td>
                     {{item.perfilCognitivo}}
                 </td>
                 <td>
+                    <ng-container *ngIf="item.idade">
+                        <span pTooltip="{{item.nome | firstWord }} nasceu em {{item.dataNascimento | date : 'dd \'de\' MMMM \'de\' yyyy'}}">{{item.idade}} anos</span>
+                    </ng-container>
+                </td>
+                <td>
                     {{item.kit}}
+                </td>
+                <td>
+                    {{item.apostila_Abaco}}
+                </td>
+                <td>
+                    {{item.numeroPaginaAbaco}}
+                </td>
+                <td>
+                    {{item.apostila_AH}}
+                </td>
+                <td>
+                    {{item.numeroPaginaAH}}
                 </td>
                 <td class="w-5rem">
                     <ng-container *ngIf="item.active">
@@ -295,7 +336,9 @@
             </tr>
         </ng-template>
         <ng-template #loadingbody let-columns="columns">
-            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" 
+            class="fadein"
+            style="height: 43px;">
                 <td *ngFor="let col of [1,2,3,4,5,6]" >
                     <p-skeleton />
                 </td>
@@ -305,7 +348,7 @@
             </tr>
         </ng-template>
         <ng-template #emptymessage>
-            <tr class="p-datatable-empty-text">
+            <tr class="p-datatable-empty-text fadein">
                 <td [attr.colspan]="tableColumns.length + 1">
                     <div class="flex align-items-center" *ngIf="!tableSearch">
                         <span>Nenhum item registrado.</span>

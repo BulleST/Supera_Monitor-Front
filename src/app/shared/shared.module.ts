@@ -65,6 +65,7 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
         FullCalendarModule,
         NgxMaskDirective,
         NgxMaskPipe,
+        NameFirstWordPipe,
         NameAbvPipe,
         ProfileComponent,
         ChangePasswordComponent,

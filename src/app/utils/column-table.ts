@@ -60,7 +60,7 @@ export interface FilterOptions {
     value?: any;
     matchMode: string;
     type: string;
-    primeElement: 'inputtext' | 'datepicker' | 'inputmask' | 'select' | 'multiselect';
+    primeElement: 'inputtext' | 'datepicker' | 'inputmask' | 'select' | 'multiselect' | 'inputnumber' | 'toggleswitch';
     primeElementOptions: any;
 }
 

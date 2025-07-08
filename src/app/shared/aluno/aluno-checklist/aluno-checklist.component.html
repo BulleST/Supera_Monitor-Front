@@ -4,9 +4,10 @@
             <span class="w-full overflow-hidden text-overflow-ellipsis white-space-nowrap">{{texto}}</span>
 
             <span class="{{textColor}} ml-auto flex align-items-center gap-2">
-                <span *ngIf="checklistVigente">
-                    {{checklistVigente.itensFinalizados.length}}/{{checklistVigente.items.length}}
-                </span>
+                <ng-container *ngIf="checklistVigente">
+                    <span>{{status}}</span>
+                    <span>{{checklistVigente.itensFinalizados.length}}/{{checklistVigente.items.length}}</span>
+                </ng-container>
                 <i class="{{icon}}"></i>
             </span>
         </div>

@@ -48,6 +48,7 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
@@ -59,11 +60,13 @@ import { PrimeNG } from 'primeng/config';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
 import { ColorPickerModule } from 'primeng/colorpicker'
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @NgModule({
     imports: [
         CommonModule,
         AccordionModule,
+        AnimateOnScrollModule,
         BadgeModule,
         ButtonModule,
         CardModule,
@@ -114,6 +117,7 @@ import { ColorPickerModule } from 'primeng/colorpicker'
         ToastModule,
         ToolbarModule,
         ToggleButtonModule,
+        ToggleSwitchModule,
         TooltipModule,
         TreeModule,
         TreeTableModule,
@@ -122,6 +126,7 @@ import { ColorPickerModule } from 'primeng/colorpicker'
     exports: [
         CommonModule,
         AccordionModule,
+        AnimateOnScrollModule,
         BadgeModule,
         ButtonModule,
         CardModule,
@@ -172,6 +177,7 @@ import { ColorPickerModule } from 'primeng/colorpicker'
         ToastModule,
         ToolbarModule,
         ToggleButtonModule,
+        ToggleSwitchModule,
         TooltipModule,
         TreeModule,
         TreeTableModule,

@@ -33,23 +33,33 @@ export class AlunoService extends Service {
 
     ) {
         super(http, toastrService);
-
-
-        // lastValueFrom(this.checklistService.getList())
-        //     .then(res => this.checklists = res);
-
         this.checklistService.list.subscribe(res => this.checklists = res);
-
     }
+
+    calculaIdade(dataNascimento: Date) {
+        const hoje = new Date;
+        return moment(hoje).diff(dataNascimento, 'years');
+    }
+
+    ehAniversario(dataNascimento?: Date) {
+        let hoje = new Date;
+        if (!dataNascimento) {
+            return false;
+        } else {
+            return moment(hoje).week() == moment(dataNascimento).week();
+        }
+    }
+
     mapAluno(aluno: Aluno, where: string) {
-        // console.log('mapAluno', where, aluno);
-        var semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+        const semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
         aluno.active = !aluno.deactivated;
         aluno.activeString = aluno.active ? 'Ativo' : 'Inativo';
 
         aluno.created = moment(aluno.created).toDate();
         aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
-        aluno.dataNascimento = moment(aluno.dataNascimento).toDate();
+        aluno.dataNascimento = aluno.dataNascimento ? moment(aluno.dataNascimento).toDate() : undefined;
+        aluno.idade = aluno.dataNascimento ? this.calculaIdade(aluno.dataNascimento) : undefined;
+        aluno.ehAniversario = aluno.dataNascimento ? this.ehAniversario(aluno.dataNascimento) : undefined;
 
         aluno.turma = aluno.turma ?? 'Indefinido';
         aluno.perfilCognitivo = aluno.perfilCognitivo ?? 'Indefinido';
@@ -193,6 +203,7 @@ export class AlunoService extends Service {
 
     edit(model: Aluno) {
         var request = MyMap(model, new AlunoRequest) as AlunoRequest;
+        request.dataNascimento = model.dataNascimento;
         request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
         request.apostila_Kit_Id = model.apostila_Kit_Id;
         request.dataFimVigencia = model.dataFimVigencia;

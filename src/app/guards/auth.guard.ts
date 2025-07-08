@@ -17,7 +17,6 @@ export class AuthGuard implements CanActivate {
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
     ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
-
         return new Promise(async (resolve, reject) => {
             await lastValueFrom(this.accountService.refreshToken('appInitializer'))
             .then(async account => {
@@ -25,23 +24,21 @@ export class AuthGuard implements CanActivate {
                 const expires = new Date(jwtToken.exp * 1000);
                 if (new Date() > expires) {
                     resolve(false);
-                    this.router.navigate(['accounts/login']);
+                    this.router.navigate(['accounts', 'login'], { queryParams: { returnUrl: state.url } });
                     return;
                 }
 
-                
                 resolve(true);
 
                 if (!account.passwordReset) {
-
                     this.accountService.profileModalOpen.emit(true);
                     this.accountService.changePasswordModalOpen.emit(true);
                     this.accountService.emitChangePasswordRequired.emit(true);
                 }
             })
             .catch(res => {
-               
-                this.router.navigate(['accounts/login']);
+                console.log('res', res);
+                this.router.navigate(['accounts', 'login'], { queryParams: { returnUrl: state.url } });
                 resolve(false);
 
             })            

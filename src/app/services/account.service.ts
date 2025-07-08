@@ -49,8 +49,6 @@ export class AccountService {
     login(model: Login) {
         return this.http.post<AccountResponse>(`${this.url}/accounts/authenticate`, model, { withCredentials: true } /* */).pipe(
             tap(async (account) => {
-                
-
                 this.setAccount('login', account);
                 this.startRefreshTokenTimer();
                 return of(account);
