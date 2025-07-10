@@ -26,15 +26,15 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     view: CalendarioView = CalendarioView.CalendarioGeral;
     viewMenu: MenuItem[] = [
         {
+            label: 'Calendário Geral',
+            value: CalendarioView.CalendarioGeral,
+            icon: 'pi pi-calendar',
+        },
+        {
             label: 'Meu Calendário',
             value: CalendarioView.MeuCalendario,
             icon: 'pi pi-user',
         },
-        {
-            label: 'Calendário Geral',
-            value: CalendarioView.CalendarioGeral,
-            icon: 'pi pi-calendar',
-        }
     ];
 
     agendarValue?: MenuItem;

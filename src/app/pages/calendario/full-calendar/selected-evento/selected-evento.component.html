@@ -44,21 +44,22 @@
                         <span class="inline-flex w-1rem h-1rem border-circle ml-2"
                               [style]="{ backgroundColor: evento.corLegenda }"></span>
                     </div>
-                    <!-- perfilCoginitivo -->
-                    <div class="flex align-items-center gap-2">
-                        <span class="flex w-2rem justify-content-center -ml-1">
-                            <i class="fa-solid fa-brain"></i>
-                        </span>
-                        <span>Perfil Cognitivo: </span>
-
-                        <ng-container
-                                      *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
-                        <ng-template #perfilCognitivoTemplate let-perfilCoginitivo>
-                            <span *ngIf="perfilCoginitivo">{{ perfilCoginitivo }}</span>
-                            <span *ngIf="!perfilCoginitivo" class="font-bold">Indefinido</span>
-                        </ng-template>
-
-                    </div>
+                    <!-- perfilCognitivo -->
+                    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+                        <div class="flex align-items-center gap-2">
+                            <span class="flex w-2rem justify-content-center -ml-1">
+                                <i class="fa-solid fa-brain"></i>
+                            </span>
+                            <span>Perfil Cognitivo: </span>
+                            
+                            <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
+                                <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
+                                <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                                    <p class="font-bold">{{ perfilCognitivo }} </p>
+                                </ng-template>
+                            </ng-container>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
             <!-- Alunos -->
@@ -306,7 +307,7 @@
                             </ng-container>
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar"
-                                      icon="pi pi-user-plus text-red-500"
+                                      icon="pi pi-times-circle text-red-500"
                                       [text]="true"
                                       [disabled]="!evento.active"
                                       severity="secondary"

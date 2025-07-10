@@ -1,4 +1,4 @@
-<p-popover #popover styleClass="bg-transparent border-none p-0 popover-event-hover ">
+<p-popover #popover styleClass="bg-transparent border-none p-0 popover-event-hover">
     <ng-container *ngIf="evento && evento.id">
         <div class="w-15rem h-8rem shadow-8" style="margin-top: -5px;">
             <ng-container *ngTemplateOutlet="eventoTemplate"></ng-container>
@@ -59,32 +59,37 @@
         </ng-template>
         <ng-template #eventFooter>
             <div class="event-footer ">
-                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                    <p class="event-description text-sm">
-                        <!-- <span class="pr-2">
-                            <span>Aluno</span><span *ngIf="evento.alunos.length > 1">s</span>
-                            <span>:</span>
-                        </span> -->
-                        <span>{{alunosStr}}</span>
-                        <!-- <ng-container *ngFor="let aluno of evento.alunos">
-                            <span>{{aluno.aluno | firstWord }}</span>
-                        </ng-container> -->
+                <ng-container *ngIf="!evento.finalizado && evento.active">
+                    <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                        <p class="event-description text-sm">
+                            <span>{{alunosStr}}</span>
+                        </p>
+                    </ng-container>
+                    <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
+                        <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
+                        <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
+                            <p class="text-xs m-0">{{ perfilCognitivo }} </p>
+                        </ng-template>
+                    </ng-container>
+                    <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
+                        <p class="text-xs m-0">
+                            <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
+                                <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{evento.capacidadeMaximaAlunos}} vagas</span>
+                                <span *ngSwitchCase="0">Não há vagas / {{evento.alunos.length}} alunos</span>
+                                <span *ngSwitchCase="1">1 vaga / {{evento.alunos.length}} alunos</span>
+                                <span *ngSwitchDefault>{{evento.capacidadeMaximaAlunos - evento.alunos.length}} vagas / {{evento.alunos.length}} alunos </span>
+                            </span>
+                        </p>
+                    </ng-container>
+                </ng-container>
+                <ng-container *ngIf="evento.active === false">
+                    <p class="event-cancelado text-red-500 flex align-items-center gap-1 text-base font-bold">
+                        <i class="fa fa-times-circle text-lg mr-1"></i> Cancelado
                     </p>
                 </ng-container>
-                <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
-                    <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento.perfilCognitivo) }"></ng-container>
-                    <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
-                        <p class="text-xs m-0">{{ perfilCognitivo }} </p>
-                    </ng-template>
-                </ng-container>
-                <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
-                    <p class="text-xs m-0">
-                        <span [ngSwitch]="evento.capacidadeMaximaAlunos - evento.alunos.length">
-                            <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{evento.capacidadeMaximaAlunos}} vagas</span>
-                            <span *ngSwitchCase="0">Não há vagas / {{evento.alunos.length}} alunos</span>
-                            <span *ngSwitchCase="1">1 vaga / {{evento.alunos.length}} alunos</span>
-                            <span *ngSwitchDefault>{{evento.capacidadeMaximaAlunos - evento.alunos.length}} vagas / {{evento.alunos.length}} alunos </span>
-                        </span>
+                <ng-container *ngIf="evento.finalizado && evento.active">
+                    <p class="event-check flex align-items-center gap-1 text-base font-bold">
+                        <i class="fa fa-check-circle text-lg mr-1"></i> Finalizado
                     </p>
                 </ng-container>
             </div>
