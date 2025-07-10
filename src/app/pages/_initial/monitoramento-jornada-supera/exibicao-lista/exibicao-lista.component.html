@@ -1,20 +1,21 @@
 <div class="bg-white w-full overflow-hidden">
     <p-table #dt
              [value]="alunos"
-             [rows]="50"
-             [rowsPerPageOptions]="[50, 100, 1000]"
-             [paginator]="alunos.length > 50"
-             [loading]="loading"
-             [showLoader]="false"
              dataKey="id"
              stripedRows
              showGridlines
              [rowHover]="alunos.length > 0"
-             [virtualScroll]="true"
-             [virtualScrollDelay]="0"
+             [loading]="loading"
+             [showLoader]="false"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100]"
+             [paginator]="alunos.length > 50">
+             <!-- 
+                [virtualScroll]="true"
+                [virtualScrollDelay]="0"
              virtualScrollItemSize="37px"
              [scrollable]="true"
-             scrollHeight="600px">
+             scrollHeight="600px" -->
         <ng-template #header>
             <tr>
                 <!-- Aluno -->
@@ -43,16 +44,24 @@
                         </div>
                     </div>
                 </th>
-                <th *ngFor="let checklist of checklists"
-                    class="w-3rem surface-900 px-1 border-none text-white text-center white-space-nowrap py-2">
-                    {{checklist.nome}}
-                </th>
+                <ng-container *ngIf="loadingChecklists">
+                    <th *ngFor="let index of [0,1,2,3,4,5,6,7,8,9,10,11,12]">
+                        <span *ngIf="index == 0">Semana {{index}}</span>
+                        <span *ngIf="index > 0">{{index}}ª Semana </span>
+                    </th> 
+                </ng-container>
+                <ng-container *ngIf="!loadingChecklists">
+                    <th *ngFor="let checklist of checklists"
+                        class="w-3rem surface-900 px-1 border-none text-white text-center white-space-nowrap py-2">
+                        {{checklist.nome}}
+                    </th>
+                </ng-container>
             </tr>
         </ng-template>
         <ng-template #body let-aluno let-rowIndex="rowIndex">
             <tr class="cursor-pointer" style="height: 37px;">
                 <!-- Nome -->
-                <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2">
+                <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 fadein">
                     <div class="flex align-items-center white-space-nowrap gap-2">
                         <p-button type="button"
                                   (onClick)="enviarMensagem(aluno)"
@@ -71,7 +80,7 @@
                               (click)="showAlunoPopover($event, aluno)">{{ aluno.nome | nameAbv }}</span>
                     </div>
                 </td>
-                <td class="white-space-nowrap">
+                <td class="white-space-nowrap fadein">
                     <div class="flex aliign-items-center">
                         <span class="w-1rem h-1rem inline-flex border-circle flex-none mr-2"
                               [pTooltip]="aluno.professor"
@@ -82,11 +91,16 @@
                         <span>{{aluno.turma}}</span>
                     </div>
                 </td>
-                <ng-container *ngFor="let checklist of aluno.checklistCompleto; trackBy: trackByChecklistId">
-                    <td (click)="showChecklistPopover($event, aluno, checklist)"
-                        class="white-space-nowrap  border-left-none border-right-none text-center px-3">
-                        <app-checklist-status [checklist]="checklist"></app-checklist-status>
-                    </td>
+                <ng-container *ngIf="loadingChecklists">
+                    <td *ngFor="let col of [0,1,2,3,4,5,6,7,8,9,10,11,12]" class="border-none fadein"><p-skeleton /></td>
+                </ng-container>
+                <ng-container *ngIf="!loadingChecklists">
+                    <ng-container *ngFor="let checklist of aluno.checklistCompleto; trackBy: trackByChecklistId">
+                        <td (click)="showChecklistPopover($event, aluno, checklist)"
+                            class="white-space-nowrap  border-left-none border-right-none text-center px-3 fadein">
+                            <app-checklist-status [checklist]="checklist"></app-checklist-status>
+                        </td>
+                    </ng-container>
                 </ng-container>
             </tr>
         </ng-template>
@@ -95,11 +109,16 @@
                 <td [attr.colspan]="2 + checklists.length">Nenhum item encontrado.</td>
             </tr>
         </ng-template>
-        <ng-template #loadingbody>
+        <ng-template #loadingbody let-columns="columns">
             <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
-                <td class="border-none"><p-skeleton /></td>
-                <td class="border-none"><p-skeleton /></td>
-                <td *ngFor="let col of checklists" class="border-none"><p-skeleton /></td>
+                <td class="border-none"><p-skeleton styleClass="fadein" /></td>
+                <td class="border-none"><p-skeleton styleClass="fadein" /></td>
+                <ng-container *ngIf="loadingChecklists">
+                    <td *ngFor="let col of [0,1,2,3,4,5,6,7,8,9,10,11,12]" class="border-none fadein"><p-skeleton /></td>
+                </ng-container>
+                <ng-container *ngIf="!loadingChecklists">
+                    <td *ngFor="let col of checklists" class="border-none fadein"><p-skeleton /></td>
+                </ng-container>
             </tr>
         </ng-template>
     </p-table>

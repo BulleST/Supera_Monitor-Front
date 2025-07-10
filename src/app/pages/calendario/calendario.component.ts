@@ -41,7 +41,6 @@ import { NgModel } from '@angular/forms';
     templateUrl: './calendario.component.html',
     styleUrl: './calendario.component.css',
     providers: [ConfirmationService],
-
 })
 export class CalendarioComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];

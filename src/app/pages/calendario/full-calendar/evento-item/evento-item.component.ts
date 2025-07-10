@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import moment from 'moment';
@@ -9,8 +9,7 @@ import { Evento_Participacao_Aluno } from '../../../../models/evento-participaca
     selector: 'app-evento-item',
     standalone: false,
     templateUrl: './evento-item.component.html',
-    styleUrl: './evento-item.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrl: './evento-item.component.css'
 })
 export class EventoItemComponent implements OnChanges {
     @Input() evento!: Evento;

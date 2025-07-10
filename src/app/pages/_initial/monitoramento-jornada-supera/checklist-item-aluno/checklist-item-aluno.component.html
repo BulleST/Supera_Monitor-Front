@@ -13,23 +13,23 @@
                   [rounded]="true"
                   [text]="true"
                   size="small"
-                  styleClass="-ml-2"/>
-        <p class="hover:text-primary hover:underline cursor-pointer capitalize"
+                  styleClass="-ml-2 fadein"/>
+        <p class="hover:text-primary hover:underline cursor-pointer capitalize fadein"
             (click)="alunoPopover.show($event)">
             {{ alunoChecklistItem.aluno | nameAbv }}
         </p>
         <p (click)="showAlunoChecklistOnConfirm()"
-            class="cursor-pointer text-primary-500 flex align-items-center gap-2 hover:underline hover:font-bold ml-auto">
+            class="cursor-pointer text-primary-500 flex align-items-center gap-2 hover:underline hover:font-bold ml-auto fadein">
             <span>Clique para finalizar</span>
             <i class="pi pi-check no-underline hoveer:no-underline"></i>
         </p>
     </div>
     <div class="flex align-items-center justify-content-between">
-        <p class="flex">
+        <p class="flex fadein">
             <span class="font-bold mr-2">Prazo: </span>
             <span>{{alunoChecklistItem.prazo | date : 'dd/MM/yy'}}</span>
         </p>
-        <p class="ml-auto">
+        <p class="ml-auto fadein">
             <span class="flex align-items-center line-height-1">
                 <span [class]="textColor">{{text}}</span>
                 <i  class="{{textColor}} {{icon}} ml-2 mt-1"></i>

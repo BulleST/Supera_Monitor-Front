@@ -102,8 +102,10 @@
                                 [field]="col.field"
                                 [type]="col.filterOptions?.type ?? 'text'"
                                 [matchMode]="col.filterOptions?.matchMode ?? 'contains'"
-                                class="p-column-filter-inline">
-                                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                class="p-column-filter-inline"
+                                >
+                                <ng-template #filter let-value let-filter="filterCallback">
+                                    value: {{value}} - {{col.filterOptions?.value}}
                                     <p-iconfield [class.filter-icon-field]="col.filterOptions && col.filterOptions.icon">
                                         <ng-container *ngIf="col.filterOptions">
                                             <!-- IconField -->

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, OnDestroy } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { Evento, EventoTipo } from '../../../models/evento.model';

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
 import { Turma } from '../../../../models/turma.model';
 import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
@@ -8,7 +8,7 @@ import { AlunoService } from '../../../../services/alunos.service';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import { Aluno_Restricao, Aluno_Restricao_Request } from '../../../../models/aluno-restricao.model';
 import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
-import { Aluno_CheckList_Item, Checklist, Checklist_Item } from '../../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
 import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
@@ -20,7 +20,6 @@ import { Apostila_Kit } from '../../../../models/apostila.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { getError, MensagemWhatsapp, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
-import { playAlert, playSuccess } from '../../../../utils/audio';
 import { Popover } from 'primeng/popover';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 
@@ -30,7 +29,6 @@ import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno
     templateUrl: './dados-cadastrais.component.html',
     styleUrl: './dados-cadastrais.component.css',
     providers: [ConfirmationService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }] // Permite validação de form pai em input de componente filho
 })
 export class DadosCadastraisComponent implements OnChanges, OnDestroy {

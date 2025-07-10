@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { AlunoChecklistCompleto } from '../../../../../models/calendario.model';
 
 @Component({
@@ -6,7 +6,6 @@ import { AlunoChecklistCompleto } from '../../../../../models/calendario.model';
     standalone: false,
     templateUrl: './checklist-status.component.html',
     styleUrl: './checklist-status.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChecklistStatusComponent implements OnChanges {
     @Input() checklist!: AlunoChecklistCompleto;

@@ -4,7 +4,7 @@
            class="mr-auto"
            styleClass="sticky top-0 left-0 z-2" />
     <div class="mt-2">
-        <p-accordion [(value)]="activeIndex">
+        <p-accordion [(value)]="activeIndex" styleClass="bg-white">
             <ng-container *ngFor="let item of checklist.items; trackBy: trackByChecklistItemId let index = index;">
                 <app-checklist-item [item]="item"
                                     [checklist]="checklist"

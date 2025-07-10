@@ -1,5 +1,25 @@
 <section class="w-full overflow-auto flex h-full">
-    <ng-container *ngFor="let checklist of checklists; trackBy: trackByChecklistId">
-        <app-checklist-component [checklist]="checklist" [loading]="loading"></app-checklist-component>
+
+    <ng-container *ngIf="loadingChecklists">
+        <ng-container *ngFor="let index of [0,1,2,3,4,5,6,7,8,9,10,11,12]">
+            <div class="pr-5" style="width: 350px;">
+                <p-tag [value]="index == 0 ? 'Semana 0' : index + 'ª semana'"
+                    severity="contrast"
+                    class="mr-auto"
+                    styleClass="sticky top-0 left-0 z-2 white-space-nowrap fadein" />
+                    <p-skeleton width="330px" height="40px" borderRadius="10px" styleClass="mt-4 bg-white-alpha-50 fadein" />
+                    <p-skeleton width="330px" height="160px" borderRadius="10px" styleClass="mt-4 bg-white-alpha-50 fadein" />
+                    <p-skeleton width="330px" height="40px" borderRadius="10px" styleClass="mt-4 bg-white-alpha-50 fadein" />
+                    <p-skeleton width="330px" height="40px" borderRadius="10px" styleClass="mt-4 bg-white-alpha-50 fadein" />
+                    <p-skeleton width="330px" height="40px" borderRadius="10px" styleClass="mt-4 bg-white-alpha-50 fadein" />
+            </div>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!loadingChecklists">
+        <ng-container *ngFor="let checklist of checklists; trackBy: trackByChecklistId">
+            <app-checklist-component 
+                [checklist]="checklist" 
+                [loading]="loading"></app-checklist-component>
+        </ng-container>
     </ng-container>
 </section>

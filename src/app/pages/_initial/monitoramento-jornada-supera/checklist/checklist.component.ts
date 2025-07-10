@@ -1,17 +1,17 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Checklist, Checklist_Item } from '../../../../models/checklist.model';
 
 @Component({
     selector: 'app-checklist-component',
     standalone: false,
     templateUrl: './checklist.component.html',
-    styleUrl: './checklist.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrl: './checklist.component.css'
 })
 export class ChecklistComponent implements OnChanges {
 
     @Input() checklist!: Checklist;
     @Input() loading: boolean = true;
+    @Input() loadingChecklists: boolean = true;
     activeIndex = 0;
 
 
@@ -21,6 +21,9 @@ export class ChecklistComponent implements OnChanges {
         }
         if (changes['loading']) {
             this.loading = changes['loading'].currentValue;
+        }
+        if (changes['loadingChecklists']) {
+            this.loadingChecklists = changes['loadingChecklists'].currentValue;
         }
     }
 

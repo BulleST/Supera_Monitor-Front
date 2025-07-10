@@ -46,8 +46,10 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
         }
     }
 
-    show(e: any) {
+    show(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
         this.popover.show(e);
+        this.aluno = aluno;
+        this.checklist = checklist
         try {
             this.popover.align();
         }

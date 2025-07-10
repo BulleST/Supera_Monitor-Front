@@ -22,7 +22,6 @@ import { EventoService } from '../../../services/evento.service';
 import { validaProfessores, validaSalaAulas } from '../../../utils/validacao';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
 import $ from 'jquery';
-import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-form',

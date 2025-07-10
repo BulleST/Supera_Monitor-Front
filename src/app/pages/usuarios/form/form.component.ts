@@ -1,7 +1,7 @@
 import { Component, inject, Injector, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, insertOrReplace, showError } from '../../../utils';
+import { Crypto, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { UserService } from '../../../services/user.service';
@@ -10,7 +10,6 @@ import { Account, AccountResponse } from '../../../models/account.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Role } from '../../../models/account-perfil.model';
 import { ToastrService } from 'ngx-toastr';
-import { playAlert, playSuccess } from '../../../utils/audio';
 
 @Component({
     selector: 'app-form',

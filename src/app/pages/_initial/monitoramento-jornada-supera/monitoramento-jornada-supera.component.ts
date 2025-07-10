@@ -15,7 +15,7 @@ import { AccountService } from '../../../services/account.service';
     standalone: false,
     templateUrl: './monitoramento-jornada-supera.component.html',
     styleUrl: './monitoramento-jornada-supera.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService],
 })
 export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
@@ -25,14 +25,14 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     alunos: Aluno[] = [];
     alunosFiltered: Aluno[] = [];
-    loadingAlunos = false;
+    loadingAlunos = true;
 
-    checklists: Checklist[] = [];
-    loadingChecklist = true;
+    checklists!: Checklist[];
+    loadingChecklists = true;
 
     list: Aluno_Checklist_Item_View[] = [];
     listFiltered: Aluno_Checklist_Item_View[] = [];
-    loading = false;
+    loadingChecklistAlunos = true;
 
     // true - cards
     // false - lista
@@ -42,12 +42,10 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         private service: ChecklistService,
         private alunoService: AlunoService,
         private confirmationService: ConfirmationService,
-        private accountService: AccountService
+        private accountService: AccountService,
+        
     ) {
-        var onFinish = this.service.onFinish.subscribe(res => {
-
-    
-
+        let onFinish = this.service.onFinish.subscribe(res => {
             this.checklists = this.checklists.map((checklist, indexChecklist) => {
                 checklist.items = checklist.items.map((item, indexItem) => {
               
@@ -76,6 +74,13 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
             })
         });
         this.subscription.push(onFinish);
+
+
+        let list = this.service.list.subscribe(res => this.checklists = res);
+        this.subscription.push(list);
+
+        let exibicaoLista = this.service.exibicaoLista.subscribe(res => this.alunos = res);
+        this.subscription.push(exibicaoLista);
     }
 
     ngOnDestroy(): void {
@@ -83,26 +88,26 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     async update() {
-        if (!this.checklists.length)
-            await this.getChecklists();
-
-        this.getChecklistList();
+        console.log('update')
+        
+        await this.getChecklists();
+        this.getChecklistAlunos();
         this.getAlunosList();
     }
 
 
     async getChecklists() {
-        this.loadingChecklist = true;
+        this.loadingChecklists = true;
         await lastValueFrom(this.service.getList())
             .then(res => {
+                this.loadingChecklists = false;
                 this.checklists = res;
-            });
-
-        this.loadingChecklist = false;
+            })
+            .catch(res => this.loadingChecklists = false);
     }
 
-    getChecklistList() {
-        this.loading = true;
+    getChecklistAlunos() {
+        this.loadingChecklistAlunos = true;
         lastValueFrom(this.alunoService.getChecklist(this.request))
             .then(res => {
                 this.list = res.map(item => {
@@ -116,11 +121,11 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                         item.status = 'Finalizado'
                     return item;
                 });
-                this.loading = false;
+                this.loadingChecklistAlunos = false;
 
                 this.applyPendentesSemana(this.request.pendentesSemana);
             })
-            .catch(res => this.loading = false);
+            .catch(res => this.loadingChecklistAlunos = false);
 
     }
 
@@ -128,8 +133,8 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         this.loadingAlunos = true;
         lastValueFrom(this.alunoService.getListWithChecklist(this.request))
         .then(res => {
+            this.service.exibicaoLista.next(res);
             this.alunos = res;
-    
             this.alunosFiltered = res;
             this.loadingAlunos = false;
         })

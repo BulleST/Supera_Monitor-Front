@@ -1,13 +1,13 @@
-<p-accordion-panel [value]="index" #panel >
-    <p-accordion-header>
-        <div class="flex justify-content-between w-full -mt-1">
+<p-accordion-panel [value]="index" #panel>
+    <p-accordion-header style="background-color: white;">
+        <div class="flex justify-content-between w-full -mt-1 bg-white">
             <p>{{item.nome}}</p>
             <p class="font-normal px-2 white-space-nowrap" *ngIf="item.alunos">{{item.alunos.length}} alunos</p>
         </div>
     </p-accordion-header>
-    <p-accordion-content>
-        <p-table *ngIf="activeIndex == index" 
-                [value]="item.alunos"
+    <p-accordion-content style="background-color: white;">
+        <p-table *ngIf="activeIndex == index"
+                 [value]="item.alunos"
                  [scrollable]="true"
                  [scrollHeight]="'200px'"
                  [virtualScroll]="true"
@@ -32,24 +32,23 @@
                                         'surface-50': item % 2 != 0,
                                     }">
                             <div class="flex align-items-center mb-2 gap-2">
-                                <p-skeleton size="1rem" shape="circle" />
-                                <p-skeleton width="10rem" height="1rem" borderRadius="2rem" />
+                                <p-skeleton size="1rem" shape="circle" styleClass="fadein" />
+                                <p-skeleton width="10rem" height="1rem" borderRadius="2rem" styleClass="fadein" />
                             </div>
                             <div class="flex align-items-center gap-2">
-                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem" />
-                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem"
-                                            class="ml-auto" />
-                                <p-skeleton size="1rem" shape="circle" />
+                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem" styleClass="fadein" />
+                                <p-skeleton width="5rem" height="1rem" borderRadius="2rem" styleClass="fadein" class="ml-auto" />
+                                <p-skeleton size="1rem" shape="circle" styleClass="fadein" />
                             </div>
                         </td>
                     </tr>
                 </ng-container>
                 <ng-container *ngIf="!loading">
                     <tr style="height: 35px;">
-                        <td class="text-500 py-0">Nenhum aluno nessa etapa</td>
+                        <td class="text-500 py-0 fadein">Nenhum aluno nessa etapa</td>
                     </tr>
                 </ng-container>
             </ng-template>
-        </p-table> 
+        </p-table>
     </p-accordion-content>
 </p-accordion-panel>

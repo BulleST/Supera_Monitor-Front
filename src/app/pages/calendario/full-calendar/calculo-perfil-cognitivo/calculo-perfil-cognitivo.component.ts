@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { FullCalendarComponent } from '@fullcalendar/angular';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Feriado } from '../../../../models/feriado.model';
 import { Evento } from '../../../../models/evento.model';
 import { Calendar } from '@fullcalendar/core';
@@ -11,8 +10,7 @@ import { Popover } from 'primeng/popover';
     selector: 'app-calculo-perfil-cognitivo',
     standalone: false,
     templateUrl: './calculo-perfil-cognitivo.component.html',
-    styleUrl: './calculo-perfil-cognitivo.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrl: './calculo-perfil-cognitivo.component.css'
 })
 export class CalculoPerfilCognitivoComponent implements OnChanges {
     @Input() eventos!: Evento[];

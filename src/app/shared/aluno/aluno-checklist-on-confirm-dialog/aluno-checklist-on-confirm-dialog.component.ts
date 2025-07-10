@@ -1,11 +1,10 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Aluno_CheckList_Item, Checklist_Item } from '../../../models/checklist.model';
+import { Checklist_Item } from '../../../models/checklist.model';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmationService } from 'primeng/api';
 import { MensagemWhatsapp, showError } from '../../../utils';
 import { lastValueFrom } from 'rxjs';
-import { Aluno_Checklist_Item_View } from '../../../models/aluno-checklist-item-list.model';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { UserService } from '../../../services/user.service';

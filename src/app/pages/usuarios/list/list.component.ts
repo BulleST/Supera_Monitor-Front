@@ -11,7 +11,6 @@ import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AccountResponse, Account, userColumns } from '../../../models/account.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
-import { playAlert, playSuccess } from '../../../utils/audio';
 import { ContextMenu } from 'primeng/contextmenu';
 
 @Component({

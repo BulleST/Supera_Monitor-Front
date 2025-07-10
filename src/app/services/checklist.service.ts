@@ -7,6 +7,7 @@ import { RequestResponse } from '../helpers/request-response.interface';
 import { Aluno_Checklist_Item_View } from '../models/aluno-checklist-item-list.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
+import { Aluno } from '../models/alunos.model';
 
 @Injectable({
     providedIn: 'root',
@@ -16,6 +17,8 @@ export class ChecklistService extends Service {
     override list = new BehaviorSubject<Checklist[]>([]);
     listSubject = new Subject<Checklist[]>();
     onFinish = new EventEmitter<any>();
+
+    exibicaoLista = new BehaviorSubject<Aluno[]>([])
 
     constructor(
         http: HttpClient,

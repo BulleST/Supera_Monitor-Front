@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
@@ -8,8 +8,7 @@ import moment from 'moment';
     selector: 'app-evento-item-hover',
     standalone: false,
     templateUrl: './evento-item-hover.component.html',
-    styleUrl: './evento-item-hover.component.css',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrl: './evento-item-hover.component.css'
 })
 export class EventoItemHoverComponent implements OnChanges {
     @Input() evento!: Evento;

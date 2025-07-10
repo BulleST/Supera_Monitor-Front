@@ -44,10 +44,12 @@
     </p-toolbar>
     <div class="relative w-full overflow-hidden h-full">
         <app-exibicao-cards *ngIf="modoExibicao"
-                            [loading]="loading"
+                            [loading]="loadingChecklistAlunos"
+                            [loadingChecklists]="loadingChecklists"
                             [checklists]="checklists"></app-exibicao-cards>
         <app-exibicao-lista *ngIf="!modoExibicao"
                             [loading]="loadingAlunos"
+                            [loadingChecklists]="loadingChecklists"
                             [checklists]="checklists"
                             [alunos]="alunos"></app-exibicao-lista>
     </div>

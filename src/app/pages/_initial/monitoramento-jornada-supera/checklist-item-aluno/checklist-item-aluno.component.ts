@@ -1,17 +1,15 @@
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Aluno_Checklist_Item_View } from '../../../../models/aluno-checklist-item-list.model';
 import { MensagemWhatsapp } from '../../../../utils';
 import { Aluno } from '../../../../models/alunos.model';
 import { Checklist_Item } from '../../../../models/checklist.model';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
-import { ChecklistService } from '../../../../services/checklist.service';
 
 @Component({
     selector: 'app-checklist-item-aluno',
     standalone: false,
     templateUrl: './checklist-item-aluno.component.html',
     styleUrl: './checklist-item-aluno.component.css',
-    // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChecklistItemAlunoComponent implements OnChanges {
 
