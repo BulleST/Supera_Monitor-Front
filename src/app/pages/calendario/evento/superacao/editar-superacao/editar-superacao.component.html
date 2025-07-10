@@ -21,7 +21,7 @@
                    pInputText
                    [value]="evento.data | date : 'HH:mm'"
                    id="horario"
-                name="horario"
+                   name="horario"
                    readonly 
                    fluid/>
         </p-iconfield>
@@ -242,6 +242,7 @@
                               [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
                               [outlined]="item.presente !== true && item.presente !== false"
                               (onClick)="presente(item)"
+                              [disabled]="evento.finalizado"
                               size="small"
                               class="my-auto" />
                 </header>

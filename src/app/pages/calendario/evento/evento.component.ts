@@ -385,7 +385,7 @@ EventoTipo = EventoTipo;
                     this.markChecklistAsDone()
 
                     this.toastrService.success(
-                        `${this.tipoString} finalizada com sucesso.`,
+                        `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
                         'Sucesso',
                     )
                 })
@@ -395,6 +395,10 @@ EventoTipo = EventoTipo;
                     this.loading = false
                 })
         }
+    }
+
+    capitalizeFirstLetter(input: string) {
+        return input.charAt(0).toUpperCase() + input.slice(1);
     }
 
     sendConfirmation(e: any, form: NgForm) {
