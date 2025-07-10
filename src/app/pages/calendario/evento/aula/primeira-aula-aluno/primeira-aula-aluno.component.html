@@ -61,13 +61,83 @@
         [virtualScrollItemSize]="25"
         [loading]="loadingAlunos"
         appendTo="body">
+        <ng-template
+          let-item
+          #item>
+          <div class="flex align-items-center justify-content-between w-full gap-2">
+            <div>
+              <div class="flex align-items-center">
+                <p-button
+                  type="button"
+                  icon="pi pi-whatsapp {{ !item.celular ? 'text-300' : '' }}"
+                  (onClick)="enviarMensagem(item)"
+                  (auxclick)="enviarMensagem(item)"
+                  (contextmenu)="enviarMensagem(item)"
+                  severity="success"
+                  [text]="true"
+                  [rounded]="true"
+                  [disabled]="!item.celular"
+                  pTooltip="Enviar mensagem"
+                  class="mr-2"
+                  styleClass="w-auto h-auto p-1 {{ !item.celular ? 'text-300' : '' }}">
+                </p-button>
+                <p class="font-bold mb-1">
+                  <span class="mr-2">{{ item.nome }}</span>
+                  <p-badge
+                    *ngIf="item.disponivel == false"
+                    value="Indisponível"
+                    severity="danger"
+                    [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                  <ng-template #disponivelEvent>
+                    <div class="w-25rem">
+                      <p>
+                        <span>Evento: </span>
+                        <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                        <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
+                      </p>
+                      <p>{{ item.disponivelEvent.descricao }}</p>
+                      <p *ngIf="item.disponivelEvent.professor">
+                        <span
+                          class="w-1rem h-1rem border-circle inline-flex mr-2"
+                          [style]="{
+                            backgroundColor: item.disponivelEvent.corLegenda,
+                            borderColor: item.disponivelEvent.corLegenda
+                          }"></span>
+                        <span>{{ item.disponivelEvent.professor }}</span>
+                      </p>
+                      <p
+                        *ngIf="
+                          item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao
+                        ">
+                        {{ item.disponivelEvent.turma }}
+                      </p>
+                      <p *ngIf="item.disponivelEvent.sala_Id">
+                        <span>Sala: </span>
+                        <app-sala-aula
+                          [numeroSala]="item.disponivelEvent.numeroSala"
+                          [andar]="item.disponivelEvent.andar"
+                          [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                      </p>
+                    </div>
+                  </ng-template>
+                </p>
+              </div>
+              <p class="mb-1 flex align-items-center">
+                <span
+                  class="w-1rem h-1rem border-circle flex mr-3 ml-1"
+                  [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                <span class="font-normal">Turma {{ item.turma }}</span>
+              </p>
+            </div>
+            <p-badge [value]="item.perfilCognitivo" />
+          </div>
+        </ng-template>
       </p-select>
 
       <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
         <li>
           Apenas alunos com o
-          <strong>perfil cognitivo correspondente ao evento</strong> são
-          exibidos.
+          <strong>perfil cognitivo correspondente ao evento</strong> são exibidos.
         </li>
         <li>
           Apenas alunos que
@@ -85,14 +155,11 @@
           [label]="perfil.nome"
           class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
 
-        <p *ngIf="evento.perfilCognitivo.length === 0">
-          Evento livre, não possui perfis cognitivos associados
-        </p>
+        <p *ngIf="evento.perfilCognitivo.length === 0">Evento livre, não possui perfis cognitivos associados</p>
       </div>
     </p-fieldset>
 
-    <div
-      class="col-12 px-0 gap-4 flex flex-wrap align-items-center justify-content-between">
+    <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center justify-content-between">
       <div class="sm:col-9 col-12"></div>
       <div class="ml-auto">
         <p-button

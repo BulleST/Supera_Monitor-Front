@@ -123,6 +123,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
+        this.fullCalendar.getApi().today()
         if (changes['object']) {
             this.aluno = changes['object'].currentValue
 
@@ -186,16 +187,15 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             .then((list) => {
                 this.eventos = list.filter(evento => {
                     let temVaga = evento.alunos.length < evento.capacidadeMaximaAlunos;
-                    let ehPerfiCompativel = (this.aluno.perfilCognitivo_Id && evento.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id))
+                    let ehPerfilCompativel = (this.aluno.perfilCognitivo_Id && evento.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id))
                         || (!this.aluno.perfilCognitivo_Id);
 
-                    return temVaga && ehPerfiCompativel;
+                    return temVaga && ehPerfilCompativel;
                 })
             })
     }
 
     setCalendario() {
-
         let calendar = this.fullCalendar.getApi()
         calendar.removeAllEvents()
 
