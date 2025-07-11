@@ -76,21 +76,25 @@
                                               styleClass="ml-2"
                                               class="ml-auto"
                                               pTooltip="Clique para ver detalhes"
+                                              tooltipPosition="top"
                                               (onClick)="checklistData.toggle($event)" />
-                                    <p-popover #checklistData
-                                               styleClass="-mt-1">
+                                    <p-popover #checklistData styleClass="max-w-24rem p-1">
                                         <ng-container *ngIf="checklistItem.finalizado">
                                             <p *ngIf="checklistItem.dataFinalizacao"> 
-                                                <span>Finalizado em </span> 
-                                                <span class="font-bold">{{checklistItem.dataFinalizacao | date : 'dd/MM/yy \'às\' HH:mm' }}</span> 
-                                                <span> por {{checklistItem.account_Finalizacao }}</span>
+                                                <i class="pi pi-calendar text-primary mr-1"></i>
+                                                 Finalizado em: <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yy \'às\' HH:mm' }}</b> 
+                                            </p>
+                                            <p *ngIf="checklistItem.account_Finalizacao">
+                                                <i class="pi pi-user text-primary mr-1"></i>
+                                                Finalizado por: <b><a>{{checklistItem.account_Finalizacao}}</a></b>
                                             </p>
                                         </ng-container>
-                                        <p>
-                                            <span class="font-bold">Observações: </span>
-                                            <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
-                                            <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma observação</span>
-                                        </p>
+                                        <p-fieldset legend="Observações">
+                                            <p>
+                                                <span *ngIf="checklistItem.observacoes">{{checklistItem.observacoes}}</span>
+                                                <span *ngIf="!checklistItem.observacoes" class="text-400">Nenhuma observação</span>
+                                            </p>
+                                        </p-fieldset>
                                     </p-popover>
                                 </ng-container>
                                 <ng-container *ngIf="!checklistItem.finalizado">
