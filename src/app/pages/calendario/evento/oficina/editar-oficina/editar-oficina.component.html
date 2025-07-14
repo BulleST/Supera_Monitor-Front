@@ -283,7 +283,7 @@
                                   name="observacao[{{i}}]"
                                   [(ngModel)]="item.observacao"
                                   (focus)="inputFocus($event)"
-                                  [readonly]="!evento.finalizado"
+                                  [readonly]="evento.finalizado"
                                   [placeholder]="evento.finalizado ? 'Nenhuma observação' : 'Observações...'"
                                   rows="2"
                                   fluid></textarea>

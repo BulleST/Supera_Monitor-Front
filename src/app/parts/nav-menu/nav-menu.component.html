@@ -38,7 +38,7 @@
         </a>
     </ng-template>
     <ng-template #end>
-        <div class="flex justify-content-center align-items-center -mt-2 pb-3"
+        <div class="flex justify-content-center align-items-center  pb-3"
              [class.pr-3]="menuOpen"
              *ngIf="accountData">
             <p-button *ngIf="menuOpen"
@@ -58,12 +58,13 @@
             </p-button>
             <p-button (onClick)="logout($event)"
                       severity="secondary"
-                      pTooltip="Sair"
+                      pTooltip="Sair da conta"
+                      tooltipPosition="top"
                       [label]="menuOpen ? 'Sair' : undefined"
                       icon="pi pi-sign-out text-white"
                       [rounded]="menuOpen"
                       size="small"
-                      styleClass="ml-auto p-menu-item-icon w-full  bg-black-alpha-80 text-white {{menuOpen ? 'px-3' : ''}}" />
+                      styleClass="ml-auto p-menu-item-icon w-full bg-black-alpha-80 hover:bg-black-alpha-60 border-none text-white {{menuOpen ? 'px-3' : ''}}" />
         </div>
     </ng-template>
 </p-menu>
