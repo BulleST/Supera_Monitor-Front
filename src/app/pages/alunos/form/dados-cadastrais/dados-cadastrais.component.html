@@ -412,7 +412,7 @@
                                             <ng-container *ngIf="object.celular 
                                                             && checklistItem.finalizado == false 
                                                             && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                                                <a [href]="enviarMensagemCondicao(checklistItem)"
+                                                <a [href]="enviarMensagemCondicao(checklistItem).link"
                                                     target="_blank"
                                                     class="p-button p-button-sm p-button-rounded p-button-success py-1 px-3 ml-auto">
                                                     <span class="p-button-label">Enviar mensagem</span>
