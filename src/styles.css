@@ -462,6 +462,18 @@ input.ng-invalid.ng-touched {
     border-color: var(--surface-950);
 }
 
+.p-select-overlay.p-select-stripped .p-select-list-container .p-select-list p-selectitem:nth-child(odd) .p-select-option,
+.p-select-overlay.p-select-stripped .p-select-list-container .p-select-list p-selectitem:nth-child(even) .p-select-option {
+    border-bottom: 1px solid var(--surface-200);
+}
+.p-select-overlay.p-select-stripped .p-select-list-container .p-select-list p-selectitem:nth-child(odd) .p-select-option {
+    background-color: var(--surface-50);
+}
+
+.p-select-overlay.p-select-stripped .p-select-list-container .p-select-list p-selectitem:nth-child(even) .p-select-option:hover,
+.p-select-overlay.p-select-stripped .p-select-list-container .p-select-list p-selectitem:nth-child(odd) .p-select-option:hover {
+    background-color: var(--p-primary-100);
+}
 form .field p-selectitem:nth-child(even) .p-select-option {
     border-bottom: 1px solid var(--surface-200);
 }

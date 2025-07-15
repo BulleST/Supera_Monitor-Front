@@ -38,10 +38,11 @@
                                             [virtualScroll]="true"
                                             [virtualScrollItemSize]="43"
                                             optionLabel="nome"
-                                            (onChange)="alunoChanged($event, aluno_Id)"
+                                            (onChange)="alunoChanged($event)"
                                             [readonly]="blockAlunoField"
                                             [disabled]="blockAlunoField"
                                             placeholder="Selecione um aluno"
+                                            panelStyleClass="p-select-stripped"
                                             appendTo="body"
                                             fluid>
                                         <ng-template let-item #item>
@@ -98,10 +99,6 @@
                                     <div class="flex align-items-center gap-2">
                                         <i class="fa-solid fa-users-between-lines"></i>
                                         <p>Turma: {{alunoSelected.turma}}</p>
-                                    </div>
-                                    <div class="flex align-items-center gap-2">
-                                        <i class="fa-solid fa-person-chalkboard"></i>
-                                        <p>Educador(a): {{alunoSelected.professor}}</p>
                                         <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: alunoSelected.corLegenda, borderColor: alunoSelected.corLegenda }"></span>
                                     </div>
                                     <div class="flex align-items-center gap-2"> 
@@ -128,7 +125,11 @@
                                 <div class="flex flex-column gap-2" >
                                     <div class="flex align-items-center gap-2">
                                         <i class="fa-solid fa-users-between-lines"></i>
-                                        <p class="flex gap-2 align-items-center">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                        <p class="flex gap-2 align-items-center">
+                                            <span>Turma: </span>
+                                            <p-skeleton width="100px" height="10px"></p-skeleton>
+                                            <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                                        </p>
                                     </div>
                                     <div class="flex align-items-center gap-2">
                                         <i class="fa-solid fa-person-chalkboard"></i>
@@ -179,24 +180,49 @@
                                             optionDisabled="deactivated"
                                             placeholder="Selecione uma aula para repor"
                                             (onChange)="eventoReposicaoChanged()"
+                                            panelStyleClass="p-select-stripped"
                                             appendTo="body"
                                             fluid>
-                                        <ng-template let-item #item>
-                                            <div class="flex flex-column gap-2" >
-                                                <div class="flex align-items-center gap-2">
-                                                    <i class="fa-solid fa-users-between-lines"></i>
-                                                    <span>{{item.turma ?? item.descricao}}</span>
-                                                    <i class="pi pi-calendar ml-2"></i>
-                                                    <span>Data: {{item.data | date : 'dd/MM \'às\' HH:mm'}}</span>
+                                        <ng-template #selectedItem let-selectedOption>
+                                            <ng-container *ngIf="selectedOption">
+                                                <div class="flex align-items-center">
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 text-white ">
+                                                        <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
+                                                    </div>
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                        <span>{{selectedOption.data | date : 'HH:mm'}}</span>
+                                                    </div>
+                                                    <p class="flex align-items-center gap-1 ml-2">
+                                                        <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
+                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                                    </p>
                                                 </div>
-                                                <p class="flex align-items-center gap-2">
-                                                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                                                    <span>{{item.professor}}</span>
-                                                    <span class="ml-2">Sala: </span>
-                                                    <app-sala-aula [andar]="item.andar"
-                                                                [numeroSala]="item.numeroSala"
-                                                                [sala_Id]="item.sala_Id"></app-sala-aula>
-                                                </p>
+                                            </ng-container>
+                                        </ng-template>
+                                        <ng-template let-item #item>
+                                            <div class="flex gap-2">
+                                                <div class="flex flex-column">
+                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
+                                                        <i class="pi pi-calendar text-sm"></i>
+                                                        <span>{{item.data | date : 'dd/MMM'}}</span>
+                                                    </div>
+                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                        <i class="pi pi-clock text-sm"></i>
+                                                        <span>{{item.data | date : 'HH:mm'}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-column" >
+                                                    <p class="flex align-items-center gap-2 py-1">
+                                                        <span>{{item.turma ?? item.descricao}}</span>
+                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                    </p>
+                                                    <p class="flex align-items-center gap-2 py-1">
+                                                        <span class="">Sala: </span>
+                                                        <app-sala-aula [andar]="item.andar"
+                                                                    [numeroSala]="item.numeroSala"
+                                                                    [sala_Id]="item.sala_Id"></app-sala-aula>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </ng-template>
                                     
@@ -223,7 +249,7 @@
                                 </p-iconfield>
                             </ng-template>
                         </div>
-                        <ng-container *ngIf="eventoReposicaoDe">
+                        <ng-container *ngIf="eventoReposicaoDe && !loadingEventosReposicaoDe">
                             <div class="field sm:col-8 col-12 flex align-items-center">
                                 <p-divider layout="vertical" styleClass="mr-0" />
                                 <div class="flex flex-column white-space-nowrap ">
@@ -252,22 +278,10 @@
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
                                                 <p>Turma: {{eventoReposicaoDe.turma}}</p>
+                                                <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoDe.corLegenda, borderColor: eventoReposicaoDe.corLegenda }"></span>
                                             </div>
                                         </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
-                                                <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
-                                                </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p>Educador(a): {{eventoReposicaoDe.professor}}</p>
-                                                    <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoDe.corLegenda, borderColor: eventoReposicaoDe.corLegenda }"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
@@ -275,19 +289,21 @@
                                                 <p>Sala: {{getSalaAula(eventoReposicaoDe)}}</p>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-star text-base"></i>
+                                                    <i class="fa-solid fa-star text-base" [ngStyle]="{
+                                                        color: getCorRoteiro(eventoReposicaoDe.roteiro_Id) ?? 'var(--p-surface-900)'
+                                                    }"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
                                                     <p>Roteiro: {{eventoReposicaoDe.tema + ' - Semana ' + eventoReposicaoDe.semana}}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
@@ -299,7 +315,7 @@
                                 </div>
                             </div>
                         </ng-container>
-                        <ng-container *ngIf="!eventoReposicaoDe && loadingEventosReposicaoDe">
+                        <ng-container *ngIf="loadingEventosReposicaoDe">
                             <div class="field sm:col-8 col-12 flex align-items-center">
                                 <p-divider layout="vertical" styleClass="mr-0" />
                                 <div class="flex flex-column white-space-nowrap ">
@@ -327,23 +343,14 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p class="flex align-items-center gap-2">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
-                                            </div>
-                                        </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
-                                                <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
-                                                </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p class="flex align-items-center gap-2">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">
+                                                    <span>Turma: </span>
+                                                    <p-skeleton width="100px" height="10px"></p-skeleton>
                                                     <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
-                                                </div>
+                                                </p>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
@@ -351,7 +358,9 @@
                                                 <p class="flex align-items-center gap-2">Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-star text-base"></i>
@@ -361,9 +370,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
@@ -404,28 +411,51 @@
                                             [disabled]="!eventoReposicaoDe || loadingEventosReposicaoPara"
                                             placeholder="Selecione uma aula para repor"
                                             (onChange)="eventoDisponivelChanged($event, eventoDisponivel_Id)"
+                                            panelStyleClass="p-select-stripped"
                                             appendTo="body"
                                             fluid>
-                                        <ng-template let-item #item>
-                                            <div class="flex flex-column gap-2" >
-                                                <div class="flex align-items-center gap-2">
-                                                    <i class="fa-solid fa-users-between-lines"></i>
-                                                    <span>{{item.turma ?? item.descricao}}</span>
-                                                    <i class="pi pi-calendar ml-2"></i>
-                                                    <span>Data: {{item.data | date : 'dd/MM \'às\' HH:mm'}}</span>
+                                        <ng-template #selectedItem let-selectedOption>
+                                            <ng-container *ngIf="selectedOption">
+                                                <div class="flex align-items-center">
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 text-white ">
+                                                        <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
+                                                    </div>
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                        <span>{{selectedOption.data | date : 'HH:mm'}}</span>
+                                                    </div>
+                                                    <p class="flex align-items-center gap-1 ml-2">
+                                                        <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
+                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                                    </p>
                                                 </div>
-                                                <p class="flex align-items-center gap-2">
-                                                    <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                                                    <span>{{item.professor}}</span>
-                                                    <span class="ml-2">Sala: </span>
-                                                    <app-sala-aula [andar]="item.andar"
-                                                                [numeroSala]="item.numeroSala"
-                                                                [sala_Id]="item.sala_Id"></app-sala-aula>
-                                                    <span><b> {{item.capacidadeMaximaAlunos - item.alunos.length}} vaga(s)</b> / {{item.alunos.length}} alunos</span>
-                                                </p>
+                                            </ng-container>
+                                        </ng-template>
+                                        <ng-template let-item #item>
+                                            <div class="flex gap-2">
+                                                <div class="flex flex-column">
+                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
+                                                        <i class="pi pi-calendar text-sm"></i>
+                                                        <span>{{item.data | date : 'dd/MMM'}}</span>
+                                                    </div>
+                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                        <i class="pi pi-clock text-sm"></i>
+                                                        <span>{{item.data | date : 'HH:mm'}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-column" >
+                                                    <p class="flex align-items-center gap-2 py-1">
+                                                        <span>{{item.turma ?? item.descricao}}</span>
+                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                    </p>
+                                                    <p class="flex align-items-center gap-2 py-1">
+                                                        <span class="">Sala: </span>
+                                                        <app-sala-aula [andar]="item.andar"
+                                                                    [numeroSala]="item.numeroSala"
+                                                                    [sala_Id]="item.sala_Id"></app-sala-aula>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </ng-template>
-                                    
                                     </p-select>
                                 </p-iconfield>
                                 <div *ngIf="eventoDisponivel_Id.touched && eventoDisponivel_Id.invalid && eventoDisponivel_Id.errors">
@@ -448,7 +478,7 @@
                                 </p-iconfield>
                             </ng-template>
                         </div>
-                        <ng-container *ngIf="eventoReposicaoPara">
+                        <ng-container *ngIf="eventoReposicaoPara && !loadingEventosReposicaoPara && !loadingEventosReposicaoDe">
                             <div class="field sm:col-8 col-12 flex align-items-center">
                                 <p-divider layout="vertical" styleClass="mr-0" />
                                 <div class="flex flex-column white-space-nowrap ">
@@ -477,22 +507,10 @@
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
                                                 <p>Turma: {{eventoReposicaoPara.turma}}</p>
+                                                <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoPara.corLegenda, borderColor: eventoReposicaoPara.corLegenda }"></span>
                                             </div>
                                         </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
-                                                <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
-                                                </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p>Educador(a): {{eventoReposicaoPara.professor}}</p>
-                                                    <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoPara.corLegenda, borderColor: eventoReposicaoPara.corLegenda }"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="md:col-7 sm:col-6 col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
@@ -500,19 +518,21 @@
                                                 <p>Sala: {{getSalaAula(eventoReposicaoPara)}}</p>
                                             </div>
                                         </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-star text-base"></i>
+                                                    <i class="fa-solid fa-star text-base" [ngStyle]="{
+                                                        color: getCorRoteiro(eventoReposicaoPara.roteiro_Id) ?? 'var(--p-surface-900)'
+                                                    }"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
                                                     <p>Roteiro: {{eventoReposicaoPara.tema + ' - Semana ' + eventoReposicaoPara.semana}}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
@@ -552,33 +572,26 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p class="flex align-items-center gap-2">Turma: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                                                <p class="flex align-items-center gap-2">
+                                                    <span>Turma: </span>
+                                                    <p-skeleton width="100px" height="10px"></p-skeleton>
+                                                    <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
-                                                <div class="w-2rem text-center flex-none">
-                                                    <i class="fa-solid fa-person-chalkboard text-base"></i>
-                                                </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p class="flex align-items-center gap-2">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
-                                                    <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="md:col-7 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
                                                 </div>
                                                 <p class="flex align-items-center gap-2">Sala: <p-skeleton width="100px" height="10px"></p-skeleton></p>
                                             </div>
                                         </div>
-                                        <div class="md:col-5 sm:col-6 col-12 py-1">
+                                    </div>
+                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
+                                        <div class="md:col-7 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
-                                                <div class="w-2rem text-center flex-none">
+                                               <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-star text-base"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
@@ -586,9 +599,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
-                                        <div class="col-12 py-1">
+                                        <div class="md:col-5 sm:col-6 col-12 py-1">
                                             <div class="flex align-items-center gap-2">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
@@ -597,6 +608,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
                                 </div>
                             </div>
                         </ng-container>
