@@ -33,6 +33,7 @@ export class Turma extends Basic_List {
     salaDeAulaString: string = '';
     capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
+    vagas: number = 0
 }
 
 export var turmaColumns: ColumnTable[] = [
@@ -131,6 +132,24 @@ export var turmaColumns: ColumnTable[] = [
             value: '',
             icon: undefined,
             primeElement: 'inputtext',
+            primeElementOptions: {}
+        },
+        options: {
+            width: '15px'
+        },
+    },
+    {
+        field: 'vagas',
+        label: 'Vagas Disponíveis',
+        filterType: FilterType.numeric,
+        displayType: DisplayType.text,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: '',
+            icon: undefined,
+            primeElement: 'inputnumber',
             primeElementOptions: {}
         },
         options: {

@@ -36,6 +36,9 @@ export class TurmaService extends Service {
         turma.salaDeAulaString = this.salaAulaPipe.transform(turma);
         turma.capacidadeMaximaAlunosString = `${turma.capacidadeMaximaAlunos} alunos`;
 
+        turma.vagas = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
+        turma.vagas = turma.vagas < 0 ? 0 : turma.vagas;
+
         return turma;
     }
 
