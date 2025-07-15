@@ -24,7 +24,7 @@ export class FormComponent implements OnDestroy {
     visible: boolean = false;
     aluno_Id: number = 0;
     object!: Aluno
-    loading = false;
+    loading = true;
     error: string = '';
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
@@ -39,6 +39,8 @@ export class FormComponent implements OnDestroy {
         private toastrService: ToastrService,
     ) {
         this.loadPage();
+                // this.visible = true;
+                // this.loading = true;
     }
 
     ngOnDestroy(): void {

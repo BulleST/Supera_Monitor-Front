@@ -455,9 +455,9 @@
                           placeholder="Selecione"
                           optionDisabled="deactivated"
                           (onChange)="turmaChanged(turma_Id, $event)">
-                    <ng-template let-item #item>
+                    <ng-template #item let-item>
                         <div class="w-full">
-                            <div class="flex align-items-center justify-content-between">
+                            <div class="flex align-items-center justify-content-between gap-3">
                                 <p class="flex align-items-center">
                                     <span class="w-1rem h-1rem flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
                                     <span>{{ item.nome }}</span>
@@ -466,7 +466,7 @@
                             </div>
                             <p class="text-xs mt-1">
                                 <i class="fa-solid fa-brain mr-2"></i>
-                                {{getPerfilCognitivo(item)}}
+                                 {{item.perfilCognitivoString}}
                             </p>
                         </div>
                     </ng-template>

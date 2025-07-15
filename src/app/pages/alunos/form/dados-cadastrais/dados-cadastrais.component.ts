@@ -139,7 +139,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
-            
+
             if (this.object.id) {
                 this.loadTurmas();
                 this.getRestricoes();
@@ -163,32 +163,29 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
         if (this.object?.id && this.turmas.length) {
 
-            
             // Filtra turmas que o aluno poderia participar:
             // Ou a turma atual
             // Ou alguma turma do mesmo perfil cognitivo
             // E turmas com vagas
-                this.turmasFiltered = this.turmas.filter(turma => {
-                    var alunoTemTurma = !!this.object.turma_Id;
-                    var alunoTemPerfil = !!this.object.perfilCognitivo_Id;
-                    var ehTurmaDoAluno = turma.id == this.object.turma_Id;
-                    var ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
-                    var temVagas = (!ehTurmaDoAluno && turma.alunosAtivos < turma.capacidadeMaximaAlunos) || ehTurmaDoAluno;
-                    
-                    // Se o aluno tem perfil definido e a turma tem o perfil, exibe a turma
-                    // Se o aluno não tem perfil definido e a turma tem vagas, exibe a turma
-                    // Se o aluno tem turma definida e a turma é a turma atual, exibe a turma
-                    // Se o aluno não tem turma definida e a turma tem vagas, exibe a turma
-                    return ((alunoTemPerfil && ehPerfilDoAluno) || (!alunoTemPerfil && temVagas))
-                    && ((alunoTemTurma && ehTurmaDoAluno) || (!alunoTemTurma && temVagas))
-                });
-                
-        
-                
-                if (this.object.turma_Id) {
-                    this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
-                    this.oldTurmaId = this.selectedTurma?.id;
-                }
+            this.turmasFiltered = this.turmas.filter(turma => {
+                const alunoTemTurma = !!this.object.turma_Id;
+                const alunoTemPerfil = !!this.object.perfilCognitivo_Id;
+                const ehTurmaDoAluno = turma.id == this.object.turma_Id;
+                const ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
+                const temVagas = turma.alunosAtivos < turma.capacidadeMaximaAlunos;
+                //
+                // Se o perfil da turma é compatível com o perfil do aluno OU o aluno não tiver perfil definido
+                // Se a turma tiver vagas OU se for uma turma que o aluno já participa
+                //
+                const condicao = ((alunoTemPerfil && ehPerfilDoAluno) || !alunoTemPerfil) 
+                                && (temVagas || (!temVagas && alunoTemTurma && ehTurmaDoAluno))
+                return condicao
+            });
+
+            if (this.object.turma_Id) {
+                this.selectedTurma = this.turmas.find(x => x.id == this.object.turma_Id);
+                this.oldTurmaId = this.selectedTurma?.id;
+            }
 
         }
     }
@@ -295,7 +292,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
         // console.log('Log: Aluno tentando mudar de turma - turmaChanged')
 
-        if (!this.selectedTurma) { 
+        if (!this.selectedTurma) {
             this.turmaChangedConfirm(e, model);
         }
         else if (this.selectedTurma.alunosAtivos >= this.selectedTurma.capacidadeMaximaAlunos) {
@@ -305,12 +302,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         } else {
             let temPerfil = this.object.perfilCognitivo_Id;
             let perfilCompativel = this.selectedTurma!.perfilCognitivo.map(x => x.id).includes(this.object.perfilCognitivo_Id);
-            if (temPerfil && !perfilCompativel ) {
+            if (temPerfil && !perfilCompativel) {
                 this.showError('Transferência inválida', `O perfil cognitivo dessa turma é incompatível para o aluno.`, e);
                 this.turmaReject(model);
                 return;
             }
-    
+
             let restricoes = this.object.restricoes.filter(x => x.active == true);
             if (restricoes.length > 0 || this.object.restricaoMobilidade) {
                 this.turmaChangedRestricaoConfirm(e, model, restricoes);
@@ -319,7 +316,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.turmaChangedConfirm(e, model);
             }
         }
-            
+
         /* else {
             this.object.turma = '';
             this.object.turma_Id = undefined as any;
@@ -330,13 +327,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     turmaChangedRestricaoConfirm(e: any, model: NgModel, restricoes: Aluno_Restricao[]) {
         let message = 'O aluno apresenta as seguintes restrições: <ul>';
-        
+
         if (this.object.restricaoMobilidade) {
-            message += `<li class="font-bold">• Restrição de mobilidade.</li>`
+            message += `<li class="font-bold">Restrição de mobilidade.</li>`
         }
 
         if (restricoes.length > 0) {
-            message += restricoes.map(x => `<li>• ${x.descricao}.</li>`);
+            message += restricoes.map(x => `<li>${x.descricao}.</li>`);
         }
         message += `</ul> <p>Continuar com transferência de turma?</p>`;
         this.confirmationService.confirm({
@@ -416,10 +413,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         const max = 999999;
         var rm = Math.floor(Math.random() * (max - min + 1)) + min
         return rm.toString();
-    }
-
-    getPerfilCognitivo(turma: Turma) {
-        return turma.perfilCognitivo.map(x => x.nome).join(', ');
     }
 
     getRestricoes() {
