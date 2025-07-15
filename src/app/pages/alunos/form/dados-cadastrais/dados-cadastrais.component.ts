@@ -85,7 +85,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         private mensagemWhatsapp: MensagemWhatsapp,
     ) {
 
-        var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
+        let perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos)
 
         if (this.perfisCognitivos.length == 0) {
@@ -104,7 +104,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             .catch(res => this.loadingSexos = false);
 
 
-        var listKits = this.apostilaService.listKits.subscribe(res => this.kits = res);
+        let listKits = this.apostilaService.listKits.subscribe(res => this.kits = res);
         this.subscription.push(listKits);
 
         if (this.kits.length == 0) {
@@ -114,7 +114,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 .catch(res => this.loadingKits = false);
         }
 
-        var turmas = this.turmaService.list.subscribe(res => {
+        let turmas = this.turmaService.list.subscribe(res => {
             this.turmas = res;
             this.loadTurmasDisponiveis();
         });
@@ -127,7 +127,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var checklists = this.checklistService.list.subscribe(res => this.checklists = res);
+        let checklists = this.checklistService.list.subscribe(res => this.checklists = res);
         this.subscription.push(checklists);
 
     }
@@ -213,7 +213,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     async onSelectedFiles(event: FileSelectEvent) {
         this.loadingFile = true;
         this.file = event.currentFiles[0];
-        var base64 = await new Promise<string>((resolve) => {
+        let base64 = await new Promise<string>((resolve) => {
             const reader = new FileReader();
             reader.readAsDataURL(event.currentFiles[0]);
             reader.onloadend = () => {
@@ -249,18 +249,20 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
         this.alunoChecklistOnConfirmDialog.show();
 
-        var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
+        let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
             model.control.setValue(false);
             model.control.updateValueAndValidity();
             this.alunoChecklistOnConfirmDialog.hide();
             onCancel.unsubscribe();
+            onFinish.unsubscribe();
         });
 
-        var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+        let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
             alunoChecklistItem.observacoes = res.observacoes;
             alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
             alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
             alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+            onCancel.unsubscribe();
             onFinish.unsubscribe();
         });
     }
@@ -269,12 +271,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (this.selectedKit) {
             this.object.apostila_Kit_Id = this.selectedKit.id;
 
-            var ah = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 2 && x.ordem == 1);
+            let ah = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 2 && x.ordem == 1);
             this.object.apostila_AH_Id = ah?.id;
             this.object.apostila_AH = ah?.nome;
             this.object.numeroPaginaAH = 0;
 
-            var abaco = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 1 && x.ordem == 1);
+            let abaco = this.selectedKit.apostilas.find(x => x.apostila_Tipo_Id == 1 && x.ordem == 1);
             this.object.apostila_Abaco_Id = abaco?.id;
             this.object.apostila_Abaco = abaco?.nome;
             this.object.numeroPaginaAbaco = 0;
@@ -369,8 +371,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     turmaChangedConfirm(e: any, model: NgModel) {
 
-        var mensagem = 'Continuar com transferência de turma?';
-        var perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
+        let mensagem = 'Continuar com transferência de turma?';
+        let perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
 
         if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
             mensagem = 'O perfil dessa turma é diferente desse aluno.<br>' + mensagem
@@ -399,7 +401,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaReject(model: NgModel) {
-        var turma = this.turmas.find(x => x.id == this.oldTurmaId);
+        let turma = this.turmas.find(x => x.id == this.oldTurmaId);
         this.object.turma = turma?.nome as any;
         this.object.turma_Id = turma?.id as any;
         this.object.professor_Id = turma?.professor_Id as any;
@@ -439,7 +441,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     cadastrarRestricao(e: any, model: HTMLInputElement, popover: Popover) {
-        var restricao = model.value;
+        let restricao = model.value;
 
         if (!restricao) {
             this.showError('Erro', 'Insira uma restrição para salvar', e);
@@ -460,7 +462,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 rejectIcon: 'pi pi-times',
                 rejectLabel: 'Cancelar',
                 accept: async () => {
-                    var request: Aluno_Restricao_Request = {
+                    let request: Aluno_Restricao_Request = {
                         id: 0,
                         aluno_Id: this.object.id,
                         descricao: restricao,
@@ -495,10 +497,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     }
     toggleRestricao(e: any, item: Aluno_Restricao, model: NgModel, popover: Popover) {
-        var active = item.active;
-        var text = `${active ? 'Habilitar' : 'Desabilitar'}`
-        var mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
-        var title = `${text} restrição`;
+        let active = item.active;
+        let text = `${active ? 'Habilitar' : 'Desabilitar'}`
+        let mensagem = `Tem certeza que deseja ${text.toLocaleLowerCase()} restrição?`;
+        let title = `${text} restrição`;
 
         // playAlert();
 
@@ -525,7 +527,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                             // playSuccess();
                             popover.show(e);
 
-                            var index = this.object.restricoes.findIndex(x => x.id == item.id);
+                            let index = this.object.restricoes.findIndex(x => x.id == item.id);
                             if (index != -1) {
                                 this.object.restricoes.splice(index, 1, res.object)
                             }

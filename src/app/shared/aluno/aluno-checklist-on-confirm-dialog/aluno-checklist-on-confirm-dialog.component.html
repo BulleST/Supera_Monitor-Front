@@ -32,15 +32,16 @@
             </p-iconfield>
         </div>
         <div class="w-full flex align-items-center justify-content-end gap-2">
-            <p-button label="Enviar mensagem"
-                icon="pi pi-whatsapp"
-                styleClass="{{!celular ? 'surface-700 border-700' : ''}}"
-                severity="success"
-                [rounded]="true"
-                [disabled]="!celular"
-                (onClick)="enviarMensagem()"
-                (auxclick)="enviarMensagem()"
-                (contextmenu)="enviarMensagem()"/>
+            <ng-container *ngIf="alunoChecklistItem && alunoChecklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(alunoChecklistItem.checklist_Item_Id)">
+                <p-button label="Enviar mensagem"
+                    icon="pi pi-whatsapp"
+                    [severity]="celular ? 'success' : 'secondary'"
+                    [rounded]="true"
+                    [disabled]="!celular"
+                    (onClick)="enviarMensagemCondicao()"
+                    (auxclick)="enviarMensagemCondicao()"
+                    (contextmenu)="enviarMensagemCondicao()"/>
+            </ng-container>
             <p-button type="button"
                       label="Ainda não"
                       icon="pi pi-times"

@@ -63,18 +63,16 @@
                             </td>
                             <td class="p-0 pr-2">
                                 <ng-container *ngIf="checklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                                    
-                                    
-                                <p-button type="button"
-                                    icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                    severity="success"
-                                    [disabled]="!aluno.celular"
-                                    [text]="true"
-                                    [rounded]="true"
-                                    pTooltip="Enviar mensagem"
-                                    (onClick)="enviarMensagemCondicao(checklistItem, aluno)"
-                                    (auxclick)="enviarMensagemCondicao(checklistItem, aluno)"
-                                    (contextmenu)="enviarMensagemCondicao(checklistItem, aluno)"/>
+                                    <p-button type="button"
+                                        icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                                        severity="success"
+                                        [disabled]="!aluno.celular"
+                                        [text]="true"
+                                        [rounded]="true"
+                                        pTooltip="Enviar mensagem"
+                                        (onClick)="enviarMensagemCondicao(checklistItem, aluno)"
+                                        (auxclick)="enviarMensagemCondicao(checklistItem, aluno)"
+                                        (contextmenu)="enviarMensagemCondicao(checklistItem, aluno)"/>
                                 </ng-container>
                             </td>
                         </tr>

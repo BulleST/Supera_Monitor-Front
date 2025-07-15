@@ -9,7 +9,7 @@
             </span>
             <div>
                 <div [innerHTML]="message.message"></div>
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
+                <p class="mt-3 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let aluno of mensagensEnviadasAlunos">
@@ -421,14 +421,13 @@
                          [cdkDropListConnectedTo]="alunosTarget"
                          [cdkDropListData]="alunos"
                          (cdkDropListDropped)="sourceDropped($event)">
-                        <!-- <ng-container *ngTemplateOutlet="tableTemplate1; context: { list: alunos }"></ng-container> -->
                         <p-table #dtSource
                                  [value]="alunos"
-                                 [loading]="loadingAlunos"
                                  styleClass="h-30rem"
                                  [scrollable]="true"
                                  scrollHeight="30rem"
-                                 [loading]="loading"
+                                 [loading]="loadingAlunos"
+                                 [showLoader]="false"
                                  selectionMode="single"
                                  [(selection)]="selectedAlunoSource"
                                  [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
@@ -469,18 +468,21 @@
                                     </td>
                                 </tr>
                             </ng-template>
+                            <ng-template #loadingbody>
+                                tr
+                            </ng-template>
                         </p-table>
                     </div>
                     <div class="flex md:flex-column md:w-min w-full gap-2 px-1 py-1 sticky top-0 justify-content-center align-items-center">
                         <p-button
-                                  icon="pi pi-angle-right"
-                                  styleClass="md:rotate-180 rotate-90"
+                                  icon="pi pi-angle-left"
+                                  styleClass="md:rotate-180 sm:-rotate-90"
                                   severity="secondary"
                                   [disabled]="!selectedAlunoSource"
                                   (onClick)="moveToTarget($event)" />
                         <p-button
-                                  icon="pi pi-angle-left "
-                                  styleClass="md:rotate-180 rotate-90"
+                                  icon="pi pi-angle-right "
+                                  styleClass="md:rotate-180 sm:-rotate-90"
                                   severity="secondary"
                                   [disabled]="!selectedAlunoTarget"
                                   (onClick)="moveToSource($event)" />

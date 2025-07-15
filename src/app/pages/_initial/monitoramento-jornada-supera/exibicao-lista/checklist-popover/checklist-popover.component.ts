@@ -90,6 +90,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             model.control.updateValueAndValidity();
             this.alunoChecklistOnConfirmDialog.hide();
             onCancel.unsubscribe();
+            onFinish.unsubscribe();
         });
 
         var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
@@ -99,6 +100,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
             alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
 
+            onCancel.unsubscribe();
             onFinish.unsubscribe();
         });
 

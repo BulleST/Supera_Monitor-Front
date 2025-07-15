@@ -69,18 +69,22 @@ export class AlunoChecklistDialogComponent implements OnChanges {
         
         const onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
     
+            console.log('onCancel')
             model.control.setValue(false);
             model.control.updateValueAndValidity();
             this.alunoChecklistOnConfirmDialog.hide();
             onCancel.unsubscribe();
+            onFinish.unsubscribe();
         });
         
         const onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-    
+            
+            console.log('onFinish')
             alunoChecklistItem.observacoes = res.observacoes;
             alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
             alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
             alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+            onCancel.unsubscribe();
             onFinish.unsubscribe();
         });
         

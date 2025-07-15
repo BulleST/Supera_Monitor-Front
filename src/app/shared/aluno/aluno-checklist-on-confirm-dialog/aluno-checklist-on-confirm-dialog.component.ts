@@ -108,25 +108,28 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
                 this.observacao = '';
                 this.loading = false;
                 this.toastr.success(`Checklist ${this.item.nome} finalizado com sucesso!`);
-                this.hide();
+
+                this.onFinish.emit(true);
 
                 this.userService.get(res.object.account_Finalizacao_Id)
                     .then(user => {
                         res.object.account_Finalizacao = user.name;
                         this.onFinish.emit(res.object);
                         this.service.onFinish.emit(res.object)
+                        this.hide();
                     });
 
             })
             .catch(res => {
                 this.showError('Erro', 'Não foi possível finalizar o checklist.', e, res)
                 this.hide();
+                console.log(res)
                 this.onCancel.emit(true);
             });
     }
 
 
-    enviarMensagem() {
+    enviarMensagemCondicao() {
 
         let id = this.alunoChecklistItem.checklist_Item_Id;
         let aluno = {
