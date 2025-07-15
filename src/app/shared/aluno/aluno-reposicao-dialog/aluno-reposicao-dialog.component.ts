@@ -85,7 +85,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 this.loadEventosReposicaoDe();
             }
             else {
-                let alunos = alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active));
+                let alunos = alunoService.list.subscribe(res => {
+                    this.alunos = res.filter(x =>  x.active == true);
+                    this.setAlunos();
+                });
                 this.subscription.push(alunos)
 
                 if (!this.alunos.length) {
@@ -112,6 +115,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             if (res) {
                 this.eventoReposicaoPara = res;
                 this.blockReposicaoParaField = true;
+                this.setAlunos();
             }
         });
         this.subscription.push(eventoReposicaoPara);
@@ -146,6 +150,27 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    }
+
+    setAlunos() {
+        if (this.alunos.length) {
+            if (this.eventoReposicaoPara) {
+
+                // Em caso de rota por selected-evento.component > opções > agendar reposicao
+                // Vai marcar o para
+                // Filtra somente os alunos que não estão nessa aula
+                
+                let alunos = this.eventoReposicaoPara.alunos.filter(x => x.active).map(X => X.aluno_Id);
+                this.alunos = this.alunos.filter(x => !alunos.includes(x.id) && x.active == true)
+                
+                // OBS: 
+                // Se em caso de rota por selected-evento.component > aluno-popover.component > opções > agendar reposicao
+                // OU _initial/monitoramento-dashboard.component > agendar reposicao
+                // o eventoReposicaoDe é marcado e a rota é inserida com o aluno_id, impossibilitando seleção de outro aluno
+                // Sendo assim não precisa filtrar os alunos nesse caso
+            }
+            
+        }
     }
 
     async loadAluno(aluno?: Aluno) {
@@ -267,7 +292,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         if (!this.eventoService.eventoReposicaoPara.value) {
             this.eventoReposicaoPara = undefined;
         }
-        
+
         this.loadEventosReposicaoDe();
     }
 

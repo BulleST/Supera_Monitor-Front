@@ -303,6 +303,7 @@ export class SelectedEventoComponent implements OnChanges {
 
     goToReposicao() {
         if (this.evento) {
+            this.service.setEventoReposicaoDe(undefined)
             this.service.setEventoReposicaoPara(this.evento);
             this.router.navigate([ 'reposicao', 'agendar'], { relativeTo: this.activatedRoute });
         }

@@ -218,6 +218,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     goToAgendarReposicao() {
         this.eventoService.setEventoReposicaoDe(this.evento);
+        this.eventoService.setEventoReposicaoPara(undefined);
         this.router.navigate(['reposicao', 'agendar', this.crypto.encrypt(this.aluno_Id)], { relativeTo: this.activatedRoute });
     }
 
