@@ -47,7 +47,7 @@ export class ProfileComponent implements OnDestroy {
         this.service.profileModalOpen.emit(this.visible);
     }
 
-    changePassworModalOpen() {
+    changePasswordModalOpen() {
         this.service.changePasswordModalOpen.emit(true);
     }
     

@@ -184,6 +184,16 @@ sendConfirmation(e: any) {
     }
 }
 
+enviarMensagem(aluno: Aluno) {
+    if (!aluno.celular) {
+        this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+        return;
+    }
+    let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+    window.open(object.link, '_blank');
+    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+}
+
 formatDate(evento: Evento) {
     return this.calendarioUtils.formatDate(evento.data)
 }
