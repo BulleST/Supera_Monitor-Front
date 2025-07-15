@@ -40,6 +40,7 @@
                   appendTo="body"
                   [virtualScroll]="true"
                   virtualScrollItemSize="55"
+                  panelStyleClass="p-select-stripped"
                   optionDisabled="deactivated,disponivel">
             <ng-template let-aluno pTemplate="selectedItem">
                 <div class="flex justify-between align-items-center gap-2 w-full">
@@ -87,7 +88,8 @@
                                         </p>
                                         <p
                                            *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
-                                            {{item.disponivelEvent.turma}} </p>
+                                            {{item.disponivelEvent.turma}}
+                                        </p>
                                         <p *ngIf="item.disponivelEvent.sala_Id">
                                             <span>Sala: </span>
                                             <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
@@ -113,13 +115,14 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['required']">Esse campo é obrigatório.</p>
             <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
             <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['restricaoMobilidade']">
-                {{_aluno_Id.errors['restricaoMobilidade']}}.</p>
+                {{_aluno_Id.errors['restricaoMobilidade']}}.
+            </p>
         </div>
     </div>
     <!-- Calendario -->
     <div class="mt-1 h-full" *ngIf="selectedAluno">
-      <app-calendario-aluno-options [aluno]="selectedAluno"
-      (onClose)="visible = false; visibleChange()"></app-calendario-aluno-options>
+        <app-calendario-aluno-options [aluno]="selectedAluno"
+                                      (onClose)="visible = false; visibleChange()"></app-calendario-aluno-options>
     </div>
     <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
         <li>

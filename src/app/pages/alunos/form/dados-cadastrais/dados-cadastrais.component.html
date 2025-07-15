@@ -319,7 +319,7 @@
                                    #restricao
                                    id="restricao"
                                    name="restricao"
-                                   class="w-full"
+                                   class="w-full pr-7"
                                    [required]="true"
                                    (keyup.enter)="cadastrarRestricao($event, restricao, restricoes)"
                                    placeholder="Inserir nova restrição...">
@@ -354,7 +354,8 @@
                                 name="restricaoMobilidade"
                                 #restricaoMobilidade="ngModel"
                                 [(ngModel)]="object.restricaoMobilidade"
-                                [binary]="true" />
+                                [binary]="true"
+                                (onChange)="mobilidadeReduzidaChange($event, turma_Id)" />
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
             </div>

@@ -22,6 +22,7 @@ import { getError, MensagemWhatsapp, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Popover } from 'primeng/popover';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { CheckboxChangeEvent } from 'primeng/checkbox';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -287,6 +288,13 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             // delete this.object.numeroPaginaAbaco;
         }
     }
+    mobilidadeReduzidaChange(e: CheckboxChangeEvent, turmaModel: NgModel) {
+        if (e.checked && this.selectedTurma && this.selectedTurma?.andar > 1) {
+            turmaModel.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+            this.showError('Restrição de Mobilidade', `O ${this.object.nome.split(' ')[0]} tem restrição de mobilidade e não poderia participar das aulascom a turma ${this.selectedTurma.nome} na sala ${this.selectedTurma.numeroSala} - ${this.selectedTurma.andar}º andar.`, e.originalEvent);
+            return;
+        }
+    }
 
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
         // console.log('Log: Aluno tentando mudar de turma - turmaChanged')
@@ -304,6 +312,11 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             if (temPerfil && !perfilCompativel) {
                 this.showError('Transferência inválida', `O perfil cognitivo dessa turma é incompatível para o aluno.`, e);
                 this.turmaReject(model);
+                return;
+            }
+            else if (this.object.restricaoMobilidade && this.selectedTurma.andar > 1) {
+                model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
+                this.showError('Restrição de Mobilidade', `O ${this.object.nome.split(' ')[0]} tem restrição de mobilidade e não poderia participar das aulascom a turma ${this.selectedTurma.nome} na sala ${this.selectedTurma.numeroSala} - ${this.selectedTurma.andar}º andar.`, e.originalEvent);
                 return;
             }
 
@@ -439,7 +452,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 target: e.target,
                 message: `Você inseriu uma nova restrição, deseja salvar?`,
                 header: 'Inserir restrição',
-                icon: 'pi pi-exclamation-triangle',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Salvar',
                 acceptButtonStyleClass: 'p-button-rounded',
