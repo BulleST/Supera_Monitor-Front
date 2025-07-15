@@ -45,7 +45,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     oldTurmaId?: number;
     selectedTurma?: Turma;
     turmas: Turma[] = [];
-    turmasFiltered: Turma[] = [];
+    turmasDisponiveis: Turma[] = [];
     loadingTurmas = false;
 
     sexos: Pessoa_Sexo[] = [];
@@ -115,7 +115,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
         var turmas = this.turmaService.list.subscribe(res => {
             this.turmas = res;
-            this.loadTurmas();
+            this.loadTurmasDisponiveis();
         });
         this.subscription.push(turmas);
 
@@ -140,15 +140,14 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (changes['object']) {
             this.object = changes['object'].currentValue;
 
+            console.log('object', JSON.parse(JSON.stringify(this.object)))
+
             if (this.object.id) {
-                this.loadTurmas();
-                this.getRestricoes();
+                this.loadTurmasDisponiveis();
+                this.formataRestricoes();
+                this.generateRM();
 
                 this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
-
-                if (!this.object.rm) {
-                    this.object.rm = this.generateRM()
-                }
 
             }
 
@@ -159,7 +158,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    loadTurmas() {
+    loadTurmasDisponiveis() {
 
         if (this.object?.id && this.turmas.length) {
 
@@ -167,7 +166,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             // Ou a turma atual
             // Ou alguma turma do mesmo perfil cognitivo
             // E turmas com vagas
-            this.turmasFiltered = this.turmas.filter(turma => {
+            this.turmasDisponiveis = this.turmas.filter(turma => {
                 const alunoTemTurma = !!this.object.turma_Id;
                 const alunoTemPerfil = !!this.object.perfilCognitivo_Id;
                 const ehTurmaDoAluno = turma.id == this.object.turma_Id;
@@ -409,13 +408,15 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     generateRM() {
-        const min = 100000;
-        const max = 999999;
-        var rm = Math.floor(Math.random() * (max - min + 1)) + min
-        return rm.toString();
+        if (!this.object.rm) {
+            const min = 100000;
+            const max = 999999;
+            const rm = Math.floor(Math.random() * (max - min + 1)) + min
+            this.object.rm  = rm.toString();
+        }
     }
 
-    getRestricoes() {
+    formataRestricoes() {
         if (!this.object || !this.object.restricoes || this.object.restricoes.length == 0) {
             this.restricoesText = ''
         } else {
@@ -466,7 +467,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                                 res.object.active = true;
 
                                 this.object.restricoes.push(res.object);
-                                this.getRestricoes();
+                                this.formataRestricoes();
                             }
                         })
                         .catch((res: HttpErrorResponse) => {
@@ -516,7 +517,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                             if (index != -1) {
                                 this.object.restricoes.splice(index, 1, res.object)
                             }
-                            this.getRestricoes();
+                            this.formataRestricoes();
                         }
                     })
                     .catch((res: HttpErrorResponse) => {
@@ -534,61 +535,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item) {
-        // Apresentação do Diretor Franqueado 
-        if (checklistItem.checklist_Item_Id == 8) {
-            return this.enviarMensagemApresentacaoDiretorFranqueado(this.object);
-            // Confirmação da adequação do aluno ao perfil da turma 
-        } else if (checklistItem.checklist_Item_Id == 9) {
-            return this.enviarMensagemAdequacaoTurma(this.object);
-            // Agendar 1ª Oficina 
-        } else if (checklistItem.checklist_Item_Id == 12) {
-            return this.enviarMensagemLembreteOficina(this.object);
-            // Feedback pós venda 
-        } else if (checklistItem.checklist_Item_Id == 13) {
-            return this.enviarMensagemFeedbackPosVenda(this.object);
-            // Confirmação de preeechimento do feedback pós venda 
-        } else if (checklistItem.checklist_Item_Id == 32) {
-            return this.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(this.object);
-            // Mensagem de boas-vindas 
-        } else if (checklistItem.checklist_Item_Id == 37) {
-            return this.enviarMensagemBoasVindas(this.object);
-            // Agendar Superação 
-        } else if (checklistItem.checklist_Item_Id == 22) {
-            return this.enviarMensagemLembreteSuperacao(this.object);
-            // Agendar 2ª Superação 
-        } else if (checklistItem.checklist_Item_Id == 29) {
-            return this.enviarMensagemLembreteSuperacao(this.object);
-            // Agendar 2ª Oficina 
-        } else if (checklistItem.checklist_Item_Id == 23) {
-            return this.enviarMensagemLembreteOficina(this.object);
-        } else {
-            return this.enviarMensagem(this.object);
-        }
+        this.mensagemWhatsapp.enviarMensagemCondicao(this.object, checklistItem.checklist_Item_Id)
     }
 
-    enviarMensagem(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
-    }
-
-    enviarMensagemApresentacaoDiretorFranqueado(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemApresentacaoDiretorFranqueado(aluno.nome, aluno.celular);
-    }
-    enviarMensagemBoasVindas(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemBoasVindas(aluno.nome, aluno.celular, aluno.email, aluno.diaSemana, aluno.horario, aluno.professor, aluno.linkGrupo);
-    }
-    enviarMensagemAdequacaoTurma(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemAdequacaoTurma(aluno.nome, aluno.celular);
-    }
-    enviarMensagemLembreteOficina(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteOficina(aluno.nome, aluno.celular);
-    }
-    enviarMensagemLembreteSuperacao(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemLembreteSuperacao(aluno.nome, aluno.celular);
-    }
-    enviarMensagemFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemFeedbackPosVenda(aluno.nome, aluno.celular);
-    }
-    enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno: Aluno) {
-        return this.mensagemWhatsapp.enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(aluno.nome, aluno.celular);
-    }
 }

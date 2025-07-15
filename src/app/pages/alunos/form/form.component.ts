@@ -1,14 +1,13 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { Crypto, insertOrReplace, showError } from '../../../utils';
+import { Crypto, showError } from '../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { Popover } from 'primeng/popover';
 import { HttpErrorResponse } from '@angular/common/http';
-import { playAlert, playSuccess } from '../../../utils/audio';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 
