@@ -142,7 +142,7 @@
           [disabled]="form.invalid || loading" />
         <p-button
           type="button"
-          (onClick)="finalizar($event)"
+          (onClick)="finalizarConfirmation($event)"
           styleClass="px-3"
           label="Salvar e finalizar"
           icon="pi pi-check"
@@ -155,3 +155,6 @@
     </ng-container>
   </form>
 </p-dialog>
+
+
+<i class="pi pi-times text-red-500"></i>
