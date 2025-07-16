@@ -169,7 +169,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getListWithChecklist())
+            lastValueFrom(this.alunoService.getList())
                 .then(res => this.loadingAlunos = false)
                 .catch(res => this.loadingAlunos = false);
         }

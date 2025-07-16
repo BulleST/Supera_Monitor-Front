@@ -588,7 +588,8 @@
                 <span class="font-bold">{{ item.turma }}</span>
             </p>
             <!-- PerfilCognitivo -->
-            <p class="ml-auto">{{item.perfilCognitivo}}</p>
+            <p-tag [value]="item.perfilCognitivo" icon="fa fa-brain text-primary-500 -mt-1 text-sm mr-2" styleClass="text-primary-500 -" class="ml-auto"/>
+            <!-- <p class="ml-auto font-bold text-primary-500">{{item.perfilCognitivo}}</p> -->
         </div>
     </div>
     <ng-template #indisponivelTemplate>
