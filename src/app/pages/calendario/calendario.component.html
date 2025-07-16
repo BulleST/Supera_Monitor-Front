@@ -235,6 +235,7 @@
                     </ng-template>
                     <ng-template #eventContent let-arg>
                         <app-evento-item
+                                         class="w-full"
                                          [evento]="arg.event.extendedProps"
                                          [arg]="arg"
                                          (selectEvent)="selectEvento($event, arg.event.extendedProps)"
