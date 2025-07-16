@@ -8,7 +8,7 @@ const routes: Routes = [
     { path: '', component: ListComponent, children: [
             { path: 'cadastrar', component: FormComponent },
             { path: 'editar/:id', component: FormComponent },
-            { path: 'calendario/:id', component: CalendarioComponent },
+            // { path: 'calendario/:id', component: CalendarioComponent },
 
         ] },
 ];

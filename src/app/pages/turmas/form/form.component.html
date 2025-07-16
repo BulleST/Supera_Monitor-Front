@@ -311,14 +311,14 @@
                 <p class="text-red-500" *ngIf="error">{{error}}</p>
             </div>
             <div class="ml-auto">
-                <p-button *ngIf="isEditPage"
+                <!-- <p-button *ngIf="isEditPage"
                           type="button"
                           (onClick)="goToCalendario()"
                           styleClass="border-2 px-3 mr-2"
                           label="Ver calendário"
                           icon="pi pi-calendar"
                           [rounded]="true"
-                          [outlined]="true" />
+                          [outlined]="true" /> -->
                 <p-button
                           type="submit"
                           [disabled]="form.invalid || loading"
