@@ -1,7 +1,8 @@
 <app-confirm-dialog></app-confirm-dialog>
 <p-confirmdialog
                  key="confirmarPrimeiraAula"
-                 styleClass="w-32rem">
+                 styleClass="w-32rem"
+                 [acceptVisible]="restricaoCheck || (!aluno.restricaoMobilidade && aluno.restricoes.length === 0)">
     <ng-template
                  #message
                  let-message>
@@ -15,46 +16,104 @@
                         Certifique-se de que todas as informações estão corretas.
                     </p>
 
-                    <p-fieldset legend="Dados do agendamento"
-                                class="flex-1 w-full flex flex-column p-3 border rounded-md">
-                        <div class="mt-1">
-                            <div class="inline-flex gap-2">
-                                <label>Título do evento: </label>
-                                <p class="font-semibold text-primary-600">
-                                    {{ selectedEvento?.descricao }}
-                                </p>
+                    <ng-template #displayError>
+                        <p>Ocorreu um erro ao visualizar os dados</p>
+                    </ng-template>
+
+                    <ng-container *ngIf="selectedEvento; else displayError" class="px-2">
+                        <p-fieldset legend="Dados do agendamento"
+                                    class="flex-1 w-full flex flex-column border rounded-md">
+                            <div>
+                                <div class="inline-flex gap-2">
+                                    <label>Turma:</label>
+                                    <p class="font-semibold text-primary-600">
+                                        {{ selectedEvento.descricao }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mt-1">
-                            <div class="inline-flex gap-2">
-                                <label>Data do evento: </label>
-                                <p class="font-semibold text-primary-600">
-                                    {{ selectedEvento?.data | date : 'dd/MM/yyyy - HH:mm' }}
-                                </p>
+                            <div class="mt-1">
+                                <div class="inline-flex gap-2">
+                                    <label>Data: </label>
+                                    <p class="font-semibold text-primary-600">
+                                        {{ selectedEvento.data | date : 'dd/MM/yyyy - HH:mm' }}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mt-1">
-                            <div class="inline-flex gap-2">
-                                <label>Aluno:</label>
-                                <p class="font-semibold text-primary-600">{{ aluno.nome }}</p>
+                            <div class="mt-1">
+                                <div class="inline-flex gap-2">
+                                    <label>Aluno:</label>
+                                    <p class="font-semibold text-primary-600">{{ aluno.nome }}</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="mt-1 flex gap-2 align-items-center font-medium">
-                            <label>Perfil Cognitivo do aluno:</label>
-                            <p-badge [value]="aluno.perfilCognitivo" />
-                        </div>
+                            <div class="mt-1">
+                                <div class="inline-flex gap-2">
+                                    <label>Sala:</label>
+                                    <app-sala-aula class="font-bold text-primary" [andar]="selectedEvento.andar" [numeroSala]="selectedEvento.numeroSala" />
+                                </div>
+                            </div>
 
-                        <div
-                             class="mt-1 flex flex-wrap gap-2 align-items-center font-medium">
-                            <label>Perfis Cognitivos do evento:</label>
-                            <ng-container *ngFor="let perfil of selectedEvento?.perfilCognitivo">
-                                <p-badge [value]="perfil.nome" />
+                            <div class="mt-1 flex gap-2 align-items-center font-medium">
+                                <label>Perfil Cognitivo do aluno:</label>
+                                <p-badge [value]="aluno.perfilCognitivo" />
+                            </div>
+
+                            <div
+                                class="mt-1 flex flex-wrap gap-2 align-items-center font-medium">
+                                <label>Perfis Cognitivos do agendamento:</label>
+                                <ng-container *ngFor="let perfil of selectedEvento?.perfilCognitivo">
+                                    <p-badge [value]="perfil.nome" />
+                                </ng-container>
+                            </div>
+                        </p-fieldset>
+
+                        <p-fieldset legend="Restrições"
+                                    class="flex-1 w-full flex flex-column border rounded-md">    
+                            <ng-container *ngIf="!aluno.restricaoMobilidade; else mobilidade">
+                                <div class="flex gap-2 align-items-center mt-1">
+                                    <i class="pi pi-check-circle text-primary"></i>
+                                    <p>Aluno não possui restrição de mobilidade.</p>
+                                </div>
                             </ng-container>
-                        </div>
-                    </p-fieldset>
+
+                            <ng-template #mobilidade>
+                                <div class="flex gap-2 align-items-center mt-1 text-primary">
+                                    <i class="fa fa-wheelchair"></i>
+                                    <p class="font-bold text-base">Aluno possui restrição de mobilidade.</p>
+                                </div>
+                            </ng-template>
+                            
+                            <ng-container *ngIf="aluno.restricoes.length === 0; else restricoes">
+                                <div class="flex gap-2 align-items-center mt-1">
+                                    <i class="pi pi-check-circle text-primary"></i>
+                                    <p>Aluno não possui outras restrições registradas.</p>
+                                </div>
+                            </ng-container>
+
+                            <ng-template #restricoes>
+                                <div class="flex flex-column gap-1 mt-1">
+                                    <p *ngFor="let restricao of aluno.restricoes">
+                                        <i class="pi pi-ban pr-2"></i>
+                                        <span>{{restricao.descricao}}</span>
+                                    </p>
+                                </div>
+                            </ng-template>
+                        </p-fieldset>
+
+                        <ng-container *ngIf="aluno.restricaoMobilidade || aluno.restricoes.length != 0">
+                            <div class="flex align-items-center mt-3">
+                                <p-checkbox
+                                    inputId="restricaoCheck"
+                                    [(ngModel)]="restricaoCheck"
+                                    binary="true"/>
+                                <label for="restricaoCheck" class="ml-2 mt-1 leading-none">
+                                    Estou ciente das restrições do aluno e quero continuar.
+                                </label>
+                            </div>
+                        </ng-container>
+                    </ng-container>
                 </div>
             </div>
         </div>

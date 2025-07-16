@@ -16,7 +16,7 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
     @Input() eventos!: Evento[];
     @Input() data!: Date;
     @Input() feriados: Feriado[] = [];
-    @Input() perfilCoginitivo: PerfilCognitivo[] = [];
+    @Input() perfilCognitivo: PerfilCognitivo[] = [];
     @Input() loadingPerfilCognitivo = false;
     calendar!: Calendar;
 
@@ -32,7 +32,7 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
         if (changes['eventos']) this.eventos = changes['eventos'].currentValue;
         if (changes['data']) this.data = changes['data'].currentValue;
         if (changes['feriados']) this.feriados = changes['feriados'].currentValue;
-        if (changes['perfilCoginitivo']) this.perfilCoginitivo = changes['perfilCoginitivo'].currentValue;
+        if (changes['perfilCognitivo']) this.perfilCognitivo = changes['perfilCognitivo'].currentValue;
         if (changes['loadingPerfilCognitivo']) this.loadingPerfilCognitivo = changes['loadingPerfilCognitivo'].currentValue;
         this.calcula();
     }
@@ -50,7 +50,7 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
             var dataFormated = moment(this.data).format('YYYY-MM-DD');
             var eventosData = this.eventos.filter(x => moment(x.data).format('YYYY-MM-DD') == dataFormated);
             var alunosData = eventosData.flatMap(x => x.alunos).filter(x => x.active);
-            this.perfilCoginitivo.forEach(item => {
+            this.perfilCognitivo.forEach(item => {
                 var alunosPerfil = alunosData.filter(x => x.perfilCognitivo_Id == item.id);
                 dataPerfilCog.total += alunosPerfil.length;
                 dataPerfilCog.perfilCognitivo.push({
