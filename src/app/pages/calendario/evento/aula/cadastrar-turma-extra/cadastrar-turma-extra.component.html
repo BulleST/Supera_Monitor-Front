@@ -1,4 +1,3 @@
-
 <app-confirm-dialog></app-confirm-dialog>
 <p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
     <ng-template #message let-message>
@@ -9,7 +8,7 @@
             </span>
             <div>
                 <div [innerHTML]="message.message"></div>
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
+                <p class="mt-3 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
                 <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let aluno of mensagensEnviadasAlunos">
@@ -22,8 +21,8 @@
                                   styleClass="{{!aluno.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [label]="aluno.nome"
-                                  [text]="true"/>
-                       </div>
+                                  [text]="true" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -35,21 +34,17 @@
                  [closable]="true">
     <ng-template #message let-message>
         <ng-container *ngIf="selectedAlunoSource">
-            <div class="flex align-items-start gap-2 w-full">
-                <span class="mt-4">
-                    <i class="pi pi-calendar text-3xl text-pink-500"></i>
-                </span>
-                <div class="w-full">
-                    <div [innerHTML]="message.message"></div>
-                    <div class="formgrid grid">
-                        <div class="field col-12"> <!-- Eventos  -->
-                            <label for="evento_Id">Selecione uma aula: <span class="text-red-500">*</span></label>
+            <div class="w-full">
+                <div [innerHTML]="message.message"></div>
+                <div class="formgrid grid">
+                    <div class="field col-12"> <!-- Eventos  -->
+                        <label for="evento_Id">Selecione uma aula: <span class="text-red-500">*</span></label>
+                        <p-iconfield>
+                            <p-inputicon styleClass="pi pi-calendar text-pink-500 text-base" />
                             <p-select [options]="selectedAlunoSource.aulasParaRepor"
                                       [(ngModel)]="selectedEventoReposicao"
                                       [loading]="loadingEventosReposicaoAluno"
                                       #evento_Id="ngModel"
-                                      styleClass="w-full"
-                                      class="w-full"
                                       name="evento_Id"
                                       inputId="evento_Id"
                                       optionLabel="data"
@@ -57,81 +52,63 @@
                                       [filter]="true"
                                       [filterBy]="'data,turma,professor'"
                                       emptyMessage="Nenhuma aula para repor"
-                                      appendTo="body">
+                                      panelStyleClass="p-select-stripped"
+                                      appendTo="body"
+                                      fluid>
                                 <ng-template #selectedItem let-selectedOption>
                                     <ng-container *ngIf="selectedOption">
-                                        <p class="font-bold mb-1 flex align-items-center ">
-                                            <span class="w-1rem h-1rem border-circle flex mr-2 "
-                                                  [pTooltip]="selectedOption.professor"
-                                                  [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
-                                            <span class="mr-2">{{ selectedOption.data | date : 'dd/MM HH:mm' }}</span>
-                                            <ng-container *ngFor="let participacao of selectedOption.alunos">
-                                                <ng-container *ngIf="selectedOption.feriado">
-                                                    <p-badge [value]="'Feriado: ' + selectedOption.feriado.name"
-                                                             severity="danger"
-                                                             styleClass="white-space-nowrap"
-                                                             [pTooltip]="feriado" />
-                                                    <ng-template #feriado>
-                                                        <p>Feriado: {{selectedOption.feriado.name}}</p>
-                                                        <p>Nível {{selectedOption.feriado.level}} - Tipo {{selectedOption.feriado.type}}</p>
-                                                    </ng-template>
-                                                </ng-container>
-                                                <ng-container *ngIf="selectedOption.active == false && !selectedOption.feriado">
-                                                    <p-badge value="Aula cancelada"
-                                                             severity="danger"
-                                                             [pTooltip]="selectedOption.observacao" />
-                                                </ng-container>
-                                                <ng-container *ngIf="participacao.presente == false && selectedOption.active == true">
-                                                    <p-badge value="Faltou"
-                                                             severity="danger"
-                                                             [pTooltip]="participacao.observacao" />
-                                                </ng-container>
-                                            </ng-container>
-                                        </p>
+                                        <div class="flex align-items-center">
+                                            <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 text-white ">
+                                                <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
+                                            </div>
+                                            <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                <span>{{selectedOption.data | date : 'HH:mm'}}</span>
+                                            </div>
+                                            <p class="flex align-items-center gap-1 ml-2">
+                                                <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
+                                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                            </p>
+                                        </div>
                                     </ng-container>
                                 </ng-template>
-                                <ng-template let-evento #item>
-                                    <div class="flex flex-column">
-                                        <p class="font-bold mb-1 flex align-items-center ">
-                                            <span class="w-1rem h-1rem border-circle flex mr-2 "
-                                                  [pTooltip]="evento.professor"
-                                                  [style]="{ backgroundColor: evento.corLegenda, borderColor: evento.corLegenda }"></span>
-                                            <span class="mr-2">{{ evento.data | date : 'dd/MM HH:mm' }}</span>
-                                            <ng-container *ngFor="let participacao of evento.alunos">
-                                                <ng-container *ngIf="evento.feriado">
-                                                    <p-badge [value]="'Feriado: ' + evento.feriado.name"
-                                                             severity="danger"
-                                                             styleClass="white-space-nowrap"
-                                                             [pTooltip]="feriado" />
-                                                    <ng-template #feriado>
-                                                        <p>Feriado: {{evento.feriado.name}}</p>
-                                                        <p>Nível {{evento.feriado.level}} - Tipo {{evento.feriado.type}}</p>
-                                                    </ng-template>
-                                                </ng-container>
-                                                <ng-container *ngIf="evento.active == false && !evento.feriado">
-                                                    <p-badge value="Aula cancelada"
-                                                             severity="danger"
-                                                             [pTooltip]="evento.observacao" />
-                                                </ng-container>
-                                                <ng-container *ngIf="participacao.presente == false && evento.active == true">
-                                                    <p-badge value="Faltou"
-                                                             severity="danger"
-                                                             [pTooltip]="participacao.observacao" />
-                                                </ng-container>
-                                            </ng-container>
-                                        </p>
-                                        <p>Turma: {{evento.turma}} </p>
+                                <ng-template let-item #item>
+                                    <div class="flex gap-2">
+                                        <div class="flex flex-column">
+                                            <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
+                                                <i class="pi pi-calendar text-sm"></i>
+                                                <span>{{item.data | date : 'dd/MMM'}}</span>
+                                            </div>
+                                            <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                <i class="pi pi-clock text-sm"></i>
+                                                <span>{{item.data | date : 'HH:mm'}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-column">
+                                            <p class="flex align-items-center gap-2 py-1">
+                                                <span>{{item.turma ?? item.descricao}}</span>
+                                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                            </p>
+                                            <p class="flex align-items-center gap-2 py-1">
+                                                <span class="">Sala: </span>
+                                                <app-sala-aula [andar]="item.andar"
+                                                               [numeroSala]="item.numeroSala"
+                                                               [sala_Id]="item.sala_Id"></app-sala-aula>
+                                                <span class="ml-auto text-base">
+                                                    {{item.capacidadeMaximaAlunos - item.alunos.length}} vaga(s) </span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </ng-template>
                             </p-select>
-                            <div *ngIf="evento_Id.touched && evento_Id.invalid && evento_Id.errors">
-                                <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['required']">Esse campo é obrigatório.</p>
-                                <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['indisponivel']">Educador indisponível.</p>
-                            </div>
+                        </p-iconfield>
+                        <div *ngIf="evento_Id.touched && evento_Id.invalid && evento_Id.errors">
+                            <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['required']">Esse campo é obrigatório.</p>
+                            <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['indisponivel']">Educador indisponível.</p>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- </div> -->
         </ng-container>
     </ng-template>
 </p-confirmdialog>
@@ -261,6 +238,7 @@
                           [required]="true"
                           [filter]="true"
                           filterBy="nome"
+                                      panelStyleClass="p-select-stripped"
                           appendTo="body"
                           optionDisabled="deactivated">
                     <ng-template let-item #item>
@@ -379,20 +357,21 @@
             <!-- Perfil Cognitivo -->
             <div class="field md:col-3 sm:col-3 col-6">
                 <label for="perfilCognitivo">Perfil Cognitivo: <span class="text-red-500">*</span></label>
-                <p-select
-                          [(ngModel)]="perfilCognitivoSelected"
-                          [options]="perfisCognitivos"
-                          [loading]="loadingPerfisCognitivos"
-                          #perfilCognitivo="ngModel"
-                          inputId="perfilCognitivo"
-                          name="perfilCognitivo"
-                          placeholder="Selecione"
-                          optionLabel="nome"
-                          [filter]="true"
-                          filterBy="nome"
-                          [required]="true"
-                          styleClass="w-full"
-                          appendTo="body" />
+                <p-multiselect
+                               [(ngModel)]="perfilCognitivoSelected"
+                               [options]="perfisCognitivos"
+                               [loading]="loadingPerfisCognitivos"
+                               (onChange)="perfilChanged($event)"
+                               #perfilCognitivo="ngModel"
+                               inputId="perfilCognitivo"
+                               name="perfilCognitivo"
+                               placeholder="Selecione"
+                               optionLabel="nome"
+                               [filter]="true"
+                               filterBy="nome"
+                               [required]="true"
+                               styleClass="w-full"
+                               appendTo="body" />
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -411,137 +390,148 @@
                        class="w-full">
             </div>
             <!-- Alunos -->
-            <div class="field col-12">
-                <label class="text-orange-500 font-bold">Selecione os Alunos</label>
-                <hr class="mb-4 border-orange-500 border-1">
-                <div class="flex flex-wrap gap-1">
-                    <div class="md:col col-12"
-                         cdkDropList
-                         #alunosSource="cdkDropList"
-                         [cdkDropListConnectedTo]="alunosTarget"
-                         [cdkDropListData]="alunos"
-                         (cdkDropListDropped)="sourceDropped($event)">
-                        <!-- <ng-container *ngTemplateOutlet="tableTemplate1; context: { list: alunos }"></ng-container> -->
-                        <p-table #dtSource
-                                 [value]="alunos"
-                                 [loading]="loadingAlunos"
-                                 styleClass="h-30rem"
-                                 [scrollable]="true"
-                                 scrollHeight="30rem"
-                                 [loading]="loading"
-                                 selectionMode="single"
-                                 [(selection)]="selectedAlunoSource"
-                                 [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
-                            <ng-template #header>
-                                <tr>
-                                    <th>Clique e arraste para selecionar</th>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <div class="flex align-items-center gap-2">
-                                            <span>Nome </span>
-                                            <p-iconfield iconPosition="left" class="ml-auto">
-                                                <p-inputicon styleClass="pi pi-search" />
-                                                <input pInputText
-                                                       type="text"
-                                                       #inputSource
-                                                       (input)="dtSource.filterGlobal(inputSource.value, 'contains')"
-                                                       placeholder="Filtrar nome ou turma" />
-                                            </p-iconfield>
-                                            <p-sortIcon field="nome" />
-                                        </div>
-                                    </th>
-                                </tr>
-                            </ng-template>
-                            <ng-template #body let-item>
-                                <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
-                                    <td [ngClass]="{
-                                        'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id
-                                    }">
-                                        <div cdkDrag [cdkDragData]="item">
-                                            <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
-                                            <div *cdkDragPreview class="p-4">
-                                                <div class="shadow-2 bg-white p-2">
-                                                    <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+            <p-blockui [target]="alunosPanel" [blocked]="!data || !horario" />
+            <p-panel #alunosPanel fluid class="w-full" styleClass="w-full p-0">
+                <div class="field col-12">
+                    <label class="text-orange-500 font-bold">Selecione os Alunos</label>
+                    <hr class="mb-4 border-orange-500 border-1">
+                    <div class="flex flex-wrap gap-1">
+                        <div class="md:col col-12"
+                             cdkDropList
+                             #_alunosSource="cdkDropList"
+                             [cdkDropListConnectedTo]="_alunosTarget"
+                             [cdkDropListData]="alunosSource"
+                             (cdkDropListDropped)="sourceDropped($event)"
+                             [cdkDropListDisabled]="!data || !horario ">
+                            <p-table #dtSource
+                                     [value]="alunosSource"
+                                     styleClass="h-30rem"
+                                     [scrollable]="true"
+                                     scrollHeight="30rem"
+                                     [loading]="loadingAlunos"
+                                     [showLoader]="false"
+                                     selectionMode="single"
+                                     [(selection)]="selectedAlunoSource"
+                                     [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
+                                <ng-template #header>
+                                    <tr>
+                                        <th *ngIf="data && horario">Clique e arraste para selecionar</th>
+                                        <th *ngIf="!data && !horario">Selecione uma data e horário para selecionar alunos</th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <div class="flex align-items-center gap-2">
+                                                <span>Nome </span>
+                                                <p-iconfield iconPosition="left" class="ml-auto">
+                                                    <p-inputicon styleClass="pi pi-search" />
+                                                    <input pInputText
+                                                           type="text"
+                                                           #inputSource
+                                                           (input)="dtSource.filterGlobal(inputSource.value, 'contains')"
+                                                           placeholder="Filtrar nome ou turma" />
+                                                </p-iconfield>
+                                                <p-sortIcon field="nome" />
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template #body let-item>
+                                    <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
+                                        <td [ngClass]="{
+                                            'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id
+                                        }">
+                                            <div cdkDrag [cdkDragData]="item">
+                                                <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                                <div *cdkDragPreview class="p-4">
+                                                    <div class="shadow-2 bg-white p-2">
+                                                        <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
-                    </div>
-                    <div class="flex md:flex-column md:w-min w-full gap-2 px-1 py-1 sticky top-0 justify-content-center align-items-center">
-                        <p-button
-                                  icon="pi pi-angle-right"
-                                  styleClass="md:rotate-180 rotate-90"
-                                  severity="secondary"
-                                  [disabled]="!selectedAlunoSource"
-                                  (onClick)="moveToTarget($event)" />
-                        <p-button
-                                  icon="pi pi-angle-left "
-                                  styleClass="md:rotate-180 rotate-90"
-                                  severity="secondary"
-                                  [disabled]="!selectedAlunoTarget"
-                                  (onClick)="moveToSource($event)" />
-                    </div>
-                    <div class="md:col col-12"
-                         cdkDropList
-                         #alunosTarget="cdkDropList"
-                         [cdkDropListConnectedTo]="alunosSource"
-                         [cdkDropListData]="alunosSelected"
-                         (cdkDropListDropped)="targetDropped($event)">
-                        <p-table #dtTarget
-                                 [value]="alunosSelected"
-                                 [loading]="loadingAlunos"
-                                 styleClass="h-30rem"
-                                 [scrollable]="true"
-                                 scrollHeight="30rem"
-                                 [loading]="loading"
-                                 selectionMode="single"
-                                 [(selection)]="selectedAlunoTarget"
-                                 [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
-                            <ng-template #header>
-                                <tr>
-                                    <th>Clique e arraste para remover</th>
-                                </tr>
-                                <tr>
-                                    <th>
-                                        <div class="flex align-items-center gap-2">
-                                            <span>Nome </span>
-                                            <p-iconfield iconPosition="left" class="ml-auto">
-                                                <p-inputicon styleClass="pi pi-search" />
-                                                <input pInputText
-                                                       type="text"
-                                                       #inputTarget
-                                                       (input)="dtTarget.filterGlobal(inputTarget.value, 'contains')"
-                                                       placeholder="Filtrar nome, turma ou perfil cognitivo" />
-                                            </p-iconfield>
-                                            <p-sortIcon field="nome" />
-                                        </div>
-                                    </th>
-                                </tr>
-                            </ng-template>
-                            <ng-template #body let-item>
-                                <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
-                                    <td [ngClass]="{
-                                        'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id
-                                    }">
-                                        <div cdkDrag [cdkDragData]="item">
-                                            <div *cdkDragPreview>
-                                                <div class="shadow-2 bg-white">
-                                                    <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
-                                                </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                                <ng-template #loadingbody let-columns="columns">
+                                    <tr>
+                                        <td>
+                                            <ng-container *ngTemplateOutlet="alunoLoading"></ng-container>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
+                        <div class="flex md:flex-column md:w-min w-full gap-2 px-1 py-1 sticky top-0 justify-content-center align-items-center">
+                            <p-button
+                                      icon="pi pi-angle-left"
+                                      styleClass="md:rotate-180 sm:-rotate-90"
+                                      severity="secondary"
+                                      [disabled]="!selectedAlunoSource"
+                                      (onClick)="moveToTarget($event)" />
+                            <p-button
+                                      icon="pi pi-angle-right "
+                                      styleClass="md:rotate-180 sm:-rotate-90"
+                                      severity="secondary"
+                                      [disabled]="!selectedAlunoTarget"
+                                      (onClick)="moveToSource($event)" />
+                        </div>
+                        <div class="md:col col-12"
+                             cdkDropList
+                             #_alunosTarget="cdkDropList"
+                             [cdkDropListConnectedTo]="_alunosSource"
+                             [cdkDropListData]="alunosTarget"
+                             (cdkDropListDropped)="targetDropped($event)"
+                             [cdkDropListDisabled]="!data || !horario ">
+                            <p-table #dtTarget
+                                     [value]="alunosTarget"
+                                     [loading]="loadingAlunos"
+                                     styleClass="h-30rem"
+                                     [scrollable]="true"
+                                     scrollHeight="30rem"
+                                     [loading]="loading"
+                                     selectionMode="single"
+                                     [(selection)]="selectedAlunoTarget"
+                                     [globalFilterFields]="['nome', 'turma', 'perfilCognitivo']">
+                                <ng-template #header>
+                                    <tr>
+                                        <th *ngIf="data && horario">Clique e arraste para remover</th>
+                                        <th *ngIf="!data && !horario">Selecione uma data para remover</th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <div class="flex align-items-center gap-2">
+                                                <span>Nome </span>
+                                                <p-iconfield iconPosition="left" class="ml-auto">
+                                                    <p-inputicon styleClass="pi pi-search" />
+                                                    <input pInputText
+                                                           type="text"
+                                                           #inputTarget
+                                                           (input)="dtTarget.filterGlobal(inputTarget.value, 'contains')"
+                                                           placeholder="Filtrar nome, turma ou perfil cognitivo" />
+                                                </p-iconfield>
+                                                <p-sortIcon field="nome" />
                                             </div>
-                                            <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
+                                        </th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template #body let-item>
+                                    <tr [pSelectableRow]="item" [pSelectableRowDisabled]="!item.disponivel">
+                                        <td [ngClass]="{'border-top-1 border-bottom-1 border-primary-500 hover:bg-primary-100': item.id == selectedAlunoSource?.id}">
+                                            <div cdkDrag [cdkDragData]="item">
+                                                <div *cdkDragPreview>
+                                                    <div class="shadow-2 bg-white">
+                                                        <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                                    </div>
+                                                </div>
+                                                <ng-container *ngTemplateOutlet="alunoTemplate; context: { item: item }"></ng-container>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </p-panel>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"
                           styleClass="w-full px-3"
@@ -554,20 +544,31 @@
         </div>
     </form>
 </p-dialog>
+<ng-template #alunoLoading>
+    <div class="cursor-pointer">
+        <div class="flex align-items-center gap-2">
+            <p-skeleton shape="circle" size="2rem" />
+            <p-skeleton width="3rem" height="1.5rem" borderRadius="10px" />
+        </div>
+        <div class="flex align-items-center gap-2">
+            <p-skeleton shape="circle" size="2rem" />
+            <p-skeleton width="3rem" height="1.5rem" borderRadius="10px" />
+            <p-skeleton width="3rem" height="2rem" borderRadius="10px" />
+        </div>
+    </div>
+</ng-template>
 <ng-template #alunoTemplate let-item="item">
     <div class="cursor-pointer">
         <div class="flex align-items-center gap-2">
             <!-- Whatsapp -->
-            <div class="w-2rem h-2rem flex flex-none align-items-center justify-content-center">
-                <p-button type="button"
-                          (onClick)="enviarMensagem(item)"
-                          (auxclick)="enviarMensagem(item)"
-                          (contextmenu)="enviarMensagem(item)"
-                          [disabled]="!item.celular"
-                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                          severity="success"
-                          [text]="true"/>
-            </div>
+            <p-button type="button"
+                        (onClick)="enviarMensagem(item)"
+                        (auxclick)="enviarMensagem(item)"
+                        (contextmenu)="enviarMensagem(item)"
+                        [disabled]="!item.celular"
+                        icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                        severity="success"
+                        [text]="true" />
             <!-- Nome -->
             <p class="mr-2">{{ item.nome }}</p>
             <p-badge *ngIf="item.disponivel == false"
@@ -577,18 +578,15 @@
         </div>
         <div class="flex align-items-center gap-2">
             <!-- Cor legenda -->
-            <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
-            <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
-                    <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                </div>
-            </ng-template>
+            <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
+                <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+            </div>
             <!-- Turma -->
             <p [pTooltip]="'Turma: ' + item.turma">
                 <span class="font-bold">{{ item.turma }}</span>
             </p>
             <!-- PerfilCognitivo -->
-            <p-tag [value]="item.perfilCognitivo" icon="fa fa-brain text-primary-500 -mt-1 text-sm mr-2" styleClass="text-primary-500 -" class="ml-auto"/>
+            <p-tag [value]="item.perfilCognitivo" icon="fa fa-brain text-primary-500 -mt-1 text-sm mr-2" styleClass="text-primary-500 -" class="ml-auto" />
             <!-- <p class="ml-auto font-bold text-primary-500">{{item.perfilCognitivo}}</p> -->
         </div>
     </div>

@@ -1,6 +1,7 @@
 <app-confirm-dialog></app-confirm-dialog>
 
 <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
+
 <div class="formgrid grid">
     <!-- Foto -->
     <div class="lg:col-3 md:col-3 col-12 px-0 ">
@@ -318,7 +319,7 @@
                                    #restricao
                                    id="restricao"
                                    name="restricao"
-                                   class="w-full"
+                                   class="w-full pr-7"
                                    [required]="true"
                                    (keyup.enter)="cadastrarRestricao($event, restricao, restricoes)"
                                    placeholder="Inserir nova restrição...">
@@ -353,7 +354,8 @@
                                 name="restricaoMobilidade"
                                 #restricaoMobilidade="ngModel"
                                 [(ngModel)]="object.restricaoMobilidade"
-                                [binary]="true" />
+                                [binary]="true"
+                                (onChange)="mobilidadeReduzidaChange($event, turma_Id)" />
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
             </div>
@@ -371,61 +373,69 @@
                         class="w-full"
                         [aluno_Id]="aluno_Id"
                         [aluno]="object"
-                        [showChecklist]="true"
-                        (alunoChanged)="object = $event"></app-aluno-checklist>
+                        [showChecklist]="true"></app-aluno-checklist>
                 </div>
                 <p-popover #checklistPopover appendTo="body">
                     <div [style]="{ maxHeight: '50vh', height: '50vh' }" class="overflow-auto">
                         <ng-container *ngFor="let checklist of object.checklistCompleto">
-                            <div class="my-2 border-100 border-bottom-1 pb-4" *ngIf="checklist">
-                                <div class="flex p-2">
-                                    <p><b>{{checklist.nome}}</b></p>
-                                    <p class="ml-2"> - Prazo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
-                                    <p class="pl-2 ml-auto text-orange-500" *ngIf="checklist.id == object.checklist_Id"> Em Andamento <i class="pi pi-hourglass ml-2"></i> </p>
-                                    <p class="pl-2 ml-auto text-red-500" *ngIf="checklist.itensAtrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times-circle ml-2"></i> </p>
-                                    <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.itensFinalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
-                                </div>
-                                <div class="px-2">
-                                    
-                                    <ng-container *ngFor="let checklistItem of checklist.items; let index = index">
-                                        <div class="flex align-items-baseline gap-2 my-1 w-min-content pr-3 p-2"
-                                                [ngClass]="{
-                                                    'surface-50': index % 2 == 0,
-                                                    'bg-white': index % 2 != 0,
-                                                }"
-                                                [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
-                                                tooltipPosition="top">
-                                            <p-checkbox *ngIf="!checklistItem.finalizado"
-                                                        [inputId]="'checklistitem-' + checklistItem.id"
-                                                        [name]="'checklistitem-' + checklistItem.id"
-                                                        #checkboxModel="ngModel"
-                                                        [(ngModel)]="checklistItem.finalizado"
-                                                        [binary]="true"
-                                                        (ngModelChange)="checklistMark(checklistItem, checkboxModel)" />
-                                            <div *ngIf="checklistItem.finalizado" 
-                                                class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
-                                                <div class="p-checkbox-box">
-                                                    <i class="pi pi-check p-checkbox-icon "></i>
+                            <ng-container *ngIf="checklist">
+                                <div class="my-2 border-100 border-bottom-1 pb-4">
+                                    <div class="flex p-2">
+                                        <p><b>{{checklist.nome}}</b></p>
+                                        <p class="ml-2"> - Prazo: <b>{{checklist.prazo | date : 'dd/MM/yyyy'}}</b></p>
+                                        <p class="pl-2 ml-auto text-orange-500" *ngIf="checklist.id == object.checklist_Id"> Em Andamento <i class="pi pi-hourglass ml-2"></i> </p>
+                                        <p class="pl-2 ml-auto text-red-500" *ngIf="checklist.itensAtrasados.length > 0 && checklist.id != object.checklist_Id"> Atrasado <i class="pi pi-times-circle ml-2"></i> </p>
+                                        <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.itensFinalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
+                                    </div>
+                                    <div class="px-2">
+                                        <!-- <pre>{{checklist.items|json}}</pre> -->
+                                        
+                                        <ng-container *ngFor="let checklistItem of checklist.items; let index = index">
+                                            <div class="flex align-items-baseline gap-2 my-1 w-min-content pr-3 p-2"
+                                                    [ngClass]="{
+                                                        'surface-50': index % 2 == 0,
+                                                        'bg-white': index % 2 != 0,
+                                                    }"
+                                                    style="height: 42px;"
+                                                    [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
+                                                    tooltipPosition="top">
+                                                <p-checkbox *ngIf="!checklistItem.finalizado"
+                                                            [inputId]="'checklistitem-' + checklistItem.id"
+                                                            [name]="'checklistitem-' + checklistItem.id"
+                                                            #checkboxModel="ngModel"
+                                                            [(ngModel)]="checklistItem.finalizado"
+                                                            [binary]="true"
+                                                            (ngModelChange)="checklistMark(checklistItem, checkboxModel)" />
+                                                <div *ngIf="checklistItem.finalizado" 
+                                                    class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
+                                                    <div class="p-checkbox-box">
+                                                        <i class="pi pi-check p-checkbox-icon "></i>
+                                                    </div>
                                                 </div>
+                                                <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
+                                                <ng-container *ngIf="checklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
+                                                  <div class="pl-2 ml-auto">
+                                                    
+                                                    <p-button type="button"
+                                                        icon="pi pi-whatsapp "
+                                                        [severity]="!object.celular ? 'secondary' : 'success'"
+                                                        [disabled]="!object.celular"
+                                                        [rounded]="true"
+                                                        pTooltip="Enviar mensagem"
+                                                        label="Enviar mensagem"
+                                                        (onClick)="enviarMensagemCondicao(checklistItem)"
+                                                        (auxclick)="enviarMensagemCondicao(checklistItem)"
+                                                        (contextmenu)="enviarMensagemCondicao(checklistItem)"/>
+                                                  </div>
+                                                </ng-container>
+                                                <ng-template #finalizadoTooltip>
+                                                    <p class="ml-auto pl-2" *ngIf="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao">Finalizado por <b>{{checklistItem.account_Finalizacao}}</b> em <b>{{checklistItem.dataFinalizacao | date : 'dd/mm/yy'}}</b></p>
+                                                </ng-template>
                                             </div>
-                                            <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                                            <ng-container *ngIf="object.celular 
-                                                            && checklistItem.finalizado == false 
-                                                            && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                                                <a [href]="enviarMensagemCondicao(checklistItem).link"
-                                                    target="_blank"
-                                                    class="p-button p-button-sm p-button-rounded p-button-success py-1 px-3 ml-auto">
-                                                    <span class="p-button-label">Enviar mensagem</span>
-                                                    <i class="pi pi-whatsapp p-button-icon p-button-icon-right"></i>
-                                                </a>
-                                            </ng-container>
-                                            <ng-template #finalizadoTooltip>
-                                                <p class="ml-auto pl-2" *ngIf="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao">Finalizado por <b>{{checklistItem.account_Finalizacao}}</b> em <b>{{checklistItem.dataFinalizacao | date : 'dd/mm/yy'}}</b></p>
-                                            </ng-template>
-                                        </div>
-                                    </ng-container>
+                                        </ng-container>
+                                    </div>
                                 </div>
-                            </div>
+                            </ng-container>
                         </ng-container>
                     </div>
                 </p-popover>
@@ -439,7 +449,7 @@
             <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
                 <p-select
-                          [options]="turmasFiltered"
+                          [options]="turmasDisponiveis"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
                           [showClear]="true"
@@ -455,9 +465,9 @@
                           placeholder="Selecione"
                           optionDisabled="deactivated"
                           (onChange)="turmaChanged(turma_Id, $event)">
-                    <ng-template let-item #item>
+                    <ng-template #item let-item>
                         <div class="w-full">
-                            <div class="flex align-items-center justify-content-between">
+                            <div class="flex align-items-center justify-content-between gap-3">
                                 <p class="flex align-items-center">
                                     <span class="w-1rem h-1rem flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
                                     <span>{{ item.nome }}</span>
@@ -466,7 +476,7 @@
                             </div>
                             <p class="text-xs mt-1">
                                 <i class="fa-solid fa-brain mr-2"></i>
-                                {{getPerfilCognitivo(item)}}
+                                 {{item.perfilCognitivoString}}
                             </p>
                         </div>
                     </ng-template>

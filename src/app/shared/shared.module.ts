@@ -14,10 +14,10 @@ import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 // Alunos
-import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
-import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
-import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/form/historico/historico.component';
+// import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
+// import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
+// import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
+// import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/form/historico/historico.component';
 import { AlunoPopoverComponent } from './aluno/aluno-popover/aluno-popover.component';
 import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/aluno-checklist-dialog.component';
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
@@ -40,10 +40,10 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
     declarations: [
         ProfileComponent,
         ChangePasswordComponent,
-        AlunoFormComponent,
-        AlunoDadosCadastraisComponent,
-        AlunoCalendarioComponent,
-        AlunoHistoricoComponent,
+        // AlunoFormComponent,
+        // AlunoDadosCadastraisComponent,
+        // AlunoCalendarioComponent,
+        // AlunoHistoricoComponent,
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,
@@ -69,10 +69,10 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
         NameAbvPipe,
         ProfileComponent,
         ChangePasswordComponent,
-        AlunoFormComponent,
-        AlunoDadosCadastraisComponent,
-        AlunoCalendarioComponent,
-        AlunoHistoricoComponent,
+        // AlunoFormComponent,
+        // AlunoDadosCadastraisComponent,
+        // AlunoCalendarioComponent,
+        // AlunoHistoricoComponent,
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,

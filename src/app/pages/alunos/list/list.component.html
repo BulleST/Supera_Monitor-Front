@@ -336,11 +336,11 @@
                 </td>
             </tr>
         </ng-template>
-        <ng-template #loadingbody let-columns="columns">
+        <ng-template #loadingbody let-columns>
             <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" 
-            class="fadein"
-            style="height: 43px;">
-                <td *ngFor="let col of [1,2,3,4,5,6]" >
+                class="fadein"
+                style="height: 43px;">
+                <td *ngFor="let col of columns" >
                     <p-skeleton />
                 </td>
                 <td>

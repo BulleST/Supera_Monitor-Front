@@ -462,6 +462,32 @@ input.ng-invalid.ng-touched {
     border-color: var(--surface-950);
 }
 
+/* multiselect */
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(odd) .p-multiselect-option,
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(even) .p-multiselect-option,
+/* select */
+.p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option,
+.p-select-overlay.p-select-stripped p-selectitem:nth-child(even) .p-select-option {
+    border-bottom: 1px solid var(--surface-200)!important;
+}
+/* multiselect */
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(odd) .p-multiselect-option,
+/* select */
+.p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option {
+    background-color: var(--surface-50)!important;
+}
+
+/* multiselect */
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(even) .p-multiselect-option:hover,
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(odd) .p-multiselect-option:hover,
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(even) .p-multiselect-option.p-focus,
+.p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(odd) .p-multiselect-option.p-focus,
+/* select */
+.p-select-overlay.p-select-stripped p-selectitem:nth-child(even) .p-select-option:hover,
+.p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option:hover {
+    background-color: var(--p-primary-100)!important;
+}
+
 form .field p-selectitem:nth-child(even) .p-select-option {
     border-bottom: 1px solid var(--surface-200);
 }

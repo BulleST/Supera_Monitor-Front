@@ -90,6 +90,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
             this.alunoChecklistOnConfirmDialog.hide();
             onCancel.unsubscribe();
+            onFinish.unsubscribe();
         });
 
         var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
@@ -102,6 +103,7 @@ export class ChecklistItemAlunoComponent implements OnChanges {
             setTimeout(() => {
                 this.alunoChecklistItem = undefined as any;
             }, 1000);
+            onCancel.unsubscribe();
             onFinish.unsubscribe();
         });
         

@@ -1,0 +1,109 @@
+<div class="card">
+    <p-tabs [value]="0">
+        <p-tablist>
+            <p-tab [value]="0">Dados Cadastrais</p-tab>
+            <p-tab [value]="1" [disabled]="true">Histórico</p-tab>
+        </p-tablist>
+        <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
+            <p-tabpanel [value]="0">
+                <div class="formgrid grid">
+                    <div class="lg:col-3 md:col-3 col-12 flex align-items-center justify-content-center">
+                        <p-skeleton size="180px" shape="circle"/>
+                    </div>
+                   <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
+                        <div class="hidden md:block surface-300" style="height: 95%; width: 2px;"></div>
+                        <div class="formgrid grid pl-2 sm:px-3">
+                            <div class="field lg:col-4 md:col-6 sm:col-6 xs:col-8 col-12">
+                                <label>Nome: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                          <div class="field lg:col-2 md:col-3 sm:col-2 xs:col-4 col-12">
+                                <label>RM <small class="text-400 line-height-1">(Registro de Matrícula)</small>: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                             </div>
+                          <div class="field lg:col-3 md:col-3 sm:col-4 xs:col-6 col-12">
+                                <label>Data de Nascimento: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                               <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
+                                <label>Gênero: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
+                                <label>Telefone: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
+                                <label>Celular: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field sm:col-6 xs:col-6 col-12">
+                                <label>E-mail: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field sm:col-6 xs:col-6 col-12">
+                                <label>Endereço: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
+                                <label>Início Vigência: <span class="text-red-500">*</span></label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
+                                <label>Fim Vigência: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
+                                <label>Restrições: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
+                                <label>Etapa da jornada: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div> 
+                        </div>
+                    </div>
+                     <div class="col-12 px-3 mt-2 flex overflow-hidden">
+
+                        <div class="formgrid grid w-full">
+                            <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Turma:</label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Educador: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Perfil Cognitivo:</label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Kit Apostila</label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Apostila Ábaco: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Página: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Apostila AH: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                            <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
+                                <label>Página: </label>
+                                <p-skeleton width="100%" height="32px" borderRadius="5px"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p-tabpanel>
+            <p-tabpanel [value]="1">
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</div>

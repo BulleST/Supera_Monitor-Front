@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Checklist_Item } from '../../../models/checklist.model';
+import { Aluno_CheckList_Item, Checklist_Item } from '../../../models/checklist.model';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmationService } from 'primeng/api';
@@ -8,6 +8,7 @@ import { lastValueFrom } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoService } from '../../../services/alunos.service';
 import { UserService } from '../../../services/user.service';
+import { AccountService } from '../../../services/account.service';
 
 @Component({
     selector: 'app-aluno-checklist-on-confirm-dialog',
@@ -38,6 +39,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
         private mensagemWhatsapp: MensagemWhatsapp,
         private alunoService: AlunoService,
         private userService: UserService,
+        private accountService: AccountService,
     ) {
 
     }
@@ -58,11 +60,14 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
         }
     }
 
-    show(aluno?: Aluno) {
+    show(aluno?: Aluno, alunoChecklistItem?: Aluno_CheckList_Item){
         this.visible = true;
         if (aluno) {
             this.aluno = aluno;
         }
+
+        if (alunoChecklistItem)
+            this.alunoChecklistItem = alunoChecklistItem;
         if (!this.aluno) {
             this.loadAluno();
         }
@@ -108,25 +113,22 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
                 this.observacao = '';
                 this.loading = false;
                 this.toastr.success(`Checklist ${this.item.nome} finalizado com sucesso!`);
+
+                res.object.account_Finalizacao = this.accountService.accountValue!.name; 
+                this.onFinish.emit(res.object);
+                this.onCancel.complete();
                 this.hide();
-
-                this.userService.get(res.object.account_Finalizacao_Id)
-                    .then(user => {
-                        res.object.account_Finalizacao = user.name;
-                        this.onFinish.emit(res.object);
-                        this.service.onFinish.emit(res.object)
-                    });
-
             })
             .catch(res => {
                 this.showError('Erro', 'Não foi possível finalizar o checklist.', e, res)
                 this.hide();
+                console.log(res)
                 this.onCancel.emit(true);
             });
     }
 
 
-    enviarMensagem() {
+    enviarMensagemCondicao() {
 
         let id = this.alunoChecklistItem.checklist_Item_Id;
         let aluno = {

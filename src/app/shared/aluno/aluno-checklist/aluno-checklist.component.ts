@@ -95,7 +95,8 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
                     var checklistAluno = new AlunoChecklistCompleto;
                     checklistAluno.id = checklist.id;
                     checklistAluno.nome = checklist.nome;
-                    checklistAluno.items = alunoChecklist.filter(x => x.checklist_Id == checklist.id);
+                    checklistAluno.items = alunoChecklist.filter(x => x.checklist_Id == checklist.id)
+                        .sort((x, y) => x.ordem - y.ordem);
                     checklistAluno.prazo = checklistAluno.items[0]?.prazo ?? undefined;
                     checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                     checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());

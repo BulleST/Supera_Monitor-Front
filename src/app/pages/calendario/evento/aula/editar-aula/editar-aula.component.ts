@@ -101,12 +101,17 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue
+
+            if (!this.evento.finalizado) {
+                this.evento.alunos.filter(x => x.active).forEach(item => item.presente = true)
+            }
             this.setApostilasAlunos()
+            this.setRoteiro();
+
             if (this.evento.perfilCognitivo.length > 0) {
                 this.perfilCognitivo = this.evento.perfilCognitivo[0].nome
             }
 
-            this.setRoteiro()
         }
 
         if (changes['duracaoEvento'])
@@ -114,10 +119,13 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         if (changes['professores'])
             this.professores = changes['professores'].currentValue
+
         if (changes['loadingProfessores'])
             this.loadingProfessores = changes['loadingProfessores'].currentValue
 
-        if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue
+        if (changes['salaAulas']) 
+            this.salaAulas = changes['salaAulas'].currentValue
+
         if (changes['loadingSalaAulas'])
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue
 
@@ -144,17 +152,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         this.validaProfessor.emit(item)
 
         if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Professor indisponível' })
-            this.showError(
-                'Professor Indisponível',
-                `Esse professor está atribuído a outra ${this.getTipo(
-                    item.disponivelEvent,
-                )} no mesmo dia às <b>${moment(item.disponivelEvent.data).format(
-                    'HH[h]mm',
-                )}</b>.`,
-                e.originalEvent,
-            )
-            return
+            model.control.setErrors({ indisponivel: 'Educador indisponível' })
+            let horario = moment(item.disponivelEvent.data).format('HH[h]mm');
+            this.showError('Educador Indisponível', `Esse educador está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${horario}</b>.`, e.originalEvent );
+            return;
         } else {
             model.control.setErrors({ indisponivel: null })
         }
@@ -307,10 +308,13 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         let prev = this.clonedRow[item.aluno_Id]
         let current = item
 
-        if (
-            current.numeroPaginaAbaco <= prev.numeroPaginaAbaco &&
-            prev.apostila_Abaco_Id == current.apostila_Abaco_Id
-        ) {
+
+        if (item.presente === true && item.numeroPaginaAbaco === 0) {
+            item.numeroPaginaAbaco = 1;
+            return this.showError('OPS!', 'Se o aluno esteve presente, ele deve avançar pelo menos na página 1, certo?!', e);
+        }
+
+        if (current.numeroPaginaAbaco <= prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
             this.confirmationService.confirm({
                 target: e.target,
                 message: `O aluno está regredindo a página da apostila "${current.apostila_Abaco}"?`,
@@ -336,17 +340,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
     apostilaAHChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
 
-        let newApostila = this.apostilas.find(
-            (x) => x.id == item.apostila_AH_Id,
-        ) as Apostila
-        let oldApostila = this.apostilas.find(
-            (x) => x.id == this.clonedRow[item.aluno_Id].apostila_AH_Id,
-        ) as Apostila
+        let newApostila = this.apostilas.find(x => x.id == item.apostila_AH_Id) as Apostila;
+        let oldApostila = this.apostilas.find(x => x.id == this.clonedRow[item.aluno_Id].apostila_AH_Id) as Apostila;
 
-        if (
-            newApostila.id != oldApostila.id &&
-            newApostila.ordem < oldApostila.ordem
-        ) {
+        if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
             this.confirmationService.confirm({
                 target: e.originalEvent.target as EventTarget,
                 message: `Tem certeza que deseja regredir a apostila desse aluno?.`,
@@ -381,6 +378,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         let prev = this.clonedRow[item.aluno_Id]
         let current = item
 
+        if (item.presente === true && item.numeroPaginaAbaco === 0) {
+            item.numeroPaginaAbaco = 1;
+            return this.showError('OPS!', 'Se o aluno esteve presente, ele deve avançar pelo menos na página 1, certo?!', e);
+        }
         if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
             this.confirmationService.confirm({
                 target: e.target,

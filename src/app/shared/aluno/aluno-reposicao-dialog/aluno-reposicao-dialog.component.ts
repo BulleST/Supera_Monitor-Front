@@ -17,6 +17,8 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoAulaRequest } from '../../../models/evento-aula.model';
 import { MyMap } from '../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
+import { Roteiro } from '../../../models/roteiro.model';
+import { RoteiroService } from '../../../services/roteiro.service';
 
 @Component({
     selector: 'app-aluno-reposicao-dialog',
@@ -42,6 +44,9 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
+    roteiros: Roteiro[] = [];
+    loadingRoteiros = false;
+
     eventoReposicaoPara?: Evento;
     eventosReposicaoParaList: Evento[] = [];
     loadingEventosReposicaoPara = false;
@@ -59,10 +64,20 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         private crypto: Crypto,
         private salaAulaPipe: SalaAulaPipe,
         private confirmationService: ConfirmationService,
+        private roteiroService: RoteiroService,
     ) {
 
+        let roteiros = roteiroService.list.subscribe(res => this.roteiros = res);
+        this.subscription.push(roteiros)
 
-        var params = this.activatedRoute.params.subscribe(res => {
+        if (!this.roteiros.length) {
+            this.loadingRoteiros = true;
+            lastValueFrom(this.roteiroService.getList())
+                .then(res => this.loadingRoteiros = false)
+                .catch(res => this.loadingRoteiros = false);
+        }
+
+        let params = this.activatedRoute.params.subscribe(res => {
             if (res['aluno_id']) {
                 this.aluno_Id = this.crypto.decrypt(res['aluno_id']);
                 this.blockAlunoField = true;
@@ -70,7 +85,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 this.loadEventosReposicaoDe();
             }
             else {
-                var alunos = alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active));
+                let alunos = alunoService.list.subscribe(res => {
+                    this.alunos = res.filter(x =>  x.active == true);
+                    this.setAlunos();
+                });
                 this.subscription.push(alunos)
 
                 if (!this.alunos.length) {
@@ -97,6 +115,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             if (res) {
                 this.eventoReposicaoPara = res;
                 this.blockReposicaoParaField = true;
+                this.setAlunos();
             }
         });
         this.subscription.push(eventoReposicaoPara);
@@ -128,9 +147,30 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     enviarMensagem(aluno: Aluno) {
-        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+    }
+
+    setAlunos() {
+        if (this.alunos.length) {
+            if (this.eventoReposicaoPara) {
+
+                // Em caso de rota por selected-evento.component > opções > agendar reposicao
+                // Vai marcar o para
+                // Filtra somente os alunos que não estão nessa aula
+                
+                let alunos = this.eventoReposicaoPara.alunos.filter(x => x.active).map(X => X.aluno_Id);
+                this.alunos = this.alunos.filter(x => !alunos.includes(x.id) && x.active == true)
+                
+                // OBS: 
+                // Se em caso de rota por selected-evento.component > aluno-popover.component > opções > agendar reposicao
+                // OU _initial/monitoramento-dashboard.component > agendar reposicao
+                // o eventoReposicaoDe é marcado e a rota é inserida com o aluno_id, impossibilitando seleção de outro aluno
+                // Sendo assim não precisa filtrar os alunos nesse caso
+            }
+            
+        }
     }
 
     async loadAluno(aluno?: Aluno) {
@@ -243,12 +283,23 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
 
-    alunoChanged(e: SelectChangeEvent, model: NgModel) {
+    alunoChanged(e: SelectChangeEvent) {
         this.aluno_Id = e.value.id;
+
+        if (!this.eventoService.eventoReposicaoDe.value) {
+            this.eventoReposicaoDe = undefined;
+        }
+        if (!this.eventoService.eventoReposicaoPara.value) {
+            this.eventoReposicaoPara = undefined;
+        }
+
         this.loadEventosReposicaoDe();
     }
 
     eventoReposicaoChanged() {
+        if (!this.eventoService.eventoReposicaoPara.value) {
+            this.eventoReposicaoPara = undefined;
+        }
         this.loadEventosReposicaoPara();
     }
 
@@ -315,12 +366,18 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     getRestricoes(aluno: Aluno) {
-        var restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
+        let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
         return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
     }
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
+    }
+
+    getCorRoteiro(roteiro_Id?: number) {
+        let roteiro = this.roteiros.find(x => x.id == roteiro_Id)
+        return roteiro?.corLegenda;
+
     }
 
 
@@ -361,11 +418,11 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
         this.loading = true;
 
-        var request = new ReposicaoAlunoRequest;
+        let request = new ReposicaoAlunoRequest;
         request.aluno_Id = aluno.id;
         request.source_Aula_Id = source.id;
         request.dest_Aula_Id = target.id;
-        var response: RequestResponse = { success: true, message: '', object: undefined };
+        let response: RequestResponse = { success: true, message: '', object: undefined };
 
 
         // Se a aula source não existir, cria a aula
@@ -408,7 +465,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     requestAulaTurma(evento: Evento) {
-        var request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
+        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
         request.alunos = evento.alunos.map(x => x.aluno_Id);
         request.professores = evento.professor_Id ? [evento.professor_Id] : [];
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id);
@@ -431,7 +488,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             accept: () => {
                 this.visible = false
                 this.visibleChange();
-                var url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, evento);
+                let url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, evento);
                 window.open(url.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(url.mensagem);
             },

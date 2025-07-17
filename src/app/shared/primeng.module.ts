@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 
 // Módulos essenciais - baseado na análise dos templates HTML
 import { AccordionModule } from 'primeng/accordion';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { BadgeModule } from 'primeng/badge';
+import { BlockUIModule } from 'primeng/blockui';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ChipModule } from 'primeng/chip';
+import { ColorPickerModule } from 'primeng/colorpicker'
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { DataViewModule } from 'primeng/dataview';
+import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
 import { FieldsetModule } from 'primeng/fieldset';
@@ -32,11 +36,14 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { PickListModule } from 'primeng/picklist';
+import { PrimeNG } from 'primeng/config';
+import { PopoverModule } from 'primeng/popover';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { RippleModule } from 'primeng/ripple';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { SelectModule } from 'primeng/select';
 import { SidebarModule } from 'primeng/sidebar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
@@ -50,17 +57,12 @@ import { ToastModule } from 'primeng/toast';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { ToolbarModule } from 'primeng/toolbar';
+import { TooltipModule } from 'primeng/tooltip';
 import { TreeModule } from 'primeng/tree';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeSelectModule } from 'primeng/treeselect';
-import { PopoverModule } from 'primeng/popover';
+
 import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api';
-import { TooltipModule } from 'primeng/tooltip';
-import { PrimeNG } from 'primeng/config';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SelectModule } from 'primeng/select';
-import { ColorPickerModule } from 'primeng/colorpicker'
-import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @NgModule({
     imports: [
@@ -69,6 +71,7 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
         AnimateOnScrollModule,
         BadgeModule,
         ButtonModule,
+        BlockUIModule,
         CardModule,
         CheckboxModule,
         ChipModule,
@@ -129,6 +132,7 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
         AnimateOnScrollModule,
         BadgeModule,
         ButtonModule,
+        BlockUIModule,
         CardModule,
         CheckboxModule,
         ChipModule,

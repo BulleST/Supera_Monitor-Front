@@ -299,6 +299,35 @@ EventoTipo = EventoTipo;
     }
 
     finalizarConfirmation(e: any) {
+
+        let alunosPresentesSemPaginaDefinida = this.evento.alunos.filter(x => x.active === true 
+            && x.presente === true
+            && (x.numeroPaginaAH == 0 || x.numeroPaginaAbaco == 0)
+        )
+
+        if (alunosPresentesSemPaginaDefinida.length > 0) {
+            let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul>'
+            alunosPresentesSemPaginaDefinida.forEach(item => {
+                mensagem += `<li>${item.aluno}: `
+                if (item.numeroPaginaAH == 0) 
+                    mensagem += `- Página AH: ${item.numeroPaginaAH}  <i class="pi pi-times-circle text-red-500"></i>`;
+                else 
+                    mensagem += `- Página AH: ${item.numeroPaginaAH}  <i class="pi pi-check-circle text-green-500"></i>`;
+
+                if (item.numeroPaginaAbaco == 0) 
+                    mensagem += `- Página Ábaco: ${item.numeroPaginaAbaco}  <i class="pi pi-times-circle text-red-500"></i>`;
+                else 
+                    mensagem += `- Página Ábaco: ${item.numeroPaginaAbaco}  <i class="pi pi-check-circle text-green-500"></i>`;
+
+                    mensagem += '</li>';
+                    
+                })
+            mensagem += '</ul>';
+            return this.showError('Validar páginas', mensagem, e)
+        }
+
+
+
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,

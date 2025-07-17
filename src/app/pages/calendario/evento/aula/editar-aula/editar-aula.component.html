@@ -1,271 +1,268 @@
 <div class="formgrid grid">
-  <div class="lg:col-8 md:col-8 col-12">
-    <div class="formgrid grid">
-      <!-- Descrição -->
-      <div
-        class="field lg:col-6 sm:col-5 col-6"
-        *ngIf="evento.turma">
-        <label for="turma">Turma:</label>
-        <p-iconfield>
-          <p-inputicon styleClass="fa-solid fa-users-between-lines text-primary" />
-          <input
-            type="text"
-            pInputText
-            [value]="evento.descricao"
-            class="w-full cursor-default bg-surface-100"
-            id="turma"
-            readonly />
-        </p-iconfield>
-      </div>
-      <!-- Data -->
-      <div class="field lg:col-2 sm:col-3 col-6">
-        <label for="dataInicio">Data:</label>
-        <p-iconfield>
-          <p-inputicon styleClass="pi pi-calendar text-primary" />
-          <input
-            type="text"
-            pInputText
-            [value]="evento.data | date : 'dd/MM/yyyy'"
-            class="w-full cursor-default bg-surface-100"
-            id="dataInicio"
-            readonly />
-        </p-iconfield>
-      </div>
+    <div class="lg:col-8 md:col-8 col-12">
+        <div class="formgrid grid">
+            <!-- Descrição -->
+            <div
+                 class="field lg:col-6 sm:col-5 col-6"
+                 *ngIf="evento.turma">
+                <label for="turma">Turma:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="fa-solid fa-users-between-lines text-primary" />
+                    <input
+                           type="text"
+                           pInputText
+                           [value]="evento.descricao"
+                           class="w-full cursor-default bg-surface-100"
+                           id="turma"
+                           readonly />
+                </p-iconfield>
+            </div>
+            <!-- Data -->
+            <div class="field lg:col-2 sm:col-3 col-6">
+                <label for="dataInicio">Data:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-calendar text-primary" />
+                    <input
+                           type="text"
+                           pInputText
+                           [value]="evento.data | date : 'dd/MM/yyyy'"
+                           class="w-full cursor-default bg-surface-100"
+                           id="dataInicio"
+                           readonly />
+                </p-iconfield>
+            </div>
 
-      <!-- Horário -->
-      <div class="field lg:col-2 sm:col-2 col-6">
-        <label for="horario">Horário:</label>
-        <p-iconfield>
-          <p-inputicon styleClass="pi pi-clock text-primary" />
-          <input
-            type="text"
-            pInputText
-            [value]="evento.data | date : 'HH:mm'"
-            class="w-full cursor-default bg-surface-100"
-            id="horario"
-            readonly />
-        </p-iconfield>
-      </div>
+            <!-- Horário -->
+            <div class="field lg:col-2 sm:col-2 col-6">
+                <label for="horario">Horário:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-clock text-primary" />
+                    <input
+                           type="text"
+                           pInputText
+                           [value]="evento.data | date : 'HH:mm'"
+                           class="w-full cursor-default bg-surface-100"
+                           id="horario"
+                           readonly />
+                </p-iconfield>
+            </div>
 
-      <!-- Duração -->
-      <div class="field lg:col-2 sm:col-2 col-6">
-        <label for="duracaoEvento">Duração:</label>
-        <p-iconfield>
-          <p-inputicon styleClass="pi pi-hourglass text-primary" />
-          <input
-            type="text"
-            pInputText
-            [value]="duracaoEvento"
-            class="w-full cursor-default bg-surface-100"
-            id="duracaoEvento"
-            readonly />
-        </p-iconfield>
-      </div>
+            <!-- Duração -->
+            <div class="field lg:col-2 sm:col-2 col-6">
+                <label for="duracaoEvento">Duração:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-hourglass text-primary" />
+                    <input
+                           type="text"
+                           pInputText
+                           [value]="duracaoEvento"
+                           class="w-full cursor-default bg-surface-100"
+                           id="duracaoEvento"
+                           readonly />
+                </p-iconfield>
+            </div>
 
-      <!-- Educador -->
-      <div class="field sm:col-4 col-6">
-        <label for="professor_Id"
-          >Educador:
-          <span
-            *ngIf="evento.finalizado"
-            class="text-red-500"
-            >*</span
-          ></label
-        >
-        <p-select
-          [options]="professores"
-          [(ngModel)]="evento.professor_Id"
-          [loading]="loadingProfessores"
-          (onChange)="professorChanged($event, professor_Id)"
-          placeholder="Selecione"
-          #professor_Id="ngModel"
-          styleClass="w-full"
-          class="w-full"
-          name="professor_Id"
-          inputId="professor_Id"
-          optionLabel="nome"
-          optionValue="id"
-          [required]="true"
-          [filter]="true"
-          filterBy="nome"
-          appendTo="body"
-          optionDisabled="deactivated"
-          [readonly]="evento.finalizado || !evento.active"
-          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
-          <ng-template
-            let-item
-            #item>
-            <div class="flex align-items-center justify-content-between w-full gap-2">
-              <div>
-                <p class="font-bold mb-1 flex align-items-center">
-                  <span
-                    class="w-1rem h-1rem border-circle flex mr-2"
-                    [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                  <span class="mr-2">{{ item.nome }}</span>
-                  <p-badge
-                    *ngIf="item.disponivel == false"
-                    value="Indisponível"
-                    severity="danger"
-                    [pTooltip]="indisponivelTemplate" />
-                  <ng-template #indisponivelTemplate>
-                    <div class="w-25rem">
-                      <p>
-                        <span>Evento: </span>
-                        <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
-                        <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
-                      </p>
-                      <p>{{ item.disponivelEvent.descricao }}</p>
-                      <p *ngIf="item.disponivelEvent.professor">
-                        <span
-                          class="w-1rem h-1rem border-circle inline-flex mr-2"
-                          [style]="{
+            <!-- Educador -->
+            <div class="field sm:col-4 col-6">
+                <label for="professor_Id">Educador:
+                    <span
+                          *ngIf="evento.finalizado"
+                          class="text-red-500">*</span></label>
+                <p-select
+                          [options]="professores"
+                          [(ngModel)]="evento.professor_Id"
+                          [loading]="loadingProfessores"
+                          (onChange)="professorChanged($event, professor_Id)"
+                          placeholder="Selecione"
+                          #professor_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="professor_Id"
+                          inputId="professor_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          [readonly]="evento.finalizado || !evento.active"
+                          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                    <ng-template
+                                 let-item
+                                 #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1 flex align-items-center">
+                                    <span
+                                          class="w-1rem h-1rem border-circle flex mr-2"
+                                          [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                    <span class="mr-2">{{ item.nome }}</span>
+                                    <p-badge
+                                             *ngIf="item.disponivel == false"
+                                             value="Indisponível"
+                                             severity="danger"
+                                             [pTooltip]="indisponivelTemplate" />
+                                    <ng-template #indisponivelTemplate>
+                                        <div class="w-25rem">
+                                            <p>
+                                                <span>Evento: </span>
+                                                <span
+                                                      class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                                                <span> -
+                                                    {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
+                                            </p>
+                                            <p>{{ item.disponivelEvent.descricao }}</p>
+                                            <p *ngIf="item.disponivelEvent.professor">
+                                                <span
+                                                      class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                                      [style]="{
                             backgroundColor: item.disponivelEvent.corLegenda,
                             borderColor: item.disponivelEvent.corLegenda
                           }"></span>
-                        <span>{{ item.disponivelEvent.professor }}</span>
-                      </p>
-                      <p
-                        *ngIf="
+                                                <span>{{ item.disponivelEvent.professor }}</span>
+                                            </p>
+                                            <p
+                                               *ngIf="
                           item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao
                         ">
-                        {{ item.disponivelEvent.turma }}
-                      </p>
-                      <p *ngIf="item.disponivelEvent.sala_Id">
-                        <span>Sala: </span>
-                        <app-sala-aula
-                          [numeroSala]="item.disponivelEvent.numeroSala"
-                          [andar]="item.disponivelEvent.andar"
-                          [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                      </p>
-                    </div>
-                  </ng-template>
-                </p>
-                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                  <p class="text-sm">
-                    Expediente {{ item.expedienteInicio | date : 'HH:mm' }} às {{ item.expedienteFim | date : 'HH:mm' }}
-                  </p>
-                </ng-container>
-              </div>
-              <p-tag
-                styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                [value]="item.active ? 'Ativo' : 'Inativo'"
-                [severity]="item.active ? 'success' : 'danger'"
-                [pTooltip]="
+                                                {{ item.disponivelEvent.turma }}
+                                            </p>
+                                            <p *ngIf="item.disponivelEvent.sala_Id">
+                                                <span>Sala: </span>
+                                                <app-sala-aula
+                                                               [numeroSala]="item.disponivelEvent.numeroSala"
+                                                               [andar]="item.disponivelEvent.andar"
+                                                               [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                            </p>
+                                        </div>
+                                    </ng-template>
+                                </p>
+                                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                    <p class="text-sm">
+                                        Expediente {{ item.expedienteInicio | date : 'HH:mm' }} às
+                                        {{ item.expedienteFim | date : 'HH:mm' }}
+                                    </p>
+                                </ng-container>
+                            </div>
+                            <p-tag
+                                   styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo' : 'Inativo'"
+                                   [severity]="item.active ? 'success' : 'danger'"
+                                   [pTooltip]="
                   !item.active ? 'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm') : undefined
                 " />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
+                    <p
+                       class="text-red-500 mt-2 mb-0"
+                       *ngIf="professor_Id.errors['required']">
+                        Esse campo é obrigatório.
+                    </p>
+                    <p
+                       class="text-red-500 mt-2 mb-0"
+                       *ngIf="professor_Id.errors['indisponivel']">
+                        Educador indisponível.
+                    </p>
+                </div>
             </div>
-          </ng-template>
-        </p-select>
-        <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
-          <p
-            class="text-red-500 mt-2 mb-0"
-            *ngIf="professor_Id.errors['required']">
-            Esse campo é obrigatório.
-          </p>
-          <p
-            class="text-red-500 mt-2 mb-0"
-            *ngIf="professor_Id.errors['indisponivel']">
-            Educador indisponível.
-          </p>
-        </div>
-      </div>
-      <!-- Sala -->
-      <div class="field sm:col-4 col-6">
-        <label for="sala_Id"
-          >Sala:
-          <span
-            *ngIf="evento.finalizado"
-            class="text-red-500"
-            >*</span
-          ></label
-        >
-        <p-select
-          [options]="salaAulas"
-          [(ngModel)]="evento.sala_Id"
-          [loading]="loadingSalaAulas"
-          (onChange)="salaAulaChanged($event, sala_Id)"
-          #sala_Id="ngModel"
-          styleClass="w-full"
-          class="w-full"
-          name="sala_Id"
-          inputId="sala_Id"
-          optionValue="id"
-          [required]="true"
-          [filter]="true"
-          filterBy="nome"
-          appendTo="body"
-          optionDisabled="deactivated"
-          [readonly]="evento.finalizado || !evento.active"
-          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
-          <ng-template
-            #selectedItem
-            let-selectedOption>
-            <app-sala-aula
-              [numeroSala]="selectedOption.numeroSala"
-              [andar]="selectedOption.andar"
-              [sala_Id]="selectedOption.id"></app-sala-aula>
-          </ng-template>
-          <ng-template
-            let-item
-            #item>
-            <span class="mr-2">
-              <app-sala-aula
-                [numeroSala]="item.numeroSala"
-                [andar]="item.andar"
-                [sala_Id]="item.id"></app-sala-aula>
-            </span>
-            <p-badge
-              *ngIf="item.disponivel == false"
-              value="Indisponível"
-              severity="danger"
-              [pTooltip]="indisponivelTemplate" />
-            <ng-template #indisponivelTemplate>
-              <div class="w-25rem">
-                <p>
-                  <span>Evento: </span>
-                  <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
-                  <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
-                </p>
-                <p>{{ item.disponivelEvent.descricao }}</p>
-                <p *ngIf="item.disponivelEvent.professor">
-                  <span
-                    class="w-1rem h-1rem border-circle inline-flex mr-2"
-                    [style]="{
+            <!-- Sala -->
+            <div class="field sm:col-4 col-6">
+                <label for="sala_Id">Sala:
+                    <span
+                          *ngIf="evento.finalizado"
+                          class="text-red-500">*</span></label>
+                <p-select
+                          [options]="salaAulas"
+                          [(ngModel)]="evento.sala_Id"
+                          [loading]="loadingSalaAulas"
+                          (onChange)="salaAulaChanged($event, sala_Id)"
+                          #sala_Id="ngModel"
+                          styleClass="w-full"
+                          class="w-full"
+                          name="sala_Id"
+                          inputId="sala_Id"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          [readonly]="evento.finalizado || !evento.active"
+                          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                    <ng-template
+                                 #selectedItem
+                                 let-selectedOption>
+                        <app-sala-aula
+                                       [numeroSala]="selectedOption.numeroSala"
+                                       [andar]="selectedOption.andar"
+                                       [sala_Id]="selectedOption.id"></app-sala-aula>
+                    </ng-template>
+                    <ng-template
+                                 let-item
+                                 #item>
+                        <span class="mr-2">
+                            <app-sala-aula
+                                           [numeroSala]="item.numeroSala"
+                                           [andar]="item.andar"
+                                           [sala_Id]="item.id"></app-sala-aula>
+                        </span>
+                        <p-badge
+                                 *ngIf="item.disponivel == false"
+                                 value="Indisponível"
+                                 severity="danger"
+                                 [pTooltip]="indisponivelTemplate" />
+                        <ng-template #indisponivelTemplate>
+                            <div class="w-25rem">
+                                <p>
+                                    <span>Evento: </span>
+                                    <span
+                                          class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                                    <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
+                                </p>
+                                <p>{{ item.disponivelEvent.descricao }}</p>
+                                <p *ngIf="item.disponivelEvent.professor">
+                                    <span
+                                          class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                          [style]="{
                       backgroundColor: item.disponivelEvent.corLegenda,
                       borderColor: item.disponivelEvent.corLegenda
                     }"></span>
-                  <span>{{ item.disponivelEvent.professor }}</span>
-                </p>
-                <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
-                  {{ item.disponivelEvent.turma }}
-                </p>
-                <p *ngIf="item.disponivelEvent.sala_Id">
-                  <span>Sala: </span>
-                  <app-sala-aula
-                    [numeroSala]="item.disponivelEvent.numeroSala"
-                    [andar]="item.disponivelEvent.andar"
-                    [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                </p>
-              </div>
-            </ng-template>
-          </ng-template>
-        </p-select>
-        <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
-          <p
-            class="text-red-500 mt-2 mb-0"
-            *ngIf="sala_Id.errors['required']">
-            Esse campo é obrigatório.
-          </p>
-          <p
-            class="text-red-500 mt-2 mb-0"
-            *ngIf="sala_Id.errors['indisponivel']">
-            Sala indisponível.
-          </p>
-        </div>
-      </div>
-      <!-- Semana -->
-      <!-- <div class="field sm:col-3 col-6">
+                                    <span>{{ item.disponivelEvent.professor }}</span>
+                                </p>
+                                <p
+                                   *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
+                                    {{ item.disponivelEvent.turma }}
+                                </p>
+                                <p *ngIf="item.disponivelEvent.sala_Id">
+                                    <span>Sala: </span>
+                                    <app-sala-aula
+                                                   [numeroSala]="item.disponivelEvent.numeroSala"
+                                                   [andar]="item.disponivelEvent.andar"
+                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                </p>
+                            </div>
+                        </ng-template>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+                    <p
+                       class="text-red-500 mt-2 mb-0"
+                       *ngIf="sala_Id.errors['required']">
+                        Esse campo é obrigatório.
+                    </p>
+                    <p
+                       class="text-red-500 mt-2 mb-0"
+                       *ngIf="sala_Id.errors['indisponivel']">
+                        Sala indisponível.
+                    </p>
+                </div>
+            </div>
+            <!-- Semana -->
+            <!-- <div class="field sm:col-3 col-6">
         <label for="roteiro">Roteiro da Semana:</label>
         <p-iconfield iconPosition="left">
           <p-inputicon
@@ -290,51 +287,48 @@
         </p-iconfield>
       </div> -->
 
-      <!-- Perfil Cognitivo -->
-      <div class="field sm:col-4 col-12">
-        <label for="perfilCognitivo_Id"
-          >Perfil Cognitivo:
-          <span
-            *ngIf="evento.finalizado"
-            class="text-red-500"
-            >*</span
-          ></label
-        >
-        <input
-          type="text"
-          pInputText
-          [value]="perfilCognitivo"
-          styleClass="w-full"
-          class="w-full hidden"
-          id="turma"
-          readonly />
-        <div class="flex flex-wrap gap-2">
-          <p-chip
-            *ngFor="let perfil of evento.perfilCognitivo"
-            [label]="perfil.nome"
-            class="mt-1 px-2 py-1 rounded-full text-primary bg-primary" />
+            <!-- Perfil Cognitivo -->
+            <div class="field sm:col-4 col-12">
+                <label for="perfilCognitivo_Id">Perfil Cognitivo:
+                    <span
+                          *ngIf="evento.finalizado"
+                          class="text-red-500">*</span></label>
+                <input
+                       type="text"
+                       pInputText
+                       [value]="perfilCognitivo"
+                       styleClass="w-full"
+                       class="w-full hidden"
+                       id="turma"
+                       readonly />
+                <div class="flex flex-wrap gap-2">
+                    <p-chip
+                            *ngFor="let perfil of evento.perfilCognitivo"
+                            [label]="perfil.nome"
+                            class="mt-1 px-2 py-1 rounded-full text-primary bg-primary" />
 
-          <p *ngIf="evento.perfilCognitivo.length === 0">Evento livre, não possui perfis cognitivos associados</p>
+                    <p *ngIf="evento.perfilCognitivo.length === 0">Evento livre, não possui perfis cognitivos associados
+                    </p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <div class="lg:col-4 md:col-4 col-12">
-    <div class="formgrid grid">
-      <!-- Observações -->
-      <div class="field col-12">
-        <label for="observacao">Observações:</label>
-        <textarea
-          pTextarea
-          style="height: 100px"
-          class="w-full"
-          name="observacao"
-          id="observacao"
-          [(ngModel)]="evento.observacao"
-          [readOnly]="evento.finalizado || !evento.active"></textarea>
-      </div>
+    <div class="lg:col-4 md:col-4 col-12">
+        <div class="formgrid grid">
+            <!-- Observações -->
+            <div class="field col-12">
+                <label for="observacao">Observações:</label>
+                <textarea
+                          pTextarea
+                          style="height: 100px"
+                          class="w-full"
+                          name="observacao"
+                          id="observacao"
+                          [(ngModel)]="evento.observacao"
+                          [readOnly]="evento.finalizado || !evento.active"></textarea>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <div class="formgrid grid">
     <!-- Alunos -->
@@ -352,7 +346,8 @@
                                            [evento]="evento"
                                            [showChecklist]="true"></app-aluno-popover>
                         <!-- Card -->
-                        <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 22rem">
+                        <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3"
+                             style="min-width: 22rem">
                             <header class="flex align-items-center mb-2 p-3 surface-50">
                                 <p-button type="button"
                                           (onClick)="enviarMensagem(item)"
@@ -364,7 +359,8 @@
                                           [text]="true" />
                                 <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                                     <div class="flex align-items-center">
-                                        <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                                        <p class="p-button-link capitalize text-lg font-bold"
+                                           (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                             <span>{{ item.aluno | nameAbv }}</span>
                                         </p>
                                         <p-badge *ngIf="item.reposicaoDe_Evento_Id"
@@ -378,12 +374,17 @@
                                     </p>
                                     <ng-template #reposicaoTemplate>
                                         <div *ngIf="item.reposicaoDe_Evento" class="w-25rem">
-                                            <p class="text-purple-500">Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
-                                            <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}</p>
+                                            <p class="text-purple-500">Reposição do dia
+                                                {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
+                                            <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana
+                                                {{ item.reposicaoDe_Evento.semana }} -
+                                                {{ item.reposicaoDe_Evento.tema }}</p>
                                             <p>
                                                 <span>Observações: </span>
-                                                <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
-                                                <span *ngIf="!item.reposicaoDe_Evento.observacao" class="text-200">Nenhuma observação</span>
+                                                <span
+                                                      *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
+                                                <span *ngIf="!item.reposicaoDe_Evento.observacao"
+                                                      class="text-200">Nenhuma observação</span>
                                             </p>
                                         </div>
                                     </ng-template>
@@ -396,23 +397,23 @@
                                 </div>
 
                                 <p-button type="button" *ngIf="item.presente === false"
-                                    (onClick)="enviarMensagemFalta(item, $event)"
-                                    (auxclick)="enviarMensagemFalta(item, $event)"
-                                    (contextmenu)="enviarMensagemFalta(item, $event)"
-                                    [disabled]="!item.celular"
-                                    icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                    severity="success"
-                                    pTooltip="Enviar mensagem de falta"
-                                    [text]="true" />
-                           
-                                    <p-button  [disabled]=" evento.finalizado || !evento.active"
-                                    [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
-                                    [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
-                                    [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
-                                    [outlined]="item.presente == undefined || item.presente === null"
-                                    iconPos="right"
-                                    size="small"
-                                    (onClick)="presente(item)" />
+                                          (onClick)="enviarMensagemFalta(item, $event)"
+                                          (auxclick)="enviarMensagemFalta(item, $event)"
+                                          (contextmenu)="enviarMensagemFalta(item, $event)"
+                                          [disabled]="!item.celular"
+                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                          severity="success"
+                                          pTooltip="Enviar mensagem de falta"
+                                          [text]="true" />
+
+                                <p-button [disabled]=" evento.finalizado || !evento.active"
+                                          [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                                          [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                                          [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
+                                          [outlined]="item.presente == undefined || item.presente === null"
+                                          iconPos="right"
+                                          size="small"
+                                          (onClick)="presente(item)" />
                             </header>
                             <div class="formgrid grid px-3 bg-white">
                                 <!-- Ábaco -->
@@ -449,8 +450,8 @@
                                 <div class="field col-6">
                                     <label for="numeroPaginaAbaco">Página: <span class="text-red-500">*</span></label>
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
-                                                   (input)="numeroPaginaAbacoChange(item, $event)"
-                                                   (focus)="inputFocus($event)"
+                                                   (onInput)="numeroPaginaAbacoChange(item, $event)"
+                                                   (onFocus)="inputFocus($event)"
                                                    [name]="'numeroPaginaAbaco[' + i + ']'"
                                                    [id]="'numeroPaginaAbaco[' + i + ']'"
                                                    [min]="0"
@@ -498,8 +499,8 @@
                                 <div class="field col-6">
                                     <label for="numeroPaginaAH">Página: <span class="text-red-500">*</span></label>
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
-                                                   (ngModelChange)="numeroPaginaAHChange(item, $event)"
-                                                   (focus)="inputFocus($event)"
+                                    (onFocus)="inputFocus($event)"
+                                    (onInput)="numeroPaginaAHChange(item, $event)"
                                                    [name]="'numeroPaginaAH[' + i + ']'"
                                                    [id]="'numeroPaginaAH[' + i + ']'"
                                                    [disabled]="!evento.active"
@@ -532,14 +533,12 @@
                 <p-table #table
                          [value]="evento.alunos"
                          dataKey="id"
-                         stripedRows
-                         [scrollable]="true"
-                         scrollHeight="300px">
+                         stripedRows>
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
                     <ng-template #header>
-                        <tr class="static z-2">
+                        <tr class="sticky top-0 z-2">
                             <th pFrozenColumn class="z-4">Nome</th>
                             <th>Apostila</th>
                             <th>Presença</th>
@@ -570,29 +569,34 @@
                                                   (click)="popoverAluno.show($event)"
                                                   pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
 
-                                                <p-badge *ngIf="item.primeiraAula_Id == evento.id"
-                                                        class="ml-auto"
-                                                        styleClass="ml-2 bg-pink-500"
-                                                        value="Aula 1"
-                                                        size="small"
-                                                        severity="danger"
-                                                        [pTooltip]="'Primeira aula'" />
-                                                <p-badge *ngIf="item.reposicaoDe_Evento_Id"
-                                                        styleClass="ml-2 bg-purple-500"
-                                                        value="Reposição"
-                                                        size="small"
-                                                        [pTooltip]="item.reposicaoDe_Evento ? reposicaoTemplate : undefined"></p-badge>
-                                                <ng-template #reposicaoTemplate>
-                                                    <div *ngIf="item.reposicaoDe_Evento" class="w-25rem">
-                                                        <p class="text-purple-500">Reposição do dia {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
-                                                        <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana {{ item.reposicaoDe_Evento.semana }} - {{ item.reposicaoDe_Evento.tema }}</p>
-                                                        <p>
-                                                            <span>Observações: </span>
-                                                            <span *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
-                                                            <span *ngIf="!item.reposicaoDe_Evento.observacao" class="text-200">Nenhuma observação.</span>
-                                                        </p>
-                                                    </div>
-                                                </ng-template>
+                                            <p-badge *ngIf="item.primeiraAula_Id == evento.id"
+                                                     class="ml-auto"
+                                                     styleClass="ml-2 bg-pink-500"
+                                                     value="Aula 1"
+                                                     size="small"
+                                                     severity="danger"
+                                                     [pTooltip]="'Primeira aula'" />
+                                            <p-badge *ngIf="item.reposicaoDe_Evento_Id"
+                                                     styleClass="ml-2 bg-purple-500"
+                                                     value="Reposição"
+                                                     size="small"
+                                                     [pTooltip]="item.reposicaoDe_Evento ? reposicaoTemplate : undefined"></p-badge>
+                                            <ng-template #reposicaoTemplate>
+                                                <div *ngIf="item.reposicaoDe_Evento" class="w-25rem">
+                                                    <p class="text-purple-500">Reposição do dia
+                                                        {{ item.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
+                                                    <p *ngIf="item.reposicaoDe_Evento.roteiro_Id">Semana
+                                                        {{ item.reposicaoDe_Evento.semana }} -
+                                                        {{ item.reposicaoDe_Evento.tema }}</p>
+                                                    <p>
+                                                        <span>Observações: </span>
+                                                        <span
+                                                              *ngIf="item.reposicaoDe_Evento.observacao">{{ item.reposicaoDe_Evento.observacao }}</span>
+                                                        <span *ngIf="!item.reposicaoDe_Evento.observacao"
+                                                              class="text-200">Nenhuma observação.</span>
+                                                    </p>
+                                                </div>
+                                            </ng-template>
                                         </div>
                                         <span class="text-sm w-min">
                                             <app-aluno-checklist
@@ -607,7 +611,8 @@
                                 <div class="flex gap-2">
                                     <!-- Abaco -->
                                     <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1" for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
+                                        <label class="ml-1 text-sm line-height-1"
+                                               for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
                                             <p-select [options]="item.apostilasAbacoList"
@@ -631,12 +636,13 @@
                                     </div>
                                     <!-- Página -->
                                     <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1" for="numeroPaginaAbaco[{{ rowIndex }}]">Página:</label>
+                                        <label class="ml-1 text-sm line-height-1"
+                                               for="numeroPaginaAbaco[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
                                                        id="numeroPaginaAbaco[{{ rowIndex }}]"
                                                        name="numeroPaginaAbaco[{{ rowIndex }}]"
-                                                       (focus)="inputFocus($event)"
-                                                       (input)="numeroPaginaAbacoChange(item, $event)"
+                                                       (onFocus)="inputFocus($event)"
+                                                       (onInput)="numeroPaginaAbacoChange(item, $event)"
                                                        #numeroPaginaAbaco="ngModel"
                                                        [min]="0"
                                                        [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
@@ -647,7 +653,8 @@
                                     </div>
                                     <!-- AH -->
                                     <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1" for="apostila_AH[{{ rowIndex }}]">AH:</label>
+                                        <label class="ml-1 text-sm line-height-1"
+                                               for="apostila_AH[{{ rowIndex }}]">AH:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
                                             <p-select [options]="item.apostilasAHList"
@@ -670,12 +677,13 @@
                                     </div>
                                     <!-- Página -->
                                     <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1" for="numeroPaginaAH[{{ rowIndex }}]">Página:</label>
+                                        <label class="ml-1 text-sm line-height-1"
+                                               for="numeroPaginaAH[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
                                                        id="numeroPaginaAH[{{ rowIndex }}]"
                                                        name="numeroPaginaAH[{{ rowIndex }}]"
-                                                       (focus)="inputFocus($event)"
-                                                       (input)="numeroPaginaAHChange(item, $event)"
+                                                       (onFocus)="inputFocus($event)"
+                                                       (onInput)="numeroPaginaAHChange(item, $event)"
                                                        #numeroPaginaAH="ngModel"
                                                        [min]="0"
                                                        [max]="item.apostilaAHObject?.numeroTotalPaginas"
@@ -689,24 +697,24 @@
                             <!-- Presente -->
                             <td class="relative z-0 py-0">
                                 <div class="mt-3 flex align-items-start gap-2">
-                                <p-button  [disabled]=" evento.finalizado || !evento.active"
-                                    [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
-                                    [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
-                                    [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
-                                    [outlined]="item.presente == undefined || item.presente === null"
-                                    iconPos="right"
-                                    (onClick)="presente(item)" />
+                                    <p-button [disabled]=" evento.finalizado || !evento.active"
+                                              [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                                              [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                                              [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
+                                              [outlined]="item.presente == undefined || item.presente === null"
+                                              iconPos="right"
+                                              (onClick)="presente(item)" />
 
                                     <p-button *ngIf="item.presente === false"
-                                                [disabled]="!item.celular"
-                                                label="Enviar mensagem"
-                                                icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                                iconPos="right"
-                                                pTooltip="Enviar mensagem de falta"
-                                                severity="success"
-                                                (onClick)="enviarMensagemFalta(item, $event)"
-                                                (contextmenu)="enviarMensagemFalta(item, $event)"
-                                                (auxclick)="enviarMensagemFalta(item, $event)"></p-button>
+                                              [disabled]="!item.celular"
+                                              label="Enviar mensagem"
+                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                              iconPos="right"
+                                              pTooltip="Enviar mensagem de falta"
+                                              severity="success"
+                                              (onClick)="enviarMensagemFalta(item, $event)"
+                                              (contextmenu)="enviarMensagemFalta(item, $event)"
+                                              (auxclick)="enviarMensagemFalta(item, $event)"></p-button>
                                     <div *ngIf="showDivVaziaEnviarMensagemFalta(item)" style="width:134px"></div>
                                 </div>
                             </td>
