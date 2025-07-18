@@ -45,12 +45,12 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
-            this.celular = this.aluno.celular;
+            this.celular = this.aluno?.celular;
             this.cdr.markForCheck();
         }
         if (changes['alunoChecklistItem']) {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
-            this.celular = this.alunoChecklistItem.celular;
+            this.celular = this.alunoChecklistItem?.celular;
             this.cdr.markForCheck();
         }
         if (changes['item']) {

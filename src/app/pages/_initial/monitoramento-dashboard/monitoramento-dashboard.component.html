@@ -1,33 +1,8 @@
 <app-filtro-popover #filtroPopover (applyFilter)="applyFilter($event)"></app-filtro-popover>
 <app-aluno-popover #alunoPopover [showChecklist]="true"> </app-aluno-popover>
 <app-aula-participacao-popover #selectedAulaComponent></app-aula-participacao-popover>
-
-<div class="p-1">
-    <p-toolbar id="toolbar" styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
-        <div class="p-toolbar-group-start w-full flex align-items-center justify-content-between gap-2">
-            <h2 class="flex align-items-center">
-                <i class="bi bi-table mr-3 text-primary-500 text-2xl"></i>
-                <span class="text-2xl font-normal my-0 white-space-nowrap">Dashboard</span>
-            </h2>
-            <p-button icon="pi pi-info-circle"
-                      label="Ver Legenda"
-                      class="ml-auto"
-                      [rounded]="true"
-                      severity="secondary"
-                      (onClick)="legendaPopover.show($event)" />
-            <p-button label="Ver filtros"
-                      icon="pi pi-filter"
-                      severity="secondary"
-                      styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
-                      (onClick)="filtroPopover.toggle($event)"
-                      [rounded]="true" />
-        </div>
-        <app-legenda-popover #legendaPopover></app-legenda-popover>
-    </p-toolbar>
-    <div id="dash-content" [style]="{ height: height }">
-        <div class="flex justify-content-end align-itens-center mb-2">
-            <p *ngIf="!loading">{{alunos.length}} alunos</p>
-        </div>
+<!-- <div class="p-1"> -->
+    <!-- <div id="dash-content" [style]="{ height: height }"> -->
         <p-table [value]="alunos"
                  stripedRows
                  dataKey="id"
@@ -38,7 +13,32 @@
                  virtualScrollItemSize="46"
                  [virtualScrollDelay]="0"
                  [loading]="loading"
-                 [showLoader]="false">
+                 [showLoader]="false"
+                 [showCurrentPageReport]="true"
+                 currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos">
+            <ng-template #caption>
+                <p-toolbar id="toolbar" styleClass="border-none bg-white py-3  relative z-3">
+                    <div class="p-toolbar-group-start w-full flex align-items-center justify-content-between gap-2">
+                        <h2 class="flex align-items-center">
+                            <i class="bi bi-table mr-3 text-primary-500 text-2xl"></i>
+                            <span class="text-2xl font-normal my-0 white-space-nowrap">Dashboard</span>
+                        </h2>
+                        <p-button icon="pi pi-info-circle"
+                                  label="Ver Legenda"
+                                  class="ml-auto"
+                                  [rounded]="true"
+                                  severity="secondary"
+                                  (onClick)="legendaPopover.show($event)" />
+                        <p-button label="Ver filtros"
+                                  icon="pi pi-filter"
+                                  severity="secondary"
+                                  styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
+                                  (onClick)="filtroPopover.toggle($event)"
+                                  [rounded]="true" />
+                    </div>
+                    <app-legenda-popover #legendaPopover></app-legenda-popover>
+                </p-toolbar>
+            </ng-template>
             <ng-template #header let-columns>
                 <tr pFrozenRow>
                     <th rowspan="2"
@@ -107,17 +107,16 @@
                         class="white-space-nowrap px-2 py-1 z-2">
                         <div class="flex align-items-center">
                             <span class="mr-2">
-                                <p-button 
-                                    icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                    severity="success"
-                                    [rounded]="true"
-                                    [text]="true"
-                                    pTooltip="Enviar mensagem"
-                                    (onClick)="enviarMensagem(aluno)"
-                                    (auxclick)="enviarMensagem(aluno)"
-                                    (contextmenu)="enviarMensagem(aluno)"
-                                    [disabled]="!aluno.celular"
-                                />
+                                <p-button
+                                          icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                                          severity="success"
+                                          [rounded]="true"
+                                          [text]="true"
+                                          pTooltip="Enviar mensagem"
+                                          (onClick)="enviarMensagem(aluno)"
+                                          (auxclick)="enviarMensagem(aluno)"
+                                          (contextmenu)="enviarMensagem(aluno)"
+                                          [disabled]="!aluno.celular" />
                             </span>
                             <p (click)="showAluno(aluno.id, $event)"
                                class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
@@ -187,7 +186,6 @@
                                                     'bg-blue-500' : item.participacao.reposicaoDe_Evento_Id,
                                                 }">
                                                 <span>Faltou</span>
-                                         
                                             </div>
                                             <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                         </ng-container>
@@ -237,8 +235,8 @@
                 <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
             </ng-template>
         </p-table>
-    </div>
-</div>
+    <!-- </div>
+</div> -->
 <ng-template #loadingTemplate>
     <ng-container *ngFor="let item of [1,2,3,4,5]; let i = index;">
         <tr style="height: 35px;">

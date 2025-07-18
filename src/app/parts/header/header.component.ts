@@ -59,7 +59,7 @@ export class HeaderComponent implements OnDestroy {
         this.subscription.push(accountData);
 
         var navigationItems = this.header.navigationItems.subscribe(res => {
-            this.items = res.filter(x => x.items && x.items.length > 0).flatMap(x => x.items) as MenuItem[];
+            this.items = res;//.filter(x => x.items && x.items.length > 0).flatMap(x => x.items) as MenuItem[];
         });
         this.subscription.push(navigationItems);
 
@@ -110,8 +110,10 @@ export class HeaderComponent implements OnDestroy {
             header: 'Sair',
             closeOnEscape: true,
             acceptLabel: `Sair`,
-            acceptButtonStyleClass: 'p-button-rounded',
+            acceptIcon: 'pi pi-sign-out',
             rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.accountService.logout();

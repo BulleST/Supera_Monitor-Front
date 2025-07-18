@@ -44,7 +44,6 @@ export var userColumns: ColumnTable[] = [
             label: 'Nome',
             displayType: DisplayType.text,
             sortable: true,
-            frozen: true,
             filterOptions: {
                 type: FilterType.text,
                 matchMode: FilterMatchMode.CONTAINS.toString(),
@@ -59,7 +58,6 @@ export var userColumns: ColumnTable[] = [
         label: 'E-mail',
         displayType: DisplayType.text,
         sortable: true,
-        frozen: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
@@ -74,7 +72,6 @@ export var userColumns: ColumnTable[] = [
         label: 'Celular',
         displayType: DisplayType.mask,
         sortable: true,
-        frozen: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),

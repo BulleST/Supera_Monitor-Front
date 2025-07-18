@@ -98,7 +98,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         lastValueFrom(this.alunoService.getFoto(this.aluno_Id))
             .then(res => {
                 this.loadingFoto = false;
-                this.aluno.aluno_Foto = res;
+                this.aluno!.aluno_Foto = res;
                 this.foto = res;
             })
             .catch(res => this.loadingFoto = false);

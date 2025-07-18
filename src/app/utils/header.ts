@@ -10,121 +10,133 @@ import { AccountService } from "../services/account.service";
 export class Header {
     menuAsideOpen = new BehaviorSubject<boolean>(false);
     minhaContaOpen = new BehaviorSubject<boolean>(false);
-    sidebarWidth = new BehaviorSubject<any>(undefined);    
-    accountData = new BehaviorSubject<{name: string, abreviacao: string, email: string} | undefined>(undefined);    
+    sidebarWidth = new BehaviorSubject<any>(undefined);
+    accountData = new BehaviorSubject<{ name: string, abreviacao: string, email: string } | undefined>(undefined);
     navigationItems = new BehaviorSubject<MenuItem[]>([
-                    {
-                        label: 'Home',
-                        items: [
-                            {
-                                label: 'Calendário de Aulas',
-                                tooltip: 'Calendário de Aulas',
-                                iconFontawesome: faCalendar,
-                                routerLink: '/calendario',
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Dashboard',
-                                tooltip: 'Dashboard',
-                                // iconFontawesome: faCalendar,
-                                icon: 'bi bi-table',
-                                routerLink: ['dashboard'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Jornada Supera',
-                                tooltip: 'Jornada Supera',
-                                icon: 'pi pi-check-square',
-                                routerLink: '/jornada-supera',
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Roteiro',
-                                tooltip: 'Roteiro',
-                                icon: 'bi bi-calendar-range',
-                                routerLink: ['roteiro'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                        ]
-                    },
-                    {
-                        label: 'Cadastros',
-                        items: [
-                            {
-                                label: 'Alunos',
-                                tooltip: 'Alunos',
-                                iconFontawesome: faUserGraduate,
-                                routerLink: ['alunos'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Educadores',
-                                tooltip: 'Educadores',
-                                iconFontawesome: faPersonChalkboard,
-                                routerLink: ['educadores'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Turmas',
-                                tooltip: 'Turmas',
-                                iconFontawesome: faUsersBetweenLines,
-                                routerLink: ['turmas'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-                            {
-                                label: 'Usuários',
-                                tooltip: 'Usuários',
-                                iconFontawesome: faUsers,
-                                routerLink: ['usuarios'],
-                                routerLinkActiveOptions: { exact: false },
-                                routerLinkActive: 'active-link',
-                                command: e => {
-                                    this.menuAsideOpen.next(false);
-                                }
-                            },
-        
-                        ]
-                    },
-                    {
-                        label: 'Minha conta'
-                    },
+        {
+            separator: true,
+        },
+        {
+            label: 'Home',
+            expanded: true,
+            items: [
+                {
+                    label: 'Calendário de Aulas',
+                    tooltip: 'Calendário de Aulas',
+                    iconFontawesome: faCalendar,
+                    routerLink: '/calendario',
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Dashboard',
+                    tooltip: 'Dashboard',
+                    // iconFontawesome: faCalendar,
+                    icon: 'bi bi-table',
+                    routerLink: ['dashboard'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Jornada Supera',
+                    tooltip: 'Jornada Supera',
+                    icon: 'pi pi-check-square',
+                    routerLink: '/jornada-supera',
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Roteiro',
+                    tooltip: 'Roteiro',
+                    icon: 'bi bi-calendar-range',
+                    routerLink: ['roteiro'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+            ]
+        },
+        {
+            separator: true,
+        },
+        {
+            label: 'Cadastros',
+            expanded: true,
+            items: [
+                {
+                    label: 'Alunos',
+                    tooltip: 'Alunos',
+                    iconFontawesome: faUserGraduate,
+                    routerLink: ['alunos'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Educadores',
+                    tooltip: 'Educadores',
+                    iconFontawesome: faPersonChalkboard,
+                    routerLink: ['educadores'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Turmas',
+                    tooltip: 'Turmas',
+                    iconFontawesome: faUsersBetweenLines,
+                    routerLink: ['turmas'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+                {
+                    label: 'Usuários',
+                    tooltip: 'Usuários',
+                    iconFontawesome: faUsers,
+                    routerLink: ['usuarios'],
+                    routerLinkActiveOptions: { exact: false },
+                    routerLinkActive: 'active-link',
+                    command: e => {
+                        this.menuAsideOpen.next(false);
+                    }
+                },
+
+            ]
+        },
+        {
+            separator: true,
+        },
+        {
+            label: 'Minha conta',
+            expanded: true,
+        },
     ]);
-    
-    
+
+
     constructor(
         private accountService: AccountService,
     ) {
 
         this.accountService.account.subscribe(account => {
-            var a = {name: 'Noemi C. Almeida', abreviacao: 'NC', email: 'calmeida.no@gmail.com'};
+            var a = { name: 'Noemi C. Almeida', abreviacao: 'NC', email: 'calmeida.no@gmail.com' };
 
             if (account) {
                 var array = account.name.split(' ') as string[];
@@ -150,7 +162,7 @@ export class Header {
         // var encryted = this.crypto.encrypt(value) ?? '';
         // localStorage.setItem('navigation', encryted);
         this.menuAsideOpen.next(value);
-      
+
     }
 
 
@@ -172,11 +184,11 @@ export class Header {
         //     classe.closeMenuMinhaConta();
         //     classe.setMenuAside(false);
         // });
-        
+
         // $('.navigation-toggle-content').on('click', function (e) {
         //     classe.setMenuAside(true);
         // });
-        
+
         // $('.navigation-content*').each((i, el) => {
         //     $(el).on('click', function (e) {
         //         e.stopPropagation();

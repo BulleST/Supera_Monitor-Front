@@ -10,7 +10,7 @@
              #dt
              [value]="list"
              [rows]="50"
-             [rowsPerPageOptions]="[50, 100, 1000]"
+             [rowsPerPageOptions]="[50, 100, 500]"
              [paginator]="list.length > 50"
              [columns]="tableColumns"
              [globalFilterFields]="tableGlobalFilterFields"
@@ -18,7 +18,9 @@
              stripedRows
              [loading]="tableLoading"
              [showLoader]="false"
-             [rowHover]="list.length > 0">
+             [rowHover]="list.length > 0"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos">
         <ng-template #caption>
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">

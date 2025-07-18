@@ -277,8 +277,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: 'Tem certeza que deseja sallet os dados da turma?',
-            header: 'Sallet dados',
+            message: 'Tem certeza que deseja salvar os dados da turma?',
+            header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
