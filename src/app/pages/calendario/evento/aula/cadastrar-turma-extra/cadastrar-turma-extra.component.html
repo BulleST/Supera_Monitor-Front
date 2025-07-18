@@ -143,8 +143,8 @@
                        [(ngModel)]="object.descricao"
                        id="descricao"
                        name="descricao"
-                       class="w-full"
-                       [required]="true">
+                       [required]="true"
+                       fluid>
                 <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -163,15 +163,13 @@
                               [minDate]="minData"
                               inputId="data"
                               name="data"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
                               [disabledDates]="feriadoDates"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
                 <div *ngIf="dataNgModel.touched && dataNgModel.invalid && dataNgModel.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNgModel.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -189,12 +187,10 @@
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               appendTo="body"
-                              [timeOnly]="true">
+                              [timeOnly]="true"
+                              fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -210,10 +206,8 @@
                                [(ngModel)]="object.capacidadeMaximaAlunos"
                                id="capacidadeMaximaAlunos"
                                name="capacidadeMaximaAlunos"
-                               class="w-full"
-                               styleClass="w-full"
-                               inputStyleClass="w-full"
-                               [required]="true" />
+                               [required]="true" 
+                               fluid/>
                 <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -230,7 +224,7 @@
                           [disabled]="!data || !horario"
                           [pTooltip]="!data || !horario ? 'Escolha data e horário para selecionar um educador disponível' : 'Selecione o educador'"
                           #professor_Id="ngModel"
-                        placeholder="Selecione"
+                          placeholder="Selecione"
                           name="professor_Id"
                           inputId="professor_Id"
                           optionLabel="nome"
@@ -238,7 +232,7 @@
                           [required]="true"
                           [filter]="true"
                           filterBy="nome"
-                                      panelStyleClass="p-select-stripped"
+                          panelStyleClass="p-select-stripped"
                           appendTo="body"
                           optionDisabled="deactivated"
                           fluid>
@@ -303,7 +297,7 @@
                           [disabled]="!data || !horario"
                           [pTooltip]="!data || !horario ? 'Escolha data e horário para selecionar uma sala disponível' : 'Selecione a sala'"
                           #sala_Id="ngModel"
-                        placeholder="Selecione"
+                          placeholder="Selecione"
                           name="sala_Id"
                           inputId="sala_Id"
                           optionValue="id"
@@ -375,8 +369,8 @@
                                [filter]="true"
                                filterBy="nome"
                                [required]="true"
-                               styleClass="w-full"
-                               appendTo="body" />
+                               appendTo="body" 
+                               fluid/>
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -384,8 +378,8 @@
             <!-- Roteiro da Semana -->
             <div class="field md:col-3 sm:col-3 col-6">
                 <label for="roteiro">Roteiro da Semana</label>
-                <p-iconfield >
-                    <p-inputicon styleClass="pi pi-star-fill" [ngStyle]="{ color: roteiroAtual?.corLegenda }"/>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-star-fill" [ngStyle]="{ color: roteiroAtual?.corLegenda }" />
                     <input type="text"
                            pInputText
                            [value]="roteiroAtual ? roteiroAtual.tema : 'Indefinido'"
@@ -394,7 +388,7 @@
                            id="roteiro"
                            name="roteiro"
                            readonly
-                           class="w-full">
+                           fluid />
                 </p-iconfield>
             </div>
             <!-- Alunos -->
@@ -574,22 +568,20 @@
         <div class="flex align-items-center gap-2">
             <!-- Whatsapp -->
             <p-button type="button"
-                        (onClick)="enviarMensagem(item)"
-                        (auxclick)="enviarMensagem(item)"
-                        (contextmenu)="enviarMensagem(item)"
-                        [disabled]="!item.celular"
-                        icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                        severity="success"
-                        [text]="true" />
+                      (onClick)="enviarMensagem(item)"
+                      (auxclick)="enviarMensagem(item)"
+                      (contextmenu)="enviarMensagem(item)"
+                      [disabled]="!item.celular"
+                      icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                      severity="success"
+                      [text]="true" />
             <!-- Nome -->
             <p class="mr-2">{{ item.nome }}</p>
-            
             <p-tag *ngIf="item.eventoReposicaoEmAndamento"
-                     value="{{item.eventoReposicaoEmAndamento.data | date : 'dd/MMMM HH:mm'}}"
-                     icon="pi pi-calendar"
-                     severity="secondary"
-                     [pTooltip]="eventoReposicaoTemplate" />
-
+                   value="{{item.eventoReposicaoEmAndamento.data | date : 'dd/MMMM HH:mm'}}"
+                   icon="pi pi-calendar"
+                   severity="secondary"
+                   [pTooltip]="eventoReposicaoTemplate" />
             <p-badge *ngIf="item.disponivel == false"
                      value="Indisponível"
                      severity="danger"

@@ -5,8 +5,7 @@
         <div class="event"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
-             >
-             <!-- [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex }" -->
+             [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex }">
             <p>Feriado</p>
             <p>{{evento.descricao}}</p>
         </div>
@@ -14,6 +13,7 @@
     <!-- AULA E AULA EXTRA -->
     <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
         <div class="event"
+             [class.event-disabled]="!evento.active"
              cdkDropList
              [cdkDropListSortingDisabled]="true"
              [cdkDropListData]="evento.alunos"
@@ -22,17 +22,17 @@
              [id]="arg.event?.id"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
-             (click)="eventoClick($event)">
-             <!-- [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex, }"> -->
+             (click)="eventoClick($event)"
+             [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex, }">
             <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
             <ng-container *ngTemplateOutlet="eventBody"></ng-container>
             <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
         </div>
-        <!--  -->
     </ng-container>
     <!-- OFICINA, REUNIÃO, SUPERAÇÃO, AULA ZERO -->
     <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao, EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
         <div class="event"
+             [class.event-disabled]="!evento.active"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
              (click)="eventoClick($event)"
@@ -82,15 +82,15 @@
             <!-- Se Cancelado -->
             <ng-container *ngIf="!evento.active; else checkFinalizado">
                 <span class="event-cancelado">
-                    <i class="fa fa-times"></i> 
-                    <span>Cancelado</span> 
+                    <i class="fa fa-times text-red-500 text-lg"></i>
+                    <span>Cancelado</span>
                 </span>
             </ng-container>
             <!-- Se Finalizado -->
             <ng-template #checkFinalizado>
                 <ng-container *ngIf="evento.finalizado; else notFinalizado">
                     <span class="event-finalizado">
-                        <i class="fa fa-check-circle"></i> 
+                        <i class="fa fa-check-circle"></i>
                         <span>Finalizado</span>
                     </span>
                 </ng-container>
@@ -103,7 +103,6 @@
                     </span>
                 </ng-container>
                 <ng-container *ngIf="evento.perfilCognitivo.length > 0">
-                    
                     <span class="event-perfil">
                         <!-- <span class="fa fa-brain"></span> -->
                         {{ getPerfilCognitivo(evento.perfilCognitivo) }}
@@ -112,15 +111,15 @@
                 <ng-container *ngIf="![EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                     <span class="event-vagas">
                         <ng-container *ngIf="evento.vagas < 0">
-                            <span class="text-red-500 fadeout animation-iteration-infinite"> 
-                                <i class="pi pi-times-circle"></i> 
+                            <span class="text-red-500 fadeout animation-iteration-infinite">
+                                <i class="pi pi-times-circle"></i>
                             </span>
                             <span>{{evento.capacidadeMaximaAlunos}}</span>
                         </ng-container>
                         <ng-container *ngIf="evento.vagas == 0">Não há vagas</ng-container>
                         <ng-container *ngIf="evento.vagas == 1">1 vaga</ng-container>
                         <ng-container *ngIf="evento.vagas > 1">{{evento.vagas}} vagas</ng-container>
-                        <span>/</span>
+                        <span class="font-bold">/</span>
                         <ng-container *ngIf="evento.alunos.length == 0">Nenhum aluno</ng-container>
                         <ng-container *ngIf="evento.alunos.length == 1">1 aluno</ng-container>
                         <ng-container *ngIf="evento.alunos.length > 1">{{evento.alunos.length}} alunos</ng-container>

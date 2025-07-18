@@ -25,22 +25,6 @@ export class CalendarioUtils {
 
         this.service.feriados.subscribe((res) => (this.feriados = res))
 
-        //
-        // Não é mais necessário cancelar eventos, pois o back já faz isso
-        //
-        // this.service.eventos.subscribe((res) => {
-        //     console.log('calendario utils  eventos', res)
-        //   var feriados = this.service.feriados.value
-        //   var feriadosDates = feriados.map((x) =>
-        //     moment(x.date).format('YYYY-MM-DD'),
-        //   )
-        //   var eventosCancelar = res.filter(
-        //     (x) =>
-        //       x.active == true &&
-        //       feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')),
-        //   )
-        //   this.cancelarEventos(eventosCancelar)
-        // })
     }
 
     weekOfYear(date: Date) {
@@ -97,7 +81,7 @@ export class CalendarioUtils {
     } {
         const MEETING_COLOR = '#F37435'
         const DEFAULT_COLOR = '#2E2E2E'
-        const DIM_COLOR = '#D6D6DB'
+        const DIM_COLOR = '#E6E6E7';
 
         let backgroundColor = DEFAULT_COLOR
         let borderColor = DEFAULT_COLOR
@@ -126,8 +110,8 @@ export class CalendarioUtils {
 
         // Solid dim color (gray)
         if (item.active === false) {
-            backgroundColor = this.clarearRgb(DIM_COLOR);
-            borderColor = this.clarearRgb(DIM_COLOR);
+            backgroundColor = DIM_COLOR;
+            borderColor = DIM_COLOR;
             textColor = this.getTextColor(backgroundColor)
             zIndex = -100;
         }
@@ -138,38 +122,6 @@ export class CalendarioUtils {
             textColor,
             zIndex,
         }
-    }
-
-    hexToRgb(hex: string) {
-        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, function (m, r, g, b) {
-            return r + r + g + g + b + b;
-        });
-
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    }
-
-    rgbToHex(r: number, g: number, b: number) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-    }
-
-
-    clarearRgb(hex: string) {
-        let rgb: any = this.hexToRgb(hex);
-        let amount = 50;
-
-        rgb = {
-            r: Math.min(255, rgb.r + amount),
-            g: Math.min(255, rgb.g + amount),
-            b: Math.min(255, rgb.b + amount)
-        };
-        let tomMaisClaroHEX = this.rgbToHex(rgb.r, rgb.g, rgb.b);
-        return tomMaisClaroHEX;
     }
 
     getEventoTipo(evento: Evento) {
@@ -233,7 +185,4 @@ export class CalendarioUtils {
         return moment(date).format('DD/MM/YYYY HH:mm')
     }
 
-    /**
-     * Fim Cancelamento automático de eventos
-     */
 }

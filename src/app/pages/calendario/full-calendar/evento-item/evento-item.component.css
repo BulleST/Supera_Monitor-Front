@@ -1,11 +1,24 @@
+::ng-deep.fc-event {
+    background-color: white !important;
+    border-color: white !important;
+    border-radius: 5px;
+}
 .event {
     width: 100%;
-    height: 100%;
+    height: calc(100% + 4px);
     display: flex;
     flex-flow: column;
-    padding: 0.25rem;
+    padding: 0.35rem;
     cursor: pointer;
-    margin-top: -2px;
+    border-radius: 4px;
+    margin: -2px;
+    border-style: solid;
+    border-width: 2px;
+    transition: .1s;
+}
+.event:not(.event-disabled):hover {
+    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
+    scale: 1.01;
 }
 
 .event-header {
@@ -75,14 +88,16 @@
 
 .event-alunos {}
 
-.event-vagas {}
+.event-vagas {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
 
 .event-cancelado {
     display: flex;
     align-items: center;
     gap: 3px;
-    font-weight: 800;
-    /* color: var(--p-red-500); */
 }
 
 .event-finalizado {
@@ -136,7 +151,7 @@
 .event.event-superacao .event-body .event-reagendamento-icon {
     border-width: 1px;
 } */
-@media (max-width: 500px) {
+/* @media (max-width: 500px) {
     .event-header>* {
         line-height: 1.4;
         font-size: 0.4rem !important;
@@ -180,4 +195,4 @@
     .event-vagas {
         font-size: .5rem;
     }
-}
+} */
