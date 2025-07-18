@@ -327,7 +327,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.calendario(request))
+        await lastValueFrom(this.service.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
@@ -573,7 +573,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         }
         this.loadingEventosReposicaoAluno = true;
         
-        lastValueFrom(this.service.calendario(request))
+        lastValueFrom(this.service.getList(request))
             .then(res => {
 
                 let feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));

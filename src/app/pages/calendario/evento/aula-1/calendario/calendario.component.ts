@@ -185,7 +185,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     async getCalendario() {
-        await lastValueFrom(this.service.calendario(this.calendarioRequest))
+        await lastValueFrom(this.service.getList(this.calendarioRequest))
             .then((list) => {
                 this.eventos = list.filter(evento => {
                     let temVaga = evento.alunos.length < evento.capacidadeMaximaAlunos;

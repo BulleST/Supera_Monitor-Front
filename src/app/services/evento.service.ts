@@ -40,15 +40,12 @@ export class EventoService extends Service {
 
     constructor(
         http: HttpClient,
-        toastr: ToastrService,
+        toastrService: ToastrService,
         private roteiroService: RoteiroService
     ) {
-        super(http, toastr);
+        super(http, toastrService);
 
         this.roteiroService.list.subscribe(res => this.roteiros = res);
-
-        // if (roteiroService.list.value.length == 0) 
-        //     lastValueFrom(roteiroService.getList('evento service'))
     }
 
     getEvento() {
@@ -78,31 +75,57 @@ export class EventoService extends Service {
         else localStorage.removeItem('evento-reposicao-para');
     }
 
+    mapEvento(evento: Evento) {
+        evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate(),
+        evento.active = !evento.deactivated;
+        evento.professores = evento.professores ?? [];
+
+        evento.alunos = evento.alunos ?? [];
+        evento.alunos.forEach(aluno => aluno.active = !aluno.deactivated );
+        evento.alunos = evento.alunos.filter(aluno => aluno.active).sort((x, y) => x.aluno < y.aluno ? -1 : 1);
+        evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.length;
+
+        if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
+            let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
+            if (roteiro) evento.roteiro_Id = roteiro.id;
+        }
+        return evento;
+    }
+
+    getList(request: CalendarioRequest) {
+        return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
+            .pipe(tap({
+                next: async eventos => {
+                    if (this.roteiroService.list.value.length == 0) 
+                        await lastValueFrom(this.roteiroService.getList('calendario'));
+
+                    let list = this.eventos.value as Evento[];
+                    eventos = eventos.map(evento => {
+                        evento = this.mapEvento(evento);
+    
+                        let index = list.findIndex(x => x.id == evento.id 
+                                && x.turma_Id == evento.turma_Id 
+                                && moment(x.data).isSame(evento.data));
+
+                        if (index == -1) list.push(evento);
+                        else list.splice(index, 1, evento);
+                        return evento;
+                    });
+    
+                    this.eventos.next(list);
+
+                    return of(list);
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
+                }
+            }));
+    }
     
     get(id: number) {
         return this.http.get<Evento>(`${this.url}/eventos/${id}`)
         .pipe(tap(evento => {
-            evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate(),
-            evento.active = !evento.deactivated;
-            evento.professores = evento.professores ?? [];
-            evento.alunos = evento.alunos ?? [];
-            evento.alunos = evento.alunos.sort((x, y) => x.aluno < y.aluno ? -1 : 1);
-            evento.alunos.map(async aluno => {
-                aluno.active = !aluno.deactivated;               
-                return aluno;
-            } );
-            evento.alunos = evento.alunos.filter(aluno => aluno.active)
-
-            if (!evento.professor_Id && evento.professores.length > 0) {
-                evento.professor_Id = evento.professores[0].professor_Id;
-                evento.professor = evento.professores[0].nome;
-            }
-
-            if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-                let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
-                if (roteiro) evento.roteiro_Id = roteiro.id;
-            }
-
+            evento = this.mapEvento(evento);
             return evento;
         }))
     }
@@ -123,71 +146,6 @@ export class EventoService extends Service {
                 return of(list);
             }
         }))
-    }
-
-    carregaFeriadosCalendario(ano: number = new Date().getFullYear()) {
-        let feriados = this.feriados.value;
-        let temFeriadoNoAno = feriados.find(x => x.date.getFullYear() == ano);
-        if (!temFeriadoNoAno) {
-            lastValueFrom(this.getFeriados(ano))
-            .then(res => {
-                this.carregaFeriadosCalendario(ano)
-            })
-        }
-    }
-
-    calendario(request: CalendarioRequest) {
-        return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
-            .pipe(tap({
-                next: async eventos => {
-                    if (this.roteiroService.list.value.length == 0) 
-                        await lastValueFrom(this.roteiroService.getList('calendario'));
-
-                    // this.carregaFeriadosCalendario(request.intervaloDe?.getFullYear())
-
-                    // let feriados = this.feriados.value;
-                    // let temFeriadoNoAno = feriados.find(x => x.date.getFullYear() == request.intervaloDe?.getFullYear());
-
-                    // if (!temFeriadoNoAno) {
-                    //     lastValueFrom(this.getFeriados(request.intervaloDe?.getFullYear())).then(res => {})
-                    // }
-    
-                    let list = this.eventos.value as Evento[];
-                    eventos = eventos.map(evento => {
-                        evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate(),
-                        evento.active = !evento.deactivated;
-                        evento.professores = evento.professores ?? [];
-                        evento.alunos = evento.alunos ?? [];
-                        evento.alunos.forEach(aluno => aluno.active = !aluno.deactivated );
-                        evento.alunos = evento.alunos.filter(aluno => !aluno.deactivated)
-
-                        if (!evento.professor_Id && evento.professores.length > 0) {
-                            evento.professor_Id = evento.professores[0].professor_Id;
-                            evento.professor = evento.professores[0].nome;
-                        }
-    
-                        if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-                            let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
-                            if (roteiro) evento.roteiro_Id = roteiro.id;
-                        }
-    
-                        let index = list.findIndex(x => x.id == evento.id 
-                                && x.turma_Id == evento.turma_Id 
-                                && moment(x.data).isSame(evento.data));
-
-                        if (index == -1) list.push(evento);
-                        else list.splice(index, 1, evento);
-                        return evento;
-                    });
-    
-                    this.eventos.next(list);
-
-                    return of(list);
-                },
-                error: err => {
-                    this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
-                }
-            }));
     }
 
     getOficinas() {
@@ -265,6 +223,18 @@ export class EventoService extends Service {
             return dashboard;
         }))
     }
+
+    // carregaFeriadosCalendario(ano: number = new Date().getFullYear()) {
+    //     let feriados = this.feriados.value;
+    //     let temFeriadoNoAno = feriados.find(x => x.date.getFullYear() == ano);
+    //     if (!temFeriadoNoAno) {
+    //         lastValueFrom(this.getFeriados(ano))
+    //         .then(res => {
+    //             this.carregaFeriadosCalendario(ano)
+    //         })
+    //     }
+    // }
+
     
     createAulaTurma(model: EventoAulaRequest ) {
         let request = MyMap(model, new EventoAulaRequest) as EventoAulaRequest;

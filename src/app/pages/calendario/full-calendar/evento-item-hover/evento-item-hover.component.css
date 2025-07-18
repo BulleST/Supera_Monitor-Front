@@ -1,17 +1,17 @@
-.event.event-hover {
+.event {
     width: 100%;
     height: 100%;
     display: flex;
     flex-flow: column;
     flex: 1 1 0% !important;
-    padding: 0.35rem;
+    padding: 0.25rem;
     border-width: 2px;
     border-style: solid;
     cursor: pointer;
     border-radius: 3px;
 }
 
-.event.event-hover .event-header {
+.event-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -22,7 +22,7 @@
     overflow: hidden;
 }
 
-.event.event-hover .event-body {
+.event-body {
     width: 100%;
     height: 3rem;
     display: flex;
@@ -32,10 +32,10 @@
     margin-bottom: auto;
 }
 
-.event.event-hover .event-description {
+.event-description {
     width: 100%;
     height: 100%;
-    padding-bottom: 5px;
+    margin-bottom: 5px;
     display: flex;
     align-items: center;
     font-size: 1rem;
@@ -45,39 +45,148 @@
     text-overflow: ellipsis;
 }
 
-.event.event-hover .event-footer {
+.event-footer {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    flex-flow: wrap;
+    flex-wrap: wrap;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     width: 100%;
-    gap: 2px;
-    margin-top: auto;
-    flex: none;
+    gap: 2px
 }
 
-.event.event-hover .event-reagendamento-icon {
-    width: 1.8rem;
-    height: 1.8rem;
-    font-size: 0.8rem !important;
+.event p {
+    margin-bottom: 0;
+}
+
+.event-reagendamento-icon {
+    width: 1.4rem;
+    height: 1.4rem;
     display: flex;
     align-items: center;
     justify-content: center;
     flex: none;
-    margin-right: 0.25rem !important;
-    border-radius: 50% !important;
-    border-width: 2px !important;
+    margin-right: 0.25rem;
+    border-radius: 50%;
+    border-width: 2px;
     border-style: solid;
     font-weight: bold;
     text-align: center;
-    font-size: 0.75rem !important;
+    font-size: 0.65rem;
 }
 
+.event-descricao {
+    width: 100%;
+    height: 100%;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
 ::ng-deep .popover-event-hover .p-popover-content {
     height: 100%;
     padding: 0px;
+}
+
+.event-sala {
+    font-size: .875rem;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-bottom: 5px;
+    text-overflow: ellipsis;
+    display: flex;
+}
+
+/* .event.event-reuniao,
+.event.event-oficina,
+.event.event-aula-zero,
+.event.event-superacao {
+    padding: 0;
+    margin: -3px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    line-height: 0.9;
+    scale: 0.9;
+}
+
+.event.event-reuniao .event-header,
+.event.event-oficina .event-header,
+.event.event-aula-zero .event-header,
+.event.event-superacao .event-header {
+    padding-top: 1px;
+}
+
+.event.event-reuniao .event-body .event-descricao,
+.event.event-oficina .event-body .event-descricao,
+.event.event-aula-zero .event-body .event-descricao,
+.event.event-superacao .event-body .event-descricao {
+    font-weight: normal;
+}
+
+.event.event-reuniao .event-body .event-sala,
+.event.event-oficina .event-body .event-sala,
+.event.event-aula-zero .event-body .event-sala,
+.event.event-superacao .event-body .event-sala {
+    font-size: .75rem;
+}
+
+.event.event-reuniao .event-body .event-reagendamento-icon,
+.event.event-oficina .event-body .event-reagendamento-icon,
+.event.event-aula-zero .event-body .event-reagendamento-icon,
+.event.event-superacao .event-body .event-reagendamento-icon {
+    border-width: 1px;
+} */
+
+@media (max-width: 500px) {
+    .event-header>* {
+        line-height: 1.4;
+        font-size: 0.4rem !important;
+    }
+
+    .event-body {
+        height: auto;
+    }
+
+    .event p {
+        line-height: 1;
+    }
+
+    .event-descricao {
+        font-size: 0.7rem;
+    }
+
+    .event.event-reuniao .event-body .event-descricao,
+    .event.event-oficina .event-body .event-descricao,
+    .event.event-aula-zero .event-body .event-descricao,
+    .event.event-superacao .event-body .event-descricao {
+        font-size: 0.7rem;
+    }
+    
+    .event.event-reuniao .event-body .event-vagas,
+    .event.event-oficina .event-body .event-vagas,
+    .event.event-aula-zero .event-body .event-vagas,
+    .event.event-superacao .event-body .event-vagas {
+        font-size: 0.5rem;
+    }
+
+    .event-sala {
+        font-size: .5rem ;
+        margin-top: 10px;
+    }
+
+    .event-perfil {
+        font-size: 0.5rem;
+    }
+
+    .event-vagas {
+        font-size: .5rem;
+    }
 }

@@ -115,7 +115,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             intervaloDe: moment(new Date).startOf('week').toDate(),
             intervaloAte: moment(new Date).endOf('week').toDate()
         };
-        lastValueFrom(this.eventoService.calendario(request))
+        lastValueFrom(this.eventoService.getList(request))
             .then(res => {
                 this.loadingEventos = false;
                 this.eventos = res;

@@ -87,7 +87,7 @@
                              <div class="flex align-items-center mr-2">
                                  <label for="data" class="mr-1">Data: </label>
                                  <p-datepicker 
-                                               (onBlur)="dataSelect(dataNgModel)"
+                                               (onSelect)="dataChanged(dataNgModel)"
                                                #dataNgModel="ngModel"
                                                [(ngModel)]="data"
                                                [showIcon]="true"
@@ -108,7 +108,7 @@
                              <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
                                        [severity]="dayView ? 'primary' : 'secondary'"
                                        [styleClass]="dayView ? 'h-full mr-2' : 'surface-800 border-800 text-white h-full mr-2'"
-                                       (onClick)="calendarChanged()" />
+                                       (onClick)="calendarViewChanged()" />
                              <!-- Prev -->
                              <p-button icon="pi pi-angle-left text-lg"
                                        styleClass="w-full h-full surface-100 border-100 overflow-hidden"
@@ -153,7 +153,7 @@
                                                    [styleClass]="dayView ? 'h-full ' : 'surface-800 border-800 text-white h-full mr-auto'"
                                                    class="mr-auto"
                                                    size="small"
-                                                   (onClick)="calendarChanged()" />
+                                                   (onClick)="calendarViewChanged()" />
                                          <!-- Prev -->
                                          <p-button icon="pi pi-angle-left text-lg"
                                                    styleClass="w-full h-full surface-100 border-100"
@@ -186,7 +186,7 @@
                                      <div class="col-12 surface-50 shadow-1">
                                          <div class="flex align-items-center mx-2">
                                              <label for="data" class="mr-1">Data: </label>
-                                             <p-datepicker (onSelect)="dataSelect(dataNgModel)"
+                                             <p-datepicker (onSelect)="dataChanged(dataNgModel)"
                                                            #dataNgModel="ngModel"
                                                            [(ngModel)]="data"
                                                            [showIcon]="true"
@@ -212,7 +212,7 @@
              </div>
             <!-- FIM SEMANA -->
             <!-- CALENDARIO -->
-            <div (touchstart)="touchStart($event)" (touchend)="touchEnd($event)" class="w-full overflow-auto">
+            <div class="w-full overflow-auto">
                 <full-calendar [options]="calendarioOptions" class="myycalendar" #fullCalendar>
                     <ng-template #dayHeaderContent let-arg>
                         <app-calculo-perfil-cognitivo #calculo

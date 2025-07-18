@@ -221,6 +221,7 @@
             <!-- Educador -->
             <div class="field md:col-4 sm:col-4 col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
+                {{object.professor_Id}}
                 <p-select
                           [options]="professores"
                           [(ngModel)]="object.professor_Id"
@@ -229,8 +230,7 @@
                           [disabled]="!data || !horario"
                           [pTooltip]="!data || !horario ? 'Escolha data e horário para selecionar um educador disponível' : 'Selecione o educador'"
                           #professor_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
+                        placeholder="Selecione"
                           name="professor_Id"
                           inputId="professor_Id"
                           optionLabel="nome"
@@ -240,7 +240,8 @@
                           filterBy="nome"
                                       panelStyleClass="p-select-stripped"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
@@ -293,6 +294,7 @@
             <!-- Sala -->
             <div class="field md:col-2 sm:col-2 col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
+                {{object.sala_Id}}
                 <p-select
                           [options]="salaAulas"
                           [(ngModel)]="object.sala_Id"
@@ -301,8 +303,7 @@
                           [disabled]="!data || !horario"
                           [pTooltip]="!data || !horario ? 'Escolha data e horário para selecionar uma sala disponível' : 'Selecione a sala'"
                           #sala_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
+                        placeholder="Selecione"
                           name="sala_Id"
                           inputId="sala_Id"
                           optionValue="id"
@@ -311,7 +312,8 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template #selectedItem let-selectedOption>
                         <ng-container *ngIf="selectedOption">
                             <app-sala-aula [numeroSala]="selectedOption.numeroSala"

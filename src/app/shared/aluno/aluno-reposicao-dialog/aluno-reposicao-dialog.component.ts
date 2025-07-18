@@ -203,7 +203,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             }
 
             this.loadingEventosReposicaoDe = true;
-            lastValueFrom(this.eventoService.calendario(request))
+            lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
                     this.eventosReposicaoDeList = res.filter(aula => {
                         const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
@@ -248,7 +248,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     
 
             this.loadingEventosReposicaoPara = true;
-            lastValueFrom(this.eventoService.calendario(request))
+            lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
             
                     this.eventosReposicaoParaList = res.filter(aula => {

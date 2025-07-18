@@ -35,6 +35,7 @@ export class Evento {
     turma?: string;
     perfilCognitivo: PerfilCognitivo[] = [];
     capacidadeMaximaAlunos: number = 12;
+    vagas: number = 0;
     roteiro_Id?: number;
     semana?: number;
     tema?: string;

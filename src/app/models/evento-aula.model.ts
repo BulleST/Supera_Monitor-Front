@@ -3,10 +3,10 @@ import { PseudoEvento } from "./reposicao.model";
 export class EventoAulaRequest {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
-    turma_Id: number = 0;
-    roteiro_Id: number = 0;
-    professor_Id: number = 0;
-    sala_Id: number = 0;
+    turma_Id: number = undefined as unknown as number;
+    roteiro_Id: number = undefined as unknown as number;
+    professor_Id: number = undefined as unknown as number;
+    sala_Id: number = undefined as unknown as number;
     duracaoMinutos: number = 120;
     observacao: string = '';
     descricao: string = '';
@@ -20,8 +20,8 @@ export class EventoTurmaExtraRequest {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
     roteiro_Id?: number;
-    professor_Id: number = 0;
-    sala_Id: number = 0;
+    professor_Id: number = undefined as unknown as number;
+    sala_Id: number = undefined as unknown as number;
     duracaoMinutos: number = 120;
     capacidadeMaximaAlunos: number = 12;
     observacao: string = '';

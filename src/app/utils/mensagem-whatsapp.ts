@@ -51,7 +51,7 @@ export class MensagemWhatsapp {
             return;
         }
 
-        lastValueFrom(this.eventoService.calendario({
+        lastValueFrom(this.eventoService.getList({
             intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
             intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
             perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,

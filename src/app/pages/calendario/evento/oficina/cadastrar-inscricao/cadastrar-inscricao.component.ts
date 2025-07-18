@@ -226,7 +226,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD').add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.calendario(request))
+        await lastValueFrom(this.service.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 

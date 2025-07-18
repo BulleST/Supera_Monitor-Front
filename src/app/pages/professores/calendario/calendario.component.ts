@@ -167,7 +167,7 @@ export class CalendarioComponent {
 
         this.loading = true;
 
-        await lastValueFrom(this.service.calendario(this.calendarioRequest))
+        await lastValueFrom(this.service.getList(this.calendarioRequest))
             .then(calendarioList => {
                 this.calendarioList = calendarioList.filter(x => x.active == true);
             })

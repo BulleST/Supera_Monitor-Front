@@ -246,7 +246,7 @@ EventoTipo = EventoTipo;
             .toDate()
 
         this.loadingEventos = true
-        await lastValueFrom(this.service.calendario(request))
+        await lastValueFrom(this.service.getList(request))
             .then((res) => (this.loadingEventos = false))
             .catch((res) => (this.loadingEventos = false))
 
