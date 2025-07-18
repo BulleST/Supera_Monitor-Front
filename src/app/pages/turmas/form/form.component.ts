@@ -80,7 +80,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
     ) {
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
@@ -90,7 +90,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
@@ -100,7 +100,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingSalaAulas = false);
         }
 
-        var perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
+        let perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos);
 
         if (this.perfisCognitivos.length == 0) {
@@ -111,7 +111,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         }
 
         this.loadingEventos = true;
-        var request: CalendarioRequest = {
+        let request: CalendarioRequest = {
             intervaloDe: moment(new Date).startOf('week').toDate(),
             intervaloAte: moment(new Date).endOf('week').toDate()
         };
@@ -119,6 +119,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             .then(res => {
                 this.loadingEventos = false;
                 this.eventos = res;
+
+                this.verificaDisponibilidade();
             })
             .catch(res => this.loadingEventos = false);
     }
@@ -132,11 +134,11 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     loadPage() {
-        var params = this.activatedRoute.params.subscribe(res => {
+        let params = this.activatedRoute.params.subscribe(res => {
             this.isEditPage = !!res['id'];
             if (this.isEditPage) {
                 this.loading = true;
-                var id = this.crypto.decrypt(res['id'])
+                let id = this.crypto.decrypt(res['id'])
 
                 this.service.get(id)
                     .then(res => {
@@ -145,7 +147,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                         this.visible = true;
 
                         if (this.object.perfilCognitivo.length > 0) {
-                            var perfilId = this.object.perfilCognitivo[0].id;
+                            let perfilId = this.object.perfilCognitivo[0].id;
                             this.selectedPerfil = this.perfisCognitivos.filter(x => x.id == perfilId) ?? []
                         }
 
@@ -164,13 +166,13 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
     visibleChange() {
         if (!this.visible) {
-            var route = this.isEditPage ? ['../../'] : ['../'];
+            let route = this.isEditPage ? ['../../'] : ['../'];
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
 
     async verificaDisponibilidade() {
-        var valid = true;
+        let valid = true;
 
         if (!this.object.diaSemana || !this.object.horario) {
             return valid;
@@ -183,7 +185,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     validaSalaAulas() {
-        var data = moment(new Date).set({
+        let data = moment(new Date).set({
             day: this.object.diaSemana,
             hours: this.object.horario.getHours(),
             minutes: this.object.horario.getMinutes(),
@@ -194,7 +196,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
     validaProfessores() {
 
-        var data = moment().set({
+        let data = moment().set({
             day: this.object.diaSemana,
             hours: this.object.horario.getHours(),
             minutes: this.object.horario.getMinutes(),
@@ -203,7 +205,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         this.professores = validaProfessores(data, 120, this.professores, this.eventos, this.object.id);
 
         if (this.object.professor_Id) {
-            var e: SelectChangeEvent = {
+            let e: SelectChangeEvent = {
                 value: this.object.professor_Id,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
             }
@@ -212,7 +214,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.professores.find(x => x.id == e.value);
+        let item = this.professores.find(x => x.id == e.value);
         let mensagemErro: string | null = null;
 
         if (item && !item.disponivel && item.disponivelEvent) {
@@ -232,7 +234,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        var salaAula = this.salaAulas.find(x => x.id == e.value);
+        let salaAula = this.salaAulas.find(x => x.id == e.value);
         if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuído para outra aula com a turma <b>${salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao}</b> no mesmo dia às <b>${moment(salaAula.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
@@ -244,8 +246,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     perfilChange(model: NgModel) {
-            // PRIMENG Multiselect já lida com quase todo o onChange
-        this.object.perfilCognitivo = model.value
+        // PRIMENG Multiselect já lida com quase todo o onChange
+        this.object.perfilCognitivo = model.value;
     }
 
     goToCalendario() {
@@ -260,14 +262,14 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         showError(this.confirmationService, header, message, e);
     }
 
-  @HostListener('keydown.enter', ['$event'])
-  onEnterKeydown(event: KeyboardEvent) {
-    
-    // Add your desired logic here
-    this.sendConfirmation(this.form, event)
-  }
+    @HostListener('keydown.enter', ['$event'])
+    onEnterKeydown(event: KeyboardEvent) {
+
+        // Add your desired logic here
+        this.sendConfirmation(this.form, event)
+    }
     async sendConfirmation(form: NgForm, e: any) {
-        var professorValido = await this.verificaDisponibilidade();
+        let professorValido = await this.verificaDisponibilidade();
         if (form.invalid || professorValido == false) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);
         }
@@ -275,8 +277,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: 'Tem certeza que deseja salvar os dados da turma?',
-            header: 'Salvar dados',
+            message: 'Tem certeza que deseja sallet os dados da turma?',
+            header: 'Sallet dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
