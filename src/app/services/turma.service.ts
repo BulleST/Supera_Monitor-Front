@@ -38,6 +38,7 @@ export class TurmaService extends Service {
 
         turma.vagas = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
         turma.vagas = turma.vagas < 0 ? 0 : turma.vagas;
+        turma.temGrupo = !!turma.linkGrupo;
 
         return turma;
     }

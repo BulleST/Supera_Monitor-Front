@@ -1,166 +1,176 @@
 <p-contextmenu #cm
-    [model]="tableMenu"
-    (onHide)="tableSelectedItem = null"
-    appendTo="body"
-    triggerEvent="onclick" />
-
+               [model]="tableMenu"
+               (onHide)="tableSelectedItem = null"
+               appendTo="body"
+               triggerEvent="onclick" />
 <app-confirm-dialog></app-confirm-dialog>
-
 <div class="px-3 pb-4 bg-white">
     <p-table
-        #dt
-        [value]="list"
-        [rows]="50"
-        [rowsPerPageOptions]="[50, 100, 1000]"
-        [paginator]="list.length > 50"
-        [columns]="tableColumns"
-        [globalFilterFields]="tableGlobalFilterFields"
-        dataKey="id"
-        stripedRows
-        [loading]="tableLoading"
-        [showLoader]="false"
-        [rowHover]="list.length > 0">
-    <ng-template #caption>
-        <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
-            <div class="p-toolbar-group-start">
-                <h2 class="flex align-items-center ">
-                    <i class=" fa-solid fa-users mr-3 text-primary text-2xl"></i>
-                    <span class="text-2xl font-normal my-0">Usuários</span>
-                </h2>
-            </div>
-            <div class="p-toolbar-group-center"></div>
-            <div class="p-toolbar-group-end items-stretch">
-                <div class="flex align-items-strech">
-                    <p-iconfield class="mr-2">
-                        <p-inputicon styleClass="pi pi-search" />
-                        <input type="text"
-                        pInputText
-                        #_tableSearch="ngModel"
-                        [(ngModel)]="tableSearch"
-                        id="search"
-                        name="search"
-                        (input)="dt.filterGlobal(tableSearch, 'contains')"
-                        placeholder="Pesquisar" />
-                    </p-iconfield>
-                    <p-button
-                    icon="pi pi-filter-slash text-sm text-white"
-                    (onClick)="clear(dt)"
-                    severity="secondary"
-                    [text]="true"
-                    pTooltip="Limpar filtro"
-                    tooltipPosition="bottom"
-                    class="mr-2" 
-                    styleClass="h-full bg-black-alpha-80" />
-                    <p-button
-                    icon="pi pi-sync text-sm text-white"
-                    (onClick)="update()"
-                    severity="secondary"
-                    [text]="true"
-                    pTooltip="Atualizar usuários"
-                    tooltipPosition="bottom"
-                    class="mr-2" 
-                    styleClass="h-full bg-black-alpha-80" />
-                    <p-button
-                    icon="pi pi-plus text-sm"
-                    label="Cadastrar"
-                    [routerLink]="['cadastrar' ]"
-                    [rounded]="true"
-                    pTooltip="Cadastrar usuário"
-                    tooltipPosition="bottom"
-                    styleClass="h-full px-3" />
+             #dt
+             [value]="list"
+             [rows]="50"
+             [rowsPerPageOptions]="[50, 100, 1000]"
+             [paginator]="list.length > 50"
+             [columns]="tableColumns"
+             [globalFilterFields]="tableGlobalFilterFields"
+             dataKey="id"
+             stripedRows
+             [loading]="tableLoading"
+             [showLoader]="false"
+             [rowHover]="list.length > 0">
+        <ng-template #caption>
+            <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
+                <div class="p-toolbar-group-start">
+                    <h2 class="flex align-items-center ">
+                        <i class=" fa-solid fa-users mr-3 text-primary text-2xl"></i>
+                        <span class="text-2xl font-normal my-0">Usuários</span>
+                    </h2>
                 </div>
-            </div>
-        </p-toolbar>
-    </ng-template>
-    <ng-template #header>
-        <tr *ngIf="(!tableLoading && list.length > 0) || tableLoading">
-            <th *ngFor="let col of tableColumns" 
-            [pSortableColumn]="col.field"class="surface-900 border-none text-white white-space-nowrap" 
-            [style]="{ 
-                width: col.options && col.options.width ? col.options.width : ''
-            }">
-            <div class="flex align-items-center">
-                <span>{{ col.label }}</span>
-                <ng-container *ngIf="col.filterType != FilterType.none">
-                    <div class="flex align-items-center" 
-                    [class.ml-3]="col.displayType != DisplayType.options">
-                    <p-columnFilter [type]="col.filterType"
-                    [field]="col.field"
-                    display="menu" />
-                    <p-sortIcon [field]="col.field" />
+                <div class="p-toolbar-group-center"></div>
+                <div class="p-toolbar-group-end items-stretch">
+                    <div class="flex align-items-strech">
+                        <p-iconfield class="mr-2">
+                            <p-inputicon styleClass="pi pi-search" />
+                            <input type="text"
+                                   pInputText
+                                   #_tableSearch="ngModel"
+                                   [(ngModel)]="tableSearch"
+                                   id="search"
+                                   name="search"
+                                   (input)="dt.filterGlobal(tableSearch, 'contains')"
+                                   placeholder="Pesquisar" />
+                        </p-iconfield>
+                        <p-button
+                                  icon="pi pi-filter-slash text-sm text-white"
+                                  (onClick)="clear(dt)"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Limpar filtro"
+                                  tooltipPosition="bottom"
+                                  class="mr-2"
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-sync text-sm text-white"
+                                  (onClick)="update()"
+                                  severity="secondary"
+                                  [text]="true"
+                                  pTooltip="Atualizar usuários"
+                                  tooltipPosition="bottom"
+                                  class="mr-2"
+                                  styleClass="h-full bg-black-alpha-80" />
+                        <p-button
+                                  icon="pi pi-plus text-sm"
+                                  label="Cadastrar"
+                                  [routerLink]="['cadastrar' ]"
+                                  [rounded]="true"
+                                  pTooltip="Cadastrar usuário"
+                                  tooltipPosition="bottom"
+                                  styleClass="h-full px-3" />
+                    </div>
                 </div>
-            </ng-container>
-        </div>
-    </th>
-    <th pFrozenColumn
-    alignFrozen="right"
-    class="surface-900 border-bottom-none text-white"></th>
-</tr>
-    </ng-template>
-    <ng-template #body let-item let-index="rowIndex">
-        <tr class="white-space-nowrap">
-            <td *ngFor="let col of tableColumns"
-            [style]="{ 
-                width: col.options && col.options.width ? col.options.width : ''
-            }">
-            <ng-container *ngIf="col.displayType == DisplayType.options">
-                <ng-container *ngTemplateOutlet="tag; 
-                context: { 
-                    item: item,
-                    option: getOption(col, item)
-                }">
-            </ng-container>
-            <ng-template #tag let-item="item" let-option="option">
-                <p-tag *ngIf="option"
-                styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                [icon]="option.icon ? (option.icon + ' mr-2 text-sm') : ''"
-                [value]="option.label"
-                [severity]="option.severity ? option.severity : 'secondary'"
-                tooltipPosition="top"
-                [pTooltip]="option.showDeactivatedDate == true  && item['deactivated'] ?  'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-            </ng-template>
-        </ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.color">
-            <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item[col.field] ?? 'black' }"></span>
-        </ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.text">{{ item[col.field] }}</ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.numeric">{{ item[col.field] | number : col.options?.digitsInfo : col.options?.locale }}</ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.date">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.time">{{ item[col.field] | date : col.options?.format : col.options?.timezone : col.options?.locale }}</ng-container>
-        <ng-container *ngIf="col.displayType == DisplayType.mask">{{ item[col.field] | mask : col.options.format }}</ng-container>
-    </td>
-    <td pFrozenColumn
-    alignFrozen="right">
-    <p-button
-    [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
-    [severity]="'secondary'"
-    [rounded]="true"
-    title="Ver mais"
-    styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
-    (onClick)="showContextMenu($event, item)" />
-    </td>
-    </tr>
-    </ng-template>
-    <ng-template #loadingbody let-columns="columns">
-        <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
-            <td *ngFor="let col of tableColumns" >
-                <p-skeleton />
-            </td>
-            <td>
-                <p-skeleton shape="circle" size="1rem" />
-            </td>
-        </tr>
-    </ng-template>
-    <ng-template #emptymessage>
-        <tr class="p-datatable-empty-text">
-            <td [attr.colspan]="tableColumns.length + 1">
-                <div class="flex align-items-center" *ngIf="!tableSearch">
-                    <span>Nenhum item registrado.</span>
-                </div>
-                <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
-            </td>
-        </tr>
-    </ng-template>
-</p-table>
+            </p-toolbar>
+        </ng-template>
+        <ng-template #header>
+            <tr class="fadein">
+                <ng-container *ngFor="let col of tableColumns">
+                    <ng-container *ngIf="col.frozen === true">
+                        <th pFrozenColumn [pSortableColumn]="col.field">
+                            <div class="flex align-items-center gap-4">
+                                <span>{{col.label}}</span>
+                                <p-sortIcon *ngIf="col.sortable" [field]="col.field" />
+                            </div>
+                        </th>
+                    </ng-container>
+                    <ng-container *ngIf="!col.frozen">
+                        <th [pSortableColumn]="col.field">
+                            <div class="flex align-items-center gap-4">
+                                <span>{{col.label}}</span>
+                                <p-sortIcon *ngIf="col.sortable" [field]="col.field" />
+                            </div>
+                        </th>
+                    </ng-container>
+                </ng-container>
+                <th pFrozenColumn [alignFrozen]="'right'"></th>
+            </tr>
+            <tr>
+                <ng-container *ngFor="let col of tableColumns">
+                    <ng-container *ngIf="col.frozen === true">
+                        <th pFrozenColumn class="z-1">
+                            <app-table-header-filter [col]="col"></app-table-header-filter>
+                        </th>
+                    </ng-container>
+                    <ng-container *ngIf="!col.frozen">
+                        <th>
+                            <app-table-header-filter [col]="col"></app-table-header-filter>
+                        </th>
+                    </ng-container>
+                </ng-container>
+                <th pFrozenColumn alignFrozen="right"></th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-item let-index="rowIndex">
+            <tr class="white-space-nowrap">
+                <td>
+                    {{item.name}}
+                </td>
+                <td>
+                    {{item.email}}
+                </td>
+                <td>
+                    {{item.phone | mask : '+00 (00) 0.0000-0000'}}
+                </td>
+                <td>
+                    {{item.role}}
+                </td>
+                
+                <td class="w-5rem">
+                    <ng-container *ngIf="item.active">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                               icon="pi pi-check mr-2 text-xs"
+                               value="Ativo"
+                               severity="success"
+                               [pTooltip]="'Ativo'" />
+                    </ng-container>
+                    <ng-container *ngIf="!item.active">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                               icon="pi pi-times mr-2 text-xs"
+                               value="Inativo"
+                               severity="danger"
+                               [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
+                    </ng-container>
+                </td>
+                <td pFrozenColumn
+                    alignFrozen="right">
+                    <p-button
+                              [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+                              [severity]="'secondary'"
+                              [rounded]="true"
+                              title="Ver mais"
+                              styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+                              (onClick)="showContextMenu($event, item)" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #loadingbody let-columns="columns">
+            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
+                <td *ngFor="let col of tableColumns">
+                    <p-skeleton />
+                </td>
+                <td>
+                    <p-skeleton shape="circle" size="1rem" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr class="p-datatable-empty-text">
+                <td [attr.colspan]="tableColumns.length + 1">
+                    <div class="flex align-items-center" *ngIf="!tableSearch">
+                        <span>Nenhum item registrado.</span>
+                    </div>
+                    <div *ngIf="tableSearch"> Nenhum item encontrado. </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
 </div>
 <router-outlet></router-outlet>

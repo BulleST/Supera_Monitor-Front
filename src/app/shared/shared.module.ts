@@ -35,15 +35,12 @@ import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
+import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
 
 @NgModule({
     declarations: [
         ProfileComponent,
         ChangePasswordComponent,
-        // AlunoFormComponent,
-        // AlunoDadosCadastraisComponent,
-        // AlunoCalendarioComponent,
-        // AlunoHistoricoComponent,
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,
@@ -54,6 +51,8 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
         EventoItemComponent,
         EventoItemHoverComponent,
         LoadingBrainComponent,
+        TableHeaderFilterComponent,
+        TableHeaderFilterComponent,
     ],
     exports: [
         FormsModule,
@@ -69,10 +68,6 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
         NameAbvPipe,
         ProfileComponent,
         ChangePasswordComponent,
-        // AlunoFormComponent,
-        // AlunoDadosCadastraisComponent,
-        // AlunoCalendarioComponent,
-        // AlunoHistoricoComponent,
         AlunoPopoverComponent,
         AlunoChecklistComponent,
         AlunoChecklistDialogComponent,
@@ -83,6 +78,7 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
         EventoItemComponent,
         EventoItemHoverComponent,
         LoadingBrainComponent,
+        TableHeaderFilterComponent,
     ],
     imports: [
         CommonModule,

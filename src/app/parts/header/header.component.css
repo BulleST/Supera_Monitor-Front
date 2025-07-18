@@ -2,6 +2,31 @@
     display: none;
 }
 
+.header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 1100%;
+    background-color: var(--p-primary-500);
+    border: none;
+    border-radius: 0;
+    padding: 0.5rem 3rem;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.header.header--mobile {
+    padding: 0.9rem 0.5rem;
+    z-index: 1;
+}
+
+.navigation-container {
+    /* position: relative; */
+    /* top: 0; */
+    width: 100%;
+    /* margin-bottom: 6;2px; */
+}
+
 .navigation {
     padding: 6px 0;
     display: flex;
@@ -11,8 +36,13 @@
     box-shadow: -2px 0px 7px -5px black;
     max-width: 250px;
     width: 85vw;
+    transform: translateX(-100%);
+    transition: .3s;
+    position: absolute;
 }
-
+.navigation-container-open .navigation {
+    transform: translateX(0px);
+}
 .navigation-link {
     color: white;
     padding: 7px 15px;
@@ -22,40 +52,28 @@
     transition: .2s;
 }
 
-.navigation-container {
-    position: fixed;
-    display: flex;
-    top: 0;
-    right: 0;
-    align-items: start;
-    justify-content: start;
-    transform: translateX(100%);
-    transition: .3s;
-}
 
 ::ng-deep .navigation-toggler {
-    width: 4rem!important;
-    height: 4.3rem!important;
-     /*var(--pink-400)!important;*/
-     /*var(--pink-400);*/
-    border-bottom-right-radius: 0px!important;
-    border-top-right-radius: 0px!important;
+    width: 4rem !important;
+    height: 4.3rem !important;
+    /*var(--pink-400)!important;*/
+    /*var(--pink-400);*/
+    border-bottom-right-radius: 0px !important;
+    border-top-right-radius: 0px !important;
     flex: none;
     display: flex;
     transform: translateX(-100%);
 }
 
-.navigation-container.navigation-container-open {
-    transform: translateX(0);
-}
 
-::ng-deep .navigation-container.navigation-container-open  .navigation-toggler {
-    
+::ng-deep .navigation-container.navigation-container-open .navigation-toggler {
     transform: translateX(0%);
 }
+
 .navigation-link:hover {
     background-color: #ffffff30;
 }
+
 .navigation-link.active-link {
     background-color: var(--orange-600);
 }

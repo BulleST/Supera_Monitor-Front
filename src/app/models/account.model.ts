@@ -1,3 +1,4 @@
+import { FilterMatchMode } from "primeng/api";
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Basic_List } from "./_basic.model";
 import { Role } from "./account-perfil.model";
@@ -39,24 +40,52 @@ export class AccountResponse {
 
 export var userColumns: ColumnTable[] = [
     {
-        field: 'name',
-        label: 'Nome',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
-        options: undefined,
+            field: 'name',
+            label: 'Nome',
+            displayType: DisplayType.text,
+            sortable: true,
+            frozen: true,
+            filterOptions: {
+                type: FilterType.text,
+                matchMode: FilterMatchMode.CONTAINS.toString(),
+                value: undefined,
+                icon: undefined,
+                primeElement: 'inputtext',
+                primeElementOptions: {}
+            }
     },
     {
         field: 'email',
         label: 'E-mail',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
+        sortable: true,
+        frozen: true,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.CONTAINS.toString(),
+            value: undefined,
+            icon: undefined,
+            primeElement: 'inputtext',
+            primeElementOptions: {}
+        }
     },
     {
         field: 'phone',
         label: 'Celular',
-        filterType: FilterType.text,
         displayType: DisplayType.mask,
+        sortable: true,
+        frozen: true,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.CONTAINS.toString(),
+            value: undefined,
+            icon: 'pi pi-mobile',
+            primeElement: 'inputmask',
+            primeElementOptions: {
+                format: '+99 (99) 9.9999-9999',
+                placeholder: '+99 (99) 9.9999-9999',
+            }
+        },
         options: {
             format: '+99 (99) 9.9999-9999'
         },
@@ -64,20 +93,49 @@ export var userColumns: ColumnTable[] = [
     {
         field: 'role',
         label: 'Perfil',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
-        options: undefined,
+        filterOptions: {
+            type: FilterType.text,
+            matchMode: FilterMatchMode.CONTAINS.toString(),
+            value: undefined,
+            icon: undefined,
+            primeElement: 'inputtext',
+            primeElementOptions: {}
+        }
     },
     {
         field: 'active',
         label: 'Status',
-        filterType: FilterType.text,
         displayType: DisplayType.options,
-        options: { 
-            "items": [
-                { "value": true, "label": "Ativo", "severity": "success", "icon": "pi pi-lock-open", "showDeactivatedDate": false }, 
-                { "value": false, "label": "Inativo", "severity": "danger", "icon": "pi pi-lock", "showDeactivatedDate": true }
-            ]
+        sortable: true,
+        filterOptions: {
+            type: FilterType.boolean,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: undefined,
+            primeElement: 'select',
+            primeElementOptions: {
+                icon: undefined,
+                format: undefined,
+                placeholder: undefined,
+                options: [
+                    {
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
+                    },
+                    {
+                        value: true,
+                        label: "Ativo",
+                        icon: "pi pi-lock-open text-green-500",
+                    },
+                    {
+                        value: false,
+                        label: "Inativo",
+                        icon: "pi pi-lock text-red-500",
+                    }
+                ]
+
+            }
         },
     },
 ];

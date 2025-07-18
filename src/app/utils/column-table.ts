@@ -38,29 +38,27 @@ export enum FilterType {
     date = 'date',
     dateTime = 'dateTime',
     time = 'time',
+    boolean = 'boolean',
     none = 'none',
 }
 
 
-export class ColumnTable {
-    field: string = '';
-    label: string = '';
-    filterType: FilterType = FilterType.text;
-    displayType?: DisplayType = DisplayType.text;
-    filterMatchMode?: string = FilterMatchMode.CONTAINS.toString();
+export interface ColumnTable {
+    field: string;
+    label: string;
+    displayType: DisplayType;
+    filterOptions: FilterOptions;
     options?: any;
-    filterValue?: any = '';
-    filterOptions?: FilterOptions;
-    sortable?: boolean = true;
-    frozen?: boolean = false;
+    sortable?: boolean;
+    frozen?: boolean;
 }
 
 export interface FilterOptions {
+    type: string;
     icon?: string;
     value?: any;
-    matchMode: string;
-    type: string;
-    primeElement: 'inputtext' | 'datepicker' | 'inputmask' | 'select' | 'multiselect' | 'inputnumber' | 'toggleswitch';
-    primeElementOptions: any;
+    matchMode?: string;
+    primeElement?: 'inputtext' | 'datepicker' | 'inputmask' | 'select' | 'multiselect' | 'inputnumber' | 'toggleswitch';
+    primeElementOptions?: any;
 }
 

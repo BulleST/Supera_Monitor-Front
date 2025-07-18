@@ -59,20 +59,21 @@ export var professorColumns: ColumnTable[] = [
     {
         field: 'corLegenda',
         label: '',
-        filterType: FilterType.none,
         displayType: DisplayType.color,
         sortable: false,
+        filterOptions: {
+            type: FilterType.none
+        }
     },
     {
         field: 'nome',
         label: 'Nome',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -81,13 +82,12 @@ export var professorColumns: ColumnTable[] = [
     {
         field: 'email',
         label: 'E-mail',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: 'pi pi-envelope',
             primeElement: 'inputtext',
             primeElementOptions: {
@@ -100,12 +100,11 @@ export var professorColumns: ColumnTable[] = [
         field: 'telefone',
         label: 'Celular',
         sortable: true,
-        filterType: FilterType.text,
         displayType: DisplayType.mask,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: 'pi pi-mobile',
             primeElement: 'inputmask',
             primeElementOptions: {
@@ -122,10 +121,9 @@ export var professorColumns: ColumnTable[] = [
         field: 'dataInicio',
         label: 'Data de Início',
         sortable: true,
-        filterType: FilterType.date,
         displayType: DisplayType.date,
         filterOptions: {
-            type: 'date',
+            type: FilterType.date,
             matchMode: FilterMatchMode.DATE_IS.toString(),
             value: undefined,
             primeElement: 'datepicker',
@@ -145,10 +143,9 @@ export var professorColumns: ColumnTable[] = [
         field: 'professor_NivelCertificacao',
         label: 'Nível Certificação',
         sortable: true,
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         filterOptions: {
-            type: 'text',
+            type: FilterType.text,
             matchMode: FilterMatchMode.IN.toString(),
             value: undefined,
             primeElement: 'multiselect',
@@ -168,10 +165,9 @@ export var professorColumns: ColumnTable[] = [
         field: 'expedienteInicio',
         label: 'Início Expediente',
         sortable: true,
-        filterType: FilterType.time,
         displayType: DisplayType.time,
         filterOptions: {
-            type: 'text',
+            type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
             value: undefined,
             primeElement: 'datepicker',
@@ -193,10 +189,9 @@ export var professorColumns: ColumnTable[] = [
         field: 'expedienteFim',
         label: 'Fim Expediente',
         sortable: true,
-        filterType: FilterType.time,
         displayType: DisplayType.time,
         filterOptions: {
-            type: 'date',
+            type: FilterType.date,
             matchMode: FilterMatchMode.DATE_IS.toString(),
             value: undefined,
             primeElement: 'datepicker',
@@ -215,14 +210,12 @@ export var professorColumns: ColumnTable[] = [
         },
     },
     {
-        field: 'activeString',
+        field: 'active',
         label: 'Status',
-        sortable: true,
-        filterType: FilterType.text,
-        filterMatchMode: FilterMatchMode.EQUALS.toString(),
         displayType: DisplayType.options,
+        sortable: true,
         filterOptions: {
-            type: 'text',
+            type: FilterType.boolean,
             matchMode: FilterMatchMode.EQUALS.toString(),
             value: undefined,
             primeElement: 'select',
@@ -232,40 +225,23 @@ export var professorColumns: ColumnTable[] = [
                 placeholder: undefined,
                 options: [
                     {
-                        value: 'Ativo',
-                        label: "Ativo",
-                        severity: "success",
-                        icon: "pi pi-lock-open",
-                        showDeactivatedDate: false
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
                     },
                     {
-                        value: 'Inativo',
+                        value: true,
+                        label: "Ativo",
+                        icon: "pi pi-lock-open text-green-500",
+                    },
+                    {
+                        value: false,
                         label: "Inativo",
-                        severity: "danger",
-                        icon: "pi pi-lock",
-                        showDeactivatedDate: true
+                        icon: "pi pi-lock text-red-500",
                     }
                 ]
 
             }
-        },
-        options: {
-            items: [
-                {
-                    value: 'Ativo',
-                    label: "Ativo",
-                    severity: "success",
-                    icon: "pi pi-lock-open",
-                    showDeactivatedDate: false
-                },
-                {
-                    value: 'Inativo',
-                    label: "Inativo",
-                    severity: "danger",
-                    icon: "pi pi-lock",
-                    showDeactivatedDate: true
-                }
-            ]
         },
     },
 ];

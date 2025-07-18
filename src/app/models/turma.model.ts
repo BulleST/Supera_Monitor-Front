@@ -33,27 +33,29 @@ export class Turma extends Basic_List {
     salaDeAulaString: string = '';
     capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
-    vagas: number = 0
+    vagas: number = 0;
+    temGrupo: boolean = false;
 }
 
 export var turmaColumns: ColumnTable[] = [
     {
         field: 'corLegenda',
         label: '',
-        filterType: FilterType.none,
         displayType: DisplayType.color,
         sortable: false,
+        filterOptions: {
+            type: FilterType.none,
+        }
     },
     {
         field: 'nome',
         label: 'Nome',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -62,13 +64,12 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'professor',
         label: 'Educador(a)',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -78,13 +79,12 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'diasDeAulaString',
         label: 'Dias de Aula',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -93,13 +93,12 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'salaDeAulaString',
         label: 'Sala',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -108,13 +107,12 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'perfilCognitivoString',
         label: 'Perfil Cognitivo',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -123,31 +121,29 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'capacidadeMaximaAlunosString',
         label: 'Limite',
-        filterType: FilterType.text,
-        displayType: DisplayType.text,
+        displayType: DisplayType.mask,
         sortable: true,
         filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
         },
         options: {
-            width: '15px'
+            width: '15px',
         },
     },
     {
         field: 'vagas',
-        label: 'Vagas Disponíveis',
-        filterType: FilterType.numeric,
+        label: 'Vaga(s)',
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.numeric,
             matchMode: FilterMatchMode.EQUALS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
             primeElementOptions: {}
@@ -157,30 +153,47 @@ export var turmaColumns: ColumnTable[] = [
         },
     },
     {
-        field: 'linkGrupo',
+        field: 'temGrupo',
         label: 'Grupo',
-        filterType: FilterType.text,
         displayType: DisplayType.link,
         sortable: true,
         filterOptions: {
-            
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            type: FilterType.boolean,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: undefined,
             icon: undefined,
-            primeElement: 'inputtext',
-            primeElementOptions: {}
+            primeElement: 'select',
+            primeElementOptions: {
+                icon: undefined,
+                format: undefined,
+                placeholder: undefined,
+                options: [
+                    {
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
+                    },
+                    {
+                        value: true,
+                        label: "Tem grupo",
+                        icon: "pi pi-check text-green-500",
+                    },
+                    {
+                        value: false,
+                        label: "Não tem grupo",
+                        icon: "pi pi-times text-red-500",
+                    }
+                ]
+            }
         }
     },
     {
-        field: 'activeString',
+        field: 'active',
         label: 'Status',
-        sortable: true,
-        filterType: FilterType.text,
-        filterMatchMode: FilterMatchMode.EQUALS.toString(),
         displayType: DisplayType.options,
+        sortable: true,
         filterOptions: {
-            type: 'text',
+            type: FilterType.boolean,
             matchMode: FilterMatchMode.EQUALS.toString(),
             value: undefined,
             primeElement: 'select',
@@ -190,40 +203,23 @@ export var turmaColumns: ColumnTable[] = [
                 placeholder: undefined,
                 options: [
                     {
-                        value: 'Ativo',
-                        label: "Ativo",
-                        severity: "success",
-                        icon: "pi pi-lock-open",
-                        showDeactivatedDate: false
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
                     },
                     {
-                        value: 'Inativo',
+                        value: true,
+                        label: "Ativo",
+                        icon: "pi pi-lock-open text-green-500",
+                    },
+                    {
+                        value: false,
                         label: "Inativo",
-                        severity: "danger",
-                        icon: "pi pi-lock",
-                        showDeactivatedDate: true
+                        icon: "pi pi-lock text-red-500",
                     }
                 ]
 
             }
-        },
-        options: {
-            items: [
-                {
-                    value: 'Ativo',
-                    label: "Ativo",
-                    severity: "success",
-                    icon: "pi pi-lock-open",
-                    showDeactivatedDate: false
-                },
-                {
-                    value: 'Inativo',
-                    label: "Inativo",
-                    severity: "danger",
-                    icon: "pi pi-lock",
-                    showDeactivatedDate: true
-                }
-            ]
         },
     },
 ];

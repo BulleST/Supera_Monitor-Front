@@ -133,14 +133,13 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'nome',
         label: 'Nome',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         frozen: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -149,13 +148,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'turma',
         label: 'Turma',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -164,13 +162,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'perfilCognitivo',
         label: 'Perfil Cognitivo',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -179,13 +176,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'idade',
         label: 'Idade',
-        filterType: FilterType.numeric,
         displayType: DisplayType.mask,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.EQUALS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
             primeElementOptions: {}
@@ -194,13 +190,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'kit',
         label: 'Kit',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true, 
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -209,13 +204,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'apostila_Abaco',
         label: 'Ábaco',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true, 
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -224,13 +218,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'numeroPaginaAbaco',
         label: 'Página',
-        filterType: FilterType.numeric,
         displayType: DisplayType.mask,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.EQUALS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
             primeElementOptions: {}
@@ -239,13 +232,12 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'apostila_AH',
         label: 'AH',
-        filterType: FilterType.text,
         displayType: DisplayType.text,
         sortable: true, 
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.CONTAINS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
             primeElementOptions: {}
@@ -254,27 +246,24 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'numeroPaginaAH',
         label: 'Página',
-        filterType: FilterType.numeric,
         displayType: DisplayType.mask,
         sortable: true,
         filterOptions: {
             type: FilterType.text,
             matchMode: FilterMatchMode.EQUALS.toString(),
-            value: '',
+            value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
             primeElementOptions: {}
         }
     },
     {
-        field: 'activeString',
+        field: 'active',
         label: 'Status',
-        sortable: true,
-        filterType: FilterType.text,
-        filterMatchMode: FilterMatchMode.EQUALS.toString(),
         displayType: DisplayType.options,
+        sortable: true,
         filterOptions: {
-            type: 'text',
+            type: FilterType.boolean,
             matchMode: FilterMatchMode.EQUALS.toString(),
             value: undefined,
             primeElement: 'select',
@@ -284,40 +273,23 @@ export var alunosColumns: ColumnTable[] = [
                 placeholder: undefined,
                 options: [
                     {
-                        value: 'Ativo',
-                        label: "Ativo",
-                        severity: "success",
-                        icon: "pi pi-lock-open",
-                        showDeactivatedDate: false
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
                     },
                     {
-                        value: 'Inativo',
+                        value: true,
+                        label: "Ativo",
+                        icon: "pi pi-lock-open text-green-500",
+                    },
+                    {
+                        value: false,
                         label: "Inativo",
-                        severity: "danger",
-                        icon: "pi pi-lock",
-                        showDeactivatedDate: true
+                        icon: "pi pi-lock text-red-500",
                     }
                 ]
 
             }
-        },
-        options: {
-            items: [
-                {
-                    value: 'Ativo',
-                    label: "Ativo",
-                    severity: "success",
-                    icon: "pi pi-lock-open",
-                    showDeactivatedDate: false
-                },
-                {
-                    value: 'Inativo',
-                    label: "Inativo",
-                    severity: "danger",
-                    icon: "pi pi-lock",
-                    showDeactivatedDate: true
-                }
-            ]
         },
     },
 ];

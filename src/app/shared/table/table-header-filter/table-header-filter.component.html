@@ -1,0 +1,135 @@
+<ng-container *ngIf="col.filterOptions.type != FilterType.none">
+    <!-- ColumnFilter -->
+    <p-columnFilter
+                    [field]="col.field"
+                    [type]="col.filterOptions.type"
+                    [matchMode]="col.filterOptions.matchMode ?? FilterMatchMode.CONTAINS"
+                    class="p-column-filter-inline">
+        <ng-template #filter let-value let-filter="filterCallback">
+            <p-iconfield [class.filter-icon-field]="col.filterOptions && col.filterOptions.icon">
+                <ng-container *ngIf="col.filterOptions">
+                    <!-- IconField -->
+                    <ng-container *ngIf="col.filterOptions.icon">
+                        <p-inputicon styleClass="{{col.filterOptions.icon}}" />
+                    </ng-container>
+                    <!-- Field -->
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'inputtext'">
+                        <input pInputText
+                               [(ngModel)]="col.filterOptions.value"
+                               [email]="col.filterOptions.primeElementOptions.email"
+                               [id]="col.field"
+                               [name]="col.field"
+                               [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                               (ngModelChange)="filter(col.filterOptions.value)"
+                               style="min-width: 5rem;"
+                               fluid>
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'inputnumber'">
+                        <p-inputnumber
+                                       [showButtons]="true"
+                                       [step]="1"
+                                       [useGrouping]="false"
+                                       [(ngModel)]="col.filterOptions.value"
+                                       [id]="col.field"
+                                       [name]="col.field"
+                                       [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                       (ngModelChange)="filter(col.filterOptions.value)"
+                                       [style]="{'min-width': '7rem'}"
+                                       [suffix]="col.filterOptions.primeElementOptions.suffix ?? ''"
+                                       [prefix]="col.filterOptions.primeElementOptions.prefix ?? ''"
+                                       fluid />
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'inputmask'">
+                        <p-inputmask
+                                     [mask]="col.filterOptions.primeElementOptions.format"
+                                     [unmask]="true"
+                                     [(ngModel)]="col.filterOptions.value"
+                                     [inputId]="col.field"
+                                     [name]="col.field"
+                                     [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                     (onComplete)="filter(col.filterOptions.value)"
+                                     (ngModelChange)="filter(col.filterOptions.value)" />
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'datepicker'">
+                        <p-datepicker
+                                      appendTo="body"
+                                      [showIcon]="col.filterOptions.primeElementOptions.showIcon"
+                                      [iconDisplay]="'input'"
+                                      [dateFormat]="col.filterOptions.primeElementOptions.format"
+                                      [inputId]="col.field"
+                                      [name]="col.field"
+                                      [(ngModel)]="col.filterOptions.value"
+                                      [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                      class="w-full"
+                                      styleClass="w-full"
+                                      inputStyleClass="w-10rem"
+                                      [timeOnly]="col.filterOptions.primeElementOptions.timeOnly"
+                                      [showTime]="col.filterOptions.primeElementOptions.showTime"
+                                      [hourFormat]="col.filterOptions.primeElementOptions.hourFormat"
+                                      (ngModelChange)="filter(col.filterOptions.value)"
+                                      (onSelect)="filter(col.filterOptions.value)">
+                            <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
+                                <i class="{{col.filterOptions.primeElementOptions.icon}}" (click)="clickCallBack($event)"></i>
+                            </ng-template>
+                        </p-datepicker>
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'select'">
+                        <p-select
+                                  [options]="col.filterOptions.primeElementOptions.options"
+                                  [(ngModel)]="col.filterOptions.value"
+                                  [inputId]="col.field"
+                                  [name]="col.field"
+                                  [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                  optionLabel="label"
+                                  optionValue="value"
+                                  (ngModelChange)="filter(col.filterOptions.value)"
+                                  appendTo="body">
+                            <ng-template let-option #item>
+                                <p-button *ngIf="option.severity"
+                                          [icon]="option.icon"
+                                          [label]="option.label"
+                                          [severity]="option.severity ?? 'secondary'" />
+                                <div *ngIf="!option.severity" class="flex align-items-center gap-2">
+                                    <i *ngIf="option.icon" class="{{option.icon}}"></i>
+                                    <span>{{option.label}}</span>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'multiselect'">
+                        <p-multiselect
+                                       [options]="col.filterOptions.primeElementOptions.options"
+                                       [(ngModel)]="col.filterOptions.value"
+                                       [inputId]="col.field"
+                                       [name]="col.field"
+                                       [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
+                                       optionLabel="label"
+                                       optionValue="value"
+                                       (ngModelChange)="filter(col.filterOptions.value)"
+                                       appendTo="body">
+                            <ng-template let-option #item>
+                                <p-button *ngIf="option.severity"
+                                          [icon]="option.icon"
+                                          [label]="option.label"
+                                          [severity]="option.severity ?? 'secondary'" />
+                                <div *ngIf="!option.severity" class="flex align-items-center gap-2">
+                                    <i *ngIf="option.icon" class="{{option.icon}}"></i>
+                                    <span>{{option.label}}</span>
+                                </div>
+                            </ng-template>
+                        </p-multiselect>
+                    </ng-container>
+                    <ng-container *ngIf="col.filterOptions.primeElement == 'toggleswitch'">
+                        <p-toggleswitch
+                                        #toggleSwitch
+                                        [(ngModel)]="col.filterOptions.value"
+                                        [inputId]="col.field"
+                                        [name]="col.field"
+                                        (ngModelChange)="filter(col.filterOptions.value)">
+                        </p-toggleswitch>
+                    </ng-container>
+                </ng-container>
+            </p-iconfield>
+        </ng-template>
+    </p-columnFilter>
+</ng-container>
