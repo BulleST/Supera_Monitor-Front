@@ -15,17 +15,16 @@ import { AccountService } from '../../../services/account.service';
     standalone: false,
     templateUrl: './aluno-checklist-on-confirm-dialog.component.html',
     styleUrl: './aluno-checklist-on-confirm-dialog.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService],
 })
 export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
-
     visible = false;
     observacao = '';
     celular = '';
     loading = false;
 
     @Input() aluno!: Aluno;
-    @Input() alunoChecklistItem: any;//Aluno_CheckList_Item | Aluno_Checklist_Item_View;
+    @Input() alunoChecklistItem: any; //Aluno_CheckList_Item | Aluno_Checklist_Item_View;
     @Input() item!: Checklist_Item;
 
     @Output() onCancel = new EventEmitter<boolean>();
@@ -40,27 +39,26 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
         private alunoService: AlunoService,
         private userService: UserService,
         private accountService: AccountService,
-    ) {
+    ) { }        
 
-    }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes['aluno']) {
+            this.aluno = changes['aluno'].currentValue;
+            this.celular = this.aluno.celular;
+            this.cdr.markForCheck();
+        }
         if (changes['alunoChecklistItem']) {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
-            this.celular = this.alunoChecklistItem?.celular;
+            this.celular = this.alunoChecklistItem.celular;
+            this.cdr.markForCheck();
         }
         if (changes['item']) {
             this.item = changes['item'].currentValue;
         }
-        if (changes['aluno']) {
-            this.aluno = changes['aluno'].currentValue;
-            this.celular = this.aluno?.celular;
-            this.cdr.markForCheck(); // Marca para verificação na próxima detecção
-            this.cdr.detectChanges();
-        }
     }
 
-    show(aluno?: Aluno, alunoChecklistItem?: Aluno_CheckList_Item){
+    show(aluno?: Aluno, alunoChecklistItem?: Aluno_CheckList_Item) {
         this.visible = true;
         if (aluno) {
             this.aluno = aluno;
@@ -114,7 +112,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
                 this.loading = false;
                 this.toastr.success(`Checklist ${this.item.nome} finalizado com sucesso!`);
 
-                res.object.account_Finalizacao = this.accountService.accountValue!.name; 
+                res.object.account_Finalizacao = this.accountService.accountValue!.name;
                 this.onFinish.emit(res.object);
                 this.onCancel.complete();
                 this.hide();
@@ -138,7 +136,7 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
             diaSemana: this.aluno?.diaSemana ?? this.alunoChecklistItem.diaSemana,
             horario: this.aluno?.horario ?? this.alunoChecklistItem.horario,
             professor: this.aluno?.professor ?? this.alunoChecklistItem.professor,
-            linkGrupo: this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo       
+            linkGrupo: this.aluno?.linkGrupo ?? this.alunoChecklistItem.linkGrupo
         }
 
         this.mensagemWhatsapp.enviarMensagemCondicao(aluno, id);

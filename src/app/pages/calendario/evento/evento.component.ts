@@ -188,9 +188,7 @@ EventoTipo = EventoTipo;
                 this.alunos = this.alunos.filter((x) => alunosEvento.includes(x.id))
 
                 if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-                    let roteiro = this.roteiros.find((x) =>
-                        moment(this.evento.data).isBetween(x.dataInicio, x.dataFim),
-                    )
+                    let roteiro = this.roteiros.find((x) =>moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
                     this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
                 }
 

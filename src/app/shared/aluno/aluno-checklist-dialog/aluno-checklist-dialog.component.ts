@@ -1,42 +1,43 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Aluno } from '../../../models/alunos.model';
-import { Aluno_CheckList_Item } from '../../../models/checklist.model';
-import $ from 'jquery';
-import { AlunoChecklistOnConfirmDialogComponent } from '../aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
-import { NgModel } from '@angular/forms';
-import { MensagemWhatsapp } from '../../../utils';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, ChangeDetectorRef } from '@angular/core'
+import { Aluno } from '../../../models/alunos.model'
+import { Aluno_CheckList_Item } from '../../../models/checklist.model'
+import $ from 'jquery'
+import { AlunoChecklistOnConfirmDialogComponent } from '../aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component'
+import { NgModel } from '@angular/forms'
+import { MensagemWhatsapp } from '../../../utils'
+import { AlunoService } from '../../../services/alunos.service'
 
 @Component({
-    selector: 'app-aluno-checklist-dialog',
-    standalone: false,
-    templateUrl: './aluno-checklist-dialog.component.html',
-    styleUrl: './aluno-checklist-dialog.component.css',
+  selector: 'app-aluno-checklist-dialog',
+  standalone: false,
+  templateUrl: './aluno-checklist-dialog.component.html',
+  styleUrl: './aluno-checklist-dialog.component.css',
 })
 export class AlunoChecklistDialogComponent implements OnChanges {
-    
-    @Input() aluno!: Aluno;
-    @Input() loading = false;
-    @Output() onChecklistMark = new EventEmitter<any>();
-    
-    visible = false;
-    scrollLeft: number = 0;
-    
-    selectedAlunoChecklistItem?: Aluno_CheckList_Item;
-    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
-    
-    constructor(        
-        private mensagemWhatsapp: MensagemWhatsapp,
-        private changeDetectorRef: ChangeDetectorRef,
-    ) { 
+  @Input() aluno!: Aluno
+  @Input() loading = false
+  @Output() onChecklistMark = new EventEmitter<any>()
+
+  visible = false
+  scrollLeft: number = 0
+
+  selectedAlunoChecklistItem?: Aluno_CheckList_Item
+  @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent
+
+  constructor(
+    private mensagemWhatsapp: MensagemWhatsapp,
+    private changeDetectorRef: ChangeDetectorRef,
+    private alunoService: AlunoService,
+  ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['aluno']) {
+      this.aluno = changes['aluno'].currentValue
     }
-    
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['aluno']) {
-            this.aluno = changes['aluno'].currentValue;
-          
-        }
-        if (changes['loading']) this.loading = changes['loading'].currentValue;
+    if (changes['loading']) {
+      this.loading = changes['loading'].currentValue
     }
+}
     
     
     visibleChanged() {

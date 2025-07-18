@@ -108,6 +108,10 @@ export class Aluno {
     primeiraAula?: Evento;
     aulaZero_Id?: number;
     aulaZero?: Evento;
+
+
+    // Tela Cadastrar Turma Extra
+    eventoReposicaoEmAndamento?: Evento;
 }
 
 export interface Pessoa_DropDown {

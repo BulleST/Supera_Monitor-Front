@@ -405,7 +405,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 roteiro = this.roteiros.find((x) => x.id == this.evento.roteiro_Id)
                 this.evento.roteiro_Id = roteiro?.id
             } else {
-                roteiro = this.roteiros.find((x) => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim))
+                roteiro = this.roteiros.find((x) => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
             }
             this.roteiro = roteiro
         }

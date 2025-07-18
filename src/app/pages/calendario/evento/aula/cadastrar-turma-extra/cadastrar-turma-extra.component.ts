@@ -60,7 +60,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     perfisCognitivos: PerfilCognitivo[] = [];
     loadingPerfisCognitivos = false;
     
-    roteiro?: Roteiro;
+    roteiroAtual?: Roteiro;
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
     
@@ -112,7 +112,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         public mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
     ) {
-        let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res);
+        let roteiros = this.roteiroService.list.subscribe(res => {
+            this.roteiros = res;
+            this.setRoteiroAtual();
+        });
         this.subscription.push(roteiros);
 
         if (this.roteiros.length == 0) {
@@ -206,9 +209,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             .catch(res => this.loadingFeriados = false);
     }
 
-
-    showError(header: string, message: string, e: any) {
-        showError(this.confirmationService, header, message, e);
+    showError(header: string, message: string, e: any, innerMessage?: string) {
+        showError(this.confirmationService, header, message, e, innerMessage);
     }
 
     setDiaSemana(i: number) {
@@ -292,12 +294,22 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         return object;
     }
 
-    async verificaDisponibilidade() {
-        let roteiro = this.roteiros.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim));
-        this.roteiro = roteiro;
-        if (roteiro) {
-            this.object.roteiro_Id = roteiro.id ?? undefined;
+    setRoteiroAtual() {
+        if (this.data && this.roteiros.length) {
+            let roteiro = this.roteiros.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
+            this.roteiroAtual = roteiro;
+            if (roteiro) {
+                this.object.roteiro_Id = roteiro.id ?? undefined;
+            }
+            console.log('roteiros', this.roteiros)
+            console.log('data', this.data)
+            console.log('roteiro', roteiro)
         }
+    }
+
+    async verificaDisponibilidade() {
+
+        this.setRoteiroAtual();
 
         let valid = true;
 
@@ -359,10 +371,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         let mensagemErro: string | null = null;
 
 
-        if (item && !item.disponivel && item.disponivelEvent) {
+        if (item && item.disponivel === false && item.disponivelEvent) {
             mensagemErro = `Esse educador está educador a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às ${moment(item.disponivelEvent.data).format('HH[h]mm')}.`;
         }
-        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+        else if (item && item.disponivel === false && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
             mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
         } else {
             mensagemErro = null;
@@ -380,7 +392,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         this.validaSalaAulas();
 
         let item = this.salaAulas.find(x => x.id == e.value);
-        if (item && item.disponivel == false && item.disponivelEvent) {
+        if (item && item.disponivel === false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
@@ -391,23 +403,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
-    }
-
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosTarget.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
-        this.confirmationService.confirm({
-            key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: false,
-            accept: () => {
-                this.visible = false
-                this.visibleChange();
-            },
-        });
     }
 
     moveToSource(e: any) {
@@ -443,7 +438,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         if (!this.selectedAlunoSource) {
             this.showError('Selecionar aluno', 'Selecione um aluno para mover.', e.event);
         }
-        else if (this.selectedAlunoSource.disponivel == false) {
+        else if (this.selectedAlunoSource.disponivel === false) {
             this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
         }
         else if (!this.data) {
@@ -515,7 +510,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
             this.selectedAlunoSource = aluno;
 
-            if (aluno.disponivel == false) {
+            if (aluno.disponivel === false) {
                 this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
                 this.removeSelection();
             }
@@ -594,6 +589,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                         && ((ehAulaFinalizada && !alunoGanhouPresenca) || !ehAulaFinalizada && aluno)
                         && !ehReagendada 
                         && !alunoMarcouReposicao
+                    
                     console.group(evento.descricao)
                     console.log('evento', moment(evento.data).format('DD/MM HH:mm'))
                     console.log('ehAula', ehAula)
@@ -603,25 +599,24 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                     console.log('alunoMarcouReposicao', !alunoMarcouReposicao)
                     console.log('alunoGanhouPresenca', !alunoGanhouPresenca)
                     console.log('condicao', condicao)
-console.groupEnd()
+                    console.groupEnd()
+                    
                     return condicao;
                 });
 
+            aluno.aulasParaRepor = aluno.aulasParaRepor
+                .map(evento => {
+                    evento.feriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'));
+                    return evento;
+                });
+
+                    console.log('aluno.aulasParaRepor',  aluno.aulasParaRepor)
 
 
-
-                aluno.aulasParaRepor = aluno.aulasParaRepor
-                    .map(evento => {
-                        evento.alunos = evento.alunos.filter(x => x.aluno_Id == aluno.id);
-                        let data = moment(evento.data).format('YYYY-MM-DD')
-                        evento.feriado = this.feriados.find(x => moment(x.date).format('YYYY-MM-DD') == data);
-                        return evento;
-                    });
-
-                this.loadingEventosReposicaoAluno = false;
+            this.loadingEventosReposicaoAluno = false;
 
 
-            })
+        })
 
     }
 
@@ -646,8 +641,9 @@ console.groupEnd()
 
     async selecionarAulaReposicao(e: CdkDragDrop<Aluno[]>) {
         let aluno = this.selectedAlunoSource as Aluno;
+        let evento = this.selectedEventoReposicao as Evento;
 
-        if (!this.selectedEventoReposicao || !this.selectedAlunoSource) {
+        if (!evento || !aluno) {
             this.carregaAulasDisponiveisParaRepor();
             this.confirmationService.confirm({
                 key: 'selecionarReposicao',
@@ -660,17 +656,43 @@ console.groupEnd()
                 accept: async () => this.selecionarAulaReposicao(e),
                 reject: () => this.removeSelection(),
             });
-            this.showError('Erro', 'Selecione uma aula e aluno para repor', e.event);
+            return this.showError('Erro', 'Selecione uma aula e aluno para repor', e.event);
         }
         else {
-            let alunoReposicao = {
-                aluno_Id: aluno.id,
-                reposicaoDe_Evento_Id: this.selectedEventoReposicao.id
-            };
 
-            this.object.alunos.push(alunoReposicao);
-            this.transferAlunoTarget(e);
+            if (evento.id == PseudoEvento.EventoId) {
+                lastValueFrom(this.requestAulaTurma(evento))
+                .then(res => {
+                    if (!res.success) {
+                        return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
+                    }
+                    else {
+                        evento.id = res.object.id;
+                        this.selecionarAulaReposicaoContinue(aluno, evento, e)
+                    }
+                })
+                .catch(res => {
+                    return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
+                })
+            } else {
+                this.selecionarAulaReposicaoContinue(aluno, evento, e)
+            }
         }
+    }
+    
+    selecionarAulaReposicaoContinue(aluno: Aluno, evento: Evento, e: CdkDragDrop<Aluno[]>) {
+        let alunoReposicao = {
+            aluno_Id: aluno.id,
+            reposicaoDe_Evento_Id: evento.id
+        };
+
+        aluno.eventoReposicaoEmAndamento = evento;
+
+        this.selectedAlunoSource = aluno;
+        this.selectedEventoReposicao = evento;
+
+        this.object.alunos.push(alunoReposicao);
+        this.transferAlunoTarget(e);
     }
 
     transferAlunoTarget(e: CdkDragDrop<Aluno[]>) {
@@ -700,15 +722,15 @@ console.groupEnd()
         }
 
         let professor = this.professores.find(x => x.id == this.object.professor_Id)
-        if (professor && !professor.disponivel && professor.disponivelEvent) {
+        if (professor && professor.disponivel === false && professor.disponivelEvent) {
             return this.showError('Educador indisponível', `O educador ${professor.nome} está atribuído a uma ${this.getTipo(professor.disponivelEvent)} no dia ${moment(professor.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
         let sala = this.salaAulas.find(x => x.id == this.object.sala_Id)
-        if (sala && !sala.disponivel && sala.disponivelEvent) {
+        if (sala && sala.disponivel === false && sala.disponivelEvent) {
             return this.showError('Sala indisponível', `A sala ${sala.numeroSala} está atribuída a uma ${this.getTipo(sala.disponivelEvent)} no dia ${moment(sala.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
 
-        let aluno = this.alunosTarget.find(x => !x.disponivel && x.disponivelEvent)
+        let aluno = this.alunosTarget.find(x => x.disponivel === false && x.disponivelEvent)
         if (aluno && aluno.disponivelEvent) {
             return this.showError('Aluno indisponível', `O alunos ${aluno.nome} está atribuído a uma ${this.getTipo(aluno.disponivelEvent)} no dia ${moment(aluno.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
@@ -724,11 +746,12 @@ console.groupEnd()
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula',
-            message: `Tem certeza que deseja agendar essa aula para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
+            message: `Tem certeza que deseja agendar essa aula para o dia <b class="text-primary-500">${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}</b>?`,
             acceptLabel: `Agendar aula`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Não',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -745,7 +768,12 @@ console.groupEnd()
         lastValueFrom(this.service.createAulaExtra(this.object))
             .then(res => {
                 this.loading = false;
-                this.sendMensagemAlunos();
+                if (this.object.alunos.length > 0) {
+                    this.sendMensagemAlunos();
+                } else {
+                    this.visible = false;
+                    this.visibleChange()
+                }
                 this.toastrService.success('Aula cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
 
@@ -756,6 +784,36 @@ console.groupEnd()
                 this.showError('Agendamento falhou', `Não foi possível agendar aula. \n ${getError(res)}`, e);
             })
 
+    }
+    sendMensagemAlunos() {
+        this.mensagensEnviadasAlunos = this.alunosTarget.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
+        this.confirmationService.confirm({
+            key: 'enviarMensagem',
+            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            header: 'Enviar whatsapp',
+            icon: 'pi pi-whatsapp text-green-500',
+            acceptLabel: `Concluir`,
+            acceptButtonStyleClass: 'p-button-rounded',
+            acceptIcon: 'pi pi-check',
+            rejectVisible: false,
+            accept: () => {
+                this.visible = false
+                this.visibleChange();
+            },
+        });
+    }
+
+
+    
+    requestAulaTurma(evento: Evento) {
+        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
+        request.alunos = evento.alunos.map((x) => x.aluno_Id)
+        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
+        request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
+
+        if (evento.id == PseudoEvento.EventoId)
+            return this.service.createAulaTurma(request)
+        return this.service.editAulaTurma(request)
     }
 
 }

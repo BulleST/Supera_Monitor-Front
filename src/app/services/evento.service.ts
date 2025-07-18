@@ -99,7 +99,7 @@ export class EventoService extends Service {
             }
 
             if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-                let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim));
+                let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
                 if (roteiro) evento.roteiro_Id = roteiro.id;
             }
 
@@ -167,7 +167,7 @@ export class EventoService extends Service {
                         }
     
                         if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-                            let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim));
+                            let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
                             if (roteiro) evento.roteiro_Id = roteiro.id;
                         }
     
@@ -210,7 +210,7 @@ export class EventoService extends Service {
                     evento.professor = evento.professor ?? (evento.professores.length) ? evento.professores[0].nome : undefined;
 
                     if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-                        let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim));
+                        let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
                         if (roteiro) evento.roteiro_Id = roteiro.id;
                     }
 

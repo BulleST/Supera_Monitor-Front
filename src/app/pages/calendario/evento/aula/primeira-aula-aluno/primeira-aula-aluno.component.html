@@ -49,6 +49,7 @@
       <p-select
         [options]="alunos"
         [(ngModel)]="selectedAluno"
+        (ngModelChange)="this.restricaoCheck = false"
         [checkmark]="true"
         optionLabel="nome"
         [showClear]="true"
@@ -147,20 +148,78 @@
     </div>
 
     <p-fieldset
-      legend="Perfil(is) cognitivo(s) do evento"
+      legend="Dados do agendamento"
       class="field col-12 col-span-4">
-      <div class="flex flex-wrap gap-2">
-        <p-chip
-          *ngFor="let perfil of evento.perfilCognitivo"
-          [label]="perfil.nome"
-          class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
+      <div>
+        <div class="inline-flex gap-2 align-items-center">
+          <label>Perfil(is) Cognitivo(s):</label>
+          <p-chip
+            *ngFor="let perfil of evento.perfilCognitivo"
+            [label]="perfil.nome"
+            class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
 
-        <p *ngIf="evento.perfilCognitivo.length === 0">Evento livre, não possui perfis cognitivos associados</p>
+          <p *ngIf="evento.perfilCognitivo.length === 0">Turma livre, não possui perfis cognitivos associados</p>
+        </div>
       </div>
+
+      <div>
+        <div class="inline-flex gap-2">
+          <label>Sala:</label>
+          <app-sala-aula
+            class="text-primary font-bold"
+            [andar]="evento.andar"
+            [numeroSala]="evento.numeroSala" />
+        </div>
+      </div>
+
+      <ng-container *ngIf="selectedAluno">
+        <ng-container *ngIf="!selectedAluno.restricaoMobilidade; else mobilidade">
+          <div class="flex gap-2 align-items-center mt-1">
+            <i class="pi pi-check-circle text-primary"></i>
+            <p>Aluno não possui restrição de mobilidade.</p>
+          </div>
+        </ng-container>
+
+        <ng-template #mobilidade>
+          <div class="flex gap-2 align-items-center mt-1 text-primary">
+            <i class="fa fa-wheelchair"></i>
+            <p class="font-bold text-base">Aluno possui restrição de mobilidade.</p>
+          </div>
+        </ng-template>
+
+        <ng-container *ngIf="selectedAluno.restricoes.length === 0; else restricoes">
+          <div class="flex gap-2 align-items-center mt-1">
+            <i class="pi pi-check-circle text-primary"></i>
+            <p>Aluno não possui outras restrições registradas.</p>
+          </div>
+        </ng-container>
+
+        <ng-template #restricoes>
+          <div class="flex flex-column gap-1 mt-1">
+            <p *ngFor="let restricao of selectedAluno.restricoes">
+              <i class="pi pi-ban pr-2"></i>
+              <span>{{ restricao.descricao }}</span>
+            </p>
+          </div>
+        </ng-template>
+      </ng-container>
     </p-fieldset>
 
-    <div class="col-12 px-0 gap-4 flex flex-wrap align-items-center justify-content-between">
-      <div class="sm:col-9 col-12"></div>
+    <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
+      <div
+        *ngIf="selectedAluno?.restricaoMobilidade || (selectedAluno && selectedAluno.restricoes.length > 0)"
+        class="flex align-items-center">
+        <p-checkbox
+          inputId="restricaoCheck"
+          [(ngModel)]="restricaoCheck"
+          [disabled]="!selectedAluno"
+          binary="true" />
+        <label
+          for="restricaoCheck"
+          class="ml-2 mt-1 leading-none">
+          Estou ciente das restrições do aluno e quero continuar.
+        </label>
+      </div>
       <div class="ml-auto">
         <p-button
           (onClick)="sendConfirmation($event)"
@@ -169,6 +228,13 @@
           label="Agendar"
           [icon]="'pi pi-check'"
           [loading]="loading"
+          [pTooltip]="!restricaoCheck ? 'Verifique os dados e marque a caixa' : ''"
+          tooltipPosition="top"
+          [disabled]="
+            !selectedAluno ||
+            (selectedAluno.restricaoMobilidade && !restricaoCheck) ||
+            (selectedAluno && selectedAluno.restricoes.length > 0 && !restricaoCheck)
+          "
           [rounded]="true" />
       </div>
     </div>

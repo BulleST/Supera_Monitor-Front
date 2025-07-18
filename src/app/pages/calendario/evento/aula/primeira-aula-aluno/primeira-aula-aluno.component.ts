@@ -47,6 +47,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     selectedAula?: any
     selectedEvento?: Evento
     EventoTipo = EventoTipo
+    restricaoCheck: boolean = false
     
     aluno: Aluno = new Aluno()
     participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno()

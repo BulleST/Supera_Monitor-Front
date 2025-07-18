@@ -47,6 +47,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     selectedAula?: EventImpl
     professores: Professor[] = []
     loadingProfessores = false
+    restricaoCheck = false
 
     feriados: Feriado[] = []
     loadingFeriados = false
@@ -124,6 +125,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
 
     async ngOnChanges(changes: SimpleChanges) {
         this.fullCalendar.getApi().today()
+
         if (changes['object']) {
             this.aluno = changes['object'].currentValue
 
@@ -298,6 +300,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
 
     sendConfirmation(evento: Evento, e: any): void {
         this.selectedEvento = evento
+        this.restricaoCheck = false
         this.confirmationService.confirm({
             key: 'confirmarPrimeiraAula',
             header: 'Confirmar agendamento',

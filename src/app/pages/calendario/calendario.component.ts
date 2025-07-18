@@ -339,7 +339,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return event;
         });
 
-        this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte))
+        this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'days', '[]'))
             .forEach(item => {
             var event = {
                 id: this.calendarioUtils.eventRandomId(),
@@ -366,7 +366,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.calcHeight();
 
 
-        var temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte));
+        var temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'days', '[]'));
         if (temFeriadoNaSemana.length) {
             this.calendarioOptions.allDaySlot = true;
         } else {
@@ -716,7 +716,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             .then(res => {
                 this.loadingRoteiro = false;
                 this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime());
-                this.currentRoteiro = res.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim))
+                this.currentRoteiro = res.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
             })
             .catch(res => this.loadingRoteiro = false)
 

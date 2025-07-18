@@ -7,7 +7,13 @@
           [draggable]="true"
           [maximizable]="true">
     <ng-template #header>
-        <span class="p-dialog-title">Jornada Supera</span>
+        <div class="flex align-items-center gap-2">
+            <i class="pi pi-check-square text-4xl text-primary"></i>
+            <div class="flex flex-column">
+                <span class="p-dialog-title">Jornada Supera</span>
+                <p>Aluno(a): <b class="text-primary">{{aluno.nome}}</b></p>
+            </div>
+        </div>
     </ng-template>
     <div class="pb-4">
         <p-tabs *ngIf="aluno && aluno.checklistCompleto"
