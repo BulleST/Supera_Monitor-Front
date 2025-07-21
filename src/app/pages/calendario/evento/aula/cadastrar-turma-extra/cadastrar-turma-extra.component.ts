@@ -51,7 +51,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     object: EventoTurmaExtraRequest = new EventoTurmaExtraRequest;
 
-    data: Date = new Date(2025,5,21)
+    data: Date = new Date()
     horario: Date = new Date(2025, 5, 21, 12, 0, 0);
     minData = new Date();
 
@@ -59,26 +59,26 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     perfilCognitivoSelected: PerfilCognitivo[] = [];
     perfisCognitivos: PerfilCognitivo[] = [];
     loadingPerfisCognitivos = false;
-    
+
     roteiroAtual?: Roteiro;
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
-    
+
     professores: Professor[] = [];
     loadingProfessores = false;
-    
+
     salaAulas: SalaAula[] = [];
     loadingSalaAulas = false;
-    
+
     turmas: Turma[] = [];
     loadingTurmas = false;
-    
+
     mensagensEnviadasAlunos: Aluno[] = [];
     alunosTarget: Aluno[] = [];
-    
+
     selectedAlunoSource?: Aluno;
     selectedAlunoTarget?: Aluno;
-    
+
     alunosSource: Aluno[] = [];
     loadingAlunos = false;
 
@@ -234,10 +234,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         if (selected) {
             let perfilUnselected = e.itemValue;
             let alunosPerfis = this.alunosTarget.filter(x => x.perfilCognitivo_Id == perfilUnselected.id)
-            
+
             // Se algum aluno tiver o perfil que foi removido
             if (alunosPerfis.length > 0) {
-                let mensagem = `Não é possível remover o perfil <b>${perfilUnselected.nome}</b> pois a turma possui alunos com esse perfil: 
+                let mensagem = `Não é possível remover o perfil <b>${perfilUnselected.nome}</b> pois a turma possui alunos com esse perfil:
                     <ul class="my-1">
                         ${alunosPerfis.map(x => `<li>${x.nome}</li>`)}
                     </ul>`;
@@ -246,11 +246,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             }
         }
 
-        
+
         let perfis = this.perfilCognitivoSelected.map(x => x.id);
         let alunosTarget = this.alunosTarget.map(x => x.id);
         let alunosList = this.alunoService.list.value.filter(x => x.active && x.turma_Id);
-        this.alunosSource = alunosList.filter(x => 
+        this.alunosSource = alunosList.filter(x =>
                                     (perfis.includes(x.perfilCognitivo_Id) || !x.perfilCognitivo_Id)
                                     && !alunosTarget.includes(x.id));
 
@@ -261,7 +261,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         console.log(e);
 
-        
+
 
 
     }
@@ -531,12 +531,12 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     async restricoesConfirm(e: CdkDragDrop<Aluno[]>) {
         let aluno = this.selectedAlunoSource as Aluno;
-        let restricoes = aluno.restricoes.filter(x => x.active); 
-        
+        let restricoes = aluno.restricoes.filter(x => x.active);
+
         if (restricoes.length || aluno.restricaoMobilidade) {
 
             let message = 'Esse aluno possui as seguintes restrições. <ul class="my-1">';
-            
+
             if (aluno.restricaoMobilidade) {
                 message += '<li>Restrição de mobilidade.</li>'
             }
@@ -584,12 +584,12 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                     let alunoEstaNaAula = evento.alunos.find(x => x.active === true)
                     let alunoMarcouReposicao = alunoEstaNaAula?.reposicaoDe_Evento_Id || alunoEstaNaAula?.reposicaoPara_Evento_Id;
                     let alunoGanhouPresenca = alunoEstaNaAula?.presente === true;
-                    let condicao = ehAula 
+                    let condicao = ehAula
                         && alunoEstaNaAula
                         && ((ehAulaFinalizada && !alunoGanhouPresenca) || !ehAulaFinalizada && aluno)
-                        && !ehReagendada 
+                        && !ehReagendada
                         && !alunoMarcouReposicao
-                    
+
                     console.group(evento.descricao)
                     console.log('evento', moment(evento.data).format('DD/MM HH:mm'))
                     console.log('ehAula', ehAula)
@@ -600,7 +600,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                     console.log('alunoGanhouPresenca', !alunoGanhouPresenca)
                     console.log('condicao', condicao)
                     console.groupEnd()
-                    
+
                     return condicao;
                 });
 
@@ -621,7 +621,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     selecionarAulaReposicaoConfirm(e: CdkDragDrop<Aluno[]>) {
-        
+
         this.carregaAulasDisponiveisParaRepor();
 
         this.confirmationService.confirm({
@@ -679,7 +679,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             }
         }
     }
-    
+
     selecionarAulaReposicaoContinue(aluno: Aluno, evento: Evento, e: CdkDragDrop<Aluno[]>) {
         let alunoReposicao = {
             aluno_Id: aluno.id,
@@ -776,8 +776,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 }
                 this.toastrService.success('Aula cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
-
-                playSuccess(1)
             })
             .catch(res => {
                 this.loading = false;
@@ -804,7 +802,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
 
-    
+
     requestAulaTurma(evento: Evento) {
         let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
         request.alunos = evento.alunos.map((x) => x.aluno_Id)

@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, ChangeDetectorRef } from '@angular/core'
+import $ from 'jquery'
+import { lastValueFrom } from 'rxjs'
+import { NgModel } from '@angular/forms'
+import { AlunoService } from '../../../services/alunos.service'
+import { MensagemWhatsapp } from '../../../utils'
 import { Aluno } from '../../../models/alunos.model'
 import { Aluno_CheckList_Item } from '../../../models/checklist.model'
-import $ from 'jquery'
 import { AlunoChecklistOnConfirmDialogComponent } from '../aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component'
-import { NgModel } from '@angular/forms'
-import { MensagemWhatsapp } from '../../../utils'
-import { AlunoService } from '../../../services/alunos.service'
 
 @Component({
   selector: 'app-aluno-checklist-dialog',
@@ -77,13 +78,21 @@ export class AlunoChecklistDialogComponent implements OnChanges {
             onFinish.unsubscribe();
         });
         
-        const onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-            
+        const onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(async res => {
             console.log('onFinish')
-            alunoChecklistItem.observacoes = res.observacoes;
-            alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
-            alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
-            alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+            if (this.aluno.id) {
+                try {
+                    const updatedAluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
+                    
+                    if (updatedAluno) {
+                        this.aluno = updatedAluno
+                        this.changeDetectorRef.markForCheck()
+                        this.changeDetectorRef.detectChanges()
+                    }
+                } catch (error) {
+                    console.error("Erro ao atualizar aluno após finalizar checklist item")
+                }
+            }
             onCancel.unsubscribe();
             onFinish.unsubscribe();
         });
