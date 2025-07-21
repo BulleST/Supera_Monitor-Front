@@ -186,7 +186,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     // INICIO Controles do calendario
     async update(where: string) {
-        console.log('update', where)
         this.unselectAula();
         this.requestLoadRoteiros('update');
 
@@ -362,9 +361,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.currentTitle = moment(arg.start).locale('pt').format('MMMM [de] YYYY');
         this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1);
-
-
-        console.log('arg', arg)
 
         this.calendarioRequest.intervaloDe = arg.start;
         this.calendarioRequest.intervaloAte = moment(arg.end).subtract(1, 'day').toDate(); // Full calendar está terminando no domingo da semana seguinte
@@ -609,11 +605,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     getTemaSemana() {
-        console.log('getTemaSemana', this.calendarioRequest.intervaloDe)
-        console.log('roteiros', this.roteiros)
         if (this.roteiros.length) {
             let roteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
-            console.log('roteiro', roteiro)
             this.currentRoteiro = roteiro;
         } else {
             this.currentRoteiro = undefined;

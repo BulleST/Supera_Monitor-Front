@@ -1,9 +1,7 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 
-import { ToastrService } from 'ngx-toastr'
 import { ConfirmationService } from 'primeng/api'
-import { SelectChangeEvent } from 'primeng/select'
 import { lastValueFrom, Subscription } from 'rxjs'
 
 import { Aluno } from '../../../../models/alunos.model'
@@ -43,7 +41,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
     ) {
-        var alunos = this.alunoService.list.subscribe((res) => this.alunos = res.filter(x => x.active === true && !x.primeiraAula_Id))
+        let alunos = this.alunoService.list.subscribe((res) => this.alunos = res.filter(x => x.active === true && !x.primeiraAula_Id))
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
@@ -53,7 +51,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
                 .catch(() => (this.loadingAlunos = false))
         }
 
-        var eventos = this.eventoService.eventos.subscribe((res) => this.eventos = res.filter(x => x.active && (x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.AulaExtra)))
+        let eventos = this.eventoService.eventos.subscribe((res) => this.eventos = res.filter(x => x.active && (x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.AulaExtra)))
         this.subscription.push(eventos)
 
         this.visible = true

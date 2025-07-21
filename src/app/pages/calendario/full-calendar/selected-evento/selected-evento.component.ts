@@ -98,7 +98,7 @@ export class SelectedEventoComponent implements OnChanges {
     cdkDragEntered(e: CdkDragEnter) {
         this.cdkDragCancelChange.emit(false);
         this.cdkDragCancel = false;
-        var parent = $(e.container.element.nativeElement).parent('.fc-event-main').parent('.fc-event')
+        let parent = $(e.container.element.nativeElement).parent('.fc-event-main').parent('.fc-event')
         $(parent).addClass('scalein animation-duration-200 animation-iteration-1')
         $(parent).addClass('shadow-2 border-3 border-red-500')
     }
@@ -106,7 +106,7 @@ export class SelectedEventoComponent implements OnChanges {
     cdkDragExited(e: CdkDragExit) {
         this.cdkDragCancelChange.emit(false);
         this.cdkDragCancel = false;
-        var parent = $(e.container.element.nativeElement).parent('.fc-event-main').parent('.fc-event')
+        let parent = $(e.container.element.nativeElement).parent('.fc-event-main').parent('.fc-event')
         $(parent).removeClass('scalein animation-duration-200 animation-iteration-1')
         $(parent).removeClass('shadow-2 border-3 border-red-500')
     }
@@ -187,7 +187,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEvento(this.evento);
 
-            var route: 'aula-zero' | 'superacao' = 'aula-zero'
+            let route: 'aula-zero' | 'superacao' = 'aula-zero'
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
                 case EventoTipo.Superacao: route = 'superacao'; break;
@@ -201,7 +201,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEvento(this.evento);
 
-            var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
+            let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
@@ -220,19 +220,7 @@ export class SelectedEventoComponent implements OnChanges {
     goToPrimeiraAula() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-
-            var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
-            switch (this.evento.evento_Tipo_Id) {
-                case EventoTipo.Aula: route = 'aula'; break;
-                case EventoTipo.AulaZero: route = 'aula-zero'; break;
-                case EventoTipo.AulaExtra: route = 'aula'; break;
-                case EventoTipo.Superacao: route = 'superacao'; break;
-                case EventoTipo.Reuniao: route = 'reuniao'; break;
-                case EventoTipo.Oficina: route = 'oficina'; break;
-                default: route = 'aula'; break;
-            }
-
-            this.router.navigate(['calendario', route, 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', 'aula', 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
     }
@@ -241,7 +229,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEvento(this.evento);
 
-            var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
+            let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
@@ -260,7 +248,7 @@ export class SelectedEventoComponent implements OnChanges {
     async goToEvento() {
         if (this.evento) {
             this.evento.data = new Date(this.evento.data);
-            var alunos = this.alunoService.list.value;
+            let alunos = this.alunoService.list.value;
 
             if (!alunos.length) {
                 await lastValueFrom(this.alunoService.getListWithChecklist()).then(res => alunos = res);
@@ -284,7 +272,7 @@ export class SelectedEventoComponent implements OnChanges {
             });
 
             this.service.setEvento(this.evento);
-            var route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
+            let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
 
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
@@ -334,7 +322,7 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
     tooltipPosition() {
-        var width = window.innerWidth;
+        let width = window.innerWidth;
         if (this.mouse.x >= (width / 2))
             return 'right'
         return 'left'

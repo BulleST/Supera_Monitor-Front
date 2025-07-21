@@ -51,7 +51,6 @@
                                 <i class="fa-solid fa-brain"></i>
                             </span>
                             <span>Perfil Cognitivo: </span>
-                            
                             <ng-container *ngIf="evento.perfilCognitivo && evento.perfilCognitivo.length > 0">
                                 <ng-container *ngTemplateOutlet="perfilCognitivoTemplate; context: { perfilCognitivo: getPerfilCognitivo(evento) }"></ng-container>
                                 <ng-template #perfilCognitivoTemplate let-perfilCognitivo="perfilCognitivo">
@@ -77,13 +76,11 @@
                                 <ng-container
                                               *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
                                     <span [ngSwitch]=" evento.capacidadeMaximaAlunos - evento.alunos.length">
-                                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno /
-                                            {{ evento.capacidadeMaximaAlunos }} vagas</span>
+                                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{ evento.capacidadeMaximaAlunos }} vagas</span>
                                         <span *ngSwitchCase="0">Não há vagas / {{ evento.alunos.length }} alunos</span>
                                         <span *ngSwitchCase="1">1 vaga / {{ evento.alunos.length }} alunos</span>
                                         <span
-                                              *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }}
-                                            vagas / {{ evento.alunos.length }} alunos </span>
+                                              *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }} vagas / {{ evento.alunos.length }} alunos </span>
                                     </span>
                                 </ng-container>
                                 <ng-container
@@ -126,9 +123,9 @@
                                                [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
                             <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
                                  [ngClass]="{
-                        'surface-50': i % 2 == 0,
-                        'surface-0': i % 2 != 0
-                    }">
+                                        'surface-50': i % 2 == 0,
+                                        'surface-0': i % 2 != 0
+                                    }">
                                 <div
                                      class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
                                     <i class="pi pi-user text-primary text-sm"></i>
@@ -138,12 +135,12 @@
                                           [pTooltip]="participacao.nome"
                                           (click)="popoverAluno.show($event)"
                                           [ngClass]="{
-                            'text-green-500': evento.finalizado && participacao.presente == true,
-                            'text-red-500': evento.finalizado && participacao.presente == false,
-                            'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
-                            'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
-                            'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id == evento.id
-                        }">
+                                            'text-green-500': evento.finalizado && participacao.presente == true,
+                                            'text-red-500': evento.finalizado && participacao.presente == false,
+                                            'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
+                                            'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
+                                            'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id == evento.id
+                                            }">
                                         <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                     </span>
                                     <p-badge
@@ -170,14 +167,11 @@
                                     <ng-template #reposicaoDe_Evento>
                                         <div *ngIf="participacao.reposicaoDe_Evento"
                                              class="w-15rem">
-                                            <p> Data:
-                                                {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}
+                                            <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}
                                             </p>
-                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} -
-                                                {{ participacao.reposicaoDe_Evento.tema }}
+                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}
                                             </p>
-                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma:
-                                                {{ participacao.reposicaoDe_Evento.turma }}
+                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}
                                             </p>
                                             <p *ngIf="participacao.reposicaoDe_Evento.professor">
                                                 <span class="inline-flex w-1rem h-1rem border-circle mr-2"
@@ -300,10 +294,10 @@
                                           label="Agendar 1ª Aula"
                                           icon="pi pi-user-plus text-pink-500"
                                           [text]="true"
-                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
+                                          <!-- [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos" -->
                             </ng-container>
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar"

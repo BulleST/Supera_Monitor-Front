@@ -186,7 +186,7 @@
                 <ng-container *ngIf="!loading && evento">
                     <app-evento-item-hover #eventoPopover [evento]="evento" [arg]="arg"></app-evento-item-hover>
                     <div class="w-full flex flex-column p-1 overflow-hidden border-2 border-round-sm"
-                        (mousedown)="sendConfirmation(evento, $event)"
+                        (click)="sendConfirmation(evento, $event)"
                          (mouseenter)="eventoPopover.show($event)"
                          (mouseleave)="eventoPopover.hide()"
                          [ngStyle]="{

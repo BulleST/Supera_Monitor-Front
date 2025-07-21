@@ -22,6 +22,11 @@ import { ProfessorService } from '../../../../../services/professor.service'
 import { RequestResponse } from '../../../../../helpers/request-response.interface'
 import { ToastrService } from 'ngx-toastr'
 import { AlunoService } from '../../../../../services/alunos.service'
+import { MyMap } from '../../../../../utils/map'
+import { EventoAulaRequest } from '../../../../../models/evento-aula.model'
+import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
+import { ChecklistService } from '../../../../../services/checklist.service'
+import { AccountService } from '../../../../../services/account.service'
 
 @Component({
     selector: 'app-calendario-aluno-options',
@@ -36,14 +41,12 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
 
     subscription: Subscription[] = []
     loading = false
-    loadingCalendar = false
 
     legenda: { corLegenda: string; label: string }[] = []
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent
     @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover
 
     selectedEvento?: Evento = undefined
-
     selectedAula?: EventImpl
     professores: Professor[] = []
     loadingProfessores = false
@@ -86,7 +89,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         handleWindowResize: true,
         eventsSet: this.events.bind(this),
         datesSet: (arg: DatesSetArg) => {
-            this.dataSet(arg);
+            this.datesSet(arg);
         },
     }
 
@@ -99,6 +102,8 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         private professorService: ProfessorService,
         private toastrService: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private checklistService: ChecklistService,
+        private accountService: AccountService,
     ) {
         let professores = this.professorService.list.subscribe((res) => {
             this.professores = res
@@ -148,17 +153,17 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         }
     }
 
-    showError(header: string, message: string, e: any) {
-        showError(this.confirmationService, header, message, e);
+    showError(header: string, message: string, e: any, innerMessage?: string) {
+        showError(this.confirmationService, header, message, e, innerMessage);
     }
 
 
     async update(where: string) {
-        this.loadingCalendar = true;
+        this.loading = true;
         await this.loadFeriados()
         await this.getCalendario()
         this.setCalendario()
-        this.loadingCalendar = false;
+        this.loading = false;
     }
 
     prev() {
@@ -188,8 +193,9 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         await lastValueFrom(this.service.getList(this.calendarioRequest))
             .then((list) => {
                 this.eventos = list.filter(evento => {
-                    let temVaga = evento.alunos.length < evento.capacidadeMaximaAlunos;
-                    let ehPerfilCompativel = (this.aluno.perfilCognitivo_Id && evento.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id))
+                    let temVaga = evento.alunos.length <= evento.capacidadeMaximaAlunos;
+                    let eventoPerfil = evento.perfilCognitivo.map(x => x.id)
+                    let ehPerfilCompativel = (this.aluno.perfilCognitivo_Id && eventoPerfil.includes(this.aluno.perfilCognitivo_Id))
                         || (!this.aluno.perfilCognitivo_Id);
 
                     return temVaga && ehPerfilCompativel;
@@ -198,8 +204,10 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     setCalendario() {
-        let calendar = this.fullCalendar.getApi()
-        calendar.removeAllEvents()
+        let calendar = this.fullCalendar.getApi();
+        if (calendar) {
+            calendar.removeAllEvents()
+        }
 
         let feriadosDates = this.feriados.map((x) => moment(x.date).format('YYYY-MM-DD'))
         let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(x.evento_Tipo_Id) 
@@ -207,19 +215,14 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
                                                 && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
 
         let events = eventos.map((item) => {
-            let backgroundColor = item.corLegenda
-                ? item.corLegenda
-                : item.professores && item.professores.length > 0
-                    ? item.professores[0].corLegenda
-                    : '#2e2e2e'
-            let textColor = this.calendarioUtils.getTextColor(backgroundColor)
+            let style = this.calendarioUtils.getEventStyles(item);
             let id = 'event-' + this.calendarioUtils.eventRandomId()
 
             let event: any = {
                 id: id,
-                backgroundColor: backgroundColor,
-                borderColor: backgroundColor,
-                textColor: textColor,
+                backgroundColor: style.backgroundColor,
+                borderColor: style.borderColor,
+                textColor: style.textColor,
                 title: item.turma ?? item.descricao,
                 start: moment(item.data).toDate(),
                 end: moment(item.data).add(item.duracaoMinutos, 'minutes').toDate(),
@@ -253,12 +256,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     setLegenda() {
-        this.legenda = this.professores.map((professor) => {
-            return {
-                label: professor.nome ?? '',
-                corLegenda: professor.corLegenda ?? '',
-            }
-        })
+        this.legenda = this.professores.map((professor) => ({label: professor.nome, corLegenda: professor.corLegenda }))
     }
 
     async loadFeriados() {
@@ -268,7 +266,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             .catch((res) => (this.loadingFeriados = false))
     }
 
-    async dataSet(arg: DatesSetArg) {
+    async datesSet(arg: DatesSetArg) {
 
         this.currentTitle = moment(arg.view.currentStart)
             .locale('pt')
@@ -278,15 +276,15 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
 
         this.calendarioRequest.intervaloDe = arg.view.currentStart
         this.calendarioRequest.intervaloAte = arg.view.currentEnd
+        
 
         if (
             this.ano != this.calendarioRequest.intervaloDe.getFullYear() ||
             this.feriados.length == 0
         ) {
-            this.ano == this.calendarioRequest.intervaloDe.getFullYear()
+            this.ano = this.calendarioRequest.intervaloDe.getFullYear()
             await this.loadFeriados()
         }
-
         if (!this.aluno) {
             this.fullCalendar.getApi().removeAllEvents()
             return
@@ -343,47 +341,93 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             }
         }
 
-        response = await this.requestPrimeiraAula(request)
-
-        if (response.success) {
-            this.service.calendarioReload.emit(request.evento_Id)
-            this.toastrService.success(response.message)
-        } else {
-            this.toastrService.error(response.message)
+        // Se a aula target não existir, cria a aula
+        if (request.evento_Id == PseudoEvento.EventoId) {
+            response = await this.requestAulaTurma(this.selectedEvento)
+            request.evento_Id = response.object.id
+            if (!response.success) {
+                return this.showError(
+                    'Primeira aula não agendada',
+                    `Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`,
+                    e,
+                )
+            }
         }
 
-        this.loading = false;
-        this.sendMensagemAlunos(e);
-    }
+        lastValueFrom(this.alunoService.primeiraAula(request))
+            .then(response => {
+                if (response.success) {
+                    this.service.calendarioReload.emit(request.evento_Id);
+                    this.toastrService.success(response.message);
+                    this.markChecklistAsDone();
 
-    requestPrimeiraAula(request: PrimeiraAulaRequest) {
-        return lastValueFrom(this.alunoService.primeiraAula(request))
-    }
+                    if (this.aluno?.celular) {
+                        this.sendMensagemAluno(e, this.selectedEvento as Evento);
+                    } else {
+                        this.onClose.emit(true);
+                    }
 
-    sendMensagemAlunos(e: any) {
-        let aluno = this.aluno;
-        if (aluno.celular) {
-            this.confirmationService.confirm({
-                target: e.target,
-                message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da aula.`,
-                header: 'Enviar whatsapp',
-                icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptLabel: `Enviar mensagem`,
-                acceptButtonStyleClass: 'p-button-rounded p-button-success',
-                acceptIcon: 'pi pi-whatsapp',
-                rejectLabel: 'Não enviar',
-                rejectIcon: 'pi pi-times',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: () => {
-                    let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.selectedEvento!);
-                    window.open(object.link, '_blank');
-                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-                    this.onClose.emit(true);
-                },
-                reject: () => {
-                    this.onClose.emit(true);
+                } else {
+                    this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, response.message)
                 }
-            });
+
+            })
+            .catch(res => {
+                this.loading = false;
+                this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, res.message)
+            })
+    }
+        requestAulaTurma(evento: Evento) {
+    
+            let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
+            request.alunos = evento.alunos.map((x) => x.aluno_Id)
+            request.professores = evento.professor_Id ? [evento.professor_Id] : []
+            request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
+            request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm') as any;
+    
+            return lastValueFrom(this.service.createAulaTurma(request))
+        }
+
+
+    sendMensagemAluno(e: any, evento: Evento) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Primeira aula agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
+            header: 'Enviar whatsapp',
+            icon: 'pi pi-whatsapp text-green-500 text-4xl',
+            acceptLabel: `Enviar mensagem`,
+            acceptIcon: 'pi pi-whatsapp',
+            rejectLabel: 'Não enviar',
+            acceptButtonStyleClass: 'p-button-rounded p-button-success',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: () => {
+                this.onClose.emit(true);
+                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(this.aluno.nome, this.aluno.celular, evento)
+                window.open(object.link, '_target')
+                this.mensagemWhatsapp.copiarMensagem(object.mensagem)
+            },
+            reject: () => {
+                this.onClose.emit(true);
+            },
+        })
+    }
+
+    markChecklistAsDone() {
+        let aluno = this.aluno as Aluno;
+        // Agendamento na 1ª aula 
+        if (aluno) {
+            let id = 38;
+            let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+            let data = moment(this.selectedEvento!.data).format('DD/MM/YY [às] HH[h]mm');
+            let professor = this.selectedEvento!.professor;
+            let account = this.accountService.accountValue;
+
+            if (alunoChecklist && !alunoChecklist.finalizado) {
+                let mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.\n Agendamento realizado por ${account?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
+                if (alunoChecklist && !alunoChecklist.finalizado) {
+                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
+                }
+            }
         }
     }
 

@@ -19,9 +19,9 @@ import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao
 
 const routes: Routes = [{
     path: '', component: CalendarioComponent, children: [
-
         { path: 'turma-extra/agendar', component: CadastrarTurmaExtraComponent },
         { path: 'aula-zero/agendar', component: CadastrarAula0Component },
+        { path: 'aula/primeira-aula/:evento_id', component: PrimeiraAulaAlunoComponent },
         { path: 'primeira-aula/agendar', component: CadastrarAula1Component },
         { path: 'superacao/agendar', component: CadastrarSuperacaoComponent },
         { path: 'reuniao/agendar', component: CadastrarReuniaoComponent },
@@ -37,7 +37,6 @@ const routes: Routes = [{
         { path: ':evento_nome/inserir-aluno/:evento_id', component: InserirAlunoComponent },
         { path: ':evento_nome/reagendar/:evento_id', component: ReagendarEventoComponent },
         { path: ':evento_nome/cancelar/:evento_id', component: CancelarEventoComponent },
-        { path: ':evento_nome/primeira-aula/:evento_id', component: PrimeiraAulaAlunoComponent },
         
     ]
 },];
