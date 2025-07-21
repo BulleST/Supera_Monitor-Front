@@ -74,7 +74,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     cdkDragCancel = false;
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
     calendarioOptions: CalendarOptions = {
-        initialDate: new Date(2025,11,28),
+        // initialDate: new Date(2025,11,28),
         initialView: 'timeGridWeek',
         themeSystem: 'standard',
         locale: 'pt-BR',
@@ -170,7 +170,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         })
         this.subscription.push(calendarView);
 
-        this.calendarioRequest.intervaloDe = moment(new Date).startOf('week').toDate();
+        this.calendarioRequest.intervaloDe = moment(new Date).startOf('week').add(1, 'day').toDate();
         this.calendarioRequest.intervaloAte = moment(new Date).endOf('week').toDate();
     }
     
@@ -186,19 +186,14 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     // INICIO Controles do calendario
     async update(where: string) {
+        console.log('update', where)
         this.unselectAula();
         this.requestLoadRoteiros('update');
 
         let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
         let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
         
-        if (this.loadedAnos.includes(anoDe) && this.loadedAnos.includes(anoAte) ) {
-            await this.requestLoadCalendario('update')
-            this.setCalendario();
-            this.setCalendarioHeight();
-            return;
-        } 
-        else {
+        if (!(this.loadedAnos.includes(anoDe) && this.loadedAnos.includes(anoAte)) )  {
             if (!this.loadedAnos.includes(anoDe)) {
                 
                 this.loadedAnos.push(anoDe);
@@ -210,10 +205,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 await this.requestLoadFeriados(anoAte);
                 await this.requestCancelarEventos(anoAte);
             }
-            await this.requestLoadCalendario('update')
-            this.setCalendario();
-            this.setCalendarioHeight();
         } 
+        await this.requestLoadCalendario('update')
+        this.setCalendario();
+        this.setCalendarioHeight();
+        this.getTemaSemana();
 
     }
 
@@ -367,10 +363,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.currentTitle = moment(arg.start).locale('pt').format('MMMM [de] YYYY');
         this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1);
 
-        this.getTemaSemana(arg);
 
-        this.calendarioRequest.intervaloDe = arg.view.currentStart;
-        this.calendarioRequest.intervaloAte = arg.view.currentEnd;
+        console.log('arg', arg)
+
+        this.calendarioRequest.intervaloDe = arg.start;
+        this.calendarioRequest.intervaloAte = moment(arg.end).subtract(1, 'day').toDate(); // Full calendar está terminando no domingo da semana seguinte
 
         this.update('datesset');
 
@@ -611,9 +608,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    getTemaSemana(arg: DatesSetArg) {
+    getTemaSemana() {
+        console.log('getTemaSemana', this.calendarioRequest.intervaloDe)
+        console.log('roteiros', this.roteiros)
         if (this.roteiros.length) {
-            let roteiro = this.roteiros.find(x => moment(arg.start).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
+            let roteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
+            console.log('roteiro', roteiro)
             this.currentRoteiro = roteiro;
         } else {
             this.currentRoteiro = undefined;
@@ -628,7 +628,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     requestLoadRoteiros(where: string) {
         this.loadingRoteiro = true;
         return lastValueFrom(this.roteiroService.getList('loadRoteiros'))
-            .then(res => this.loadingRoteiro = false)
+            .then(res => {
+                this.loadingRoteiro = false;
+                this.getTemaSemana()
+            })
             .catch(res => this.loadingRoteiro = false)
 
     }
