@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --host 0.0.0.0",
+    "start:ssl": "ng serve --ssl true --host 0.0.0.0",
     "start:fast": "ng serve --host 0.0.0.0 --configuration=development --poll=2000",
     "build": "ng build",
     "build:dev": "ng build --configuration=development",
