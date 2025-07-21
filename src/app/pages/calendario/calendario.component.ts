@@ -46,16 +46,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
     screen: ScreenWidth = ScreenWidth.lg;
     ScreenWidth = ScreenWidth;
-    todaydate = new Date;
-    EventoTipo = EventoTipo;
-    PseudoEvento = PseudoEvento;
     eventos: Evento[] = [];
-    selectedAluno?: Evento_Participacao_Aluno;
     selectedEvento?: Evento;
     cdkEventItensId: string[] = [];
     loading = false;
-    headerOpen = true;
-    account?: AccountResponse;
     data = new Date;
     minData = new Date(2025, 0, 1);
     observacaoReposicao: string = '';
@@ -73,15 +67,14 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     roteiros: Roteiro[] = [];
     loadingRoteiro = false;
 
-
     loadedAnos: number[] = [];
-
     dayView = false;
     currentTitle = '';
+
     cdkDragCancel = false;
-    calendarVisible = signal(false);
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
     calendarioOptions: CalendarOptions = {
+        initialDate: new Date(2025,11,28),
         initialView: 'timeGridWeek',
         themeSystem: 'standard',
         locale: 'pt-BR',
@@ -89,8 +82,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             dayGridPlugin,
             interactionPlugin,
             timeGridPlugin,
-            // listPlugin,
-            // multiMonthPlugin
         ],
         hiddenDays: [0],
         dayHeaders: true,
@@ -107,20 +98,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             right: ''
         },
         nowIndicator: true,
-        events: [],
         scrollTime: '09:00:00',
         scrollTimeReset: true,
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
         slotDuration: '00:30:00',
-        slotLabelFormat: {
-            hour: 'numeric',
-            minute: '2-digit',
-            omitZeroMinute: true,
-            meridiem: 'short'
-        },
-        lazyFetching: true,
         datesSet: this.datesSet.bind(this),
         windowResize: this.setCalendarioHeight.bind(this),
     }
@@ -149,15 +132,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.subscription.push(screen);
 
         let open = this.header.menuAsideOpen.subscribe(res => {
-            this.headerOpen = res;
             if (this.fullCalendar) {
                 this.fullCalendar.getApi().updateSize();
             }
         });
         this.subscription.push(open);
-
-        let account = this.accountService.account.subscribe(res => this.account = res);
-        this.subscription.push(account);
 
         let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime()));
         this.subscription.push(roteiros);
@@ -181,7 +160,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         let calendarView = this.service.calendarView.subscribe(async view => {
             if (view == CalendarioView.MeuCalendario) {
-                this.calendarioRequest.professor_Id = this.account?.professor_Id;
+                let account = this.accountService.accountValue;
+                this.calendarioRequest.professor_Id = account?.professor_Id;
                 this.eventos = [];
             } else {
                 this.calendarioRequest.professor_Id = undefined;
@@ -192,7 +172,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.calendarioRequest.intervaloDe = moment(new Date).startOf('week').toDate();
         this.calendarioRequest.intervaloAte = moment(new Date).endOf('week').toDate();
-
     }
     
     ngOnDestroy(): void {
@@ -207,17 +186,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     // INICIO Controles do calendario
     async update(where: string) {
-        console.log('update', where)
-
         this.unselectAula();
         this.requestLoadRoteiros('update');
 
         let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
         let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
-        console.log('anoDe', anoDe)
-        console.log('anoAte', anoAte)
-        console.log('loadedAnos', this.loadedAnos)
-        
         
         if (this.loadedAnos.includes(anoDe) && this.loadedAnos.includes(anoAte) ) {
             await this.requestLoadCalendario('update')
@@ -226,20 +199,20 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return;
         } 
         else {
-            console.log('loadedAnos', this.loadedAnos)
             if (!this.loadedAnos.includes(anoDe)) {
+                
                 this.loadedAnos.push(anoDe);
                 await this.requestLoadFeriados(anoDe);
                 await this.requestCancelarEventos(anoDe);
             }
-            console.log('loadedAnos', this.loadedAnos)
             if (!this.loadedAnos.includes(anoAte)) {
                 this.loadedAnos.push(anoAte);
                 await this.requestLoadFeriados(anoAte);
                 await this.requestCancelarEventos(anoAte);
             }
             await this.requestLoadCalendario('update')
-            console.log('loadedAnos', this.loadedAnos)
+            this.setCalendario();
+            this.setCalendarioHeight();
         } 
 
     }
@@ -314,25 +287,29 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     setCalendario() {  
 
-        console.log('setCalendario')
         this.loading = true;
         this.cdkEventItensId = [];
         
+        // Apenas eventos que não caem em um feriado
+        let eventos = this.eventos.filter(evento => {
+            let temFeriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'))
+            evento.feriado = temFeriado;
+            return !temFeriado;
+        });
+
         let calendar = this.fullCalendar.getApi();
-        calendar.removeAllEvents();
-        
-        let feriadosDates = this.feriados.map(x => moment(x.date).format('YYYY-MM-DD'));
-        let eventos = this.eventos.filter(x => feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false);
-        
+        let de = this.calendarioRequest.intervaloDe;
+        let ate = this.calendarioRequest.intervaloAte;
+        let feriados = this.feriados.filter(x => moment(x.date).isBetween(de, ate, 'days', '[]'));
+
         let events = eventos.map(item => {
-            let id = 'event-' + this.calendarioUtils.eventRandomId();
+            const id = 'event-' + this.calendarioUtils.eventRandomId();
+            const eventStyles = this.calendarioUtils.getEventStyles(item)
             
             if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
             }
 
-            const eventStyles = this.calendarioUtils.getEventStyles(item)
-            
             let event: any = {
                 id: id,
                 backgroundColor: eventStyles.backgroundColor,
@@ -347,8 +324,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return event;
         });
 
-        this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'days', '[]'))
-            .forEach(item => {
+        feriados.forEach(item => {
             let event = {
                 id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
@@ -368,24 +344,24 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             }
             events.push(event)
         })
+
+        if (calendar) {
+            calendar.removeAllEvents();
+            calendar.updateSize();
+        }
+
         this.calendarioOptions.events = events;
-        this.fullCalendar.getApi().updateSize();
         this.loading = false;
         this.setCalendarioHeight();
 
-
-        let temFeriadoNaSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'days', '[]'));
-        if (temFeriadoNaSemana.length) {
-            this.calendarioOptions.allDaySlot = true;
-        } else {
-            this.calendarioOptions.allDaySlot = false;
-        }
+        // Exibe ou esconde allDaySlot
+        let temFeriadoNaSemana = feriados.length > 0;
+        this.calendarioOptions.allDaySlot = temFeriadoNaSemana;
 
     }
 
     async datesSet(arg: DatesSetArg) {
 
-        console.log('datesSet', arg)
         this.loading = true;
 
         this.currentTitle = moment(arg.start).locale('pt').format('MMMM [de] YYYY');
@@ -396,10 +372,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.calendarioRequest.intervaloDe = arg.view.currentStart;
         this.calendarioRequest.intervaloAte = arg.view.currentEnd;
 
-        await this.requestLoadFeriados();
-        await this.requestCancelarEventos();
-        await this.requestLoadCalendario('datesset');
-        this.setCalendario();
+        this.update('datesset');
 
     }
 
@@ -601,7 +574,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         await lastValueFrom(this.alunoService.reposicao(request))
             .then(res => {
                 this.loading = false;
-                this.selectedAluno = undefined;
+                // this.selectedAluno = undefined;
                 this.service.calendarioReload.emit(source.id);
                 this.unselectAula();
                 this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
@@ -653,14 +626,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     
     requestLoadRoteiros(where: string) {
-
         this.loadingRoteiro = true;
-        lastValueFrom(this.roteiroService.getList('loadRoteiros'))
-            .then(res => {
-                this.loadingRoteiro = false;
-                this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime());
-                this.currentRoteiro = res.find(x => moment(this.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
-            })
+        return lastValueFrom(this.roteiroService.getList('loadRoteiros'))
+            .then(res => this.loadingRoteiro = false)
             .catch(res => this.loadingRoteiro = false)
 
     }
@@ -675,9 +643,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     requestLoadCalendario(where: string) {
         this.loading = true;
-        this.calendarVisible.update(() => true);
+        // this.calendarVisible.update(() => true);
         return lastValueFrom(this.service.getList(this.calendarioRequest))
-            .then(list => {
+        .then(list => {
                 this.eventos = list;
                 this.loading = false;
             })

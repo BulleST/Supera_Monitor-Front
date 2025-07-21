@@ -3,6 +3,7 @@
     border-color: white !important;
     border-radius: 5px;
 }
+
 .event {
     width: 100%;
     height: calc(100% + 4px);
@@ -16,6 +17,7 @@
     border-width: 2px;
     transition: .1s;
 }
+
 .event:not(.event-disabled):hover {
     box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
     scale: 1.01;
@@ -52,6 +54,12 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.event.event-feriado .event-body {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
 }
 
 .event.event-reuniao .event-body,

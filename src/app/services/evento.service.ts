@@ -138,7 +138,7 @@ export class EventoService extends Service {
             next: res => {
                 let list = this.feriados.value;
                 res.forEach(item => {
-                    let index = res.findIndex(x => moment(x.date).isSame(item.date));
+                    let index = list.findIndex(x => moment(item.date).isSame(x.date));
                     if (index == -1) list.push(item);
                     else list.splice(index, 1, item);
                 })

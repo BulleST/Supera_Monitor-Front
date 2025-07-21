@@ -229,8 +229,13 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
     }
 
-    padStartPage(numero: any, length: number, fill: string) {
-        return numero.toString().padStart(length, fill);
+    padStartPage(numero: number | undefined, length: number, fill: string) {
+        if (numero) {
+            return numero.toString().padStart(length, fill);
+        }
+        else {
+            return '0'.padStart(length, fill);
+        } 
     }
 
 }

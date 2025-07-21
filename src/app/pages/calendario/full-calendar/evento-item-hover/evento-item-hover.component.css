@@ -4,6 +4,10 @@
     padding: 0px;
 }
 
+.event.event-hover.event-feriado {
+    min-height: 70px;
+
+}
 
 .event.event-hover {
     width: calc(100% + 20px );

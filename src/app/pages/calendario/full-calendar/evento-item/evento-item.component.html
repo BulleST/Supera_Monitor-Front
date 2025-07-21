@@ -2,12 +2,16 @@
     <app-evento-item-hover #eventoItemHover [evento]="evento" [arg]="arg"></app-evento-item-hover>
     <!-- FERIADO -->
     <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
-        <div class="event"
+        <div class="event event-feriado"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
              [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex }">
-            <p>Feriado</p>
-            <p>{{evento.descricao}}</p>
+            <div class="event-header">
+                <span>Feriado</span>
+            </div>
+            <div class="event-body">
+                <span class="event-descricao">{{evento.descricao}}</span>
+            </div>
         </div>
     </ng-container>
     <!-- AULA E AULA EXTRA -->

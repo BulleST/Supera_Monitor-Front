@@ -38,7 +38,8 @@
                                  [cdkEventItensId]="cdkEventItensId"
                                  [cdkDragCancel]="cdkDragCancel"
                                  (cdkDragCancelChange)="cdkDragCancel = $event"
-                                 (aluno)="selectedAluno = $event"></app-selected-evento>
+                                 ></app-selected-evento>
+                                 <!-- (aluno)="selectedAluno = $event" -->
         </div>
         <!-- TOOLBAR -->
         <app-toolbar id="toolbar" [currentTitle]="currentTitle" (update)="update('button app-toolbar')"></app-toolbar>

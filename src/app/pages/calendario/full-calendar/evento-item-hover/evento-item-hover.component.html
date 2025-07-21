@@ -2,10 +2,14 @@
     <ng-container *ngIf="evento && evento.id">
         <!-- FERIADO -->
         <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
-            <div class="event"
-                 [style]="{ backgroundColor: backgroundColor, borderColor: borderColor, color: textColor }">
-                <p>Feriado</p>
-                <p>{{evento.descricao}}</p>
+            <div class="event event-hover event-feriado"
+                 [style]="{ backgroundColor: 'red', borderColor: 'red', color: 'white' }">
+                <div class="event-header">
+                    <span>Feriado</span>
+                </div>
+                 <div class="event-body">
+                     <span class="event-descricao">{{evento.descricao}}</span>
+                 </div>
             </div>
         </ng-container>
         <!-- AULA E AULA EXTRA -->
@@ -104,7 +108,7 @@
                             <ng-container *ngIf="evento.vagas == 0">Não há vagas</ng-container>
                             <ng-container *ngIf="evento.vagas == 1">1 vaga</ng-container>
                             <ng-container *ngIf="evento.vagas > 1">{{evento.vagas}} vagas</ng-container>
-                                <span class="font-bold">/</span>
+                            <span class="font-bold">/</span>
                             <ng-container *ngIf="evento.alunos.length == 0">Nenhum aluno</ng-container>
                             <ng-container *ngIf="evento.alunos.length == 1">1 aluno</ng-container>
                             <ng-container *ngIf="evento.alunos.length > 1">{{evento.alunos.length}} alunos</ng-container>

@@ -88,7 +88,7 @@ export class EventoItemHoverComponent implements OnChanges {
                 textColor = this.calendarioUtils.getTextColor(MEETING_COLOR);
                 break;
             default:
-                backgroundColor = item.corLegenda ?? item?.professores[0]?.corLegenda ?? DEFAULT_COLOR;
+                backgroundColor = item.corLegenda ?? DEFAULT_COLOR;
                 borderColor = backgroundColor;
                 textColor = this.calendarioUtils.getTextColor(backgroundColor);
                 break;
