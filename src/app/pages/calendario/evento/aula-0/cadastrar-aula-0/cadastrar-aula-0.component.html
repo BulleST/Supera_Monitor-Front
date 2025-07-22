@@ -17,8 +17,8 @@
                                   (auxclick)="enviarMensagemAgendamento(aluno)"
                                   (contextmenu)="enviarMensagemAgendamento(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                  styleClass="{{!aluno.celular ? 'text-300' : ''}}"
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-600'}}"
+                                  styleClass="text-600"
                                   severity="success"
                                   [label]="aluno.nome"
                                   [text]="true" />
@@ -103,10 +103,10 @@
             <div class="field md:col-6 sm:col-6 col-12"> <!-- Aluno -->
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-multiselect [options]="alunos"
-                               [loading]="loadingAlunos"
+                               [loading]="loadingAlunos || loadingEventos"
                                [(ngModel)]="selectedAlunos"
                                [readonly]="blockAlunoField"
-                               [disabled]="blockAlunoField"
+                               [disabled]="blockAlunoField || loadingEventos"
                                (onChange)="alunoChanged($event, aluno_Id)"
                                #aluno_Id="ngModel"
                                optionLabel="nome"
@@ -180,7 +180,8 @@
                 <p-select
                           [options]="professores"
                           [(ngModel)]="object.professor_Id"
-                          [loading]="loadingProfessores"
+                          [loading]="loadingProfessores || loadingEventos"
+                          [disabled]="loadingProfessores || loadingEventos"
                           (onChange)="professorChanged($event, professor_Id)"
                           #professor_Id="ngModel"
                           styleClass="w-full"
@@ -249,7 +250,8 @@
                 <p-select
                           [options]="salaAulas"
                           [(ngModel)]="object.sala_Id"
-                          [loading]="loadingSalaAulas"
+                          [loading]="loadingSalaAulas || loadingEventos"
+                          [disabled]="loadingSalaAulas || loadingEventos"
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
                           styleClass="w-full"
