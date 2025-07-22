@@ -68,6 +68,11 @@
         </ng-template>
         <ng-template #eventFooter>
             <div class="event-footer">
+                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                    <span class="event-alunos">
+                        <span>{{ alunosStr }}</span>
+                    </span>
+                </ng-container>
                 <!-- Se Cancelado -->
                 <ng-container *ngIf="!evento.active; else checkFinalizado">
                     <span class="event-cancelado">
@@ -86,11 +91,6 @@
                 </ng-template>
                 <!-- Caso não finalizado, renderiza o conteúdo padrão -->
                 <ng-template #notFinalizado>
-                    <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                        <span class="event-alunos">
-                            <span>{{ alunosStr }}</span>
-                        </span>
-                    </ng-container>
                     <ng-container *ngIf="evento.perfilCognitivo.length > 0">
                         <span class="event-perfil">
                             <!-- <span class="fa fa-brain"></span> -->

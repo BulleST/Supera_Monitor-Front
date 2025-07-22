@@ -4,7 +4,6 @@
     <ng-container *ngIf="sala_Id == SalaAulaId.financeiro; then financeiroTemplate"></ng-container>
 </ng-container>
 
-
 <ng-template #salaTemplate> 
     <ng-container *ngIf="numeroSala !== undefined && numeroSala !== null && andar !== undefined && andar !== null; else indefinidoTemplate">
         {{numeroSala}} - {{andar}}º andar

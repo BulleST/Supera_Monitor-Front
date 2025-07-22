@@ -398,6 +398,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             acceptLabel: `Enviar mensagem`,
             acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
+            rejectIcon: 'pi pi-times',
             acceptButtonStyleClass: 'p-button-rounded p-button-success',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {

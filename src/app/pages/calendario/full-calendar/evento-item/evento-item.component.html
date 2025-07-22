@@ -68,7 +68,8 @@
     <ng-template #eventBody>
         <div class="event-body">
             <span class="event-descricao">{{evento.descricao}}</span>
-            <ng-container *ngIf="evento.sala_Id">
+            <ng-container *ngIf="evento.sala_Id && 
+                ![EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                 <span class="event-sala">
                     <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
                 </span>

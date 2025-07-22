@@ -37,7 +37,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: .75rem;
+    font-size: 1rem;
 }
 
 .event.event-hover .event-time {
@@ -69,12 +69,12 @@
 
 .event.event-hover .event-descricao {
     width: 100%;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
 }
 
 .event.event-hover .event-sala {
-    font-size: .875rem;
+    font-size: 1rem;
     display: flex;
     gap: 2px;
 }
@@ -90,10 +90,11 @@
     text-overflow: ellipsis;
     overflow: hidden;
     line-height: 1;
-    font-size: .75rem;
+    font-size: 1rem;
 }
 
-.event.event-hover .event-alunos {}
+.event.event-hover .event-alunos {
+font-size: 1rem;}
 
 .event.event-hover .event-vagas {
     display: flex;
@@ -112,6 +113,6 @@
     display: flex;
     align-items: center;
     gap: 3px;
-    font-weight: 800;
     color: white;
+    font-size: 1rem;
 }

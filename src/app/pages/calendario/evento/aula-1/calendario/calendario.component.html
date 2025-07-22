@@ -11,7 +11,7 @@
                 <div class="flex flex-column flex-1 gap-2">
                     <p class="leading-relaxed text-justify">
                         Você está prestes a confirmar o agendamento de
-                        <strong class="text-primary-700">primeira aula</strong> para o aluno
+                        <strong class="text-primary-500">primeira aula</strong> para o aluno
                         abaixo.<br />
                         Certifique-se de que todas as informações estão corretas.
                     </p>
@@ -26,17 +26,20 @@
                             <div>
                                 <div class="inline-flex gap-2">
                                     <label>Turma:</label>
-                                    <p class="font-semibold text-primary-600">
+                                    <p class="font-bold">
                                         {{ selectedEvento.descricao }}
                                     </p>
+                                    <ng-container *ngFor="let perfil of selectedEvento?.perfilCognitivo">
+                                        <p-badge [value]="perfil.nome" />
+                                    </ng-container>
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="inline-flex gap-2">
                                     <label>Data: </label>
-                                    <p class="font-semibold text-primary-600">
-                                        {{ selectedEvento.data | date : 'dd/MM/yyyy - HH:mm' }}
+                                    <p class="font-bold">
+                                        {{ selectedEvento.data | date : 'dd \'de\' MMMM \'às\' HH:mm' }}
                                     </p>
                                 </div>
                             </div>
@@ -44,29 +47,22 @@
                             <div class="mt-1">
                                 <div class="inline-flex gap-2">
                                     <label>Aluno:</label>
-                                    <p class="font-semibold text-primary-600">{{ aluno.nome }}</p>
+                                    <p class="font-bold">{{ aluno.nome }}</p>
+                                    <p-badge [value]="aluno.perfilCognitivo" class="ml-2" />
                                 </div>
                             </div>
 
                             <div class="mt-1">
                                 <div class="inline-flex gap-2">
                                     <label>Sala:</label>
-                                    <app-sala-aula class="font-bold text-primary" [andar]="selectedEvento.andar" [numeroSala]="selectedEvento.numeroSala" />
+                                    <app-sala-aula class="font-bold" 
+                                        [andar]="selectedEvento.andar" 
+                                        [numeroSala]="selectedEvento.numeroSala"
+                                        [sala_Id]="selectedEvento.sala_Id" />
                                 </div>
                             </div>
 
-                            <div class="mt-1 flex gap-2 align-items-center font-medium">
-                                <label>Perfil Cognitivo do aluno:</label>
-                                <p-badge [value]="aluno.perfilCognitivo" />
-                            </div>
 
-                            <div
-                                class="mt-1 flex flex-wrap gap-2 align-items-center font-medium">
-                                <label>Perfis Cognitivos do agendamento:</label>
-                                <ng-container *ngFor="let perfil of selectedEvento?.perfilCognitivo">
-                                    <p-badge [value]="perfil.nome" />
-                                </ng-container>
-                            </div>
                         </p-fieldset>
 
                         <p-fieldset legend="Restrições"

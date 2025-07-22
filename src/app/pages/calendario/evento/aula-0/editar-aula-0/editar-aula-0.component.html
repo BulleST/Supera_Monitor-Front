@@ -207,7 +207,7 @@
                               [text]="true" />
                     <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                         <div class="flex align-items-center">
-                            <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                            <p class="p-button-link capitalize text-lg font-bold hover:underline cursor-pointer" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                 <span>{{ item.aluno | nameAbv }}</span>
                             </p>
                             <p-badge *ngIf="item.reposicaoDe_Evento_Id"

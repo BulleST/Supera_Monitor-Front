@@ -13,8 +13,12 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert } from '../../../../../utils/audio';
 import { showError } from '../../../../../utils';
+import { Turma } from '../../../../../models/turma.model';
+import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
+import { Apostila_Kit } from '../../../../../models/apostila.model';
+import { ApostilaService } from '../../../../../services/apostila.service';
+import { PerfilCognitivoService } from '../../../../../services/perfil-cognitivo.services';
 
 @Component({
     selector: 'app-editar-aula-0',
@@ -36,6 +40,15 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     @Input() salaAulas: SalaAula[] = [];
     @Input() loadingSalaAulas = false;
 
+    @Input() turmas: Turma[] = [];
+    @Input() loadingTurmas = false;
+
+    perfis: PerfilCognitivo[] = [];
+    loadingPerfis = false;
+
+    kits: Apostila_Kit[] = [];
+    loadingKits = false;
+
     @Output() validaProfessor = new EventEmitter<Professor>();
     @Output() validaSala = new EventEmitter<SalaAula>();
     @Output() width = new EventEmitter<string>();
@@ -47,7 +60,17 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
+        private apostilaService: ApostilaService,
+        private perfilCognitivoService: PerfilCognitivoService,
     ) {
+
+
+        let kits = this.apostilaService.listKits.subscribe(res => this.kits = res);
+        this.subscription.push(kits);
+
+        let perfis = this.perfilCognitivoService.list.subscribe(res => this.perfis = res);
+        this.subscription.push(perfis);
+
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
         })
@@ -57,19 +80,27 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
             this.evento.professor_Id = this.evento.professores[0].professor_Id;
+            
             if (!this.evento.finalizado) {
-                this.evento.alunos
-                .filter(x => x.active)
-                .map(x => {
-                    x.presente == true;
-                    return x;
-                });
+                this.evento.alunos = this.evento.alunos.map(x => {
+                    x.presente = true;
+                    x.numeroPaginaAH = null as any;
+                    x.apostila_AH_Id = null as any;
+                    x.numeroPaginaAbaco = null as any;
+                    x.apostila_Abaco_Id = null as any;
+                    return x
+                })
             }
         }
         if (changes['professores']) this.professores = changes['professores'].currentValue;
         if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
+        
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
+        
+        if (changes['turmas']) this.turmas = changes['turmas'].currentValue;
+        if (changes['loadingTurmas']) this.loadingTurmas = changes['loadingTurmas'].currentValue;
+        
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
         this.width.emit('700px')
     }

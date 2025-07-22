@@ -303,10 +303,11 @@ EventoTipo = EventoTipo;
             && (x.numeroPaginaAH == 0 || x.numeroPaginaAbaco == 0)
         )
 
-        if (alunosPresentesSemPaginaDefinida.length > 0) {
+        if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(this.evento.evento_Tipo_Id) 
+            && alunosPresentesSemPaginaDefinida.length > 0 ) {
             let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul>'
             alunosPresentesSemPaginaDefinida.forEach(item => {
-                mensagem += `<li>${item.aluno}: `
+                mensagem += `<li class="flex align-items-center">${item.aluno}: `
                 if (item.numeroPaginaAH == 0) 
                     mensagem += `- Página AH: ${item.numeroPaginaAH}  <i class="pi pi-times-circle text-red-500"></i>`;
                 else 

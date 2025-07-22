@@ -19,6 +19,7 @@ export function showError(confirmationService: ConfirmationService, header: stri
         acceptButtonStyleClass: 'p-button-rounded',
         acceptIcon: 'pi pi-times',
         rejectVisible: !!innerMessage,
+        rejectIcon: 'pi pi-info-circle',
         rejectLabel: 'Ver detalhes',
         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
         reject: () => {
