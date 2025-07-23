@@ -451,7 +451,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                     this.eventoService.calendarioReload.emit(res.object.id);
                     this.toastr.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
                     if (aluno.celular) {
-                        this.sendMensagemAluno(e, target, aluno);
+                        this.sendMensagemAluno(e, aluno, source, target);
                     } else {
                         this.visible = false;
                         this.visibleChange();
@@ -474,7 +474,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         return lastValueFrom(this.eventoService.createAulaTurma(request));
     }
 
-    sendMensagemAluno(e: any, evento: Evento, aluno: Aluno) {
+    sendMensagemAluno(e: any, aluno: Aluno, source: Evento, target: Evento) {
         this.confirmationService.confirm({
             target: e.target,
             message: `Reposição concluída com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -488,7 +488,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             accept: () => {
                 this.visible = false
                 this.visibleChange();
-                let url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, evento);
+                let url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, source, target);
                 window.open(url.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(url.mensagem);
             },

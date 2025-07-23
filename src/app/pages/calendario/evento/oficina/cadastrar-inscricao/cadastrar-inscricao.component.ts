@@ -119,7 +119,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.subscription.push(alunos);
 
         this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.getListWithChecklist())
+        lastValueFrom(this.alunoService.getList())
             .then(res => this.loadingAlunos = false)
             .catch(res => this.loadingAlunos = false);
 

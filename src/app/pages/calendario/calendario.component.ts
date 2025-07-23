@@ -413,7 +413,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         if (this.cdkDragCancel) return;
         if (!this.selectedEvento) return;
 
-
         if (event.previousContainer != event.container) {
 
             let source = this.selectedEvento;
@@ -425,7 +424,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 erroMessage = 'Essa aula atingiu o limite permitido de alunos.';
             }
 
-            if (target.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id) == false) {
+            console.log('target', target)
+            console.log('aluno', aluno)
+            let perfil = target.perfilCognitivo.map(x => x.id);
+            if (perfil.includes(aluno.perfilCognitivo_Id) == false) {
                 erroMessage = 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permitidas.';
             }
 
@@ -572,7 +574,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 this.unselectAula();
                 this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
 
-                this.sendMensagemAluno(e, target, aluno);
+                this.sendMensagemAluno(e, aluno, source, target);
 
                 this.observacaoReposicao = '';
 
@@ -583,7 +585,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             })
     }
 
-    sendMensagemAluno(e: any, evento: any, aluno: Evento_Participacao_Aluno) {
+    sendMensagemAluno(e: any, aluno: Evento_Participacao_Aluno, source: any, target: any) {
         if (aluno.celular) {
             this.confirmationService.confirm({
                 target: e.target,
@@ -596,7 +598,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 acceptButtonStyleClass: 'p-button-rounded p-button-success',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
-                    let object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, evento);
+                    let object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, source, target);
                     window.open(object.link, '_target');
                     this.mensagemWhatsapp.copiarMensagem(object.mensagem);
                 },

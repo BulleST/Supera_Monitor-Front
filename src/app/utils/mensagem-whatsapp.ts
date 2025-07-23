@@ -142,9 +142,11 @@ export class MensagemWhatsapp {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+        let tipo = this.calendarioUtils.getEventoTipo(evento);
+        let data = moment(evento.data).format('DD [de] MMMM [às] HH[h]mm');
         let mensagem = `Olá ${nome}, 
             \r\n Espero que esteja bem! 
-            \r\nNotei que você não esteve presente na ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM [às] HH[h]mm')} e gostaria de saber se houve um imprevisto. 
+            \r\nNotei que você não esteve presente na ${tipo} do dia ${data} e gostaria de saber se houve um imprevisto. 
             \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
 
             if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.AulaExtra) {
@@ -154,7 +156,8 @@ export class MensagemWhatsapp {
                     \r\n `;
                 }
                 sugestoes.forEach(sugestao => {
-                    mensagem += `\r\n • ${moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm')} - Turma: ${sugestao.turma}`;
+                    let d = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
+                    mensagem += `\r\n • ${d} - Turma: ${sugestao.turma}`;
                 })
                 mensagem += `\r\n
                     \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
@@ -180,10 +183,13 @@ export class MensagemWhatsapp {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+        let tipo = this.calendarioUtils.getEventoTipo(evento);
+        let data = moment(evento.data).format('DD [de] MMMM [às] HH[h]mm');
+
         let mensagem = `Olá ${nome}, 
             \r\nEspero que esteja bem!
-            \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
-            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\nSua ${tipo} foi agendada para o dia ${data}.
+            \r\nFico à disposição caso precise de algo antes da ${tipo}.
             \r\n
             \r\nNos vemos em breve! `;
         let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
@@ -197,11 +203,15 @@ export class MensagemWhatsapp {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+
+        let tipo = this.calendarioUtils.getEventoTipo(evento);
+        let data = moment(evento.data).format('DD/MM/YY [às] HH[h]mm');
+
         let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
-            \r\nSua ${this.calendarioUtils.getEventoTipo(evento)} foi reagendada para dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}. 
+            \r\nSua ${tipo} foi reagendada para dia ${data}. 
             \r\n
-            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\nFico à disposição caso precise de algo antes da ${tipo}.
             \r\n
             \r\nNos vemos em breve!`;
         let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
@@ -215,9 +225,11 @@ export class MensagemWhatsapp {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+        let tipo = this.calendarioUtils.getEventoTipo(evento);
+        let data = moment(evento.data).format('DD/MM/YY [às] HH[h]mm');
         let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
-            \r\nInfelizmente sua ${this.calendarioUtils.getEventoTipo(evento)} do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi cancelada devido "${evento.observacao}". 
+            \r\nInfelizmente sua ${tipo} do dia ${data} foi cancelada devido "${evento.observacao}". 
             \r\n
             \r\nPor favor, me avise sua disponibilidade para que possamos combinar um novo horário.
             \r\n
@@ -229,15 +241,18 @@ export class MensagemWhatsapp {
         };
     }
 
-    enviarMensagemReposicao(nome: string, celular: string, evento: Evento) {
+    enviarMensagemReposicao(nome: string, celular: string, eventoDe: Evento, eventoPara: Evento) {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+        let dataDe = moment(eventoDe.data).format('DD/MM/YY [às] HH[h]mm');
+        let dataPara = moment(eventoPara.data).format('DD/MM/YY [às] HH[h]mm');
+
         let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
-            \r\nConfirmo que a reposição da ${this.calendarioUtils.getEventoTipo(evento)} está agendada para o dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')}.
+            \r\nSua reposição da aula do dia ${dataDe} está agendada para o dia ${dataPara}.
             \r\n
-            \r\nFico à disposição caso precise de algo antes da ${this.calendarioUtils.getEventoTipo(evento)}.
+            \r\nFico à disposição caso precise de algo antes da aula.
             \r\n
             \r\nNos vemos em breve!
         `;
@@ -252,9 +267,11 @@ export class MensagemWhatsapp {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
+        let tipo = this.calendarioUtils.getEventoTipo(evento);
+        let data = moment(evento.data).format('DD [de] MMMM S[às] HH[h]mm');
         let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
-            \r\nSua inscrição na oficina do dia ${moment(evento.data).format('DD/MM/YY [às] HH[h]mm')} foi confirmada.
+            \r\nSua inscrição na oficina do dia ${data} foi confirmada.
             \r\n
             \r\nFico à disposição caso precise de algo antes da oficina.
             \r\n

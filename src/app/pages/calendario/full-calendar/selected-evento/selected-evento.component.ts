@@ -251,7 +251,7 @@ export class SelectedEventoComponent implements OnChanges {
             let alunos = this.alunoService.list.value;
 
             if (!alunos.length) {
-                await lastValueFrom(this.alunoService.getListWithChecklist()).then(res => alunos = res);
+                await lastValueFrom(this.alunoService.getList()).then(res => alunos = res);
             }
 
             this.evento.alunos = this.evento.alunos.map(participacao => {

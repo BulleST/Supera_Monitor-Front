@@ -17,8 +17,8 @@
                                   (auxclick)="enviarMensagemAgendamento(aluno)"
                                   (contextmenu)="enviarMensagemAgendamento(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                  styleClass="{{!aluno.celular ? 'text-300' : ''}}"
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-500'}}"
+                                  styleClass="text-700 "
                                   severity="success"
                                   [label]="aluno.nome"
                                   [text]="true" />
@@ -58,7 +58,7 @@
                                 <ng-template #selectedItem let-selectedOption>
                                     <ng-container *ngIf="selectedOption">
                                         <div class="flex align-items-center">
-                                            <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 border-1 text-white ">
+                                            <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 border-1 border-primary-500 text-white ">
                                                 <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
                                             </div>
                                             <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
@@ -215,7 +215,6 @@
             <!-- Educador -->
             <div class="field md:col-4 sm:col-4 col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
-                {{object.professor_Id}}
                 <p-select
                           [options]="professores"
                           [(ngModel)]="object.professor_Id"
@@ -288,7 +287,6 @@
             <!-- Sala -->
             <div class="field md:col-2 sm:col-2 col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
-                {{object.sala_Id}}
                 <p-select
                           [options]="salaAulas"
                           [(ngModel)]="object.sala_Id"

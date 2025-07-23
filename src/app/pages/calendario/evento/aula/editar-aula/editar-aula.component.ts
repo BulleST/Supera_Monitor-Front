@@ -57,9 +57,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     apostilas: Apostila[] = []
     loadingApostila = false
 
-    alunos: Aluno[] = []
-    loadingAluno = false
-
     ScreenWidth = ScreenWidth
     screen = ScreenWidth.lg
 
@@ -76,26 +73,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
     ) {
-        let screen = this.mobileService.get().subscribe((res) => (this.screen = res));
+        let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        let apostilas = this.apostilaService.listApostila.subscribe(
-            (res) => (this.apostilas = res),
-        )
+        let apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas)
-
-        let alunos = this.alunoService.list.subscribe((res) => (this.alunos = res))
-        this.subscription.push(alunos)
-
-        if (this.alunos.length == 0) {
-            this.loadingAluno = true
-            lastValueFrom(this.alunoService.getList())
-                .then((res) => {
-                    this.alunos = res
-                    this.loadingAluno = false
-                })
-                .catch((res) => (this.loadingAluno = false))
-        }
     }
 
     ngOnChanges(changes: SimpleChanges): void {

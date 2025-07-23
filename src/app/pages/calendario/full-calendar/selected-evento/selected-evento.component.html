@@ -4,27 +4,27 @@
            (onHide)="onHide()"
            [dismissable]="true">
     <ng-container *ngIf="evento">
-        <div class="p-2 flex flex-column row-gap-1 -m-2 max-w-fit">
-            <div class="p-2 white-space-normal">
-                <div class="flex align-items-center justify-content-between gap-1">
-                    <p class="evento-descricao text-primary-500">
-                        <i class="fa-solid fa-users-between-lines mr-2"></i>
+        <div class="selected-evento">
+            <div class="selected-evento-dados">
+                <div class="selected-evento-titulo">
+                    <p class="selected-evento-descricao">
+                        <i class="fa-solid fa-users-between-lines"></i>
                         <span>{{ evento.descricao }}</span>
                     </p>
-                    <p class="evento-tipo ml-4">{{tipoEventoString}}</p>
+                    <p class="selected-evento-tipo">{{tipoEventoString}}</p>
                 </div>
-                <div class="flex flex-column gap-1 text-600">
+                <div class="selected-evento-text">
                     <!-- Data -->
-                    <div class="flex align-items-center gap-2 mt-2">
-                        <span class="flex w-2rem justify-content-center -ml-1">
+                    <div class="selected-evento-linha">
+                        <span class="selected-evento-linha-icon">
                             <i class="pi pi-calendar"></i>
                         </span>
                         <span>Data: </span>
                         <span>{{ evento.data | date : "dd/MM/yyyy 'às' HH'h'mm" }}</span>
                     </div>
                     <!-- Sala -->
-                    <div class="flex align-items-center gap-2">
-                        <span class="flex w-2rem justify-content-center -ml-1">
+                    <div class="selected-evento-linha">
+                        <span class="selected-evento-linha-icon">
                             <i class="fa-solid fa-users-between-lines"></i>
                         </span>
                         <span>Sala: </span>
@@ -33,21 +33,21 @@
                                        [numeroSala]="evento.numeroSala"></app-sala-aula>
                     </div>
                     <!-- Educador -->
-                    <div class="flex align-items-center gap-2"
+                    <div class="selected-evento-linha"
                          *ngIf="![EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
-                        <span class="flex w-2rem justify-content-center -ml-1">
+                        <span class="selected-evento-linha-icon">
                             <i class="fa-solid fa-person-chalkboard"></i>
                         </span>
                         <span>Educador(a): </span>
                         <span *ngIf="evento.professor">{{ evento.professor }}</span>
                         <span *ngIf="!evento.professor" class="font-bold">Indefinido</span>
-                        <span class="inline-flex w-1rem h-1rem border-circle ml-2"
+                        <span class="selected-evento-cor-legenda"
                               [style]="{ backgroundColor: evento.corLegenda }"></span>
                     </div>
-                    <!-- perfilCognitivo -->
+                    <!-- Perfil Cognitivo -->
                     <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
-                        <div class="flex align-items-center gap-2">
-                            <span class="flex w-2rem justify-content-center -ml-1">
+                        <div class="selected-evento-linha">
+                            <span class="selected-evento-linha-icon">
                                 <i class="fa-solid fa-brain"></i>
                             </span>
                             <span>Perfil Cognitivo: </span>
@@ -64,7 +64,7 @@
             <!-- Alunos -->
             <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
                 <div
-                     class="flex align-items-center justify-content-between px-2 py-2 w-full gap-2 border-bottom-2 border-primary-500">
+                     class="selected-evento-alunos-header">
                     <span class="font-bold block text-primary">
                         <span *ngIf="evento.alunos.length == 0">Nenhum aluno</span>
                         <span *ngIf="evento.alunos.length > 1">Alunos</span>
@@ -297,7 +297,7 @@
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
-                                          <!-- [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos" -->
+                                <!-- [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos" -->
                             </ng-container>
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar"

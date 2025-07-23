@@ -14,10 +14,6 @@ import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 // Alunos
-// import { FormComponent as AlunoFormComponent } from '../pages/alunos/form/form.component';
-// import { DadosCadastraisComponent as AlunoDadosCadastraisComponent } from '../pages/alunos/form/dados-cadastrais/dados-cadastrais.component';
-// import { CalendarioComponent as AlunoCalendarioComponent } from '../pages/alunos/form/calendario/calendario.component';
-// import { HistoricoComponent as AlunoHistoricoComponent } from '../pages/alunos/form/historico/historico.component';
 import { AlunoPopoverComponent } from './aluno/aluno-popover/aluno-popover.component';
 import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/aluno-checklist-dialog.component';
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
@@ -36,6 +32,7 @@ import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
 import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
+import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
 
 @NgModule({
     declarations: [
@@ -46,6 +43,7 @@ import { TableHeaderFilterComponent } from './table/table-header-filter/table-he
         AlunoChecklistDialogComponent,
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
+        AlunoReposicaoTooltipComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
@@ -73,6 +71,7 @@ import { TableHeaderFilterComponent } from './table/table-header-filter/table-he
         AlunoChecklistDialogComponent,
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
+        AlunoReposicaoTooltipComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
