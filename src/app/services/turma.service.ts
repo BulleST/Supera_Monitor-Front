@@ -58,6 +58,7 @@ export class TurmaService extends Service {
     }
 
     get(id: number) {
+        // return this.http.get<Turma>(`${this.url}/roteiros/${id}`)
         return new Promise<Turma>(async (resolve, reject) => {
             if (this.list.value.length == 0)
                 await lastValueFrom(this.getList());

@@ -149,7 +149,6 @@ export class AlunoService extends Service {
             }));
     }
 
-
     getHistorico(id: number) {
         return this.http.get<Aluno_Historico[]>(`${this.url}/alunos/historico/${id}`)
             .pipe(map((res: any) => {
@@ -159,7 +158,6 @@ export class AlunoService extends Service {
                 })
             }))
     }
-
 
     getResumo(id: number) {
         return this.http.get<any[]>(`${this.url}/alunos/resumo/${id}`)

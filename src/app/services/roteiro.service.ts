@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { MyMap } from '../utils/map';
 import moment from 'moment';
@@ -45,14 +45,15 @@ export class RoteiroService extends Service {
       }
 
     get(id: number) {
-        return new Promise<Roteiro>(async (resolve, reject) => {
+        // return this.http.get<Roteiro>(`${this.url}/roteiros/${id}`)
+        return new Observable<Roteiro>(subscription => {
             if (this.list.value.length == 0)
                 this.getList('get ' + id).subscribe();
 
             var item = this.list.value.find(x => x.id == id) as Roteiro;
             if (!item){
                 this.toastrService.error(`Roteiro não encontrado.`);
-               return reject('Roteiro não encontrado.')
+                subscription.error('Roteiro não encontrado.')
             }
 
             if (item.dataInicio)
@@ -60,7 +61,8 @@ export class RoteiroService extends Service {
             if (item.dataFim)
                 item.dataFim = new Date(moment(item.dataFim).format('YYYY-MM-DD[T]HH:mm:ss'))
 
-            return resolve(item);
+             subscription.next(item);
+             subscription.complete()
         })
     }
 

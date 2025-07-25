@@ -16,7 +16,6 @@ import { CadastrarReuniaoComponent } from './evento/reuniao/cadastrar-reuniao/ca
 import { CadastrarInscricaoComponent } from './evento/oficina/cadastrar-inscricao/cadastrar-inscricao.component';
 import { EditarReuniaoComponent } from './evento/reuniao/editar-reuniao/editar-reuniao.component';
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
-import { ReagendarEventoComponent } from './reagendar-evento/reagendar-evento.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
 import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
@@ -46,7 +45,6 @@ import { LegendaComponent } from './full-calendar/legenda/legenda.component';
         EditarOficinaComponent,
         EditarSuperacaoComponent,
         EditarReuniaoComponent,
-        ReagendarEventoComponent,
         PrimeiraAulaAlunoComponent,
         CalendarioAlunoOptionsComponent,
         SelectedEventoComponent,

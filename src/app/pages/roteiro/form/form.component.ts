@@ -64,7 +64,7 @@ export class FormComponent implements OnDestroy {
                 this.loading = true;
                 var id = this.crypto.decrypt(res['id'])
 
-                this.service.get(id)
+                lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;
                         this.loading = false;

@@ -2,7 +2,7 @@
     <div class="lg:col-8 md:col-8 col-12">
         <div class="formgrid grid">
             <!-- Descrição -->
-            <div class="field lg:col-6 sm:col-5 col-6">
+            <div class="field lg:col-6 sm:col-5 col-12">
                 <label for="turma">Turma:</label>
                 <p-iconfield>
                     <p-inputicon styleClass="fa-solid fa-users-between-lines text-primary" />
@@ -15,7 +15,7 @@
                 </p-iconfield>
             </div>
             <!-- Data -->
-            <div class="field lg:col-2 sm:col-3 col-6">
+            <div class="field lg:col-2 sm:col-3 col-5">
                 <label for="dataInicio">Data:</label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-calendar text-primary" />
@@ -29,7 +29,7 @@
                 </p-iconfield>
             </div>
             <!-- Horário -->
-            <div class="field lg:col-2 sm:col-2 col-6">
+            <div class="field lg:col-2 sm:col-2 col-5">
                 <label for="horario">Horário:</label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-clock text-primary" />
@@ -43,7 +43,7 @@
                 </p-iconfield>
             </div>
             <!-- Duração -->
-            <div class="field lg:col-2 sm:col-2 col-6">
+            <div class="field lg:col-2 sm:col-2 col-2">
                 <label for="duracaoEvento">Duração:</label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-hourglass text-primary" />
@@ -57,7 +57,7 @@
                 </p-iconfield>
             </div>
             <!-- Limite de Alunos -->
-            <div class="field sm:col-2 col-4">
+            <div class="field sm:col-2 col-2">
                 <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
                 <p-inputnumber #capacidadeMaximaAlunos="ngModel"
                                [(ngModel)]="evento.capacidadeMaximaAlunos"
@@ -70,7 +70,7 @@
                 </div>
             </div>
             <!-- Educador -->
-            <div class="field sm:col-3 col-6">
+            <div class="field sm:col-3 col-5">
                 <label for="professor_Id">Educador: <span
                           *ngIf="evento.finalizado"
                           class="text-red-500">*</span></label>
@@ -169,7 +169,7 @@
                 </div>
             </div>
             <!-- Sala -->
-            <div class="field sm:col-3 col-6">
+            <div class="field sm:col-3 col-5">
                 <label for="sala_Id">Sala: <span
                           *ngIf="evento.finalizado"
                           class="text-red-500">*</span></label>
