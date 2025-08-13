@@ -7,7 +7,7 @@ const initial = () => import('./pages/_initial/initial.module').then(res => res.
 
 const routes: Routes = [
     { path: '', redirectTo: 'calendario', pathMatch: 'full'},
-    { path: '', loadChildren: initial , canActivate: [AuthGuard]/* , canActivate: [AuthGuard] */ },
+    { path: '', loadChildren: initial /* , canActivate: [AuthGuard] */ },
     { path: 'accounts', loadChildren: account },
     // { path: '**', redirectTo: '', pathMatch: 'full'},
 ];

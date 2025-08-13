@@ -4,6 +4,7 @@ import { InitialComponent } from './initial.component';
 import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
 import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 import { AgendarReposicaoComponent } from './monitoramento-dashboard/agendar-reposicao/agendar-reposicao.component';
+import { AuthGuard } from '../../guards/auth.guard';
 
 const calendario = () => import('./../calendario/calendario.module').then(res => res.CalendarioModule);
 const alunos = () => import('./../alunos/alunos.module').then(res => res.AlunosModule);
@@ -15,16 +16,16 @@ const usuarios = () => import('./../usuarios/usuarios.module').then(res => res.U
 const routes: Routes = [
     {
         path: '', component: InitialComponent, children: [
-            { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent },
-            { path: 'dashboard', component: MonitoramentoDashboardComponent, children: [
+            { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent, canActivate: [AuthGuard] },
+            { path: 'dashboard', component: MonitoramentoDashboardComponent, canActivate: [AuthGuard], children: [
                 { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent }
             ] },
-            { path: 'alunos', loadChildren: alunos },
-            { path: 'calendario', loadChildren: calendario },
-            { path: 'roteiro', loadChildren: roteiro },
-            { path: 'educadores', loadChildren: professores },
-            { path: 'turmas', loadChildren: turmas },
-            { path: 'usuarios', loadChildren: usuarios },
+            { path: 'alunos', loadChildren: alunos, canActivate: [AuthGuard] },
+            { path: 'calendario', loadChildren: calendario, canActivate: [AuthGuard] },
+            { path: 'roteiro', loadChildren: roteiro, canActivate: [AuthGuard] },
+            { path: 'educadores', loadChildren: professores, canActivate: [AuthGuard] },
+            { path: 'turmas', loadChildren: turmas, canActivate: [AuthGuard] },
+            { path: 'usuarios', loadChildren: usuarios, canActivate: [AuthGuard] },
         ]
     }
 ];
