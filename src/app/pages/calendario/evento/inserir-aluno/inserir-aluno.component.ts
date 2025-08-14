@@ -13,10 +13,6 @@ import moment from 'moment';
 import { SelectChangeEvent } from 'primeng/select';
 import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../../models/reposicao.model';
-import { MyMap } from '../../../../utils/map';
-import { RequestResponse } from '../../../../helpers/request-response.interface';
-import { EventoAula0Request } from '../../../../models/evento-aula-0.model';
-import { EventoSuperacaoRequest } from '../../../../models/evento-superacao.model';
 import { Aluno_CheckList_Item } from '../../../../models/checklist.model';
 import { AccountService } from '../../../../services/account.service';
 import { ChecklistService } from '../../../../services/checklist.service';
@@ -62,7 +58,6 @@ export class InserirAlunoComponent {
         private confirmationService: ConfirmationService,
         private crypto: Crypto,
         private alunoService: AlunoService,
-        private alunoRestricaoService: AlunoRestricaoService,
         private service: EventoService,
         private calendarioUtils: CalendarioUtils,
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -83,31 +78,28 @@ export class InserirAlunoComponent {
             return
         }
 
-        let turmas = this.turmaService.list.subscribe((res) => (this.turmas = res));
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
             this.loadingTurmas = true;
             lastValueFrom(this.turmaService.getList())
-                .then((res) => (this.loadingTurmas = false))
-                .catch((res) => (this.loadingTurmas = false));
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false)
         }
 
-        let salas = this.salaAulaService.list.subscribe((res) => (this.salas = res));
+        let salas = this.salaAulaService.list.subscribe(res => this.salas = res)
         this.subscription.push(salas);
 
         if (this.turmas.length == 0) {
             this.loadingTurmas = true;
             lastValueFrom(this.turmaService.getList())
-                .then((res) => (this.loadingTurmas = false))
-                .catch((res) => (this.loadingTurmas = false));
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false)
         }
 
         let alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active == true);
-            if (params['evento_nome'] == 'aula-zero') {
-                this.alunos = this.alunos.filter(x => !x.aulaZero_Id);
-            }
+            this.alunos = res;
             this.setAlunos();
         });
         this.subscription.push(alunos);
@@ -186,6 +178,7 @@ export class InserirAlunoComponent {
         if (this.evento && this.alunos.length) {
             let alunosInseridos = this.evento.alunos.map(x => x.aluno_Id);
             this.alunos = this.alunos.filter(x => x.active && !alunosInseridos.includes(x.id));
+
             if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
                 this.alunos = this.alunos.filter(x => !x.aulaZero_Id);
             }
@@ -346,7 +339,7 @@ export class InserirAlunoComponent {
 
     }
 
-    async send(e: any) {
+    send(e: any) {
 
         this.loading = true;
         let aluno = this.selectedAluno as Aluno;
@@ -356,15 +349,17 @@ export class InserirAlunoComponent {
                 this.loading = false;
                 this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
                 this.service.calendarioReload.emit(0);
-                this.sendMensagemAlunos(e);
+                if (aluno.celular) {
+                    this.sendMensagemAlunos(e);
+                } else {
+                    this.visible = false
+                    this.visibleChange();
+                }
                 // playSuccess();
             })
             .catch(res => {
                 this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
             })
-
-
-
     }
 
 
@@ -373,7 +368,7 @@ export class InserirAlunoComponent {
         if (aluno.celular) {
             this.confirmationService.confirm({
                 target: e.target,
-                message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
+                message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para o aluno que irá participar da ${this.tipoString}.`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptLabel: `Enviar mensagem`,
@@ -411,7 +406,7 @@ export class InserirAlunoComponent {
         let alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
 
         if (alunoChecklist && !alunoChecklist.finalizado) {
-            let mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
+            let mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.<br> Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
         }
     }
@@ -422,7 +417,7 @@ export class InserirAlunoComponent {
         let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
 
         if (alunoChecklist && !alunoChecklist.finalizado) {
-            let mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.\n Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
+            let mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.<br> Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
         }
     }

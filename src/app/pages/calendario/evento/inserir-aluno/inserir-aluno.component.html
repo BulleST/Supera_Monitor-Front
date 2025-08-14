@@ -37,14 +37,14 @@
                           appendTo="body"
                           [virtualScroll]="true"
                           virtualScrollItemSize="55"
-                               panelStyleClass="p-select-stripped"
+                            panelStyleClass="p-select-stripped"
                           optionDisabled="deactivated,disponivel">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
                                 <div class="flex align-items-center">
                                     <p-button type="button"
-                                        icon="pi pi-whatsapp"
+                                        icon="pi pi-whatsapp {{ !item.celular ? 'text-400' : '' }}"
                                         (onClick)="enviarMensagem(item)"
                                         (auxclick)="enviarMensagem(item)"
                                         (contextmenu)="enviarMensagem(item)"

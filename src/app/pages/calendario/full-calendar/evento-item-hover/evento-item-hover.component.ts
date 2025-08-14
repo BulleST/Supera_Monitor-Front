@@ -18,15 +18,6 @@ export class EventoItemHoverComponent implements OnChanges {
     alunosStr = '';
     @ViewChild('popover') popover!: Popover;
 
-    backgroundColor!: string;
-    borderColor!: string;
-    textColor!: string;
-
-    constructor(
-        private calendarioUtils: CalendarioUtils
-    ) {
-
-    }
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
@@ -35,14 +26,6 @@ export class EventoItemHoverComponent implements OnChanges {
         }
         if (changes['arg']) {
             this.arg = changes['arg'].currentValue;
-
-        }
-        if (this.evento && this.arg) {
-            const styles = this.getEventStyles(this.evento);
-            this.backgroundColor = styles.backgroundColor;
-            this.borderColor = styles.borderColor;
-            this.textColor = styles.textColor;
-
         }
     }
 
@@ -68,35 +51,4 @@ export class EventoItemHoverComponent implements OnChanges {
             return '';
         return perfilCognitivo.map(x => x.nome).join(', ');
     }
-
-    getEventStyles(item: Evento): {
-        backgroundColor: string
-        textColor: string
-        borderColor: string
-    } {
-        const MEETING_COLOR = '#F37435';
-        const DEFAULT_COLOR = '#2E2E2E';
-
-        let backgroundColor = DEFAULT_COLOR
-        let borderColor = DEFAULT_COLOR
-        let textColor = this.calendarioUtils.getTextColor(backgroundColor)
-
-        switch (item.evento_Tipo_Id) {
-            case EventoTipo.Reuniao:
-                backgroundColor = MEETING_COLOR;
-                borderColor = MEETING_COLOR;
-                textColor = this.calendarioUtils.getTextColor(MEETING_COLOR);
-                break;
-            default:
-                backgroundColor = item.corLegenda ?? DEFAULT_COLOR;
-                borderColor = backgroundColor;
-                textColor = this.calendarioUtils.getTextColor(backgroundColor);
-                break;
-        }
-
-
-        return { backgroundColor, borderColor, textColor };
-    }
-
-
 }

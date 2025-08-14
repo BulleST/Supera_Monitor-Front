@@ -427,7 +427,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             console.log('target', target)
             console.log('aluno', aluno)
             let perfil = target.perfilCognitivo.map(x => x.id);
-            if (perfil.includes(aluno.perfilCognitivo_Id) == false) {
+            if (aluno.perfilCognitivo_Id && perfil.includes(aluno.perfilCognitivo_Id) == false) {
                 erroMessage = 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permitidas.';
             }
 

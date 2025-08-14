@@ -15,7 +15,7 @@
         <!-- AULA E AULA EXTRA -->
         <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
             <div class="event event-hover"
-                 [style]="{ backgroundColor: backgroundColor, borderColor: borderColor, color: textColor }">
+                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.borderColor, color: arg.textColor }">
                 <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
                 <ng-container *ngTemplateOutlet="eventBody"></ng-container>
                 <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
@@ -25,7 +25,7 @@
         <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao, EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
             <div class="event event-hover"
                  [class.event-disabled]="!evento.active"
-                 [style]="{ backgroundColor: backgroundColor, borderColor: borderColor, color: textColor }"
+                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.borderColor, color: arg.textColor }"
                  [ngClass]="{
                     'event-superacao': EventoTipo.Superacao == evento.evento_Tipo_Id,
                     'event-aula-zero': EventoTipo.AulaZero == evento.evento_Tipo_Id,

@@ -62,7 +62,7 @@ export class MensagemWhatsapp {
                     const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == aluno.id);
                     const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
                     const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
-                    const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                    const ehPerfilCognitivoCompativel = aluno.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
                     const aulaNaoFinalizada = !aula.finalizado;
                     const aulaEstaAtiva = aula.active;
                     const naoEhFeriado = !aula.feriado;

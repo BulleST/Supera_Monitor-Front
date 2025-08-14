@@ -1,411 +1,322 @@
 <div class="formgrid grid">
-  <!-- Data -->
-  <div class="field lg:col-2 sm:col-4 col-5">
-    <label for="data">Data:</label>
-    <p-iconfield>
-      <p-inputicon styleClass="pi pi-calendar" />
-      <input
-        type="text"
-        pInputText
-        [value]="evento.data | date : 'dd/MM/yyyy'"
-        id="data"
-        name="data"
-        readonly
-        fluid
-      />
-    </p-iconfield>
-  </div>
-  <!-- Horário -->
-  <div class="field lg:col-2 sm:col-4 col-5">
-    <label for="horario">Horário:</label>
-    <p-iconfield>
-      <p-inputicon styleClass="pi pi-clock" />
-      <input
-        type="text"
-        pInputText
-        [value]="evento.data | date : 'HH:mm'"
-        id="horario"
-        name="horario"
-        readonly
-        fluid
-      />
-    </p-iconfield>
-  </div>
-  <!-- Duração -->
-  <div class="field lg:col-2 sm:col-4 col-2">
-    <label for="duracaoEvento">Duração:</label>
-    <p-iconfield>
-      <input
-        type="text"
-        pInputText
-        [value]="duracaoEvento"
-        id="duracaoEvento"
-        readonly
-        fluid
-      />
-      <p-inputicon styleClass="pi pi-hourglass" />
-    </p-iconfield>
-  </div>
-  <!-- Educador -->
-  <div class="field lg:col-3 sm:col-6 col-12">
-    <label for="professor_Id"
-      >Educador:
-      <span *ngIf="evento.finalizado" class="text-red-500">*</span></label
-    >
-    <p-select
-      [options]="professores"
-      [(ngModel)]="evento.professor_Id"
-      [loading]="loadingProfessores"
-      (onChange)="professorChanged($event, professor_Id)"
-      placeholder="Selecione"
-      #professor_Id="ngModel"
-      styleClass="w-full"
-      class="w-full"
-      name="professor_Id"
-      inputId="professor_Id"
-      optionLabel="nome"
-      optionValue="id"
-      [required]="true"
-      [filter]="true"
-      filterBy="nome"
-      appendTo="body"
-      optionDisabled="deactivated"
-      [readonly]="evento.finalizado"
-      [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
-    >
-      <ng-template let-item #item>
-        <div
-          class="flex align-items-center justify-content-between w-full gap-2"
-        >
-          <div>
-            <p class="font-bold mb-1 flex align-items-center">
-              <span
-                class="w-1rem h-1rem border-circle flex mr-2"
-                [style]="{
-                  backgroundColor: item.corLegenda,
-                  borderColor: item.corLegenda
-                }"
-              ></span>
-              <span class="mr-2">{{ item.nome }}</span>
-              <p-badge
-                *ngIf="item.disponivel == false"
-                value="Indisponível"
-                severity="danger"
-                [pTooltip]="indisponivelTemplate"
-              />
-              <ng-template #indisponivelTemplate>
-                <div class="w-25rem">
-                  <p>
-                    <span>Evento: </span>
-                    <span class="text-orange-400 font-bold capitalize">{{
-                      getTipo(item.disponivelEvent)
-                    }}</span>
-                    <span>
-                      -
-                      {{
-                        item.disponivelEvent.data | date : "dd/MM/yyyy HH:mm"
-                      }}</span
-                    >
-                  </p>
-                  <p>{{ item.disponivelEvent.descricao }}</p>
-                  <p *ngIf="item.disponivelEvent.professor">
-                    <span
-                      class="w-1rem h-1rem border-circle inline-flex mr-2"
-                      [style]="{
-                        backgroundColor: item.disponivelEvent.corLegenda,
-                        borderColor: item.disponivelEvent.corLegenda
-                      }"
-                    ></span>
-                    <span>{{ item.disponivelEvent.professor }}</span>
-                  </p>
-                  <p
-                    *ngIf="
-                      item.disponivelEvent.turma &&
-                      item.disponivelEvent.turma !=
-                        item.disponivelEvent.descricao
-                    "
-                  >
-                    {{ item.disponivelEvent.turma }}
-                  </p>
-                  <p *ngIf="item.disponivelEvent.sala_Id">
-                    <span>Sala: </span>
-                    <app-sala-aula
-                      [numeroSala]="item.disponivelEvent.numeroSala"
-                      [andar]="item.disponivelEvent.andar"
-                      [sala_Id]="item.disponivelEvent.sala_Id"
-                    ></app-sala-aula>
-                  </p>
+    <!-- Data -->
+    <div class="field lg:col-2 sm:col-4 col-5">
+        <label for="data">Data:</label>
+        <p-iconfield>
+            <p-inputicon styleClass="pi pi-calendar" />
+            <input type="text"
+                   pInputText
+                   [value]="evento.data | date : 'dd/MM/yyyy'"
+                   id="data"
+                   name="data"
+                   readonly
+                   fluid />
+        </p-iconfield>
+    </div>
+    <!-- Horário -->
+    <div class="field lg:col-2 sm:col-4 col-5">
+        <label for="horario">Horário:</label>
+        <p-iconfield>
+            <p-inputicon styleClass="pi pi-clock" />
+            <input type="text"
+                   pInputText
+                   [value]="evento.data | date : 'HH:mm'"
+                   id="horario"
+                   name="horario"
+                   readonly
+                   fluid />
+        </p-iconfield>
+    </div>
+    <!-- Duração -->
+    <div class="field lg:col-2 sm:col-4 col-2">
+        <label for="duracaoEvento">Duração:</label>
+        <p-iconfield>
+            <input type="text"
+                   pInputText
+                   [value]="duracaoEvento"
+                   id="duracaoEvento"
+                   readonly
+                   fluid />
+            <p-inputicon styleClass="pi pi-hourglass" />
+        </p-iconfield>
+    </div>
+    <!-- Educador -->
+    <div class="field lg:col-3 sm:col-6 col-12">
+        <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <p-select [options]="professores"
+                  [(ngModel)]="evento.professor_Id"
+                  [loading]="loadingProfessores"
+                  (onChange)="professorChanged($event, professor_Id)"
+                  placeholder="Selecione"
+                  #professor_Id="ngModel"
+                  styleClass="w-full"
+                  class="w-full"
+                  name="professor_Id"
+                  inputId="professor_Id"
+                  optionLabel="nome"
+                  optionValue="id"
+                  [required]="true"
+                  [filter]="true"
+                  filterBy="nome"
+                  appendTo="body"
+                  optionDisabled="deactivated"
+                  [readonly]="evento.finalizado"
+                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+            <ng-template let-item #item>
+                <div
+                     class="flex align-items-center justify-content-between w-full gap-2">
+                    <div>
+                        <p class="font-bold mb-1 flex align-items-center">
+                            <span class="w-1rem h-1rem border-circle flex mr-2"
+                                  [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                            <span class="mr-2">{{ item.nome }}</span>
+                            <p-badge *ngIf="item.disponivel == false"
+                                     value="Indisponível"
+                                     severity="danger"
+                                     [pTooltip]="indisponivelTemplate" />
+                            <ng-template #indisponivelTemplate>
+                                <div class="w-25rem">
+                                    <p>
+                                        <span>Evento: </span>
+                                        <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                                        <span> - {{ item.disponivelEvent.data | date : "dd/MM/yyyy HH:mm" }}</span>
+                                    </p>
+                                    <p>{{ item.disponivelEvent.descricao }}</p>
+                                    <p *ngIf="item.disponivelEvent.professor">
+                                        <span class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                              [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                        <span>{{ item.disponivelEvent.professor }}</span>
+                                    </p>
+                                    <p *ngIf=" item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao ">
+                                        {{ item.disponivelEvent.turma }}
+                                    </p>
+                                    <p *ngIf="item.disponivelEvent.sala_Id">
+                                        <span>Sala: </span>
+                                        <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                                       [andar]="item.disponivelEvent.andar"
+                                                       [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                    </p>
+                                </div>
+                            </ng-template>
+                        </p>
+                        <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                            <p class="text-sm"> Expediente {{ item.expedienteInicio | date : "HH:mm" }} às {{ item.expedienteFim | date : "HH:mm" }}</p>
+                        </ng-container>
+                    </div>
+                    <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                           [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                           [value]="item.active ? 'Ativo' : 'Inativo'"
+                           [severity]="item.active ? 'success' : 'danger'"
+                           [pTooltip]="!item.active ? 'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm') : undefined " />
                 </div>
-              </ng-template>
-            </p>
-            <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-              <p class="text-sm">
-                Expediente {{ item.expedienteInicio | date : "HH:mm" }} às
-                {{ item.expedienteFim | date : "HH:mm" }}
-              </p>
-            </ng-container>
-          </div>
-          <p-tag
-            styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-            [icon]="
-              (item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'
-            "
-            [value]="item.active ? 'Ativo' : 'Inativo'"
-            [severity]="item.active ? 'success' : 'danger'"
-            [pTooltip]="
-              !item.active
-                ? 'Inativo desde ' +
-                  (item.deactivated | date : 'dd/MM/yyyy HH:mm')
-                : undefined
-            "
-          />
+            </ng-template>
+        </p-select>
+        <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
+            <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']"> Esse campo é obrigatório. </p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']"> Educador indisponível. </p>
         </div>
-      </ng-template>
-    </p-select>
-    <div
-      *ngIf="
-        professor_Id.touched && professor_Id.invalid && professor_Id.errors
-      "
-    >
-      <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">
-        Esse campo é obrigatório.
-      </p>
-      <p
-        class="text-red-500 mt-2 mb-0"
-        *ngIf="professor_Id.errors['indisponivel']"
-      >
-        Educador indisponível.
-      </p>
     </div>
-  </div>
-  <!-- Sala -->
-  <div class="field lg:col-3 sm:col-6 col-12">
-    <label for="sala_Id"
-      >Sala:
-      <span *ngIf="evento.finalizado" class="text-red-500">*</span></label
-    >
-    <p-select
-      [options]="salaAulas"
-      [(ngModel)]="evento.sala_Id"
-      [loading]="loadingSalaAulas"
-      (onChange)="salaAulaChanged($event, sala_Id)"
-      #sala_Id="ngModel"
-      styleClass="w-full"
-      class="w-full"
-      name="sala_Id"
-      inputId="sala_Id"
-      optionValue="id"
-      [required]="true"
-      [filter]="true"
-      filterBy="nome"
-      appendTo="body"
-      optionDisabled="deactivated"
-      [readonly]="evento.finalizado"
-      [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
-    >
-      <ng-template #selectedItem let-selectedOption>
-        <app-sala-aula
-          [numeroSala]="selectedOption.numeroSala"
-          [andar]="selectedOption.andar"
-          [sala_Id]="selectedOption.id"
-        ></app-sala-aula>
-      </ng-template>
-      <ng-template let-item #item>
-        <span class="mr-2">
-          <app-sala-aula
-            [numeroSala]="item.numeroSala"
-            [andar]="item.andar"
-            [sala_Id]="item.id"
-          ></app-sala-aula>
-        </span>
-        <p-badge
-          *ngIf="item.disponivel == false"
-          value="Indisponível"
-          severity="danger"
-          [pTooltip]="indisponivelTemplate"
-        />
-        <ng-template #indisponivelTemplate>
-          <div class="w-25rem">
-            <p>
-              <span>Evento: </span>
-              <span class="text-orange-400 font-bold capitalize">{{
-                getTipo(item.disponivelEvent)
-              }}</span>
-              <span>
-                -
-                {{
-                  item.disponivelEvent.data | date : "dd/MM/yyyy HH:mm"
-                }}</span
-              >
-            </p>
-            <p>{{ item.disponivelEvent.descricao }}</p>
-            <p *ngIf="item.disponivelEvent.professor">
-              <span
-                class="w-1rem h-1rem border-circle inline-flex mr-2"
-                [style]="{
-                  backgroundColor: item.disponivelEvent.corLegenda,
-                  borderColor: item.disponivelEvent.corLegenda
-                }"
-              ></span>
-              <span>{{ item.disponivelEvent.professor }}</span>
-            </p>
-            <p
-              *ngIf="
-                item.disponivelEvent.turma &&
-                item.disponivelEvent.turma != item.disponivelEvent.descricao
-              "
-            >
-              {{ item.disponivelEvent.turma }}
-            </p>
-            <p *ngIf="item.disponivelEvent.sala_Id">
-              <span>Sala: </span>
-              <app-sala-aula
-                [numeroSala]="item.disponivelEvent.numeroSala"
-                [andar]="item.disponivelEvent.andar"
-                [sala_Id]="item.disponivelEvent.sala_Id"
-              ></app-sala-aula>
-            </p>
-          </div>
-        </ng-template>
-      </ng-template>
-    </p-select>
-    <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
-      <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">
-        Esse campo é obrigatório.
-      </p>
-      <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">
-        Sala indisponível.
-      </p>
+    <!-- Sala -->
+    <div class="field lg:col-3 sm:col-6 col-12">
+        <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <p-select [options]="salaAulas"
+                  [(ngModel)]="evento.sala_Id"
+                  [loading]="loadingSalaAulas"
+                  (onChange)="salaAulaChanged($event, sala_Id)"
+                  #sala_Id="ngModel"
+                  styleClass="w-full"
+                  class="w-full"
+                  name="sala_Id"
+                  inputId="sala_Id"
+                  optionValue="id"
+                  [required]="true"
+                  [filter]="true"
+                  filterBy="nome"
+                  appendTo="body"
+                  optionDisabled="deactivated"
+                  [readonly]="evento.finalizado"
+                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
+            <ng-template #selectedItem let-selectedOption>
+                <app-sala-aula [numeroSala]="selectedOption.numeroSala"
+                               [andar]="selectedOption.andar"
+                               [sala_Id]="selectedOption.id"></app-sala-aula>
+            </ng-template>
+            <ng-template let-item #item>
+                <span class="mr-2">
+                    <app-sala-aula [numeroSala]="item.numeroSala"
+                                   [andar]="item.andar"
+                                   [sala_Id]="item.id"></app-sala-aula>
+                </span>
+                <p-badge *ngIf="item.disponivel == false"
+                         value="Indisponível"
+                         severity="danger"
+                         [pTooltip]="indisponivelTemplate" />
+                <ng-template #indisponivelTemplate>
+                    <div class="w-25rem">
+                        <p>
+                            <span>Evento: </span>
+                            <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                            <span> - {{ item.disponivelEvent.data | date : "dd/MM/yyyy HH:mm" }}</span>
+                        </p>
+                        <p>{{ item.disponivelEvent.descricao }}</p>
+                        <p *ngIf="item.disponivelEvent.professor">
+                            <span class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                  [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                            <span>{{ item.disponivelEvent.professor }}</span>
+                        </p>
+                        <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao ">
+                            {{ item.disponivelEvent.turma }}
+                        </p>
+                        <p *ngIf="item.disponivelEvent.sala_Id">
+                            <span>Sala: </span>
+                            <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
+                                           [andar]="item.disponivelEvent.andar"
+                                           [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                        </p>
+                    </div>
+                </ng-template>
+            </ng-template>
+        </p-select>
+        <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+            <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']"> Esse campo é obrigatório. </p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']"> Sala indisponível. </p>
+        </div>
     </div>
-  </div>
-  <!-- Observações -->
-  <div class="field col-12">
-    <label for="observacao">Observações:</label>
-    <textarea
-      pTextarea
-      class="w-full"
-      name="observacao"
-      id="observacao"
-      [(ngModel)]="evento.observacao"
-      [readonly]="evento.finalizado"
-      [rows]="3"
-    ></textarea>
-  </div>
-  <!-- Alunos -->
-  <div class="col-12 flex flex-wrap py-2">
-    <ng-container *ngFor="let item of evento.alunos; let i = index">
-      <app-aluno-popover
-        #popoverAluno
-        [aluno_Id]="item.aluno_Id"
-        [evento]="evento"
-        [showChecklist]="true"
-      ></app-aluno-popover>
-      <!-- Card -->
-      <div
-        class="col bg-white border-round-lg shadow-2 p-0 mr-3 mb-3"
-        style="min-width: 18rem"
-      >
-        <header class="flex align-items-center p-3 surface-50">
-          <div
-            class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis"
-          >
-            <div class="flex flex-column align-items-start overflow-hidden">
-              <span class="p-button-link capitalize text-lg font-bold">
-                {{ item.aluno }}
-              </span>
+    <!-- Observações -->
+    <div class="field col-12">
+        <label for="observacao">Observações:</label>
+        <textarea pTextarea
+                  class="w-full"
+                  name="observacao"
+                  id="observacao"
+                  [(ngModel)]="evento.observacao"
+                  [readonly]="evento.finalizado"
+                  [rows]="3"></textarea>
+    </div>
+    <!-- Alunos -->
+    <div class="col-12 flex flex-wrap py-2">
+        <ng-container *ngFor="let aluno of evento.alunos; let i = index">
+            <app-aluno-popover #popoverAluno
+                               [aluno_Id]="aluno.aluno_Id"
+                               [evento]="evento"
+                               [showChecklist]="true"></app-aluno-popover>
+            <!-- Card -->
+            <div class="col bg-white border-round-lg shadow-2 p-0 mr-3 mb-3"
+                 style="min-width: 18rem">
+                <header class="flex align-items-center p-3 surface-50">
+                    <div
+                         class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
+                        <div class="flex flex-column align-items-start overflow-hidden">
+                            <span class="p-button-link capitalize text-lg font-bold">
+                                {{ aluno.aluno }}
+                            </span>
+                        </div>
+                    </div>
+                    <p-button [severity]="aluno.presente ? 'success' : 'danger'"
+                              [label]="aluno.presente ? 'Presente' : 'Faltou'"
+                              [icon]="aluno.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'"
+                              size="small"
+                              class="my-auto"
+                              [disabled]="evento.finalizado"
+                              (onClick)="presenteClick(aluno)"></p-button>
+                </header>
+                <div class="px-3 pt-3 pb-3" *ngIf="!aluno.presente">
+                    <div class="flex align-items-center justify-content-center p-3 surface-50 border-round">
+                        <i class="pi pi-info-circle text-blue-500 text-xl mr-3"></i>
+                        <span class="text-600 font-medium"> Aluno ausente - não é necessário preencher informações adicionais. </span>
+                    </div>
+                </div>
+                <div class="formgrid grid px-3 pt-3" *ngIf="aluno.presente">
+                    <!-- Perfil Cognitivo -->
+                    <div class="field col">
+                        <label for="perfilCognitivo[{{ i }}]">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa-solid fa-brain" />
+                            <p-select
+                                      [options]="perfisFiltered"
+                                      [(ngModel)]="aluno.perfilCognitivo_Id"
+                                      #perfilCognitivo_Id="ngModel"
+                                      inputId="perfilCognitivo[{{ i }}]"
+                                      name="perfilCognitivo[{{ i }}]"
+                                      (onFocus)="perfilFocus(aluno)"
+                                      optionLabel="nome"
+                                      optionValue="id"
+                                      placeholder="Selecione"
+                                      [disabled]="evento.finalizado"
+                                      [required]="true"
+                                      [showClear]="true"
+                                      appendTo="body"
+                                      fluid />
+                        </p-iconfield>
+                    </div>
+                    <!-- Turma -->
+                    <div class="field col">
+                        <label for="turma[{{ i }}]">Turma: <span class="text-red-500">*</span></label>
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+                            <p-select [options]="turmasFiltered"
+                                        #turma_Id="ngModel"
+                                      [(ngModel)]="aluno.turma_Id"
+                                      (onFocus)="turmaFocus(aluno)"
+                                      (onChange)="turmaChanged(aluno, turma_Id, $event)"
+                                      inputId="turma[{{ i }}]"
+                                      name="turma[{{ i }}]"
+                                      optionLabel="nome"
+                                      optionValue="id"
+                                      placeholder="Selecione"
+                                      [filter]="true"
+                                      filterBy="nome,professor,perfilCognitivoString,diasDeAulaString,salaDeAulaString,vagas"
+                                      [disabled]="evento.finalizado"
+                                      [required]="true"
+                                      [showClear]="true"
+                                      appendTo="body"
+                                      fluid>
+                                <ng-template #item let-option>
+                                    <div class="w-full">
+                                        <div class="flex align-items-center gap-2">
+                                            <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: option.corLegenda, borderColor: option.corLegenda }"></span>
+                                            <span>{{ option.nome }}</span>
+                                        </div>
+                                        <div class="flex align-items-center gap-2">
+                                            <ng-container *ngFor="let perfil of option.perfilCognitivo">
+                                                <p-tag [value]="perfil.nome" icon="fa-solid fa-brain"   />
+                                            </ng-container>
+                                            <p-tag *ngIf="option.vagas" [value]="option.vagas + ' vaga(s)'" 
+                                            class="ml-auto"
+                                            severity="secondary"  />
+                                            <p-tag *ngIf="!option.vagas" value="Nenhuma vaga" 
+                                            class="ml-auto"
+                                            icon="pi pi-ban text-red-500"
+                                            severity="secondary"  />
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </p-select>
+                        </p-iconfield>
+                    </div>
+                    <!-- Apostila Kit -->
+                    <div class="field col">
+                        <label for="apostilaKit[{{ i }}]">Apostila Kit: <span class="text-red-500">*</span></label>
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa-solid fa-book-open" />
+                            <p-select
+                                      [options]="kits"
+                                      [(ngModel)]="aluno.apostila_Kit_Id"
+                                      #apostila_Kit_Id="ngModel"
+                                      inputId="apostilaKit[{{ i }}]"
+                                      name="apostilaKit[{{ i }}]"
+                                      optionLabel="nome"
+                                      optionValue="id"
+                                      placeholder="Selecione"
+                                      [disabled]="evento.finalizado"
+                                      [required]="true"
+                                      [showClear]="true"
+                                      appendTo="body"
+                                      fluid />
+                        </p-iconfield>
+                    </div>
+                </div>
             </div>
-          </div>
-          <p-button
-            [severity]="item.presente ? 'success' : 'danger'"
-            [label]="item.presente ? 'Presente' : 'Faltou'"
-            [icon]="
-              item.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'
-            "
-            (onClick)="item.presente = !item.presente"
-            size="small"
-            class="my-auto"
-            [disabled]="evento.finalizado"
-          ></p-button>
-        </header>
-        <div class="px-3 pt-3 pb-3" *ngIf="!item.presente">
-          <div
-            class="flex align-items-center justify-content-center p-3 surface-50 border-round"
-          >
-            <i class="pi pi-info-circle text-blue-500 text-xl mr-3"></i>
-            <span class="text-600 font-medium">
-              Aluno ausente - não é necessário preencher informações adicionais.
-            </span>
-          </div>
-        </div>
-        <div class="formgrid grid px-3 pt-3" *ngIf="item.presente">
-          <!-- Turma -->
-          <div class="field col-6">
-            <label for="turma_{{ i }}"
-              >Turma: <span class="text-red-500">*</span></label
-            >
-            <p-iconfield>
-              <p-inputicon styleClass="fa-solid fa-users-between-lines" />
-              <p-select
-                [options]="turmas"
-                [(ngModel)]="item.turma_Id"
-                optionLabel="nome"
-                optionValue="id"
-                placeholder="Selecione"
-                inputId="turma_{{ i }}"
-                [disabled]="evento.finalizado"
-                class="w-full"
-                appendTo="body"
-                [required]="true"
-                name="turma_{{ i }}"
-              ></p-select>
-            </p-iconfield>
-          </div>
-          <!-- Perfil Cognitivo -->
-          <div class="field col-6">
-            <label for="perfilCognitivo_{{ i }}"
-              >Perfil Cognitivo: <span class="text-red-500">*</span></label
-            >
-            <p-iconfield>
-              <p-inputicon styleClass="fa-solid fa-brain" />
-              <p-select
-                [options]="perfis"
-                [(ngModel)]="item.perfilCognitivo_Id"
-                optionLabel="nome"
-                optionValue="id"
-                placeholder="Selecione"
-                inputId="perfilCognitivo_{{ i }}"
-                [disabled]="evento.finalizado"
-                class="w-full"
-                appendTo="body"
-                [required]="true"
-                name="perfilCognitivo_{{ i }}"
-              ></p-select>
-            </p-iconfield>
-          </div>
-          <!-- Apostila Kit -->
-          <div class="field col-6">
-            <label for="apostilaKit_{{ i }}"
-              >Apostila Kit: <span class="text-red-500">*</span></label
-            >
-            <p-iconfield>
-              <p-inputicon styleClass="fa-solid fa-book-open" />
-              <p-select
-                [options]="kits"
-                [(ngModel)]="item.apostila_Kit_Id"
-                optionLabel="nome"
-                optionValue="id"
-                placeholder="Selecione"
-                inputId="apostilaKit_{{ i }}"
-                [disabled]="evento.finalizado"
-                class="w-full"
-                appendTo="body"
-                [required]="true"
-                name="apostilaKit_{{ i }}"
-              ></p-select>
-            </p-iconfield>
-          </div>
-        </div>
-      </div>
-    </ng-container>
-  </div>
+        </ng-container>
+    </div>
 </div>

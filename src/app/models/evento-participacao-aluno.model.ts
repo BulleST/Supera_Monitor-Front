@@ -42,11 +42,11 @@ export class Evento_Participacao_Aluno {
     apostila_Kit?: string;
     apostila_Kit_Id?: number;
 
-    perfilCognitivo_Id: number = 0;
-    perfilCognitivo: string = '';
+    perfilCognitivo_Id?: number = 0;
+    perfilCognitivo?: string = '';
 
-    turma_Id: number = 0; // Turma do aluno
-    turma: string = ''; // Turma do aluno
+    turma_Id?: number = 0; // Turma do aluno
+    turma?: string = ''; // Turma do aluno
 
     checklist?: string;
     checklist_Id?: number;
