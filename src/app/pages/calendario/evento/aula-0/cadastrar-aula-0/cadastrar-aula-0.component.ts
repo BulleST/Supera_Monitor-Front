@@ -353,7 +353,7 @@ export class CadastrarAula0Component implements OnDestroy {
             let aluno = (e.originalEvent as any).option as Aluno;
             let salaAula = this.salaAulas.find(x => x.id == this.object.sala_Id) as SalaAula
             let nome = this.nameFirstWordPipe.transform(aluno.nome);
-          
+               
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
                 let tipo = this.getTipo(aluno.disponivelEvent);
                 let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
@@ -410,20 +410,11 @@ export class CadastrarAula0Component implements OnDestroy {
             this.loading = true
             lastValueFrom(this.alunoService.get(selectedAluno.id))
                 .then(res => {
-                    let aluno = res;
-                    
-                    let index = this.alunos.findIndex(x => x.id == aluno.id)
-                    if (index != -1) {
-                        this.alunos.splice(index, 1, aluno)
-                    }
-
-                    index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                     if (index != -1) {
-                        this.selectedAlunos.splice(index, 1, aluno)
-                    }
-
                     this.loadingAlunos = false
                     this.loading = false
+                    
+                    let aluno = res;
+
 
                     let restricoes = aluno.restricoes.filter(x => x.active === true)
                     let restricaoMobilidade = aluno.restricaoMobilidade
@@ -447,8 +438,9 @@ export class CadastrarAula0Component implements OnDestroy {
                             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                             accept: () => { },
                             reject: () => {
-                                index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                                this.selectedAlunos.splice(index, 1, aluno)
+                                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
+                                if (index != -1) this.selectedAlunos.splice(index, 1, aluno)
+
                                 model.control.setValue(this.selectedAlunos);
                                 model.control.updateValueAndValidity();
                             },
@@ -484,14 +476,15 @@ export class CadastrarAula0Component implements OnDestroy {
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any
 
         let mensagem = ``
+        let nome = this.selectedAlunos[0].nome
+        let data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')
+
         if (this.selectedAlunos.length == 1) {
-            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${this.selectedAlunos[0].nome} para o dia ${moment(
-                this.object.data,
-            ).format('DD/MM/YY [às] HH[h]mm')}?.`
+            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${nome} para o dia <span class="text-primary-500">${data}</span>?`
         } else if (this.selectedAlunos.length > 1) {
             mensagem = `Tem certeza que deseja agendar a aula 0 dos alunos ${this.selectedAlunos
                 .map(x => x.nome)
-                .join(', ')} para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`
+                .join(', ')} para o dia <span class="text-primary-500">${data}</span>?`
         }
 
         this.confirmationService.confirm({
@@ -569,11 +562,12 @@ export class CadastrarAula0Component implements OnDestroy {
         this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => (x.nome < y.nome ? -1 : 1))
         this.confirmationService.confirm({
             key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
             acceptButtonStyleClass: 'p-button-rounded',
+            acceptIcon: 'pi pi-check',
             rejectIcon: 'pi pi-times',
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
@@ -604,12 +598,11 @@ export class CadastrarAula0Component implements OnDestroy {
             this.selectedAlunos.forEach(aluno => {
                 let alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item
                 let professor = this.professores.find(x => x.id == this.object.professor_Id) as Professor
-
+                let data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')
+                let dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')
+                let account = this.accountService.accountValue?.name
                 if (alunoChecklist && !alunoChecklist.finalizado) {
-                    let mensagem = `Aula 0 agendada para o dia ${moment(this.object.data).format(
-                        'DD/MM/YY [às] HH[h]mm',
-                    )} com o educador ${professor.nome}.\n Agendamento realizado por ${this.accountService.accountValue?.name
-                        } no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
+                    let mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor.nome}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}}`
                     if (alunoChecklist && !alunoChecklist.finalizado) {
                         lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
                     }

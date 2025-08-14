@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Checklist } from '../../../../models/checklist.model';
 
 @Component({
@@ -12,20 +12,31 @@ export class ExibicaoCardsComponent implements OnChanges {
     @Input() loading: boolean = true;
     @Input() loadingChecklists: boolean = true;
 
+    // true - cards
+    // false - lista
+    @Input() modoExibicao: boolean = true;
+    @Output() modoExibicaoOnChange = new EventEmitter<boolean>();
+    @Output() toggleFilterPopover = new EventEmitter<any>();
+
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['checklists']) {
             this.checklists = changes['checklists'].currentValue;
         }
         if (changes['loadingAlunos']) {
             this.loading = changes['loadingAlunos'].currentValue;
-            console.log('exibicao-list loadingAlunos', this.loading)
         }
         if (changes['loadingChecklists']) {
             this.loadingChecklists = changes['loadingChecklists'].currentValue;
-            console.log('exibicao-list loadingChecklists', this.loadingChecklists)
         }
+                if (changes['modoExibicao']) {
+                    this.modoExibicao = changes['modoExibicao'].currentValue;
+                }
     }
-    
+
+    modoExibicaoChanged() {
+        this.modoExibicaoOnChange.emit(this.modoExibicao);
+    }
+
     trackByChecklistId(index: number, item: Checklist) {
         return item.id;
     }

@@ -36,7 +36,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
 
     // true - cards
     // false - lista
-    modoExibicao: boolean = true;
+    modoExibicao: boolean = false;
 
     constructor(
         private service: ChecklistService,
@@ -162,9 +162,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
         });
     }
 
-    modoExibicaoChanged() {
-
-    }
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);

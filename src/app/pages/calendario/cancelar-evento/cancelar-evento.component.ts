@@ -245,7 +245,7 @@ export class CancelarEventoComponent implements OnDestroy {
       header: `Cancelar ${this.tipoEventoString}`,
       message: `Tem certeza que deseja cancelar a ${this.tipoEventoString} do dia ${moment(this.evento.data).format(
         'DD/MM/YY [às] HH[h]mm',
-      )}?.`,
+      )}?`,
       rejectLabel: 'Não cancelar',
       rejectIcon: 'pi pi-times',
       rejectButtonStyleClass: 'p-button-rounded p-button-outlined',

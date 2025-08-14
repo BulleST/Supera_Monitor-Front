@@ -146,6 +146,7 @@ export class ListComponent implements OnDestroy {
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o aluno selecionado?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
             icon: 'pi pi-exclamation-triangle',
+            acceptIcon: `${deactivated ? 'pi pi-lock-open' : 'pi pi-lock'}`,
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',

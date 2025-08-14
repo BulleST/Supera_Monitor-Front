@@ -23,7 +23,7 @@
                             (mouseenter)="checklistItem.finalizado ? checklistData.show($event) : undefined"
                             (mouseleave)="checklistItem.finalizado ? checklistData.hide() : undefined">
                             <td class="pr-1">
-                                <p-popover #checklistData appendTo="body">
+                                <p-popover #checklistData appendTo="body" styleClass="w-30rem max-w-screen">
                                     <ng-container *ngIf="checklistItem.finalizado">
                                       <p>
                                           <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>

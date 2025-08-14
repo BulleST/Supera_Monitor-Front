@@ -340,7 +340,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar superação',
-            message: `Tem certeza que deseja agendar superação para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
+            message: `Tem certeza que deseja agendar superação para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?`,
             acceptLabel: `Agendar superação`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',

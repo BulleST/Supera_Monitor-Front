@@ -47,6 +47,7 @@ export class ForgotPasswordComponent {
                     rejectVisible: false,
                     acceptLabel: 'Fazer Login',
                     acceptButtonStyleClass: 'p-button-rounded',
+                    acceptIcon: 'pi pi-sign-in',
                     accept: () => {
                         this.router.navigate(['accounts', 'login']);
                     }
@@ -64,8 +65,7 @@ export class ForgotPasswordComponent {
                     rejectVisible: false,
                     acceptLabel: 'OK',
                     acceptButtonStyleClass: 'p-button-rounded',
-                    rejectIcon: "none",
-                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                    acceptIcon: 'pi pi-check'
                 })
             });
     }

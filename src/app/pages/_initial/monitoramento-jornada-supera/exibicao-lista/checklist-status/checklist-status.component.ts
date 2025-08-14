@@ -43,7 +43,7 @@ export class ChecklistStatusComponent implements OnChanges {
             && this.checklist.itensFinalizados.length != this.checklist.items.length) {
             this.icon = 'pi pi-clock';
             this.textColor = 'text-blue-500';
-            this.text = `Futuro ${this.checklist.prazo}/${this.checklist.items.length}`;
+            this.text = `Futuro ${this.checklist.itensFinalizados.length}/${this.checklist.items.length}`;
         }
         else {
             this.icon = 'pi pi-question';

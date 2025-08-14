@@ -94,7 +94,7 @@ export class AlunoService extends Service {
 
             aluno.checklistCompleto = this.checklists
                 .map(checklist => {
-                    var checklistAluno = new AlunoChecklistCompleto;
+                    let checklistAluno = new AlunoChecklistCompleto;
                     checklistAluno.id = checklist.id;
                     checklistAluno.nome = checklist.nome;
                     checklistAluno.items = [...aluno.alunoChecklist]
@@ -104,6 +104,29 @@ export class AlunoService extends Service {
                     checklistAluno.itensFinalizados = checklistAluno.items.filter((x: any) => x.finalizado)
                     checklistAluno.itensAtrasados = checklistAluno.items.filter((x: any) => !x.finalizado && moment(x.prazo).week() < moment(new Date).week());
                     checklistAluno.itensEmAndamento = checklistAluno.items.filter((x: any) => moment(x.prazo).week() == moment(new Date).week() && !x.finalizado);
+
+                    if (checklistAluno.itensFinalizados.length == checklistAluno.items.length) {
+                        checklistAluno.status = `Finalizado`;
+                    }
+                    else if (checklistAluno.itensAtrasados.length > 0
+                        && checklistAluno.itensFinalizados.length < checklistAluno.items.length) {
+                        checklistAluno.status = `Atrasado`;
+                    }
+                    else if (checklistAluno.itensEmAndamento.length > 0
+                        && checklistAluno.itensFinalizados.length < checklistAluno.items.length) {
+                        checklistAluno.status = `Em Andamento`;
+                    }
+                    else if (checklistAluno.itensEmAndamento.length == 0
+                        && checklistAluno.itensAtrasados.length == 0
+                        && checklistAluno.prazo
+                        && checklistAluno.itensFinalizados.length != checklistAluno.items.length) {
+                        checklistAluno.status = `Futuro`;
+                    }
+                    else {
+                        checklistAluno.status = `Indefinido`;
+                    }
+
+
                     return checklistAluno;
                 });
         }
@@ -165,13 +188,13 @@ export class AlunoService extends Service {
 
     getFoto(id: number): Observable<string> {
 
-        var list = this.list.value;
-        var index = list.findIndex(x => x.id == id);
+        let list = this.list.value;
+        let index = list.findIndex(x => x.id == id);
         return this.http.get<RequestResponse>(`${this.url}/alunos/image/${id}`)
             .pipe(map(
                 res => {
                     if (index != -1) {
-                        var aluno = list[index];
+                        let aluno = list[index];
                         if (aluno) {
                             aluno.aluno_Foto = res.object ?? '';
                             list.splice(index, 1, aluno);
@@ -200,7 +223,7 @@ export class AlunoService extends Service {
     }
 
     edit(model: Aluno) {
-        var request = MyMap(model, new AlunoRequest) as AlunoRequest;
+        let request = MyMap(model, new AlunoRequest) as AlunoRequest;
         request.dataNascimento = model.dataNascimento;
         request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
         request.apostila_Kit_Id = model.apostila_Kit_Id;
@@ -240,7 +263,7 @@ export class AlunoService extends Service {
                 }
             }));
     }
-    
+
     primeiraAula(request: PrimeiraAulaRequest) {
         return this.http.post<RequestResponse>(`${this.url}/alunos/primeira-aula`, request)
             .pipe(tap({

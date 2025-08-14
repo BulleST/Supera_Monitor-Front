@@ -105,6 +105,7 @@ export class AlunoChecklistCompleto {
     id: number = 0;
     nome: string = '';
     prazo: Date = new Date;
+    status: 'Atrasado' | 'Finalizado' | 'Em Andamento' | 'Futuro' | 'Indefinido' = 'Indefinido';
     itensFinalizados: Aluno_CheckList_Item[] = [];
     itensEmAndamento: Aluno_CheckList_Item[] = [];
     itensAtrasados: Aluno_CheckList_Item[] = [];

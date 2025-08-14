@@ -69,6 +69,7 @@ export class AccountService {
     }
 
     refreshToken(where: string) {
+        console.log('refreshToken', where)
         return this.http.post<AccountResponse>(`${this.url}/accounts/refresh-token`, {}, { withCredentials: true })
             .pipe(tap({
                 next: async account => {

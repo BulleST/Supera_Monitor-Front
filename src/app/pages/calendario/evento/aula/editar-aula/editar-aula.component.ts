@@ -258,7 +258,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         ) {
             this.confirmationService.confirm({
                 target: e.originalEvent.target as EventTarget,
-                message: `Tem certeza que deseja regredir a apostila desse aluno?.`,
+                message: `Tem certeza que deseja regredir a apostila desse aluno?`,
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Sim',
@@ -328,7 +328,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         if (newApostila.id != oldApostila.id && newApostila.ordem < oldApostila.ordem) {
             this.confirmationService.confirm({
                 target: e.originalEvent.target as EventTarget,
-                message: `Tem certeza que deseja regredir a apostila desse aluno?.`,
+                message: `Tem certeza que deseja regredir a apostila desse aluno?`,
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
                 acceptLabel: 'Sim',

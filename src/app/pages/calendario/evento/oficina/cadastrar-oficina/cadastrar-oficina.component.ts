@@ -246,7 +246,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar oficina',
-            message: `Tem certeza que deseja agendar oficina para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?.`,
+            message: `Tem certeza que deseja agendar oficina para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?`,
             acceptLabel: `Agendar oficina`,
             acceptIcon: 'pi pi-check',
             rejectLabel: 'Não',

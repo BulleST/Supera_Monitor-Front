@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
 
             let account = this.accountService.accountValue;
             if (!account) {
-                await lastValueFrom(this.accountService.refreshToken(''))
+                await lastValueFrom(this.accountService.refreshToken('auth guard'))
                     .then(async res => {
                         account = res;
                     })

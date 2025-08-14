@@ -563,3 +563,10 @@ p-scroller{
 td.p-datatable-frozen-column.p-datatable-frozen-column-left {
     border-right: 2px var(--p-primary-color) solid !important;
 } */
+
+
+.bg-transparent .p-datatable-header {
+    background-color: transparent;
+    border: navajowhite;
+    padding: 0 !important;
+}
