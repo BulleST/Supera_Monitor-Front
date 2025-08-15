@@ -176,6 +176,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     formatDate(evento: Evento) {
         return this.calendarioUtils.formatDate(evento.data)
     }
+
     sendConfirmation(e: any) {
         if (!this.selectedAluno) {
             this.toastrService.error('Selecione um aluno')
@@ -186,10 +187,10 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
                 message: `Tem certeza que deseja marcar primeira aula do aluno <b>${this.aluno.nome} </b> para o dia <b>${data}</b>?`,
                 header: 'Agendar primeira aula',
                 acceptIcon: 'pi pi-check',
-                acceptLabel: 'Agendar',
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectIcon: 'pi pi-times',
+                acceptLabel: 'Agendar',
                 rejectLabel: 'Cancelar',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
                     this.send(e)
@@ -270,8 +271,9 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             message: `Primeira aula agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
-            acceptLabel: `Enviar mensagem`,
             acceptIcon: 'pi pi-whatsapp',
+            rejectIcon: 'pi pi-times',
+            acceptLabel: `Enviar mensagem`,
             rejectLabel: 'Não enviar',
             acceptButtonStyleClass: 'p-button-rounded p-button-success',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',

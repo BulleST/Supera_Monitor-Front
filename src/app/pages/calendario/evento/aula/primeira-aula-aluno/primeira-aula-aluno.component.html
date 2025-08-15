@@ -1,242 +1,233 @@
 <app-confirm-dialog></app-confirm-dialog>
 <p-dialog
-  [header]="'Agendar primeira aula'"
-  [maximizable]="true"
-  [draggable]="true"
-  [modal]="true"
-  [(visible)]="visible"
-  (visibleChange)="visibleChange()"
-  [style]="{ width: '480px', maxWidth: '95vw', maxHeight: '95vh' }"
-  appendTo="body"
-  id="reposicao">
-  <ng-template #header>
-    <div class="w-full flex align-items-center">
-      <span class="p-dialog-title">
-        <i
-          class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
-        Agendar primeira aula
-      </span>
-    </div>
-  </ng-template>
-  <div class="formgrid grid">
-    <div class="field col-6">
-      <label for="turma">Turma:</label>
-      <p-iconfield>
-        <p-inputicon styleClass="fa-solid fa-users-between-lines" />
-        <input
-          type="text"
-          pInputText
-          [value]="evento.descricao"
-          class="w-full"
-          readonly />
-      </p-iconfield>
-    </div>
-    <div class="field col-6">
-      <label for="turma">Data:</label>
-      <p-iconfield>
-        <p-inputicon styleClass="fa-solid fa-calendar" />
-        <input
-          type="text"
-          pInputText
-          [value]="formatDate(evento)"
-          class="w-full"
-          readonly />
-      </p-iconfield>
-    </div>
-
-    <div class="field col-12 col-span-4 mb-0">
-      <label for="aluno">Aluno:</label>
-      <p-select
-        [options]="alunos"
-        [(ngModel)]="selectedAluno"
-        (ngModelChange)="this.restricaoCheck = false"
-        [checkmark]="true"
-        optionLabel="nome"
-        [showClear]="true"
-        placeholder="Selecione um aluno"
-        class="w-full"
-        [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
-        [filter]="true"
-        filterPlaceholder="Digite o nome do aluno..."
-        [virtualScroll]="true"
-        [virtualScrollItemSize]="25"
-        [loading]="loadingAlunos"
-        appendTo="body">
-        <ng-template
-          let-item
-          #item>
-          <div class="flex align-items-center justify-content-between w-full gap-2">
-            <div>
-              <div class="flex align-items-center">
-                <p-button
-                  type="button"
-                  icon="pi pi-whatsapp {{ !item.celular ? 'text-300' : '' }}"
-                  (onClick)="enviarMensagem(item)"
-                  (auxclick)="enviarMensagem(item)"
-                  (contextmenu)="enviarMensagem(item)"
-                  severity="success"
-                  [text]="true"
-                  [rounded]="true"
-                  [disabled]="!item.celular"
-                  pTooltip="Enviar mensagem"
-                  class="mr-2"
-                  styleClass="w-auto h-auto p-1 {{ !item.celular ? 'text-300' : '' }}">
-                </p-button>
-                <p class="font-bold mb-1">
-                  <span class="mr-2">{{ item.nome }}</span>
-                  <p-badge
-                    *ngIf="item.disponivel == false"
-                    value="Indisponível"
-                    severity="danger"
-                    [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
-                  <ng-template #disponivelEvent>
-                    <div class="w-25rem">
-                      <p>
-                        <span>Evento: </span>
-                        <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
-                        <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
-                      </p>
-                      <p>{{ item.disponivelEvent.descricao }}</p>
-                      <p *ngIf="item.disponivelEvent.professor">
-                        <span
-                          class="w-1rem h-1rem border-circle inline-flex mr-2"
-                          [style]="{
+          [header]="'Agendar primeira aula'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '480px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center">
+            <span class="p-dialog-title">
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Agendar primeira aula</span>
+            </span>
+        </div>
+    </ng-template>
+    <div class="formgrid grid">
+        <!-- Turma -->
+        <div class="field col-6">
+            <label for="turma">Turma:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+                <input type="text"
+                       pInputText
+                       id="turma"
+                       [value]="evento.descricao"
+                       readonly
+                       fluid />
+            </p-iconfield>
+        </div>
+        <!-- Data -->
+        <div class="field col-3">
+            <label for="data">Data:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="fa-solid fa-calendar" />
+                <input type="text"
+                       pInputText
+                       id="data"
+                       [value]="evento.data | date : 'dd/MM/yyyy'"
+                       readonly
+                       fluid />
+            </p-iconfield>
+        </div>
+        <!-- Horário -->
+        <div class="field col-3">
+            <label for="data">Horário:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-clock" />
+                <input type="text"
+                       pInputText
+                       id="data"
+                       [value]="evento.data | date : 'HH:mm'"
+                       readonly
+                       fluid />
+            </p-iconfield>
+        </div>
+        <!-- Aluno -->
+        <div class="field col-12 col-span-4 mb-0">
+            <label for="aluno">Aluno:</label>
+            <p-select [options]="alunos"
+                      [(ngModel)]="selectedAluno"
+                      (ngModelChange)="this.restricaoCheck = false"
+                      [checkmark]="true"
+                      optionLabel="nome"
+                      [showClear]="true"
+                      placeholder="Selecione um aluno"
+                      [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
+                      [filter]="true"
+                      filterPlaceholder="Digite o nome do aluno..."
+                      [virtualScroll]="true"
+                      [virtualScrollItemSize]="25"
+                      [loading]="loadingAlunos"
+                      appendTo="body"
+                      fluid>
+                <ng-template let-item #item>
+                    <div class="flex align-items-center justify-content-between w-full gap-2">
+                        <div>
+                            <div class="flex align-items-center">
+                                <p-button
+                                          type="button"
+                                          icon="pi pi-whatsapp {{ !item.celular ? 'text-300' : '' }}"
+                                          (onClick)="enviarMensagem(item)"
+                                          (auxclick)="enviarMensagem(item)"
+                                          (contextmenu)="enviarMensagem(item)"
+                                          severity="success"
+                                          [text]="true"
+                                          [rounded]="true"
+                                          [disabled]="!item.celular"
+                                          pTooltip="Enviar mensagem"
+                                          class="mr-2"
+                                          styleClass="w-auto h-auto p-1 {{ !item.celular ? 'text-300' : '' }}">
+                                </p-button>
+                                <p class="font-bold mb-1">
+                                    <span class="mr-2">{{ item.nome }}</span>
+                                    <p-badge
+                                             *ngIf="item.disponivel == false"
+                                             value="Indisponível"
+                                             severity="danger"
+                                             [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
+                                    <ng-template #disponivelEvent>
+                                        <div class="w-25rem">
+                                            <p>
+                                                <span>Evento: </span>
+                                                <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
+                                                <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
+                                            </p>
+                                            <p>{{ item.disponivelEvent.descricao }}</p>
+                                            <p *ngIf="item.disponivelEvent.professor">
+                                                <span
+                                                      class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                                      [style]="{
                             backgroundColor: item.disponivelEvent.corLegenda,
                             borderColor: item.disponivelEvent.corLegenda
                           }"></span>
-                        <span>{{ item.disponivelEvent.professor }}</span>
-                      </p>
-                      <p
-                        *ngIf="
+                                                <span>{{ item.disponivelEvent.professor }}</span>
+                                            </p>
+                                            <p
+                                               *ngIf="
                           item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao
                         ">
-                        {{ item.disponivelEvent.turma }}
-                      </p>
-                      <p *ngIf="item.disponivelEvent.sala_Id">
-                        <span>Sala: </span>
-                        <app-sala-aula
-                          [numeroSala]="item.disponivelEvent.numeroSala"
-                          [andar]="item.disponivelEvent.andar"
-                          [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                      </p>
+                                                {{ item.disponivelEvent.turma }}
+                                            </p>
+                                            <p *ngIf="item.disponivelEvent.sala_Id">
+                                                <span>Sala: </span>
+                                                <app-sala-aula
+                                                               [numeroSala]="item.disponivelEvent.numeroSala"
+                                                               [andar]="item.disponivelEvent.andar"
+                                                               [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
+                                            </p>
+                                        </div>
+                                    </ng-template>
+                                </p>
+                            </div>
+                            <p class="mb-1 flex align-items-center">
+                                <span
+                                      class="w-1rem h-1rem border-circle flex mr-3 ml-1"
+                                      [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                <span class="font-normal">Turma {{ item.turma }}</span>
+                            </p>
+                        </div>
+                        <p-badge [value]="item.perfilCognitivo" />
                     </div>
-                  </ng-template>
-                </p>
-              </div>
-              <p class="mb-1 flex align-items-center">
-                <span
-                  class="w-1rem h-1rem border-circle flex mr-3 ml-1"
-                  [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                <span class="font-normal">Turma {{ item.turma }}</span>
-              </p>
+                </ng-template>
+            </p-select>
+            <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
+                <li> Apenas alunos com o <b>perfil cognitivo correspondente a essa aula</b> são exibidos. </li>
+                <li> Apenas alunos que <b>ainda não realizaram primeira aula</b> são exibidos. </li>
+            </ul>
+        </div>
+        <p-fieldset legend="Dados do agendamento" class="field col-12 col-span-4">
+            <div>
+                <div class="inline-flex gap-2 align-items-center">
+                    <label>Perfil(is) Cognitivo(s):</label>
+                    <ng-container *ngFor="let perfil of evento.perfilCognitivo">
+                        <p-badge [value]="perfil.nome" size="xlarge" />
+                    </ng-container>
+                    <p *ngIf="evento.perfilCognitivo.length === 0">Turma livre, não possui perfis cognitivos associados</p>
+                </div>
             </div>
-            <p-badge [value]="item.perfilCognitivo" />
-          </div>
-        </ng-template>
-      </p-select>
-
-      <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
-        <li>
-          Apenas alunos com o
-          <strong>perfil cognitivo correspondente ao evento</strong> são exibidos.
-        </li>
-        <li>
-          Apenas alunos que
-          <strong>ainda não realizaram primeira aula</strong> são exibidos.
-        </li>
-      </ul>
-    </div>
-
-    <p-fieldset
-      legend="Dados do agendamento"
-      class="field col-12 col-span-4">
-      <div>
-        <div class="inline-flex gap-2 align-items-center">
-          <label>Perfil(is) Cognitivo(s):</label>
-          <p-chip
-            *ngFor="let perfil of evento.perfilCognitivo"
-            [label]="perfil.nome"
-            class="px-2 py-1 rounded-full text-primary bg-primary text-sm" />
-
-          <p *ngIf="evento.perfilCognitivo.length === 0">Turma livre, não possui perfis cognitivos associados</p>
-        </div>
-      </div>
-
-      <div>
-        <div class="inline-flex gap-2">
-          <label>Sala:</label>
-          <app-sala-aula
-            class="text-primary font-bold"
-            [andar]="evento.andar"
-            [numeroSala]="evento.numeroSala" />
-        </div>
-      </div>
-
-      <ng-container *ngIf="selectedAluno">
-        <ng-container *ngIf="!selectedAluno.restricaoMobilidade; else mobilidade">
-          <div class="flex gap-2 align-items-center mt-1">
-            <i class="pi pi-check-circle text-primary"></i>
-            <p>Aluno não possui restrição de mobilidade.</p>
-          </div>
-        </ng-container>
-
-        <ng-template #mobilidade>
-          <div class="flex gap-2 align-items-center mt-1 text-primary">
-            <i class="fa fa-wheelchair"></i>
-            <p class="font-bold text-base">Aluno possui restrição de mobilidade.</p>
-          </div>
-        </ng-template>
-
-        <ng-container *ngIf="selectedAluno.restricoes.length === 0; else restricoes">
-          <div class="flex gap-2 align-items-center mt-1">
-            <i class="pi pi-check-circle text-primary"></i>
-            <p>Aluno não possui outras restrições registradas.</p>
-          </div>
-        </ng-container>
-
-        <ng-template #restricoes>
-          <div class="flex flex-column gap-1 mt-1">
-            <p *ngFor="let restricao of selectedAluno.restricoes">
-              <i class="pi pi-ban pr-2"></i>
-              <span>{{ restricao.descricao }}</span>
-            </p>
-          </div>
-        </ng-template>
-      </ng-container>
-    </p-fieldset>
-
-    <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
-      <div
-        *ngIf="selectedAluno?.restricaoMobilidade || (selectedAluno && selectedAluno.restricoes.length > 0)"
-        class="flex align-items-center">
-        <p-checkbox
-          inputId="restricaoCheck"
-          [(ngModel)]="restricaoCheck"
-          [disabled]="!selectedAluno"
-          binary="true" />
-        <label
-          for="restricaoCheck"
-          class="ml-2 mt-1 leading-none">
-          Estou ciente das restrições do aluno e quero continuar.
-        </label>
-      </div>
-      <div class="ml-auto">
-        <p-button
-          (onClick)="sendConfirmation($event)"
-          class="w-full"
-          styleClass="w-full px-3"
-          label="Agendar"
-          [icon]="'pi pi-check'"
-          [loading]="loading"
-          [pTooltip]="!restricaoCheck ? 'Verifique os dados e marque a caixa' : ''"
-          tooltipPosition="top"
-          [disabled]="
+            <div>
+                <div class="inline-flex gap-2">
+                    <label>Sala:</label>
+                    <app-sala-aula
+                                   class="text-primary font-bold"
+                                   [andar]="evento.andar"
+                                   [numeroSala]="evento.numeroSala" />
+                </div>
+            </div>
+            <ng-container *ngIf="selectedAluno">
+                <ng-container *ngIf="!selectedAluno.restricaoMobilidade; else mobilidade">
+                    <div class="flex gap-2 align-items-center mt-1">
+                        <i class="pi pi-check-circle text-primary"></i>
+                        <p>Aluno não possui restrição de mobilidade.</p>
+                    </div>
+                </ng-container>
+                <ng-template #mobilidade>
+                    <div class="flex gap-2 align-items-center mt-1 text-primary">
+                        <i class="fa fa-wheelchair"></i>
+                        <p class="font-bold text-base">Aluno possui restrição de mobilidade.</p>
+                    </div>
+                </ng-template>
+                <ng-container *ngIf="selectedAluno.restricoes.length === 0; else restricoes">
+                    <div class="flex gap-2 align-items-center mt-1">
+                        <i class="pi pi-check-circle text-primary"></i>
+                        <p>Aluno não possui outras restrições registradas.</p>
+                    </div>
+                </ng-container>
+                <ng-template #restricoes>
+                    <div class="flex flex-column gap-1 mt-1">
+                        <p *ngFor="let restricao of selectedAluno.restricoes">
+                            <i class="pi pi-ban pr-2"></i>
+                            <span>{{ restricao.descricao }}</span>
+                        </p>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </p-fieldset>
+        <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
+            <div
+                 *ngIf="selectedAluno?.restricaoMobilidade || (selectedAluno && selectedAluno.restricoes.length > 0)"
+                 class="flex align-items-center">
+                <p-checkbox
+                            inputId="restricaoCheck"
+                            [(ngModel)]="restricaoCheck"
+                            [disabled]="!selectedAluno"
+                            binary="true" />
+                <label
+                       for="restricaoCheck"
+                       class="ml-2 mt-1 leading-none"> Estou ciente das restrições do aluno e quero continuar. </label>
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          (onClick)="sendConfirmation($event)"
+                          styleClass="w-full px-
+                          fluid3"
+                          label="Agendar"
+                          [icon]="'pi pi-check'"
+                          [loading]="loading"
+                          [pTooltip]="!restricaoCheck ? 'Verifique os dados e marque a caixa' : ''"
+                          tooltipPosition="top"
+                          [disabled]="
             !selectedAluno ||
             (selectedAluno.restricaoMobilidade && !restricaoCheck) ||
             (selectedAluno && selectedAluno.restricoes.length > 0 && !restricaoCheck)
           "
-          [rounded]="true" />
-      </div>
+                          [rounded]="true" />
+            </div>
+        </div>
     </div>
-  </div>
 </p-dialog>

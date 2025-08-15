@@ -251,8 +251,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         let alunosTarget = this.alunosTarget.map(x => x.id);
         let alunosList = this.alunoService.list.value.filter(x => x.active && x.turma_Id);
         this.alunosSource = alunosList.filter(x =>
-                                    (perfis.includes(x.perfilCognitivo_Id) || !x.perfilCognitivo_Id)
-                                    && !alunosTarget.includes(x.id));
+            (perfis.includes(x.perfilCognitivo_Id) || !x.perfilCognitivo_Id)
+            && !alunosTarget.includes(x.id));
 
 
 
@@ -412,8 +412,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
 
@@ -479,8 +481,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 message: `Tem certeza?`,
                 header: 'Remover aluno',
                 acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não',
+                acceptIcon: `pi pi-check`,
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
 
@@ -572,7 +576,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             intervaloAte: moment(this.data).add(1, 'month').toDate(),
         }
         this.loadingEventosReposicaoAluno = true;
-        
+
         lastValueFrom(this.service.getList(request))
             .then(res => {
 
@@ -604,19 +608,19 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                     return condicao;
                 });
 
-            aluno.aulasParaRepor = aluno.aulasParaRepor
-                .map(evento => {
-                    evento.feriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'));
-                    return evento;
-                });
+                aluno.aulasParaRepor = aluno.aulasParaRepor
+                    .map(evento => {
+                        evento.feriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'));
+                        return evento;
+                    });
 
-                    console.log('aluno.aulasParaRepor',  aluno.aulasParaRepor)
-
-
-            this.loadingEventosReposicaoAluno = false;
+                console.log('aluno.aulasParaRepor', aluno.aulasParaRepor)
 
 
-        })
+                this.loadingEventosReposicaoAluno = false;
+
+
+            })
 
     }
 
@@ -651,6 +655,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 header: 'Selecionar aula a repor',
                 acceptLabel: 'Continuar',
                 rejectLabel: 'Cancelar',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
                 acceptButtonStyleClass: ' p-button-rounded',
                 rejectButtonStyleClass: ' p-button-rounded p-button-outlined',
                 accept: async () => this.selecionarAulaReposicao(e),
@@ -662,18 +668,18 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
             if (evento.id == PseudoEvento.EventoId) {
                 lastValueFrom(this.requestAulaTurma(evento))
-                .then(res => {
-                    if (!res.success) {
+                    .then(res => {
+                        if (!res.success) {
+                            return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
+                        }
+                        else {
+                            evento.id = res.object.id;
+                            this.selecionarAulaReposicaoContinue(aluno, evento, e)
+                        }
+                    })
+                    .catch(res => {
                         return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
-                    }
-                    else {
-                        evento.id = res.object.id;
-                        this.selecionarAulaReposicaoContinue(aluno, evento, e)
-                    }
-                })
-                .catch(res => {
-                    return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
-                })
+                    })
             } else {
                 this.selecionarAulaReposicaoContinue(aluno, evento, e)
             }
@@ -748,10 +754,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             header: 'Agendar aula',
             message: `Tem certeza que deseja agendar essa aula para o dia <b class="text-primary-500">${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}</b>?`,
             acceptLabel: `Agendar aula`,
-            acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
             rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -791,8 +797,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded',
             acceptIcon: 'pi pi-check',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectVisible: false,
             accept: () => {
                 this.visible = false

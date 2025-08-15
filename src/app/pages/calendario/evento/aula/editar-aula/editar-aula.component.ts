@@ -105,7 +105,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         if (changes['loadingProfessores'])
             this.loadingProfessores = changes['loadingProfessores'].currentValue
 
-        if (changes['salaAulas']) 
+        if (changes['salaAulas'])
             this.salaAulas = changes['salaAulas'].currentValue
 
         if (changes['loadingSalaAulas'])
@@ -136,7 +136,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Educador indisponível' })
             let horario = moment(item.disponivelEvent.data).format('HH[h]mm');
-            this.showError('Educador Indisponível', `Esse educador está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${horario}</b>.`, e.originalEvent );
+            this.showError('Educador Indisponível', `Esse educador está atribuído a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${horario}</b>.`, e.originalEvent);
             return;
         } else {
             model.control.setErrors({ indisponivel: null })
@@ -261,10 +261,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `Tem certeza que deseja regredir a apostila desse aluno?`,
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
-                acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectIcon: 'pi pi-times',
+                acceptLabel: 'Sim',
                 rejectLabel: 'Não',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
@@ -301,9 +301,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 target: e.target,
                 message: `O aluno está regredindo a página da apostila "${current.apostila_Abaco}"?`,
                 header: 'Regredir página?',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não, foi um engano',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
                     item.numeroPaginaAbaco = prev.numeroPaginaAbaco
@@ -331,10 +333,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `Tem certeza que deseja regredir a apostila desse aluno?`,
                 header: 'Regredir apostila?',
                 acceptIcon: 'pi pi-check',
-                acceptLabel: 'Sim',
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectIcon: 'pi pi-times',
+                acceptLabel: 'Sim',
                 rejectLabel: 'Não',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
@@ -370,8 +372,10 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_AH}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                acceptButtonStyleClass: 'p-button-rounded',
                 rejectLabel: 'Não, foi um engano',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
                     item.numeroPaginaAH = prev.numeroPaginaAH

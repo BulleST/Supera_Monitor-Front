@@ -302,6 +302,7 @@
                 <p class="text-orange-500 font-bold">Alunos</p>
             </div>
             <hr class="mb-2 border-orange-500 border-1" />
+            <!-- CARDS -->
             <ng-container *ngIf="[ScreenWidth.sm].includes(screen)">
                 <div class="flex align-items-stretch flex-wrap py-2">
                     <ng-container *ngFor="let item of evento.alunos; let i = index">
@@ -476,6 +477,7 @@
                     </ng-container>
                 </div>
             </ng-container>
+            <!-- TABLE -->
             <ng-container *ngIf="[ScreenWidth.xl, ScreenWidth.lg, ScreenWidth.md].includes(screen)">
                 <p-table #table
                          [value]="evento.alunos"
@@ -551,14 +553,13 @@
                                                       (focus)="apostilaAbacoClick(item)"
                                                       [(ngModel)]="item.apostilaAbacoObject"
                                                       #apostila_Abaco="ngModel"
-                                                      styleClass="w-10rem"
+                                                      styleClass="min-w-10rem"
                                                       name="apostila_Abaco[{{ rowIndex }}]"
                                                       inputId="apostila_Abaco[{{ rowIndex }}]"
                                                       optionLabel="nome"
                                                       [required]="true"
                                                       filterBy="nome"
                                                       appendTo="body"
-                                                      autofocus
                                                       [placeholder]="!apostila_Abaco.touched ? item.apostila_Abaco : 'Selecione'"
                                                       [readonly]=" evento.finalizado"
                                                       [dropdownIcon]=" evento.finalizado ? ' ' : 'pi pi-angle-down'">
@@ -578,7 +579,7 @@
                                                        [min]="0"
                                                        [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
                                                        [step]="1"
-                                                       inputStyleClass="w-4rem text-center"
+                                                       inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true" />
                                     </div>
@@ -593,7 +594,7 @@
                                                       (focus)="apostilaAHClick(item)"
                                                       [(ngModel)]="item.apostilaAHObject"
                                                       #apostila_AH="ngModel"
-                                                      styleClass="w-10rem"
+                                                      styleClass="min-w-10rem"
                                                       name="apostila_AH[{{ rowIndex }}]"
                                                       inputId="apostila_AH[{{ rowIndex }}]"
                                                       optionLabel="nome"
@@ -619,7 +620,7 @@
                                                        [min]="0"
                                                        [max]="item.apostilaAHObject?.numeroTotalPaginas"
                                                        [step]="1"
-                                                       inputStyleClass="w-4rem text-center"
+                                                       inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true" />
                                     </div>

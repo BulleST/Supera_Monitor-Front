@@ -15,6 +15,18 @@
     margin-top: 0px !important;
 }
 
+::ng-deep .fc-header-toolbar.fc-toolbar.fc-toolbar-ltr {
+    display: none;
+}
+
+::ng-deep .fc .fc-scrollgrid {
+    border-top-color: var(--p-surface-100);
+}
+/* 
+::ng-deep .fc .fc-scrollgrid-section-header.fc-scrollgrid-section-sticky > * {
+    top: 150px;
+} */
+
 @media (max-width: 500px) {
     .myycalendar {
         width: calc(100vw + 410px);

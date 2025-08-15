@@ -277,7 +277,13 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         let windowHeight = window.outerHeight
         let calculation = windowHeight - (header?.offsetHeight ?? 0) - (toolbar?.offsetHeight ?? 0) - (div?.offsetHeight ?? 0) - (legenda?.offsetHeight ?? 0);
        
-        this.calendarioOptions.height = calculation + 'px';
+        console.log('windowHeight', windowHeight)
+            console.log('calculation', calculation)
+
+
+
+        this.calendarioOptions.height = '100%';
+        // this.calendarioOptions.height = calculation + 'px';
     }
 
     setCalendario() {  

@@ -4,7 +4,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 1100%;
+    width: 100vw;
     background-color: var(--p-primary-500);
     border: none;
     border-radius: 0;

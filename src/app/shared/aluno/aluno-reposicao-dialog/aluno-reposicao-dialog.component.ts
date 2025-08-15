@@ -86,7 +86,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             }
             else {
                 let alunos = alunoService.list.subscribe(res => {
-                    this.alunos = res.filter(x =>  x.active == true);
+                    this.alunos = res;
                     this.setAlunos();
                 });
                 this.subscription.push(alunos)
@@ -154,6 +154,9 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
     setAlunos() {
         if (this.alunos.length) {
+            this.alunos = this.alunos.filter(x => {
+                x.active == true && !!x.turma_Id
+            })
             if (this.eventoReposicaoPara) {
 
                 // Em caso de rota por selected-evento.component > opções > agendar reposicao
@@ -329,10 +332,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             message: 'O aluno possui restrição de mobilidade. Deseja continuar?',
             header: 'Restrição de mobilidade',
             acceptIcon: 'pi pi-check',
-            acceptLabel: 'Continuar',
-            acceptButtonStyleClass: 'p-button-rounded',
             rejectIcon: 'pi pi-times',
+            acceptLabel: 'Continuar',
             rejectLabel: 'Cancelar',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             reject: () => {
                 model.control.setValue(null);
@@ -400,10 +403,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             message: `Tem certeza que deseja marcar reposição do aluno <b>${aluno.nome} </b> do dia <b>${moment(source.data).format('DD/MM/YY [às] HH[h]mm')}</b> para o dia <b class="text-primary-500">${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}</b> na turma <b>${target.descricao}</b> com o professor <b>${target.professor}</b>?`,
             header: 'Agendar reposição',
             acceptIcon: 'pi pi-check',
-            acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded',
             rejectIcon: 'pi pi-times',
+            acceptLabel: 'Agendar',
             rejectLabel: 'Cancelar',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e, aluno, source, target);
@@ -481,8 +484,9 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,
-            acceptIcon: 'pi pi-whatsapp',
             rejectLabel: 'Não enviar',
+            acceptIcon: 'pi pi-whatsapp',
+            rejectIcon: 'pi pi-times',
             acceptButtonStyleClass: 'p-button-rounded p-button-success',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
