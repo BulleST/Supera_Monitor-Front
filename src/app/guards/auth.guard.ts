@@ -39,11 +39,9 @@ export class AuthGuard implements CanActivate {
                 const jwtToken = JSON.parse(atob(account.jwtToken.split('.')[1]));
                 const expires = new Date(jwtToken.exp * 1000);
                 if (moment(expires).isBefore(new Date)) {
-                    console.log('auth guard expires', false)
                     resolve(false);
                     this.router.navigate(['accounts', 'login'], { queryParams: { returnUrl: state.url } });
                 }
-                console.log('auth guard', true)
                 resolve(true);
             }
 

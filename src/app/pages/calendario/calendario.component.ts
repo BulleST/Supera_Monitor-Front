@@ -1,19 +1,16 @@
 import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../models/evento.model';
-import { CalendarOptions, DatesSetArg, EventApi, EventHoveringArg } from '@fullcalendar/core';
+import { CalendarOptions, DatesSetArg } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { ConfirmationService } from 'primeng/api';
 import { CalendarioRequest, CalendarioView } from '../../models/calendario.model';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
 import { lastValueFrom, Observable, Subscription } from 'rxjs';
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
-import { Roteiro } from '../../models/roteiro.model';
 import { getError, Header, showError } from '../../utils';
 import { AlunoService } from '../../services/alunos.service';
 import { AccountService } from '../../services/account.service';
-import { RoteiroService } from '../../services/roteiro.service';
 import { ToastrService } from 'ngx-toastr';
-import { AccountResponse } from '../../models/account.model';
 import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
@@ -33,7 +30,6 @@ import $ from 'jquery';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
-import { NgModel } from '@angular/forms';
 
 @Component({
     selector: 'app-calendario',
@@ -50,9 +46,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     selectedEvento?: Evento;
     cdkEventItensId: string[] = [];
     loading = false;
-    data = new Date;
-    minData = new Date(2025, 0, 1);
     observacaoReposicao: string = '';
+    loadedAnos: number[] = [];
 
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     @ViewChild('popoverComponent') popoverComponent!: SelectedEventoComponent;
@@ -63,13 +58,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     perfilCognitivo: PerfilCognitivo[] = [];
     loadingPerfilCognitivo = false;
 
-    currentRoteiro?: Roteiro;
-    roteiros: Roteiro[] = [];
-    loadingRoteiro = false;
-
-    loadedAnos: number[] = [];
-    dayView = false;
-    currentTitle = '';
 
     cdkDragCancel = false;
     calendarioRequest: CalendarioRequest = new CalendarioRequest;
@@ -97,15 +85,16 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             center: '',
             right: ''
         },
+        scrollTime: moment().subtract(2, 'hour').startOf('hour').format('HH:mm:ss').toString(),
         nowIndicator: true,
-        scrollTime: '09:00:00',
         scrollTimeReset: true,
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
         slotDuration: '00:30:00',
+        height: '100%',
         datesSet: this.datesSet.bind(this),
-        windowResize: this.setCalendarioHeight.bind(this),
+        windowResize: this.scrollToTime.bind(this),
     }
 
     constructor(
@@ -116,13 +105,13 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private alunoService: AlunoService,
         private alunoRestricaoService: AlunoRestricaoService,
         private accountService: AccountService,
-        private roteiroService: RoteiroService,
         private mobileService: MobileService,
         private toastrService: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
         private perfilCognitivoService: PerfilCognitivoService,
     ) {
+
         let screen = this.mobileService.get().subscribe(res => {
             this.screen = res;
             if (this.fullCalendar) {
@@ -138,8 +127,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         });
         this.subscription.push(open);
 
-        let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime()));
-        this.subscription.push(roteiros);
 
         let perfilCognitivo = this.perfilCognitivoService.list.subscribe(res => this.perfilCognitivo = res);
         this.subscription.push(perfilCognitivo);
@@ -152,7 +139,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             lastValueFrom(this.perfilCognitivoService.getList('calendario'))
                 .then(res => this.loadingPerfilCognitivo = false)
                 .catch(res => this.loadingPerfilCognitivo = false);
-
         }
 
         let calendarioReload = this.service.calendarioReload.subscribe(res => this.update('calenadrioReload'));
@@ -179,15 +165,13 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit(): void {
-        this.requestLoadRoteiros('ngAfterViewInit');
-        this.setCalendarioHeight();
+        this.scrollToTime();
     }
 
 
     // INICIO Controles do calendario
     async update(where: string) {
         this.unselectAula();
-        this.requestLoadRoteiros('update');
 
         let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
         let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
@@ -207,83 +191,17 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         } 
         await this.requestLoadCalendario('update')
         this.setCalendario();
-        this.setCalendarioHeight();
-        this.getTemaSemana();
+        this.scrollToTime();
 
     }
-
-    prev() {
-        this.fullCalendar.getApi().prev();
-        this.unselectAula();
-        this.data = this.fullCalendar.getApi().getDate();
-    }
-
-    next() {
-        this.fullCalendar.getApi().next();
-        this.unselectAula();
-        this.data = this.fullCalendar.getApi().getDate();
-    }
-
-    today() {
-        this.fullCalendar.getApi().today();
-        this.unselectAula();
-        this.data = new Date();
-    }
-
-    dataChanged(model: NgModel) {
-        if (model.dirty && model.touched) {
-            // Se for exibição diária
-            if (this.dayView) {
-                this.calendarioRequest.intervaloDe = this.data;
-                this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
-            }
-            // Se for exibição da semana
-            else {
-                if (moment(this.data).week() != moment(this.calendarioRequest.intervaloDe).week()) {
-                    this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
-                    this.calendarioRequest.intervaloAte = moment(this.calendarioRequest.intervaloDe).add(7, 'days').toDate();
-                    this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
-                }
-            }
-
-            model.control.markAsUntouched();
-            model.control.markAsPristine();
-        }
-    }
-
-    roteiroChanged() {
-        if (this.currentRoteiro) {
-            if (moment(this.currentRoteiro.dataInicio).week() != moment(this.calendarioRequest.intervaloDe).week()) {
-                this.data = this.currentRoteiro.dataInicio;
-                this.calendarioRequest.intervaloDe = moment(this.data).day(1).toDate();
-                this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
-            }
-        }
-    }
-
-    calendarViewChanged() {
-        this.dayView = !this.dayView;
-        this.fullCalendar.getApi().changeView(this.dayView ? 'dayGridDay' : 'timeGridWeek')
-    }
-    // FIM Campos do calendario
     
-    setCalendarioHeight() {
-        let header = document.querySelector('app-header') as HTMLElement;
-        let toolbar = document.querySelector('#toolbar') as HTMLElement;
-        let div = document.querySelector('#calendar-navigator') as HTMLElement;
-        let legenda = document.querySelector('#legenda') as HTMLElement;
-        let calendar = document.querySelector('full-calendar') as HTMLElement;
 
-        let windowHeight = window.outerHeight
-        let calculation = windowHeight - (header?.offsetHeight ?? 0) - (toolbar?.offsetHeight ?? 0) - (div?.offsetHeight ?? 0) - (legenda?.offsetHeight ?? 0);
-       
-        console.log('windowHeight', windowHeight)
-            console.log('calculation', calculation)
-
-
-
-        this.calendarioOptions.height = '100%';
-        // this.calendarioOptions.height = calculation + 'px';
+    
+    scrollToTime() {
+        let scrollTime = moment().subtract(1, 'hour').startOf('hour')
+        this.fullCalendar.getApi().scrollToTime({
+            hour: scrollTime.hour()
+        })
     }
 
     setCalendario() {  
@@ -353,7 +271,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         this.calendarioOptions.events = events;
         this.loading = false;
-        this.setCalendarioHeight();
+        this.scrollToTime();
 
         // Exibe ou esconde allDaySlot
         let temFeriadoNaSemana = feriados.length > 0;
@@ -361,16 +279,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     }
 
-    async datesSet(arg: DatesSetArg) {
-
+     datesSet(arg: DatesSetArg) {
         this.loading = true;
-
-        this.currentTitle = moment(arg.start).locale('pt').format('MMMM [de] YYYY');
-        this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1);
-
         this.calendarioRequest.intervaloDe = arg.start;
         this.calendarioRequest.intervaloAte = moment(arg.end).subtract(1, 'day').toDate(); // Full calendar está terminando no domingo da semana seguinte
-
+        this.unselectAula();
+        
         this.update('datesset');
 
     }
@@ -430,8 +344,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 erroMessage = 'Essa aula atingiu o limite permitido de alunos.';
             }
 
-            console.log('target', target)
-            console.log('aluno', aluno)
             let perfil = target.perfilCognitivo.map(x => x.id);
             if (aluno.perfilCognitivo_Id && perfil.includes(aluno.perfilCognitivo_Id) == false) {
                 erroMessage = 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permitidas.';
@@ -515,7 +427,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
     @HostListener('window:resize', ['$event'])
     onResize(event: Event) {
-      this.setCalendarioHeight();
+      this.scrollToTime();
     }
 
     showError(header: string, message: string, e: any) {
@@ -612,31 +524,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         }
     }
 
-    getTemaSemana() {
-        if (this.roteiros.length) {
-            let roteiro = this.roteiros.find(x => moment(this.calendarioRequest.intervaloDe).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
-            this.currentRoteiro = roteiro;
-        } else {
-            this.currentRoteiro = undefined;
-        }
-    }
-
     getEventoTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
     
-    requestLoadRoteiros(where: string) {
-        this.loadingRoteiro = true;
-        return lastValueFrom(this.roteiroService.getList('loadRoteiros'))
-            .then(res => {
-                this.loadingRoteiro = false;
-                this.getTemaSemana()
-            })
-            .catch(res => this.loadingRoteiro = false)
-
-    }
-
     requestLoadFeriados(ano: number = 2025) {
         return lastValueFrom(this.service.getFeriados(ano))
     }

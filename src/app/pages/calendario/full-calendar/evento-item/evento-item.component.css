@@ -40,6 +40,11 @@
     gap: 0.25rem;
     margin-right: auto;
     font-size: 0.75rem;
+    line-height: 1;
+}
+
+.event-time .pi.pi-clock {
+    font-size: .575rem;
 }
 
 .event-educador {
@@ -69,12 +74,19 @@
     height: unset;
 }
 
+
 .event-descricao {
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
 }
 
+.event.event-superacao .event-descricao,
+.event.event-aula-zero .event-descricao,
+.event.event-oficina .event-descricao,
+.event.event-reuniao .event-descricao {
+    font-size: .9rem;
+}
 .event-sala {
     font-size: .875rem;
     display: flex;
@@ -82,11 +94,17 @@
     line-height: 1;
 }
 
+.event.event-superacao .event-sala,
+.event.event-aula-zero .event-sala,
+.event.event-oficina .event-sala,
+.event.event-reuniao .event-sala {
+    font-size: .8rem;
+}
 .event-footer {
     width: 100%;
     display: flex;
     flex-flow: column;
-        gap: 4px;
+    gap: 4px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -101,6 +119,18 @@
     gap: 3px;
 }
 
+.event.event-superacao .event-vagas,
+.event.event-aula-zero .event-vagas,
+.event.event-oficina .event-vagas,
+.event.event-reuniao .event-vagas {
+    font-size: .7rem;
+}
+.event.event-superacao .event-alunos,
+.event.event-aula-zero .event-alunos,
+.event.event-oficina .event-alunos,
+.event.event-reuniao .event-alunos {
+    font-size: .7rem;
+}
 .event-cancelado {
     display: flex;
     align-items: center;

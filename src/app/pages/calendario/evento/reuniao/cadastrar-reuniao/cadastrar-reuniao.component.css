@@ -1,0 +1,35 @@
+::ng-deep button[data-pc-section="moveAllToSourceButton"],
+::ng-deep button[data-pc-section="moveAllToTargetButton"] {
+    display: none;
+
+}
+
+::ng-deep .p-listbox.p-disabled {
+    background-color: var(--p-listbox-background);
+    position: relative;
+    overflow: hidden;
+}
+
+::ng-deep .p-listbox.p-disabled::after {
+    content: 'Preencha data e horário para escolher os alunos disponíveis';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000ab;
+    color: white;
+    opacity: 1;
+    z-index: 999;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 30px;
+    font-size: 1.1rem;
+}
+
+::ng-deep .p-listbox.p-disabled .p-listbox-list-container {
+    overflow: hidden;
+}

@@ -26,7 +26,7 @@ export class TurmaService extends Service {
     }
 
     mapTurma(turma: Turma) {
-        var semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
+        let semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
         
         turma.active = !turma.deactivated;
         turma.activeString = turma.active ? 'Ativo' : 'Inativo';
@@ -63,7 +63,7 @@ export class TurmaService extends Service {
             if (this.list.value.length == 0)
                 await lastValueFrom(this.getList());
 
-            var item = this.list.value.find(x => x.id == id) as Turma;
+            let item = this.list.value.find(x => x.id == id) as Turma;
             if (!item) {
                 this.toastrService.error(`Turma não encontrada.`);
                return reject('Turma não encontrada.')
@@ -74,7 +74,7 @@ export class TurmaService extends Service {
     }
 
     create(model: Turma) {
-        var request = MyMap(model, new TurmaRequest);
+        let request = MyMap(model, new TurmaRequest);
 
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
@@ -96,7 +96,7 @@ export class TurmaService extends Service {
     }
 
     edit(model: Turma) {
-        var request = MyMap(model, new TurmaRequest) as TurmaRequest;
+        let request = MyMap(model, new TurmaRequest) as TurmaRequest;
         
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);

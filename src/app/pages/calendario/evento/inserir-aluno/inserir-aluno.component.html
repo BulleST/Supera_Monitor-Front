@@ -61,11 +61,11 @@
                                         <p-badge *ngIf="item.disponivel == false"
                                                  value="Indisponível"
                                                  severity="danger"
-                                                 [pTooltip]="item.disponivelEvent ? disponivelEvent : undefined" />
-                                        <ng-template #disponivelEvent>
+                                                 [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                                        <ng-template #indisponivelTemplate>
                                             <div class="w-25rem">
                                                 <p>
-                                                    <span>Evento: </span>
+                                                    
                                                     <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                                     <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                                 </p>

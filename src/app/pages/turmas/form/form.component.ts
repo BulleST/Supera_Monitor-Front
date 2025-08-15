@@ -185,6 +185,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     validaSalaAulas() {
+        this.loadingSalaAulas = true;
         let data = moment(new Date).set({
             day: this.object.diaSemana,
             hours: this.object.horario.getHours(),
@@ -192,9 +193,11 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             seconds: 0
         }).toDate();
         this.salaAulas = validaSalaAulas(data, 120, this.salaAulas, this.eventos, this.object.id);
+        this.loadingSalaAulas = false;
     }
 
     validaProfessores() {
+        this.loadingProfessores = true;
 
         let data = moment().set({
             day: this.object.diaSemana,
@@ -211,6 +214,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
             }
             this.professorChanged(e, this.professor_Id);
         }
+        this.loadingProfessores = false;
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {

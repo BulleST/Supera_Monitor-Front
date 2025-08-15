@@ -70,7 +70,6 @@ export class AlunoChecklistDialogComponent implements OnChanges {
         this.alunoChecklistOnConfirmDialog.show(this.aluno, alunoChecklistItem);
         
         const onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
-            console.log('onCancel')
             model.control.setValue(false);
             model.control.updateValueAndValidity();
             this.alunoChecklistOnConfirmDialog.hide();
@@ -79,7 +78,6 @@ export class AlunoChecklistDialogComponent implements OnChanges {
         });
         
         const onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(async res => {
-            console.log('onFinish')
             if (this.aluno.id) {
                 try {
                     const updatedAluno = await lastValueFrom(this.alunoService.get(this.aluno.id))

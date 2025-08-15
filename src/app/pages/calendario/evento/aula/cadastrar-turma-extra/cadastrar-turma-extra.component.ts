@@ -74,13 +74,13 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     loadingTurmas = false;
 
     mensagensEnviadasAlunos: Aluno[] = [];
-    alunosTarget: Aluno[] = [];
 
-    selectedAlunoSource?: Aluno;
-    selectedAlunoTarget?: Aluno;
+    selectedSource?: Aluno;
+    selectedTarget?: Aluno;
 
-    alunosSource: Aluno[] = [];
-    loadingAlunos = false;
+    target: Aluno[] = [];
+    source: Aluno[] = [];
+    loadingList = false;
 
     loadingEventosReposicaoAluno = false;
     selectedEventoReposicao?: Evento;
@@ -166,14 +166,14 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        let alunos = this.alunoService.list.subscribe(res => this.alunosSource = res.filter(x => x.active == true && x.turma_Id));
+        let alunos = this.alunoService.list.subscribe(res => this.source = res.filter(x => x.active == true && x.turma_Id));
         this.subscription.push(alunos);
 
-        if (this.alunosSource.length == 0) {
-            this.loadingAlunos = true;
+        if (this.source.length == 0) {
+            this.loadingList = true;
             lastValueFrom(this.alunoService.getList())
-                .then(res => this.loadingAlunos = false)
-                .catch(res => this.loadingAlunos = false);
+                .then(res => this.loadingList = false)
+                .catch(res => this.loadingList = false);
         }
 
 
@@ -233,7 +233,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         //
         if (selected) {
             let perfilUnselected = e.itemValue;
-            let alunosPerfis = this.alunosTarget.filter(x => x.perfilCognitivo_Id == perfilUnselected.id)
+            let alunosPerfis = this.target.filter(x => x.perfilCognitivo_Id == perfilUnselected.id)
 
             // Se algum aluno tiver o perfil que foi removido
             if (alunosPerfis.length > 0) {
@@ -248,22 +248,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
 
         let perfis = this.perfilCognitivoSelected.map(x => x.id);
-        let alunosTarget = this.alunosTarget.map(x => x.id);
+        let alunosTarget = this.target.map(x => x.id);
         let alunosList = this.alunoService.list.value.filter(x => x.active && x.turma_Id);
-        this.alunosSource = alunosList.filter(x =>
+        this.source = alunosList.filter(x =>
             (perfis.includes(x.perfilCognitivo_Id) || !x.perfilCognitivo_Id)
             && !alunosTarget.includes(x.id));
-
-
-
-        console.log('perfis', perfis)
-        console.log('alunos', this.alunosSource)
-
-        console.log(e);
-
-
-
-
     }
 
     enviarMensagem(aluno: Aluno) {
@@ -301,9 +290,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             if (roteiro) {
                 this.object.roteiro_Id = roteiro.id ?? undefined;
             }
-            console.log('roteiros', this.roteiros)
-            console.log('data', this.data)
-            console.log('roteiro', roteiro)
         }
     }
 
@@ -363,7 +349,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     validaAlunos() {
         let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.alunosSource = validaAlunos(data, this.object.duracaoMinutos, this.alunosSource, this.eventos, undefined, undefined);
+        this.source = validaAlunos(data, this.object.duracaoMinutos, this.source, this.eventos, undefined, undefined);
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
@@ -406,7 +392,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     moveToSource(e: any) {
-        if (this.selectedAlunoTarget) {
+        if (this.selectedTarget) {
             this.confirmationService.confirm({
                 target: e.target,
                 message: `Tem certeza?`,
@@ -419,13 +405,13 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: () => {
 
-                    let objIndex = this.object.alunos.findIndex(x => x.aluno_Id == this.selectedAlunoTarget!.id);
+                    let objIndex = this.object.alunos.findIndex(x => x.aluno_Id == this.selectedTarget!.id);
                     this.object.alunos.splice(objIndex, 1);
 
-                    let index = this.alunosTarget.findIndex(x => x.id == this.selectedAlunoTarget!.id);
-                    this.alunosTarget.splice(index, 1);
+                    let index = this.target.findIndex(x => x.id == this.selectedTarget!.id);
+                    this.target.splice(index, 1);
 
-                    this.alunosSource.push(this.selectedAlunoTarget as Aluno);
+                    this.source.push(this.selectedTarget as Aluno);
 
                     this.sortList();
                     this.removeSelection();
@@ -437,10 +423,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     moveToTarget(e: any) {
-        if (!this.selectedAlunoSource) {
+        if (!this.selectedSource) {
             this.showError('Selecionar aluno', 'Selecione um aluno para mover.', e.event);
         }
-        else if (this.selectedAlunoSource.disponivel === false) {
+        else if (this.selectedSource.disponivel === false) {
             this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
         }
         else if (!this.data) {
@@ -453,13 +439,13 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             let event: any = {
                 event: e,
                 item: {
-                    data: this.selectedAlunoSource
+                    data: this.selectedSource
                 },
                 previousContainer: {
-                    data: this.alunosSource
+                    data: this.source
                 },
                 container: {
-                    data: this.alunosTarget
+                    data: this.target
                 },
                 previousIndex: 0,
                 currentIndex: 0,
@@ -474,7 +460,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         if (e.previousContainer != e.container) {
             let aluno = e.item.data;
-            this.selectedAlunoTarget = aluno;
+            this.selectedTarget = aluno;
 
             this.confirmationService.confirm({
                 target: e.event.target as any,
@@ -491,10 +477,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                     let indexObj = this.object.alunos.findIndex(x => x.aluno_Id == aluno.id);
                     this.object.alunos.splice(indexObj, 1);
 
-                    let index = this.alunosTarget.findIndex(x => x.id == aluno.id);
-                    this.alunosTarget.splice(index, 1);
+                    let index = this.target.findIndex(x => x.id == aluno.id);
+                    this.target.splice(index, 1);
 
-                    this.alunosSource.push(aluno);
+                    this.source.push(aluno);
 
                     this.sortList();
                     this.removeSelection();
@@ -512,7 +498,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             let aluno = e.item.data as Aluno;
             aluno = await lastValueFrom(this.alunoService.get(aluno.id));
 
-            this.selectedAlunoSource = aluno;
+            this.selectedSource = aluno;
 
             if (aluno.disponivel === false) {
                 this.showError('Aluno indisponível', 'Você não pode mover um aluno indisponível.', e.event);
@@ -534,7 +520,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     async restricoesConfirm(e: CdkDragDrop<Aluno[]>) {
-        let aluno = this.selectedAlunoSource as Aluno;
+        let aluno = this.selectedSource as Aluno;
         let restricoes = aluno.restricoes.filter(x => x.active);
 
         if (restricoes.length || aluno.restricaoMobilidade) {
@@ -569,7 +555,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     carregaAulasDisponiveisParaRepor() {
-        let aluno = this.selectedAlunoSource as Aluno;
+        let aluno = this.selectedSource as Aluno;
         let request: CalendarioRequest = {
             aluno_Id: aluno.id,
             intervaloDe: moment(this.data).subtract(1, 'month').toDate(),
@@ -593,18 +579,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                         && ((ehAulaFinalizada && !alunoGanhouPresenca) || !ehAulaFinalizada && aluno)
                         && !ehReagendada
                         && !alunoMarcouReposicao
-
-                    console.group(evento.descricao)
-                    console.log('evento', moment(evento.data).format('DD/MM HH:mm'))
-                    console.log('ehAula', ehAula)
-                    console.log('ehAulaFinalizada', !ehAulaFinalizada)
-                    console.log('ehReagendada', !ehReagendada)
-                    console.log('alunoEstaNaAula', alunoEstaNaAula)
-                    console.log('alunoMarcouReposicao', !alunoMarcouReposicao)
-                    console.log('alunoGanhouPresenca', !alunoGanhouPresenca)
-                    console.log('condicao', condicao)
-                    console.groupEnd()
-
                     return condicao;
                 });
 
@@ -613,9 +587,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                         evento.feriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'));
                         return evento;
                     });
-
-                console.log('aluno.aulasParaRepor', aluno.aulasParaRepor)
-
 
                 this.loadingEventosReposicaoAluno = false;
 
@@ -644,7 +615,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     async selecionarAulaReposicao(e: CdkDragDrop<Aluno[]>) {
-        let aluno = this.selectedAlunoSource as Aluno;
+        let aluno = this.selectedSource as Aluno;
         let evento = this.selectedEventoReposicao as Evento;
 
         if (!evento || !aluno) {
@@ -694,32 +665,32 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         aluno.eventoReposicaoEmAndamento = evento;
 
-        this.selectedAlunoSource = aluno;
+        this.selectedSource = aluno;
         this.selectedEventoReposicao = evento;
 
         this.object.alunos.push(alunoReposicao);
-        this.transferAlunoTarget(e);
+        this.transferToTarget(e);
     }
 
-    transferAlunoTarget(e: CdkDragDrop<Aluno[]>) {
-        let aluno = this.selectedAlunoSource as Aluno;
-        let index = this.alunosSource.findIndex(x => x.id == aluno.id);
+    transferToTarget(e: CdkDragDrop<Aluno[]>) {
+        let aluno = this.selectedSource as Aluno;
+        let index = this.source.findIndex(x => x.id == aluno.id);
 
-        this.alunosTarget.push(aluno);
-        this.alunosSource.splice(index, 1);
+        this.target.push(aluno);
+        this.source.splice(index, 1);
 
         this.sortList();
         this.removeSelection();
     }
 
     sortList() {
-        this.alunosSource = this.alunosSource.sort((x, y) => x.nome < y.nome ? -1 : 1)
-        this.alunosTarget = this.alunosTarget.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.source = this.source.sort((x, y) => x.nome < y.nome ? -1 : 1)
+        this.target = this.target.sort((x, y) => x.nome < y.nome ? -1 : 1);
     }
 
     removeSelection() {
         delete this.selectedEventoReposicao;
-        delete this.selectedAlunoSource;
+        delete this.selectedSource;
     }
 
     sendConfirmation(form: NgForm, e: any) {
@@ -736,11 +707,11 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             return this.showError('Sala indisponível', `A sala ${sala.numeroSala} está atribuída a uma ${this.getTipo(sala.disponivelEvent)} no dia ${moment(sala.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
 
-        let aluno = this.alunosTarget.find(x => x.disponivel === false && x.disponivelEvent)
+        let aluno = this.target.find(x => x.disponivel === false && x.disponivelEvent)
         if (aluno && aluno.disponivelEvent) {
             return this.showError('Aluno indisponível', `O alunos ${aluno.nome} está atribuído a uma ${this.getTipo(aluno.disponivelEvent)} no dia ${moment(aluno.disponivelEvent.data).format('DD/MM/YY [ás] HH[h]mm')}`, e)
         }
-        if (!this.alunosTarget.length) {
+        if (!this.target.length) {
             return this.showError('Selecionar aluno', `Selecione pelo menos algum aluno para continuar`, e)
         }
 
@@ -789,8 +760,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             })
 
     }
+    
     sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosTarget.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
+        this.mensagensEnviadasAlunos = this.target.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
             message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
@@ -806,8 +778,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             },
         });
     }
-
-
 
     requestAulaTurma(evento: Evento) {
         let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())

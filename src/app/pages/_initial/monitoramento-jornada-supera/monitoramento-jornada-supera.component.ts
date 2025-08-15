@@ -88,8 +88,6 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
     }
 
     async update() {
-        console.log('update')
-        
         await this.getChecklists();
         this.getChecklistAlunos();
         this.getAlunosList();

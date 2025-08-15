@@ -32,8 +32,8 @@ export class Header {
                     }
                 },
                 {
-                    label: 'Dashboard',
-                    tooltip: 'Dashboard',
+                    label: 'Monitoramento',
+                    tooltip: 'Monitoramento',
                     // iconFontawesome: faCalendar,
                     icon: 'bi bi-table',
                     routerLink: ['dashboard'],

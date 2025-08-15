@@ -3,7 +3,7 @@
 }
 
 ::ng-deep .fc .fc-timegrid-slot {
-    height: 2.5em !important;
+    height: 2em !important;
 }
 
 ::ng-deep .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
@@ -22,11 +22,13 @@
 ::ng-deep .fc .fc-scrollgrid {
     border-top-color: var(--p-surface-100);
 }
-/* 
-::ng-deep .fc .fc-scrollgrid-section-header.fc-scrollgrid-section-sticky > * {
-    top: 150px;
-} */
+::ng-deep .fc-col-header {
+    width: 100%!important;
+}
 
+::ng-deep .fc-timegrid-body, .fc .fc-timegrid-body table {
+    width: 100% !important;
+}
 @media (max-width: 500px) {
     .myycalendar {
         width: calc(100vw + 410px);

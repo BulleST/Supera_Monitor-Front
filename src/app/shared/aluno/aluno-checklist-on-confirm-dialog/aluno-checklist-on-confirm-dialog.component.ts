@@ -120,7 +120,6 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
             .catch(res => {
                 this.showError('Erro', 'Não foi possível finalizar o checklist.', e, res)
                 this.hide();
-                console.log(res)
                 this.onCancel.emit(true);
             });
     }

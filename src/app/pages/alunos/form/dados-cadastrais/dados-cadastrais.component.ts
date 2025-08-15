@@ -141,8 +141,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (changes['object']) {
             this.object = changes['object'].currentValue;
 
-            console.log('object', JSON.parse(JSON.stringify(this.object)))
-
             if (this.object.id) {
                 this.loadTurmasDisponiveis();
                 this.formataRestricoes();
@@ -299,8 +297,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChanged(model: NgModel, e: SelectChangeEvent) {
-        // console.log('Log: Aluno tentando mudar de turma - turmaChanged')
-
         if (!this.selectedTurma) {
             this.turmaChangedConfirm(e, model);
         }
@@ -390,11 +386,9 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
-                // console.log("Mudança de turma aceita")
                 this.turmaAccept();
             },
             reject: () => {
-                // console.log("Mudança de turma rejeitada")
                 this.turmaReject(model);
             },
         })

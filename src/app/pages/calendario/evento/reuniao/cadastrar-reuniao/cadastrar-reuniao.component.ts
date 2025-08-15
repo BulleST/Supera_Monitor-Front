@@ -18,6 +18,7 @@ import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, getError, showError } from '../../../../../utils';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'app-cadastrar-reuniao',
@@ -38,14 +39,14 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
-    @ViewChild('picklist') picklist!: PickList;
-    @ViewChild('_horario') _horario!: NgModel;
-    @ViewChild('form') form!: NgForm;
-    @ViewChild('formDiv') formDiv!: HTMLFormElement;
+    // @ViewChild('picklist') picklist!: PickList;
+    // @ViewChild('_horario') _horario!: NgModel;
+    // @ViewChild('form') form!: NgForm;
+    // @ViewChild('formDiv') formDiv!: HTMLFormElement;
 
-    selected: Professor[] = [];
-    professores: Professor[] = [];
-    loadingProfessores = false;
+    // target: Professor[] = [];
+    // source: Professor[] = [];
+    // loadingList = false;
 
     salaAulas: SalaAula[] = [];
     loadingSalaAulas = false;
@@ -57,6 +58,13 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     loadingFeriados = false;
     feriadoDates: Date[] = [];
     ano: number = new Date().getFullYear();
+
+    selectedSource?: Professor;
+    selectedTarget?: Professor;
+
+    target: Professor[] = [];
+    source: Professor[] = [];
+    loadingList = false;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -71,17 +79,17 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     ) {
         this.object.descricao = 'Reunião';
 
-        var professores = this.professorService.list.subscribe(res => this.selected = res);
+        let professores = this.professorService.list.subscribe(res => this.target = res);
         this.subscription.push(professores);
 
-        if (this.professores.length == 0) {
-            this.loadingProfessores = true;
+        if (this.source.length == 0) {
+            this.loadingList = true;
             lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+                .then(res => this.loadingList = false)
+                .catch(res => this.loadingList = false);
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
         if (this.salaAulas.length == 0) {
             this.loadingSalaAulas = true;
@@ -91,7 +99,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         }
 
 
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res);
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
         this.loadFeriados();
 
@@ -122,18 +130,20 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         if (this.data.getDay() == 1) {
             this.object.descricao = 'Reunião Geral';
             this.horario.setHours(12, 0, 0);
-            this._horario.control.setValue(this.horario)
+            // this._horario.control.setValue(this.horario)
         }
         if (this.data.getDay() == 2) {
             this.object.descricao = 'Reunião Monitoramento';
             this.horario.setHours(12, 0, 0);
-            this._horario.control.setValue(this.horario)
+            // this._horario.control.setValue(this.horario)
         }
         if (this.data.getDay() == 5) {
             this.object.descricao = 'Reunião Pedagógica';
             this.horario.setHours(12, 0, 0);
-            this._horario.control.setValue(this.horario)
+            // this._horario.control.setValue(this.horario)
         }
+
+         this.verificaDisponibilidade();
     }
 
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
@@ -155,7 +165,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     }
 
     async verificaDisponibilidade() {
-        var valid = true;
+        let valid = true;
 
         if (!this.data || !this.horario) {
             return valid;
@@ -163,10 +173,10 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
 
         this.loadingEventos = true;
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes())
 
-        var request: CalendarioRequest = new CalendarioRequest;
+        let request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
@@ -183,76 +193,199 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     }
 
     validaSalaAulas() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
 
     validaProfessores() {
-        var data = this.data;
+        this.loadingList = true;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
-        this.selected = validaProfessores(data, this.object.duracaoMinutos, this.selected, this.eventos, undefined, undefined);
+        this.source = validaProfessores(data, this.object.duracaoMinutos, this.source, this.eventos, undefined, undefined);
+        this.target = validaProfessores(data, this.object.duracaoMinutos, this.target, this.eventos, undefined, undefined);
+        this.loadingList = false;
     }
 
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
-        var item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+
+            let tipo = this.getTipo(item.disponivelEvent);
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+
+            this.showError('Sala Indisponível', 
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`, 
+                e.originalEvent);
             return;
         }
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
     }
 
-    onMoveToSource(e: any) {
-        this.object.professores = this.selected.map(x => x.id);
-    }
+    moveToSource(e: any) {
+        if (this.selectedTarget) {
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Tem certeza?`,
+                header: 'Remover educador',
+                acceptLabel: `Sim`,
+                rejectLabel: 'Não',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-rounded',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                accept: () => {
 
-    onMoveToTarget(e: PickListMoveAllToTargetEvent) {
-        var item = e.items[0] as Professor;
-        if (!item.disponivel) {
-            this.showError('Educador indisponível', 'Você não pode mover um educador indisponível.', { target: this.picklist.el.nativeElement });
-            var index = this.selected.findIndex(x => x.id == item.id);
-            if (index != -1) {
-                this.selected.splice(index, 1)
-                this.professores.push(item);
-            };
+                    let index = this.object.professores.findIndex(x => x == this.selectedTarget!.id);
+                    this.object.professores.splice(index, 1);
+
+                    index = this.target.findIndex(x => x.id == this.selectedTarget!.id);
+                    this.target.splice(index, 1);
+
+                    this.source.push(this.selectedTarget as Professor);
+
+                    this.sortList();
+                    this.removeSelection();
+                },
+                reject: () => this.removeSelection(),
+            });
+
         }
-        this.object.professores = this.selected.map(x => x.id);
     }
 
-    onMoveAllToSource(e: any) {
-        this.object.professores = this.selected.map(x => x.id);
-    }
-
-    onMoveAllToTarget(e: any) {
-        var items = e.items as Professor[];
-        if (items.find(x => !x.disponivel)) {
-            this.showError('Educador indisponível', 'Você não pode mover educadores indisponíveis.', { target: this.picklist.el.nativeElement });
-            this.professores = items.filter(x => !x.disponivel);
-            this.selected = items.filter(x => x.disponivel);
+    moveToTarget(e: any) {
+        if (!this.selectedSource) {
+            this.showError('Selecionar educador', 'Selecione um educador para mover.', e.event);
         }
-        this.object.professores = this.selected.map(x => x.id);
+        else if (this.selectedSource.disponivel === false) {
+            this.showError('Educador indisponível', 'Você não pode mover um educador indisponível.', e.event);
+        }
+        else if (!this.data) {
+            this.showError('Selecione uma data', 'Selecione uma data para carregar sugestões de reposição do educador.', e.event);
+        }
+        else if (!this.horario) {
+            this.showError('Selecione um horário', 'Selecione um horário para carregar sugestões de reposição do educador.', e.event);
+        }
+        else {
+            let event: any = {
+                event: e,
+                item: { data: this.selectedSource },
+                previousContainer: { data: this.source },
+                container: { data: this.target },
+                previousIndex: 0,
+                currentIndex: 0,
+            }
+
+            this.object.professores.push(this.selectedSource.id);
+            this.transferToTarget(event);
+        }
+
+
+    }
+
+    sourceDropped(e: CdkDragDrop<Professor[]>) {
+
+        if (e.previousContainer != e.container) {
+            let item = e.item.data;
+            this.selectedTarget = item;
+
+            this.confirmationService.confirm({
+                target: e.event.target as any,
+                message: `Tem certeza?`,
+                header: 'Remover professor',
+                acceptLabel: `Sim`,
+                rejectLabel: 'Não',
+                acceptIcon: `pi pi-check`,
+                rejectIcon: 'pi pi-times',
+                acceptButtonStyleClass: 'p-button-rounded',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                accept: () => {
+
+                    let index = this.object.professores.findIndex(x => x == item.id);
+                    this.object.professores.splice(index, 1);
+
+                    index = this.target.findIndex(x => x.id == item.id);
+                    this.target.splice(index, 1);
+
+                    this.source.push(item);
+
+                    this.sortList();
+                    this.removeSelection();
+
+                },
+                reject: () => this.removeSelection(),
+            });
+
+        }
+    }
+
+     targetDropped(e: CdkDragDrop<Professor[]>) {
+        if (e.previousContainer != e.container) {
+
+            let professor = e.item.data as Professor;
+            this.selectedSource = professor;
+
+            if (professor.disponivel === false) {
+                this.showError('Educador indisponível', 'Você não pode mover um educador indisponível.', e.event);
+                this.removeSelection();
+            }
+            else if (!this.data) {
+                this.showError('Selecione uma data', 'Selecione uma data para carregar sugestões de reposição do educador.', e.event);
+                this.removeSelection();
+            }
+            else if (!this.horario) {
+                this.showError('Selecione um horário', 'Selecione um horário para carregar sugestões de reposição do educador.', e.event);
+                this.removeSelection();
+            }
+            else {
+                this.object.professores.push(this.selectedSource.id);
+                this.transferToTarget(e);
+            }
+
+        }
+    }
+    
+    transferToTarget(e: CdkDragDrop<Professor[]>) {
+        let item = this.selectedSource as Professor;
+        let index = this.source.findIndex(x => x.id == item.id);
+
+        this.target.push(item);
+        this.source.splice(index, 1);
+
+        this.sortList();
+        this.removeSelection();
+    }
+
+    sortList() {
+        this.source = this.source.sort((x, y) => x.nome < y.nome ? -1 : 1)
+        this.target = this.target.sort((x, y) => x.nome < y.nome ? -1 : 1);
+    }
+
+    removeSelection() {
+        delete this.selectedSource;
+    }
+
+    temIndisponivelSelecionado() {
+        return this.target.filter(x => x.disponivel === false).length > 0;
     }
 
     sendConfirmation(form: NgForm, e: any) {
         if (form.invalid)
-            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
+            return this.showError('Erro', 'Preencha todos os dados corretamente para salvar', e)
 
-        if (this.selected.length < 2)
-            return this.showError('Não foi possível salvar', 'Selecione pelo menos 2 educadores para salvar', e);
+        if (this.target.length < 2)
+            return this.showError('Não autorizado', 'Selecione pelo menos 2 educadores para salvar', e);
 
-        if (this.selected.filter(x => !x.disponivel).length > 0)
-            return this.showError('Não foi possível salvar', 'Selecione apenas educadores disponíveis', e);
+        if (this.target.filter(x => !x.disponivel).length > 0)
+            return this.showError('Não autorizado', 'Selecione apenas educadores disponíveis', e);
 
-        // playAlert();
 
-        this.object.professores = this.selected.map(x => x.id);
+        this.object.professores = this.target.map(x => x.id);
 
         this.object.data = new Date(this.data);
         this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
@@ -263,9 +396,10 @@ export class CadastrarReuniaoComponent implements OnDestroy {
             header: 'Agendar reunião',
             message: `Tem certeza que deseja agendar reunião para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?`,
             acceptLabel: `Agendar reunião`,
+            rejectLabel: 'Cancelar',
             acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -284,7 +418,6 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 this.visibleChange();
                 this.toastrService.success('Reunião cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
-                // playSuccess();
             })
             .catch(res => {
                 this.loading = false;

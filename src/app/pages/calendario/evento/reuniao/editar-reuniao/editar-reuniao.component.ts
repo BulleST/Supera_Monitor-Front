@@ -4,12 +4,12 @@ import { SelectChangeEvent } from 'primeng/select';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import moment from 'moment';
-import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
+import { PickList } from 'primeng/picklist';
 import { Evento } from '../../../../../models/evento.model';
 import { Professor } from '../../../../../models/professor.model';
 import { Evento_Participacao_Professor } from '../../../../../models/evento-participacao-professor.model';
 import { SalaAula } from '../../../../../models/sala-aula.model';
-import { MensagemWhatsapp , CalendarioUtils, showError } from '../../../../../utils';
+import { MensagemWhatsapp, CalendarioUtils, showError } from '../../../../../utils';
 
 @Component({
     selector: 'app-editar-reuniao',
@@ -41,8 +41,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
 
     @ViewChild('picklist') picklist!: PickList;
 
-
-
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
@@ -58,14 +56,14 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
             this.setProfessores();
             if (!this.evento.finalizado) {
                 this.evento.professores
-                .filter(x => x.active)
-                .map(x => {
-                    x.presente == true;
-                    return x;
-                });
+                    .filter(x => x.active)
+                    .map(x => {
+                        x.presente == true;
+                        return x;
+                    });
             }
         };
-        if (changes['professores']){
+        if (changes['professores']) {
             this.professores = changes['professores'].currentValue;
             this.setProfessores();
         }
@@ -73,7 +71,7 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
-        
+
         this.width.emit('600px');
 
     }
@@ -83,25 +81,28 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     }
 
     setProfessores() {
-        
-        var professoresIds = this.evento.professores.map(x => x.professor_Id);
+        let professoresIds = this.evento.professores.map(x => x.professor_Id);
         this.target = this.professores.filter(x => professoresIds.includes(x.id))
         this.source = this.professores.filter(x => !professoresIds.includes(x.id))
     }
 
-        
-        showError(header: string, message: string, e: any) {
-            showError(this.confirmationService, header, message, e);
-        }
-    
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
+    }
 
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value);
         this.validaSala.emit(item);
+        
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            let tipo = this.getTipo(item.disponivelEvent);
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+
+            this.showError('Sala Indisponível', 
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
+                 e.originalEvent);
             return;
         }
         model.control.setErrors({ indisponivel: null });
@@ -111,9 +112,10 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
-        presente(item: Evento_Participacao_Professor) {
-            item.presente = !item.presente;
-        }
+
+    presente(item: Evento_Participacao_Professor) {
+        item.presente = !item.presente;
+    }
 
     enviarMensagem(professor: Evento_Participacao_Professor) {
         if (!professor.phone) {
@@ -124,7 +126,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
-
 
     inputFocus(e: any) {
         e.target.select()

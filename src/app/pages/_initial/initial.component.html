@@ -3,19 +3,23 @@
     <div style="background-image: url(../../../assets/images/account-bg-2.png);" class="home-bg bg-contain bg-no-repeat opacity-10 -mb-5 fixed bottom-0 right-0 z-0"></div>
     <div style="background-image: url(assets/images/account-bg-3.jpg); opacity: 0.06;" class="bg-cover bg-no-repeat z-0 w-screen h-screen fixed top-0 left-0 "></div> -->
     <div class="relative z-1">
-        <div class="relative z-2">
+        <!-- <div class="relative z-2">
             <app-header></app-header>
-        </div>
-        <div class="flex align-items-strech justify-content-between relative z-1 px-3"
-        style="min-height: calc(100vh - 60px)">
+        </div> -->
+        <div class="flex align-items-strech justify-content-between relative z-1 pr-3"
+        style="min-height: calc(100vh)">
             <div *ngIf="[ScreenWidth.xl, ScreenWidth.lg, ScreenWidth.md].includes(screen) "
-                [ngStyle]="{ width: navigationOpen ? '20rem' : '4rem' }"
+                [ngStyle]="{ width: navigationOpen ? '22rem' : '4rem' }"
                 [ngClass]="{
-                    'transition-linear transition-duration-100 transition-all mr-5 pt-3 ': true,
+                    'pr-3 pl-3 mr-2': navigationOpen,
+                    'mr-4 ml-3': !navigationOpen,
+                    'transition-linear transition-duration-100 transition-all pt-3': true,
                 }">
+                    <!-- 'bg-primary-500': true, -->
+                
                 <app-nav-menu></app-nav-menu>
             </div>
-            <div class="border-round-md flex-grow-1 flex-shrink-1 flex-1 overflow-x-auto mt-3"
+            <div class="border-round-md flex-grow-1 flex-shrink-1 flex-1 mt-3"
                 [ngStyle]="{ width: navigationOpen && [ScreenWidth.lg, ScreenWidth.xl, ScreenWidth.md].includes(screen) ? '55%' : '80%' }">
                 <router-outlet></router-outlet>
             </div>

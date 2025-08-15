@@ -16,7 +16,7 @@ export class SalaAulaPipe implements PipeTransform {
             return 'Sala pedagógica'
         } else {
             if (value.numeroSala !== undefined && value.numeroSala !== null && value.andar !== undefined && value.andar !== null) {
-                return `Sala ${value.numeroSala} - ${value.andar}º andar`;
+                return `${value.numeroSala} - ${value.andar}º andar`;
             } else {
                 return 'Indefinido';
             }

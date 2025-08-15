@@ -10,7 +10,6 @@ import { Turma, turmaColumns } from '../../../models/turma.model'
 import { TurmaService } from '../../../services/turma.service'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ToastrService } from 'ngx-toastr'
-import { playAlert, playSuccess } from '../../../utils/audio'
 import { ContextMenu } from 'primeng/contextmenu'
 
 @Component({
@@ -46,15 +45,14 @@ export class ListComponent implements OnDestroy {
         private toastrService: ToastrService,
     ) {
         this.tableColumns = turmaColumns
-        this.tableGlobalFilterFields = this.tableColumns.map((x) => x.field)
+        this.tableGlobalFilterFields = this.tableColumns.map(x => x.field)
 
-        this.update()
-
-        var screen = this.mobileService.get().subscribe((res) => (this.screen = res))
+        let screen = this.mobileService.get().subscribe(res => (this.screen = res))
         this.subscription.push(screen)
 
-        var list = this.service.list.subscribe((res) => this.list = res);
+        let list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list)
+        this.update()
     }
 
     ngOnDestroy(): void {
@@ -65,8 +63,8 @@ export class ListComponent implements OnDestroy {
         this.list = []
         this.tableLoading = true
         lastValueFrom(this.service.getList())
-            .then((res) => (this.tableLoading = false))
-            .catch((res) => (this.tableLoading = false))
+            .then(res => (this.tableLoading = false))
+            .catch(res => (this.tableLoading = false))
     }
 
 
@@ -87,7 +85,7 @@ export class ListComponent implements OnDestroy {
     }
 
     deactivated(e: any, item: any) {
-        var deactivated = !item.active
+        let deactivated = !item.active
 
         // playAlert();
 
@@ -108,7 +106,7 @@ export class ListComponent implements OnDestroy {
 
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
-                    .then((res) => {
+                    .then(res => {
                         if (res.success) {
                             this.toastrService.success(
                                 deactivated
@@ -133,7 +131,7 @@ export class ListComponent implements OnDestroy {
     }
 
     getOption(col: ColumnTable, row: any) {
-        var item = col.options.items.find((x: any) => x.value == row[col.field])
+        let item = col.options.items.find((x: any) => x.value == row[col.field])
         return item
     }
 
@@ -170,7 +168,7 @@ export class ListComponent implements OnDestroy {
     }
 
     edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
+        let encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 

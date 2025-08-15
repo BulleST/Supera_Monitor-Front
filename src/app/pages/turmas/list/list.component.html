@@ -117,9 +117,11 @@
                 <td>{{item.nome}}</td>
                 <td>{{item.professor}}</td>
                 <td>{{item.diasDeAulaString}}</td>
-                <td>
+                <td >
+                  
+                    <!-- {{item.salaDeAulaString}} -->
                     <app-sala-aula
-                                   [sala_Id]="item.sala_Id"
+                                    [sala_Id]="item.sala_Id"
                                    [andar]="item.andar"
                                    [numeroSala]="item.numeroSala"></app-sala-aula>
                 </td>

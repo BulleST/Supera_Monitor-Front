@@ -258,18 +258,18 @@ EventoTipo = EventoTipo;
     }
 
     validaSalaAulas() {
-        let data = this.evento.data
-        this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined)
+        let data = this.evento.data;
+        this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, this.evento.id)
     }
 
     validaProfessores() {
         let data = this.evento.data
-        this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, undefined)
+        this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, this.evento.id)
     }
 
     validaAlunos() {
         let data = this.evento.data
-        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined)
+        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, this.evento.id)
     }
 
     professorChanged(professor: Professor) {

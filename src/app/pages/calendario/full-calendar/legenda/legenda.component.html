@@ -1,9 +1,9 @@
-<div class="flex" id="legenda">
+<div class="flex h-3rem mb-3" id="legenda" >
     <div class="bg-white border-round-2 shadow-2 column-gap-4 flex flex-column flex-wrap max-h-8rem p-2 px-3">
         <div *ngFor="let item of legenda"
              class="my-1 flex align-items-center cursor-pointer">
             <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
-            <span class="ml-2 hover:font-bold hover:text-primary-500 hover:underline">{{item.label}}-b</span>
+            <span class="ml-2 hover:font-bold hover:text-primary-500 hover:underline">{{item.label}}</span>
         </div>
     </div>
 </div>
