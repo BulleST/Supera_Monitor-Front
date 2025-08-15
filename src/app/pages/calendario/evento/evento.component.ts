@@ -26,7 +26,7 @@ import { PseudoEvento } from '../../../models/reposicao.model'
 import { CalendarioRequest } from '../../../models/calendario.model'
 import { RoteiroService } from '../../../services/roteiro.service'
 import { Roteiro } from '../../../models/roteiro.model'
-import { EventoAula0Request } from '../../../models/evento-aula-0.model'
+import { EventoAula0Request, FinalizarAulaZeroRequest, ParticipacaoAulaZeroModel } from '../../../models/evento-aula-0.model'
 import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model'
 import { RequestResponse } from '../../../helpers/request-response.interface'
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model'
@@ -403,6 +403,28 @@ EventoTipo = EventoTipo;
                 })
             }
 
+            if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
+                return this.finalizarAulaZero()
+                    .then((res) => {
+                        this.evento.finalizado = true
+                        this.loading = false
+                        this.visible = false
+                        this.visibleChange()
+                        this.service.calendarioReload.emit(this.evento.id)
+                        this.markChecklistAsDone()
+
+                        this.toastrService.success(
+                            `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
+                            'Sucesso',
+                        )
+                    })
+                    .catch((res) => {
+                        this.error = res.message
+                        this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
+                        this.loading = false
+                    })
+            }
+
             lastValueFrom(this.service.finalizar(request))
                 .then((res) => {
                     this.evento.finalizado = true
@@ -552,5 +574,54 @@ EventoTipo = EventoTipo;
         if (this.evento.id == PseudoEvento.EventoId)
             return this.service.createOficina(request)
         return this.service.editOficina(request)
+    }
+
+    buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {
+        const alunos: ParticipacaoAulaZeroModel[] = this.evento.alunos.map(aluno => {
+            const participacao: ParticipacaoAulaZeroModel = {
+                participacao_Id: aluno.id,
+                presente: aluno.presente || false,
+                aluno_Id: aluno.aluno_Id,
+                turma_Id: aluno.presente ? aluno.turma_Id || -1 : -1,
+                perfilCognitivo_Id: aluno.presente ? aluno.perfilCognitivo_Id || -1 : -1,
+                apostila_Kit_Id: aluno.presente ? aluno.apostila_Kit_Id || -1 : -1,
+            };
+            return participacao;
+        });
+
+        return {
+            evento_Id: this.evento.id,
+            observacao: this.evento.observacao,
+            alunos: alunos,
+        };
+    }
+
+    async finalizarAulaZero() {
+        try {
+            const request = this.buildFinalizarAulaZeroRequest();
+            await lastValueFrom(this.service.finalizarAulaZero(request));
+
+            this.evento.finalizado = true;
+            this.visible = false;
+            this.visibleChange();
+            this.service.calendarioReload.emit(this.evento.id);
+
+            this.markChecklistAsDone();
+
+            this.toastrService.success(
+                `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
+                'Sucesso'
+            );
+        } catch (error: any) {
+            this.error = error?.message || 'Erro desconhecido';
+            this.showError(
+                'Erro',
+                `Não foi possível finalizar ${this.tipoString}.`,
+                error,
+                getError(error)
+            );
+        } finally {
+            this.loading = false;
+        }
     }
 }
