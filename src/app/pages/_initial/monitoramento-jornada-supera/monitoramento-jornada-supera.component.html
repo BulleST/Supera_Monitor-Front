@@ -9,39 +9,6 @@
     <div style="background-image: url(assets/images/account-bg-2.png);"
          class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
 </div>
-<div class="w-full h-full flex flex-column">
-    <!-- <p-toolbar styleClass="border-none bg-white px-4 py-3 mb-4 relative z-3">
-        <div class="p-toolbar-group-start w-full flex align-items-center justify-content-between">
-            <h2 class="flex align-items-center">
-                <i class="pi pi-check-square mr-3 text-primary-500 text-2xl"></i>
-                <span class="text-2xl font-normal my-0 white-space-nowrap">Jornada Supera</span>
-            </h2>
-            <div class="flex align-items-center gap-2 mx-auto">
-                <label>Modo de exibição: </label>
-                <p-selectbutton [options]="[
-                                    { label: 'Cards', value: true, icon: 'bi bi-view-list' },
-                                    { label: 'Lista', value: false, icon: 'pi pi-list' },
-                                ]"
-                                [(ngModel)]="modoExibicao"
-                                name="modoExibicao"
-                                id="modoExibicao"
-                                optionLabel="label"
-                                optionValue="value"
-                                (onChange)="modoExibicaoChanged()">
-                    <ng-template #item let-item>
-                        <i [class]="item.icon"></i>
-                        <span>{{item.label}}</span>
-                    </ng-template>
-                </p-selectbutton>
-            </div>
-            <p-button label="Ver filtros"
-                      icon="pi pi-filter"
-                      severity="secondary"
-                      styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
-                      (onClick)="filtroPopover.toggle($event)"
-                      [rounded]="true" />
-        </div>
-    </p-toolbar> -->
     <div class="relative w-full overflow-hidden h-full">
         
         <app-exibicao-cards *ngIf="modoExibicao"
@@ -59,4 +26,3 @@
                             (modoExibicaoOnChange)="modoExibicao = $event"
                             (toggleFilterPopover)="filtroPopover.toggle($event)"></app-exibicao-lista>
     </div>
-</div>

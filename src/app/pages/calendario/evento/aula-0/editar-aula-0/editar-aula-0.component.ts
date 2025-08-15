@@ -77,7 +77,10 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
         // Fetch perfis data
         this.perfilCognitivoService.getList().subscribe();
-        let perfis = this.perfilCognitivoService.list.subscribe(res => this.perfis = res);
+        let perfis = this.perfilCognitivoService.list.subscribe(res => {
+            this.perfis = res;
+            this.perfisFiltered = res;
+        });
         this.subscription.push(perfis);
 
         let onSave = this.onSave.subscribe((res) => this.markChecklistAsDone());
@@ -102,6 +105,8 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
                     aluno.apostila_Kit_Id = null as any;
                     return aluno;
                 });
+            } else {
+
             }
         }
         if (changes['professores'])
@@ -116,8 +121,10 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas'])
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
 
-        if (changes['turmas']) 
+        if (changes['turmas']) {
             this.turmas = changes['turmas'].currentValue;
+            this.turmasFiltered = this.turmas;
+        }
 
         if (changes['loadingTurmas'])
             this.loadingTurmas = changes['loadingTurmas'].currentValue;
