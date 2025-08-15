@@ -77,7 +77,10 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
         // Fetch perfis data
         this.perfilCognitivoService.getList().subscribe();
-        let perfis = this.perfilCognitivoService.list.subscribe(res => this.perfis = res);
+        let perfis = this.perfilCognitivoService.list.subscribe(res => {
+            this.perfis = res
+            this.perfisFiltered = res
+        });
         this.subscription.push(perfis);
 
         let onSave = this.onSave.subscribe((res) => this.markChecklistAsDone());
@@ -116,8 +119,10 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas'])
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
 
-        if (changes['turmas']) 
+        if (changes['turmas']) {    
             this.turmas = changes['turmas'].currentValue;
+            this.turmasFiltered = this.turmas;
+        }
 
         if (changes['loadingTurmas'])
             this.loadingTurmas = changes['loadingTurmas'].currentValue;
@@ -298,55 +303,35 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     markChecklistAsDone() {
         // Comparecimento na aula 0
         this.evento.alunos
-            .filter((x) => x.presente === true && x.active === true)
-            .forEach((aluno) => {
-                let id = 33;
-                let alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-                let mensagem = '';
+            .filter((aluno) => aluno.presente === true && aluno.active === true)
+            .forEach(async (aluno) => {
+                const checklistItemId = 33; // ID for "Comparecimento na aula 0"
+                try {
+                    const checklist = await lastValueFrom(this.checklistService.getChecklistAluno(aluno.aluno_Id));
 
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    let professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
-                    let account = this.accountService.accountValue?.name
-                    let data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')
-                    let dataCadastro = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm')
-                
-                    mensagem = `Aluno compareceu na aula 0 do dia ${data} com o educador ${professor.nome}.<br> Aula 0 finalizada por ${account} no dia ${dataCadastro}`;
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem)                    );
+                    aluno.alunoChecklist = checklist;
+
+                    const alunoChecklistItem = aluno.alunoChecklist.find(item => item.checklist_Item_Id === checklistItemId) as Aluno_CheckList_Item;
+
+                    if (alunoChecklistItem && !alunoChecklistItem.finalizado) {
+                        const professor = this.professores.find(prof => prof.id === this.evento.professor_Id) as Professor;
+                        const accountName = this.accountService.accountValue?.name;
+                        const eventDate = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+                        const completionDate = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
+
+                        const mensagem = `Aluno compareceu na aula 0 do dia ${eventDate} com o educador ${professor.nome}.<br>` +
+                            `Aula 0 finalizada por ${accountName} no dia ${completionDate}.`;
+
+                        await lastValueFrom(this.checklistService.markAsDone(alunoChecklistItem.id, mensagem));
+                    }
+                } catch (error) {
+                    this.showError(
+                        'Erro ao buscar ou atualizar checklist do aluno',
+                        'Não foi possível buscar ou atualizar o checklist do aluno.',
+                        error
+                    );
                 }
             });
     }
 
-    /** 
-     * Builds the FinalizarAulaZeroRequest object for API submission
-     */
-    buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {
-        const alunos: ParticipacaoAulaZeroModel[] = this.evento.alunos.map(aluno => {
-                const participacao: ParticipacaoAulaZeroModel = {
-                    participacao_Id: aluno.id,
-                    presente: aluno.presente || false,
-                    aluno_Id: aluno.aluno_Id,
-                    turma_Id: aluno.presente ? aluno.turma_Id || -1 : -1,
-                    perfilCognitivo_Id: aluno.presente ? aluno.perfilCognitivo_Id || -1 : -1,
-                    apostila_Kit_Id: aluno.presente ? aluno.apostila_Kit_Id || -1 : -1,
-                };
-                return participacao;
-            }
-        );
-
-        const request: FinalizarAulaZeroRequest = {
-            evento_Id: this.evento.id,
-            observacao: this.evento.observacao,
-            alunos: alunos,
-        };
-
-        return request;
-    }
-
-    /**
-     * Submits the finalizar aula zero request to the API
-    */
-    finalizarAulaZero() {
-        const request = this.buildFinalizarAulaZeroRequest();
-        return this.eventoService.finalizarAulaZero(request);
-    }
 }
