@@ -243,7 +243,7 @@ a {
 }
 
 .p-fileupload-advanced {
-    background-color: transparent!important;
+    background-color: transparent !important;
 }
 
 .p-inputtext[readonly] {
@@ -438,7 +438,7 @@ input.ng-invalid.ng-touched {
     0% {
         box-shadow: 0 0 0 0 transparent;
     }
-    
+
     50% {
         box-shadow: 0 0 3px 1px #ff0000a6
     }
@@ -468,13 +468,14 @@ input.ng-invalid.ng-touched {
 /* select */
 .p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option,
 .p-select-overlay.p-select-stripped p-selectitem:nth-child(even) .p-select-option {
-    border-bottom: 1px solid var(--surface-200)!important;
+    border-bottom: 1px solid var(--surface-200) !important;
 }
+
 /* multiselect */
 .p-multiselect-overlay.p-select-stripped p-multiselect-item:nth-child(odd) .p-multiselect-option,
 /* select */
 .p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option {
-    background-color: var(--surface-50)!important;
+    background-color: var(--surface-50) !important;
 }
 
 /* multiselect */
@@ -485,7 +486,7 @@ input.ng-invalid.ng-touched {
 /* select */
 .p-select-overlay.p-select-stripped p-selectitem:nth-child(even) .p-select-option:hover,
 .p-select-overlay.p-select-stripped p-selectitem:nth-child(odd) .p-select-option:hover {
-    background-color: var(--p-primary-100)!important;
+    background-color: var(--p-primary-100) !important;
 }
 
 form .field p-selectitem:nth-child(even) .p-select-option {
@@ -547,13 +548,11 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
     justify-content: center; */
 }
 
-.p-select.p-select-menu.p-select-small .p-select-dropdown-icon i {
-}
+.p-select.p-select-menu.p-select-small .p-select-dropdown-icon i {}
 
-.p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {
-}
+.p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {}
 
-p-scroller{
+p-scroller {
     max-height: 100%;
     height: 100%;
     display: block;
@@ -563,8 +562,6 @@ p-scroller{
 td.p-datatable-frozen-column.p-datatable-frozen-column-left {
     border-right: 2px var(--p-primary-color) solid !important;
 } */
-
-
 .bg-transparent .p-datatable-header {
     background-color: transparent;
     border: navajowhite;

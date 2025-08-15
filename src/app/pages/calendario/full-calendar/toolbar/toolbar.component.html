@@ -5,141 +5,55 @@
                 <i class="bi bi-calendar text-primary text-6xl"></i>
                 <span class="absolute mt-2">{{ data |date : 'dd' }}</span>
             </div>
-            <div (click)="loadingRoteiro ? undefined : popoverSemana.toggle($event, h2)" 
-                class="border-round-md py-1 px-3 hover:bg-primary-100 cursor-pointer">
+            <div (click)="loadingRoteiro ? undefined : popoverSemana.toggle($event, h2)"
+                 class="border-round-md py-1 px-3 hover:bg-primary-100 cursor-pointer">
                 <p class="font-bold text-xl text-overflow-ellipsis">{{currentTitle}}</p>
                 <p class="flex align-items-center gap-2">
                     <span class="text-base font-light " *ngIf="!loadingRoteiro">{{currentRoteiroTitle}}</span>
-                    <p-skeleton *ngIf="loadingRoteiro" width="10rem" height="1.3rem"/>
+                    <p-skeleton *ngIf="loadingRoteiro" width="10rem" height="1.3rem" />
                     <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro?.corLegenda}"></i>
                 </p>
             </div>
         </h2>
     </div>
     <div class="p-toolbar-group-end flex align-items-center justify-content-evenly sm:justify-content-end sm:col col-12 px-0 -mx-1">
-       
         <div class="sm:col flex-grow-0 px-1 py-0 mr-4">
             <div class="flex gap-1 align-items-stretch ">
                 <ng-container *ngIf="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)">
                     <!-- Data -->
-                    <div class="flex align-items-center mr-2">
-                        <label for="data" class="mr-1">Data: </label>
-                        <p-datepicker (onSelect)="dataChanged(dataNgModel)"
-                                    #dataNgModel="ngModel"
-                                    [(ngModel)]="data"
-                                    [showIcon]="true"
-                                    [iconDisplay]="'input'"
-                                    [minDate]="minData"
-                                    inputId="data"
-                                    name="data"
-                                    class=" w-9rem"
-                                    inputStyleClass="w-full"
-                                    styleClass="w-full"
-                                    [required]="true"
-                                    [selectOtherMonths]="true"
-                                    [keepInvalid]="true"
-                                    [disabledDays]="[0]"
-                                    appendTo="body" />
-                    </div>
+                    <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                     <!-- Ver Semana -->
-                    <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
-                            [severity]="dayView ? 'primary' : 'secondary'"
-                            [styleClass]="dayView ? 'h-full mr-2' : 'surface-800 border-800 text-white h-full mr-2'"
-                            (onClick)="calendarViewChanged()" />
+                    <ng-container *ngTemplateOutlet="verSemana"></ng-container>
                     <!-- Prev -->
-                    <p-button icon="pi pi-angle-left text-lg"
-                            styleClass="w-full h-full surface-100 border-100 overflow-hidden"
-                            class="overflow-hidden"
-                            [style]="{ width : '2.4rem' }"
-                            (onClick)="prev()"
-                            severity="secondary"
-                            iconPos="right"
-                            pTooltip="Anterior"
-                            size="small" />
+                    <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
                     <!-- Hoje -->
-                    <p-button label="hoje"
-                            styleClass="h-full surface-800 border-800"
-                            (onClick)="today()"
-                            severity="help"
-                            pTooltip="Hoje"
-                            tooltipPosition="top"
-                            size="small" />
+                    <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
                     <!-- Next -->
-                    <p-button icon="pi pi-angle-right text-lg"
-                            styleClass="w-full h-full surface-100 border-100"
-                            [style]="{width: '2.4rem', overflow: 'hidden',}"
-                            (onClick)="next()"
-                            severity="secondary"
-                            pTooltip="Próximo"
-                            size="small" />
+                    <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
                 </ng-container>
                 <ng-container *ngIf="[ScreenWidth.md, ScreenWidth.sm].includes(screen)">
                     <!-- Menu -->
                     <p-button icon="pi pi-bars"
-                            iconPos="right"
-                            (onClick)="popoverActions.toggle($event)"
-                            severity="primary"
-                            pTooltip="Ações"
-                            label="Menu" />
+                              iconPos="right"
+                              (onClick)="popoverActions.toggle($event)"
+                              severity="primary"
+                              pTooltip="Ações"
+                              label="Menu" />
                     <p-popover #popoverActions styleClass="-mt-1">
                         <div class="max-w-20rem w-full min-w-15rem">
                             <div class="col-12 flex align-items-stretch justify-content-center gap-2 mb-2" style="height: 3.4rem;">
                                 <!-- Ver Semana -->
-                                <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
-                                        [severity]="dayView ? 'primary' : 'secondary'"
-                                        [styleClass]="dayView ? 'h-full ' : 'surface-800 border-800 text-white h-full mr-auto'"
-                                        class="mr-auto"
-                                        size="small"
-                                        (onClick)="calendarViewChanged()" />
+                                <ng-container *ngTemplateOutlet="verSemana"></ng-container>
                                 <!-- Prev -->
-                                <p-button icon="pi pi-angle-left text-lg"
-                                        styleClass="w-full h-full surface-100 border-100"
-                                        [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                        (onClick)="prev()"
-                                        severity="secondary"
-                                        iconPos="right"
-                                        pTooltip="Anterior"
-                                        tooltipPosition="top"
-                                        size="small" />
+                                <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
                                 <!-- Hoje -->
-                                <p-button label="hoje"
-                                        styleClass="h-full surface-800 border-800"
-                                        (onClick)="today()"
-                                        severity="help"
-                                        pTooltip="Hoje"
-                                        tooltipPosition="top"
-                                        size="small" />
+                                <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
                                 <!-- Next -->
-                                <p-button icon="pi pi-angle-right text-lg"
-                                        styleClass="w-full h-full surface-100 border-100"
-                                        [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                        (onClick)="next()"
-                                        severity="secondary"
-                                        pTooltip="Próximo"
-                                        tooltipPosition="top"
-                                        size="small" />
+                                <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
                             </div>
                             <!-- Data -->
                             <div class="col-12 surface-50 shadow-1">
-                                <div class="flex align-items-center mx-2">
-                                    <label for="data" class="mr-1">Data: </label>
-                                    <p-datepicker (onSelect)="dataChanged(dataNgModel)"
-                                                #dataNgModel="ngModel"
-                                                [(ngModel)]="data"
-                                                [showIcon]="true"
-                                                [iconDisplay]="'input'"
-                                                [minDate]="minData"
-                                                inputId="data"
-                                                name="data"
-                                                class=" w-full"
-                                                inputStyleClass="w-full"
-                                                styleClass="w-full"
-                                                [required]="true"
-                                                [selectOtherMonths]="true"
-                                                [keepInvalid]="true"
-                                                [disabledDays]="[0]"
-                                                appendTo="body" />
-                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                             </div>
                         </div>
                     </p-popover>
@@ -156,8 +70,8 @@
                       pTooltip="Atualizar calendário"
                       tooltipPosition="top" />
         </div>
+        <!-- Meu Calendário -->
         <div class="sm:col col flex-grow-0 px-1 py-0">
-            <!-- Meu Calendário -->
             <p-select [options]="viewMenu"
                       [(ngModel)]="view"
                       (onChange)="calendarViewChanged()"
@@ -204,40 +118,82 @@
         </div>
     </div>
 </p-toolbar>
-        <p-popover #popoverSemana>
-            <p class="text-500 mb-2 ml-2">Roteiros</p>
-            <div class="max-h-15rem overflow-auto">
-                <ng-container *ngFor="let item of roteiros">
-                    <div class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer"
-                         (click)="currentRoteiro = item; roteiroChanged()"
-                         title="Clique para carregar semana">
-                        <div class="flex align-items-center gap-2 w-max" pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
-                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
-                            <span>Semana {{item.semana}} - {{ item.tema }}</span>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </p-popover>
-<!-- SEMANA -->
-<!-- <div id="calendar-navigator" class="bg-white">
-    <div class="flex align-items-center justify-content-between flex-wrap py-3 px-4">
-      
-        <p-popover #popoverSemana styleClass="-mt-1 ">
-            <p class="text-500 mb-2 ml-2">Roteiros</p>
-            <div class="max-h-15rem overflow-auto w-20rem">
-                <ng-container *ngFor="let item of roteiros">
-                    <div class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer"
-                         (click)="currentRoteiro = item; roteiroChanged()"
-                         title="Clique para carregar semana">
-                        <div class="flex align-items-center gap-2 w-max" pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
-                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
-                            <span>Semana {{item.semana}} - {{ item.tema }}</span>
-                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
-                        </div>
-                    </div>
-                </ng-container>
-            </div>
-        </p-popover>
+<ng-template #verSemana>
+    <ng-container *ngIf="dayView == CalendarioDayView.Dia">
+        <p-button label="Ver semana"
+                  severity="primary"
+                  styleClass="h-full mr-2"
+                  (onClick)="calendarDayViewChanged()" />
+    </ng-container>
+    <ng-container *ngIf="dayView == CalendarioDayView.Semana">
+        <p-button label="Ver dia"
+                  severity="contrast"
+                  styleClass="h-full mr-2"
+                  (onClick)="calendarDayViewChanged()" />
+    </ng-container>
+</ng-template>
+<ng-template #prevTemplate>
+    <p-button icon="pi pi-angle-left text-lg"
+              styleClass="w-full h-full surface-100 border-100 overflow-hidden"
+              class="overflow-hidden"
+              [style]="{ width : '2.4rem' }"
+              (onClick)="prev()"
+              severity="secondary"
+              iconPos="right"
+              pTooltip="Anterior"
+              size="small" />
+</ng-template>
+<ng-template #nextTemplate>
+    <p-button icon="pi pi-angle-right text-lg"
+              styleClass="w-full h-full surface-100 border-100"
+              [style]="{width: '2.4rem', overflow: 'hidden',}"
+              (onClick)="next()"
+              severity="secondary"
+              pTooltip="Próximo"
+              size="small" />
+</ng-template>
+<ng-template #todayTemplate>
+    <p-button label="hoje"
+              styleClass="h-full surface-800 border-800"
+              (onClick)="today()"
+              severity="help"
+              pTooltip="Hoje"
+              tooltipPosition="top"
+              size="small" />
+</ng-template>
+<ng-template #dataTemplate>
+    <div class="flex align-items-center mr-2">
+        <label for="data" class="mr-1">Data: </label>
+        <p-datepicker (onSelect)="dataChanged(dataNgModel)"
+                      #dataNgModel="ngModel"
+                      [(ngModel)]="data"
+                      [showIcon]="true"
+                      [iconDisplay]="'input'"
+                      [minDate]="minData"
+                      inputId="data"
+                      name="data"
+                      class=" w-9rem"
+                      inputStyleClass="w-full"
+                      styleClass="w-full"
+                      [required]="true"
+                      [selectOtherMonths]="true"
+                      [keepInvalid]="true"
+                      [disabledDays]="[0]"
+                      appendTo="body" />
     </div>
-</div> -->
+</ng-template>
+<p-popover #popoverSemana>
+    <p class="text-500 mb-2 ml-2">Roteiros</p>
+    <div class="max-h-15rem overflow-auto">
+        <ng-container *ngFor="let item of roteiros">
+            <div class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer"
+                 (click)="currentRoteiro = item; roteiroChanged()"
+                 title="Clique para carregar semana">
+                <div class="flex align-items-center gap-2 w-max" pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
+                    <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
+                    <span>Semana {{item.semana}} - {{ item.tema }}</span>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</p-popover>

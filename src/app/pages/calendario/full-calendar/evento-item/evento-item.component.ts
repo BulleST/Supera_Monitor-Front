@@ -4,6 +4,7 @@ import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
 import moment from 'moment';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
+import { CalendarioDayView } from '../../../../models/calendario.model';
 
 @Component({
     selector: 'app-evento-item',
@@ -14,10 +15,12 @@ import { Evento_Participacao_Aluno } from '../../../../models/evento-participaca
 export class EventoItemComponent implements OnChanges {
     @Input() evento!: Evento;
     @Input() arg!: any;
+    @Input() calendarioDayView!: CalendarioDayView;
     @Output() selectEvent = new EventEmitter<any>;
     @Output() cdkDrop = new EventEmitter<any>;
     EventoTipo = EventoTipo;
     alunosStr = '';
+    CalendarioDayView = CalendarioDayView;
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
@@ -27,6 +30,9 @@ export class EventoItemComponent implements OnChanges {
         }
         if (changes['arg']) {
             this.arg = changes['arg'].currentValue;
+        }
+        if (changes['calendarioDayView']) {
+            this.calendarioDayView = changes['calendarioDayView'].currentValue;
         }
     }
 

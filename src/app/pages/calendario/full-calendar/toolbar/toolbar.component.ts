@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { CalendarioRequest, CalendarioView } from '../../../../models/calendario.model';
+import { CalendarioDayView, CalendarioRequest, CalendarioView } from '../../../../models/calendario.model';
 import { EventoService } from '../../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,11 +24,14 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     @Input() fullCalendar!: FullCalendarComponent;
     @Input() calendarioRequest!: CalendarioRequest;
     @Output() update = new EventEmitter<boolean>();
+    @Output() dayViewOnChange = new EventEmitter<CalendarioDayView>();
     
     screen: ScreenWidth = ScreenWidth.lg;
     ScreenWidth = ScreenWidth;
     subscription: Subscription[] = [];
     
+    CalendarioDayView = CalendarioDayView;
+    dayView: CalendarioDayView = CalendarioDayView.Semana;
     view: CalendarioView = CalendarioView.CalendarioGeral;
     viewMenu: MenuItem[] = [
         {
@@ -114,7 +117,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     data = new Date;
     minData = new Date(2025, 0, 1);
     loadedAnos: number[] = [];
-    dayView = false;
 
 
     constructor(
@@ -196,23 +198,27 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             }
         }
     }
+        
     prev() {
-        this.fullCalendar.getApi().prev();
-        this.data = this.fullCalendar.getApi().getDate();
+        let api = this.fullCalendar.getApi();
+        api.prev();
+        this.data = api.view.activeStart;
         this.setTitle();
         this.getTemaSemana();
     }
 
     next() {
-        this.fullCalendar.getApi().next();
-        this.data = this.fullCalendar.getApi().getDate();
+        let api = this.fullCalendar.getApi();
+        api.next();
+        this.data = this.fullCalendar.getApi().view.activeStart;
         this.setTitle();
         this.getTemaSemana();
     }
 
     today() {
-        this.fullCalendar.getApi().today();
-        this.data = new Date();
+        let api = this.fullCalendar.getApi();
+        api.today();
+        this.data = api.view.activeStart;
         this.setTitle();
         this.getTemaSemana();
     }
@@ -243,10 +249,11 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     getTemaSemana() {
-        console.log('getTemaSemana', this.roteiros)
+        console.log('getTemaSemana')
+        console.log('roteiros', this.roteiros)
+        console.log('data', this.data)
         let data = this.data;
         let roteiro = this.roteiros.find(x => moment(data).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
-        console.log('data', data)
         console.log('roteiro', roteiro)
         if (roteiro) {
             this.currentRoteiro = roteiro;
@@ -257,6 +264,16 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         }
     }
 
+    calendarDayViewChanged() {
+        if (this.dayView == CalendarioDayView.Dia) {
+            this.dayView = CalendarioDayView.Semana;
+        } else {
+            this.dayView = CalendarioDayView.Dia;
+        }
+
+        this.dayViewOnChange.emit(this.dayView);
+
+    }
     requestLoadRoteiros() {
         this.loadingRoteiro = true;
         return lastValueFrom(this.roteiroService.getList('loadRoteiros'))

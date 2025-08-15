@@ -41,173 +41,15 @@
          style="height: calc(100vh - 20px);">
         <!-- HEADER -->
         <div class="flex gap-2 flex-column z-3 surface-50">
-            <!-- TOOLBAR -->
             <app-toolbar id="toolbar"
                          [calendarioRequest]="calendarioRequest"
                          [fullCalendar]="fullCalendar"
+                         (dayViewOnChange)="calendarDayViewChanged($event)"
                          (update)="update('button app-toolbar')"></app-toolbar>
-            <!-- SEMANA -->
-            <!-- <div id="calendar-navigator" class="bg-white">
-                <div class="flex align-items-center justify-content-between flex-wrap py-3 px-4">
-                    <div *ngIf="currentRoteiro" class="flex align-items-center cursor-pointer">
-                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
-                        <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center py-2 px-4 mx-1"
-                             (click)="popoverSemana.toggle($event)"
-                             [ngClass]="{
-                             'text-white bg-primary-500': popoverSemana.overlayVisible
-                         }">
-                            <span class="font-bold text-base">Semana {{currentRoteiro.semana}} - {{currentRoteiro.tema}} </span>
-                        </div>
-                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro.corLegenda }"></i>
-                    </div>
-                    <div *ngIf="!currentRoteiro" class="flex align-items-center cursor-pointer">
-                        <div class=" hover:bg-primary-500 hover:text-white border-round-md flex align-items-center py-2 px-4 mx-1" (click)="popoverSemana.toggle($event)"
-                             [ngClass]="{
-                         'text-white bg-primary-500': popoverSemana.overlayVisible
-                     }">
-                            <span class="font-bold text-base">Roteiro Indefinido</span>
-                        </div>
-                    </div>
-                    <p-popover #popoverSemana styleClass="-mt-1 ">
-                        <p class="text-500 mb-2 ml-2">Roteiros</p>
-                        <div class="max-h-15rem overflow-auto w-20rem">
-                            <ng-container *ngFor="let item of roteiros">
-                                <div class="p-2 font-bold mb-1 hover:surface-50 cursor-pointer"
-                                     (click)="currentRoteiro = item; roteiroChanged()"
-                                     title="Clique para carregar semana">
-                                    <div class="flex align-items-center gap-2 w-max" pTooltip="{{item.dataInicio | date: 'dd/MM/yyyy'}} à {{item.dataFim | date: 'dd/MM/yyyy'}}">
-                                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
-                                        <span>Semana {{item.semana}} - {{ item.tema }}</span>
-                                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: item.corLegenda }"></i>
-                                    </div>
-                                </div>
-                            </ng-container>
-                        </div>
-                    </p-popover>
-                    <div class="flex gap-1 align-items-stretch " style="height: 2.4rem">
-                        <ng-container *ngIf="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)">
-                            <div class="flex align-items-center mr-2">
-                                <label for="data" class="mr-1">Data: </label>
-                                <p-datepicker
-                                              (onSelect)="dataChanged(dataNgModel)"
-                                              #dataNgModel="ngModel"
-                                              [(ngModel)]="data"
-                                              [showIcon]="true"
-                                              [iconDisplay]="'input'"
-                                              [minDate]="minData"
-                                              inputId="data"
-                                              name="data"
-                                              class=" w-9rem"
-                                              inputStyleClass="w-full"
-                                              styleClass="w-full"
-                                              [required]="true"
-                                              [selectOtherMonths]="true"
-                                              [keepInvalid]="true"
-                                              [disabledDays]="[0]"
-                                              appendTo="body" />
-                            </div>
-                            <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
-                                      [severity]="dayView ? 'primary' : 'secondary'"
-                                      [styleClass]="dayView ? 'h-full mr-2' : 'surface-800 border-800 text-white h-full mr-2'"
-                                      (onClick)="calendarViewChanged()" />
-                            <p-button icon="pi pi-angle-left text-lg"
-                                      styleClass="w-full h-full surface-100 border-100 overflow-hidden"
-                                      class="overflow-hidden"
-                                      [style]="{ width : '2.4rem' }"
-                                      (onClick)="prev()"
-                                      severity="secondary"
-                                      iconPos="right"
-                                      pTooltip="Anterior"
-                                      size="small" />
-                            <p-button label="hoje"
-                                      styleClass="h-full surface-800 border-800"
-                                      (onClick)="today()"
-                                      severity="help"
-                                      pTooltip="Hoje"
-                                      tooltipPosition="top"
-                                      size="small" />
-                            <p-button icon="pi pi-angle-right text-lg"
-                                      styleClass="w-full h-full surface-100 border-100"
-                                      [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                      (onClick)="next()"
-                                      severity="secondary"
-                                      pTooltip="Próximo"
-                                      size="small" />
-                        </ng-container>
-                        <ng-container *ngIf="[ScreenWidth.md, ScreenWidth.sm].includes(screen)">
-                            <p-button icon="pi pi-bars"
-                                      iconPos="right"
-                                      (onClick)="popoverActions.toggle($event)"
-                                      severity="primary"
-                                      pTooltip="Ações"
-                                      label="Menu" />
-                            <p-popover #popoverActions styleClass="-mt-1">
-                                <div class="max-w-20rem w-full min-w-15rem">
-                                    <div class="col-12 flex align-items-stretch justify-content-center gap-2 mb-2" style="height: 3.4rem;">
-                                        <p-button [label]="dayView ? 'Ver semana' : 'Ver dia'"
-                                                  [severity]="dayView ? 'primary' : 'secondary'"
-                                                  [styleClass]="dayView ? 'h-full ' : 'surface-800 border-800 text-white h-full mr-auto'"
-                                                  class="mr-auto"
-                                                  size="small"
-                                                  (onClick)="calendarViewChanged()" />
-                                        <p-button icon="pi pi-angle-left text-lg"
-                                                  styleClass="w-full h-full surface-100 border-100"
-                                                  [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                                  (onClick)="prev()"
-                                                  severity="secondary"
-                                                  iconPos="right"
-                                                  pTooltip="Anterior"
-                                                  tooltipPosition="top"
-                                                  size="small" />
-                                        <p-button label="hoje"
-                                                  styleClass="h-full surface-800 border-800"
-                                                  (onClick)="today()"
-                                                  severity="help"
-                                                  pTooltip="Hoje"
-                                                  tooltipPosition="top"
-                                                  size="small" />
-                                        <p-button icon="pi pi-angle-right text-lg"
-                                                  styleClass="w-full h-full surface-100 border-100"
-                                                  [style]="{width: '2.4rem', overflow: 'hidden',}"
-                                                  (onClick)="next()"
-                                                  severity="secondary"
-                                                  pTooltip="Próximo"
-                                                  tooltipPosition="top"
-                                                  size="small" />
-                                    </div>
-                                    <div class="col-12 surface-50 shadow-1">
-                                        <div class="flex align-items-center mx-2">
-                                            <label for="data" class="mr-1">Data: </label>
-                                            <p-datepicker (onSelect)="dataChanged(dataNgModel)"
-                                                          #dataNgModel="ngModel"
-                                                          [(ngModel)]="data"
-                                                          [showIcon]="true"
-                                                          [iconDisplay]="'input'"
-                                                          [minDate]="minData"
-                                                          inputId="data"
-                                                          name="data"
-                                                          class=" w-full"
-                                                          inputStyleClass="w-full"
-                                                          styleClass="w-full"
-                                                          [required]="true"
-                                                          [selectOtherMonths]="true"
-                                                          [keepInvalid]="true"
-                                                          [disabledDays]="[0]"
-                                                          appendTo="body" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </p-popover>
-                        </ng-container>
-                    </div>
-                </div>
-            </div> -->
         </div>
-        <!-- FIM SEMANA -->
+        <!-- CALENDARIO -->
         <div class="h-full bg-primary-100 overflow-hidden p-1 mb-2">
-            <!-- <p *ngFor="let item of [1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1,2,3,4,5,6,1,1,1,1,1,111,1,1,1,1,1,1,1,1,1,1,1]">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Atque accusantium, esse inventore error, facere dolor omnis voluptatum dolorem impedit vero quae cupiditate saepe corrupti dolore autem, voluptatem consequatur fuga sint?</p> -->
-            <!-- CALENDARIO -->
-            <full-calendar #fullCalendar [options]="calendarioOptions" >
+            <full-calendar #fullCalendar [options]="calendarioOptions">
                 <ng-template #resourceAreaHeaderContent>resourceAreaHeaderContent</ng-template>
                 <ng-template #dayHeaderContent let-arg>
                     <app-calculo-perfil-cognitivo #calculo
@@ -228,8 +70,8 @@
                     </div>
                 </ng-template>
                 <ng-template #eventContent let-arg>
-                    <app-evento-item
-                                     class="w-full"
+                    <app-evento-item class="w-full"
+                                     [calendarioDayView]="calendarioDayView"
                                      [evento]="arg.event.extendedProps"
                                      [arg]="arg"
                                      (selectEvent)="selectEvento($event, arg.event.extendedProps)"

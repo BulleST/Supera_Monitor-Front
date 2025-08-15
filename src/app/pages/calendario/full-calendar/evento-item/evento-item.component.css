@@ -16,11 +16,12 @@
     border-style: solid;
     border-width: 2px;
     transition: .1s;
+    overflow: hidden;
 }
 
 .event:not(.event-disabled):hover {
-    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.6);
-    scale: 1.01;
+    border-color: var(--p-surface-950)!important;
+    /* border-color: white!important; */
 }
 
 .event-header {
@@ -31,7 +32,6 @@
     gap: 0.25rem;
     white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden;
 }
 
 .event-time {
@@ -79,6 +79,7 @@
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
+    display: flex;
 }
 
 .event.event-superacao .event-descricao,
@@ -103,12 +104,13 @@
 .event-footer {
     width: 100%;
     display: flex;
-    flex-flow: column;
     gap: 4px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     line-height: 1;
+    justify-content: space-between;
+    text-align: left;
 }
 
 .event-alunos {}
@@ -141,5 +143,4 @@
     display: flex;
     align-items: center;
     gap: 3px;
-    color: white;
 }

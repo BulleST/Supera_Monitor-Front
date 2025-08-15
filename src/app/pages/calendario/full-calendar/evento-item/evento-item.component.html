@@ -26,7 +26,7 @@
              [id]="arg.event?.id"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
-             (click)="eventoClick($event)"
+             (click)="eventoItemHover.hide(); eventoClick($event)"
              [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor, zIndex: arg.zIndex, }">
             <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
             <ng-container *ngTemplateOutlet="eventBody"></ng-container>
@@ -39,7 +39,7 @@
              [class.event-disabled]="!evento.active"
              (mouseenter)="eventoItemHover.show($event)"
              (mouseleave)="eventoItemHover.hide()"
-             (click)="eventoClick($event)"
+             (click)="eventoItemHover.hide(); eventoClick($event)"
              [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.backgroundColor, color: arg.textColor }"
              [ngClass]="{
                     'event-superacao': EventoTipo.Superacao == evento.evento_Tipo_Id,
@@ -83,7 +83,7 @@
         </div>
     </ng-template>
     <ng-template #eventFooter>
-        <div class="event-footer">
+        <div class="event-footer" [class.flex-column]="calendarioDayView == CalendarioDayView.Semana">
             <!-- Se Cancelado -->
             <ng-container *ngIf="!evento.active; else checkFinalizado">
                 <span class="event-cancelado">

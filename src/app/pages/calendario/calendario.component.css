@@ -22,13 +22,12 @@
 ::ng-deep .fc .fc-scrollgrid {
     border-top-color: var(--p-surface-100);
 }
-::ng-deep .fc-col-header {
-    width: 100%!important;
-}
-
-::ng-deep .fc-timegrid-body, .fc .fc-timegrid-body table {
+::ng-deep .fc-col-header,
+::ng-deep .fc-timegrid-body, 
+::ng-deep .fc-timegrid-body table {
     width: 100% !important;
 }
+
 @media (max-width: 500px) {
     .myycalendar {
         width: calc(100vw + 410px);
