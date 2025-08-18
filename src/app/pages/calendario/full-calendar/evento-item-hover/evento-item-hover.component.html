@@ -1,4 +1,4 @@
-<p-popover #popover styleClass="bg-transparent border-none p-0 popover-event-hover ">
+<p-popover #popover appendTo="body" styleClass="bg-transparent border-none popover-event-hover py-0">
     <ng-container *ngIf="evento && evento.id">
         <!-- FERIADO -->
         <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
@@ -13,7 +13,7 @@
             </div>
         </ng-container>
         <!-- AULA E AULA EXTRA -->
-        <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+        <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
             <div class="event event-hover"
                  [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.borderColor, color: arg.textColor }">
                 <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
@@ -45,7 +45,12 @@
                 </div>
                 <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Reuniao">
                     <div class="event-educador">
-                        <span>{{evento.professor}}</span>
+                        <ng-container *ngIf="evento.professor">
+                            <span>{{evento.professor}}</span>
+                        </ng-container>
+                        <ng-container *ngIf="!evento.professor && evento.professores.length > 0">
+                            <span>{{evento.professores[0].nome}}</span>
+                        </ng-container>
                     </div>
                 </ng-container>
             </div>

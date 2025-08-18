@@ -210,7 +210,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 .then(res => {
                     this.eventosReposicaoDeList = res.filter(aula => {
                         const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
-                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                         const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
                         const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
                         const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
@@ -256,7 +256,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             
                     this.eventosReposicaoParaList = res.filter(aula => {
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
-                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                         const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
                         const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.alunoSelected!.perfilCognitivo_Id);
                         const aulaNaoFinalizada = !aula.finalizado;

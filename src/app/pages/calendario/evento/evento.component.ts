@@ -54,7 +54,7 @@ export class EventoComponent implements OnDestroy {
     tipo = EventoTipo
     encryptedId = ''
 
-EventoTipo = EventoTipo;
+    EventoTipo = EventoTipo;
     selectedAluno?: Evento_Participacao_Aluno
     mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
     alunos: Aluno[] = []
@@ -180,6 +180,7 @@ EventoTipo = EventoTipo;
             }
 
             if (res) {
+                // console.log('res evento', JSON.parse(JSON.stringify(res)))
                 this.evento = res
                 this.visible = true
                 this.verificaDisponibilidade()
@@ -227,6 +228,8 @@ EventoTipo = EventoTipo;
         if (!this.visible) {
             let route = '../../../';
             this.router.navigate([route], { relativeTo: this.activatedRoute })
+
+            this.service.setEvento(undefined)
         }
     }
 
@@ -303,7 +306,7 @@ EventoTipo = EventoTipo;
             && (x.numeroPaginaAH == 0 || x.numeroPaginaAbaco == 0)
         )
 
-        if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(this.evento.evento_Tipo_Id) 
+        if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(this.evento.evento_Tipo_Id) 
             && alunosPresentesSemPaginaDefinida.length > 0 ) {
             let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul>'
             alunosPresentesSemPaginaDefinida.forEach(item => {
@@ -459,7 +462,7 @@ EventoTipo = EventoTipo;
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja salvar?`,
-            header: `Sallet ${this.tipoString}`,
+            header: `Salvar ${this.tipoString}`,
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Salvar',
             acceptButtonStyleClass: 'p-button-rounded',
@@ -474,7 +477,7 @@ EventoTipo = EventoTipo;
         })
     }
 
-    async send(e: any) {
+     send(e: any) {
         this.loading = true
         lastValueFrom(this.request())
             .then((res) => {
@@ -482,10 +485,7 @@ EventoTipo = EventoTipo;
                 this.evento.id = res.object.id
                 this.service.setEvento(this.evento)
                 this.toastrService.success('Dados atualizados com sucesso.')
-                this.router.navigate(['', this.crypto.encrypt(this.evento.id)], {
-                    relativeTo: this.activatedRoute,
-                    replaceUrl: true,
-                })
+                this.router.navigate(['calendario'])
                 this.loading = false
             })
             .catch((res) => {
@@ -507,7 +507,7 @@ EventoTipo = EventoTipo;
                 return this.requestAulaTurma()
             case EventoTipo.AulaZero:
                 return this.requestAula0()
-            case EventoTipo.AulaExtra:
+            case EventoTipo.TurmaExtra:
                 return this.requestAulaExtra()
             case EventoTipo.Superacao:
                 return this.requestSuperacao()

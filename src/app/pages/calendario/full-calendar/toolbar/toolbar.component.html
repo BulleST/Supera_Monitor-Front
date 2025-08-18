@@ -1,120 +1,128 @@
-<p-toolbar styleClass="bg-white border-none sm:px-4 px-2 py-2 shadow-1 mb-2">
-    <div class="p-toolbar-group-start flex-1 px-3 sm:p-0">
-        <h2 class="flex gap-2 align-items-center" #h2>
-            <div class="relative flex align-items-center justify-content-center">
-                <i class="bi bi-calendar text-primary text-6xl"></i>
-                <span class="absolute mt-2">{{ data |date : 'dd' }}</span>
-            </div>
-            <div (click)="loadingRoteiro ? undefined : popoverSemana.toggle($event, h2)"
-                 class="border-round-md py-1 px-3 hover:bg-primary-100 cursor-pointer">
-                <p class="font-bold text-xl text-overflow-ellipsis">{{currentTitle}}</p>
-                <p class="flex align-items-center gap-2">
-                    <span class="text-base font-light " *ngIf="!loadingRoteiro">{{currentRoteiroTitle}}</span>
-                    <p-skeleton *ngIf="loadingRoteiro" width="10rem" height="1.3rem" />
-                    <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro?.corLegenda}"></i>
-                </p>
-            </div>
-        </h2>
+<p-toolbar styleClass="bg-white border-none  pl-1 pr-4 py-2 shadow-1 mb-2 flex align-items-center">
+    <div class="p-toolbar-group-start sm:col-3 col-12 lg:w-min">
+        <p-button styleClass="my-app-dark"
+                [loading]="loadingRoteiro"
+                severity="contrast"
+                (onClick)="loadingRoteiro ? undefined : popoverSemana.toggle($event) "
+                size="small"
+                fluid>
+        <div class="flex gap-2 align-items-center w-full overflow-hidden">
+                    <div class="relative flex align-items-center justify-content-center">
+                        <i class="bi bi-calendar text-primary text-6xl line-height-1"></i>
+                        <span class="absolute mt-2 text-xl font-bold">{{ data |date : 'dd' }}</span>
+                    </div>
+                    <div class="flex flex-column justify-content-start text-left w-full">
+                        <p class="font-bold text-xl text-800 text-overflow-ellipsis w-full overflow-hidden white-space-nowrap">{{currentTitle}}</p>
+                        <p class="flex align-items-center gap-2">
+                            <span class="text-base text-600 font-light text-overflow-ellipsis overflow-hidden white-space-nowrap">{{currentRoteiroTitle}}</span>
+                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro?.corLegenda}"></i>
+                        </p>
+                    </div>
+        </div>
+            </p-button>
     </div>
-    <div class="p-toolbar-group-end flex align-items-center justify-content-evenly sm:justify-content-end sm:col col-12 px-0 -mx-1">
-        <div class="sm:col flex-grow-0 px-1 py-0 mr-4">
-            <div class="flex gap-1 align-items-stretch ">
-                <ng-container *ngIf="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)">
-                    <!-- Data -->
-                    <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
-                    <!-- Ver Semana -->
-                    <ng-container *ngTemplateOutlet="verSemana"></ng-container>
-                    <!-- Prev -->
-                    <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
-                    <!-- Hoje -->
-                    <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
-                    <!-- Next -->
-                    <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
-                </ng-container>
-                <ng-container *ngIf="[ScreenWidth.md, ScreenWidth.sm].includes(screen)">
-                    <!-- Menu -->
-                    <p-button icon="pi pi-bars"
-                              iconPos="right"
-                              (onClick)="popoverActions.toggle($event)"
-                              severity="primary"
-                              pTooltip="Ações"
-                              label="Menu" />
-                    <p-popover #popoverActions styleClass="-mt-1">
-                        <div class="max-w-20rem w-full min-w-15rem">
-                            <div class="col-12 flex align-items-stretch justify-content-center gap-2 mb-2" style="height: 3.4rem;">
-                                <!-- Ver Semana -->
-                                <ng-container *ngTemplateOutlet="verSemana"></ng-container>
-                                <!-- Prev -->
-                                <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
-                                <!-- Hoje -->
-                                <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
-                                <!-- Next -->
-                                <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
+    <div class="p-toolbar-group-end">
+        <div class="flex gap-2">
+            <!-- Menu -->
+            <div class="sm:col p-0">
+                <div class="flex gap-1 align-items-stretch ">
+                    <ng-container *ngIf="[ScreenWidth.lg, ScreenWidth.xl].includes(screen)">
+                        <!-- Data -->
+                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                        <!-- Ver Semana -->
+                        <ng-container *ngTemplateOutlet="verSemana"></ng-container>
+                        <!-- Prev -->
+                        <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
+                        <!-- Hoje -->
+                        <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
+                        <!-- Next -->
+                        <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
+                    </ng-container>
+                    <ng-container *ngIf="[ScreenWidth.md, ScreenWidth.sm].includes(screen)">
+                        <!-- Menu -->
+                        <p-button icon="pi pi-bars"
+                                  iconPos="right"
+                                  (onClick)="popoverActions.toggle($event)"
+                                  severity="primary"
+                                  pTooltip="Ações"
+                                  label="Menu" />
+                        <p-popover #popoverActions styleClass="-mt-1">
+                            <div class="max-w-20rem w-full min-w-15rem">
+                                <div class="col-12 flex align-items-stretch justify-content-center gap-2 mb-2" style="height: 3.4rem;">
+                                    <!-- Ver Semana -->
+                                    <ng-container *ngTemplateOutlet="verSemana"></ng-container>
+                                    <!-- Prev -->
+                                    <ng-container *ngTemplateOutlet="prevTemplate"></ng-container>
+                                    <!-- Hoje -->
+                                    <ng-container *ngTemplateOutlet="todayTemplate"></ng-container>
+                                    <!-- Next -->
+                                    <ng-container *ngTemplateOutlet="nextTemplate"></ng-container>
+                                </div>
+                                <!-- Data -->
+                                <div class="col-12 surface-50 shadow-1">
+                                    <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                </div>
                             </div>
-                            <!-- Data -->
-                            <div class="col-12 surface-50 shadow-1">
-                                <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
-                            </div>
-                        </div>
-                    </p-popover>
-                </ng-container>
+                        </p-popover>
+                    </ng-container>
+                </div>
             </div>
-        </div>
-        <div class="sm:col col flex-grow-0 px-1">
             <!-- Atualizar -->
-            <p-button icon="pi pi-sync "
-                      (onClick)="updateCalendar()"
-                      severity="secondary"
-                      label="atualizar"
-                      [size]="[ScreenWidth.sm].includes(screen) ? 'small' : undefined"
-                      pTooltip="Atualizar calendário"
-                      tooltipPosition="top" />
-        </div>
-        <!-- Meu Calendário -->
-        <div class="sm:col col flex-grow-0 px-1 py-0">
-            <p-select [options]="viewMenu"
-                      [(ngModel)]="view"
-                      (onChange)="calendarViewChanged()"
-                      optionValue="value"
-                      styleClass="p-select-menu p-select-menu--dark p-select-small"
-                      appendTo="body">
-                <ng-template let-selectedOption #selectedItem>
-                    <div class="text-white -mr-2">
-                        <span class="{{selectedOption.icon}}"></span>
-                        <span class="ml-2">{{ selectedOption.label }}</span>
-                    </div>
-                </ng-template>
-                <ng-template let-item #item>
-                    <span class="{{item.icon}}"></span>
-                    <span class="ml-2">{{ item.label }}</span>
-                </ng-template>
-                <ng-template #dropdownicon>
-                    <i class="bi bi-chevron-down text-white"></i>
-                </ng-template>
-            </p-select>
-        </div>
-        <div class="sm:col col flex-grow-0 px-1 py-0">
+            <div class="sm:col p-0">
+                <p-button icon="pi pi-sync "
+                          (onClick)="updateCalendar()"
+                          severity="contrast"
+                          label="atualizar"
+                          pTooltip="Atualizar calendário"
+                          styleClass="surface-800 border-800 border-1"
+                          tooltipPosition="top" />
+            </div>
+            <!-- Meu Calendário -->
+            <div class="sm:col p-0">
+                <p-select [options]="viewMenu"
+                          [(ngModel)]="view"
+                          (onChange)="calendarViewChanged()"
+                          optionValue="value"
+                          styleClass="p-select-menu p-select-menu--dark p-select-small"
+                          appendTo="body">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2">
+                            <span class="{{selectedOption.icon}}"></span>
+                            <span class="ml-2">{{ selectedOption.label }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <span class="{{item.icon}}"></span>
+                        <span class="ml-2">{{ item.label }}</span>
+                    </ng-template>
+                    <ng-template #dropdownicon>
+                        <i class="bi bi-chevron-down text-white"></i>
+                    </ng-template>
+                </p-select>
+            </div>
             <!-- Agendar -->
-            <p-select [options]="agendarMenuItem"
-                      [(ngModel)]="agendarValue"
-                      #agendar="ngModel"
-                      styleClass="p-select-menu p-select-small"
-                      placeholder="Agendar"
-                      (onChange)="agendarEvento($event, agendar)"
-                      scrollHeight="250px"
-                      appendTo="body">
-                <ng-template let-selectedOption #selectedItem>
-                    <div class="text-white -mr-2">Agendar</div>
-                </ng-template>
-                <ng-template let-item #item>
-                    <div class="w-10rem">
-                        <a class="ml-2">{{ item.label }}</a>
-                    </div>
-                </ng-template>
-                <ng-template #dropdownicon>
-                    <i class="bi bi-chevron-down text-white"></i>
-                </ng-template>
-            </p-select>
+            <div class="sm:col p-0">
+                <p-select [options]="agendarMenuItem"
+                          [(ngModel)]="agendarValue"
+                          #agendar="ngModel"
+                          styleClass="p-select-menu p-select-small"
+                          placeholder="Agendar"
+                          (onChange)="agendarEvento($event, agendar)"
+                          scrollHeight="250px"
+                          appendTo="body">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2">Agendar</div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="w-10rem">
+                            <a class="ml-2">{{ item.label }}</a>
+                        </div>
+                    </ng-template>
+                    <ng-template #dropdownicon>
+                        <i class="bi bi-chevron-down text-white"></i>
+                    </ng-template>
+                </p-select>
+            </div>
         </div>
     </div>
 </p-toolbar>
@@ -182,7 +190,7 @@
                       appendTo="body" />
     </div>
 </ng-template>
-<p-popover #popoverSemana>
+<p-popover #popoverSemana appendTo="body" styleClass="-mt-1">
     <p class="text-500 mb-2 ml-2">Roteiros</p>
     <div class="max-h-15rem overflow-auto">
         <ng-container *ngFor="let item of roteiros">

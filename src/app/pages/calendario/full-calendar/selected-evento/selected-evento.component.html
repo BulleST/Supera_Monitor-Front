@@ -45,7 +45,7 @@
                               [style]="{ backgroundColor: evento.corLegenda }"></span>
                     </div>
                     <!-- Perfil Cognitivo -->
-                    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+                    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
                         <div class="selected-evento-linha">
                             <span class="selected-evento-linha-icon">
                                 <i class="fa-solid fa-brain"></i>
@@ -63,8 +63,7 @@
             </div>
             <!-- Alunos -->
             <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id) == false">
-                <div
-                     class="selected-evento-alunos-header">
+                <div class="selected-evento-alunos-header">
                     <span class="font-bold block text-primary">
                         <span *ngIf="evento.alunos.length == 0">Nenhum aluno</span>
                         <span *ngIf="evento.alunos.length > 1">Alunos</span>
@@ -73,14 +72,12 @@
                     <div class="flex flex-column align-items-end">
                         <div class="flex align-items-center">
                             <span class="ml-auto">
-                                <ng-container
-                                              *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
+                                <ng-container *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
                                     <span [ngSwitch]=" evento.capacidadeMaximaAlunos - evento.alunos.length">
                                         <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{ evento.capacidadeMaximaAlunos }} vagas</span>
                                         <span *ngSwitchCase="0">Não há vagas / {{ evento.alunos.length }} alunos</span>
                                         <span *ngSwitchCase="1">1 vaga / {{ evento.alunos.length }} alunos</span>
-                                        <span
-                                              *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }} vagas / {{ evento.alunos.length }} alunos </span>
+                                        <span *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }} vagas / {{ evento.alunos.length }} alunos </span>
                                     </span>
                                 </ng-container>
                                 <ng-container
@@ -107,13 +104,11 @@
                              class="p-2">
                             <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
                             <div class="shadow-2">
-                                <ng-container
-                                              *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
+                                <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
                             </div>
                         </div>
                         <a class="cursor-pointer">
-                            <ng-container
-                                          *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
+                            <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
                         </a>
                         <ng-template #participacaoItem let-participacao="participacao">
                             <app-aluno-popover #popoverAluno
@@ -126,8 +121,7 @@
                                         'surface-50': i % 2 == 0,
                                         'surface-0': i % 2 != 0
                                     }">
-                                <div
-                                     class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
+                                <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
                                     <i class="pi pi-user text-primary text-sm"></i>
                                 </div>
                                 <span>
@@ -135,16 +129,14 @@
                                           [pTooltip]="participacao.nome"
                                           (click)="popoverAluno.show($event)"
                                           [ngClass]="{
-                                            'text-green-500': evento.finalizado && participacao.presente == true,
-                                            'text-red-500': evento.finalizado && participacao.presente == false,
+                                            'text-red-500': evento.finalizado && participacao.presente === false,
                                             'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
                                             'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
-                                            'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id == evento.id
+                                            'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id === evento.id
                                             }">
                                         <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                     </span>
-                                    <p-badge
-                                             *ngIf="participacao.reposicaoDe_Evento_Id"
+                                    <p-badge *ngIf="participacao.reposicaoDe_Evento_Id"
                                              styleClass="ml-2 bg-purple-500"
                                              value="Reposição"
                                              size="small"
@@ -165,17 +157,13 @@
                                               pTooltip="Faltou"></span>
                                     </span>
                                     <ng-template #reposicaoDe_Evento>
-                                        <div *ngIf="participacao.reposicaoDe_Evento"
-                                             class="w-15rem">
-                                            <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}
-                                            </p>
-                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}
-                                            </p>
-                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}
-                                            </p>
+                                        <div *ngIf="participacao.reposicaoDe_Evento"  class="w-15rem">
+                                            <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}</p>
+                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}</p>
+                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}</p>
                                             <p *ngIf="participacao.reposicaoDe_Evento.professor">
                                                 <span class="inline-flex w-1rem h-1rem border-circle mr-2"
-                                                      [style]="{backgroundColor: participacao.reposicaoDe_Evento.corLegenda}"></span>
+                                                      [style]="{ backgroundColor: participacao.reposicaoDe_Evento.corLegenda }"></span>
                                                 <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
                                             </p>
                                         </div>
@@ -215,8 +203,7 @@
                 </div>
             </ng-container>
             <!-- Educadores -->
-            <ng-container
-                          *ngIf="[EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.professores && evento.professores.length > 1">
+            <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.professores && evento.professores.length > 1">
                 <div class="flex align-items-center justify-content-between px-2 w-full">
                     <span class="font-bold block text-primary">Educadores</span>
                     <span class="font-bold block ml-auto">
@@ -227,18 +214,16 @@
                 <div class="h-10rem overflow-auto w-full">
                     <div *ngFor="let professor of evento.professores; let i = index">
                         <div class="w-full flex align-items-center justify-content-start p-1"
-                             [ngClass]="{
-                            'bg-white': i % 2 == 0,
-                            'surface-50': i % 2 != 0
+                        [ngClass]="{
+                            'text-red-500': evento.finalizado && professor.presente === false,
                         }">
                             <span class="inline-flex w-1rem h-1rem border-circle mr-2"
                                   [style]="{ backgroundColor: professor.corLegenda }"></span>
                             <span class="">{{ professor.nome }}</span>
                             <span>
-                                <span *ngIf="evento.finalizado"
-                                      class="ml-2">
+                                <span *ngIf="evento.finalizado" class="ml-2">
                                     <span *ngIf="professor.presente == true"
-                                          class="pi pi-check text-green-500"
+                                          class="pi pi-check pi-thumbs-down-fill text-green-500"
                                           pTooltip="Presente"></span>
                                     <span *ngIf="professor.presente == false"
                                           class="pi pi-thumbs-down-fill text-red-500"
@@ -270,8 +255,7 @@
                                           styleClass="justify-content-start surface-50"
                                           fluid />
                             </ng-container>
-                            <ng-container
-                                          *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
+                            <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
                                 <p-button (onClick)="goToInserirAlunoConfirm($event)"
                                           label="Inserir Aluno"
                                           icon="pi pi-user-plus text-primary-500"
@@ -280,8 +264,7 @@
                                           styleClass="justify-content-start surface-50"
                                           fluid />
                             </ng-container>
-                            <ng-container
-                                          *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+                            <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
                                 <p-button (onClick)="goToReposicao()"
                                           label="Agendar Reposição"
                                           icon="pi pi-user-plus text-primary-500"
@@ -297,7 +280,6 @@
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
-                                <!-- [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos" -->
                             </ng-container>
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar"

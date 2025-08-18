@@ -70,7 +70,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             routerLink: 'calendario/turma-extra/agendar',
             command: () => {
                 let evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+                evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
                 this.service.setEvento(evento);
             }
         },
@@ -249,12 +249,8 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     getTemaSemana() {
-        console.log('getTemaSemana')
-        console.log('roteiros', this.roteiros)
-        console.log('data', this.data)
         let data = this.data;
         let roteiro = this.roteiros.find(x => moment(data).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
-        console.log('roteiro', roteiro)
         if (roteiro) {
             this.currentRoteiro = roteiro;
             this.currentRoteiroTitle = `Semana ${roteiro.semana} - ${roteiro.tema} `

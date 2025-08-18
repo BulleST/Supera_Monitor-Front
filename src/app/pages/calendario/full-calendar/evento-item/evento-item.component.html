@@ -15,7 +15,7 @@
         </div>
     </ng-container>
     <!-- AULA E AULA EXTRA -->
-    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.AulaExtra].includes(evento.evento_Tipo_Id)">
+    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
         <div class="event"
              [class.event-disabled]="!evento.active"
              cdkDropList
@@ -60,7 +60,12 @@
             </div>
             <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Reuniao">
                 <div class="event-educador">
-                    <span>{{evento.professor}}</span>
+                    <ng-container *ngIf="evento.professor">
+                        <span>{{evento.professor}}</span>
+                    </ng-container>
+                    <ng-container *ngIf="!evento.professor && evento.professores.length > 0">
+                        <span>{{evento.professores[0].nome}}</span>
+                    </ng-container>
                 </div>
             </ng-container>
         </div>
@@ -68,11 +73,14 @@
     <ng-template #eventBody>
         <div class="event-body">
             <span class="event-descricao">{{evento.descricao}}</span>
-            <ng-container *ngIf="evento.sala_Id && 
-                ![EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                <span class="event-sala">
-                    <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
-                </span>
+            <ng-container *ngIf="evento.sala_Id">
+                <ng-container *ngIf="![EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                    <ng-container *ngIf="[EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id) && evento.finalizado === false || ![EventoTipo.Reuniao, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                        <span class="event-sala">
+                            <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
+                        </span>
+                    </ng-container>
+                </ng-container>
                 <ng-template #salaTemplate>
                     <b>Sala: </b>
                     <app-sala-aula [numeroSala]="evento.numeroSala"

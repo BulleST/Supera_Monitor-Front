@@ -48,11 +48,11 @@ export class Evento {
 
 export enum EventoTipo {
     Aula = 1,
-    AulaZero = 5,
-    AulaExtra = 7,
-    Superacao = 3,
     Oficina = 2,
+    Superacao = 3,
     Reuniao = 4,
+    AulaZero = 5,
+    TurmaExtra = 7,
     Feriado = 8,
 }
 

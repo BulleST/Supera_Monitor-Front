@@ -6,18 +6,13 @@ import { ConfirmationService } from 'primeng/api'
 import moment from 'moment'
 import { ToastrService } from 'ngx-toastr'
 import { lastValueFrom, Subscription } from 'rxjs'
-
-import {
-    PseudoEvento,
-    PrimeiraAulaRequest,
-} from '../../../../../models/reposicao.model'
+import { PseudoEvento, PrimeiraAulaRequest } from '../../../../../models/reposicao.model'
 import { Aluno } from '../../../../../models/alunos.model'
 import { Roteiro } from '../../../../../models/roteiro.model'
 import { Feriado } from '../../../../../models/feriado.model'
 import { Evento, EventoTipo } from '../../../../../models/evento.model'
 import { EventoAulaRequest } from '../../../../../models/evento-aula.model'
 import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model'
-import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
 
 import { showError } from '../../../../../utils'
 import { MyMap } from '../../../../../utils/map'
@@ -50,7 +45,6 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     restricaoCheck: boolean = false
 
     aluno: Aluno = new Aluno()
-    // participacao: Evento_Participacao_Aluno = new Evento_Participacao_Aluno()
     evento: Evento = new Evento()
     eventos: Evento[] = []
     tipoString = ''
@@ -81,28 +75,19 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         private accountService: AccountService,
     ) {
         let alunos = this.alunoService.list.subscribe(res => {
-            let perfilEvento = this.evento.perfilCognitivo.flatMap((a) => a.id);
-            this.alunos = res.filter((x) => x.active === true
-                && x.primeiraAula_Id === null
-                && perfilEvento.includes(x.perfilCognitivo_Id))
+            this.alunos = res;
+            this.setAlunos();
         })
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
             this.loadingAlunos = true
             lastValueFrom(this.alunoService.getList())
-                .then(() => {
-                    let perfilEvento = this.evento.perfilCognitivo.flatMap((a) => a.id);
-                    this.alunos = this.alunos.filter((aluno) => aluno.primeiraAula_Id === null
-                        && aluno.primeiraAula_Id === null
-                        && perfilEvento.includes(aluno.perfilCognitivo_Id));
-
-                })
-                .then((res) => (this.loadingAlunos = false))
-                .catch((res) => (this.loadingAlunos = false))
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false)
         }
 
-        let evento = this.service.evento.subscribe((res) => {
+        let evento = this.service.evento.subscribe(res => {
             if (!res) {
                 try {
                     let evento = JSON.parse(localStorage.getItem('evento') ?? '')
@@ -116,13 +101,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             if (res) {
                 this.evento = res
                 this.tipoString = this.getTipo(this.evento);
-
-                if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
-                    let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
-                    this.alunos = this.alunos.filter(x => eventoAlunos.includes(x.id))
-                }
-
-                // this.participacao = this.evento.alunos.find((x) => x.aluno_Id == this.participacao.aluno_Id) as Evento_Participacao_Aluno
+                this.setAlunos();
                 this.visible = true
             }
         })
@@ -146,6 +125,29 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         if (!this.visible) {
             let route = ['../../../']
             this.router.navigate(route, { relativeTo: this.activatedRoute })
+        }
+    }
+
+    setAlunos() {
+        console.log('setAlunos')
+        console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
+        console.log('evento', JSON.parse(JSON.stringify(this.evento)))
+        if (this.alunos.length && this.evento) {
+            let perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id);
+            console.log('perfilCognitivo', perfilCognitivo)
+            this.alunos = this.alunos.filter(x => x.active // Alunos ativos
+                && !x.primeiraAula_Id  // Alunos que ainda não agendaram primeira aula
+                && x.aulaZero_Id // Alunos que agendaram aula 0
+                && perfilCognitivo.includes(x.perfilCognitivo_Id)  // Alunos de mesmo perfil cognitivo
+            )
+            console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
+
+            if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
+                let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
+                console.log('eventoAlunos', eventoAlunos)
+                this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id))
+                console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
+            }
         }
     }
 
@@ -258,9 +260,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         request.alunos = evento.alunos.map((x) => x.aluno_Id)
         request.professores = evento.professor_Id ? [evento.professor_Id] : []
         request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm',
-        ) as any
+        request.data = moment(request.data).format('YYYY-MM-DD[T]HH:mm') as any
 
         return lastValueFrom(this.service.createAulaTurma(request))
     }
@@ -299,10 +299,11 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
             let professor = this.evento.professor;
             let data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+            let dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
             let account = this.accountService.accountValue;
 
             if (alunoChecklist && !alunoChecklist.finalizado) {
-                let mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.\n Agendamento realizado por ${account?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
+                let mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account?.name} no dia ${dataAgendamento}`;
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
                 }

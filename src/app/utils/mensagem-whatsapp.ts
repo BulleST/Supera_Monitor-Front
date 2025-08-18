@@ -60,7 +60,7 @@ export class MensagemWhatsapp {
                 let sugestoes = res.filter(aula => {
                     const alunosAtivos = aula.alunos.filter(x => x.active);
                     const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == aluno.id);
-                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.AulaExtra;
+                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                     const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
                     const ehPerfilCognitivoCompativel = aluno.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
                     const aulaNaoFinalizada = !aula.finalizado;
@@ -149,7 +149,7 @@ export class MensagemWhatsapp {
             \r\nNotei que você não esteve presente na ${tipo} do dia ${data} e gostaria de saber se houve um imprevisto. 
             \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
 
-            if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.AulaExtra) {
+            if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.TurmaExtra) {
                 mensagem += `\r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. `
                 if (sugestoes.length > 0) {
                     mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:

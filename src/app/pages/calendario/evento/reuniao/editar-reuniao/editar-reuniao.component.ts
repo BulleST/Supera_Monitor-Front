@@ -25,12 +25,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     @Input() duracaoEvento = '';
     @Input() loadingChecklist = false;
 
-    source: Professor[] = [];
-    target: Professor[] = [];
-    selected: Evento_Participacao_Professor[] = [];
-    @Input() professores: Professor[] = [];
-    @Input() loadingProfessores = false;
-
     @Input() salaAulas: SalaAula[] = [];
     @Input() loadingSalaAulas = false;
 
@@ -52,9 +46,8 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            this.selected = this.evento.professores;
-            this.setProfessores();
-            if (!this.evento.finalizado) {
+                // console.log('evento Finalizado', this.evento)
+            if (this.evento.finalizado !== true) {
                 this.evento.professores
                     .filter(x => x.active)
                     .map(x => {
@@ -63,11 +56,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
                     });
             }
         };
-        if (changes['professores']) {
-            this.professores = changes['professores'].currentValue;
-            this.setProfessores();
-        }
-        if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
@@ -80,11 +68,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    setProfessores() {
-        let professoresIds = this.evento.professores.map(x => x.professor_Id);
-        this.target = this.professores.filter(x => professoresIds.includes(x.id))
-        this.source = this.professores.filter(x => !professoresIds.includes(x.id))
-    }
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
@@ -113,16 +96,16 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    presente(item: Evento_Participacao_Professor) {
+    presenteClick(item: Evento_Participacao_Professor) {
         item.presente = !item.presente;
     }
 
     enviarMensagem(professor: Evento_Participacao_Professor) {
-        if (!professor.phone) {
+        if (!professor.telefone) {
             this.showError('Erro', 'Nenhum celular cadastrado', professor);
             return;
         }
-        let object = this.mensagemWhatsapp.enviarMensagem(professor.nome, professor.phone);
+        let object = this.mensagemWhatsapp.enviarMensagem(professor.nome, professor.telefone);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }

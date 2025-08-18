@@ -583,7 +583,7 @@ export class CadastrarAula0Component implements OnDestroy {
             return
         }
         let evento = MyMap(this.object, new Evento())
-        evento.evento_Tipo_Id = EventoTipo.AulaExtra
+        evento.evento_Tipo_Id = EventoTipo.TurmaExtra
         let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
         window.open(object.link, '_target')
         this.mensagemWhatsapp.copiarMensagem(object.mensagem)

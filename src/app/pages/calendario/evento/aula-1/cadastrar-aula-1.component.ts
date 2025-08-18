@@ -51,7 +51,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
                 .catch(() => (this.loadingAlunos = false))
         }
 
-        let eventos = this.eventoService.eventos.subscribe((res) => this.eventos = res.filter(x => x.active && (x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.AulaExtra)))
+        let eventos = this.eventoService.eventos.subscribe((res) => this.eventos = res.filter(x => x.active && (x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.TurmaExtra)))
         this.subscription.push(eventos)
 
         this.visible = true

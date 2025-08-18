@@ -269,7 +269,8 @@
                               [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
                               [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
                               [outlined]="item.presente !== true && item.presente !== false"
-                              (onClick)="presente(item)"
+                              [class.pointer-events-none]="evento.finalizado"
+                              (onClick)="evento.finalizado ? undefined : presenteClick(item)"
                               size="small"
                               class="my-auto" />
                 </header>

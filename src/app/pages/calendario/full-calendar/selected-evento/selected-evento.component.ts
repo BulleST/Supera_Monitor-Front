@@ -205,7 +205,7 @@ export class SelectedEventoComponent implements OnChanges {
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
-                case EventoTipo.AulaExtra: route = 'aula'; break;
+                case EventoTipo.TurmaExtra: route = 'aula'; break;
                 case EventoTipo.Superacao: route = 'superacao'; break;
                 case EventoTipo.Reuniao: route = 'reuniao'; break;
                 case EventoTipo.Oficina: route = 'oficina'; break;
@@ -233,7 +233,7 @@ export class SelectedEventoComponent implements OnChanges {
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
-                case EventoTipo.AulaExtra: route = 'aula'; break;
+                case EventoTipo.TurmaExtra: route = 'aula'; break;
                 case EventoTipo.Superacao: route = 'superacao'; break;
                 case EventoTipo.Reuniao: route = 'reuniao'; break;
                 case EventoTipo.Oficina: route = 'oficina'; break;
@@ -277,7 +277,7 @@ export class SelectedEventoComponent implements OnChanges {
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.Aula: route = 'aula'; break;
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
-                case EventoTipo.AulaExtra: route = 'aula'; break;
+                case EventoTipo.TurmaExtra: route = 'aula'; break;
                 case EventoTipo.Superacao: route = 'superacao'; break;
                 case EventoTipo.Reuniao: route = 'reuniao'; break;
                 case EventoTipo.Oficina: route = 'oficina'; break;

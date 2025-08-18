@@ -147,7 +147,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         });
     }
 
-    presente(item: Evento_Participacao_Aluno) {
+    presenteClick(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
     

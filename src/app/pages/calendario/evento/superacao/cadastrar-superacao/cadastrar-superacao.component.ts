@@ -435,7 +435,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
     enviarMensagemAgendamento(aluno: Aluno) {
         var evento = MyMap(this.object, new Evento());
-        evento.evento_Tipo_Id = EventoTipo.AulaExtra;
+        evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
         return this.mensagemWhatsapp.enviarMensagemAgendamento(
             aluno.nome,
             aluno.celular,

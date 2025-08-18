@@ -142,7 +142,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         e.target.select()
     }
 
-    presente(aluno: Evento_Participacao_Aluno) {
+    presenteClick(aluno: Evento_Participacao_Aluno) {
         aluno.presente = !aluno.presente;
     }
 

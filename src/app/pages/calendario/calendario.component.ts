@@ -228,7 +228,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             const id = 'event-' + this.calendarioUtils.eventRandomId();
             const eventStyles = this.calendarioUtils.getEventStyles(item)
 
-            if ([EventoTipo.Aula, EventoTipo.AulaExtra].includes(item.evento_Tipo_Id)) {
+            if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
             }
 

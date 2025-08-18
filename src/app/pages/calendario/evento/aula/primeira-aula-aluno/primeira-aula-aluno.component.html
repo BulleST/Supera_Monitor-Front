@@ -59,26 +59,24 @@
         </div>
         <!-- Aluno -->
         <div class="field col-12 col-span-4 mb-0">
-            <label for="aluno">Aluno:</label>
+            <label for="aluno">Aluno: <span class="text-red-500">*</span></label>
             <p-select [options]="alunos"
                       [(ngModel)]="selectedAluno"
                       (ngModelChange)="this.restricaoCheck = false"
-                      [checkmark]="true"
                       optionLabel="nome"
                       [showClear]="true"
                       placeholder="Selecione um aluno"
                       [ngClass]="!selectedAluno ? 'ng-dirty ng-invalid' : null"
+                      [required]="true"
                       [filter]="true"
                       filterPlaceholder="Digite o nome do aluno..."
-                      [virtualScroll]="true"
-                      [virtualScrollItemSize]="25"
                       [loading]="loadingAlunos"
                       appendTo="body"
                       fluid>
                 <ng-template let-item #item>
                     <div class="flex align-items-center justify-content-between w-full gap-2">
                         <div>
-                            <div class="flex align-items-center">
+                            <div class="flex align-items-center gap-2">
                                 <p-button
                                           type="button"
                                           icon="pi pi-whatsapp {{ !item.celular ? 'text-300' : '' }}"
@@ -90,9 +88,7 @@
                                           [rounded]="true"
                                           [disabled]="!item.celular"
                                           pTooltip="Enviar mensagem"
-                                          class="mr-2"
-                                          styleClass="w-auto h-auto p-1 {{ !item.celular ? 'text-300' : '' }}">
-                                </p-button>
+                                          styleClass="w-auto h-auto p-1 {{ !item.celular ? 'text-300' : '' }}" />
                                 <p class="font-bold mb-1">
                                     <span class="mr-2">{{ item.nome }}</span>
                                     <p-badge
@@ -103,24 +99,15 @@
                                     <ng-template #indisponivelTemplate>
                                         <div class="w-25rem">
                                             <p>
-                                                
                                                 <span class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
                                                 <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
                                             </p>
                                             <p>{{ item.disponivelEvent.descricao }}</p>
                                             <p *ngIf="item.disponivelEvent.professor">
-                                                <span
-                                                      class="w-1rem h-1rem border-circle inline-flex mr-2"
-                                                      [style]="{
-                            backgroundColor: item.disponivelEvent.corLegenda,
-                            borderColor: item.disponivelEvent.corLegenda
-                          }"></span>
+                                                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
                                                 <span>{{ item.disponivelEvent.professor }}</span>
                                             </p>
-                                            <p
-                                               *ngIf="
-                          item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao
-                        ">
+                                            <p *ngIf=" item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
                                                 {{ item.disponivelEvent.turma }}
                                             </p>
                                             <p *ngIf="item.disponivelEvent.sala_Id">
@@ -135,8 +122,7 @@
                                 </p>
                             </div>
                             <p class="mb-1 flex align-items-center">
-                                <span
-                                      class="w-1rem h-1rem border-circle flex mr-3 ml-1"
+                                <span class="w-1rem h-1rem border-circle flex mr-3 ml-1"
                                       [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
                                 <span class="font-normal">Turma {{ item.turma }}</span>
                             </p>
@@ -166,7 +152,8 @@
                     <app-sala-aula
                                    class="text-primary font-bold"
                                    [andar]="evento.andar"
-                                   [numeroSala]="evento.numeroSala" />
+                                   [numeroSala]="evento.numeroSala"
+                                   [sala_Id]="evento.sala_Id" />
                 </div>
             </div>
             <ng-container *ngIf="selectedAluno">

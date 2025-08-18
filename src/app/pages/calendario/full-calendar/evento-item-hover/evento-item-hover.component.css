@@ -72,11 +72,18 @@
     font-size: 1.2rem;
     font-weight: bold;
 }
+.event.event-hover.event-reuniao .event-descricao {
+    font-size: 1rem;
+}
 
 .event.event-hover .event-sala {
     font-size: 1rem;
     display: flex;
     gap: 2px;
+}
+
+.event.event-hover.event-reuniao .event-sala {
+    font-size: .9rem;
 }
 
 .event.event-hover .event-footer {

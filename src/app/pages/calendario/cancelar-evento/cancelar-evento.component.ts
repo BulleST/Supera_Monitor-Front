@@ -168,7 +168,7 @@ export class CancelarEventoComponent implements OnDestroy {
         case EventoTipo.AulaZero:
           route = 'aula-zero'
           break
-        case EventoTipo.AulaExtra:
+        case EventoTipo.TurmaExtra:
           route = 'aula'
           break
         case EventoTipo.Superacao:

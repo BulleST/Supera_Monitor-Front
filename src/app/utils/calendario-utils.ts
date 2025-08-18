@@ -127,7 +127,7 @@ export class CalendarioUtils {
     getEventoTipo(evento: Evento) {
         if (evento.evento_Tipo_Id == EventoTipo.Aula) return 'aula'
         else if (evento.evento_Tipo_Id == EventoTipo.AulaZero) return 'aula zero'
-        else if (evento.evento_Tipo_Id == EventoTipo.AulaExtra) return 'aula'
+        else if (evento.evento_Tipo_Id == EventoTipo.TurmaExtra) return 'aula'
         else if (evento.evento_Tipo_Id == EventoTipo.Superacao) return 'superação'
         else if (evento.evento_Tipo_Id == EventoTipo.Oficina) return 'oficina'
         else if (evento.evento_Tipo_Id == EventoTipo.Reuniao) return 'reunião'

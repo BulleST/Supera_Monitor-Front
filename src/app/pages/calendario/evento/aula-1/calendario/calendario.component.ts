@@ -210,7 +210,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         }
 
         let feriadosDates = this.feriados.map((x) => moment(x.date).format('YYYY-MM-DD'))
-        let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.AulaExtra].includes(x.evento_Tipo_Id) 
+        let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id) 
                                                 && x.active == true 
                                                 && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
 

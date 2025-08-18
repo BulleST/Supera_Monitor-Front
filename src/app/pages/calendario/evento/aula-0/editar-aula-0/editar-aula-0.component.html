@@ -195,9 +195,9 @@
     </div>
     <!-- Alunos -->
     <div class="col-12 flex flex-wrap py-2">
-        <ng-container *ngFor="let aluno of evento.alunos; let i = index">
+        <ng-container *ngFor="let item of evento.alunos; let i = index">
             <app-aluno-popover #popoverAluno
-                               [aluno_Id]="aluno.aluno_Id"
+                               [aluno_Id]="item.aluno_Id"
                                [evento]="evento"
                                [showChecklist]="true"></app-aluno-popover>
             <!-- Card -->
@@ -208,45 +208,55 @@
                          class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                         <div class="flex flex-column align-items-start overflow-hidden">
                             <span class="p-button-link capitalize text-lg font-bold">
-                                {{ aluno.aluno }}
+                                {{ item.aluno }}
                             </span>
                         </div>
                     </div>
-                    <p-button [severity]="aluno.presente ? 'success' : 'danger'"
-                              [label]="aluno.presente ? 'Presente' : 'Faltou'"
-                              [icon]="aluno.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'"
+                    <p-button [severity]="item.presente ? 'success' : 'danger'"
+                              [label]="item.presente ? 'Presente' : 'Faltou'"
+                              [icon]="item.presente ? 'pi pi-thumbs-up-fill' : 'pi pi-thumbs-down-fill'"
                               size="small"
                               class="my-auto"
-                              [disabled]="evento.finalizado"
-                              (onClick)="presenteClick(aluno)"></p-button>
+                              [class.pointer-events-none]="evento.finalizado"
+                              (onClick)="evento.finalizado ? undefined : presenteClick(item)"></p-button>
                 </header>
-                <div class="px-3 pt-3 pb-3" *ngIf="!aluno.presente">
+                <div class="px-3 pt-3 pb-3" *ngIf="!item.presente">
                     <div class="flex align-items-center justify-content-center p-3 surface-50 border-round">
                         <i class="pi pi-info-circle text-blue-500 text-xl mr-3"></i>
                         <span class="text-600 font-medium"> Aluno ausente - não é necessário preencher informações adicionais. </span>
                     </div>
                 </div>
-                <div class="formgrid grid px-3 pt-3" *ngIf="aluno.presente">
+                <div class="formgrid grid px-3 pt-3" *ngIf="item.presente">
                     <!-- Perfil Cognitivo -->
                     <div class="field col">
                         <label for="perfilCognitivo[{{ i }}]">Perfil Cognitivo: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-brain" />
-                            <p-select
-                                      [options]="perfisFiltered"
-                                      [(ngModel)]="aluno.perfilCognitivo_Id"
-                                      #perfilCognitivo_Id="ngModel"
-                                      inputId="perfilCognitivo[{{ i }}]"
-                                      name="perfilCognitivo[{{ i }}]"
-                                      (onFocus)="perfilFocus(aluno)"
-                                      optionLabel="nome"
-                                      optionValue="id"
-                                      placeholder="Selecione"
-                                      [disabled]="evento.finalizado"
-                                      [required]="true"
-                                      [showClear]="true"
-                                      appendTo="body"
-                                      fluid />
+                            <ng-container *ngIf="evento.finalizado">
+                                <input pInputText
+                                          id="perfilCognitivo[{{ i }}]"
+                                          name="perfilCognitivo[{{ i }}]"
+                                          [value]="item.perfilCognitivo"
+                                          readonly
+                                          fluid />
+                            </ng-container>
+                            <ng-container *ngIf="!evento.finalizado">
+                                <p-select 
+                                          [options]="perfisFiltered"
+                                          [(ngModel)]="item.perfilCognitivo_Id"
+                                          #perfilCognitivo_Id="ngModel"
+                                          inputId="perfilCognitivo[{{ i }}]"
+                                          name="perfilCognitivo[{{ i }}]"
+                                          (onFocus)="perfilFocus(item)"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          placeholder="Selecione"
+                                          [disabled]="evento.finalizado"
+                                          [required]="true"
+                                          [showClear]="true"
+                                          appendTo="body"
+                                          fluid />
+                            </ng-container>
                         </p-iconfield>
                     </div>
                     <!-- Turma -->
@@ -254,44 +264,54 @@
                         <label for="turma[{{ i }}]">Turma: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-users-between-lines" />
-                            <p-select [options]="turmasFiltered"
-                                        #turma_Id="ngModel"
-                                      [(ngModel)]="aluno.turma_Id"
-                                      (onFocus)="turmaFocus(aluno)"
-                                      (onChange)="turmaChanged(aluno, turma_Id, $event)"
-                                      inputId="turma[{{ i }}]"
-                                      name="turma[{{ i }}]"
-                                      optionLabel="nome"
-                                      optionValue="id"
-                                      placeholder="Selecione"
-                                      [filter]="true"
-                                      filterBy="nome,professor,perfilCognitivoString,diasDeAulaString,salaDeAulaString,vagas"
-                                      [disabled]="evento.finalizado"
-                                      [required]="true"
-                                      [showClear]="true"
-                                      appendTo="body"
-                                      fluid>
-                                <ng-template #item let-option>
-                                    <div class="w-full">
-                                        <div class="flex align-items-center gap-2">
-                                            <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: option.corLegenda, borderColor: option.corLegenda }"></span>
-                                            <span>{{ option.nome }}</span>
+                            <ng-container *ngIf="evento.finalizado">
+                                <input pInputText
+                                          id="turma[{{ i }}]"
+                                          name="turma[{{ i }}]"
+                                          [value]="item.turma"
+                                          readonly
+                                          fluid />
+                            </ng-container>
+                            <ng-container *ngIf="!evento.finalizado">
+                                <p-select [options]="turmasFiltered"
+                                            #turma_Id="ngModel"
+                                        [(ngModel)]="item.turma_Id"
+                                        (onFocus)="turmaFocus(item)"
+                                        (onChange)="turmaChanged(item, turma_Id, $event)"
+                                        inputId="turma[{{ i }}]"
+                                        name="turma[{{ i }}]"
+                                        optionLabel="nome"
+                                        optionValue="id"
+                                        placeholder="Selecione"
+                                        [filter]="true"
+                                        filterBy="nome,professor,perfilCognitivoString,diasDeAulaString,salaDeAulaString,vagas"
+                                        [disabled]="evento.finalizado"
+                                        [required]="true"
+                                        [showClear]="true"
+                                        appendTo="body"
+                                        fluid>
+                                    <ng-template let-option>
+                                        <div class="w-full">
+                                            <div class="flex align-items-center gap-2">
+                                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: option.corLegenda, borderColor: option.corLegenda }"></span>
+                                                <span>{{ option.nome }}</span>
+                                            </div>
+                                            <div class="flex align-items-center gap-2">
+                                                <ng-container *ngFor="let perfil of option.perfilCognitivo">
+                                                    <p-tag [value]="perfil.nome" icon="fa-solid fa-brain"   />
+                                                </ng-container>
+                                                <p-tag *ngIf="option.vagas" [value]="option.vagas + ' vaga(s)'" 
+                                                class="ml-auto"
+                                                severity="secondary"  />
+                                                <p-tag *ngIf="!option.vagas" value="Nenhuma vaga" 
+                                                class="ml-auto"
+                                                icon="pi pi-ban text-red-500"
+                                                severity="secondary"  />
+                                            </div>
                                         </div>
-                                        <div class="flex align-items-center gap-2">
-                                            <ng-container *ngFor="let perfil of option.perfilCognitivo">
-                                                <p-tag [value]="perfil.nome" icon="fa-solid fa-brain"   />
-                                            </ng-container>
-                                            <p-tag *ngIf="option.vagas" [value]="option.vagas + ' vaga(s)'" 
-                                            class="ml-auto"
-                                            severity="secondary"  />
-                                            <p-tag *ngIf="!option.vagas" value="Nenhuma vaga" 
-                                            class="ml-auto"
-                                            icon="pi pi-ban text-red-500"
-                                            severity="secondary"  />
-                                        </div>
-                                    </div>
-                                </ng-template>
-                            </p-select>
+                                    </ng-template>
+                                </p-select>
+                            </ng-container>
                         </p-iconfield>
                     </div>
                     <!-- Apostila Kit -->
@@ -299,20 +319,31 @@
                         <label for="apostilaKit[{{ i }}]">Apostila Kit: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-book-open" />
-                            <p-select
-                                      [options]="kits"
-                                      [(ngModel)]="aluno.apostila_Kit_Id"
-                                      #apostila_Kit_Id="ngModel"
-                                      inputId="apostilaKit[{{ i }}]"
-                                      name="apostilaKit[{{ i }}]"
-                                      optionLabel="nome"
-                                      optionValue="id"
-                                      placeholder="Selecione"
-                                      [disabled]="evento.finalizado"
-                                      [required]="true"
-                                      [showClear]="true"
-                                      appendTo="body"
-                                      fluid />
+                            <ng-container *ngIf="evento.finalizado">
+                                <input pInputText
+                                          id="apostilaKit[{{ i }}]"
+                                          name="apostilaKit[{{ i }}]"
+                                          readonly
+                                          [value]="item.apostila_Kit_Id"
+                                          fluid />
+                                          <!-- [value]="aluno.apostila_Kit ?? ''" -->
+                                        </ng-container>
+                            <ng-container *ngIf="!evento.finalizado">
+                                <p-select
+                                          [options]="kits"
+                                          [(ngModel)]="item.apostila_Kit_Id"
+                                          #apostila_Kit_Id="ngModel"
+                                          inputId="apostilaKit[{{ i }}]"
+                                          name="apostilaKit[{{ i }}]"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          placeholder="Selecione"
+                                          [disabled]="evento.finalizado"
+                                          [required]="true"
+                                          [showClear]="true"
+                                          appendTo="body"
+                                          fluid />
+                            </ng-container>
                         </p-iconfield>
                     </div>
                 </div>

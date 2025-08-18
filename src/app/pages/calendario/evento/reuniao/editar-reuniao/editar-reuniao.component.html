@@ -1,7 +1,9 @@
+
+<!-- <pre>{{evento|json}}</pre> -->
 <div class="formgrid grid">
     <!-- Descrição -->
     <div class="field lg:col-4 sm:col-5 col-12">
-        <label for="descricao">Descrição: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="descricao">Descrição: <span *ngIf="!evento.finalizado" class="text-red-500">*</span></label>
         <input type="text"
                pInputText
                #descricao="ngModel"
@@ -21,7 +23,7 @@
             <p-inputicon styleClass="pi pi-calendar" />
             <input type="text"
                    pInputText
-                   [value]="evento.data | date : 'dd/MM/yy'"
+                   [value]="evento.data | date : 'dd/MM/yyyy'"
                    id="data"
                    name="data"
                    readonly
@@ -58,7 +60,7 @@
     </div>
     <!-- Sala -->
     <div class="field col-12">
-        <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="sala_Id">Sala: <span *ngIf="!evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="salaAulas"
                   [(ngModel)]="evento.sala_Id"
@@ -128,58 +130,59 @@
                   id="observacao"
                   [(ngModel)]="evento.observacao"
                   [readonly]="evento.finalizado"
-                  [rows]="3"
+                  [rows]="2"
                   fluid></textarea>
     </div>
     <!-- Educadores Table -->
     <div class="field col-12">
         <p-table [value]="evento.professores"
                  dataKey="id"
+                 size="small"
                  stripedRows>
             <ng-template #header>
                 <tr>
-                    <th class="sticky left-0">Nome</th>
+                    <th pFrozenColumn>Nome</th>
                     <th class="w-4rem">Presença</th>
                     <th class="w-4rem">Observação</th>
                 </tr>
             </ng-template>
             <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                 <tr>
-                    <td class="sticky left-0 cursor-pointer">
+                    <td pFrozenColumn>
                         <div class="flex align-items-center">
                             <p-button type="button"
                                       (onClick)="enviarMensagem(item)"
                                       (auxclick)="enviarMensagem(item)"
                                       (contextmenu)="enviarMensagem(item)"
-                                      [disabled]="!item.phone"
-                                      icon="pi pi-whatsapp {{!item.phone ? 'text-300' : ''}}"
+                                      [disabled]="!item.telefone"
+                                      icon="pi pi-whatsapp {{!item.telefone ? 'text-300' : ''}}"
                                       severity="success"
                                       [text]="true" />
-                            <div class="inline-flex p-button-link">
-                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2"
-                                      [pTooltip]=" item.nome">{{ item.nome }}
-                                </span>
-                            </div>
+                            <p class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2" [pTooltip]=" item.nome">
+                                {{ item.nome }}
+                            </p>
                         </div>
                     </td>
                     <td class="w-4rem text-center">
-                        <p-button (onClick)="presente(item)"
-                                  [label]="item.presente ? 'Presente': 'Faltou'"
-                                  [severity]="item.presente ? 'success': 'danger'"
-                                  [icon]="item.presente ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
-                                  styleClass="py-1 line-height-2" />
+                            <p-button [label]="item.presente === true ? 'Presente': 'Faltou'"
+                                      [severity]="item.presente === true ? 'success': 'danger'"
+                                        [icon]="item.presente === true ? 'pi pi-check' : 'pi pi-thumbs-down-fill'"
+                                        [class.pointer-events-none]="evento.finalizado === true"
+                              [class.pointer-events-none]="evento.finalizado"
+                              (onClick)="evento.finalizado ? undefined : presenteClick(item)" />
                     </td>
-                    <td class="w-5rem white-space-nowrap text-overflow-ellipsis">
-                        <textarea pTextarea
-                                  placeholder="Insira as observações..."
-                                  [(ngModel)]="item.observacao"
-                                  (focus)="inputFocus($event)"
-                                  [readonly]="!evento.active"
-                                  id="observacao[{{rowIndex}}]"
-                                  name="observacao[{{rowIndex}}]"
-                                  class="mt-4"
-                                  [style]="{ heigth: '28px', width: '20vw' }"
-                                  fluid></textarea>
+                    <td class="w-20rem">
+                        <div class="flex align-items-center h-full">
+                            <textarea pTextarea
+                                      placeholder="Insira as observações..."
+                                      [(ngModel)]="item.observacao"
+                                      (focus)="inputFocus($event)"
+                                      [readonly]="!evento.active"
+                                      id="observacao[{{rowIndex}}]"
+                                      name="observacao[{{rowIndex}}]"
+                                      rows="1.1"
+                                      fluid></textarea>
+                        </div>
                     </td>
                 </tr>
             </ng-template>

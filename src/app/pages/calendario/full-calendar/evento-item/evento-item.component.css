@@ -49,6 +49,7 @@
 
 .event-educador {
     font-size: 0.75rem;
+    line-height: 1;
 }
 
 .event-body {
@@ -87,6 +88,7 @@
 .event.event-oficina .event-descricao,
 .event.event-reuniao .event-descricao {
     font-size: .9rem;
+    line-height: 1;
 }
 .event-sala {
     font-size: .875rem;
@@ -95,6 +97,9 @@
     line-height: 1;
 }
 
+.event.event-reuniao .event-sala  {
+    padding-top: 6px;
+}
 .event.event-superacao .event-sala,
 .event.event-aula-zero .event-sala,
 .event.event-oficina .event-sala,

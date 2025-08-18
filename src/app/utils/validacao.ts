@@ -90,15 +90,15 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
 }
 
 export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: SalaAula[], eventos: Evento[], turma_Id?: number, evento_Id?: number) {
-    console.log('validaSalaAulas')
+    // console.log('validaSalaAulas')
     let intervaloDe = moment(data);
     let intervaloAte = moment(intervaloDe).add(duracaoMinutos - 1, 'minutes');
 
-    console.log('intervaloDe', moment(intervaloDe).format('DD/MM HH:mm'))
-    console.log('intervaloAte', moment(intervaloAte).format('DD/MM HH:mm'))
+    // console.log('intervaloDe', moment(intervaloDe).format('DD/MM HH:mm'))
+    // console.log('intervaloAte', moment(intervaloAte).format('DD/MM HH:mm'))
 
     return salaAulas.map(item => {
-        console.log('sala inicio', item.description, item)
+        // console.log('sala inicio', item.description, item)
         if (item.id == SalaAulaId.online) {
             return item;
         }
@@ -107,10 +107,10 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
             let eventoIntervaloDe = moment(e.data);
             let eventoIntervaloAte = moment(e.data).add(e.duracaoMinutos - 1, 'minutes');
 
-            console.group('evento', e.descricao, e)
+            // console.group('evento', e.descricao, e)
             
-            console.log('eventoIntervaloDe', moment(eventoIntervaloDe).format('DD/MM HH:mm'))
-            console.log('eventoIntervaloAte', moment(eventoIntervaloAte).format('DD/MM HH:mm'))
+            // console.log('eventoIntervaloDe', moment(eventoIntervaloDe).format('DD/MM HH:mm'))
+            // console.log('eventoIntervaloAte', moment(eventoIntervaloAte).format('DD/MM HH:mm'))
 
             let c1 = intervaloDe.isAfter(eventoIntervaloDe);
             let c2 = intervaloDe.isBefore(eventoIntervaloAte);
@@ -121,22 +121,22 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
             let t1 = intervaloAte.isBetween(eventoIntervaloDe, eventoIntervaloAte);
             let t2 = intervaloAte.isBetween(eventoIntervaloDe, eventoIntervaloAte);
 
-            console.log('c1', c1)
-            console.log('c2', c2)
-            console.log('c3', c3)
-            console.log('c4', c4)
-            console.log('t1', t1)
-            console.log('t2', t2)
+            // console.log('c1', c1)
+            // console.log('c2', c2)
+            // console.log('c3', c3)
+            // console.log('c4', c4)
+            // console.log('t1', t1)
+            // console.log('t2', t2)
 
             let ehSalaDoEvento = e.sala_Id == item.id;
             let ehTurmaDiferente = turma_Id ? e.turma_Id != turma_Id : true;
             let ehEventoDiferente = evento_Id ? e.id != evento_Id : true;
             let ehEventoAtivo = e.active;
 
-            console.log('ehSalaDoEvento', ehSalaDoEvento)
-            console.log('ehTurmaDiferente', ehTurmaDiferente)
-            console.log('ehEventoDiferente', ehEventoDiferente)
-            console.log('ehEventoAtivo', ehEventoAtivo)
+            // console.log('ehSalaDoEvento', ehSalaDoEvento)
+            // console.log('ehTurmaDiferente', ehTurmaDiferente)
+            // console.log('ehEventoDiferente', ehEventoDiferente)
+            // console.log('ehEventoAtivo', ehEventoAtivo)
 
             let c9 = ((c1 && c2) || (c3 && c4)) 
                         && ehSalaDoEvento 
@@ -144,9 +144,9 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
                         && ehEventoDiferente 
                         && ehEventoAtivo;
 
-            console.log('c9', c9)
+            // console.log('c9', c9)
 
-            console.groupEnd();
+            // console.groupEnd();
             if (c9) {
                 return e;
             }
@@ -156,7 +156,7 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
         item.disponivel = !evento;
         item.disponivelEvent = evento;
 
-        console.log('sala final', item.description, item);
+        // console.log('sala final', item.description, item);
         return item;
     });
 }
