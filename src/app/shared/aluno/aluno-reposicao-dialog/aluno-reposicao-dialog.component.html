@@ -95,26 +95,26 @@
                         <ng-container *ngIf="alunoSelected">
                             <div class="field sm:col-8 col-12 flex align-items-center gap-2">
                                 <p-divider layout="vertical" />
-                                <div class="flex flex-column gap-2" >
-                                    <div class="flex align-items-center gap-2">
+                                <div class="flex flex-column gap-2 w-full" >
+                                    <div class="flex align-items-center gap-2 w-full">
                                         <i class="fa-solid fa-users-between-lines"></i>
-                                        <p>Turma: {{alunoSelected.turma}}</p>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Turma: {{alunoSelected.turma}}</p>
                                         <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: alunoSelected.corLegenda, borderColor: alunoSelected.corLegenda }"></span>
                                     </div>
-                                    <div class="flex align-items-center gap-2"> 
+                                    <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="fa-solid fa-brain"></i>
-                                        <p>Perfil Cognitivo: {{alunoSelected.perfilCognitivo}}</p>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{alunoSelected.perfilCognitivo}}</p>
                                     </div>
-                                    <div class="flex align-items-center gap-2"> 
+                                    <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="fa-solid fa-wheelchair"></i>
-                                        <p>Restrição de mobilidade: 
+                                        <p class="overflow-hidden text-overflow-ellipsis">Restrição de mobilidade: 
                                             <span *ngIf="alunoSelected.restricaoMobilidade" class="text-red-500 zoomin animation-iteration-infinite animation-duration-500 font-bold">Sim</span> 
                                             <span *ngIf="!alunoSelected.restricaoMobilidade">Não</span> 
                                         </p>
                                     </div>
-                                    <div class="flex align-items-center gap-2"> 
+                                    <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="pi pi-ban"></i>
-                                        <p>Outras restrições: {{ getRestricoes(alunoSelected) }}</p>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Outras restrições: {{ getRestricoes(alunoSelected) }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -183,6 +183,9 @@
                                             panelStyleClass="p-select-stripped"
                                             appendTo="body"
                                             fluid>
+                                        <ng-template #footer>
+                                            <p class="py-2 px-4">Exibindo {{eventosReposicaoDeList.length}} aulas do aluno</p>
+                                        </ng-template>
                                         <ng-template #selectedItem let-selectedOption>
                                             <ng-container *ngIf="selectedOption">
                                                 <div class="flex align-items-center">
@@ -259,60 +262,60 @@
                                 <div class="flex flex-column white-space-nowrap ">
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-calendar text-base"></i>
                                                 </div>
-                                                <p>Data: {{eventoReposicaoDe.data | date : 'dd \'de\' MMMM'}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Data: {{eventoReposicaoDe.data | date : 'dd \'de\' MMMM'}}</p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-clock text-base"></i>
                                                 </div>
-                                                <p>Horário: {{eventoReposicaoDe.data | date : 'HH:mm'}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Horário: {{eventoReposicaoDe.data | date : 'HH:mm'}}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p>Turma: {{eventoReposicaoDe.turma}}</p>
-                                                <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoDe.corLegenda, borderColor: eventoReposicaoDe.corLegenda }"></span>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Turma: {{eventoReposicaoDe.turma}}</p>
+                                                <span class="inline-flex w-1rem h-1rem border-circle flex-none" [style]="{ backgroundColor: eventoReposicaoDe.corLegenda, borderColor: eventoReposicaoDe.corLegenda }"></span>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
                                                 </div>
-                                                <p>Sala: {{getSalaAula(eventoReposicaoDe)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(eventoReposicaoDe)}}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-star text-base" [ngStyle]="{
                                                         color: getCorRoteiro(eventoReposicaoDe.roteiro_Id) ?? 'var(--p-surface-900)'
                                                     }"></i>
                                                 </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p>Roteiro: {{eventoReposicaoDe.tema + ' - Semana ' + eventoReposicaoDe.semana}}</p>
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Roteiro: {{eventoReposicaoDe.tema + ' - Semana ' + eventoReposicaoDe.semana}}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
                                                 </div>
-                                                <p>Perfil Cognitivo: {{getPerfilCognitivo(eventoReposicaoDe)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{getPerfilCognitivo(eventoReposicaoDe)}}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -418,6 +421,9 @@
                                             panelStyleClass="p-select-stripped"
                                             appendTo="body"
                                             fluid>
+                                        <ng-template #footer>
+                                            <p class="py-2 px-4">Exibindo {{eventosReposicaoParaList.length}} aulas compatíveis com o aluno</p>
+                                        </ng-template>
                                         <ng-template #selectedItem let-selectedOption>
                                             <ng-container *ngIf="selectedOption">
                                                 <div class="flex align-items-center">
@@ -437,21 +443,21 @@
                                         <ng-template let-item #item>
                                             <div class="flex gap-2">
                                                 <div class="flex flex-column">
-                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
-                                                        <i class="pi pi-calendar text-sm"></i>
+                                                    <div class="flex align-items-center gap-2 px-1 text-xs bg-primary-500 text-white ">
+                                                        <i class="pi pi-calendar text-xs"></i>
                                                         <span>{{item.data | date : 'dd/MMM'}}</span>
                                                     </div>
-                                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
-                                                        <i class="pi pi-clock text-sm"></i>
+                                                    <div class="flex align-items-center gap-2 px-1 text-xs bg-white border-1 border-200 text-primary-500 ">
+                                                        <i class="pi pi-clock text-xs"></i>
                                                         <span>{{item.data | date : 'HH:mm'}}</span>
                                                     </div>
                                                 </div>
                                                 <div class="flex flex-column" >
-                                                    <p class="flex align-items-center gap-2 py-1">
+                                                    <p class="flex align-items-center gap-2">
                                                         <span>{{item.turma ?? item.descricao}}</span>
                                                         <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
                                                     </p>
-                                                    <p class="flex align-items-center gap-2 py-1">
+                                                    <p class="flex align-items-center gap-2">
                                                         <span class="">Sala: </span>
                                                         <app-sala-aula [andar]="item.andar"
                                                                     [numeroSala]="item.numeroSala"
@@ -491,60 +497,60 @@
                                 <div class="flex flex-column white-space-nowrap ">
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:sm-7 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-calendar text-base"></i>
                                                 </div>
-                                                <p>Data: {{eventoReposicaoPara.data | date : 'dd \'de\' MMMM'}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Data: {{eventoReposicaoPara.data | date : 'dd \'de\' MMMM'}}</p>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="pi pi-clock text-base"></i>
                                                 </div>
-                                                <p>Horário: {{eventoReposicaoPara.data | date : 'HH:mm'}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Horário: {{eventoReposicaoPara.data | date : 'HH:mm'}}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:col-7 sm:col-6 col-12 py-1 flex-none">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
-                                                <p>Turma: {{eventoReposicaoPara.turma}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Turma: {{eventoReposicaoPara.turma}}</p>
                                                 <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoPara.corLegenda, borderColor: eventoReposicaoPara.corLegenda }"></span>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-building text-base"></i>
                                                 </div>
-                                                <p>Sala: {{getSalaAula(eventoReposicaoPara)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(eventoReposicaoPara)}}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex align-items-center justify-content-between w-full col-12 flex-wrap">
                                         <div class="md:col-7 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-star text-base" [ngStyle]="{
                                                         color: getCorRoteiro(eventoReposicaoPara.roteiro_Id) ?? 'var(--p-surface-900)'
                                                     }"></i>
                                                 </div>
-                                                <div class="flex align-items-center gap-2">
-                                                    <p>Roteiro: {{eventoReposicaoPara.tema + ' - Semana ' + eventoReposicaoPara.semana}}</p>
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Roteiro: {{eventoReposicaoPara.tema + ' - Semana ' + eventoReposicaoPara.semana}}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
-                                            <div class="flex align-items-center gap-2">
+                                            <div class="flex align-items-center gap-2 w-full">
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="fa-solid fa-brain text-base"></i>
                                                 </div>
-                                                <p>Perfil Cognitivo: {{getPerfilCognitivo(eventoReposicaoPara)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{getPerfilCognitivo(eventoReposicaoPara)}}</p>
                                             </div>
                                         </div>
                                     </div>

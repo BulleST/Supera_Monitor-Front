@@ -107,11 +107,10 @@
                                     <ng-container *ngIf="[8,9,12,13,32,37,22,29,23].includes(checklistItem.checklist_Item_Id)">
                                         <div class="ml-auto">
                                             <p-button label="Enviar mensagem"
-                                                icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                                severity="success"
+                                                icon="pi pi-whatsapp"
                                                 [rounded]="true"
                                                 [disabled]="!aluno.celular"
-                                                styleClass="{{!aluno.celular ? 'text-300' : ''}}"
+                                                [severity]="aluno.celular ? 'success' : 'secondary'"
                                                 (onClick)="enviarMensagem(checklistItem, aluno )"
                                                 (auxclick)="enviarMensagem(checklistItem, aluno)"
                                                 (contextmenu)="enviarMensagem(checklistItem, aluno)"/>

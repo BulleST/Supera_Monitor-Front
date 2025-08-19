@@ -102,7 +102,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         });
         this.subscription.push(params);
 
-        let eventoReposicaoDe = this.eventoService.eventoReposicaoDe.subscribe(res => {
+        let eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
+            console.log('eventoReposicaoDe', res)
             if (res) {
                 this.eventoReposicaoDe = res;
                 this.blockReposicaoDeField = true;
@@ -111,7 +112,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         });
         this.subscription.push(eventoReposicaoDe);
 
-        let eventoReposicaoPara = this.eventoService.eventoReposicaoPara.subscribe(res => {
+        let eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => {
+            console.log('eventoReposicaoPara', res)
             if (res) {
                 this.eventoReposicaoPara = res;
                 this.blockReposicaoParaField = true;
@@ -131,7 +133,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         if (!this.visible) {
             let params = this.activatedRoute.snapshot.params;
             let routeBack = ['../..'];
-            if (params['aluno_id']) 
+            if (params['aluno_id'])
                 routeBack = ['../../../'];
             this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
         }
@@ -162,17 +164,17 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 // Em caso de rota por selected-evento.component > opções > agendar reposicao
                 // Vai marcar o para
                 // Filtra somente os alunos que não estão nessa aula
-                
+
                 let alunos = this.eventoReposicaoPara.alunos.filter(x => x.active).map(X => X.aluno_Id);
                 this.alunos = this.alunos.filter(x => !alunos.includes(x.id) && x.active == true)
-                
+
                 // OBS: 
                 // Se em caso de rota por selected-evento.component > aluno-popover.component > opções > agendar reposicao
                 // OU _initial/monitoramento-dashboard.component > agendar reposicao
                 // o eventoReposicaoDe é marcado e a rota é inserida com o aluno_id, impossibilitando seleção de outro aluno
                 // Sendo assim não precisa filtrar os alunos nesse caso
             }
-            
+
         }
     }
 
@@ -225,9 +227,9 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                     this.loadingEventosReposicaoDe = false;
 
                     if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
-                        this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id 
-                                                                                            && moment( x.data).isSame(this.eventoReposicaoDe!.data)
-                                                                                            && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
+                        this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id
+                            && moment(x.data).isSame(this.eventoReposicaoDe!.data)
+                            && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
                     }
                 })
                 .catch(res => {
@@ -248,12 +250,12 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
                 intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
             }
-    
+
 
             this.loadingEventosReposicaoPara = true;
             lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
-            
+
                     this.eventosReposicaoParaList = res.filter(aula => {
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
@@ -274,7 +276,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && naoEhFeriado;
 
                     });
-            
+
 
                     this.loadingEventosReposicaoPara = false;
                 })
@@ -317,11 +319,16 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                     let confirmRestricoes = this.confirmRestricoes(e, model);
                     let onAcceptRestricoes = confirmRestricoes.accept.subscribe(res => {
                         onAcceptRestricoes.unsubscribe();
+                        this.selectEventoReposicaoPara(target)
                     });
+                } else {
+                    this.selectEventoReposicaoPara(target)
                 }
 
                 onAcceptRestricaoMobilidade.unsubscribe();
             });
+        } else {
+            this.selectEventoReposicaoPara(target)
         }
 
     }
@@ -340,6 +347,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             reject: () => {
                 model.control.setValue(null);
                 this.eventoReposicaoPara = undefined;
+                this.eventoService.setEventoReposicaoPara(undefined)
             }
         });
     }
@@ -347,13 +355,37 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     confirmRestricoes(e: any, model: NgModel) {
         return this.confirmationService.confirm({
             target: e.target,
-            message: 'O aluno possui restrições. Deseja continuar?',
+            message: 'O aluno possui outras restrições. Deseja continuar?',
             header: 'Restrições',
             reject: () => {
                 model.control.setValue(null);
                 this.eventoReposicaoPara = undefined;
+                this.eventoService.setEventoReposicaoPara(undefined)
             }
         });
+    }
+
+    selectEventoReposicaoPara(target: Evento) {
+
+        if (!target.roteiro_Id) {
+            let roteiro = this.roteiros.find(x => moment(target.data).isBetween(x.dataInicio, x.dataFim, null, '[]'));
+            target.roteiro_Id = roteiro?.id;
+            target.semana = roteiro?.semana;
+            target.tema = roteiro?.tema;
+        }
+
+        let index = this.eventosReposicaoParaList.findIndex(x => moment(x.data).isSame(target.data, 'minutes') 
+                                                    && x.id == target.id 
+                                                    && target.turma_Id == x.turma_Id)
+
+        if (index == -1) {
+            
+        } 
+        else {
+            this.eventosReposicaoParaList.splice(index, 1, target)
+        }
+        this.eventoReposicaoPara = target;
+        this.eventoService.setEventoReposicaoPara(target)
     }
 
     getPerfilCognitivo(evento: Evento) {

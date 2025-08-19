@@ -162,6 +162,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: () => {
+                    this.eventoService.setEventoReposicaoDe(this.evento);
                     this.goToAgendarReposicao();
                 },
             })

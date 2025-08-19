@@ -33,6 +33,7 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
 import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
 import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
+import { LegendColorComponent } from './professor/legend-color/legend-color.component';
 
 @NgModule({
     declarations: [
@@ -51,6 +52,7 @@ import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-
         LoadingBrainComponent,
         TableHeaderFilterComponent,
         TableHeaderFilterComponent,
+        LegendColorComponent,
     ],
     exports: [
         FormsModule,
