@@ -1,25 +1,60 @@
 <p-toolbar styleClass="bg-white border-none  pl-1 pr-4 py-2 shadow-1 mb-2 flex align-items-center">
     <div class="p-toolbar-group-start sm:col-3 col-12 lg:w-min">
-        <p-button styleClass="my-app-dark"
-                [loading]="loadingRoteiro"
-                severity="contrast"
-                (onClick)="loadingRoteiro ? undefined : popoverSemana.toggle($event) "
-                size="small"
-                fluid>
-        <div class="flex gap-2 align-items-center w-full overflow-hidden">
+        <p-select
+                  [options]="roteiros"
+                  [(ngModel)]="currentRoteiro"
+                  [loading]="loadingRoteiro"
+                  (ngModelChange)="roteiroChanged()"
+                  styleClass="border-none p-button-secondary p-button-text select-no-dropdown-icon">
+            <ng-template #selectedItem let-selectedOption>
+                <div class="flex gap-2 align-items-center w-full overflow-hidden">
                     <div class="relative flex align-items-center justify-content-center">
                         <i class="bi bi-calendar text-primary text-6xl line-height-1"></i>
                         <span class="absolute mt-2 text-xl font-bold">{{ data |date : 'dd' }}</span>
                     </div>
                     <div class="flex flex-column justify-content-start text-left w-full">
                         <p class="font-bold text-xl text-800 text-overflow-ellipsis w-full overflow-hidden white-space-nowrap">{{currentTitle}}</p>
-                        <p class="flex align-items-center gap-2">
-                            <span class="text-base text-600 font-light text-overflow-ellipsis overflow-hidden white-space-nowrap">{{currentRoteiroTitle}}</span>
-                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro?.corLegenda}"></i>
+                        <p class="flex align-items-center gap-2" *ngIf="selectedOption">
+                            <span class="text-base text-600 font-light text-overflow-ellipsis overflow-hidden white-space-nowrap">Semana {{selectedOption.semana}} - {{selectedOption.tema}}</span>
+                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: selectedOption.corLegenda }"></i>
+                        </p>
+                        <p class="flex align-items-center gap-2" *ngIf="!selectedOption">
+                            <span class="text-base text-600 font-light text-overflow-ellipsis overflow-hidden white-space-nowrap">Indefinido</span>
+                            <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: 'var(--p-surface-800)' }"></i>
                         </p>
                     </div>
-        </div>
-            </p-button>
+                </div>
+            </ng-template>
+            <ng-template let-roteiro #item>
+                <div pTooltip="{{roteiro.dataInicio | date: 'dd/MM/yyyy'}} à {{roteiro.dataFim | date: 'dd/MM/yyyy'}}">
+                    <div class="flex align-items-center gap-2 w-max">
+                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: roteiro.corLegenda }"></i>
+                        <span>Semana {{roteiro.semana}} - {{ roteiro.tema }}</span>
+                    </div>
+                </div>
+            </ng-template>
+    <ng-template #dropdownicon></ng-template>
+        </p-select>
+        <!-- <p-button styleClass="my-app-dark"
+                  [loading]="loadingRoteiro"
+                  severity="contrast"
+                  (onClick)="loadingRoteiro ? undefined : popoverSemana.toggle($event) "
+                  size="small"
+                  fluid>
+            <div class="flex gap-2 align-items-center w-full overflow-hidden">
+                <div class="relative flex align-items-center justify-content-center">
+                    <i class="bi bi-calendar text-primary text-6xl line-height-1"></i>
+                    <span class="absolute mt-2 text-xl font-bold">{{ data |date : 'dd' }}</span>
+                </div>
+                <div class="flex flex-column justify-content-start text-left w-full">
+                    <p class="font-bold text-xl text-800 text-overflow-ellipsis w-full overflow-hidden white-space-nowrap">{{currentTitle}}</p>
+                    <p class="flex align-items-center gap-2">
+                        <span class="text-base text-600 font-light text-overflow-ellipsis overflow-hidden white-space-nowrap">{{currentRoteiroTitle}}</span>
+                        <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: currentRoteiro?.corLegenda}"></i>
+                    </p>
+                </div>
+            </div>
+        </p-button> -->
     </div>
     <div class="p-toolbar-group-end">
         <div class="flex gap-2">

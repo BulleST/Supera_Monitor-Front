@@ -54,6 +54,7 @@
                               #_data="ngModel"
                               [(ngModel)]="data"
                               (onBlur)="verificaDisponibilidade()"
+                              [disabled]="loadingEventos"
                               (onMonthChange)="dateNavigatorChanged($event)"
                               (onYearChange)="dateNavigatorChanged($event)"
                               placeholder="dd/mm/yyyy"
@@ -62,15 +63,13 @@
                               [minDate]="minData"
                               inputId="data"
                               name="data"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
                               [disabledDates]="feriadoDates"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -80,18 +79,17 @@
                 <p-datepicker inputId="horario"
                               name="horario"
                               #_horario="ngModel"
+                              [disabled]="loadingEventos"
                               [(ngModel)]="horario"
                               (onBlur)="verificaDisponibilidade()"
                               placeholder="hh:mm"
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               appendTo="body"
-                              [timeOnly]="true">
+                              [timeOnly]="true"
+                              fluid >
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -106,11 +104,9 @@
                           [options]="professores"
                           [(ngModel)]="object.professor_Id"
                           [loading]="loadingProfessores || loadingEventos"
-                          [disabled]="loadingProfessores || loadingEventos"
+                          [disabled]="loadingProfessores || loadingEventos || !data || !horario"
                           (onChange)="professorChanged($event, professor_Id)"
                           #professor_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="professor_Id"
                           inputId="professor_Id"
                           optionLabel="nome"
@@ -120,7 +116,8 @@
                           filterBy="nome"
                           appendTo="body"
                           optionDisabled="deactivated"
-                          placeholder="Selecione">
+                          placeholder="Selecione"
+                              fluid >
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
@@ -134,7 +131,6 @@
                                     <ng-template #indisponivelTemplate>
                                         <div class="w-25rem">
                                             <p>
-                                                
                                                 <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                                 <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                             </p>
@@ -176,12 +172,10 @@
                           [options]="salaAulas"
                           [(ngModel)]="object.sala_Id"
                           [loading]="loadingSalaAulas || loadingEventos"
-                          [disabled]="loadingSalaAulas || loadingEventos"
+                          [disabled]="loadingSalaAulas || loadingEventos || !data || !horario"
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
-                          styleClass="w-full"
                           optionValue="id"
-                          class="w-full"
                           name="sala_Id"
                           inputId="sala_Id"
                           [required]="true"
@@ -189,7 +183,8 @@
                           filterBy="nome"
                           appendTo="body"
                           optionDisabled="deactivated"
-                          placeholder="Selecione">
+                          placeholder="Selecione"
+                              fluid >
                     <ng-template #selectedItem let-selectedOption>
                         <app-sala-aula [numeroSala]="selectedOption.numeroSala"
                                        [andar]="selectedOption.andar"
@@ -208,7 +203,6 @@
                         <ng-template #indisponivelTemplate>
                             <div class="w-25rem">
                                 <p>
-                                    
                                     <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                     <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                 </p>
@@ -240,7 +234,7 @@
                                [loading]="loadingAlunos || loadingEventos"
                                [(ngModel)]="selectedAlunos"
                                [readonly]="blockAlunoField"
-                               [disabled]="blockAlunoField || loadingEventos"
+                               [disabled]="blockAlunoField || loadingEventos || !data || !horario"
                                (onChange)="alunoChanged($event, aluno_Id)"
                                #aluno_Id="ngModel"
                                optionLabel="nome"
@@ -250,12 +244,10 @@
                                [filter]="true"
                                filterBy="nome"
                                [showToggleAll]="false"
-                               [virtualScroll]="true"
-                               [virtualScrollItemSize]="43"
                                optionDisabled="deactivated, disponivel"
                                placeholder="Selecione"
                                appendTo="body"
-                               panelStyleClass="p-select-stripped" 
+                               panelStyleClass="p-select-stripped"
                                display="chip"
                                fluid>
                     <ng-template let-item #item>
@@ -279,13 +271,15 @@
                                 <ng-template #indisponivelTemplate>
                                     <div class="w-25rem">
                                         <p>
-                                            
                                             <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                             <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                         </p>
                                         <p>{{item.disponivelEvent.descricao}}</p>
                                         <p *ngIf="item.disponivelEvent.professor">
-                                            <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                            <app-legend-color [corLegenda]="item.disponivelEvent.corLegenda"
+                                                              [professor_Id]="item.disponivelEvent.professor_Id"
+                                                              [professor]="item.disponivelEvent.professor"
+                                                              [turma_Id]="item.disponivelEvent.turma_Id"></app-legend-color>
                                             <span>{{item.disponivelEvent.professor}}</span>
                                         </p>
                                         <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
@@ -298,10 +292,6 @@
                                     </div>
                                 </ng-template>
                             </div>
-                            <!-- <div class="flex align-items-center gap-2">
-                                <span>{{ item.turma }}</span>
-                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                            </div> -->
                         </div>
                     </ng-template>
                 </p-multiselect>

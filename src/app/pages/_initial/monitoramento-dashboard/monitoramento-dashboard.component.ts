@@ -4,18 +4,16 @@ import { lastValueFrom } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
-import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao, Dashboard_Aula } from '../../../models/dashboard.model';
+import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Crypto } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import moment from 'moment';
-import 'moment/locale/pt-br';
 import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 import { AulaParticipacaoPopoverComponent } from './aula-participacao-popover/aula-participacao-popover.component';
+import moment from 'moment';
+import 'moment/locale/pt-br';
 
 @Component({
     selector: 'app-monitoramento-dashboard',

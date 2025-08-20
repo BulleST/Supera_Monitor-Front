@@ -1,0 +1,3 @@
+::ng-deep .select-no-dropdown-icon .p-select-dropdown {
+    display: none;
+}

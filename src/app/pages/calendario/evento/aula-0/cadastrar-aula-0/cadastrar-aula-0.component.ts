@@ -255,14 +255,7 @@ export class CadastrarAula0Component implements OnDestroy {
 
         let data = this.data
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.professores = validaProfessores(
-            data,
-            this.object.duracaoMinutos,
-            this.professores,
-            this.eventos,
-            undefined,
-            undefined,
-        )
+        this.professores = validaProfessores(data,this.object.duracaoMinutos,this.professores,this.eventos,undefined,undefined)
 
         if (this.object.professor_Id) {
             let e: SelectChangeEvent = {
@@ -547,10 +540,9 @@ export class CadastrarAula0Component implements OnDestroy {
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.visible = false
-                this.visibleChange()
-                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
-                window.open(object.link, '_target')
-                this.mensagemWhatsapp.copiarMensagem(object.mensagem)
+                this.visibleChange();
+                
+                this.enviarMensagemAgendamento(aluno)
             },
             reject: () => {
                 this.visible = false
@@ -558,6 +550,7 @@ export class CadastrarAula0Component implements OnDestroy {
             },
         })
     }
+
     sendMensagemAlunos() {
         this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => (x.nome < y.nome ? -1 : 1))
         this.confirmationService.confirm({
@@ -577,6 +570,7 @@ export class CadastrarAula0Component implements OnDestroy {
             },
         })
     }
+
     enviarMensagemAgendamento(aluno: Aluno) {
         if (!aluno.celular) {
             this.showError('Erro', 'Nenhum celular cadastrado', aluno)

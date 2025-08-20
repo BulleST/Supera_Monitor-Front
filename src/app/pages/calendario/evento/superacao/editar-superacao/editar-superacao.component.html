@@ -1,6 +1,6 @@
 <div class="formgrid grid">
     <!-- Data -->
-    <div class="field lg:col-2 sm:col-3 col-5">
+    <div class="field md:col-2 sm:col-4 col-4">
         <label for="data">Data:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-calendar" />
@@ -13,7 +13,7 @@
         </p-iconfield>
     </div>
     <!-- Horário -->
-    <div class="field lg:col-2 sm:col-3 col-5">
+    <div class="field md:col-2 sm:col-4 col-4">
         <label for="horario">Horário:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-clock" />
@@ -27,7 +27,7 @@
         </p-iconfield>
     </div>
     <!-- Duração -->
-    <div class="field lg:col-2 sm:col-2 col-2">
+    <div class="field md:col-2 sm:col-4 col-4">
         <label for="duracaoEvento">Duração:</label>
         <p-iconfield>
             <p-inputicon styleClass="pi pi-hourglass" />
@@ -41,7 +41,7 @@
         </p-iconfield>
     </div>
     <!-- Educador -->
-    <div class="field lg:col-5 sm:col-5  col-5">
+    <div class="field md:col-3 sm:col-6 col-6">
         <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="professores"
@@ -111,7 +111,7 @@
         </div>
     </div>
     <!-- Sala -->
-    <div class="field lg:col-5 sm:col-5  col-5">
+    <div class="field md:col-3 sm:col-6 col-6">
         <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="salaAulas"
@@ -193,7 +193,7 @@
                                [evento]="evento"
                                [showChecklist]="true"></app-aluno-popover>
             <!-- Card -->
-            <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
+            <div class="col  bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
                 <header class="flex align-items-center mb-2 p-3 surface-50">
                     <p-button type="button"
                               (onClick)="enviarMensagem(item)"
@@ -205,7 +205,7 @@
                               [text]="true" />
                     <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                         <div class="flex align-items-center">
-                            <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                            <p class="p-button-link hover:underline capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                 <span>{{ item.aluno | nameAbv }}</span>
                             </p>
                             <p-badge *ngIf="item.reposicaoDe_Evento_Id"
@@ -249,8 +249,7 @@
                 <div class="formgrid grid px-3 bg-white">
                     
                     <!-- Observações -->
-                    <div class="field col-12">
-                        <label for="observacao[{{i}}]"></label>
+                    <div class="field mt-1 col-12">
                         <textarea pTextarea
                                   id="observacao[{{i}}]"
                                   name="observacao[{{i}}]"

@@ -14,7 +14,6 @@ import { AlunoService } from '../../../../../services/alunos.service';
 import { TurmaService } from '../../../../../services/turma.service';
 import { Turma } from '../../../../../models/turma.model';
 import { NgForm, NgModel } from '@angular/forms';
-import moment from 'moment';
 import { EventoService } from '../../../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
@@ -27,8 +26,11 @@ import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { MyMap } from '../../../../../utils/map';
-import $ from 'jquery';
 import { validaAlunos, validaProfessores, validaSalaAulas, CalendarioUtils, showError } from '../../../../../utils';
+import 'moment/locale/pt-br';
+import moment from 'moment';
+import $ from 'jquery';
+import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -45,7 +47,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     object: EventoSuperacaoRequest = new EventoSuperacaoRequest;
 
-    data: Date = new Date;
+    data: Date = undefined as unknown as Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
 
@@ -92,6 +94,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
+        private nameFirstWordPipe: NameFirstWordPipe,
     ) {
 
         this.object.descricao = 'Superação';
@@ -195,11 +198,14 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         }
 
         this.loadingEventos = true;
-        let data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes())
+
+        let hora = moment(this.horario);
+        let data = moment(this.data).set( { hour: hora.hour(), minute: hora.minute(), second: 0 } );
+
+        moment.locale('pt-br')
 
         let request: CalendarioRequest = new CalendarioRequest;
-        request.intervaloDe = data;
+        request.intervaloDe = data.toDate();
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
@@ -277,40 +283,121 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
-        let alunos = e.value as Aluno[];
-        let aluno = (e.originalEvent as any).option as Aluno;
-        if (alunos.length)
 
+        this.validaAlunos()
+
+        let selected = (e.originalEvent as any).selected
+
+        // se o aluno foi selecionado, selected = false
+        // se o aluno foi deselecionado, selected = true
+        if (selected == false) { 
+            let alunos = e.value as Aluno[];
+            let aluno = (e.originalEvent as any).option as Aluno;
+            let salaAula = this.salaAulas.find(x => x.id == this.object.sala_Id) as SalaAula
+            let nome = this.nameFirstWordPipe.transform(aluno.nome);
+               
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
-                if (index) this.selectedAlunos.splice(index, 1);
+                let tipo = this.getTipo(aluno.disponivelEvent);
+                let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
+                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
+                
+                if (index) {
+                    this.selectedAlunos.splice(index, 1);
+                }
+                
+                model.control.setValue(this.selectedAlunos);
+                this.showError('Aluno Indisponível', `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, e.originalEvent);
+                return
+            } 
+            else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
 
-                this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
-                return;
-            }
+                model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+                this.showError('Restrição de Mobilidade',`O ${nome} tem restrição de mobilidade e não pode participar da superação na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent)
+                return
+            } 
             else if (alunos.length > 1) {
+
                 this.confirmationService.confirm({
                     target: e.originalEvent.target as EventTarget,
                     header: `Selecionar ${alunos.length} alunos?`,
-                    message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? Confirme a disponibilidade.',
-                    acceptLabel: `Sim`,
+                    message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? <br> Se recusar, apenas o primeiro aluno selecionado será mantido. <br> Não esqueça de confirmar a disponibilidade',
+                    acceptLabel: `Continuar`,
+                    rejectLabel: 'Cancelar',
+                    acceptIcon: 'pi pi-check',
+                    rejectIcon: 'pi pi-times',
                     acceptButtonStyleClass: 'p-button-rounded',
-                    rejectLabel: 'Não',
                     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                    reject: () => {
-                        this.selectedAlunos = [this.selectedAlunos[0]]
+                    accept: () => {
+                        model.control.setErrors(null);
+                        model.control.updateValueAndValidity()
+                        this.loadAluno(e.originalEvent, aluno, model)
                     },
-                });
+                    reject: () => {
+                        this.selectedAlunos = [this.selectedAlunos[0]];
+                        model.control.updateValueAndValidity()
+
+                    },
+                })
             }
 
-        model.control.updateValueAndValidity();
+            model.control.updateValueAndValidity()
+
+        }
     }
 
+    loadAluno(e: any, selectedAluno: Aluno, model: NgModel) {
+        if (this.selectedAlunos.length > 0) {
+            this.loadingAlunos = true
+            this.loading = true
+            lastValueFrom(this.alunoService.get(selectedAluno.id))
+                .then(res => {
+                    this.loadingAlunos = false
+                    this.loading = false
+                    
+                    let aluno = res;
+                    let restricoes = aluno.restricoes.filter(x => x.active === true)
+                    let restricaoMobilidade = aluno.restricaoMobilidade
+
+                    if (restricoes.length > 0 || restricaoMobilidade) {
+                        let mensagem = 'Esse aluno possui algumas restrições:  <ul>'
+
+                        if (restricaoMobilidade) mensagem += '<li>Restrição de mobilidade </li>'
+
+                        mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
+                        mensagem += `</ul> Tem certeza que deseja inserir ele nessa superação?`
+
+                        this.confirmationService.confirm({
+                            target: e.target,
+                            header: 'Inserir aluno',
+                            message: mensagem,
+                            acceptLabel: `Continuar`,
+                            acceptIcon: 'pi pi-check',
+                            acceptButtonStyleClass: 'p-button-rounded',
+                            rejectIcon: 'pi pi-times',
+                            rejectLabel: 'Cancelar',
+                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                            accept: () => { },
+                            reject: () => {
+                                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
+                                if (index != -1) this.selectedAlunos.splice(index, 1, aluno)
+
+                                model.control.setValue(this.selectedAlunos);
+                                model.control.updateValueAndValidity();
+                            },
+                        })
+                    }
+                })
+                .catch(res => {
+                    this.showError('Erro', `Não foi possível carregar restrições de ${selectedAluno.nome}`, e)
+                    this.loadingAlunos = false
+                    this.loading = false
+                })
+        }
+    }
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
-
     
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
@@ -331,20 +418,21 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         // playAlert();
 
         this.object.alunos = this.selectedAlunos.map(x => x.id);
-        this.object.professores = [this.professorSelected.id];
-
         this.object.data = new Date(this.data);
         this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any
+        this.object.professores = [this.professorSelected.id];
+        this.object.professor_Id = this.professorSelected.id;
 
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar superação',
             message: `Tem certeza que deseja agendar superação para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?`,
             acceptLabel: `Agendar superação`,
+            rejectLabel: 'Cancelar',
             acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Não',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -363,13 +451,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
                 this.service.calendarioReload.emit(res.object.id);
                 this.markChecklistAsDone();
-                // playSuccess();
+                this.sendMensagemAlunos();
 
-                if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
-                    this.sendMensagemAluno(e, res.object);
-                } else {
-                    this.sendMensagemAlunos();
-                }
             })
             .catch(res => {
                 this.loading = false;
@@ -378,35 +461,6 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     }
 
-    sendMensagemAluno(e: any, evento: any) {
-        let aluno = this.selectedAlunos[0] as Aluno;
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500 text-4xl',
-            acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: ' p-button-rounded p-button-success',
-            acceptIcon: 'pi pi-whatsapp',
-            rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                this.visible = false;
-                this.visibleChange();
-                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(
-                    aluno.nome,
-                    aluno.celular,
-                    evento
-                );
-                window.open(object.link, '_target');
-                this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-            },
-            reject: () => {
-                this.visible = false;
-                this.visibleChange();
-            },
-        });
-    }
     sendMensagemAlunos() {
         this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
@@ -415,9 +469,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
+            acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            rejectVisible: false,
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
@@ -433,15 +487,21 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
         }
     }
+    
     enviarMensagemAgendamento(aluno: Aluno) {
-        let evento = MyMap(this.object, new Evento());
-        evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
-        return this.mensagemWhatsapp.enviarMensagemAgendamento(
-            aluno.nome,
-            aluno.celular,
-            evento
-        );
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
+            return
+        }
+        let evento = MyMap(this.object, new Evento())
+        evento.evento_Tipo_Id = EventoTipo.TurmaExtra
+        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
+        window.open(object.link, '_target')
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
+        let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+        if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1)
     }
+
 
     enviarMensagem(aluno: Aluno) {
         if (!aluno.celular) {
