@@ -16,6 +16,7 @@ import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
 import { EventoService } from '../../../../../services/evento.service';
+import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({
     selector: 'app-editar-oficina',
@@ -50,6 +51,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
         private service: EventoService,
+        private alunoService: AlunoService,
     ) {
         this.onSave.subscribe(res => {
             this.markChecklistAsDone();
@@ -135,11 +137,18 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         // Id 34 ou 36
         this.evento.alunos
         .filter(x => x.presente === true && x.active === true)
-        .forEach(aluno => {
-            let alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36)) as Aluno_CheckList_Item;
+        .forEach(async aluno => {
+            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36)) as Aluno_CheckList_Item;
+            
             if (alunoChecklist && !alunoChecklist.finalizado) {
-                let mensagem = `Aluno compareceu na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
-                                Oficina finalizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+
+                const data = moment(this.evento.data).format('DD/MM/YY [às] hh[h]mm')
+                const account = this.accountService.accountValue?.name;
+                const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] hh[h]mm');
+                
+                const mensagem = `Aluno compareceu na oficina do dia ${data}. <br>
+                                Oficina finalizada por ${account} no dia ${dataCadastro}.`
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
                 }

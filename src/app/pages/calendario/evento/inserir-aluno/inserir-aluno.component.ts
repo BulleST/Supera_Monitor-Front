@@ -66,7 +66,7 @@ export class InserirAlunoComponent {
         private checklistService: ChecklistService,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
-        
+
 
     ) {
 
@@ -212,15 +212,15 @@ export class InserirAlunoComponent {
     alunoChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaAlunos();
         let aluno = e.value as Aluno;
-        let salaAula =  this.salas.find(x => x.id == this.evento.sala_Id) as SalaAula;
+        let salaAula = this.salas.find(x => x.id == this.evento.sala_Id) as SalaAula;
         if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-    
+
             this.selectedAluno = undefined;
             this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
         else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
-    
+
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
             this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);
             return;
@@ -236,8 +236,8 @@ export class InserirAlunoComponent {
         this.loading = true;
 
         lastValueFrom(this.alunoService.get(aluno.id))
-        .then(res => {
-        
+            .then(res => {
+
                 aluno = res;
 
                 this.loadingAlunos = false;
@@ -253,7 +253,7 @@ export class InserirAlunoComponent {
 
                     mensagem += restricoes.map(x => '• ' + x.descricao).join('<br>');
                     mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
-            
+
 
                     this.confirmationService.confirm({
                         target: e.target,
@@ -266,10 +266,10 @@ export class InserirAlunoComponent {
                         rejectLabel: 'Cancelar',
                         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                         accept: () => {
-                    
+
                         },
                         reject: () => {
-                    
+
                             this.selectedAluno = undefined;
                         }
                     })
@@ -381,7 +381,7 @@ export class InserirAlunoComponent {
                     let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
                     window.open(object.link, '_blank');
                     this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-    
+
                     this.visible = false
                     this.visibleChange();
                 },
@@ -393,8 +393,9 @@ export class InserirAlunoComponent {
         }
     }
 
-    markChecklistAsDone() {
-        let aluno = this.selectedAluno as Aluno;
+    async markChecklistAsDone() {
+        const aluno = await lastValueFrom(this.alunoService.get(this.selectedAluno!.id));
+
         if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
             this.checklistAula0(aluno);
         } else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
@@ -403,21 +404,30 @@ export class InserirAlunoComponent {
     }
 
     checklistSuperacao(aluno: Aluno) {
-        let alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+        const alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+        const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        const professor = this.evento.professor;
+        const account = this.accountService.accountValue?.name;
+        const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
 
         if (alunoChecklist && !alunoChecklist.finalizado) {
-            let mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.<br> Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`
+            const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro};`
             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
         }
     }
 
     checklistAula0(aluno: Aluno) {
         // Agendamento na aula 0
-        let id = 31;
-        let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        const id = 31;
+        const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
 
         if (alunoChecklist && !alunoChecklist.finalizado) {
-            let mensagem = `Aula 0 agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm')} com o educador ${this.evento.professor}.<br> Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')}}`;
+            const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+            const professor = this.evento.professor;
+            const account = this.accountService.accountValue?.name;
+            const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+
+            const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`;
             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
         }
     }

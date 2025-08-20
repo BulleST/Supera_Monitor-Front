@@ -291,19 +291,19 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         })
     }
 
-    markChecklistAsDone() {
-        let aluno = this.aluno as Aluno;
+   async markChecklistAsDone() {
+        const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id));   
         // Agendamento na 1ª aula 
         if (aluno) {
-            let id = 38;
-            let alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            let professor = this.evento.professor;
-            let data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-            let dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
-            let account = this.accountService.accountValue;
+            const id = 38;
+            const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+            const professor = this.evento.professor;
+            const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+            const dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
+            const account = this.accountService.accountValue?.name;
 
             if (alunoChecklist && !alunoChecklist.finalizado) {
-                let mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account?.name} no dia ${dataAgendamento}`;
+                const mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account} no dia ${dataAgendamento}`;
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
                 }

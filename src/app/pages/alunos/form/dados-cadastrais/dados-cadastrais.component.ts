@@ -480,7 +480,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                         })
                         .catch((res: HttpErrorResponse) => {
                             this.loadingRestricoes = false;
-                            this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                            this.showError('Erro', 'Não foi possível inserir essa restrição. <br> ' + getError(res), e);
                         })
                 },
                 reject: () => {
@@ -530,7 +530,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                     })
                     .catch((res: HttpErrorResponse) => {
                         this.loadingRestricoes = false;
-                        this.showError('Erro', 'Não foi possível inserir essa restrição. \n ' + getError(res), e);
+                        this.showError('Erro', 'Não foi possível inserir essa restrição. <br> ' + getError(res), e);
                         model.control.setValue(item.active);
                     })
 

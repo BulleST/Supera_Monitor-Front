@@ -380,7 +380,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
@@ -419,12 +419,16 @@ export class CadastrarInscricaoComponent implements OnDestroy {
 
         this.alunosSelected.forEach(async aluno => {
 
-            let alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-            let alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
+            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
             
             if (alunoChecklist) {
-                let mensagem = `Inscrição na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
-                                Inscrição realizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+                const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+                const account = this.accountService.accountValue?.name;
+                const dataInscricao = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+
+                const mensagem = `Inscrição na oficina do dia ${data}. <br> Inscrição realizada por ${account} no dia ${dataInscricao}`
+
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
                 }

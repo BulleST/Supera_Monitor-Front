@@ -96,7 +96,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         this.object.descricao = 'Superação';
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
@@ -106,7 +106,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
@@ -116,7 +116,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingSalaAulas = false);
         }
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -126,7 +126,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true));
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -136,7 +136,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 .catch(res => this.loadingAlunos = false);
         }
 
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res);
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
         this.loadFeriados();
@@ -144,7 +144,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         this.activatedRoute.params.subscribe(res => {
             if (res['aluno_Id']) {
-                var aluno_Id = this.crypto.decrypt(res['aluno_Id']);
+                let aluno_Id = this.crypto.decrypt(res['aluno_Id']);
                 this.selectedAlunos = this.alunos.filter(x => x.id = aluno_Id)
                 if (this.selectedAlunos.length > 0) this.blockAlunoField = true;
             }
@@ -188,17 +188,17 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     async verificaDisponibilidade() {
-        var valid = true;
+        let valid = true;
 
         if (!this.data || !this.horario) {
             return valid;
         }
 
         this.loadingEventos = true;
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes())
 
-        var request: CalendarioRequest = new CalendarioRequest;
+        let request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
@@ -216,18 +216,18 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     validaSalaAulas() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
 
     validaProfessores() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
 
         if (this.professorSelected) {
-            var e: SelectChangeEvent = {
+            let e: SelectChangeEvent = {
                 value: this.professorSelected,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
             }
@@ -236,13 +236,13 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     validaAlunos() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = e.value as Professor;
+        let item = e.value as Professor;
         let mensagemErro: string | null = null;
 
         if (item && !item.disponivel && item.disponivelEvent) {
@@ -266,7 +266,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
-        var item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
@@ -277,12 +277,12 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
-        var alunos = e.value as Aluno[];
-        var aluno = (e.originalEvent as any).option as Aluno;
+        let alunos = e.value as Aluno[];
+        let aluno = (e.originalEvent as any).option as Aluno;
         if (alunos.length)
 
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-                var index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
                 if (index) this.selectedAlunos.splice(index, 1);
 
                 this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
@@ -379,7 +379,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     sendMensagemAluno(e: any, evento: any) {
-        var aluno = this.selectedAlunos[0] as Aluno;
+        let aluno = this.selectedAlunos[0] as Aluno;
         this.confirmationService.confirm({
             target: e.target,
             message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -393,7 +393,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             accept: () => {
                 this.visible = false;
                 this.visibleChange();
-                var object = this.mensagemWhatsapp.enviarMensagemAgendamento(
+                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(
                     aluno.nome,
                     aluno.celular,
                     evento
@@ -411,7 +411,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
@@ -427,14 +427,14 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     removerAlunoLista(aluno: Aluno, e: any) {
         if (e.which == 2) {
-            var index = this.mensagensEnviadasAlunos.findIndex(
+            let index = this.mensagensEnviadasAlunos.findIndex(
                 (x) => x.id == aluno.id
             );
             if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
         }
     }
     enviarMensagemAgendamento(aluno: Aluno) {
-        var evento = MyMap(this.object, new Evento());
+        let evento = MyMap(this.object, new Evento());
         evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
         return this.mensagemWhatsapp.enviarMensagemAgendamento(
             aluno.nome,
@@ -456,13 +456,19 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     markChecklistAsDone() {
         // Agendar superação
         // Id 22 ou 29
-        this.selectedAlunos.forEach(aluno => {
-            var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
-            var professor = this.professorSelected as Professor;
+        this.selectedAlunos.forEach(async aluno => {
+            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+
+            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+
+            const professor = this.professorSelected?.nome;
+            const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm');
+            const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+            const account = this.accountService.accountValue?.name;
 
             if (alunoChecklist) {
-                var mensagem = `Superação agendada para o dia ${moment(this.object.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                                Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
+                const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
+                
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
                 }

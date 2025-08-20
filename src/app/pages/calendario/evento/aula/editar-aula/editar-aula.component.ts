@@ -166,7 +166,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 let restricoes = aluno.restricoes.filter(x => x.active);
 
                 if (restricaoMobilidade || restricoes.length > 0) {
-                    restricoesMessage += `\n - ${this.nameFirstWordPipe.transform(aluno.nome)}`
+                    restricoesMessage += `<br> - ${this.nameFirstWordPipe.transform(aluno.nome)}`
                     if (restricaoMobilidade) {
                         restricoesMessage += `<pre>Restrição de mobilidade: Sim</pre>`
                     }
@@ -178,7 +178,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         });
 
         if (restricoesMessage) {
-            this.showError('Atenção', `Alguns alunos possuem restrições. \n${restricoesMessage} \n Tem certeza que deseja continuar?`, e);
+            this.showError('Atenção', `Alguns alunos possuem restrições. <br>${restricoesMessage} <br> Tem certeza que deseja continuar?`, e);
         }
 
     }

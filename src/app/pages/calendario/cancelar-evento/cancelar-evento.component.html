@@ -18,12 +18,11 @@
                                   (auxclick)="enviarMensagemCancelamento(participacao)"
                                   (contextmenu)="enviarMensagemCancelamento(participacao)"
                                   [disabled]="!participacao.celular"
-                                  icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
-                                  styleClass="{{!participacao.celular ? 'text-300' : ''}}"
-                                  severity="success"
-                                  [label]="participacao.aluno"
-                                  [text]="true"
-                                  class="mt-1"/>
+                                  icon="pi pi-whatsapp"
+                                  styleClass="capitalize"
+                                  [severity]="participacao.celular ? 'success' : 'secondary'"
+                                  label="{{participacao.aluno | nameAbv}}"
+                                  [text]="true" />
                     </div>
                 </div>
             </div>
@@ -49,39 +48,42 @@
     </ng-template>
     <form #form="ngForm" (submit)="sendConfirmation( $event, form)">
         <p class="text-lg mb-1">Tem certeza que deseja cancelar essa {{tipoEventoString}}? </p>
-        <p class="text-lg my-4 flex flex-wrap gap-2 align-items-center">
+            <p class="text-xl text-primary-500 white-space-nowrap flex align-items-center gap-2">
+                <i class="fa-solid fa-users-between-lines"></i>
+                <span class="capitalize font-bold">{{evento.descricao }} </span>
+            </p>
+        <p class="flex flex-column my-2">
+        
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
                 <i class="pi pi-calendar"></i>
-                <span class="font-bold">Data:</span> 
-                <span>{{evento.data | date : 'dd/MM/yy'}} </span>
+                <!-- <span class="font-bold">Data:</span> -->
+                <span class="capitalize">{{evento.data | date : 'EEEE\',\''}} </span>
+                <span>{{evento.data | date : 'dd \'de\' MMMM \'de\' yyyy '}} </span>
             </span>
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
                 <i class="pi pi-clock"></i>
-                <span class="font-bold">Horário:</span> 
+                <!-- <span class="font-bold">Horário:</span> -->
                 <span>{{evento.data | date : 'HH:mm'}}</span>
-            </span>
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2" *ngIf="evento.turma">
-                <i class="fa-solid fa-users-between-lines"></i>
-                <span class="font-bold">Turma: </span>
-                <span>{{evento.turma}}</span>
             </span>
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2" *ngIf="evento.professor">
                 <i class="fa-solid fa-person-chalkboard"></i>
-                <span class="font-bold">Educador: </span>
+                <span>Educador: </span>
                 <span>{{evento.professor}}</span>
-                <span class="flex w-1rem h-1rem border-circle " [style]="{ backgroundColor: evento.corLegenda }"></span>
+                <app-legend-color [corLegenda]="evento.corLegenda"
+                                [professor_Id]="evento.professor_Id"
+                                [turma_Id]="evento.turma_Id"></app-legend-color>
             </span>
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
-                <i class="fa-solid fa-building text-base"></i>
-                <span class="font-bold">Sala: </span>
+                <i class="bi bi-door-closed"></i>
+                <span>Sala: </span>
                 <app-sala-aula [sala_Id]="evento.sala_Id"
-                 [numeroSala]="evento.numeroSala"
-                  [andar]="evento.andar"></app-sala-aula>
+                               [numeroSala]="evento.numeroSala"
+                               [andar]="evento.andar"></app-sala-aula>
             </span>
         </p>
-        <div class="formgrid grid mt-4">
+        <div class="formgrid grid mt-2">
             <div class="field col-12"> <!-- Observações -->
-                <label for="observacao" class="font-bold text-lg">Observações:<span class="text-red-500">*</span> <span class="text-400 text-sm font-normal ml-2">(motivo do cancelamento)</span></label>
+                <label for="observacao">Observações:<span class="text-red-500">*</span> <span class="text-400 text-sm font-normal ml-2">(motivo do cancelamento)</span></label>
                 <textarea pTextarea
                           class="w-full"
                           name="observacao"
@@ -104,7 +106,7 @@
                 </p>
                 <hr class="mb-2 border-orange-500 border-1">
                 <div *ngFor="let item of evento.alunos; let i = index">
-                    <div class="flex align-items-center w-full p-2" [ngClass]="{
+                    <div class="flex align-items-center w-full p-2 gap-2" [ngClass]="{
                         'bg-white': i % 2 == 0,
                         'surface-50': i % 2 != 0 
                     }">
@@ -116,10 +118,13 @@
                                   icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [text]="true"
-                                  [rounded]="true"/>
-                        <p class="ml-2">{{ item.aluno }}</p>
-                        <p-badge *ngIf="item.reposicaoDe_Evento_Id" styleClass="ml-2 " value="Reposição" size="small"></p-badge>
-
+                                  [rounded]="true" />
+                        <p class="capitalize" [pTooltip]="item.aluno">{{ item.aluno | nameAbv}}</p>
+                        <ng-container *ngIf="item.reposicaoDe_Evento_Id">
+                            <p-badge
+                                     value="Reposição"
+                                     size="small"></p-badge>
+                        </ng-container>
                     </div>
                 </div>
             </div>

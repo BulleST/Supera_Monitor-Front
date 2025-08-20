@@ -16,6 +16,7 @@ import { AccountService } from '../../../../../services/account.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { showError, CalendarioUtils } from '../../../../../utils';
 import { EventoService } from '../../../../../services/evento.service';
+import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({
     selector: 'app-editar-superacao',
@@ -55,6 +56,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
         private service: EventoService,
+        private alunoService: AlunoService,
     ) {
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
@@ -76,11 +78,11 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
             this.evento = changes['evento'].currentValue;
             if (!this.evento.finalizado) {
                 this.evento.alunos
-                .filter(x => x.active)
-                .map(x => {
-                    x.presente == true;
-                    return x;
-                });
+                    .filter(x => x.active)
+                    .map(x => {
+                        x.presente == true;
+                        return x;
+                    });
             }
         }
         if (changes['professores']) this.professores = changes['professores'].currentValue;
@@ -162,22 +164,28 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
 
 
     markChecklistAsDone() {
+
         // Comparecimento na superação
         // Id 35
         this.evento.alunos.filter(x => x.active === true && x.presente === true)
-        .map(aluno => {
-            var id = 35;
-            var alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            var professor = this.professores.find(x => x.id == this.evento.professor_Id) as Professor;
-    
-            if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
-                var mensagem = `Superação agendada para o dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')} com o educador ${professor.nome}.\n
-                                    Agendamento realizado por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+            .map(async aluno => {
+                const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+
+                const id = 35;
+                const alunoChecklist = alunoObj.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+                const professor = this.professores.find(x => x.id == this.evento.professor_Id)?.nome;
+                const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+                const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+                const account = this.accountService.accountValue?.name;
+
+                if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
+                    const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br>
+                                    Agendamento realizado por ${account} no dia ${dataCadastro}`
+                    if (alunoChecklist && !alunoChecklist.finalizado) {
+                        lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+                    }
                 }
-            }
-        })
+            })
     }
 
 

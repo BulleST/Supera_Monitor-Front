@@ -756,7 +756,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             })
             .catch(res => {
                 this.loading = false;
-                this.showError('Agendamento falhou', `Não foi possível agendar aula. \n ${getError(res)}`, e);
+                this.showError('Agendamento falhou', `Não foi possível agendar aula. <br> ${getError(res)}`, e);
             })
 
     }
@@ -765,7 +765,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         this.mensagensEnviadasAlunos = this.target.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. \n Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
