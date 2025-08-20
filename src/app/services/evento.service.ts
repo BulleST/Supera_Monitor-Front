@@ -123,10 +123,8 @@ export class EventoService extends Service {
     }
 
     getList(request: CalendarioRequest) {
-        return this.http
-            .post<Evento[]>(`${this.url}/eventos/calendario/`, request)
-            .pipe(
-                tap({
+        return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
+            .pipe(tap({
                     next: async (eventos) => {
                         if (this.roteiroService.list.value.length == 0)
                             await lastValueFrom(this.roteiroService.getList('calendario'));
@@ -135,12 +133,9 @@ export class EventoService extends Service {
                         eventos = eventos.map((evento) => {
                             evento = this.mapEvento(evento);
 
-                            let index = list.findIndex(
-                                (x) =>
-                                    x.id == evento.id &&
-                                    x.turma_Id == evento.turma_Id &&
-                                    moment(x.data).isSame(evento.data)
-                            );
+                            let index = list.findIndex(x => x.id == evento.id 
+                                && x.turma_Id == evento.turma_Id 
+                                && moment(x.data).isSame(evento.data));
 
                             if (index == -1) list.push(evento);
                             else list.splice(index, 1, evento);
@@ -152,9 +147,7 @@ export class EventoService extends Service {
                         return of(list);
                     },
                     error: (err) => {
-                        this.toastrService.error(
-                            `Não foi possível carregar calendário. \n ${getError(err)}`
-                        );
+                        this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
                     },
                 })
             );

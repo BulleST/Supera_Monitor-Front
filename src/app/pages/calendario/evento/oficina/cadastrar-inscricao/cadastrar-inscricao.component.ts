@@ -85,14 +85,14 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private crypto: Crypto,
     ) {
 
-        var params = this.activatedRoute.snapshot.params;
+        let params = this.activatedRoute.snapshot.params;
         if (!params['evento_id']) {
             this.visible = false;
             this.visibleChange();
             return
         }
 
-        // var professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true));
+        // let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true));
         // this.subscription.push(professores);
 
         // if (this.professores.length == 0) {
@@ -102,7 +102,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         //         .catch(res => this.loadingProfessores = false);
         // }
 
-        // var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
+        // let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
         // this.subscription.push(salaAula);
 
         // if (this.salaAulas.length == 0) {
@@ -112,7 +112,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         //         .catch(res => this.loadingSalaAulas = false);
         // }
 
-        var alunos = this.alunoService.list.subscribe(res => {
+        let alunos = this.alunoService.list.subscribe(res => {
             this.alunos = res.filter(x => x.active == true);
             this.setAlunos();
         });
@@ -123,7 +123,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             .then(res => this.loadingAlunos = false)
             .catch(res => this.loadingAlunos = false);
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -133,13 +133,13 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
 
-        var evento = this.service.evento.subscribe(async res => {
+        let evento = this.service.evento.subscribe(async res => {
             if (!res) {
                 try {
-                   var decrypted = this.crypto.decrypt(params['evento_id']);
+                   let decrypted = this.crypto.decrypt(params['evento_id']);
                     if (params['evento_id'] && decrypted && decrypted != PseudoEvento.EventoId) {
                         await lastValueFrom(this.service.get(decrypted))
                             .then(res => {
@@ -151,7 +151,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                                 this.visibleChange();
                             })
                     } else {
-                        var evento = JSON.parse(localStorage.getItem('evento') ?? '')
+                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
                         this.service.setEvento(evento)
                     }
                 }
@@ -168,9 +168,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 this.verificaDisponibilidade();
 
 
-                var minutos = this.evento.duracaoMinutos % 60
-                var horas = this.evento.duracaoMinutos / 60;
-                var horaRedonda = (horas - Math.floor(horas)) == 0;
+                let minutos = this.evento.duracaoMinutos % 60
+                let horas = this.evento.duracaoMinutos / 60;
+                let horaRedonda = (horas - Math.floor(horas)) == 0;
 
                 this.duracaoEvento = horaRedonda ?
                     horas.toString().padStart(2, '0') + 'h' :
@@ -210,17 +210,17 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         if (this.evento && this.alunos.length) {
             
 
-                var alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
+                let alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
         }
     }
 
 
     async verificaDisponibilidade() {
-        var valid = true;
+        let valid = true;
 
         this.loadingEventos = true;
-        var request: CalendarioRequest = new CalendarioRequest;
+        let request: CalendarioRequest = new CalendarioRequest;
 
         request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate();
         request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD').add(1, 'day').toDate();
@@ -239,16 +239,16 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     // validaSalaAulas() {
-    //     var data = this.object.data;
+    //     let data = this.object.data;
     //     this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     // }
 
     // validaProfessores() {
-    //     var data = this.object.data;
+    //     let data = this.object.data;
     //     this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
 
     //     if (this.object.professor_Id) {
-    //         var e: SelectChangeEvent = {
+    //         let e: SelectChangeEvent = {
     //             value: this.object.professor_Id,
     //             originalEvent: { target: $('#professor_Id').get(0) as any } as any
     //         }
@@ -257,16 +257,16 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     // }
 
     validaAlunos() {
-        var data = this.evento.data;
+        let data = this.evento.data;
         this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
     }
 
 
     // alunoChanged(e: SelectChangeEvent, model: NgModel) {
     alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
-        var aluno = e.itemValue as Aluno;
-        var alunos = e.value as Aluno[];
-        var index = alunos.findIndex(x => x.id == aluno.id);
+        let aluno = e.itemValue as Aluno;
+        let alunos = e.value as Aluno[];
+        let index = alunos.findIndex(x => x.id == aluno.id);
         if (index == -1) {
             // está removendo alunos
         } else {
@@ -285,17 +285,17 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    getCorTurma(turma_Id: number) {
-        return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
+    enviarMensagem(aluno: Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
+            return
+        }
+
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular)
+        window.open(object.link, '_target')
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
     }
 
-    enviarMensagem(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagem(nome, celular)
-    }
-
-    enviarMensagemInscricao(nome: string, celular: string) {
-        return this.mensagemWhatsapp.enviarMensagemInscricao(nome, celular, this.evento);
-    }
 
     sendConfirmation(form: NgForm, e: any) {
 
@@ -314,9 +314,10 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             header: 'Inscrever alunos',
             message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.alunosSelected.map(x => x.nome.split(' ')[0]).join(', ')}?`,
             acceptLabel: `Salvar e inscrever`,
-            acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 this.send(e);
@@ -328,14 +329,14 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     async send(e: any) {
 
         this.loading = true;
-        var response: RequestResponse = { success: false, message: '', object: undefined };
+        let response: RequestResponse = { success: false, message: '', object: undefined };
 
         if (this.evento.id == PseudoEvento.EventoId) {
             response = await lastValueFrom(this.requestOficina());
             this.evento.id = response.object.id;
         }
 
-        var count = 0
+        let count = 0
         await new Promise<boolean>((resolve, reject) => {
             this.alunosSelected.forEach(aluno => {
                 lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
@@ -366,7 +367,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     requestOficina() {
-        var request = MyMap(this.evento, new EventoOficinaRequest);
+        let request = MyMap(this.evento, new EventoOficinaRequest);
         request.alunos = [];
         request.professores = [this.evento.professor_Id];
         request.data = new Date(this.evento.data);
@@ -383,9 +384,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500',
             acceptLabel: `Concluir`,
+            acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            rejectVisible: false,
             accept: () => {
                 this.visible = false
                 this.visibleChange();
@@ -396,13 +397,13 @@ export class CadastrarInscricaoComponent implements OnDestroy {
 
     removerAlunoLista(aluno: Aluno, e: any) {
         if (e.which == 2) {
-            var index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
+            let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
             if (index != -1)
                 this.mensagensEnviadasAlunos.splice(index, 1);
         }
     }
 
-    enviarMensagemAgendamento(aluno: Aluno) {
+    enviarMensagemInscricao(aluno: Aluno) {
         if (!aluno.celular) {
             this.showError('Erro', 'Nenhum celular cadastrado', aluno);
             return;
@@ -415,10 +416,14 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     markChecklistAsDone() {
         // Agendar 1ª Oficina ou 2ª 
         // checklist_Item_Id 12 ou 23
-        this.alunosSelected.forEach(aluno => {
-            var alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
+
+        this.alunosSelected.forEach(async aluno => {
+
+            let alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+            let alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
+            
             if (alunoChecklist) {
-                var mensagem = `Inscrição na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
+                let mensagem = `Inscrição na oficina do dia ${moment(this.evento.data).format('DD/MM/YY [às] HHH[h]mm')}. \n
                                 Inscrição realizada por ${this.accountService.accountValue?.name} no dia ${moment(new Date()).format('DD/MM/YY [aproximadamente às] HHH[h]mm')}}`
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))

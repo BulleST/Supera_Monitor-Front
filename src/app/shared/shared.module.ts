@@ -80,6 +80,7 @@ import { LegendColorComponent } from './professor/legend-color/legend-color.comp
         EventoItemHoverComponent,
         LoadingBrainComponent,
         TableHeaderFilterComponent,
+        LegendColorComponent,
     ],
     imports: [
         CommonModule,

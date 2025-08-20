@@ -1,5 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-
 <p-dialog [header]="'Agendar Oficina'"
           [maximizable]="true"
           [draggable]="true"
@@ -21,7 +20,7 @@
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
             <!-- Descrição -->
-            <div class="field md:col-6 sm:col-12 col-12"> 
+            <div class="field md:col-6 sm:col-12 col-12">
                 <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -29,14 +28,14 @@
                        [(ngModel)]="object.descricao"
                        id="descricao"
                        name="descricao"
-                       class="w-full"
-                       [required]="true">
+                       [required]="true"
+                       fluid>
                 <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Data -->
-            <div class="field md:col-3 sm:col-4 col-6"> 
+            <div class="field md:col-3 sm:col-4 col-6">
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker #_data="ngModel"
                               [(ngModel)]="data"
@@ -49,21 +48,19 @@
                               [minDate]="minData"
                               inputId="data"
                               name="data"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
                               [disabledDates]="feriadoDates"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Horário -->
-            <div class="field md:col-3 sm:col-4 col-6"> 
+            <div class="field md:col-3 sm:col-4 col-6">
                 <label for="hora">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker inputId="hora"
                               name="hora"
@@ -74,12 +71,10 @@
                               [showIcon]="true"
                               icon="pi pi-clock"
                               [iconDisplay]="'input'"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
                               appendTo="body"
-                              [timeOnly]="true">
+                              [timeOnly]="true"
+                              fluid>
                     <ng-template #inputicon let-clickCallBack="clickCallBack">
                         <i class="pi pi-clock" (click)="clickCallBack($event)"></i>
                     </ng-template>
@@ -95,25 +90,22 @@
                                [(ngModel)]="object.capacidadeMaximaAlunos"
                                id="capacidadeMaximaAlunos"
                                name="capacidadeMaximaAlunos"
-                               class="w-full"
-                               styleClass="w-full"
-                               inputStyleClass="w-full"
-                               [required]="true" />
+                               [required]="true"
+                               fluid />
                 <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Educador -->
-            <div class="field md:col-4 sm:col-6 col-6"> 
+            <div class="field md:col-4 sm:col-6 col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
                           [(ngModel)]="professorSelected"
-                          [loading]="loadingProfessores"
+                          [loading]="loadingProfessores || loadingEventos"
                           (onChange)="professorChanged($event, professor_Id)"
+                          [disabled]="!data || !horario || loadingEventos"
                           #professor_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="professor_Id"
                           inputId="professor_Id"
                           optionLabel="nome"
@@ -121,7 +113,8 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
@@ -135,7 +128,6 @@
                                     <ng-template #indisponivelTemplate>
                                         <div class="w-25rem">
                                             <p>
-                                                
                                                 <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                                 <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                             </p>
@@ -172,16 +164,15 @@
                 </div>
             </div>
             <!-- Sala -->
-            <div class="field md:col-4 sm:col-6 col-6"> 
+            <div class="field md:col-4 sm:col-6 col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="salaAulas"
                           [(ngModel)]="object.sala_Id"
-                          [loading]="loadingSalaAulas"
+                          [loading]="loadingSalaAulas || loadingEventos"
+                          [disabled]="!data || !horario || loadingEventos"
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="sala_Id"
                           inputId="sala_Id"
                           optionValue="id"
@@ -189,7 +180,8 @@
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template #selectedItem let-selectedOption>
                         <app-sala-aula [numeroSala]="selectedOption.numeroSala"
                                        [andar]="selectedOption.andar"
@@ -208,7 +200,6 @@
                         <ng-template #indisponivelTemplate>
                             <div class="w-25rem">
                                 <p>
-                                    
                                     <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                     <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                 </p>
@@ -234,14 +225,14 @@
                 </div>
             </div>
             <!-- Observações -->
-            <div class="field col-12"> 
+            <div class="field col-12">
                 <label for="observacao">Observações:</label>
                 <textarea pTextarea
-                          class="w-full"
                           name="observacao"
                           id="observacao"
                           [(ngModel)]="object.observacao"
-                          [rows]="3"></textarea>
+                          [rows]="3"
+                          fluid></textarea>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"

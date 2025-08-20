@@ -13,14 +13,16 @@
                     <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
                     <div *ngFor="let aluno of mensagensEnviadasAlunos">
                         <p-button type="button"
-                                  (onClick)="enviarMensagemAgendamento(aluno)"
-                                  (auxclick)="enviarMensagemAgendamento(aluno)"
-                                  (contextmenu)="enviarMensagemAgendamento(aluno)"
+                                  (onClick)="enviarMensagemInscricao(aluno)"
+                                  (auxclick)="enviarMensagemInscricao(aluno)"
+                                  (contextmenu)="enviarMensagemInscricao(aluno)"
                                   [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                  severity="success"
-                                  [label]="aluno.nome"
-                                  [text]="true"/>
+                                  icon="pi pi-whatsapp"
+                                  [severity]="aluno.celular ? 'success' : 'secondary'"
+                                  label="{{aluno.nome | nameAbv }}"
+                                  styleClass="capitalize"
+                                  [pTooltip]="aluno.nome"
+                                  [text]="true" />
                     </div>
                 </div>
             </div>
@@ -56,7 +58,9 @@
                                [loading]="loadingAlunos"
                                [(ngModel)]="alunosSelected"
                                (onChange)="alunoChanged($event, aluno_Id)"
-                               [maxSelectedLabels]="!evento.capacidadeMaximaAlunos ? 12 : evento.capacidadeMaximaAlunos"
+                               [maxSelectedLabels]="evento.vagas"
+                               [maxlength]="evento.vagas"
+                               [selectionLimit]="evento.vagas"
                                display="chip"
                                optionLabel="nome"
                                #aluno_Id="ngModel"
@@ -68,24 +72,24 @@
                                [filter]="true"
                                filterBy="nome"
                                appendTo="body"
-                               [virtualScroll]="true"
-                               virtualScrollItemSize="55"
                                optionDisabled="deactivated,disponivel">
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
                                 <div class="flex align-items-center">
-                                    <div class="flex w-2rem h-2rem mr-1 flex-none align-items-center">
-                                        <a *ngIf="item.celular"
-                                           [href]="enviarMensagem(item.nome, item.celular)"
-                                           pTooltip="Enviar mensagem"
-                                           target="_blank"
-                                           rel="noopener noreferrer"
-                                           class="-ml-1 p-2 flex  text-green-500 border-circle hover:bg-green-500 hover:text-white pi pi-whatsapp">
-                                        </a>
+                                    <div class="flex flex-none align-items-center">
+                                        <p-button type="button"
+                                                  (onClick)="enviarMensagem(item)"
+                                                  (auxclick)="enviarMensagem(item)"
+                                                  (contextmenu)="enviarMensagem(item)"
+                                                  [disabled]="!item.celular"
+                                                  icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                                  severity="success"
+                                                  [text]="true"
+                                                  size="small"/>
                                     </div>
                                     <p class="font-bold mb-1">
-                                        <span class="mr-2">{{item.nome}}</span>
+                                        <span class="mr-2 capitalize">{{item.nome | nameAbv }}</span>
                                         <p-badge *ngIf="item.disponivel == false"
                                                  value="Indisponível"
                                                  severity="danger"
@@ -93,13 +97,13 @@
                                         <ng-template #indisponivelTemplate>
                                             <div class="w-25rem">
                                                 <p>
-                                                    
                                                     <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
                                                     <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                                                 </p>
                                                 <p>{{item.disponivelEvent.descricao}}</p>
-                                                <p *ngIf="item.disponivelEvent.professor">
-                                                    <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
+                                                <p class="flex gap-2 pl-2">
+                                                    <app-legend-color [corLegenda]="item.disponivelEvent.corLegenda"
+                                                                      [professor]="item.disponivelEvent.professor"></app-legend-color>
                                                     <span>{{item.disponivelEvent.professor}}</span>
                                                 </p>
                                                 <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
@@ -113,11 +117,11 @@
                                         </ng-template>
                                     </p>
                                 </div>
-                                <p class="mb-1 flex align-items-center ">
-                                    <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
-                                    <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                                        <span class="w-1rem h-1rem border-circle flex mr-3 ml-1" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
-                                    </ng-template>
+                                <p class="mb-1 flex align-items-center gap-2 ">
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor]="item.professor"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [turma_Id]="item.turma_Id"></app-legend-color>
                                     <span class="font-normal">Educador(a) {{item.professor}}</span>
                                 </p>
                             </div>

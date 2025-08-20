@@ -21,7 +21,6 @@ import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import $ from 'jquery';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playSuccess } from '../../../../../utils/audio';
 
 @Component({
     selector: 'app-cadastrar-oficina',
@@ -74,7 +73,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
     ) {
         this.object.descricao = 'Oficina';
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
@@ -84,7 +83,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
@@ -97,7 +96,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
         this.visible = true;
 
-        var eventos = this.service.eventos.subscribe(res => this.eventos = res);
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
         this.loadFeriados();
@@ -141,17 +140,24 @@ export class CadastrarOficinaComponent implements OnDestroy {
     }
     
     async verificaDisponibilidade() {
-        var valid = true;
+        console.log('verificaDisponibilidade', this.data.getDay())
+        let valid = true;
+
+        if (this.data.getDay() === 1 && !this.horario) {
+            this.horario = moment(this.data).set({ hour: 10, minute: 0, second: 0 }).toDate();
+        }
 
         if (!this.data || !this.horario) {
             return valid;
         }
 
-        this.loadingEventos = true;
-        var data = this.data;
-        data.setHours(this.horario.getHours(), this.horario.getMinutes())
 
-        var request: CalendarioRequest = new CalendarioRequest;
+        this.loadingEventos = true;
+        let data = moment(this.data).set({ hour: this.horario.getHours(), minute: this.horario.getMinutes(), second: 0 }).toDate();
+
+        console.log(data)
+
+        let request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
@@ -168,17 +174,17 @@ export class CadastrarOficinaComponent implements OnDestroy {
     }
 
     validaSalaAulas() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.salaAulas = validaSalaAulas(data, this.object.duracaoMinutos, this.salaAulas, this.eventos, undefined, undefined);
     }
 
     validaProfessores() {
-        var data = this.data;
+        let data = this.data;
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
         if (this.professorSelected) {
-            var e: SelectChangeEvent = {
+            let e: SelectChangeEvent = {
                 value: this.professorSelected,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
             } 
@@ -188,7 +194,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        var item = e.value as Professor;
+        let item = e.value as Professor;
         let mensagemErro: string | null = null;
 
         if (item && !item.disponivel && item.disponivelEvent) {
@@ -213,7 +219,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
-        var item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value);
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
             this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
