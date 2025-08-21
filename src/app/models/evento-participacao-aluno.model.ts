@@ -65,7 +65,6 @@ export class Evento_Participacao_Aluno {
     restricaoMobilidade: boolean = false;
     restricoes: Aluno_Restricao[] = [];
 
-
     primeiraAula_Id?: number;
     aulaZero_Id?: number;
 }

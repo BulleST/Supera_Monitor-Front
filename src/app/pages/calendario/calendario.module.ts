@@ -28,6 +28,7 @@ import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.compon
 import { CalendarioAlunoOptionsComponent } from './evento/aula-1/calendario/calendario.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
 import { LegendaComponent } from './full-calendar/legenda/legenda.component';
+import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
 
 @NgModule({
     declarations: [
@@ -55,6 +56,7 @@ import { LegendaComponent } from './full-calendar/legenda/legenda.component';
         InserirAlunoComponent,
         AgendarReposicaoComponent,
         LegendaComponent,
+        AgendarFaltaComponent,
         
     ],
     imports: [

@@ -1,8 +1,8 @@
-import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService, MenuItem } from 'primeng/api';
-import { Table } from 'primeng/table';
+import { Table, TableEditCancelEvent, TableEditCompleteEvent, TableEditInitEvent } from 'primeng/table';
 import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
@@ -13,6 +13,15 @@ import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { showError } from '../../../utils';
 import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 import { ContextMenu } from 'primeng/contextmenu';
+import { Turma } from '../../../models/turma.model';
+import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
+import { Apostila, Apostila_Kit } from '../../../models/apostila.model';
+import { TurmaService } from '../../../services/turma.service';
+import { ApostilaService } from '../../../services/apostila.service';
+import { PerfilCognitivoService } from '../../../services/perfil-cognitivo.services';
+import { NgModel } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { SelectChangeEvent } from 'primeng/select';
 
 @Component({
     selector: 'app-list',
@@ -39,6 +48,21 @@ export class ListComponent implements OnDestroy {
     @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
     @ViewChild('cm') cm!: ContextMenu;
 
+    turmas: Turma[] = [];
+    turmasFiltered: Turma[] = [];
+    loadingTurmas = false;
+
+    perfisFiltered: PerfilCognitivo[] = [];
+    perfilCognitivos: PerfilCognitivo[] = [];
+    loadingPerfilCognitivo = false;
+
+    listKits: Apostila_Kit[] = [];
+    loadingKit = false;
+
+    listApostila: Apostila[] = [];
+    loadingApostilas = false;
+
+    oldRow?: Aluno;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -48,38 +72,97 @@ export class ListComponent implements OnDestroy {
         private crypto: Crypto,
         private mobileService: MobileService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private turmaService: TurmaService,
+        private apostilaService: ApostilaService,
+        private perfilCognitivoService: PerfilCognitivoService,
+        private toastr: ToastrService,
 
     ) {
         this.tableColumns = alunosColumns;
         this.tableGlobalFilterFields = this.tableColumns.map(x => x.field);
 
-
-        var screen = this.mobileService.get().subscribe(res => this.screen = res);
+        let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
 
-        var list = this.service.list.subscribe(res => this.list = res);
+        let list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
+
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        this.subscription.push(turmas);
+
+        let listKits = this.apostilaService.listKits.subscribe(res => this.listKits = res);
+        this.subscription.push(listKits);
+
+        let listApostila = this.apostilaService.listApostila.subscribe(res => this.listApostila = res);
+        this.subscription.push(listApostila);
+
+        let perfilCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfilCognitivos = res);
+        this.subscription.push(perfilCognitivos);
+
+        if (!this.turmas.length) {
+            this.loadTurmas();
+        }
+
+        if (!this.perfilCognitivos.length) {
+            this.loadPerfis();
+        }
+
+        if (!this.listKits.length) {
+            this.loadKits();
+        }
+
+        if (!this.listApostila.length) {
+            this.loadApostilas();
+        }
 
         this.update()
     }
-
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    async update() {
-        this.list = [];
+    loadAlunos() {
         this.tableLoading = true;
-
         lastValueFrom(this.service.getList())
-            .then(async alunos => {
-                this.tableLoading = false;
-                this.list = alunos
-            })
-            .catch(res => {
-                this.tableLoading = false;
-            });
+            .then(res => this.tableLoading = false)
+            .catch(res => this.tableLoading = false);
+    }
+
+    loadTurmas() {
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => this.loadingTurmas = false)
+            .catch(res => this.loadingTurmas = false);
+
+    }
+    loadPerfis() {
+        this.loadingPerfilCognitivo = true;
+        lastValueFrom(this.perfilCognitivoService.getList())
+            .then(res => this.loadingPerfilCognitivo = false)
+            .catch(res => this.loadingPerfilCognitivo = false);
+
+    }
+    loadKits() {
+        this.loadingKit = true;
+        lastValueFrom(this.apostilaService.getKit())
+            .then(res => this.loadingKit = false)
+            .catch(res => this.loadingKit = false);
+    }
+    loadApostilas() {
+        this.loadingApostilas = true;
+        lastValueFrom(this.apostilaService.getApostilas())
+            .then(res => this.loadingApostilas = false)
+            .catch(res => this.loadingApostilas = false);
+    }
+
+    update() {
+        this.list = [];
+        this.loadAlunos();
+        this.loadTurmas();
+        this.loadPerfis();
+        this.loadKits();
+        this.loadApostilas();
     }
 
     showContextMenu(e: any, item: Aluno) {
@@ -133,23 +216,23 @@ export class ListComponent implements OnDestroy {
 
 
     edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
+        let encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 
     deactivated(e: any, item: any) {
         // playAlert();
 
-        var deactivated = !item.active;
+        let deactivated = !item.active;
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o aluno selecionado?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            icon: 'pi pi-exclamation-triangle',
             acceptIcon: `${deactivated ? 'pi pi-lock-open' : 'pi pi-lock'}`,
+            rejectIcon: 'pi pi-times',
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
-            acceptButtonStyleClass: 'p-button-rounded',
             rejectLabel: 'Cancelar',
+            acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
@@ -159,7 +242,6 @@ export class ListComponent implements OnDestroy {
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
-                            // playSuccess();
                         } else {
                             this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
                         }
@@ -171,12 +253,12 @@ export class ListComponent implements OnDestroy {
         });
     }
 
-    showError(header: string, message: string, e: any) {
-        showError(this.confirmationService, header, message, e)
+    showError(header: string, message: string, e: any, innerMessage?: string) {
+        showError(this.confirmationService, header, message, e, innerMessage)
     }
 
     getOption(col: ColumnTable, row: any) {
-        var item = col.options.items.find((x: any) => x.value == row[col.field]);
+        let item = col.options.items.find((x: any) => x.value == row[col.field]);
         return item;
     }
 
@@ -198,5 +280,262 @@ export class ListComponent implements OnDestroy {
         this.popoverAluno.aluno = aluno;
         this.popoverAluno.showChecklist = true;
         this.popoverAluno.show(e);
+    }
+
+    turmaFocus(item: Aluno) {
+        this.turmasFiltered = this.turmas.filter(turma => {
+            const turmaAtiva = turma.active;
+            const turmaTemVagas = turma.vagas > 0;
+            const ehPerfilCompativel = !item.perfilCognitivo_Id || turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
+            return turmaAtiva && ehPerfilCompativel && (turmaTemVagas && item.turma_Id != turma.id || item.turma_Id == turma.id)
+        })
+
+    }
+
+    turmaChanged(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+        let turma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
+        let restricoes = item.restricoes.filter(x => x.active)
+        if ((item.restricaoMobilidade && turma.andar > 1) || restricoes.length > 0) {
+            this.alunoRestricaoConfirm(item, model, e);
+        }
+        else {
+            this.turmaTransferirConfirm(item, model, e)
+        }
+
+    }
+
+    alunoRestricaoConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+
+        let restricoes = item.restricoes.filter(x => x.active)
+
+        let mensagem = 'O aluno possui as seguintes restrições: <ul>';
+
+        if (item.restricaoMobilidade) {
+            mensagem += `<li>Restrição de mobilidade</li>`
+        }
+        if (restricoes.length > 0) {
+            mensagem += restricoes.map(x => `<li>${x.descricao}</li>`).join('');
+        }
+
+        mensagem += `</ul> Tem certeza que deseja continuar?`
+
+        this.confirmationService.confirm({
+            target: e.originalEvent.target as any,
+            message: mensagem,
+            header: 'Verificação de restrições',
+            acceptLabel: 'Continuar',
+            rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: () => {
+                this.turmaTransferirConfirm(item, model, e);
+            },
+            reject: () => {
+                this.turmaTransferenciaReject(item, model, e);
+            }
+        });
+    }
+
+    turmaTransferirConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+        let novaTurma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
+
+        item.turma = novaTurma.nome;
+        item.turma_Id = novaTurma.id;
+        item.corLegenda = novaTurma.corLegenda;
+        item.professor = novaTurma.professor;
+        item.professor_Id = novaTurma.professor_Id;
+        item.diaSemana = novaTurma.diaSemana;
+        item.horario = novaTurma.horario;
+        item.linkGrupo = novaTurma.linkGrupo;
+
+
+        let mensagem = `Tem certeza que deseja mudar o aluno da turma <span class="font-bold">${item.turma}</span> para a turma <span class="font-bold">${novaTurma.nome}</span>`
+        this.confirmationService.confirm({
+            target: e.originalEvent.target as any,
+            message: mensagem,
+            header: 'Transferência de turma',
+            acceptLabel: 'Continuar',
+            rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.tableLoading = true;
+
+                let novoAluno = await lastValueFrom(this.service.get(item.id));
+                novoAluno.turma_Id = novaTurma.id;
+
+                lastValueFrom(this.service.edit(novoAluno))
+                    .then(res => {
+                        this.tableLoading = false;
+                        if (res.success) {
+                            this.toastr.success('Transferência finalizada com sucesso');
+                        } else {
+                            this.turmaTransferenciaReject(item, model, e)
+                            this.showError('Ops', `Não foi possível finalizar transferência. <br> ${res.message}`, e.originalEvent)
+                        }
+                    })
+                    .catch(res => {
+                        this.tableLoading = false;
+                        this.turmaTransferenciaReject(item, model, e)
+                        this.showError('Ops', `Não foi possível finalizar transferência. <br> ${res.message}`, e, res.message)
+                    })
+            },
+            reject: () => {
+                this.turmaTransferenciaReject(item, model, e);
+            }
+        });
+    }
+
+    turmaTransferenciaReject(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+        if (this.oldRow) {
+            item = this.service.mapAluno(this.oldRow);
+            model.control.setValue(this.oldRow?.turma_Id)
+        }
+        else {
+            delete item.turma;
+            delete item.turmaDesc;
+            delete item.turma_Id;
+            delete item.corLegenda;
+            delete item.professor;
+            delete item.professor_Id;
+            delete item.diaSemana;
+            delete item.horario;
+            delete item.linkGrupo;
+            model.control.setValue(undefined)
+        }
+
+    }
+
+    perfilFocus(item: Aluno) {
+        this.perfisFiltered = this.perfilCognitivos;
+    }
+
+    perfilChangedConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+        let novoPerfil = this.perfilCognitivos.find(x => x.id == item.perfilCognitivo_Id) as PerfilCognitivo;
+
+        item.perfilCognitivo = novoPerfil.nome;
+        item.perfilCognitivo_Id = novoPerfil.id;
+
+        this.confirmationService.confirm({
+            target: e.originalEvent.target as any,
+            message: 'Tem certeza que deseja alterar o perfil cognitivo desse aluno?',
+            header: 'Alterar Perfil cognitivo',
+            acceptLabel: 'Continuar',
+            rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.tableLoading = true;
+
+                let novoAluno = await lastValueFrom(this.service.get(item.id));
+                novoAluno.perfilCognitivo_Id = novoPerfil.id;
+
+                lastValueFrom(this.service.edit(novoAluno))
+                    .then(res => {
+                        this.tableLoading = false;
+                        if (res.success) {
+                            this.toastr.success('Perfil Cognitivo alterado com sucesso');
+                        } else {
+                            this.showError('Ops', `Não foi possível finalizar alteração. <br> ${res.message}`, e)
+                            this.perfilChangedReject(item, model, e)
+                        }
+                    })
+                    .catch(res => {
+                        this.tableLoading = false;
+                        this.showError('Ops', `Não foi possível finalizar alteração.`, e, res.message)
+                        this.perfilChangedReject(item, model, e)
+                    })
+            },
+            reject: () => {
+
+                this.perfilChangedReject(item, model, e)
+            }
+        });
+    }
+
+    perfilChangedReject(item: Aluno, model: NgModel, e: any) {
+        let oldPerfil = this.perfilCognitivos.find(x => x.id == item.perfilCognitivo_Id);
+        model.control.setValue(oldPerfil)
+    }
+
+    kitFocus(item: Aluno) {
+    }
+
+    kitChangedConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
+        let kit = model.value;
+        let novoKit = this.listKits.find(x => x.id == item.apostila_Kit_Id) as Apostila_Kit;
+
+        item.kit = novoKit.nome;
+        item.apostila_Kit_Id = novoKit.id;
+
+        this.confirmationService.confirm({
+            target: e.originalEvent.target as any,
+            message: 'Tem certeza que deseja alterar o kit desse aluno?',
+            header: 'Alterar kit',
+            acceptLabel: 'Continuar',
+            rejectLabel: 'Cancelar',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.tableLoading = true;
+
+                let novoAluno = await lastValueFrom(this.service.get(item.id));
+                novoAluno.apostila_Kit_Id = kit.id;
+
+
+                lastValueFrom(this.service.edit(novoAluno))
+                    .then(res => {
+                        this.tableLoading = false;
+                        if (res.success) {
+                            this.toastr.success('Kit alterado com sucesso');
+                        } else {
+                            this.showError('Ops', `Não foi possível finalizar alteração. <br> ${res.message}`, e)
+                            this.apostilaKitChangedReject(item, model, e)
+                        }
+                    })
+                    .catch(res => {
+                        this.tableLoading = false;
+                        this.showError('Ops', `Não foi possível finalizar alteração.`, e, res.message)
+                        this.apostilaKitChangedReject(item, model, e)
+                    })
+            },
+            reject: () => {
+
+                this.apostilaKitChangedReject(item, model, e)
+            }
+        });
+    }
+
+    apostilaKitChangedReject(item: Aluno, model: NgModel, e: any) {
+        let oldapostilaKit = this.listKits.find(x => x.id == item.apostila_Kit_Id);
+        model.control.setValue(oldapostilaKit)
+    }
+
+    onEditInit(e: TableEditInitEvent) {
+        let aluno = e.data as Aluno;
+        this.oldRow = JSON.parse(JSON.stringify(aluno));
+
+        if (e.field === 'turma_Id') {
+            this.turmaFocus(aluno)
+        }
+        else if (e.field === 'perfilCognitivo_Id') {
+            this.perfilFocus(aluno)
+        }
+    }
+
+    onEditCancel(e: TableEditCancelEvent) {
+        delete this.oldRow;
+    }
+
+    onEditComplete(e: TableEditCompleteEvent) {
+        delete this.oldRow;
     }
 }

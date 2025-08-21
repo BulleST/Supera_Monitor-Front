@@ -3,10 +3,10 @@ import { AlunoService } from '../../../services/alunos.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { Popover } from 'primeng/popover';
-import { Crypto, MensagemWhatsapp } from '../../../utils';
+import { CalendarioUtils, Crypto, MensagemWhatsapp } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
 import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
 import { Select, SelectChangeEvent } from 'primeng/select';
 import { Evento } from '../../../models/evento.model';
@@ -27,6 +27,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     @Input() aluno_Id!: number;
     @Input() showChecklist: boolean = false;
     @Input() evento?: Evento;
+    @Input() eventoReposicao?: Evento;
     @Input() participacao?: Evento_Participacao_Aluno;
     @Input() alunoChecklistItem?: Aluno_CheckList_Item | Aluno_Checklist_Item_View;
 
@@ -52,6 +53,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         private router: Router,
         private crypto: Crypto,
         private activatedRoute: ActivatedRoute,
+        private calendarioUtils: CalendarioUtils,
     ) {
     }
 
@@ -61,6 +63,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
+        }
+        if (changes['eventoReposicao']) {
+            this.eventoReposicao = changes['eventoReposicao'].currentValue;
         }
         if (changes['participacao']) {
             this.participacao = changes['participacao'].currentValue;
@@ -84,7 +89,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 this.loadMenuItems();
                 this.loadAulaZero();
                 this.loadPrimeiraAula();
-                
+
                 return this.aluno;
             })
             .catch(res => {
@@ -125,28 +130,37 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     loadMenuItems() {
         this.menuItems = [];
 
+        // Editar aluno
         this.menuItems.push({
             label: 'Editar aluno',
             icon: 'pi pi-user-edit text-primary-500 ',
             styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100',
+            disabled: this.aluno.active === false,
+            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
             command: () => this.goToAluno(),
         })
+
+        // Enviar mensagem
         this.menuItems.push({
             label: 'Enviar mensagem',
             icon: 'pi pi-whatsapp text-green-500',
             styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
-            disabled: !this.aluno?.celular,
+            disabled: this.aluno.active === false || !this.aluno?.celular,
+            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
             command: () => {
                 let object = this.mensagemWhatsapp.enviarMensagem(this.aluno.nome, this.aluno.celular);
                 window.open(object.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
         })
+        // Jornada Supera
         if (this.showChecklist) {
             this.menuItems.push({
                 label: 'Jornada Supera',
                 icon: 'pi pi-check-square text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
+                disabled: this.aluno.active === false,
+                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
                 command: () => {
                     this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
                     this.alunoChecklistDialog.aluno = this.aluno;
@@ -154,24 +168,43 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 },
             })
         }
-        if (this.evento
+
+        // Agendar reposição
+        if (this.eventoReposicao
             && this.participacao
             && (this.participacao.presente != true)) {
             this.menuItems.push({
                 label: 'Agendar reposição',
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
+                disabled: this.aluno.active === false,
+                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
                 command: () => {
-                    this.eventoService.setEventoReposicaoDe(this.evento);
                     this.goToAgendarReposicao();
                 },
             })
         }
+
+        // Agendar falta
+        this.menuItems.push({
+            label: 'Agendar falta',
+            icon: 'fas fa-thumbs-down text-red-500',
+            styleClass: 'text-red-500 surface-50 hover:surface-100',
+            disabled: this.aluno.active === false,
+            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
+            command: (e: MenuItemCommandEvent) => {
+                this.goToAgendarFalta(e)
+            },
+        })
+
+        // Finalizar checklist
         if (this.alunoChecklistItem && !this.alunoChecklistItem.finalizado) {
             this.menuItems.push({
                 label: 'Finalizar checklist',
                 icon: 'pi pi-check text-primary-500',
                 styleClass: 'text-primary-500 bg-primary-100 hover:bg-primary-200',
+                disabled: this.aluno.active === false,
+                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
                 command: () => {
                     this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem as Aluno_CheckList_Item;
                     this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
@@ -191,7 +224,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
     show(e: any) {
         this.visible = true;
-        
+
         this.popover.show(e);
         this.loadAluno();
         this.loadFoto();
@@ -236,7 +269,13 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
         else {
             return '0'.padStart(length, fill);
-        } 
+        }
+    }
+
+    goToAgendarFalta(e: MenuItemCommandEvent) {
+        this.eventoService.setEvento(this.evento);
+        this.alunoService.setAluno(this.aluno);
+        this.router.navigate(['agendar-falta', this.crypto.encrypt(this.aluno_Id)], { relativeTo: this.activatedRoute });
     }
 
 }

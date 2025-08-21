@@ -14,6 +14,7 @@ import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.comp
 import { PrimeiraAulaAlunoComponent } from './evento/aula/primeira-aula-aluno/primeira-aula-aluno.component';
 import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
+import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
 
 
 const routes: Routes = [{
@@ -30,6 +31,9 @@ const routes: Routes = [{
         { path: 'reposicao/agendar', component: AgendarReposicaoComponent },
         { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
         { path: 'aluno/:aluno_id', component: AlunoFormComponent },
+        
+        { path: 'agendar-falta', component: AgendarFaltaComponent },
+        { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
 
         { path: ':evento_nome/:evento_id', component: EventoComponent },
         { path: ':evento_nome/inserir-aluno/:evento_id', component: InserirAlunoComponent },

@@ -1,0 +1,267 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-dialog [header]="'Agendar Falta'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ 
+            width: blockEventoField ? '550px' : '850px', 
+            maxWidth: '95vw', 
+            maxHeight: '95vh' 
+            }"
+          appendTo="body"
+          id="reposicao">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title flex gap-2 align-items-center">
+                <i class="pi pi-calendar text-xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Agendar Falta</span>
+                <i class="fa fa-thumbs-down text-red-500"></i>
+            </span>
+        </div>
+    </ng-template>
+    <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+        <div class="formgrid grid">
+            <!-- Aluno -->
+            <div class="field" 
+                    [ngClass]="{
+                        'col-12': !blockEventoField,
+                        'col-6': blockEventoField
+                    }">
+                <ng-container *ngIf="!blockAlunoField; else alunoSelecionadoTemplate">
+                    <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
+                    <p-iconfield>
+                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user" />
+                        <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
+                        <p-select [options]="alunos"
+                                    [loading]="loadingAlunos"
+                                    name="aluno_Id"
+                                    inputId="aluno_Id"
+                                    #aluno_Id="ngModel"
+                                    [(ngModel)]="aluno"
+                                    [required]="true"
+                                    [filter]="true"
+                                    filterBy="nome,turma,professor"
+                                    [virtualScroll]="true"
+                                    [virtualScrollItemSize]="43"
+                                    optionLabel="nome"
+                                    (onChange)="alunoChanged($event)"
+                                    [readonly]="blockAlunoField"
+                                    [disabled]="blockAlunoField"
+                                    placeholder="Selecione um aluno"
+                                    panelStyleClass="p-select-stripped"
+                                    appendTo="body"
+                                    fluid>
+                            <ng-template let-item #item>
+                                <div class="flex flex-column">
+                                    <div class="flex align-items-center">
+                                        <p-button icon="pi pi-whatsapp  {{!item.celular ? 'text-300' : ''}}"
+                                                    severity="success"
+                                                    [rounded]="true"
+                                                    (onClick)="enviarMensagem(item)"
+                                                    (auxclick)="enviarMensagem(item)"
+                                                    (contextmenu)="enviarMensagem(item)"
+                                                    pTooltip="Enviar mensagem"
+                                                    [disabled]="!item.celular"
+                                                    [text]="true"
+                                                    size="small" />
+                                        <p class="capitalize" [pTooltip]="item.nome">{{item.nome | nameAbv }}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2">
+                                        <div class="w-2rem pl-1 flex justify-content-center">
+                                            <span class="w-1rem h-1rem border-circle flex " [style]="{ backgroundColor: item.corLegenda }"></span>
+                                        </div>
+                                        <span>{{item.turma}}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </p-iconfield>
+                    <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                    </div>
+                </ng-container>
+                <ng-template #alunoSelecionadoTemplate>
+                    <label for="nome">Nome:</label>
+                    <p-iconfield>
+                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user text-700" />
+                        <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
+                        <input type="text"
+                                pInputText
+                                value="{{aluno?.nome | nameAbv}}"
+                                [pTooltip]="aluno?.nome"
+                                class="capitalize"
+                                id="nome"
+                                name="nome"
+                                fluid
+                                readonly>
+                    </p-iconfield>
+                </ng-template>
+            </div>
+            <!-- Aula -->
+            <ng-container *ngIf="!blockEventoField; else eventoSelecionadoTemplate">
+                <div class="field col-12" style="order: 1">
+                    <p-fieldset legend="Quando o aluno irá faltar?">
+                        <div class="formgrid grid">
+                            <!-- Descrição -->
+                            <div class="field col-12">
+                                <ng-container *ngIf="aluno">
+                                    <app-calendario [aluno]="aluno" 
+                                    [selected]="evento"
+                                    (onSelect)="eventoCalendarioSelected($event)"></app-calendario>
+                                </ng-container>
+                            </div>
+                            <ng-container *ngIf="evento">
+                                <div class="col-12 pl-4 mb-2">
+                                    <p class="text-xl font-bold">Aula selecionada</p>
+                                </div>
+                                <div class="field col-12 flex align-items-center">
+                                    <div class="flex flex-column white-space-nowrap ">
+                                        <div class="flex align-items-center justify-content-between w-full flex-wrap">
+                                            <div class="col-12 py-1 flex-none">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="pi pi-calendar text-base"></i>
+                                                    </div>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Data: {{evento.data | date : 'dd \'de\' MMMM'}}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 py-1 flex-none">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="pi pi-clock text-base"></i>
+                                                    </div>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Horário: {{evento.data | date : 'HH:mm'}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex align-items-center justify-content-between w-full flex-wrap">
+                                            <div class="col-12 py-1 flex-none">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="fa-solid fa-users-between-lines text-base"></i>
+                                                    </div>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Turma: {{evento.turma}}</p>
+                                                    <span class="inline-flex w-1rem h-1rem border-circle flex-none" [style]="{ backgroundColor: evento.corLegenda, borderColor: evento.corLegenda }"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 py-1">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="fa-solid fa-building text-base"></i>
+                                                    </div>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(evento)}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex align-items-center justify-content-between w-full flex-wrap">
+                                            <div class="col-12 py-1">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="fa-solid fa-star text-base" [ngStyle]="{
+                                                            color: getCorRoteiro(evento.roteiro_Id) ?? 'var(--p-surface-900)'
+                                                        }"></i>
+                                                    </div>
+                                                    <div class="flex align-items-center gap-2 w-full">
+                                                        <p class="overflow-hidden text-overflow-ellipsis">Roteiro: {{evento.tema + ' - Semana ' + evento.semana}}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 py-1">
+                                                <div class="flex align-items-center gap-2 w-full">
+                                                    <div class="w-2rem text-center flex-none">
+                                                        <i class="fa-solid fa-brain text-base"></i>
+                                                    </div>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{getPerfilCognitivo(evento)}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </p-fieldset>
+                </div>
+            </ng-container>
+            <ng-template #eventoSelecionadoTemplate>
+                <div class="field col-6">
+                    <label for="evento">Turma:</label>
+                    <p-iconfield>
+                        <p-inputicon *ngIf="!loadingEventos" styleClass="fa-solid fa-users-between-lines" />
+                        <p-inputicon *ngIf="loadingEventos" styleClass="pi pi-spinner pi-spin" />
+                        <input type="text"
+                                pInputText
+                                [value]="evento?.descricao"
+                                id="evento"
+                                name="evento"
+                                fluid
+                                readonly>
+                    </p-iconfield>
+                </div>
+                <div class="field col-4">
+                    <label for="data">Data:</label>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-calendar" />
+                        <input type="text"
+                                pInputText
+                                [value]="evento?.data | date : 'dd/MM'"
+                                id="data"
+                                name="data"
+                                fluid
+                                readonly>
+                    </p-iconfield>
+                </div>
+                <div class="field col-4">
+                    <label for="horario">Horário:</label>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-calendar" />
+                        <input type="text"
+                                pInputText
+                                [value]="evento?.data | date : 'HH:mm'"
+                                id="horario"
+                                name="horario"
+                                fluid
+                                readonly>
+                    </p-iconfield>
+                </div>
+                <div class="field col-4">
+                    <label for="semana">Semana:</label>
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-star-fill" />
+                        <input type="text"
+                                pInputText
+                                [value]="'Semana ' + evento?.semana + '- Tema ' + evento?.tema "
+                                id="semana"
+                                name="semana"
+                                fluid
+                                readonly>
+                    </p-iconfield>
+                </div>
+            </ng-template>
+            <!-- OBS -->
+            <div class="field col-12">
+                <label for="observacoes" class="font-bold">Por que o aluno irá faltar? <span class="text-red-500">*</span></label>
+                <textarea pTextarea
+                            id="observacoes"
+                            name="observacoes"
+                            [(ngModel)]="observacoes"
+                            #_observacoes="ngModel"
+                            [required]="true"
+                            placeholder="Insira aqui o motivo..."
+                            rows="2"
+                            fluid></textarea>
+            </div>
+        </div>
+        <div class="col-12 px-1 flex align-items-center justify-content-end">
+            <p-button type="submit"
+                      fluid
+                      label="Marcar falta"
+                      icon="pi pi-check"
+                      [loading]="loading"
+                      [rounded]="true"
+                      [disabled]="form.invalid || loading || !evento" />
+        </div>
+    </form>
+</p-dialog>

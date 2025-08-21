@@ -114,7 +114,8 @@
                             <app-aluno-popover #popoverAluno
                                                [aluno_Id]="participacao.aluno_Id"
                                                [showChecklist]="true"
-                                               [evento]="participacao.reposicaoDe_Evento ? undefined : evento"
+                                               [evento]="evento"
+                                               [eventoReposicao]="participacao.reposicaoDe_Evento ? undefined : evento"
                                                [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
                             <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
                                  [ngClass]="{

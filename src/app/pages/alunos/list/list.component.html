@@ -19,8 +19,11 @@
              [loading]="tableLoading"
              [showLoader]="false"
              [rowHover]="list.length > 0"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos">
+             [showCurrentPageReport]="true"
+             currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos"
+             (onEditInit)="onEditInit($event)"
+             (onEditCancel)="onEditCancel($event)"
+             (onEditComplete)="onEditComplete($event)">
         <ng-template #caption>
             <p-toolbar styleClass="border-none bg-white py-2 px-2 -mx-3 ">
                 <div class="p-toolbar-group-start">
@@ -69,7 +72,7 @@
                     <ng-container *ngIf="col.frozen === true">
                         <th pFrozenColumn [pSortableColumn]="col.field">
                             <div class="flex align-items-center gap-4">
-                                <span >{{col.label}}</span>
+                                <span>{{col.label}}</span>
                                 <p-sortIcon *ngIf="col.sortable" [field]="col.field" />
                             </div>
                         </th>
@@ -77,7 +80,7 @@
                     <ng-container *ngIf="!col.frozen">
                         <th [pSortableColumn]="col.field">
                             <div class="flex align-items-center gap-4">
-                                <span >{{col.label}}</span>
+                                <span>{{col.label}}</span>
                                 <p-sortIcon *ngIf="col.sortable" [field]="col.field" />
                             </div>
                         </th>
@@ -101,99 +104,195 @@
                 <th pFrozenColumn alignFrozen="right"></th>
             </tr>
         </ng-template>
-        <ng-template #body let-item let-index="rowIndex">
-            <tr class="white-space-nowrap fadein" pAnimateOnScroll>
-                
+        <ng-template #body let-aluno let-rowIndex="rowIndex" let-editing="editing">
+            <tr class="white-space-nowrap fadein">
                 <td pFrozenColumn alignFrozen="left">
                     <div class="flex align-items-center gap-2">
                         <p-button type="button"
-                            icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                            severity="success"
-                            [disabled]="!item.celular"
-                            [text]="true"
-                            [rounded]="true"
-                            pTooltip="Enviar mensagem"
-                            (onClick)="enviarMensagem(item)"
-                            (auxclick)="enviarMensagem(item)"
-                            (contextmenu)="enviarMensagem(item)"
-                        />
-                         
+                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                                  severity="success"
+                                  [disabled]="!aluno.celular"
+                                  [text]="true"
+                                  [rounded]="true"
+                                  pTooltip="Enviar mensagem"
+                                  (onClick)="enviarMensagem(aluno)"
+                                  (auxclick)="enviarMensagem(aluno)"
+                                  (contextmenu)="enviarMensagem(aluno)" />
                         <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
-                              pTooltip="{{item.nome}}"
+                              pTooltip="{{aluno.nome}}"
                               tooltipPosition="top"
-                              (click)="showPopoverAluno(item, $event)">{{ item.nome | nameAbv }}</span>
-
-                        <i *ngIf="item.ehAniversario" 
-                            pTooltip="{{item.nome | firstWord}} faz aniversário dia {{item.dataNascimento | date : 'dd \'de\' MMMM'}}"
-                            class="bi bi-cake-fill text-pink-500 fadein"></i>
+                              (click)="showPopoverAluno(aluno, $event)">{{ aluno.nome | nameAbv }}</span>
+                        <i *ngIf="aluno.ehAniversario"
+                           pTooltip="{{aluno.nome | firstWord}} faz aniversário dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM'}}"
+                           class="bi bi-cake-fill text-pink-500 fadein"></i>
                     </div>
                 </td>
-                <td>
-                    <div class="flex align-items-center gap-2">
-                        <span class="w-1rem h-1rem inline-flex border-circle"
-                              [style]="{ 
-                                    backgroundColor: item.corLegenda, 
-                                    borderColor: item.corLegenda 
-                                }"></span>
-                        <span>{{item.turma}}</span>
-                    </div>
+                <td [pEditableColumn]="aluno" pEditableColumnField="turma_Id">
+                    <p-cellEditor>
+                        <ng-template #input>
+                            <p-select
+                                      [options]="turmasFiltered"
+                                      [loading]="loadingTurmas"
+                                      [showClear]="false"
+                                      [(ngModel)]="aluno.turma_Id"
+                                      inputId="turma[{{rowIndex}}]"
+                                      name="turma[{{rowIndex}}]"
+                                      #turma_Id="ngModel"
+                                      optionLabel="nome"
+                                      optionValue="id"
+                                      (onChange)="turmaChanged(aluno, turma_Id, $event)"
+                                      (onFocus)="turmaFocus(aluno)"
+                                      [filter]="true"
+                                      filterBy="nome"
+                                      appendTo="body"
+                                      fluid>
+                                <ng-template #selectedItem let-selectedOption>
+                                    <div class="flex align-items-center gap-2">
+                                        <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                        [professor]="selectedOption.professor"
+                                                        [professor_Id]="selectedOption.professor_Id"
+                                                        [turma_Id]="selectedOption.id"></app-legend-color>
+                                        <span>{{selectedOption.nome}}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template #item let-turma>
+                                    <div class="flex align-items-start gap-2 w-full">
+                                        <div>
+                                            <p class="flex align-items-center gap-2">
+                                                <app-legend-color [corLegenda]="turma.corLegenda"
+                                                                [professor]="turma.professor"
+                                                                [professor_Id]="turma.professor_Id"
+                                                                [turma_Id]="turma.id"></app-legend-color>
+                                                <span>{{turma.nome}}</span>
+                                            </p>
+                                            <p class="text-xs ml-4" *ngIf="turma.vagas > 0">{{turma.vagas}} vagas</p>
+                                        </div>
+                                        <span class="pl-2 flex align-items-center gap-2 ml-auto">
+                                            <ng-container *ngFor="let perfil of turma.perfilCognitivo">
+                                                <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
+                                            </ng-container>
+                                        </span>
+                                    </div>
+                                </ng-template>
+                            </p-select>
+                        </ng-template>
+                        <ng-template #output>
+                            <div class="flex align-items-center gap-2">
+                                <app-legend-color [corLegenda]="aluno.corLegenda"
+                                                  [professor_Id]="aluno.professor_Id"
+                                                  [professor]="aluno.professor"
+                                                  [turma_Id]="aluno.turma_Id"></app-legend-color>
+                                <span>{{aluno.turma}}</span>
+                            </div>
+                        </ng-template>
+                    </p-cellEditor>
+                </td>
+                <td [pEditableColumn]="aluno" pEditableColumnField="perfilCognitivo_Id">
+                    <p-cellEditor>
+                        <ng-template #input>
+                            <p-iconfield>
+                                    <p-inputicon class="fa fa-brain" />
+                                    <p-select
+                                            [options]="perfisFiltered"
+                                            [loading]="loadingPerfilCognitivo"
+                                            [showClear]="false"
+                                            [(ngModel)]="aluno.perfilCognitivo_Id"
+                                            inputId="perfilCognitivo[{{rowIndex}}]"
+                                            name="perfilCognitivo[{{rowIndex}}]"
+                                            #perfilCognitivo_Id="ngModel"
+                                            optionLabel="nome"
+                                            optionValue="id"
+                                            [filter]="true"
+                                            filterBy="nome"
+                                            (onChange)="perfilChangedConfirm(aluno, perfilCognitivo_Id, $event)"
+                                            (onFocus)="perfilFocus(aluno)"
+                                            appendTo="body"
+                                            fluid />
+                            </p-iconfield>
+                        </ng-template>
+                        <ng-template #output>
+                            {{aluno.perfilCognitivo}}
+                        </ng-template>
+                    </p-cellEditor>
                 </td>
                 <td>
-                    {{item.perfilCognitivo}}
-                </td>
-                <td>
-                    <ng-container *ngIf="item.idade">
-                        <span pTooltip="{{item.nome | firstWord }} nasceu em {{item.dataNascimento | date : 'dd \'de\' MMMM \'de\' yyyy'}}">{{item.idade}} anos</span>
+                    <ng-container *ngIf="aluno.idade">
+                        <span pTooltip="{{aluno.nome | firstWord }} nasceu em {{aluno.dataNascimento | date : 'dd \'de\' MMMM \'de\' yyyy'}}">{{aluno.idade}} anos</span>
                     </ng-container>
                 </td>
-                <td>
-                    {{item.kit}}
+                <td [pEditableColumn]="aluno" pEditableColumnField="apostila_Kit_Id">
+                    <p-cellEditor>
+                        <ng-template #input>
+                            <p-iconfield>
+                                    <p-inputicon class="bi bi-book-fill" />
+                                    <p-select
+                                              [options]="listKits"
+                                              [loading]="loadingKit"
+                                              [showClear]="false"
+                                              [(ngModel)]="aluno.apostila_Kit_Id"
+                                              inputId="kit[{{rowIndex}}]"
+                                              name="kit[{{rowIndex}}]"
+                                              #kit_Id="ngModel"
+                                              optionLabel="nome"
+                                              optionVlue="id"
+                                              [filter]="true"
+                                              filterBy="nome"
+                                              (onChange)="kitChangedConfirm(aluno, kit_Id, $event)"
+                                              (onFocus)="kitFocus(aluno)"
+                                              appendTo="body"
+                                              fluid />
+                            </p-iconfield>
+                        </ng-template>
+                        <ng-template #output>
+                            {{aluno.kit}}
+                        </ng-template>
+                    </p-cellEditor>
                 </td>
                 <td>
-                    {{item.apostila_Abaco}}
+                    {{aluno.apostila_Abaco}}
                 </td>
                 <td>
-                    {{item.numeroPaginaAbaco}}
+                    {{aluno.numeroPaginaAbaco}}
                 </td>
                 <td>
-                    {{item.apostila_AH}}
+                    {{aluno.apostila_AH}}
                 </td>
                 <td>
-                    {{item.numeroPaginaAH}}
+                    {{aluno.numeroPaginaAH}}
                 </td>
                 <td class="w-5rem">
-                    <ng-container *ngIf="item.active">
+                    <ng-container *ngIf="aluno.active">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                icon="pi pi-check mr-2 text-xs"
                                value="Ativo"
                                severity="success"
                                [pTooltip]="'Ativo'" />
                     </ng-container>
-                    <ng-container *ngIf="!item.active">
+                    <ng-container *ngIf="!aluno.active">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                icon="pi pi-times mr-2 text-xs"
                                value="Inativo"
                                severity="danger"
-                               [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
+                               [pTooltip]=" 'Inativo desde ' + (aluno['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
                     </ng-container>
                 </td>
                 <td pFrozenColumn
                     alignFrozen="right">
                     <p-button
-                              [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+                              [icon]="cm.visible() && tableSelectedItem.id == aluno.id ? 'pi pi-times' : 'pi pi-cog'"
                               [severity]="'secondary'"
                               [rounded]="true"
                               title="Ver mais"
-                              styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
-                              (onClick)="showContextMenu($event, item)" />
+                              styleClass="bg-transparent border-transparent {{rowIndex % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+                              (onClick)="showContextMenu($event, aluno)" />
                 </td>
             </tr>
         </ng-template>
         <ng-template #loadingbody let-columns>
-            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" 
+            <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]"
                 class="fadein"
                 style="height: 43px;">
-                <td *ngFor="let col of columns" >
+                <td *ngFor="let col of columns">
                     <p-skeleton />
                 </td>
                 <td>

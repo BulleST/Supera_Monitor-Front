@@ -129,24 +129,17 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     }
 
     setAlunos() {
-        console.log('setAlunos')
-        console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
-        console.log('evento', JSON.parse(JSON.stringify(this.evento)))
         if (this.alunos.length && this.evento) {
             let perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id);
-            console.log('perfilCognitivo', perfilCognitivo)
             this.alunos = this.alunos.filter(x => x.active // Alunos ativos
                 && !x.primeiraAula_Id  // Alunos que ainda não agendaram primeira aula
                 && x.aulaZero_Id // Alunos que agendaram aula 0
                 && perfilCognitivo.includes(x.perfilCognitivo_Id)  // Alunos de mesmo perfil cognitivo
             )
-            console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
 
             if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
-                console.log('eventoAlunos', eventoAlunos)
                 this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id))
-                console.log('alunos', JSON.parse(JSON.stringify(this.alunos)))
             }
         }
     }

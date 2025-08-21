@@ -244,30 +244,35 @@
                                [filter]="true"
                                filterBy="nome"
                                [showToggleAll]="false"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="54"
                                optionDisabled="deactivated, disponivel"
                                placeholder="Selecione"
                                appendTo="body"
                                panelStyleClass="p-select-stripped"
                                display="chip"
                                fluid>
-                    <ng-template let-item #item>
-                        <div class="w-full flex flex-column align-items-stretch">
-                            <div class="flex align-items-center gap-2">
-                                <p-button type="button"
-                                          (onClick)="enviarMensagem(item)"
-                                          (auxclick)="enviarMensagem(item)"
-                                          (contextmenu)="enviarMensagem(item)"
-                                          [disabled]="!item.celular"
-                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                          severity="success"
-                                          [text]="true"
-                                          styleClass="px-0 w-auto" />
-                                <span class="mr-2 capitalize">{{item.nome | nameAbv }}</span>
+            <ng-template let-item #item>
+                <div class="flex align-items-center justify-content-between w-full gap-2">
+                    <div>
+                        <div class="flex align-items-center">
+                            <p-button type="button"
+                                      icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                      (onClick)="enviarMensagem(item)"
+                                      (auxclick)="enviarMensagem(item)"
+                                      (contextmenu)="enviarMensagem(item)"
+                                      severity="success"
+                                      [text]="true"
+                                      [disabled]="!item.celular"
+                                      pTooltip="Enviar mensagem"
+                                      size="small">
+                            </p-button>
+                            <p class="font-bold">
+                                <span class="mr-2">{{item.nome}}</span>
                                 <p-badge *ngIf="item.disponivel == false"
                                          value="Indisponível"
                                          severity="danger"
-                                         [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined"
-                                         class="ml-auto" />
+                                         [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
                                 <ng-template #indisponivelTemplate>
                                     <div class="w-25rem">
                                         <p>
@@ -276,13 +281,13 @@
                                         </p>
                                         <p>{{item.disponivelEvent.descricao}}</p>
                                         <p *ngIf="item.disponivelEvent.professor">
-                                            <app-legend-color [corLegenda]="item.disponivelEvent.corLegenda"
-                                                              [professor_Id]="item.disponivelEvent.professor_Id"
-                                                              [professor]="item.disponivelEvent.professor"
-                                                              [turma_Id]="item.disponivelEvent.turma_Id"></app-legend-color>
+                                            <span class="w-1rem h-1rem border-circle inline-flex mr-2"
+                                                  [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
                                             <span>{{item.disponivelEvent.professor}}</span>
                                         </p>
-                                        <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao"> {{item.disponivelEvent.turma}} </p>
+                                        <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
+                                            {{item.disponivelEvent.turma}}
+                                        </p>
                                         <p *ngIf="item.disponivelEvent.sala_Id">
                                             <span>Sala: </span>
                                             <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
@@ -291,9 +296,19 @@
                                         </p>
                                     </div>
                                 </ng-template>
-                            </div>
+                            </p>
                         </div>
-                    </ng-template>
+                        <p class="flex align-items-center gap-2 pl-2">
+                            <app-legend-color [corLegenda]="item.corLegenda"
+                                              [professor_Id]="item.professor_Id"
+                                              [professor]="item.professor"
+                                              [turma_Id]="item.turma_Id"></app-legend-color>
+                            <span class="font-normal">Turma {{item.turma}}</span>
+                        </p>
+                    </div>
+                    <p-badge [value]="item.perfilCognitivo" />
+                </div>
+            </ng-template>
                 </p-multiselect>
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>

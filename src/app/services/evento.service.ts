@@ -49,36 +49,30 @@ export class EventoService extends Service {
     }
 
     getEvento() {
-        console.log('getEvento')
         if (!this.evento.value) {
             let eventoString = localStorage.getItem('evento');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
             this.evento.next(evento);
         }
-        console.log('getEvento evento', this.evento.value)
         return this.evento;
     }
 
     setEvento(value: Evento | undefined) {
-        console.log('setEvento', value);
         this.evento.next(value);
         if (value) localStorage.setItem('evento', JSON.stringify(value));
         else localStorage.removeItem('evento');
     }
 
     getEventoReposicaoDe() {
-        console.log('getEventoReposicaoDe')
         if (!this.eventoReposicaoDe.value) {
             let eventoString = localStorage.getItem('evento-reposicao-de');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
             this.eventoReposicaoDe.next(evento);
         }
-        console.log('getEventoReposicaoDe eventoReposicaoDe', this.eventoReposicaoDe.value)
         return this.eventoReposicaoDe;
     }
 
     setEventoReposicaoDe(value: Evento | undefined) {
-        console.log('setEventoReposicaoDe', value);
         this.eventoReposicaoDe.next(value);
         if (value)
             localStorage.setItem('evento-reposicao-de', JSON.stringify(value));
@@ -86,17 +80,14 @@ export class EventoService extends Service {
     }
 
     getEventoReposicaoPara() {
-        console.log('getEventoReposicaoPara')
         if (!this.eventoReposicaoPara.value) {
             let eventoString = localStorage.getItem('evento-reposicao-para');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
             this.eventoReposicaoPara.next(evento);
         }
-        console.log('getEventoReposicaoPara eventoReposicaoPara', this.eventoReposicaoPara.value)
         return this.eventoReposicaoPara;
     }
     setEventoReposicaoPara(value: Evento | undefined) {
-        console.log('setEventoReposicaoPara', value);
         this.eventoReposicaoPara.next(value);
         if (value)
             localStorage.setItem('evento-reposicao-para', JSON.stringify(value));
@@ -110,7 +101,6 @@ export class EventoService extends Service {
         evento.professores = evento.professores ?? [];
         evento.alunos = evento.alunos ?? [];
 
-        evento.alunos.forEach(aluno => aluno.active = !aluno.deactivated);
         evento.alunos = evento.alunos.filter(aluno => aluno.active).sort((x, y) => (x.aluno < y.aluno ? -1 : 1));
         evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.length;
 
@@ -130,7 +120,7 @@ export class EventoService extends Service {
                             await lastValueFrom(this.roteiroService.getList('calendario'));
 
                         let list = this.eventos.value as Evento[];
-                        eventos = eventos.map((evento) => {
+                        eventos = eventos.map(evento => {
                             evento = this.mapEvento(evento);
 
                             let index = list.findIndex(x => x.id == evento.id 
@@ -139,6 +129,7 @@ export class EventoService extends Service {
 
                             if (index == -1) list.push(evento);
                             else list.splice(index, 1, evento);
+
                             return evento;
                         });
 
@@ -509,5 +500,12 @@ export class EventoService extends Service {
             `${this.url}/eventos/cancelar-eventos-feriado/${ano}`,
             {}
         );
+    }
+
+    cancelarParticipacao(participacaoId: number, observacao: string) {
+        return this.http.post<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, {
+            participacao_Id: participacaoId,
+            observacao: observacao,
+        });
     }
 }

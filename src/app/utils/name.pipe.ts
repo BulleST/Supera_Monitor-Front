@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class NameAbvPipe implements PipeTransform
 {
-    transform(value: string): string
+    transform(value?: string): string
     {
         if (!value) { return ''; }
         var nameArray = value.split(' ').filter(x => !!x )

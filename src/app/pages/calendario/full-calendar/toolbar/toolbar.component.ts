@@ -66,11 +66,24 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             }
         },
         {
-            label: 'Turma Extra',
-            routerLink: 'calendario/turma-extra/agendar',
+            label: 'Falta',
+            routerLink: 'calendario/agendar-falta',
+        },
+        {
+            label: 'Oficina',
+            routerLink: 'calendario/oficina/agendar',
             command: () => {
                 let evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
+                evento.evento_Tipo_Id = EventoTipo.Oficina;
+                this.service.setEvento(evento);
+            }
+        },
+        {
+            label: 'Reunião',
+            routerLink: 'calendario/reuniao/agendar',
+            command: () => {
+                let evento = new Evento;
+                evento.evento_Tipo_Id = EventoTipo.Reuniao;
                 this.service.setEvento(evento);
             }
         },
@@ -88,20 +101,11 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             }
         },
         {
-            label: 'Oficina',
-            routerLink: 'calendario/oficina/agendar',
+            label: 'Turma Extra',
+            routerLink: 'calendario/turma-extra/agendar',
             command: () => {
                 let evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.Oficina;
-                this.service.setEvento(evento);
-            }
-        },
-        {
-            label: 'Reunião',
-            routerLink: 'calendario/reuniao/agendar',
-            command: () => {
-                let evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.Reuniao;
+                evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
                 this.service.setEvento(evento);
             }
         },
@@ -128,6 +132,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         private roteiroService: RoteiroService,
 
     ) {
+        this.agendarMenuItem.sort((x,y) => x.label! < y.label! ? -1 : 1)
 
         let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);

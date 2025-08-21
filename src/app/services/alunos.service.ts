@@ -23,6 +23,7 @@ import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../models/aluno
 export class AlunoService extends Service {
 
     override list = new BehaviorSubject<Aluno[]>([]);
+    aluno = new BehaviorSubject<Aluno | undefined>(undefined);
     checklists: Checklist[] = [];
     restricaoCreated = new EventEmitter<Aluno_Restricao>();
 
@@ -36,6 +37,22 @@ export class AlunoService extends Service {
         this.checklistService.list.subscribe(res => this.checklists = res);
     }
 
+
+    getAluno() {
+        if (!this.aluno.value) {
+            let itemString = localStorage.getItem('aluno');
+            let item = itemString ? this.mapAluno(JSON.parse(itemString))  : undefined;
+            this.aluno.next(item);
+        }
+        return this.aluno;
+    }
+
+    setAluno(value: Aluno | undefined) {
+        this.aluno.next(value);
+        if (value) localStorage.setItem('aluno', JSON.stringify(value));
+        else localStorage.removeItem('aluno');
+    }
+    
     calculaIdade(dataNascimento: Date) {
         const hoje = new Date;
         return moment(hoje).diff(dataNascimento, 'years');
@@ -50,7 +67,7 @@ export class AlunoService extends Service {
         }
     }
 
-    mapAluno(aluno: Aluno, where: string) {
+    mapAluno(aluno: Aluno) {
         const semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
         aluno.active = !aluno.deactivated;
         aluno.activeString = aluno.active ? 'Ativo' : 'Inativo';
@@ -139,7 +156,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: async list => {
                     await list.map(async aluno => {
-                        return await this.mapAluno(aluno, 'getList')
+                        return await this.mapAluno(aluno)
                     });
                     this.list.next(list);
                 },
@@ -154,7 +171,7 @@ export class AlunoService extends Service {
         return this.http.post<Aluno[]>(`${this.url}/alunos/all/with-checklist`, request)
             .pipe(tap({
                 next: list => {
-                    list = list.map(aluno => this.mapAluno(aluno, 'getListWithChecklist'));
+                    list = list.map(aluno => this.mapAluno(aluno));
                     return of(list);
                 },
                 error: err => {
@@ -214,7 +231,7 @@ export class AlunoService extends Service {
         return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({
                 next: res => {
-                    return this.mapAluno(res, 'get');
+                    return this.mapAluno(res);
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
@@ -237,7 +254,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        res.object = this.mapAluno(res.object, 'edit')
+                        res.object = this.mapAluno(res.object)
                         replace(this, res.object, 'list')
                     }
                     return res;
@@ -253,7 +270,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        res.object = this.mapAluno(res.object, 'deactivated')
+                        res.object = this.mapAluno(res.object)
                         replace(this, res.object, 'list')
                     }
                     return res;

@@ -246,13 +246,13 @@ export class InserirAlunoComponent {
                 let restricoes = aluno.restricoes.filter(x => x.active === true);
                 let restricaoMobilidade = aluno.restricaoMobilidade;
                 if (restricoes.length > 0 || restricaoMobilidade) {
-                    let mensagem = 'Esse aluno possui algumas restrições: ';
+                    let mensagem = '<p>Esse aluno possui algumas restrições: </p> <ul class="my-2 pl-2">';
 
                     if (restricaoMobilidade)
-                        mensagem += '• Restrição de mobilidade <br>';
+                        mensagem += '<li>Restrição de mobilidade</li>';
 
-                    mensagem += restricoes.map(x => '• ' + x.descricao).join('<br>');
-                    mensagem += `<br> Tem certeza que deseja inserir ele nessa aula zero?`;
+                    mensagem += restricoes.map(x => '<li>' + x.descricao + '</li>').join('');
+                    mensagem += `</ul> Tem certeza que deseja inserir ele nessa aula zero?`;
 
 
                     this.confirmationService.confirm({

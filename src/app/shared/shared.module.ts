@@ -34,6 +34,9 @@ import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.comp
 import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
 import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
 import { LegendColorComponent } from './professor/legend-color/legend-color.component';
+import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
+import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
+import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
 
 @NgModule({
     declarations: [
@@ -53,6 +56,9 @@ import { LegendColorComponent } from './professor/legend-color/legend-color.comp
         TableHeaderFilterComponent,
         TableHeaderFilterComponent,
         LegendColorComponent,
+        IndisponivelTooltipComponent,
+        AlunoAgendarFaltaDialogComponent,
+        CalendarioComponent,
     ],
     exports: [
         FormsModule,
@@ -81,6 +87,8 @@ import { LegendColorComponent } from './professor/legend-color/legend-color.comp
         LoadingBrainComponent,
         TableHeaderFilterComponent,
         LegendColorComponent,
+        IndisponivelTooltipComponent,
+        AlunoAgendarFaltaDialogComponent,
     ],
     imports: [
         CommonModule,

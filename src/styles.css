@@ -411,6 +411,7 @@ td.p-datatable-frozen-column {
     width: 21px;
 }
 
+.p-textarea.ng-touched.ng-invalid,
 .p-select.ng-touched.ng-invalid,
 p-multiselect.ng-touched.ng-invalid .p-inputtext,
 p-datepicker.ng-touched.ng-invalid .p-inputtext,
@@ -440,7 +441,7 @@ input.ng-invalid.ng-touched {
     }
 
     50% {
-        box-shadow: 0 0 3px 1px #ff0000a6
+        box-shadow: 0 0 1px 1px #ff000083
     }
 }
 
@@ -542,16 +543,6 @@ form .field p-selectitem:nth-child(odd) .p-select-option {
     background-color: transparent;
 }
 
-.p-select.p-select-menu .p-select-dropdown-icon {
-    /* display: flex;
-    align-items: center;
-    justify-content: center; */
-}
-
-.p-select.p-select-menu.p-select-small .p-select-dropdown-icon i {}
-
-.p-select.p-select-menu.p-select-small .p-select-label.p-placeholder span {}
-
 p-scroller {
     max-height: 100%;
     height: 100%;
@@ -562,12 +553,4 @@ p-scroller {
     background-color: transparent;
     border: navajowhite;
     padding: 0 !important;
-}
-
-.p-virtualscroller {
-    height: 100% !important;
-}
-
-.fc .fc-view-harness {
-    /* position: static; */
 }

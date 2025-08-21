@@ -4,14 +4,6 @@
 
 export const environment = {
   production: false,
-  development: true,
-  hmr: true,
-  cache: true,
-  // Configurações de otimização
-  enableSourceMaps: true,
-  enableOptimizations: false,
-  enableTreeShaking: false,
-  // URL da API
   url: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back',
 //   url: 'https://localhost:7281/back',
 };

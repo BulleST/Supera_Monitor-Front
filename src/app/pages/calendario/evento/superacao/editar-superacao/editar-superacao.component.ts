@@ -74,17 +74,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['evento']) {
-            this.evento = changes['evento'].currentValue;
-            if (!this.evento.finalizado) {
-                this.evento.alunos
-                    .filter(x => x.active)
-                    .map(x => {
-                        x.presente == true;
-                        return x;
-                    });
-            }
-        }
+        if (changes['evento']) this.evento = changes['evento'].currentValue;
         if (changes['professores']) this.professores = changes['professores'].currentValue;
         if (changes['loadingProfessores']) this.loadingProfessores = changes['loadingProfessores'].currentValue;
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;

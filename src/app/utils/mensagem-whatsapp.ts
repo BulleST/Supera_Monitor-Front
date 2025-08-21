@@ -32,12 +32,12 @@ export class MensagemWhatsapp {
 
     copiarMensagem(mensagem: string) {
         navigator.clipboard.writeText(mensagem)
-        .then(() => {
-            this.toastr.info('Mensagem copiada para área de transferência');
-        })
-        .catch(() => {
-            this.toastr.error('Erro ao copiar mensagem');
-        });
+            .then(() => {
+                this.toastr.info('Mensagem copiada para área de transferência');
+            })
+            .catch(() => {
+                this.toastr.error('Erro ao copiar mensagem');
+            });
     }
 
     enviarMensagemFalta(evento: Evento, aluno: Evento_Participacao_Aluno, e: any) {
@@ -81,10 +81,10 @@ export class MensagemWhatsapp {
                 this.copiarMensagem(object.mensagem);
             })
     }
-    
+
     enviarMensagemCondicao(aluno: any, id: number) {
         let object = null;
-                
+
         if (id && aluno && aluno.celular) {
             // Apresentação do Diretor Franqueado 
             if (id == 8) {
@@ -149,29 +149,29 @@ export class MensagemWhatsapp {
             \r\nNotei que você não esteve presente na ${tipo} do dia ${data} e gostaria de saber se houve um imprevisto. 
             \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
 
-            if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.TurmaExtra) {
-                mensagem += `\r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. `
-                if (sugestoes.length > 0) {
-                    mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
+        if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.TurmaExtra) {
+            mensagem += `\r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. `
+            if (sugestoes.length > 0) {
+                mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
                     \r\n `;
-                }
-                sugestoes.forEach(sugestao => {
-                    let d = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
-                    mensagem += `\r\n • ${d} - Turma: ${sugestao.turma}`;
-                })
-                mensagem += `\r\n
+            }
+            sugestoes.forEach(sugestao => {
+                let d = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
+                mensagem += `\r\n • ${d} - Turma: ${sugestao.turma}`;
+            })
+            mensagem += `\r\n
                     \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
                     \r\n
                     \r\nIremos aguardar sua resposta...`;
-            }
-            else if (evento.evento_Tipo_Id == EventoTipo.Oficina) {
-                mensagem += `\r\n O não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
+        }
+        else if (evento.evento_Tipo_Id == EventoTipo.Oficina) {
+            mensagem += `\r\n O não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
                 \r\n
                 \r\nFico à disposição caso precise de algo`;
-            }
+        }
 
-            
-            
+
+
         let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return {
             link: link,
@@ -192,28 +192,6 @@ export class MensagemWhatsapp {
             \r\nFico à disposição caso precise de algo antes da ${tipo}.
             \r\n
             \r\nNos vemos em breve! `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
-        return {
-            link: link,
-            mensagem: mensagem
-        };
-    }
-
-    enviarMensagemReagendamento(nome: string, celular: string, evento: Evento) {
-        let array = nome.split(' ');
-        nome = array[0];
-        celular = celular.replace(/\D/g, '')
-
-        let tipo = this.calendarioUtils.getEventoTipo(evento);
-        let data = moment(evento.data).format('DD/MM/YY [às] HH[h]mm');
-
-        let mensagem = `Olá ${nome},
-            \r\nEspero que esteja bem!
-            \r\nSua ${tipo} foi reagendada para dia ${data}. 
-            \r\n
-            \r\nFico à disposição caso precise de algo antes da ${tipo}.
-            \r\n
-            \r\nNos vemos em breve!`;
         let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
         return {
             link: link,
@@ -263,6 +241,39 @@ export class MensagemWhatsapp {
         };
     }
 
+    enviarMensagemAgendamentoFalta(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
+        let array = nome.split(' ');
+        nome = array[0];
+        celular = celular.replace(/\D/g, '')
+        let data = moment(evento.data).format('DD/MM/YY [às] HH[h]mm');
+        let dataLimite = moment(evento.data).add(1, 'month').format('DD/MM/YY');
+        let semana = evento.semana
+
+        let mensagem = `Olá ${nome},
+            \r\nEspero que esteja bem!
+            \r\nSua falta do dia ${data} foi registrada.
+            \r\n Você terá até o dia ${dataLimite} para participar de uma reposição, caso contrário, perderá por completo o conteúdo da semana ${semana}.
+        `;
+        if (sugestoes.length > 0) {
+            mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
+                    \r\n `;
+        }
+        sugestoes.forEach(sugestao => {
+            let data = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
+            mensagem += `\r\n • ${data} - Turma: ${sugestao.turma}`;
+        })
+        mensagem += `\r\n
+                    \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
+                    \r\n
+                    \r\nIremos aguardar sua resposta...`;
+
+        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        return {
+            link: link,
+            mensagem: mensagem
+        };
+    }
+
     enviarMensagemInscricao(nome: string, celular: string, evento: Evento) {
         let array = nome.split(' ');
         nome = array[0];
@@ -297,6 +308,7 @@ export class MensagemWhatsapp {
             mensagem: mensagem
         };
     }
+
     enviarMensagemConfirmacaoPreenchimentoFeedbackPosVenda(nome: string, celular: string) {
         let array = nome.split(' ');
         nome = array[0];
@@ -333,7 +345,7 @@ export class MensagemWhatsapp {
     }
 
     enviarMensagemBoasVindas(nome: string, celular: string, email: string, diaSemana?: number, horario?: any, professor?: string, linkGrupo?: string) {
-        horario = horario ? new Date().toISOString().substring(0,10) + 'T' + horario : undefined;
+        horario = horario ? new Date().toISOString().substring(0, 10) + 'T' + horario : undefined;
         let semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
         let array = nome.split(' ');
         nome = array[0];
@@ -370,7 +382,7 @@ export class MensagemWhatsapp {
                 \r\n
             `;
         } else {
-             mensagem += `
+            mensagem += `
                 \r\n
                 \r\nCaso não tenha sido incluído, enviaremos o convite para você clicar e entrar no grupo.
             `;
@@ -462,141 +474,141 @@ export class MensagemWhatsapp {
     }
 
 
-/*---Mensagem de Falta-----------------------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem! 
-Notei que você não esteve presente na <aula/superação/aula-0/oficina> do dia <data dia/mes/ano hora:minuto> e gostaria de saber se houve um imprevisto. 
-Imprevistos acontecem e queremos saber se você está enfrentando dificuldades. 
-Sugiro agendarmos uma reposição, para você não perder o conteúdo. 
-Me avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
-
-Iremos aguardar sua resposta...
-*/
-/*---Mensagem de Agendamento-----------------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem! 
-Sua <aula/superação/aula-0/oficina> foi agendada para o dia <data dia/mes/ano hora:minuto>.
-
-Fico à disposição caso precise de algo antes da <aula/superação/aula-0/oficina>.
-
-Nos vemos em breve!
-*/
-/*---Mensagem de Reagendamento---------------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem! 
-Sua <aula/superação/aula-0/oficina> foi reagendada para o dia <data dia/mes/ano hora:minuto>.
-
-Fico à disposição caso precise de algo antes da <aula/superação/aula-0/oficina>.
-
-Nos vemos em breve!
-*/
-/*---Mensagem de Cancelamento----------------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem! 
-Infelizmente sua <aula/superação/aula-0/oficina> do dia <data dia/mes/ano hora:minuto> foi cancelada devido <motivo inserido em observações>.
-
-Por favor, me avise sua disponibilidade para que possamos combinar um novo horário.
-
-Agradeço pela compreensão!
-*/
-/*---Mensagem de Reposição agendada----------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem!
-Confirmo que a reposição da sua aula está agendada para o dia <data dia/mes/ano hora:minuto>.
-Fico à disposição caso precise de algo antes da aula.
-
-Nos vemos em breve!
-*/
-/*---Mensagem de Incrição oficina------------------------------------------------------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem!
-Sua inscrição na oficina do dia <data dia/mes/ano hora:minuto> foi confirmada.
-Fico à disposição caso precise de algo antes da oficina.
-
-Nos vemos em breve!
-*/
-/*---Jornada Supera - Semana 0 - Mensagem de boas vindas-------------------------------------
-
-Olá <nome do aluno>, 
-Tudo bem?
-Meu nome é Antonio Neto, coordenador pedagógico da Equipe Supera Paraíso!
-
-Estamos felizes e honrados em ter você como nosso(a) aluno(a)! 
-Seja bem-vindo(a) à Família SUPERA! 💪🧠
-
-Para começar, vamos ver algumas informações importantes sobre o início do curso:
-Sua Turma: <dia da semana> - <hora:minuto>
-Seu educador é o <educador do aluno>
-
-Te incluímos em dois grupos do SUPERA no WhatsApp 💪🧠
-
-O Supera INFORMATIVOS é onde enviamos recados gerais, gabaritos, oficinas e etc. 
-
-Já o SUPERA [<dia da semana> - <hora:minuto>] é o grupo apenas da sua turma, onde enviamos exercícios, reflexão da semana e recados voltados a turma.
-
-SENSORIAL MOOVE (SUPERA ONLINE PREMIUM): Sendo nosso aluno, você possui acesso ao nosso aplicativo com exercícios complementares ao treino cognitivo. Poderá ser baixado nos links abaixo 👇 
-
-Celular (IPHONE): https://apps.apple.com/br/app/sensorial-moove/id1613606380
-Celular (ANDROID): https://play.google.com/store/apps/details?id=com.sensorial.moove&pli=1
-Computador: https://apps.microsoft.com/detail/9pj1l9fd95nc?hl=en-us&gl=BR
-
-SEU USUÁRIO: <email do aluno>
-SUA SENHA: Super@123
-
-Qualquer dúvida, estou à disposição!
-*/
-/*---Jornada Supera - 1ª Semana- Apresentação do diretor franqueado--------------------------
-    PENDENTE
-*/
-/*---Jornada Supera - 2ª Semana - Confirmação da adequação do aluno ao perfil da turma-------
-Olá <nome do aluno>, 
-Espero que esteja bem!
-
-Queremos saber como você está se sentindo em relação à sua turma.
-Está tudo indo bem por aí? Há algo em que possamos te ajudar ou melhorar para que sua experiência seja ainda mais positiva?
-
-Conte com a gente! 😊
-*/
-/*---Jornada Supera - 3ª Semana - Feedback pós-venda-----------------------------------------
-    PENDENTE
-*/
-/*---Jornada Supera - 3ª Semana - Confirmação de preenchimento do feedback pós-venda---------
-Olá <nome do aluno>, 
-Espero que esteja bem!
-Passando para confirmar se você já conseguiu preencher o formulário que enviamos.
-Caso ainda não tenha preenchido, posso te enviar novamente — é rapidinho! 😊
-
-Link: <Link do formulário>
-
-Fico no aguardo, tá bom?
-*/
-/*---Jornada Supera - 3ª e 7ª Semana - Lembrete para agendar oficina-------------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem!
-Gostaria de te convidar para participar de uma oficina super especial com a gente.
-Nela, vamos trabalhar juntos o desenvolvimento da criatividade, autoestima, coordenação motora e da sua capacidade de expressão de forma divertida e envolvente!
-
-Será uma alegria ter você com a gente!
-
-Posso contar com você? 💪🙂
-*/
-/*---Jornada Supera - 7ª e 11ª Semana - Lembrete para agendar superação----------------------
-
-Olá <nome do aluno>, 
-Espero que esteja bem!
-Não se esqueça de agendar sua Superação com a gente.
-
-Essa é uma aula exclusiva, essencial para o desenvolvimento do cérebro e da cognição. Além disso, é uma ótima oportunidade para tirar todas as suas dúvidas com um professor, de forma prática e personalizada.
-Vamos juntos nessa jornada? 💪🙂
-
-Nos vemos em breve!
-*/
+    /*---Mensagem de Falta-----------------------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem! 
+    Notei que você não esteve presente na <aula/superação/aula-0/oficina> do dia <data dia/mes/ano hora:minuto> e gostaria de saber se houve um imprevisto. 
+    Imprevistos acontecem e queremos saber se você está enfrentando dificuldades. 
+    Sugiro agendarmos uma reposição, para você não perder o conteúdo. 
+    Me avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
+    
+    Iremos aguardar sua resposta...
+    */
+    /*---Mensagem de Agendamento-----------------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem! 
+    Sua <aula/superação/aula-0/oficina> foi agendada para o dia <data dia/mes/ano hora:minuto>.
+    
+    Fico à disposição caso precise de algo antes da <aula/superação/aula-0/oficina>.
+    
+    Nos vemos em breve!
+    */
+    /*---Mensagem de Reagendamento---------------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem! 
+    Sua <aula/superação/aula-0/oficina> foi reagendada para o dia <data dia/mes/ano hora:minuto>.
+    
+    Fico à disposição caso precise de algo antes da <aula/superação/aula-0/oficina>.
+    
+    Nos vemos em breve!
+    */
+    /*---Mensagem de Cancelamento----------------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem! 
+    Infelizmente sua <aula/superação/aula-0/oficina> do dia <data dia/mes/ano hora:minuto> foi cancelada devido <motivo inserido em observações>.
+    
+    Por favor, me avise sua disponibilidade para que possamos combinar um novo horário.
+    
+    Agradeço pela compreensão!
+    */
+    /*---Mensagem de Reposição agendada----------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    Confirmo que a reposição da sua aula está agendada para o dia <data dia/mes/ano hora:minuto>.
+    Fico à disposição caso precise de algo antes da aula.
+    
+    Nos vemos em breve!
+    */
+    /*---Mensagem de Incrição oficina------------------------------------------------------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    Sua inscrição na oficina do dia <data dia/mes/ano hora:minuto> foi confirmada.
+    Fico à disposição caso precise de algo antes da oficina.
+    
+    Nos vemos em breve!
+    */
+    /*---Jornada Supera - Semana 0 - Mensagem de boas vindas-------------------------------------
+    
+    Olá <nome do aluno>, 
+    Tudo bem?
+    Meu nome é Antonio Neto, coordenador pedagógico da Equipe Supera Paraíso!
+    
+    Estamos felizes e honrados em ter você como nosso(a) aluno(a)! 
+    Seja bem-vindo(a) à Família SUPERA! 💪🧠
+    
+    Para começar, vamos ver algumas informações importantes sobre o início do curso:
+    Sua Turma: <dia da semana> - <hora:minuto>
+    Seu educador é o <educador do aluno>
+    
+    Te incluímos em dois grupos do SUPERA no WhatsApp 💪🧠
+    
+    O Supera INFORMATIVOS é onde enviamos recados gerais, gabaritos, oficinas e etc. 
+    
+    Já o SUPERA [<dia da semana> - <hora:minuto>] é o grupo apenas da sua turma, onde enviamos exercícios, reflexão da semana e recados voltados a turma.
+    
+    SENSORIAL MOOVE (SUPERA ONLINE PREMIUM): Sendo nosso aluno, você possui acesso ao nosso aplicativo com exercícios complementares ao treino cognitivo. Poderá ser baixado nos links abaixo 👇 
+    
+    Celular (IPHONE): https://apps.apple.com/br/app/sensorial-moove/id1613606380
+    Celular (ANDROID): https://play.google.com/store/apps/details?id=com.sensorial.moove&pli=1
+    Computador: https://apps.microsoft.com/detail/9pj1l9fd95nc?hl=en-us&gl=BR
+    
+    SEU USUÁRIO: <email do aluno>
+    SUA SENHA: Super@123
+    
+    Qualquer dúvida, estou à disposição!
+    */
+    /*---Jornada Supera - 1ª Semana- Apresentação do diretor franqueado--------------------------
+        PENDENTE
+    */
+    /*---Jornada Supera - 2ª Semana - Confirmação da adequação do aluno ao perfil da turma-------
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    
+    Queremos saber como você está se sentindo em relação à sua turma.
+    Está tudo indo bem por aí? Há algo em que possamos te ajudar ou melhorar para que sua experiência seja ainda mais positiva?
+    
+    Conte com a gente! 😊
+    */
+    /*---Jornada Supera - 3ª Semana - Feedback pós-venda-----------------------------------------
+        PENDENTE
+    */
+    /*---Jornada Supera - 3ª Semana - Confirmação de preenchimento do feedback pós-venda---------
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    Passando para confirmar se você já conseguiu preencher o formulário que enviamos.
+    Caso ainda não tenha preenchido, posso te enviar novamente — é rapidinho! 😊
+    
+    Link: <Link do formulário>
+    
+    Fico no aguardo, tá bom?
+    */
+    /*---Jornada Supera - 3ª e 7ª Semana - Lembrete para agendar oficina-------------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    Gostaria de te convidar para participar de uma oficina super especial com a gente.
+    Nela, vamos trabalhar juntos o desenvolvimento da criatividade, autoestima, coordenação motora e da sua capacidade de expressão de forma divertida e envolvente!
+    
+    Será uma alegria ter você com a gente!
+    
+    Posso contar com você? 💪🙂
+    */
+    /*---Jornada Supera - 7ª e 11ª Semana - Lembrete para agendar superação----------------------
+    
+    Olá <nome do aluno>, 
+    Espero que esteja bem!
+    Não se esqueça de agendar sua Superação com a gente.
+    
+    Essa é uma aula exclusiva, essencial para o desenvolvimento do cérebro e da cognição. Além disso, é uma ótima oportunidade para tirar todas as suas dúvidas com um professor, de forma prática e personalizada.
+    Vamos juntos nessa jornada? 💪🙂
+    
+    Nos vemos em breve!
+    */
 
 }

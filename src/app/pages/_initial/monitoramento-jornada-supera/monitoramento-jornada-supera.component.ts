@@ -69,7 +69,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                     }
                     return checklist;
                 });
-                aluno = await this.alunoService.mapAluno(aluno, 'monitoramento-jornada-supera')
+                aluno = await this.alunoService.mapAluno(aluno)
                 return aluno;
             })
         });

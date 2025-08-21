@@ -10,6 +10,7 @@ import { AlunoService } from '../../../../services/alunos.service'
 import { EventoService } from '../../../../services/evento.service'
 import { Evento, EventoTipo } from '../../../../models/evento.model'
 import { CalendarioUtils, MensagemWhatsapp, showError, validaAlunos } from '../../../../utils'
+import { NgModel } from '@angular/forms'
 
 @Component({
     selector: 'app-cadastrar-aula-1',
@@ -30,7 +31,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
 
     selectedEvento?: Evento = undefined
     selectedAluno?: Aluno = undefined
-    aluno_Id?: number = undefined
+    alunoSelectedId?: number = undefined;
 
     constructor(
         private router: Router,
@@ -41,7 +42,11 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
     ) {
-        let alunos = this.alunoService.list.subscribe((res) => this.alunos = res.filter(x => x.active === true && !x.primeiraAula_Id))
+        let alunos = this.alunoService.list.subscribe(res => {
+            this.alunos = res.filter(x => x.active && !x.primeiraAula_Id);
+            console.log(res);
+            console.log(this.alunos);
+        })
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
@@ -51,7 +56,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
                 .catch(() => (this.loadingAlunos = false))
         }
 
-        let eventos = this.eventoService.eventos.subscribe((res) => this.eventos = res.filter(x => x.active && (x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.TurmaExtra)))
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res)
         this.subscription.push(eventos)
 
         this.visible = true
@@ -69,16 +74,29 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
         }
     }
 
-    alunoChanged(e: any, aluno_Id: any) {
+    alunoChanged(e: any, aluno_Id: NgModel) {
         this.loadAluno(e, aluno_Id);
     }
 
-    loadAluno(e: any, aluno_Id: number) {
+    loadAluno(e: any, aluno_Id: NgModel) {
         this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.get(aluno_Id))
+        lastValueFrom(this.alunoService.get(this.alunoSelectedId!))
             .then(res => {
                 this.selectedAluno = res;
                 this.loadingAlunos = false;
+
+                this.eventos = this.eventos.filter(evento =>  {
+                    const eventoAtivo = evento.active;
+                    const ehAula = [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id);
+                    const ehPerfilCompativel = !this.selectedAluno?.perfilCognitivo_Id || evento.perfilCognitivo.map(x => x.id).includes(this.selectedAluno?.perfilCognitivo_Id)
+                    const eventoTemVaga = evento.vagas > 0;
+                    const alunoEstaNaAula = evento.alunos.map(x => x.aluno_Id).includes(this.selectedAluno!.id);
+
+                    return eventoAtivo 
+                        && ehAula 
+                        && ehPerfilCompativel 
+                        && ((eventoTemVaga && !alunoEstaNaAula) || alunoEstaNaAula);
+                })
             })
             .catch(res => {
                 this.loadingAlunos = false;
