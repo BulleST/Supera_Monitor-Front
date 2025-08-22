@@ -60,14 +60,15 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             label: 'Aula 1',
             routerLink: 'calendario/primeira-aula/agendar',
             command: () => {
-                let evento = new Evento;
-                evento.evento_Tipo_Id = EventoTipo.Aula;
-                this.service.setEvento(evento);
+                this.service.setEvento(undefined);
             }
         },
         {
             label: 'Falta',
             routerLink: 'calendario/agendar-falta',
+            command: () => {
+                this.service.setEvento(undefined);
+            }
         },
         {
             label: 'Oficina',
@@ -90,6 +91,9 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         {
             label: 'Reposição',
             routerLink: 'calendario/reposicao/agendar',
+            command: () => {
+                this.service.setEvento(undefined);
+            }
         },
         {
             label: 'Superação',

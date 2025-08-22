@@ -66,29 +66,10 @@
                                          value="Indisponível"
                                          severity="danger"
                                          [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                <ng-template #indisponivelTemplate>
-                                    <div class="w-25rem">
-                                        <p>
-                                            <span class="text-orange-400 font-bold capitalize">{{getTipo(item.disponivelEvent)}}</span>
-                                            <span> - {{item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm'}}</span>
-                                        </p>
-                                        <p>{{item.disponivelEvent.descricao}}</p>
-                                        <p *ngIf="item.disponivelEvent.professor">
-                                            <span class="w-1rem h-1rem border-circle inline-flex mr-2"
-                                                  [style]="{ backgroundColor: item.disponivelEvent.corLegenda, borderColor: item.disponivelEvent.corLegenda }"></span>
-                                            <span>{{item.disponivelEvent.professor}}</span>
-                                        </p>
-                                        <p *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
-                                            {{item.disponivelEvent.turma}}
-                                        </p>
-                                        <p *ngIf="item.disponivelEvent.sala_Id">
-                                            <span>Sala: </span>
-                                            <app-sala-aula [numeroSala]="item.disponivelEvent.numeroSala"
-                                                           [andar]="item.disponivelEvent.andar"
-                                                           [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                                        </p>
-                                    </div>
-                                </ng-template>
+                                         
+                                         <ng-template #indisponivelTemplate>
+                                             <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                         </ng-template>
                             </p>
                         </div>
                         <p class="flex align-items-center gap-2 pl-2">

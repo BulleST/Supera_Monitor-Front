@@ -87,17 +87,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingAlunos = false)
         }
 
-        let evento = this.service.evento.subscribe(res => {
-            if (!res) {
-                try {
-                    let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                    this.service.setEvento(evento)
-                } catch (e) {
-                    this.visible = false
-                    this.visibleChange()
-                }
-                return
-            }
+        let evento = this.service.getEvento().subscribe(res => {
             if (res) {
                 this.evento = res
                 this.tipoString = this.getTipo(this.evento);

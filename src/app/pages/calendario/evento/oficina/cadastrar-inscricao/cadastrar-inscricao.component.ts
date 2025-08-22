@@ -55,12 +55,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
-    // professores: Professor[] = [];
-    // loadingProfessores = false;
-
-    // salaAulas: SalaAula[] = [];
-    // loadingSalaAulas = false;
-
     turmas: Turma[] = [];
     loadingTurmas = false;
 
@@ -92,26 +86,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return
         }
 
-        // let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true));
-        // this.subscription.push(professores);
-
-        // if (this.professores.length == 0) {
-        //     this.loadingProfessores = true;
-        //     lastValueFrom(this.professorService.getList())
-        //         .then(res => this.loadingProfessores = false)
-        //         .catch(res => this.loadingProfessores = false);
-        // }
-
-        // let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true));
-        // this.subscription.push(salaAula);
-
-        // if (this.salaAulas.length == 0) {
-        //     this.loadingSalaAulas = true;
-        //     lastValueFrom(this.salaAulaService.getList())
-        //         .then(res => this.loadingSalaAulas = false)
-        //         .catch(res => this.loadingSalaAulas = false);
-        // }
-
         let alunos = this.alunoService.list.subscribe(res => {
             this.alunos = res.filter(x => x.active == true);
             this.setAlunos();
@@ -136,32 +110,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
 
-        let evento = this.service.evento.subscribe(async res => {
-            if (!res) {
-                try {
-                   let decrypted = this.crypto.decrypt(params['evento_id']);
-                    if (params['evento_id'] && decrypted && decrypted != PseudoEvento.EventoId) {
-                        await lastValueFrom(this.service.get(decrypted))
-                            .then(res => {
-                                this.service.setEvento(res);
-                                this.evento = res;
-                            })
-                            .catch(res => {
-                                this.visible = false;
-                                this.visibleChange();
-                            })
-                    } else {
-                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                        this.service.setEvento(evento)
-                    }
-                }
-                catch (e) {
-                    this.visible = false;
-                    this.visibleChange();
-                }
-                return;
-            }
-
+        let evento = this.service.getEvento().subscribe(async res => {
             if (res) {
                 this.evento = res;
                 this.visible = true;

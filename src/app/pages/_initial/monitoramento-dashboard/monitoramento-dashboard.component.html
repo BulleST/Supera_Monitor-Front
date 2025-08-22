@@ -199,8 +199,8 @@
                                     {
                                         <div class="event-status surface-800 border-800">
                                             <span>Cancelada</span>
-                                            
-                                            <!-- @if (true)  -->
+                                            <i *ngIf="!item.participacao.alunoContactado " class="pi pi-times text-white" ></i>
+                                            <i *ngIf="item.participacao.alunoContactado " class="pi pi-check text-white" ></i>
                                         </div>
                                         <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                     }
@@ -229,7 +229,9 @@
                                         <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                     }
                                     <!-- Falta Agendada -->
-                                    @else if (item.aula.finalizado === false && item.participacao.presente === false && !item.participacao.reposicaoDe_Evento_Id) 
+                                    @else if ( item.participacao.presente === false 
+                                        && item.participacao.active === false 
+                                        && !item.participacao.reposicaoDe_Evento_Id) 
                                     {
                                         <div class="event-status bg-red-500 border-red-500">
                                             <span>Falta Agendada</span>

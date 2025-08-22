@@ -114,32 +114,7 @@ export class InserirAlunoComponent {
         let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
 
-        let evento = this.service.evento.subscribe(async res => {
-            if (!res) {
-                try {
-                    let decrypted = this.crypto.decrypt(params['evento_id']);
-                    if (params['evento_id'] && decrypted && decrypted != PseudoEvento.EventoId) {
-                        await lastValueFrom(this.service.get(decrypted))
-                            .then(res => {
-                                this.service.setEvento(res);
-                                this.evento = res;
-                            })
-                            .catch(res => {
-                                this.visible = false;
-                                this.visibleChange();
-                            })
-                    } else {
-                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                        this.service.setEvento(evento)
-                    }
-                }
-                catch (e) {
-                    this.visible = false;
-                    this.visibleChange();
-                }
-                return;
-            }
-
+        let evento = this.service.getEvento().subscribe(async res => {
             if (res) {
                 this.evento = res;
                 this.visible = true;

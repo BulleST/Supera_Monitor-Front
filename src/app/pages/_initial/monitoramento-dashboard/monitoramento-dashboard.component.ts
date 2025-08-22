@@ -1,12 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { Roteiro } from '../../../models/roteiro.model';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Aula_Participacao } from '../../../models/dashboard.model';
+import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Item } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { Crypto } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,7 +22,7 @@ import 'moment/locale/pt-br';
     styleUrl: './monitoramento-dashboard.component.css',
     providers: [ConfirmationService],
 })
-export class MonitoramentoDashboardComponent implements AfterViewInit {
+export class MonitoramentoDashboardComponent implements AfterViewInit, OnDestroy {
     alunos: Dashboard_Aluno[] = [];
     loading = false;
     mesesAno: Dashboard_Mes[] = [];
@@ -42,6 +42,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     loadingRequests = new EventEmitter<number>();
     hoje = new Date;
     height = 'flex';
+    subscription: Subscription[] = [];
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
@@ -50,12 +51,20 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         private router: Router,
         private activatedRoute: ActivatedRoute,
     ) {
+        let calendarioReload = this.service.calendarioReload.subscribe(res => {
+            this.update();
+        })
+        this.subscription.push(calendarioReload);
 
     }
 
     ngAfterViewInit(): void {
         this.calcHeight();
      }
+
+    ngOnDestroy(): void {
+        this.subscription.forEach(item => item.unsubscribe());
+    }
 
 
     calcHeight() {
@@ -201,13 +210,13 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.alunoPopover.show(event)
     }
     
-    showAula(aluno: Dashboard_Aluno, item: Dashboard_Aula_Participacao, event: any) {
+    showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
         this.selectedAulaComponent.aluno = aluno;
         this.selectedAulaComponent.participacao = item;
         this.selectedAulaComponent.show(event);
     }
 
-    alunoVigente(item: Dashboard_Aula_Participacao, aluno: Dashboard_Aluno) {
+    alunoVigente(item: Dashboard_Item, aluno: Dashboard_Aluno) {
 
     }
 }

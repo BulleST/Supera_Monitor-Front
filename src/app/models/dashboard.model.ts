@@ -13,7 +13,7 @@ export class Dashboard_Response {
     roteiros: Dashboard_Roteiro[] = [];
 }
 
-export class Dashboard_Aula_Participacao {
+export class Dashboard_Item {
     show: boolean = true;
     aula: Dashboard_Aula = new Dashboard_Aula;
     participacao: Dashboard_Participacao = new Dashboard_Participacao;
@@ -75,6 +75,8 @@ export class Dashboard_Participacao {
     observacao?: string;
     deactivated?: Date;
     active: boolean = true;
+    alunoContactado: boolean = false; 
+    observacoesContato?: string; 
 }
 
 export class Dashboard_Roteiro {
@@ -95,7 +97,7 @@ export class Dashboard_Aluno {
     aulaZero_Id?: number;
     dataNascimento?: Date;
     perfilCognitivo_Id: number = 0;
-    aulas: Dashboard_Aula_Participacao[] = [];
+    aulas: Dashboard_Item[] = [];
 }
 
 export class Dashboard_Mes {

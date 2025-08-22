@@ -22,6 +22,7 @@ import { MyMap } from '../utils/map';
 import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
 import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
+import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
 
 @Injectable({
     providedIn: 'root',
@@ -58,6 +59,7 @@ export class EventoService extends Service {
     }
 
     setEvento(value: Evento | undefined) {
+        console.log('setEvento')
         this.evento.next(value);
         if (value) localStorage.setItem('evento', JSON.stringify(value));
         else localStorage.removeItem('evento');
@@ -99,10 +101,12 @@ export class EventoService extends Service {
         evento.active = !evento.deactivated;
 
         evento.professores = evento.professores ?? [];
-        evento.alunos = evento.alunos ?? [];
+        evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1))
 
-        evento.alunos = evento.alunos.filter(aluno => aluno.active).sort((x, y) => (x.aluno < y.aluno ? -1 : 1));
-        evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.length;
+        evento.alunos = evento.alunos ?? [];
+        evento.alunos.sort((x, y) => (x.aluno < y.aluno ? -1 : 1))
+
+        evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.filter(x => x.active === true).length;
 
         if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
             let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
@@ -342,7 +346,7 @@ export class EventoService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
     }
 
-    cancelarParticipacao(participacao_Id: number, observacao: string) {
-        return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, { participacao_Id, observacao });
+    cancelarParticipacao(request: EventoAgendarFaltaRequest) {
+        return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
     }
 }

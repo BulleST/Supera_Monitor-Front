@@ -149,42 +149,17 @@ export class EventoComponent implements OnDestroy {
         let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true))
         this.subscription.push(eventos)
 
-        let evento = this.service.evento.subscribe(async (res) => {
-            if (!res) {
-                try {
-                    let decrypted = this.crypto.decrypt(this.encryptedId)
-                    if (this.encryptedId && decrypted && decrypted != PseudoEvento.EventoId) {
-                        await lastValueFrom(this.service.get(decrypted))
-                            .then((res) => {
-                                this.service.setEvento(res)
-                                this.evento = res
-                            })
-                            .catch((res) => {
-                                this.visible = false
-                                this.visibleChange()
-                            })
-                    } else {
-                        let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                        this.service.setEvento(evento)
-                    }
-                } catch (e) {
-                    this.visible = false
-                    this.visibleChange()
-                }
-                return
-            }
-
+        let evento = this.service.getEvento().subscribe(async (res) => {
             if (res) {
-                // console.log('res evento', JSON.parse(JSON.stringify(res)))
                 this.evento = res
                 this.visible = true
                 this.verificaDisponibilidade()
                 this.tipoString = this.getTipo(this.evento)
-                let alunosEvento = this.evento.alunos.map((x) => x.aluno_Id)
-                this.alunos = this.alunos.filter((x) => alunosEvento.includes(x.id))
+                let alunosEvento = this.evento.alunos.map(x => x.aluno_Id)
+                this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id))
 
                 if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-                    let roteiro = this.roteiros.find((x) =>moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
+                    let roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
                     this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
                 }
 
@@ -198,13 +173,6 @@ export class EventoComponent implements OnDestroy {
             }
         })
         this.subscription.push(evento)
-
-        setTimeout(() => {
-            if (!this.evento) {
-                this.visible = false
-                this.visibleChange()
-            }
-        }, 1000)
     }
 
     getDeactivatedInformation(evento: Evento) {
@@ -365,7 +333,7 @@ export class EventoComponent implements OnDestroy {
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
-                alunos: this.evento.alunos.map((x) => {
+                alunos: this.evento.alunos.map(x => {
                     return {
                         participacao_Id: x.id,
                         observacao: x.observacao,
@@ -386,7 +354,7 @@ export class EventoComponent implements OnDestroy {
             }
 
             if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
-                request.professores = this.evento.professores.map((x) => {
+                request.professores = this.evento.professores.map(x => {
                     return {
                         participacao_Id: x.id,
                         observacao: x.observacao,

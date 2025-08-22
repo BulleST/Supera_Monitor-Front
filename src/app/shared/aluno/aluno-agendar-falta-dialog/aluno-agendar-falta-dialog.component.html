@@ -186,21 +186,23 @@
                 </div>
             </ng-container>
             <ng-template #eventoSelecionadoTemplate>
+                <!-- Turma -->
                 <div class="field col-6">
-                    <label for="evento">Turma:</label>
+                    <label for="descricao">Turma:</label>
                     <p-iconfield>
                         <p-inputicon *ngIf="!loadingEventos" styleClass="fa-solid fa-users-between-lines" />
                         <p-inputicon *ngIf="loadingEventos" styleClass="pi pi-spinner pi-spin" />
                         <input type="text"
                                 pInputText
                                 [value]="evento?.descricao"
-                                id="evento"
-                                name="evento"
+                                id="descricao"
+                                name="descricao"
                                 fluid
                                 readonly>
                     </p-iconfield>
                 </div>
-                <div class="field col-4">
+                <!-- Data -->
+                <div class="field col-3">
                     <label for="data">Data:</label>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-calendar" />
@@ -213,7 +215,8 @@
                                 readonly>
                     </p-iconfield>
                 </div>
-                <div class="field col-4">
+                <!-- Horário -->
+                <div class="field col-3">
                     <label for="horario">Horário:</label>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-calendar" />
@@ -226,14 +229,15 @@
                                 readonly>
                     </p-iconfield>
                 </div>
-                <div class="field col-4">
+                <!-- Roteiro -->
+                <div class="field col-6">
                     <label for="semana">Semana:</label>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-star-fill" />
                         <ng-container *ngIf="evento?.semana && evento?.tema; else roteiroIndefinidoTemplate">
                             <input type="text"
                                     pInputText
-                                    [value]="'Semana ' + evento?.semana + '- Tema ' + evento?.tema "
+                                    [value]="'Semana ' + evento?.semana + ' - ' + evento?.tema "
                                     id="semana"
                                     name="semana"
                                     fluid
@@ -251,18 +255,72 @@
                     </p-iconfield>
                 </div>
             </ng-template>
+
             <!-- OBS -->
             <div class="field col-12">
-                <label for="observacoes" class="font-bold">Por que o aluno irá faltar? <span class="text-red-500">*</span></label>
+                <label for="observacao" class="font-bold">Por que o aluno irá faltar? <span class="text-red-500">*</span></label>
                 <textarea pTextarea
-                            id="observacoes"
-                            name="observacoes"
-                            [(ngModel)]="observacoes"
-                            #_observacoes="ngModel"
+                            id="observacao"
+                            name="observacao"
+                            [(ngModel)]="request.observacao"
+                            #observacao="ngModel"
                             [required]="true"
                             placeholder="Insira aqui o motivo..."
                             rows="2"
                             fluid></textarea>
+                <ng-container *ngIf="observacao.touched && observacao.errors">
+                    <p class="text-red-500" *ngIf="observacao.errors['required']">Esse campo é obrigatório</p>
+                </ng-container>
+            </div>
+
+            
+            <div class="col-12 flex align-items-center gap-2 mb-2">
+                <label for="alunoContactado" class="font-bold">O aluno foi contatado?</label>
+
+                <p-button 
+                    [icon]="request.alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+                    [label]="request.alunoContactado ? 'Sim' : 'Não'"
+                    [severity]="request.alunoContactado ? 'success' : 'danger'"
+                    (onClick)="request.alunoContactado = !request.alunoContactado"
+                    size="small"
+                />
+     
+
+                <p-button type="button" *ngIf="evento && aluno && !request.alunoContactado"
+                    (onClick)="enviarMensagemFalta($event)"
+                    (auxclick)="enviarMensagemFalta($event)"
+                    (contextmenu)="enviarMensagemFalta($event)"
+                    [disabled]="!aluno.celular"
+                    icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                    severity="success"
+                    pTooltip="Enviar mensagem de falta"
+                    label="Enviar mensagem"
+                    [text]="true" />
+
+
+            </div>
+            <div class="field col-6">
+                <label for="status_Id" class="font-bold">Status do contato: <span class="text-red-500">*</span></label>
+                <p-select [options]="status"
+                    inputId="status_Id"
+                    name="status_Id"
+                    [(ngModel)]="request.status_Id"
+                    #status_Id="ngModel"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    filterBy="label"
+                    appendTo="body"
+                    fluid />
+            </div>
+            <div class="field col-6">
+                <label for="observacaoContato" class="font-bold">Retorno do contato: </label>
+                <input pInputText 
+                    id="observacaoContato"
+                    name="observacaoContato"
+                    [(ngModel)]="request.observacaoContato"
+                    #observacaoContato="ngModel"
+                    fluid />
             </div>
         </div>
         <div class="col-12 px-1 flex align-items-center justify-content-end">

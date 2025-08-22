@@ -139,10 +139,13 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     visibleChange() {
         if (!this.visible) {
             let params = this.activatedRoute.snapshot.params;
-            let routeBack = ['../..'];
-            if (params['aluno_id'])
-                routeBack = ['../../../'];
+            let routeBack = params['aluno_id'] ? ['../../../'] : ['../..'];
             this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
+
+            this.eventoService.setEvento(undefined)
+            this.eventoService.setEventoReposicaoDe(undefined)
+            this.eventoService.setEventoReposicaoPara(undefined)
+            this.alunoService.setAluno(undefined)
         }
     }
 

@@ -104,43 +104,12 @@
                                           class="w-1rem h-1rem border-circle flex mr-2"
                                           [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
                                     <span class="mr-2">{{ item.nome }}</span>
-                                    <p-badge
-                                             *ngIf="item.disponivel == false"
+                                    <p-badge *ngIf="item.disponivel == false"
                                              value="Indisponível"
                                              severity="danger"
                                              [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
                                     <ng-template #indisponivelTemplate>
-                                        <div class="w-25rem">
-                                            <p>
-                                                
-                                                <span
-                                                      class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
-                                                <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
-                                            </p>
-                                            <p>{{ item.disponivelEvent.descricao }}</p>
-                                            <p *ngIf="item.disponivelEvent.professor">
-                                                <span
-                                                      class="w-1rem h-1rem border-circle inline-flex mr-2"
-                                                      [style]="{
-                            backgroundColor: item.disponivelEvent.corLegenda,
-                            borderColor: item.disponivelEvent.corLegenda
-                          }"></span>
-                                                <span>{{ item.disponivelEvent.professor }}</span>
-                                            </p>
-                                            <p
-                                               *ngIf="
-                          item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao
-                        ">
-                                                {{ item.disponivelEvent.turma }}
-                                            </p>
-                                            <p *ngIf="item.disponivelEvent.sala_Id">
-                                                <span>Sala: </span>
-                                                <app-sala-aula
-                                                               [numeroSala]="item.disponivelEvent.numeroSala"
-                                                               [andar]="item.disponivelEvent.andar"
-                                                               [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                                            </p>
-                                        </div>
+                                        <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
                                     </ng-template>
                                 </p>
                                 <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
@@ -213,37 +182,10 @@
                                  value="Indisponível"
                                  severity="danger"
                                  [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                        <ng-template #indisponivelTemplate>
-                            <div class="w-25rem">
-                                <p>
-                                    
-                                    <span
-                                          class="text-orange-400 font-bold capitalize">{{ getTipo(item.disponivelEvent) }}</span>
-                                    <span> - {{ item.disponivelEvent.data | date : 'dd/MM/yyyy HH:mm' }}</span>
-                                </p>
-                                <p>{{ item.disponivelEvent.descricao }}</p>
-                                <p *ngIf="item.disponivelEvent.professor">
-                                    <span
-                                          class="w-1rem h-1rem border-circle inline-flex mr-2"
-                                          [style]="{
-                      backgroundColor: item.disponivelEvent.corLegenda,
-                      borderColor: item.disponivelEvent.corLegenda
-                    }"></span>
-                                    <span>{{ item.disponivelEvent.professor }}</span>
-                                </p>
-                                <p
-                                   *ngIf="item.disponivelEvent.turma && item.disponivelEvent.turma != item.disponivelEvent.descricao">
-                                    {{ item.disponivelEvent.turma }}
-                                </p>
-                                <p *ngIf="item.disponivelEvent.sala_Id">
-                                    <span>Sala: </span>
-                                    <app-sala-aula
-                                                   [numeroSala]="item.disponivelEvent.numeroSala"
-                                                   [andar]="item.disponivelEvent.andar"
-                                                   [sala_Id]="item.disponivelEvent.sala_Id"></app-sala-aula>
-                                </p>
-                            </div>
-                        </ng-template>
+                                 
+                                 <ng-template #indisponivelTemplate>
+                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                 </ng-template>
                     </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
@@ -278,16 +220,16 @@
             </div>
         </div>
     </div>
+    <!-- Observações -->
     <div class="lg:col-4 md:col-4 col-12">
         <div class="formgrid grid">
-            <!-- Observações -->
             <div class="field col-12">
                 <label for="observacao">Observações:</label>
                 <textarea pTextarea
                           name="observacao"
                           id="observacao"
                           [(ngModel)]="evento.observacao"
-                          [readOnly]="evento.finalizado || !evento.active"
+                          [readonly]="evento.finalizado || !evento.active"
                           rows="6"
                           fluid></textarea>
             </div>
@@ -312,7 +254,7 @@
                                            [showChecklist]="true"></app-aluno-popover>
                         <!-- Card -->
                         <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3"
-                             style="min-width: 22rem">
+                             style="min-width: 18rem">
                             <header class="flex align-items-center mb-2 p-3 surface-50">
                                 <p-button type="button"
                                           (onClick)="enviarMensagem(item)"
@@ -371,29 +313,22 @@
                                     <label for="apostila_Abaco">Ábaco: <span class="text-red-500">*</span></label>
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
-                                        <ng-container *ngIf="evento.finalizado">
-                                            <input pInputText
-                                                   [value]="item.apostila_Abaco"
-                                                   [name]="'apostila_Abaco[' + i + ']'"
-                                                   [id]="'apostila_Abaco[' + i + ']'"
-                                                   [readonly]="true"
-                                                   fluid />
-                                        </ng-container>
-                                        <ng-container *ngIf="!evento.finalizado">
-                                            <p-select [options]="item.apostilasAbacoList"
-                                                      (onChange)="apostilaAbacoChange(item, $event)"
-                                                      (focus)="apostilaAbacoClick(item)"
-                                                      [(ngModel)]="item.apostilaAbacoObject"
-                                                      #apostila_Abaco="ngModel"
-                                                      [name]="'apostila_Abaco[' + i + ']'"
-                                                      [inputId]="'apostila_Abaco[' + i + ']'"
-                                                      optionLabel="nome"
-                                                      [required]="true"
-                                                      filterBy="nome"
-                                                      appendTo="body"
-                                                      [placeholder]="!apostila_Abaco.touched ? item.apostila_Abaco : 'Selecione'"
-                                                      fluid />
-                                        </ng-container>
+                                        <p-select [options]="item.apostilasAbacoList"
+                                                    (onChange)="apostilaAbacoChange(item, $event)"
+                                                    (focus)="apostilaAbacoClick(item)"
+                                                    [(ngModel)]="item.apostilaAbacoObject"
+                                                    #apostila_Abaco="ngModel"
+                                                    name="apostila_Abaco[{{i}}]"
+                                                    inputId="apostila_Abaco[{{i}}]"
+                                                    optionLabel="nome"
+                                                    [required]="true"
+                                                    filterBy="nome"
+                                                    placeholder="Selecione"
+                                                    [readonly]="item.presente === false || evento.finalizado"
+                                                    [disabled]="item.presente === false || evento.finalizado"
+                                                    [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi' : 'pi pi-angle-down'"
+                                                    appendTo="body"
+                                                    fluid />
                                     </p-iconfield>
                                 </div>
                                 <!-- Página Abaco -->
@@ -402,13 +337,14 @@
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
                                                    (onInput)="numeroPaginaAbacoChange(item, $event)"
                                                    (onFocus)="inputFocus($event)"
-                                                   [name]="'numeroPaginaAbaco[' + i + ']'"
-                                                   [id]="'numeroPaginaAbaco[' + i + ']'"
+                                                   name="numeroPaginaAbaco[{{i}}]"
+                                                   inputId="numeroPaginaAbaco[{{i}}]"
                                                    [min]="0"
                                                    [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
                                                    #numeroPaginaAbaco="ngModel"
                                                    [required]="true"
-                                                   [readonly]=" evento.finalizado"
+                                                   [readonly]="item.presente === false || evento.finalizado"
+                                                   [disabled]="item.presente === false || evento.finalizado"
                                                    fluid />
                                 </div>
                                 <!-- AH -->
@@ -416,33 +352,23 @@
                                     <label for="apostila_AH">AH: <span class="text-red-500">*</span></label>
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
-                                        <ng-container *ngIf="evento.finalizado">
-                                            <input pInputText
-                                                   [value]="item.apostila_AH"
-                                                   [disabled]="!evento.active"
-                                                   [name]="'apostila_AH[' + i + ']'"
-                                                   [id]="'apostila_AH[' + i + ']'"
-                                                   [readonly]="true"
-                                                   fluid />
-                                        </ng-container>
-                                        <ng-container *ngIf="!evento.finalizado">
-                                            <p-select [options]="item.apostilasAHList"
-                                                      (ngModelChange)="apostilaAHChange(item, $event)"
-                                                      (focus)="apostilaAHClick(item)"
-                                                      [(ngModel)]="item.apostilaAHObject"
-                                                      [disabled]="!evento.active"
-                                                      #apostila_AH="ngModel"
-                                                      [name]="'apostila_AH[' + i + ']'"
-                                                      [inputId]="'apostila_AH[' + i + ']'"
-                                                      optionLabel="nome"
-                                                      [placeholder]="!apostila_AH.touched ? item.apostila_AH : 'Selecione'"
-                                                      [required]="true"
-                                                      filterBy="nome"
-                                                      [readonly]=" evento.finalizado"
-                                                      [dropdownIcon]=" evento.finalizado ? ' ' : 'pi pi-angle-down'"
-                                                      appendTo="body"
-                                                      fluid />
-                                        </ng-container>
+                                        <p-select [options]="item.apostilasAHList"
+                                                    (ngModelChange)="apostilaAHChange(item, $event)"
+                                                    (focus)="apostilaAHClick(item)"
+                                                    [(ngModel)]="item.apostilaAHObject"
+                                                    [disabled]="!evento.active"
+                                                    #apostila_AH="ngModel"
+                                                    name="apostila_AH[{{i}}]"
+                                                    inputId="apostila_AH[{{i}}]"
+                                                    optionLabel="nome"
+                                                    [placeholder]="!apostila_AH.touched ? item.apostila_AH : 'Selecione'"
+                                                    [required]="true"
+                                                    filterBy="nome"
+                                                    [readonly]="item.presente === false || evento.finalizado"
+                                                    [disabled]="item.presente === false || evento.finalizado"
+                                                    [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi' : 'pi pi-angle-down'"
+                                                    appendTo="body"
+                                                    fluid />
                                     </p-iconfield>
                                 </div>
                                 <!-- Página AH -->
@@ -451,14 +377,15 @@
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
                                                    (onFocus)="inputFocus($event)"
                                                    (onInput)="numeroPaginaAHChange(item, $event)"
-                                                   [name]="'numeroPaginaAH[' + i + ']'"
-                                                   [id]="'numeroPaginaAH[' + i + ']'"
+                                                   name="numeroPaginaAH[{{i}}]"
+                                                   inputId="numeroPaginaAH[{{i}}]"
                                                    [disabled]="!evento.active"
                                                    [min]="0"
                                                    [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
                                                    #numeroPaginaAH="ngModel"
                                                    [required]="true"
-                                                   [readonly]=" evento.finalizado"
+                                                   [readonly]="item.presente === false || evento.finalizado"
+                                                   [disabled]="item.presente === false || evento.finalizado"
                                                    fluid />
                                 </div>
                                 <!-- Observações -->
@@ -562,9 +489,10 @@
                                                       [required]="true"
                                                       filterBy="nome"
                                                       appendTo="body"
-                                                      [placeholder]="!apostila_Abaco.touched ? item.apostila_Abaco : 'Selecione'"
-                                                      [readonly]="evento.finalizado === true  || item.presente === false"
-                                                      [dropdownIcon]="evento.finalizado === true  || item.presente === false ? ' ' : 'pi pi-angle-down'">
+                                                      [readonly]="item.presente === false || evento.finalizado"
+                                                      [disabled]="item.presente === false || evento.finalizado"
+                                                      [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi' : 'pi pi-angle-down'"
+                                                      placeholder="Selecione">
                                             </p-select>
                                         </p-iconfield>
                                     </div>
@@ -584,7 +512,8 @@
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true"
-                                                       [readonly]="evento.finalizado === true  || item.presente === false" />
+                                                       [readonly]="item.presente === false || evento.finalizado"
+                                                       [disabled]="item.presente === false || evento.finalizado" />
                                     </div>
                                     <!-- AH -->
                                     <div class="flex flex-column gap-1">
@@ -604,9 +533,10 @@
                                                       [required]="true"
                                                       filterBy="nome"
                                                       appendTo="body"
-                                                      [placeholder]="!apostila_AH.touched ? item.apostila_AH : 'Selecione'"
-                                                      [readonly]="evento.finalizado === true  || item.presente === false"
-                                                      [dropdownIcon]="evento.finalizado === true  || item.presente === false ? ' ' : 'pi pi-angle-down'"
+                                                      [readonly]="item.presente === false || evento.finalizado"
+                                                      [disabled]="item.presente === false || evento.finalizado"
+                                                      [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi' : 'pi pi-angle-down'"
+                                                      placeholder="Selecione"
                                                       >
                                             </p-select>
                                         </p-iconfield>
@@ -627,7 +557,8 @@
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true"
-                                                       [readonly]="evento.finalizado === true  || item.presente === false" />
+                                                       [readonly]="item.presente === false || evento.finalizado"
+                                                       [disabled]="item.presente === false || evento.finalizado" />
                                     </div>
                                 </div>
                             </td>

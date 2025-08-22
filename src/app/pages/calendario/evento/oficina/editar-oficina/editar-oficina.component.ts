@@ -6,7 +6,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
-import { Evento, EventoQueryParams, EventoTipo } from '../../../../../models/evento.model';
+import { Evento } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
@@ -50,7 +50,6 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         private accountService: AccountService,
         private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
-        private service: EventoService,
         private alunoService: AlunoService,
     ) {
         this.onSave.subscribe(res => {

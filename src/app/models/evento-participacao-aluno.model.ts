@@ -67,6 +67,9 @@ export class Evento_Participacao_Aluno {
 
     primeiraAula_Id?: number;
     aulaZero_Id?: number;
+
+    alunoContactado: boolean = false; 
+    observacoesContato?: string; 
 }
 
 export var alunoParticipacao: Evento_Participacao_Aluno[] = [];

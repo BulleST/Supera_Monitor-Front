@@ -1,3 +1,19 @@
 ::ng-deep .select-no-dropdown-icon .p-select-dropdown {
     display: none;
 }
+
+::ng-deep  .p-toolbar-content {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    border: none;
+    border-width: 0px;
+    border-style: hidden;
+    background-color: white;
+    margin-bottom: 0.5rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    padding-left: 0.25rem;
+    padding-right: 1.5rem;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
+}

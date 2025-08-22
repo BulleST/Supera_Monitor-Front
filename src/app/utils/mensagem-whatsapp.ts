@@ -40,13 +40,13 @@ export class MensagemWhatsapp {
             });
     }
 
-    enviarMensagemFalta(evento: Evento, aluno: Evento_Participacao_Aluno, e: any) {
-        if (!aluno.celular) {
+    enviarMensagemFalta(evento: Evento, participacao: Evento_Participacao_Aluno, e: any) {
+        if (!participacao.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
             return;
         }
 
-        if (aluno.presente) {
+        if (participacao.presente) {
             this.showError('Aluno presente', 'O aluno já está presente.', e.target);
             return;
         }
@@ -54,15 +54,15 @@ export class MensagemWhatsapp {
         lastValueFrom(this.eventoService.getList({
             intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
             intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
-            perfil_Cognitivo_Id: aluno.perfilCognitivo_Id,
+            perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
         }))
             .then(res => {
                 let sugestoes = res.filter(aula => {
                     const alunosAtivos = aula.alunos.filter(x => x.active);
-                    const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == aluno.id);
+                    const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
                     const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                     const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
-                    const ehPerfilCognitivoCompativel = aluno.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id);
+                    const ehPerfilCognitivoCompativel = participacao.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
                     const aulaNaoFinalizada = !aula.finalizado;
                     const aulaEstaAtiva = aula.active;
                     const naoEhFeriado = !aula.feriado;
@@ -76,7 +76,7 @@ export class MensagemWhatsapp {
                         && naoEhFeriado;
                 });
 
-                let object = this.enviarMensagemFaltaSend(aluno.aluno, aluno.celular!, evento, sugestoes);
+                let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, evento, sugestoes);
                 window.open(object.link, '_blank');
                 this.copiarMensagem(object.mensagem);
             })

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy} from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoReuniaoRequest } from '../../../../../models/evento-reuniao.model';
 import { Professor } from '../../../../../models/professor.model';
@@ -14,7 +14,6 @@ import moment from 'moment';
 import { Evento } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
-import { PickList, PickListMoveAllToTargetEvent } from 'primeng/picklist';
 import { Feriado } from '../../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, getError, showError } from '../../../../../utils';
@@ -38,16 +37,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
-
-    // @ViewChild('picklist') picklist!: PickList;
-    // @ViewChild('_horario') _horario!: NgModel;
-    // @ViewChild('form') form!: NgForm;
-    // @ViewChild('formDiv') formDiv!: HTMLFormElement;
-
-    // target: Professor[] = [];
-    // source: Professor[] = [];
-    // loadingList = false;
-
+    
     salaAulas: SalaAula[] = [];
     loadingSalaAulas = false;
 

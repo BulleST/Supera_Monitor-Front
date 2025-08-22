@@ -1,5 +1,5 @@
 import { Component, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Dashboard_Aluno, Dashboard_Aula, Dashboard_Aula_Participacao } from '../../../../models/dashboard.model';
+import { Dashboard_Aluno, Dashboard_Aula, Dashboard_Item } from '../../../../models/dashboard.model';
 import { Popover } from 'primeng/popover';
 import { Router } from '@angular/router';
 import { Crypto, MensagemWhatsapp } from '../../../../utils';
@@ -22,7 +22,7 @@ import { NgModel } from '@angular/forms';
     styleUrl: './aula-participacao-popover.component.css'
 })
 export class AulaParticipacaoPopoverComponent implements OnChanges {
-    @Input() participacao!: Dashboard_Aula_Participacao;
+    @Input() participacao!: Dashboard_Item;
     @Input() aluno!: Dashboard_Aluno;
 
     @ViewChild('popover') popover!: Popover;
@@ -47,6 +47,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     show(e: any) {
+        this.loadMenuItems();
         this.popover.show(e);
         try {
             this.popover.align();
@@ -61,13 +62,16 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     loadMenuItems() {
+        if (!this.participacao || !this.aluno) {
+            return
+        }
         this.menuItems = [];
 
         // Ver aula
         this.menuItems.push({
             label: 'Ver aula',
-            icon: 'pi pi-calendar text-primary-500 ',
-            styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100',
+            icon: 'pi pi-search order-1 text-primary-500 ',
+            styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100 -mx-2',
             command: () => this.goToAula(),
         })
 
@@ -79,7 +83,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             this.menuItems.push({
                 label: 'Agendar falta',
                 icon: 'pi pi-thumbs-down text-red-500 ',
-                styleClass: 'text-red-500 bg-red-50 hover:bg-red-100',
+                styleClass: 'text-red-500 bg-red-50 hover:bg-red-100 -mx-2',
                 command: () => this.goToAgendarFalta(),
             })
         }
@@ -87,8 +91,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         if (this.participacao.participacao.presente !== true) {
             this.menuItems.push({
                 label: 'Agendar reposição',
-                icon: 'pi pi-thumbs-down text-red-500 ',
-                styleClass: 'text-red-500 bg-red-50 hover:bg-red-100',
+                icon: 'pi pi-calendar ',
                 command: () => this.goToReposicao(),
             })
         }
@@ -97,7 +100,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             this.menuItems.push({
                 label: 'Enviar Mensagem de Falta',
                 icon: 'pi pi-whatsapp text-green-500 ',
-                styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
+                styleClass: 'text-green-500 bg-green-50 hover:bg-green-100 -mx-2',
                 command: e => this.enviarMensagemFalta(e),
             })
         }

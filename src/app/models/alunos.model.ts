@@ -3,7 +3,7 @@ import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { AlunoChecklistCompleto } from "./calendario.model";
 import { Aluno_CheckList_Item } from "./checklist.model";
-import { Dashboard_Aula_Participacao } from "./dashboard.model";
+import { Dashboard_Item } from "./dashboard.model";
 import { Evento } from "./evento.model";
 
 export class AlunoRequest {
@@ -99,7 +99,7 @@ export class Aluno {
     checklist_Id?: number = '' as any;
     checklist?: string = '';
     
-    aulas: Dashboard_Aula_Participacao[] = [];
+    aulas: Dashboard_Item[] = [];
     disponivel?: boolean;
     disponivelEvent?: Evento;
     aulasParaRepor: Evento[] = []

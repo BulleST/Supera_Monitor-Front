@@ -10,16 +10,15 @@ import { NgForm, NgModel } from '@angular/forms';
 import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
-import { ConfirmationService, ScrollerOptions } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
-import { EventoAulaRequest } from '../../../models/evento-aula.model';
-import { MyMap } from '../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { EventoAgendarFaltaRequest } from '../../../models/evento-agendar-falta-request.model';
 
 @Component({
     selector: 'app-aluno-agendar-falta-dialog',
@@ -31,6 +30,7 @@ import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-a
 export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     aluno?: Aluno;
     blockAlunoField = false;
+    request = new EventoAgendarFaltaRequest;
 
     evento?: Evento;
     blockEventoField = false;
@@ -38,7 +38,6 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     visible = false;
     loading = false;
     subscription: Subscription[] = [];
-    observacoes = '';
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -50,6 +49,18 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     loadingRoteiros = false;
 
     onHide = new EventEmitter<boolean>();
+
+    status = [
+        { value: 1, label: 'Não compareceu' },
+        { value: 2, label: 'Aguardando Retorno' },
+        { value: 3, label: 'Optou por não repor' },
+        { value: 4, label: 'Aula Cancelada' },
+        { value: 5, label: 'Reposição Agendada' },
+        { value: 6, label: 'Reposição Realizada' },
+        { value: 7, label: 'Não Compareceu na reposição' },
+        { value: 8, label: 'Reposição Desmarcada' },
+        { value: 9, label: 'Outro' },
+    ]
 
     constructor(
         private eventoService: EventoService,
@@ -182,8 +193,13 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     }
 
     loadSugestoesReposicao() {
-        let evento = this.evento as Evento;
-        let aluno = this.aluno as Aluno;
+        
+        if (!this.aluno || !this.evento) {
+            return
+        }
+        
+        let evento = this.evento;
+        let aluno = this.aluno;
 
         let request: CalendarioRequest = {
             intervaloDe: moment(evento.data).toDate(),
@@ -255,6 +271,13 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         this.evento = evento;
     }
 
+    enviarMensagemFalta(e: any) {
+        if (this.evento) {
+            let participacao = this.evento.alunos.find(x => x.aluno_Id == this.aluno?.id) as Evento_Participacao_Aluno;
+            this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e);
+        }
+    }
+
     sendConfirmation(form: NgForm, e: any) {
 
         if (!form.valid) {
@@ -305,7 +328,9 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
             }
         }
 
-        await lastValueFrom(this.eventoService.cancelarParticipacao(participacao.id, this.observacoes))
+        this.request.participacao_Id = participacao.id
+
+        await lastValueFrom(this.eventoService.cancelarParticipacao(this.request))
             .then(res => {
                 // playSuccess();
                 this.loading = false;

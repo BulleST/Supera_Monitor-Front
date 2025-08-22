@@ -46,7 +46,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-                // console.log('evento Finalizado', this.evento)
             if (this.evento.finalizado !== true) {
                 this.evento.professores
                     .filter(x => x.active)
