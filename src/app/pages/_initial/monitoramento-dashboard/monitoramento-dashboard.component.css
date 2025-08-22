@@ -1,20 +1,41 @@
 .primeira-aula {
-    width: 20px;
-    height: 35px;
+    width: 16px;
     background-color: var(--p-pink-500);
     font-size: 0.8rem;
     color: white;
-    writing-mode: sideways-rl;
     text-align: center;
+    writing-mode: vertical-rl;
+}
+
+
+.event-status {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: .5rem;
+    border-width: 1px;
+    text-align: center;
+    color: white;
+    font-size: .75rem;
+    position: relative;
 }
 
-.primeira-aula.vertical {
-    writing-mode: horizontal-tb;
+/* .event-status >span {
+    margin-left: 5px;
+} */
+
+.event-status-presente {
+    font-size: .75rem;
     width: 100%;
-    height: 25px;
-    border-radius: 2px;
-    font-size: .9rem;
+    color: white;
+    border-width: 1px;
+}
+
+.event-status-presente .apostila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 0 .25rem;
 }

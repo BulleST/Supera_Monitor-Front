@@ -638,7 +638,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         else {
 
             if (evento.id == PseudoEvento.EventoId) {
-                lastValueFrom(this.requestAulaTurma(evento))
+                this.requestAulaTurma(evento)
                     .then(res => {
                         if (!res.success) {
                             return this.showError('OPS!', 'Não foi possível selecionar aula', e.event, res.message);
@@ -780,14 +780,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     }
 
     requestAulaTurma(evento: Evento) {
-        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
-        request.alunos = evento.alunos.map((x) => x.aluno_Id)
-        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
-        request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
-
-        if (evento.id == PseudoEvento.EventoId)
-            return this.service.createAulaTurma(request)
-        return this.service.editAulaTurma(request)
+        return this.calendarioUtils.requestAulaTurma(evento);
     }
 
 }

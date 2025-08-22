@@ -332,7 +332,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         let response: RequestResponse = { success: false, message: '', object: undefined };
 
         if (this.evento.id == PseudoEvento.EventoId) {
-            response = await lastValueFrom(this.requestOficina());
+            response = await this.requestOficina();
             this.evento.id = response.object.id;
         }
 
@@ -367,13 +367,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
     requestOficina() {
-        let request = MyMap(this.evento, new EventoOficinaRequest);
-        request.alunos = [];
-        request.professores = [this.evento.professor_Id];
-        request.data = new Date(this.evento.data);
-        request.data = moment(this.evento.data).format('YYYY-MM-DD[T]HH:mm') as any;
-
-        return this.service.createOficina(request);
+        return this.calendarioUtils.requestOficina(this.evento);
     }
     
     sendMensagemAlunos() {

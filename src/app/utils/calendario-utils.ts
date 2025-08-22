@@ -1,19 +1,16 @@
 import { Injectable } from '@angular/core'
-import { BehaviorSubject, lastValueFrom } from 'rxjs'
-import {
-    Evento,
-    EventoCancelamentoRequest,
-    EventoTipo,
-} from '../models/evento.model'
+import { lastValueFrom } from 'rxjs'
+import { Evento, EventoTipo } from '../models/evento.model'
 import { EventoService } from '../services/evento.service'
-import moment from 'moment'
 import { Feriado } from '../models/feriado.model'
-import { RequestResponse } from '../helpers/request-response.interface'
 import { PseudoEvento } from '../models/reposicao.model'
 import { MyMap } from './map'
 import { EventoOficinaRequest } from '../models/evento-oficina.model'
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model'
-import { EventoAulaRequest } from '../models/evento-aula.model'
+import { EventoAulaRequest, EventoTurmaExtraRequest } from '../models/evento-aula.model'
+import { SalaAulaId } from '../models/sala-aula.model'
+import 'moment/locale/pt-br';
+import moment from 'moment';
 
 @Injectable({
     providedIn: 'root',
@@ -22,17 +19,14 @@ export class CalendarioUtils {
     feriados: Feriado[] = []
 
     constructor(private service: EventoService) {
-
-        this.service.feriados.subscribe((res) => (this.feriados = res))
-
+        this.service.feriados.subscribe(res => this.feriados = res)
+        moment.locale('pt-br')
     }
 
     weekOfYear(date: Date) {
         const startOfYear = new Date(date.getFullYear(), 0, 1)
         startOfYear.setDate(startOfYear.getDate() + (startOfYear.getDay() % 7))
-        let weekOfYear = Math.round(
-            (date.getTime() - startOfYear.getTime()) / (7 * 24 * 3600 * 1000),
-        )
+        let weekOfYear = Math.round((date.getTime() - startOfYear.getTime()) / (7 * 24 * 3600 * 1000))
 
         if (date.getMonth() == 11) {
             weekOfYear += 1
@@ -42,8 +36,8 @@ export class CalendarioUtils {
     }
 
     getTextColor(hex: string) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-        var rgb = result
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        let rgb = result
             ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
@@ -62,8 +56,7 @@ export class CalendarioUtils {
     eventRandomId() {
         let length = 5
         let result = ''
-        const characters =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
         const charactersLength = characters.length
         let counter = 0
         while (counter < length) {
@@ -101,13 +94,6 @@ export class CalendarioUtils {
                 break
         }
 
-        // Lowers opacity, keeps color
-        // if (item.active === false) {
-        //     backgroundColor = this.dimHexToRgba(backgroundColor, 1, 0.25)
-        //     borderColor = this.dimHexToRgba(borderColor, 1, 0.25)
-        //     textColor = this.dimHexToRgba(textColor, 1, 0.25)
-        // }
-
         // Solid dim color (gray)
         if (item.active === false) {
             backgroundColor = DIM_COLOR;
@@ -135,9 +121,11 @@ export class CalendarioUtils {
     }
 
     request(evento: Evento) {
-        evento.data = new Date(evento.data)
+        evento.data = moment(evento.data).locale('pt-br').toDate()
         switch (evento.evento_Tipo_Id) {
             case EventoTipo.Aula:
+                return this.requestAulaTurma(evento)
+            case EventoTipo.TurmaExtra:
                 return this.requestAulaTurma(evento)
             case EventoTipo.Reuniao:
                 return this.requestReuniao(evento)
@@ -149,11 +137,11 @@ export class CalendarioUtils {
     }
 
     requestAulaTurma(evento: Evento) {
-        var request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
-        request.alunos = evento.alunos.map((x) => x.aluno_Id)
+        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
+        request.alunos = evento.alunos.map(x => x.aluno_Id)
         request.professores = evento.professor_Id ? [evento.professor_Id] : []
-        request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
-        request.sala_Id = request.sala_Id ?? 13 // online;
+        request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id)
+        request.sala_Id = request.sala_Id ?? SalaAulaId.online; // online;
 
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createAulaTurma(request))
@@ -161,10 +149,10 @@ export class CalendarioUtils {
     }
 
     requestReuniao(evento: Evento) {
-        var request = MyMap(evento, new EventoReuniaoRequest())
-        request.alunos = evento.alunos.map((x) => x.aluno_Id)
-        request.professores = evento.professores.map((x) => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? 14 // professores;
+        let request = MyMap(evento, new EventoReuniaoRequest())
+        request.alunos = evento.alunos.map(x => x.aluno_Id)
+        request.professores = evento.professores.map(x => x.professor_Id)
+        request.sala_Id = request.sala_Id ?? SalaAulaId.professores // professores;
 
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createReuniao(request))
@@ -172,10 +160,10 @@ export class CalendarioUtils {
     }
 
     requestOficina(evento: Evento) {
-        var request = MyMap(evento, new EventoOficinaRequest())
-        request.alunos = evento.alunos.map((x) => x.aluno_Id)
-        request.professores = evento.professores.map((x) => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? 13 // online;
+        let request = MyMap(evento, new EventoOficinaRequest())
+        request.alunos = evento.alunos.map(x => x.aluno_Id)
+        request.professores = evento.professores.map(x => x.professor_Id)
+        request.sala_Id = request.sala_Id ?? SalaAulaId.online; // online;
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request))
         return lastValueFrom(this.service.editOficina(request))

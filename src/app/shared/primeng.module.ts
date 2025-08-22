@@ -33,6 +33,7 @@ import { MenuModule } from 'primeng/menu';
 import { MenubarModule } from 'primeng/menubar';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
 import { PanelModule } from 'primeng/panel';
 import { PasswordModule } from 'primeng/password';
 import { PickListModule } from 'primeng/picklist';
@@ -98,6 +99,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         MenubarModule,
         MultiSelectModule,
         OverlayPanelModule,
+        OverlayBadgeModule,
         PanelModule,
         PasswordModule,
         PopoverModule,
@@ -159,6 +161,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         MenubarModule,
         MultiSelectModule,
         OverlayPanelModule,
+        OverlayBadgeModule,
         PanelModule,
         PasswordModule,
         PopoverModule,

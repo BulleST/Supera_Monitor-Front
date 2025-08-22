@@ -91,22 +91,16 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => (this.loadingTurmas = false))
         }
 
-        let eventos = this.service.evento.subscribe(res => {
-            if (!res) {
-                try {
-                    let evento = JSON.parse(localStorage.getItem('evento') ?? '')
-                    this.service.setEvento(evento)
-                } catch (e) {
-                    this.visible = false
-                    this.visibleChange()
-                }
-                return
-            }
+        let eventos = this.service.getEvento().subscribe(res => {
             if (res) {
                 this.evento = res
                 this.tipoEventoString = this.getTipo(this.evento)
                 this.setAlunosProfessores()
                 this.visible = true
+            } 
+            else {
+                this.visible = false
+                this.visibleChange()
             }
         })
         this.subscription.push(eventos)
@@ -300,47 +294,8 @@ export class CancelarEventoComponent implements OnDestroy {
     }
 
     request() {
-        this.evento.data = new Date(this.evento.data)
-        switch (this.evento.evento_Tipo_Id) {
-            case EventoTipo.Aula:
-                return this.requestAulaTurma()
-            case EventoTipo.Reuniao:
-                return this.requestReuniao()
-            case EventoTipo.Oficina:
-                return this.requestOficina()
-            default:
-                return this.requestAulaTurma()
-        }
-    }
-
-    requestAulaTurma() {
-        let request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
-        request.alunos = this.evento.alunos.map(x => x.aluno_Id)
-        request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : []
-        request.perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id)
-        request.sala_Id = request.sala_Id ?? 13 // online;
-
-        if (this.evento.id == PseudoEvento.EventoId) return lastValueFrom(this.service.createAulaTurma(request))
-        return lastValueFrom(this.service.editAulaTurma(request))
-    }
-
-    requestReuniao() {
-        let request = MyMap(this.evento, new EventoReuniaoRequest())
-        request.alunos = this.evento.alunos.map(x => x.aluno_Id)
-        request.professores = this.evento.professores.map(x => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? 14 // professores;
-
-        if (this.evento.id == PseudoEvento.EventoId) return lastValueFrom(this.service.createReuniao(request))
-        return lastValueFrom(this.service.editReuniao(request))
-    }
-
-    requestOficina() {
-        let request = MyMap(this.evento, new EventoOficinaRequest())
-        request.alunos = this.evento.alunos.map(x => x.aluno_Id)
-        request.professores = this.evento.professores.map(x => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? 13 // online;
-        if (this.evento.id == PseudoEvento.EventoId) return lastValueFrom(this.service.createOficina(request))
-        return lastValueFrom(this.service.editOficina(request))
+        let evento = this.evento;
+        return this.calendarioUtils.request(evento);
     }
 
     sendMensagemAlunos() {

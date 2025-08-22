@@ -130,12 +130,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
     setAlunos() {
         if (this.alunos.length && this.evento) {
-            let perfilCognitivo = this.evento.perfilCognitivo.map(x => x.id);
-            this.alunos = this.alunos.filter(x => x.active // Alunos ativos
-                && !x.primeiraAula_Id  // Alunos que ainda não agendaram primeira aula
-                && x.aulaZero_Id // Alunos que agendaram aula 0
-                && perfilCognitivo.includes(x.perfilCognitivo_Id)  // Alunos de mesmo perfil cognitivo
-            )
+            this.alunos = this.alunos.filter(x => x.active)
 
             if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
@@ -248,14 +243,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
 
     requestAulaTurma(evento: Evento) {
-
-        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
-        request.alunos = evento.alunos.map((x) => x.aluno_Id)
-        request.professores = evento.professor_Id ? [evento.professor_Id] : []
-        request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
-        request.data = moment(request.data).format('YYYY-MM-DD[T]HH:mm') as any
-
-        return lastValueFrom(this.service.createAulaTurma(request))
+        return this.calendarioUtils.requestAulaTurma(evento);
     }
 
     sendMensagemAluno(e: any, evento: Evento) {

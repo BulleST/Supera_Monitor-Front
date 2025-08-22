@@ -31,7 +31,7 @@
                                             name="aluno_Id"
                                             inputId="aluno_Id"
                                             #aluno_Id="ngModel"
-                                            [(ngModel)]="alunoSelected"
+                                            [(ngModel)]="aluno"
                                             [required]="true"
                                             [filter]="true"
                                             filterBy="nome,turma,professor"
@@ -84,7 +84,7 @@
                                     <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
                                     <input type="text"
                                         pInputText
-                                        [value]="alunoSelected?.nome"
+                                        [value]="aluno?.nome"
                                         id="nome"
                                         name="nome"
                                         fluid
@@ -92,34 +92,34 @@
                                 </p-iconfield>
                             </ng-template>
                         </div>
-                        <ng-container *ngIf="alunoSelected">
+                        <ng-container *ngIf="aluno">
                             <div class="field sm:col-8 col-12 flex align-items-center gap-2">
                                 <p-divider layout="vertical" />
                                 <div class="flex flex-column gap-2 w-full" >
                                     <div class="flex align-items-center gap-2 w-full">
                                         <i class="fa-solid fa-users-between-lines"></i>
-                                        <p class="overflow-hidden text-overflow-ellipsis">Turma: {{alunoSelected.turma}}</p>
-                                        <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: alunoSelected.corLegenda, borderColor: alunoSelected.corLegenda }"></span>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Turma: {{aluno.turma}}</p>
+                                        <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></span>
                                     </div>
                                     <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="fa-solid fa-brain"></i>
-                                        <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{alunoSelected.perfilCognitivo}}</p>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Perfil Cognitivo: {{aluno.perfilCognitivo}}</p>
                                     </div>
                                     <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="fa-solid fa-wheelchair"></i>
                                         <p class="overflow-hidden text-overflow-ellipsis">Restrição de mobilidade: 
-                                            <span *ngIf="alunoSelected.restricaoMobilidade" class="text-red-500 zoomin animation-iteration-infinite animation-duration-500 font-bold">Sim</span> 
-                                            <span *ngIf="!alunoSelected.restricaoMobilidade">Não</span> 
+                                            <span *ngIf="aluno.restricaoMobilidade" class="text-red-500 zoomin animation-iteration-infinite animation-duration-500 font-bold">Sim</span> 
+                                            <span *ngIf="!aluno.restricaoMobilidade">Não</span> 
                                         </p>
                                     </div>
                                     <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="pi pi-ban"></i>
-                                        <p class="overflow-hidden text-overflow-ellipsis">Outras restrições: {{ getRestricoes(alunoSelected) }}</p>
+                                        <p class="overflow-hidden text-overflow-ellipsis">Outras restrições: {{ getRestricoes(aluno) }}</p>
                                     </div>
                                 </div>
                             </div>
                         </ng-container>
-                        <ng-container *ngIf="!alunoSelected && loadingAlunos">
+                        <ng-container *ngIf="!aluno && loadingAlunos">
                             <div class="field sm:col-8 col-12 flex align-items-center gap-2">
                                 <p-divider layout="vertical" />
                                 <div class="flex flex-column gap-2" >
@@ -171,8 +171,8 @@
                                             inputId="eventoReposicao_Id"
                                             #eventoReposicao_Id="ngModel"
                                             [(ngModel)]="eventoReposicaoDe"
-                                            [readonly]="!alunoSelected || loadingEventosReposicaoDe"
-                                            [disabled]="!alunoSelected || loadingEventosReposicaoDe"
+                                            [readonly]="!aluno || loadingEventosReposicaoDe"
+                                            [disabled]="!aluno || loadingEventosReposicaoDe"
                                             [required]="true"
                                             [filter]="true"
                                             filterBy="descricao,turma,professor,data,sala"

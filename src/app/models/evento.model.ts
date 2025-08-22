@@ -3,13 +3,14 @@ import { Evento_Participacao_Professor } from "./evento-participacao-professor.m
 import { Feriado } from "./feriado.model";
 import { PerfilCognitivo } from "./perfil-cognitivo.model";
 import { PseudoEvento } from "./reposicao.model";
+import { SalaAulaId } from "./sala-aula.model";
 
 export class Evento {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
 
     evento_Tipo_Id: number = EventoTipo.Aula;
-    sala_Id: number = undefined as unknown as number;
+    sala_Id: number = SalaAulaId.online;
     numeroSala: number = undefined as unknown as number;
     andar: number = undefined as unknown as number;
     duracaoMinutos: number = 60; 

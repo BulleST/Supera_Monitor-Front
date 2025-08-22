@@ -345,6 +345,7 @@
                                              severity="danger"
                                              [pTooltip]="'Primeira aula'" />
                                 </div>
+
                                 <p-button type="button" *ngIf="item.presente === false"
                                           (onClick)="enviarMensagemFalta(item, $event)"
                                           (auxclick)="enviarMensagemFalta(item, $event)"
@@ -354,6 +355,7 @@
                                           severity="success"
                                           pTooltip="Enviar mensagem de falta"
                                           [text]="true" />
+
                                 <p-button [disabled]=" evento.finalizado || !evento.active"
                                           [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                                           [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
@@ -486,18 +488,18 @@
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
-                    <ng-template #header>
+                    <!-- <ng-template #header>
                         <tr class="sticky top-0 z-2">
                             <th pFrozenColumn class="z-4">Nome</th>
                             <th>Apostila</th>
                             <th>Presença</th>
                             <th>Observação</th>
                         </tr>
-                    </ng-template>
+                    </ng-template> -->
                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                         <tr class="static z-0">
                             <!-- Nome -->
-                            <td pFrozenColumn class="z-1 p-0">
+                            <td pFrozenColumn class="p-0 pb-1">
                                 <app-aluno-popover #popoverAluno
                                                    [aluno_Id]="item.aluno_Id"
                                                    [evento]="evento"
@@ -518,14 +520,14 @@
                                                   (click)="popoverAluno.show($event)"
                                                   pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
                                             <p-badge *ngIf="item.primeiraAula_Id == evento.id"
-                                                     class="ml-auto"
+                                                     class="-mt-1 mb-1"
                                                      styleClass="ml-2 bg-pink-500"
                                                      value="Aula 1"
                                                      size="small"
                                                      severity="danger"
                                                      [pTooltip]="'Primeira aula'" />
                                             <p-badge *ngIf="item.reposicaoDe_Evento_Id"
-                                                     styleClass="ml-2 bg-purple-500"
+                                                     styleClass=" -mt-1 mb-1 bg-purple-500"
                                                      value="Reposição"
                                                      size="small"
                                                      (mouseenter)="reposicaoTooltip.show($event, item)"
@@ -540,7 +542,7 @@
                                 </div>
                             </td>
                             <!-- Apostila -->
-                            <td class="relative z-0 p-0">
+                            <td class="p-0 pb-1">
                                 <div class="flex gap-2">
                                     <!-- Abaco -->
                                     <div class="flex flex-column gap-1">
@@ -561,8 +563,8 @@
                                                       filterBy="nome"
                                                       appendTo="body"
                                                       [placeholder]="!apostila_Abaco.touched ? item.apostila_Abaco : 'Selecione'"
-                                                      [readonly]=" evento.finalizado"
-                                                      [dropdownIcon]=" evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                                                      [readonly]="evento.finalizado === true  || item.presente === false"
+                                                      [dropdownIcon]="evento.finalizado === true  || item.presente === false ? ' ' : 'pi pi-angle-down'">
                                             </p-select>
                                         </p-iconfield>
                                     </div>
@@ -581,7 +583,8 @@
                                                        [step]="1"
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
-                                                       [required]="true" />
+                                                       [required]="true"
+                                                       [readonly]="evento.finalizado === true  || item.presente === false" />
                                     </div>
                                     <!-- AH -->
                                     <div class="flex flex-column gap-1">
@@ -602,8 +605,9 @@
                                                       filterBy="nome"
                                                       appendTo="body"
                                                       [placeholder]="!apostila_AH.touched ? item.apostila_AH : 'Selecione'"
-                                                      [readonly]=" evento.finalizado"
-                                                      [dropdownIcon]=" evento.finalizado ? ' ' : 'pi pi-angle-down'">
+                                                      [readonly]="evento.finalizado === true  || item.presente === false"
+                                                      [dropdownIcon]="evento.finalizado === true  || item.presente === false ? ' ' : 'pi pi-angle-down'"
+                                                      >
                                             </p-select>
                                         </p-iconfield>
                                     </div>
@@ -622,12 +626,13 @@
                                                        [step]="1"
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
-                                                       [required]="true" />
+                                                       [required]="true"
+                                                       [readonly]="evento.finalizado === true  || item.presente === false" />
                                     </div>
                                 </div>
                             </td>
                             <!-- Presente -->
-                            <td class="relative z-0 py-0">
+                            <td class="p-0 pb-1">
                                 <div class="mt-3 flex align-items-start gap-2">
                                     <p-button [disabled]=" evento.finalizado || !evento.active"
                                               [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
@@ -650,16 +655,19 @@
                                 </div>
                             </td>
                             <!-- Observações  -->
-                            <td class="relative z-0 p-0">
-                                <textarea pTextarea
-                                          placeholder="Insira as observações..."
-                                          [(ngModel)]="item.observacao"
-                                          (focus)="inputFocus($event)"
-                                          [readonly]="!evento.active"
-                                          id="observacao[{{rowIndex}}]"
-                                          name="observacao[{{rowIndex}}]"
-                                          class="mt-3"
-                                          [style]="{ heigth: '28px', maxWidth: '20vw', width: '20vw' }"></textarea>
+                            <td class="p-0 pb-1">
+                                <div class="flex flex-column gap-1">
+                                    <label for="observacao" class="ml-1 text-sm line-height-1">Observações: <span class="text-red-500" *ngIf="item.presente === false">*</span></label>
+                                    <textarea pTextarea
+                                            placeholder="Insira as observações..."
+                                            [(ngModel)]="item.observacao"
+                                            (focus)="inputFocus($event)"
+                                            id="observacao[{{rowIndex}}]"
+                                            name="observacao[{{rowIndex}}]"
+                                            class="10rem "
+                                            [rows]="1"
+                                            [required]="item.presente === false"></textarea>
+                                </div>
                             </td>
                         </tr>
                     </ng-template>

@@ -44,7 +44,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
 
     menuOptionsValue: any;
-    menuItems: MenuItem[] = []
+    menuItems: MenuItem[] = [];
 
     constructor(
         private alunoService: AlunoService,

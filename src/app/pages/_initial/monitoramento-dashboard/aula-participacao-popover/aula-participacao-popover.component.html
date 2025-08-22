@@ -1,91 +1,122 @@
 <p-popover #popover
-           (onHide)="onHide()"
            [dismissable]="true"
            styleClass="-mt-1"
            appendTo="body">
-    <div class="flex gap-2 flex-column w-30rem" *ngIf="aluno && item">
-        <div>
-            <!-- Cancelada -->
-            <ng-container *ngIf="!item.aula.active && !item.aula.reagendamentoPara_Evento_Id">
-                <p class="surface-800 text-base text-white py-1 px-2">
-                    <i class="pi pi-times mr-2"></i>
-                    <span>Aula Cancelada</span>
-                </p>
-            </ng-container>
-            <!-- Reagendada -->
-            <ng-container *ngIf="item.aula.reagendamentoDe_Evento_Id && item.aula.reagendamentoDe_Evento">
-                <p class="bg-yellow-500 text-base text-900 py-1 px-2">
-                    <i class="pi pi-exclamation-triangle mr-2"></i>
-                    <span>Reagendamento da aula do dia
-                        {{item.aula.reagendamentoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
-                </p>
-            </ng-container>
-            <!-- Reposição -->
-            <ng-container *ngIf="item.participacao.reposicaoDe_Evento_Id && item.participacao.reposicaoDe_Evento">
-                <p class="bg-purple-600 text-base text-white py-1 px-2">
-                    <i class="pi pi-exclamation-triangle mr-2"></i>
-                    <span>Reposição da aula do dia
-                        {{item.participacao.reposicaoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
-                </p>
-            </ng-container>
-        </div>
-
-        <div class="line-height-3">
-            <p-badge *ngIf="aluno.primeiraAula_Id == item.aula.id"
-                     styleClass=" bg-pink-500 border-pink-500"
-                     value="Aula 1"
-                     size="small"
-                     severity="danger" />
-            <p class="flex gap-2">
-                <span class="font-bold">Data:</span>
-                <span>{{item.aula.data | date:'dd/MM/yy '}}</span>
-                <span class="font-bold">Horário:</span>
-                <span>{{item.aula.data | date:'HH:mm'}}</span>
-            </p>
-            <p *ngIf="item.aula.turma"><span class="font-bold">Turma</span> {{item.aula.turma}}</p>
-            <p *ngIf="item.aula.professor">
-                <span class="font-bold">Professor: </span>
-                <span>{{item.aula.professor}}</span>
-                <span class="border-circle w-1rem h-1rem ml-1 inline-flex"
-                      [style]="{ backgroundColor: item.aula.corLegenda }"> </span>
-            </p>
-            <p class="font-bold mt-2">Observações: </p>
-            <div class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis">
-                <p *ngIf="item.aula.observacao" [innerHTML]="item.aula.observacao"></p>
-                <p *ngIf="item.participacao.observacao" [innerHTML]="item.participacao.observacao"></p>
-                <p *ngIf="!item.aula.observacao && !item.participacao.observacao" class="text-500">Nenhuma observação
-                </p>
-            </div>
-        </div>
-
-        <ng-container *ngIf="(item.aula.active == false 
-             || item.participacao.presente != true)
-             && !item.participacao.reposicaoDe_Evento_Id
-             && !item.participacao.reposicaoPara_Evento_Id">
-
-             <div class="flex align-items-center gap-2">
-                
-                <p-button type="button"
-                        icon="pi pi-calendar"
-                        label="Agendar reposição"
-                        severity="secondary"
-                        rounded
-                        (onClick)="goToReposicao(aluno.id, item.aula.id)" />
-                        
-                <ng-container  *ngIf="item.participacao.presente === false ">
-                    <p-button type="button"
-                            (onClick)="enviarMensagemFalta(item, aluno, $event)"
-                            (auxclick)="enviarMensagemFalta(item, aluno, $event)"
-                            (contextmenu)="enviarMensagemFalta(item, aluno, $event)"
-                            [disabled]="!aluno.celular"
-                            icon="pi pi-whatsapp"
-                            severity="success"
-                            label="Enviar mensagem"
-                            [rounded]="true"
-                            pTooltip="Enviar mensagem de falta" />
+    <ng-container *ngIf="aluno && participacao">
+        <div class="flex gap-2 flex-column" style="width: 40rem;">
+            <div>
+                <!-- Cancelada -->
+                <ng-container *ngIf="!participacao.aula.active && !participacao.aula.reagendamentoPara_Evento_Id">
+                    <p class="surface-800 text-base text-white py-1 px-2">
+                        <i class="pi pi-times mr-2"></i>
+                        <span>Aula Cancelada</span>
+                    </p>
                 </ng-container>
-             </div>
-             
-        </ng-container>
-    </div>
+                <!-- Reagendada -->
+                <ng-container *ngIf="participacao.aula.reagendamentoDe_Evento_Id && participacao.aula.reagendamentoDe_Evento">
+                    <p class="bg-yellow-500 text-base text-900 py-1 px-2">
+                        <i class="pi pi-exclamation-triangle mr-2"></i>
+                        <span>Reagendamento da aula do dia {{participacao.aula.reagendamentoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
+                    </p>
+                </ng-container>
+                <!-- Reposição -->
+                <ng-container *ngIf="participacao.participacao.reposicaoDe_Evento_Id && participacao.participacao.reposicaoDe_Evento">
+                    <p class="bg-purple-600 text-base text-white py-1 px-2">
+                        <i class="pi pi-exclamation-triangle mr-2"></i>
+                        <span>Reposição da aula do dia {{participacao.participacao.reposicaoDe_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
+                    </p>
+                </ng-container>
+            </div>
+            <div class="line-height-3">
+                <p-badge *ngIf="aluno.primeiraAula_Id == participacao.aula.id"
+                         styleClass=" bg-pink-500 border-pink-500"
+                         value="Aula 1"
+                         size="small"
+                         severity="danger" />
+                <p class="flex gap-2">
+                    <span class="font-bold">Data:</span>
+                    <span>{{participacao.aula.data | date:'dd/MM/yy '}}</span>
+                    <span class="font-bold">Horário:</span>
+                    <span>{{participacao.aula.data | date:'HH:mm'}}</span>
+                </p>
+                <p *ngIf="participacao.aula.turma"><span class="font-bold">Turma</span> {{participacao.aula.turma}}</p>
+                <p *ngIf="participacao.aula.professor">
+                    <span class="font-bold">Professor: </span>
+                    <span>{{participacao.aula.professor}}</span>
+                    <span class="border-circle w-1rem h-1rem ml-1 inline-flex"
+                          [style]="{ backgroundColor: participacao.aula.corLegenda }"> </span>
+                </p>
+                <p class="font-bold mt-2">Observações: </p>
+                <div class="max-w-20rem max-h-20rem white-space-normal overflow-hidden text-overflow-ellipsis">
+                    <p *ngIf="participacao.aula.observacao" [innerHTML]="participacao.aula.observacao"></p>
+                    <p *ngIf="participacao.participacao.observacao" [innerHTML]="participacao.participacao.observacao"></p>
+                    <p *ngIf="!participacao.aula.observacao && !participacao.participacao.observacao" class="text-500">Nenhuma observação </p>
+                </div>
+            </div>
+            <div class="flex align-items-center gap-2">
+                <p-button label="Fechar"
+                          severity="secondary"
+                          class="w-full"
+                          [outlined]="true"
+                          styleClass="w-full"
+                          (onClick)="hide()" />
+                <p-select [options]="menuItems"
+                          [styleClass]="'p-select-menu p-select-small'"
+                          appendTo="body"
+                          dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
+                          optionLabel="label"
+                          placeholder="Opções"
+                          (onChange)="menuItemChanged($event, options)"
+                          #options="ngModel"
+                          [(ngModel)]="menuOptionsValue"
+                          [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
+                    <ng-template let-selectedOption #selectedItem>
+                        <div class="text-white -mr-2 text-center text-base">Opções</div>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                            <i [class]="item.icon"></i>
+                            <a class="ml-2">{{ item.label }}</a>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+            <!-- <div class="flex align-items-center gap-2">
+                       <ng-container *ngIf="item.aula.active === true 
+                                           && item.aula.finalizado === false 
+                                           && item.participacao.presente !== true
+                                           && item.participacao.active === true" >
+                           <p-button type="button"
+                                     icon="pi pi-thumbs-down"
+                                     label="Agendar falta"
+                                     severity="danger"
+                                     rounded
+                                     (onClick)="goToAgendarFalta(aluno, item)" />
+                       </ng-container>
+                       <ng-container *ngIf="(item.aula.active == false 
+                        || item.participacao.presente != true)
+                        && !item.participacao.reposicaoDe_Evento_Id
+                        && !item.participacao.reposicaoPara_Evento_Id">
+                           <p-button type="button"
+                                     icon="pi pi-calendar"
+                                     label="Agendar reposição"
+                                     severity="secondary"
+                                     rounded
+                                     (onClick)="goToReposicao(aluno, item)" />
+                           <ng-container *ngIf="item.participacao.presente === false ">
+                               <p-button type="button"
+                                         (onClick)="enviarMensagemFalta(item, aluno, $event)"
+                                         (auxclick)="enviarMensagemFalta(item, aluno, $event)"
+                                         (contextmenu)="enviarMensagemFalta(item, aluno, $event)"
+                                         [disabled]="!aluno.celular"
+                                         icon="pi pi-whatsapp"
+                                         severity="success"
+                                         label="Enviar mensagem"
+                                         [rounded]="true"
+                                         pTooltip="Enviar mensagem de falta" />
+                           </ng-container>
+                       </ng-container>
+                   </div> -->
+        </div>
+    </ng-container>
 </p-popover>

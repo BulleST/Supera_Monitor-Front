@@ -7,7 +7,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { NgForm, NgModel } from '@angular/forms';
-import { Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
+import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 import { ConfirmationService, ScrollerOptions } from 'primeng/api';
@@ -62,6 +62,7 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         private salaAulaPipe: SalaAulaPipe,
         private confirmationService: ConfirmationService,
         private roteiroService: RoteiroService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         let roteiros = roteiroService.list.subscribe(res => this.roteiros = res);
@@ -290,21 +291,19 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
 
         this.loading = true;
 
-        let request: any = {};
         let response: RequestResponse = { success: true, message: '', object: undefined };
 
+        let participacao = evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
         // Se a aula não existir, cria a aula
         if (evento.id == PseudoEvento.EventoId) {
             response = await this.requestAulaTurma(evento)
-            request.evento_Id = response.object.id;
+            participacao = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+
             if (!response.success) {
                 return this.showError('Falta não registrada', `Ocorreu um erro ao registrar falta. <br> ${response.message}`, e);
             }
         }
-
-
-        const participacao = evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
         await lastValueFrom(this.eventoService.cancelarParticipacao(participacao.id, this.observacoes))
             .then(res => {
@@ -328,13 +327,7 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     }
 
     requestAulaTurma(evento: Evento) {
-        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
-        request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
-        request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id);
-        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm') as any;
-
-        return lastValueFrom(this.eventoService.createAulaTurma(request));
+        return this.calendarioUtils.requestAulaTurma(evento);
     }
 
     sendMensagemAluno(e: any, aluno: Aluno, evento: Evento) {

@@ -222,23 +222,49 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 .catch((res) => (this.loadingApostila = false))
         }
 
-        this.evento.alunos.forEach((aluno) => {
+        this.evento.alunos.forEach(aluno => {
+            aluno.apostilasAbacoList = this.apostilas.filter(x => {
+                const abaco = x.apostila_Tipo_Id == ApostilaTipo.Abaco;
+                const temKit = aluno.apostila_Kit_Id;
+                const temApostilaNoDia = aluno.apostila_Abaco_Id;
+                
+                return abaco 
+                    && (!temKit || aluno.apostila_Kit_Id == x.apostila_Kit_Id)
+                    && (!temApostilaNoDia || aluno.apostila_Abaco_Id == x.id)
+            });
+            aluno.apostilasAHList = this.apostilas.filter(x => {
+                const ah = x.apostila_Tipo_Id == ApostilaTipo.AH;
+                const temKit = aluno.apostila_Kit_Id;
+                const temApostilaNoDia = aluno.apostila_AH_Id;
+                return ah 
+                    && (!temKit || aluno.apostila_Kit_Id == x.apostila_Kit_Id)
+                    && (!temApostilaNoDia || aluno.apostila_AH_Id == x.id)
+                
+            });
+
+            aluno.numeroPaginaAbaco = aluno.numeroPaginaAbaco ?? 0;
+            aluno.numeroPaginaAH = aluno.numeroPaginaAH ?? 0;
+
             if (aluno.apostila_Abaco_Id) {
-                aluno.apostilaAbacoObject = this.apostilas.find((x) => x.id == aluno.apostila_Abaco_Id) as Apostila;
-                aluno.apostilasAbacoList = this.apostilas.filter((x) => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == ApostilaTipo.Abaco);
-                aluno.numeroPaginaAbaco = aluno.numeroPaginaAbaco ?? 0;
+                aluno.apostilaAbacoObject = this.apostilas.find(x => x.id == aluno.apostila_Abaco_Id) as Apostila;
+            } else {
+                aluno.apostilaAbacoObject = aluno.apostilasAbacoList[0];
+                aluno.apostila_Abaco_Id = aluno.apostilaAbacoObject.id;
+                aluno.apostila_Abaco = aluno.apostilaAbacoObject.nome;
             }
 
             if (aluno.apostila_AH_Id) {
-                aluno.apostilaAHObject = this.apostilas.find((x) => x.id == aluno.apostila_AH_Id) as Apostila;
-                aluno.apostilasAHList = this.apostilas.filter((x) => x.apostila_Kit_Id == aluno.apostila_Kit_Id && x.apostila_Tipo_Id == ApostilaTipo.AH);
-                aluno.numeroPaginaAH = aluno.numeroPaginaAH ?? 0;
+                aluno.apostilaAHObject = this.apostilas.find(x => x.id == aluno.apostila_AH_Id) as Apostila;
+            }
+            else {
+                aluno.apostilaAHObject = aluno.apostilasAHList[0];
+                aluno.apostila_AH_Id = aluno.apostilaAHObject.id;
+                aluno.apostila_AH = aluno.apostilaAHObject.nome;
             }
         })
     }
 
     clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
-
 
     //
     // Abaco
@@ -269,26 +295,26 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
                     item.numeroPaginaAbaco = 1
-                    item.apostila_Abaco_Id = newApostila.id
-                    item.apostila_Abaco = newApostila.nome
+                    item.apostila_Abaco_Id = newApostila.id;
+                    item.apostila_Abaco = newApostila.nome;
                 },
                 reject: () => {
                     // Seta antiga apostila e página e máximo permitido
-                    item.apostila_Abaco_Id = oldApostila.id
-                    item.apostila_Abaco = oldApostila.nome
+                    item.apostila_Abaco_Id = oldApostila.id;
+                    item.apostila_Abaco = oldApostila.nome;
                 },
             })
         } else {
             // Seta nova apostila e página e máximo permitido
-            item.apostila_Abaco = newApostila.nome
-            item.apostila_Abaco_Id = newApostila.id
-            item.numeroPaginaAbaco = 1
+            item.apostila_Abaco = newApostila.nome;
+            item.apostila_Abaco_Id = newApostila.id;
+            item.numeroPaginaAbaco = 1;
         }
     }
 
     numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any) {
-        let prev = this.clonedRow[item.aluno_Id]
-        let current = item
+        let prev = this.clonedRow[item.aluno_Id];
+        let current = item;
 
 
         if (item.presente === true && item.numeroPaginaAbaco === 0) {
@@ -308,7 +334,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
-                    item.numeroPaginaAbaco = prev.numeroPaginaAbaco
+                    item.numeroPaginaAbaco = prev.numeroPaginaAbaco;
                 },
             })
         }
@@ -319,7 +345,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAHClick(item: Evento_Participacao_Aluno) {
-        this.clonedRow[item.aluno_Id as number] = { ...item }
+        this.clonedRow[item.aluno_Id as number] = { ...item };
     }
 
     apostilaAHChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {
@@ -340,30 +366,30 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 accept: async () => {
                     // Seta nova apostila e página e máximo permitido
-                    item.numeroPaginaAH = 1
-                    item.apostila_AH_Id = newApostila.id
-                    item.apostila_AH = newApostila.nome
+                    item.numeroPaginaAH = 1;
+                    item.apostila_AH_Id = newApostila.id;
+                    item.apostila_AH = newApostila.nome;
                 },
                 reject: () => {
                     // Seta antiga apostila e página e máximo permitido
-                    item.apostila_AH_Id = oldApostila.id
-                    item.apostila_AH = oldApostila.nome
+                    item.apostila_AH_Id = oldApostila.id;
+                    item.apostila_AH = oldApostila.nome;
                 },
             })
         } else {
             // Seta nova apostila e página e máximo permitido
-            item.apostila_AH = newApostila.nome
-            item.apostila_AH_Id = newApostila.id
-            item.numeroPaginaAH = 1
+            item.apostila_AH = newApostila.nome;
+            item.apostila_AH_Id = newApostila.id;
+            item.numeroPaginaAH = 1;
         }
     }
 
     numeroPaginaAHChange(item: Evento_Participacao_Aluno, e: any) {
-        let prev = this.clonedRow[item.aluno_Id]
-        let current = item
+        let prev = this.clonedRow[item.aluno_Id];
+        let current = item;
 
-        if (item.presente === true && item.numeroPaginaAbaco === 0) {
-            item.numeroPaginaAbaco = 1;
+        if (item.presente === true && item.numeroPaginaAH === 0) {
+            item.numeroPaginaAH = 1;
             return this.showError('OPS!', 'Se o aluno esteve presente, ele deve avançar pelo menos na página 1, certo?!', e);
         }
         if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
@@ -378,7 +404,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
-                    item.numeroPaginaAH = prev.numeroPaginaAH
+                    item.numeroPaginaAH = prev.numeroPaginaAH;
                 },
             })
         }
@@ -396,6 +422,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
             this.roteiro = roteiro
         }
     }
+    
     showDivVaziaEnviarMensagemFalta(item: Evento_Participacao_Aluno) {
         return this.evento.alunos.filter(x => x.presente === false).length > 0 && item.presente !== false
     }

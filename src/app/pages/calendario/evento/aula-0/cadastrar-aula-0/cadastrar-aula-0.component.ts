@@ -32,6 +32,7 @@ import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.s
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
 import { MyMap } from '../../../../../utils/map'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
+import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -48,7 +49,6 @@ export class CadastrarAula0Component implements OnDestroy {
     object: EventoAula0Request = new EventoAula0Request()
     data: Date = undefined as unknown as Date
     horario: Date = undefined as unknown as Date
-    minData = new Date()
 
     blockAlunoField = false
 
@@ -100,7 +100,7 @@ export class CadastrarAula0Component implements OnDestroy {
     ) {
         this.object.descricao = 'Aula 0'
 
-        let professores = this.professorService.list.subscribe(res => (this.professores = res))
+        let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
 
         if (this.professores.length == 0) {
@@ -110,7 +110,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch(res => (this.loadingProfessores = false))
         }
 
-        let salaAula = this.salaAulaService.list.subscribe(res => (this.salaAulas = res))
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res)
         this.subscription.push(salaAula)
 
         if (this.salaAulas.length == 0) {
@@ -120,7 +120,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch(res => (this.loadingSalaAulas = false))
         }
 
-        let turmas = this.turmaService.list.subscribe(res => (this.turmas = res))
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
         this.subscription.push(turmas)
 
         if (this.turmas.length == 0) {
@@ -130,7 +130,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch(res => (this.loadingTurmas = false))
         }
 
-        let alunos = this.alunoService.list.subscribe(res => (this.alunos = res.filter(x => x.active && !x.aulaZero_Id)))
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active))
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
@@ -140,7 +140,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 .catch(res => (this.loadingAlunos = false))
         }
 
-        let eventos = this.service.eventos.subscribe(res => (this.eventos = res))
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res)
         this.subscription.push(eventos)
 
         this.loadFeriados()
@@ -333,7 +333,7 @@ export class CadastrarAula0Component implements OnDestroy {
         model.control.updateValueAndValidity()
     }
 
-    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+    async alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
 
         this.validaAlunos()
 
@@ -342,110 +342,141 @@ export class CadastrarAula0Component implements OnDestroy {
         // se o aluno foi selecionado, selected = false
         // se o aluno foi deselecionado, selected = true
         if (selected == false) { 
-            let alunos = e.value as Aluno[];
             let aluno = (e.originalEvent as any).option as Aluno;
-            let salaAula = this.salaAulas.find(x => x.id == this.object.sala_Id) as SalaAula
             let nome = this.nameFirstWordPipe.transform(aluno.nome);
-               
+            
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
                 let tipo = this.getTipo(aluno.disponivelEvent);
                 let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
-                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                
-                if (index) {
-                    this.selectedAlunos.splice(index, 1);
-                }
-                
-                model.control.setValue(this.selectedAlunos);
                 this.showError('Aluno Indisponível', `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, e.originalEvent);
+                
+                this.selectAlunoReject(aluno, model);
                 return
-            } 
-            else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
+            }
+            
+            aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
 
-                model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
-                this.showError('Restrição de Mobilidade',`O ${nome} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent)
-                return
-            } 
-            else if (alunos.length > 1) {
+            let mensagem = ''
+            mensagem += await this.aulaZeroMensagem(aluno, mensagem);
+            mensagem += await this.restricaoMobilidadeMensagem(aluno, mensagem);
+            mensagem += await this.maisDeUmAlunoMensagem(aluno, mensagem);
 
+
+            console.log('mensagem', mensagem)
+            if (mensagem) {
                 this.confirmationService.confirm({
-                    target: e.originalEvent.target as EventTarget,
-                    header: `Selecionar ${alunos.length} alunos?`,
-                    message:
-                        'Tem certeza que deseja selecionar mais de um aluno para a aula? <br> Se recusar, apenas o primeiro aluno selecionado será mantido. <br> Não esqueça de confirmar a disponibilidade',
+                    target: e.originalEvent.target as any,
+                    header: 'Selecionar aluno',
+                    message: `<p>Algumas observações são relevantes antes de continuar:</p>
+                                ${mensagem}
+                                <p>Tem certeza que deseja continuar?</p>
+                            `,
                     acceptLabel: `Continuar`,
-                    acceptButtonStyleClass: 'p-button-rounded',
+                    rejectLabel: 'Não',
                     acceptIcon: 'pi pi-check',
                     rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Não',
+                    acceptButtonStyleClass: 'p-button-rounded',
                     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => {
-                        model.control.setErrors(null);
-                        model.control.updateValueAndValidity()
-                        this.loadAluno(e.originalEvent, aluno, model)
+                        this.send(e)
                     },
                     reject: () => {
-                        this.selectedAlunos = [this.selectedAlunos[0]];
-                        model.control.updateValueAndValidity()
-
-                    },
+                        this.selectAlunoReject(aluno, model);
+                    }
                 })
             }
-
+          
             model.control.updateValueAndValidity()
 
         }
     }
 
-    loadAluno(e: any, selectedAluno: Aluno, model: NgModel) {
-        if (this.selectedAlunos.length > 0) {
-            this.loadingAlunos = true
-            this.loading = true
-            lastValueFrom(this.alunoService.get(selectedAluno.id))
-                .then(res => {
-                    this.loadingAlunos = false
-                    this.loading = false
-                    
-                    let aluno = res;
 
-
-                    let restricoes = aluno.restricoes.filter(x => x.active === true)
-                    let restricaoMobilidade = aluno.restricaoMobilidade
-                    if (restricoes.length > 0 || restricaoMobilidade) {
-                        let mensagem = 'Esse aluno possui algumas restrições:  <ul>'
-
-                        if (restricaoMobilidade) mensagem += '<li>Restrição de mobilidade </li>'
-
-                        mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
-                        mensagem += `</ul> Tem certeza que deseja inserir ele nessa aula zero?`
-
-                        this.confirmationService.confirm({
-                            target: e.target,
-                            header: 'Inserir aluno',
-                            message: mensagem,
-                            acceptLabel: `Continuar`,
-                            acceptIcon: 'pi pi-check',
-                            acceptButtonStyleClass: 'p-button-rounded',
-                            rejectIcon: 'pi pi-times',
-                            rejectLabel: 'Cancelar',
-                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                            accept: () => { },
-                            reject: () => {
-                                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                                if (index != -1) this.selectedAlunos.splice(index, 1, aluno)
-
-                                model.control.setValue(this.selectedAlunos);
-                                model.control.updateValueAndValidity();
-                            },
-                        })
-                    }
-                })
-                .catch(res => {
-                    this.showError('Erro', `Não foi possível carregar restrições de ${selectedAluno.nome}`, e)
-                    this.loadingAlunos = false
-                    this.loading = false
-                })
+    async aulaZeroMensagem(aluno: Aluno, mensagem: string) {
+        if (aluno.aulaZero_Id) {
+            let aulaZero: Evento = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
+            let participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+            
+            mensagem += '<br>'
+            mensagem += `<p>Outra aula zero já foi cadastrada: </p>`;
+            
+            if (!aulaZero.active) {
+                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
+            } 
+            else if (aulaZero.active && participacaoAulaZero.presente === false && participacaoAulaZero.active === true) {
+                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Faltou (${participacaoAulaZero.observacao})</p>`;
+            } 
+            else {
+                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
+                mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
+            }
         }
+        return mensagem;
+    }
+
+    async restricaoMobilidadeMensagem(aluno: Aluno, mensagem: string) {
+        let restricoes = aluno.restricoes.filter(x => x.active === true)
+        let restricaoMobilidade = aluno.restricaoMobilidade
+        
+        if (restricoes.length > 0 || restricaoMobilidade) {
+            mensagem += '<br>'
+            mensagem += '<p class="font-bold">Restrições:</p> <ul class="my-2 pl-2">'
+            
+            if (restricaoMobilidade) 
+                mensagem += '<li>Restrição de mobilidade </li>'
+            if (restricoes.length > 0)
+                mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
+            
+            mensagem += `</ul>`
+            mensagem += `<p class="text-sm text-red-500">Tem certeza que deseja ignorar as restrições e continuar?</p>`;
+        }
+        return mensagem;
+    }
+
+   async maisDeUmAlunoMensagem(aluno: Aluno, mensagem: string) {
+
+        if (this.selectedAlunos.length == 0) {
+            mensagem += '<br>'
+            mensagem += `<p>Nenhum aluno selecionado.</p>`;
+        }
+        // else if (this.selectedAlunos.length == 1) {
+        //     mensagem += '<br>'
+        //     mensagem += `<p>1 aluno selecionado</p>`;
+        // }
+        else if (this.selectedAlunos.length > 1) {
+            mensagem += '<br>'
+            mensagem += `<p>${this.selectedAlunos.length} alunos selecionados</p>`;
+            mensagem += `<p class="text-sm text-red-500">Tem certeza que deseja selecionar mais de um aluno?</p>`;
+        }
+
+        return mensagem;
+    }
+
+    selectAlunoReject(aluno: Aluno, model: NgModel) {
+        let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+        if (index) 
+            this.selectedAlunos.splice(index, 1);
+        
+        model.control.setValue(this.selectedAlunos);
+        model.control.updateValueAndValidity()
+    }
+
+
+    loadAluno(e: any, selectedAluno: Aluno, model: NgModel) {
+        this.loadingAlunos = true
+        this.loading = true
+        return lastValueFrom(this.alunoService.get(selectedAluno.id))
+            .then(res => {
+                this.loadingAlunos = false
+                this.loading = false
+                return res;
+            })
+            .catch(res => {
+                this.showError('Erro', `Não foi possível carregar dados do aluno ${selectedAluno.nome}`, e)
+                this.loadingAlunos = false
+                this.loading = false
+                return undefined
+            })
     }
 
     getTipo(e: Evento) {

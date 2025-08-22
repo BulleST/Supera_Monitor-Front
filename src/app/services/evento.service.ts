@@ -106,7 +106,7 @@ export class EventoService extends Service {
 
         if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
             let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
-            if (roteiro) 
+            if (roteiro)
                 evento.roteiro_Id = roteiro.id;
         }
         return evento;
@@ -115,116 +115,81 @@ export class EventoService extends Service {
     getList(request: CalendarioRequest) {
         return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
             .pipe(tap({
-                    next: async (eventos) => {
-                        if (this.roteiroService.list.value.length == 0)
-                            await lastValueFrom(this.roteiroService.getList('calendario'));
+                next: async (eventos) => {
+                    if (this.roteiroService.list.value.length == 0)
+                        await lastValueFrom(this.roteiroService.getList('calendario'));
 
-                        let list = this.eventos.value as Evento[];
-                        eventos = eventos.map(evento => {
-                            evento = this.mapEvento(evento);
+                    let list = this.eventos.value as Evento[];
+                    eventos = eventos.map(evento => {
+                        evento = this.mapEvento(evento);
 
-                            let index = list.findIndex(x => x.id == evento.id 
-                                && x.turma_Id == evento.turma_Id 
-                                && moment(x.data).isSame(evento.data));
+                        let index = list.findIndex(x => x.id == evento.id
+                            && x.turma_Id == evento.turma_Id
+                            && moment(x.data).isSame(evento.data));
 
-                            if (index == -1) list.push(evento);
-                            else list.splice(index, 1, evento);
+                        if (index == -1) list.push(evento);
+                        else list.splice(index, 1, evento);
 
-                            return evento;
-                        });
+                        return evento;
+                    });
 
-                        this.eventos.next(list);
+                    this.eventos.next(list);
 
-                        return of(list);
-                    },
-                    error: (err) => {
-                        this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
-                    },
-                })
+                    return of(list);
+                },
+                error: (err) => {
+                    this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
+                },
+            })
             );
     }
 
     get(id: number) {
-        return this.http.get<Evento>(`${this.url}/eventos/${id}`).pipe(
-            tap((evento) => {
+        return this.http.get<Evento>(`${this.url}/eventos/${id}`)
+            .pipe(tap(evento => {
                 evento = this.mapEvento(evento);
                 return evento;
-            })
-        );
+            }));
+    }
+
+    getPseudoAula(turma_Id: number, dataHora: Date) {
+        return this.http.post<Evento>(`${this.url}/eventos/pseudo-aula`, { turma_Id, dataHora })
+            .pipe(tap(evento => {
+                evento = this.mapEvento(evento);
+                return evento;
+            }));
     }
 
     getFeriados(ano: number = new Date().getFullYear()) {
         let token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
         token = '20487|fbPtn71wk6mjsGDWRdU8mGECDlNZhyM7';
-        return this.http
-            .get<Feriado[]>(
-                `https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `
-            )
-            .pipe(
-                tap({
-                    next: (res) => {
-                        let list = this.feriados.value;
-                        res.forEach((item) => {
-                            let index = list.findIndex((x) =>
-                                moment(item.date).isSame(x.date)
-                            );
-                            if (index == -1) list.push(item);
-                            else list.splice(index, 1, item);
-                        });
-                        this.feriados.next(list);
-                        return of(list);
-                    },
-                })
-            );
+        return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
+            .pipe(tap({
+                next: res => {
+                    let list = this.feriados.value;
+                    res.forEach(item => {
+                        let index = list.findIndex(x => moment(item.date).isSame(x.date));
+                        if (index == -1) list.push(item);
+                        else list.splice(index, 1, item);
+                    });
+                    this.feriados.next(list);
+                    return of(list);
+                },
+            }));
     }
 
     getOficinas() {
-        return this.http.get<Evento[]>(`${this.url}/eventos/oficinas/`).pipe(
-            tap({
-                next: async (eventos) => {
+        return this.http.get<Evento[]>(`${this.url}/eventos/oficinas/`)
+            .pipe(tap({
+                next: async eventos => {
                     if (this.roteiroService.list.value.length == 0)
                         await lastValueFrom(this.roteiroService.getList('oficinas'));
 
                     let eventosExistentes = this.eventos.value as Evento[];
-                    eventos = eventos.map((evento) => {
-                        evento.data = new Date(evento.data as any);
-                        evento.active = !evento.deactivated;
-                        evento.professores = evento.professores ?? [];
-                        evento.alunos = evento.alunos ?? [];
-                        evento.alunos.forEach(
-                            (aluno) => (aluno.active = !aluno.deactivated)
-                        );
-                        evento.alunos = evento.alunos.filter((aluno) => !aluno.deactivated);
+                    eventos = eventos.map(evento => {
+                        evento = this.mapEvento(evento);
 
-                        evento.professor_Id =
-                            evento.professor_Id ?? evento.professores.length
-                                ? evento.professores[0].id
-                                : undefined;
-                        evento.professor =
-                            evento.professor ?? evento.professores.length
-                                ? evento.professores[0].nome
-                                : undefined;
-
-                        if (
-                            !evento.roteiro_Id ||
-                            evento.roteiro_Id == PseudoEvento.EventoId
-                        ) {
-                            let roteiro = this.roteiros.find((x) =>
-                                moment(evento.data).isBetween(
-                                    x.dataInicio,
-                                    x.dataFim,
-                                    'days',
-                                    '[]'
-                                )
-                            );
-                            if (roteiro) evento.roteiro_Id = roteiro.id;
-                        }
-
-                        let index = eventosExistentes.findIndex(
-                            (x) =>
-                                x.turma_Id == evento.turma_Id &&
-                                moment(x.data).isSame(evento.data)
-                        );
+                        let index = eventosExistentes.findIndex(x => x.turma_Id == evento.turma_Id && moment(x.data).isSame(evento.data));
                         if (index == -1) eventosExistentes.push(evento);
                         else eventosExistentes.splice(index, 1, evento);
                         return evento;
@@ -234,12 +199,9 @@ export class EventoService extends Service {
                     return of(eventos);
                 },
                 error: (err) => {
-                    this.toastrService.error(
-                        `Não foi possível carregar calendário. \n ${getError(err)}`
-                    );
+                    this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
                 },
-            })
-        );
+            }));
     }
 
     getDashboard(request: DashboardRequest) {
@@ -255,30 +217,22 @@ export class EventoService extends Service {
 
                             // Procura se a aula foi reagendada
                             if (aula.aula.reagendamentoPara_Evento_Id) {
-                                aula.aula.reagendamentoPara_Evento = aluno.aulas.find(
-                                    (x) => x.aula.id == aula.aula.reagendamentoPara_Evento_Id
-                                )?.aula;
+                                aula.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoPara_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula é reagendamento de outra
                             if (aula.aula.reagendamentoDe_Evento_Id) {
-                                aula.aula.reagendamentoDe_Evento = aluno.aulas.find(
-                                    (x) => x.aula.id == aula.aula.reagendamentoDe_Evento_Id
-                                )?.aula;
+                                aula.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoDe_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula foi reposta
                             if (aula.participacao.reposicaoPara_Evento_Id) {
-                                aula.participacao.reposicaoPara_Evento = aluno.aulas.find(
-                                    (x) => x.aula.id == aula.participacao.reposicaoPara_Evento_Id
-                                )?.aula;
+                                aula.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoPara_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula foi reposicao de outra
                             if (aula.participacao.reposicaoDe_Evento_Id) {
-                                aula.participacao.reposicaoDe_Evento = aluno.aulas.find(
-                                    (x) => x.aula.id == aula.participacao.reposicaoDe_Evento_Id
-                                )?.aula;
+                                aula.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoDe_Evento_Id)?.aula;
                             }
                             return aula;
                         });
@@ -289,223 +243,106 @@ export class EventoService extends Service {
                 })
             );
     }
-
-    // carregaFeriadosCalendario(ano: number = new Date().getFullYear()) {
-    //     let feriados = this.feriados.value;
-    //     let temFeriadoNoAno = feriados.find(x => x.date.getFullYear() == ano);
-    //     if (!temFeriadoNoAno) {
-    //         lastValueFrom(this.getFeriados(ano))
-    //         .then(res => {
-    //             this.carregaFeriadosCalendario(ano)
-    //         })
-    //     }
-    // }
-
     createAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/aulas/turma`,
-            request
-        );
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/turma`, request);
     }
 
     editAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
     }
 
     createAula0(model: EventoAula0Request) {
         let request = MyMap(model, new EventoAula0Request()) as EventoAula0Request;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/aulas/zero`,
-            model
-        );
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, model);
     }
 
     editAula0(model: EventoAula0Request) {
         let request = MyMap(model, new EventoAula0Request()) as EventoAula0Request;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
     }
 
     createAulaExtra(model: EventoTurmaExtraRequest) {
-        let request = MyMap(
-            model,
-            new EventoTurmaExtraRequest()
-        ) as EventoTurmaExtraRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/aulas/extra`,
-            model
-        );
+        let request = MyMap(model, new EventoTurmaExtraRequest()) as EventoTurmaExtraRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, model);
     }
 
     editAulaExtra(model: EventoTurmaExtraRequest) {
-        let request = MyMap(
-            model,
-            new EventoTurmaExtraRequest()
-        ) as EventoTurmaExtraRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
+        let request = MyMap(model, new EventoTurmaExtraRequest()) as EventoTurmaExtraRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
         return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
     }
 
     createSuperacao(model: EventoSuperacaoRequest) {
-        let request = MyMap(
-            model,
-            new EventoSuperacaoRequest()
-        ) as EventoSuperacaoRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/superacao`,
-            model
-        );
+        let request = MyMap(model, new EventoSuperacaoRequest()) as EventoSuperacaoRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/superacao`, model);
     }
 
     editSuperacao(model: EventoSuperacaoRequest) {
-        let request = MyMap(
-            model,
-            new EventoSuperacaoRequest()
-        ) as EventoSuperacaoRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.put<RequestResponse>(
-            `${this.url}/eventos/superacao`,
-            model
-        );
+        let request = MyMap(model, new EventoSuperacaoRequest()) as EventoSuperacaoRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.put<RequestResponse>(`${this.url}/eventos/superacao`, model);
     }
 
     createOficina(model: EventoOficinaRequest) {
-        let request = MyMap(
-            model,
-            new EventoOficinaRequest()
-        ) as EventoOficinaRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/oficinas`,
-            model
-        );
+        let request = MyMap(model, new EventoOficinaRequest()) as EventoOficinaRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/oficinas`, model);
     }
 
     editOficina(model: EventoOficinaRequest) {
-        let request = MyMap(
-            model,
-            new EventoOficinaRequest()
-        ) as EventoOficinaRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.put<RequestResponse>(
-            `${this.url}/eventos/oficinas`,
-            model
-        );
+        let request = MyMap(model, new EventoOficinaRequest()) as EventoOficinaRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.put<RequestResponse>(`${this.url}/eventos/oficinas`, model);
     }
 
     createReuniao(model: EventoReuniaoRequest) {
-        let request = MyMap(
-            model,
-            new EventoReuniaoRequest()
-        ) as EventoReuniaoRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/reunioes`,
-            model
-        );
+        let request = MyMap(model, new EventoReuniaoRequest()) as EventoReuniaoRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reunioes`, model);
     }
 
     editReuniao(model: EventoReuniaoRequest) {
-        let request = MyMap(
-            model,
-            new EventoReuniaoRequest()
-        ) as EventoReuniaoRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.put<RequestResponse>(
-            `${this.url}/eventos/reunioes`,
-            model
-        );
+        let request = MyMap(model, new EventoReuniaoRequest()) as EventoReuniaoRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.put<RequestResponse>(`${this.url}/eventos/reunioes`, model);
     }
 
     cancelar(request: EventoCancelamentoRequest) {
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/cancelar`,
-            request
-        );
+        return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar`, request);
     }
 
     inscrever(aluno_Id: number, evento_Id: number) {
         let request = { aluno_Id, evento_Id };
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/inscrever`,
-            request
-        );
+        return this.http.post<RequestResponse>(`${this.url}/eventos/participacao/inscrever`, request);
     }
 
     reagendar(model: EventoReagendamentoRequest) {
-        let request = MyMap(
-            model,
-            new EventoReagendamentoRequest()
-        ) as EventoReagendamentoRequest;
-        request.data = moment(new Date(request.data)).format(
-            'YYYY-MM-DD[T]HH:mm:ss'
-        ) as any;
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/reagendar`,
-            request
-        );
+        let request = MyMap(model, new EventoReagendamentoRequest()) as EventoReagendamentoRequest;
+        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm:ss') as any;
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reagendar`, request);
     }
 
     finalizar(request: EventoChamadaRequest) {
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/finalizar`,
-            request
-        );
+        return this.http.post<RequestResponse>(`${this.url}/eventos/finalizar`, request);
     }
 
     finalizarAulaZero(request: FinalizarAulaZeroRequest) {
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/aula-zero/finalizar`,
-            request
-        );
-    }
-
-    oficinasFuturas() {
-        return this.http.get<RequestResponse>(`${this.url}/eventos/oficinas/all`);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aula-zero/finalizar`, request);
     }
 
     cancelarEventos(ano: number) {
-        return this.http.post<RequestResponse>(
-            `${this.url}/eventos/cancelar-eventos-feriado/${ano}`,
-            {}
-        );
+        return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
     }
 
-    cancelarParticipacao(participacaoId: number, observacao: string) {
-        return this.http.post<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, {
-            participacao_Id: participacaoId,
-            observacao: observacao,
-        });
+    cancelarParticipacao(participacao_Id: number, observacao: string) {
+        return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, { participacao_Id, observacao });
     }
 }

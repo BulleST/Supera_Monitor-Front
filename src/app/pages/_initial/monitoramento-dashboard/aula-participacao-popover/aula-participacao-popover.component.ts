@@ -10,6 +10,11 @@ import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ToastrService } from 'ngx-toastr';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { Aluno } from '../../../../models/alunos.model';
+import { PseudoEvento } from '../../../../models/reposicao.model';
+import { AlunoService } from '../../../../services/alunos.service';
+import { MenuItem } from 'primeng/api';
+import { SelectChangeEvent } from 'primeng/select';
+import { NgModel } from '@angular/forms';
 @Component({
     selector: 'app-aula-participacao-popover',
     standalone: false,
@@ -17,15 +22,18 @@ import { Aluno } from '../../../../models/alunos.model';
     styleUrl: './aula-participacao-popover.component.css'
 })
 export class AulaParticipacaoPopoverComponent implements OnChanges {
-    @Input() item!: Dashboard_Aula_Participacao;
+    @Input() participacao!: Dashboard_Aula_Participacao;
     @Input() aluno!: Dashboard_Aluno;
 
     @ViewChild('popover') popover!: Popover;
+    menuItems: MenuItem[] = [];
+    menuOptionsValue: any;
 
     constructor(
         private router: Router,
         private crypto: Crypto,
         private service: EventoService,
+        private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private toastr: ToastrService,
     ) {
@@ -33,8 +41,9 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['item']) this.item = changes['item'].currentValue;
+        if (changes['item']) this.participacao = changes['item'].currentValue;
         if (changes['aluno']) this.aluno = changes['aluno'].currentValue;
+        this.loadMenuItems();
     }
 
     show(e: any) {
@@ -51,33 +60,104 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         this.popover.hide();
     }
 
-    onHide() {
+    loadMenuItems() {
+        this.menuItems = [];
 
-    }
+        // Ver aula
+        this.menuItems.push({
+            label: 'Ver aula',
+            icon: 'pi pi-calendar text-primary-500 ',
+            styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100',
+            command: () => this.goToAula(),
+        })
 
-    goToReposicao(aluno_Id: number, evento_Id: number) {
-        lastValueFrom(this.service.get(evento_Id))
-            .then(evento => {
-                this.service.setEventoReposicaoDe(evento);
-                this.router.navigate(['dashboard', 'reposicao', 'agendar', this.crypto.encrypt(aluno_Id)])
+        // Agendar Falta
+        if (this.participacao.aula.active === true
+            && this.participacao.aula.finalizado === false
+            && this.participacao.participacao.presente !== true
+            && this.participacao.participacao.active === true) {
+            this.menuItems.push({
+                label: 'Agendar falta',
+                icon: 'pi pi-thumbs-down text-red-500 ',
+                styleClass: 'text-red-500 bg-red-50 hover:bg-red-100',
+                command: () => this.goToAgendarFalta(),
             })
+        }
+        // Agendar reposição
+        if (this.participacao.participacao.presente !== true) {
+            this.menuItems.push({
+                label: 'Agendar reposição',
+                icon: 'pi pi-thumbs-down text-red-500 ',
+                styleClass: 'text-red-500 bg-red-50 hover:bg-red-100',
+                command: () => this.goToReposicao(),
+            })
+        }
+        // Enviar Mensagem de Falta
+        if (this.participacao.participacao.presente === false) {
+            this.menuItems.push({
+                label: 'Enviar Mensagem de Falta',
+                icon: 'pi pi-whatsapp text-green-500 ',
+                styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
+                command: e => this.enviarMensagemFalta(e),
+            })
+        }
+    }
+
+    menuItemChanged(e: SelectChangeEvent, select: NgModel) {
+        if (e.value && e.value.command) {
+            e.value.command(e);
+            select.control.setValue(undefined)
+            select.control.updateValueAndValidity();
+        }
     }
 
 
-    enviarMensagemFalta(item: Dashboard_Aula_Participacao, aluno: Dashboard_Aluno, e: any) {
-        let participacao: Evento_Participacao_Aluno = {
-            id: item.participacao.id,
-            aluno_Id: aluno.id,
-            aluno: aluno.nome,
-            celular: aluno.celular,
-            perfilCognitivo_Id: aluno.perfilCognitivo_Id,
-            presente: item.participacao.presente,
-        } as any;
-        let evento: Evento = {
-            data: item.aula.data,
-            evento_Tipo_Id: item.aula.evento_Tipo_Id,
-            descricao: item.aula.descricao,
-        } as any;
+    goToAula() {
+
+    }
+
+    async goToAgendarFalta() {
+
+        let participacao = this.participacao;
+
+        let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
+        let evento: Evento;
+        if (participacao.aula.id == PseudoEvento.EventoId) {
+            let turma_Id = participacao.aula.turma_Id!;
+            let data = moment(participacao.aula.data).format('YYYY-MM-DDTHH:mm:ss')
+            evento = await lastValueFrom(this.service.getPseudoAula(turma_Id, data as any))
+        }
+        else {
+            evento = await lastValueFrom(this.service.get(participacao.aula.id))
+        }
+
+        this.service.setEvento(evento);
+        this.alunoService.setAluno(aluno);
+        this.router.navigate(['dashboard', 'agendar-falta', this.crypto.encrypt(this.aluno.id)]);
+    }
+
+    async goToReposicao() {
+        let participacao = this.participacao;
+        let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
+        let evento: Evento;
+        if (participacao.aula.id == PseudoEvento.EventoId) {
+            let turma_Id = participacao.aula.turma_Id!;
+            let data = moment(participacao.aula.data).format('YYYY-MM-DDTHH:mm:ss')
+            evento = await lastValueFrom(this.service.getPseudoAula(turma_Id, data as any))
+        }
+        else {
+            evento = await lastValueFrom(this.service.get(participacao.aula.id))
+        }
+
+        this.service.setEventoReposicaoDe(evento);
+        this.alunoService.setAluno(aluno)
+        this.router.navigate(['dashboard', 'reposicao', 'agendar', this.crypto.encrypt(this.aluno.id)])
+    }
+
+
+    async enviarMensagemFalta(e: any) {
+        let evento: Evento = await lastValueFrom(this.service.get(this.participacao.aula.id));
+        let participacao = evento.alunos.find(x => x.id == this.participacao.participacao.id) as Evento_Participacao_Aluno;
         this.mensagemWhatsapp.enviarMensagemFalta(evento, participacao, e);
     }
 

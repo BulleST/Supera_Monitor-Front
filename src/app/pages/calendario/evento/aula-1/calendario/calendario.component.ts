@@ -210,9 +210,9 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         }
 
         let feriadosDates = this.feriados.map((x) => moment(x.date).format('YYYY-MM-DD'))
-        let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id) 
-                                                && x.active == true 
-                                                && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
+        let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id)
+            && x.active == true
+            && feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
 
         let events = eventos.map((item) => {
             let style = this.calendarioUtils.getEventStyles(item);
@@ -256,7 +256,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     setLegenda() {
-        this.legenda = this.professores.map((professor) => ({label: professor.nome, corLegenda: professor.corLegenda }))
+        this.legenda = this.professores.map((professor) => ({ label: professor.nome, corLegenda: professor.corLegenda }))
     }
 
     async loadFeriados() {
@@ -276,7 +276,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
 
         this.calendarioRequest.intervaloDe = arg.view.currentStart
         this.calendarioRequest.intervaloAte = arg.view.currentEnd
-        
+
 
         if (
             this.ano != this.calendarioRequest.intervaloDe.getFullYear() ||
@@ -346,11 +346,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             response = await this.requestAulaTurma(this.selectedEvento)
             request.evento_Id = response.object.id
             if (!response.success) {
-                return this.showError(
-                    'Primeira aula não agendada',
-                    `Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`,
-                    e,
-                )
+                return this.showError('Primeira aula não agendada', `Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`, e)
             }
         }
 
@@ -377,16 +373,10 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
                 this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, res.message)
             })
     }
-        requestAulaTurma(evento: Evento) {
-    
-            let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
-            request.alunos = evento.alunos.map((x) => x.aluno_Id)
-            request.professores = evento.professor_Id ? [evento.professor_Id] : []
-            request.perfilCognitivo = evento.perfilCognitivo.map((x) => x.id)
-            request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm') as any;
-    
-            return lastValueFrom(this.service.createAulaTurma(request))
-        }
+
+    requestAulaTurma(evento: Evento) {
+        return this.calendarioUtils.requestAulaTurma(evento);
+    }
 
 
     sendMensagemAluno(e: any, evento: Evento) {
@@ -414,7 +404,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     async markChecklistAsDone() {
-        const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id));     
+        const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id));
 
 
         // Agendamento na 1ª aula 

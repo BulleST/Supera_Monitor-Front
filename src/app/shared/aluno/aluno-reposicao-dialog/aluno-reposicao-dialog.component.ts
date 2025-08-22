@@ -8,14 +8,12 @@ import { CalendarioRequest } from '../../../models/calendario.model';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { NgForm, NgModel } from '@angular/forms';
-import { Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
+import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 import { ConfirmationService } from 'primeng/api';
 import { PseudoEvento, ReposicaoAlunoRequest } from '../../../models/reposicao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
-import { EventoAulaRequest } from '../../../models/evento-aula.model';
-import { MyMap } from '../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
@@ -28,8 +26,6 @@ import { RoteiroService } from '../../../services/roteiro.service';
     providers: [ConfirmationService]
 })
 export class AlunoReposicaoDialogComponent implements OnDestroy {
-    aluno_Id?: number;
-    alunoSelected?: Aluno;
     blockAlunoField = false;
 
     eventosReposicaoDeList: Evento[] = [];
@@ -41,6 +37,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     loading = false;
     subscription: Subscription[] = [];
 
+    aluno?: Aluno;
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -65,6 +62,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         private salaAulaPipe: SalaAulaPipe,
         private confirmationService: ConfirmationService,
         private roteiroService: RoteiroService,
+        private calendarioUtils: CalendarioUtils,
     ) {
 
         let roteiros = roteiroService.list.subscribe(res => this.roteiros = res);
@@ -77,14 +75,23 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 .catch(res => this.loadingRoteiros = false);
         }
 
-        let params = this.activatedRoute.params.subscribe(res => {
-            if (res['aluno_id']) {
-                this.aluno_Id = this.crypto.decrypt(res['aluno_id']);
+
+        let aluno = this.alunoService.getAluno().subscribe(async res => {
+            if (!res) {
+                let params = this.activatedRoute.snapshot.paramMap;
+                 if (params.get('aluno_id')) {
+                    const aluno_Id = this.crypto.decrypt(params.get('aluno_id'));
+                    this.blockAlunoField = true;
+                    let aluno = await this.loadAluno(aluno_Id);
+                    this.alunoService.setAluno(aluno)
+                }
+            }
+            if (res) {
+                this.aluno = res;
                 this.blockAlunoField = true;
-                this.loadAluno();
-                this.loadEventosReposicaoDe();
             }
             else {
+                
                 let alunos = alunoService.list.subscribe(res => {
                     this.alunos = res;
                     this.setAlunos();
@@ -100,7 +107,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             }
             this.show();
         });
-        this.subscription.push(params);
+        this.subscription.push(aluno);
+
 
         let eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
             console.log('eventoReposicaoDe', res)
@@ -113,7 +121,6 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         this.subscription.push(eventoReposicaoDe);
 
         let eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => {
-            console.log('eventoReposicaoPara', res)
             if (res) {
                 this.eventoReposicaoPara = res;
                 this.blockReposicaoParaField = true;
@@ -178,31 +185,25 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         }
     }
 
-    async loadAluno(aluno?: Aluno) {
-        if (aluno) {
-            this.alunoSelected = aluno;
-            this.loadingAlunos = false;
-            return;
-        }
-        else if (this.aluno_Id) {
-            this.loadingAlunos = true;
-            await lastValueFrom(this.alunoService.get(this.aluno_Id))
-                .then(res => {
-                    this.alunoSelected = res;
-                    this.loadingAlunos = false;
-                })
-                .catch(res => {
-                    this.loadingAlunos = false;
-                    this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-                })
-        }
-
+    loadAluno(aluno_Id: number) {
+        this.loadingAlunos = true;
+        return lastValueFrom(this.alunoService.get(aluno_Id))
+            .then(res => {
+                this.aluno = res;
+                this.loadingAlunos = false;
+                return this.aluno;
+            })
+            .catch(res => {
+                this.loadingAlunos = false;
+                this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
+                return undefined;
+            })
     }
 
     loadEventosReposicaoDe() {
-        if (this.aluno_Id) {
+        if (this.aluno) {
             let request: CalendarioRequest = {
-                aluno_Id: this.aluno_Id,
+                aluno_Id: this.aluno.id,
                 intervaloDe: moment().subtract(1, 'month').toDate(),
                 intervaloAte: moment().endOf('year').toDate(),
             }
@@ -211,7 +212,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
             lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
                     this.eventosReposicaoDeList = res.filter(aula => {
-                        const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
+                        const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                         const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
                         const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
@@ -241,12 +242,12 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
     async loadEventosReposicaoPara() {
 
-        if (!this.alunoSelected) {
-            await this.loadAluno();
+        if (!this.aluno) {
+            return
         }
-        if (this.aluno_Id && this.eventoReposicaoDe) {
+        if (this.aluno && this.eventoReposicaoDe) {
             let request: CalendarioRequest = {
-                perfil_Cognitivo_Id: this.alunoSelected!.perfilCognitivo_Id,
+                perfil_Cognitivo_Id: this.aluno!.perfilCognitivo_Id,
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
                 intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
             }
@@ -257,13 +258,13 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 .then(res => {
 
                     this.eventosReposicaoParaList = res.filter(aula => {
-                        const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno_Id);
+                        const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                         const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
-                        const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.alunoSelected!.perfilCognitivo_Id);
+                        const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
                         const aulaNaoFinalizada = !aula.finalizado;
                         const aulaEstaAtiva = aula.active;
-                        const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.alunoSelected!.perfilCognitivo_Id);
+                        const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
                         const naoEhFeriado = !aula.feriado;
 
                         return alunoNaoEstaNaAula
@@ -289,8 +290,6 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
 
     alunoChanged(e: SelectChangeEvent) {
-        this.aluno_Id = e.value.id;
-
         if (!this.eventoService.eventoReposicaoDe.value) {
             this.eventoReposicaoDe = undefined;
         }
@@ -309,7 +308,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     eventoDisponivelChanged(e: any, model: NgModel) {
-        let aluno = this.alunoSelected as Aluno;
+        let aluno = this.aluno as Aluno;
         let target = this.eventoReposicaoPara as Evento;
 
         if (aluno.restricaoMobilidade) {
@@ -426,7 +425,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
         // playAlert();
 
-        let aluno = this.alunoSelected as Aluno;
+        let aluno = this.aluno as Aluno;
         let source = this.eventoReposicaoDe as Evento;
         let target = this.eventoReposicaoPara as Evento;
 
@@ -500,13 +499,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     requestAulaTurma(evento: Evento) {
-        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
-        request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
-        request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id);
-        request.data = moment(new Date(request.data)).format('YYYY-MM-DD[T]HH:mm') as any;
-
-        return lastValueFrom(this.eventoService.createAulaTurma(request));
+        return this.calendarioUtils.requestAulaTurma(evento);
     }
 
     sendMensagemAluno(e: any, aluno: Aluno, source: Evento, target: Evento) {

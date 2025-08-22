@@ -42,11 +42,7 @@ export class CadastrarAula1Component implements OnDestroy, AfterViewInit {
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
     ) {
-        let alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active && !x.primeiraAula_Id);
-            console.log(res);
-            console.log(this.alunos);
-        })
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active))
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {

@@ -230,13 +230,24 @@
                     <label for="semana">Semana:</label>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-star-fill" />
-                        <input type="text"
-                                pInputText
-                                [value]="'Semana ' + evento?.semana + '- Tema ' + evento?.tema "
-                                id="semana"
-                                name="semana"
-                                fluid
-                                readonly>
+                        <ng-container *ngIf="evento?.semana && evento?.tema; else roteiroIndefinidoTemplate">
+                            <input type="text"
+                                    pInputText
+                                    [value]="'Semana ' + evento?.semana + '- Tema ' + evento?.tema "
+                                    id="semana"
+                                    name="semana"
+                                    fluid
+                                    readonly>
+                        </ng-container>
+                        <ng-template #roteiroIndefinidoTemplate>
+                            <input type="text"
+                            pInputText
+                            [value]="'Indefinido'"
+                            id="semana"
+                            name="semana"
+                            fluid
+                            readonly>
+                        </ng-template>
                     </p-iconfield>
                 </div>
             </ng-template>

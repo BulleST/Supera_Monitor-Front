@@ -1,179 +1,172 @@
-
 <p-popover #popover appendTo="body" styleClass="mt-2">
-    
     <app-aluno-checklist-dialog #alunoChecklistDialog
-        [loading]="loadingAluno"></app-aluno-checklist-dialog>
-    
+                                [loading]="loadingAluno"></app-aluno-checklist-dialog>
     <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
-        [alunoChecklistItem]="alunoChecklistItem"
-        [aluno]="aluno"></app-aluno-checklist-on-confirm-dialog>
-        
+                                           [alunoChecklistItem]="alunoChecklistItem"
+                                           [aluno]="aluno"></app-aluno-checklist-on-confirm-dialog>
     <ng-container *ngIf="visible">
         <p-card *ngIf="loadingAluno"
-        [style]="{maxWidth: '960vw', width: '20rem', overflow: 'hidden' }"
-        styleClass="shadow-none">
-        <section>
-            <div class="flex mb-4">
-                <p-skeleton width="18rem" height="12rem" />
-            </div>
-            <div class="flex mb-2">
-                <p-skeleton width="18rem" height="1.5rem" />
-            </div>
-            <div class="flex justify-content-between gap-2 mb-4">
-                <p-skeleton width="13" height="1rem" />
-                <p-skeleton size="1.5rem" shape="circle" />
-            </div>
-            <div class="flex justify-content-between gap-2 mb-2">
-                <p-skeleton width="13rem" height="1rem" />
-                <p-skeleton width="4.5rem" height="1rem" />
-            </div>
-            <div class="flex justify-content-between gap-2 mb-2">
-                <p-skeleton width="13rem" height="1rem" />
-                <p-skeleton width="4.5rem" height="1rem" />
-            </div>
-            <div class="flex justify-content-between mb-2">
-                <p-skeleton width="18rem" height="1rem" />
-            </div>
-        </section>
-        <ng-template #footer>
-            <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
-        </ng-template>
+                [style]="{maxWidth: '960vw', width: '20rem', overflow: 'hidden' }"
+                styleClass="shadow-none">
+            <section>
+                <div class="flex mb-4">
+                    <p-skeleton width="18rem" height="12rem" />
+                </div>
+                <div class="flex mb-2">
+                    <p-skeleton width="18rem" height="1.5rem" />
+                </div>
+                <div class="flex justify-content-between gap-2 mb-4">
+                    <p-skeleton width="13" height="1rem" />
+                    <p-skeleton size="1.5rem" shape="circle" />
+                </div>
+                <div class="flex justify-content-between gap-2 mb-2">
+                    <p-skeleton width="13rem" height="1rem" />
+                    <p-skeleton width="4.5rem" height="1rem" />
+                </div>
+                <div class="flex justify-content-between gap-2 mb-2">
+                    <p-skeleton width="13rem" height="1rem" />
+                    <p-skeleton width="4.5rem" height="1rem" />
+                </div>
+                <div class="flex justify-content-between mb-2">
+                    <p-skeleton width="18rem" height="1rem" />
+                </div>
+            </section>
+            <ng-template #footer>
+                <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+            </ng-template>
         </p-card>
         <p-card *ngIf="aluno && !loadingAluno"
-        [style]="{maxWidth: '960vw', width: '22rem', overflow: 'hidden' }"
-        styleClass="shadow-none">
-        <ng-template #header>
-            <ng-container *ngIf="loadingFoto">
-                <p-skeleton width="22rem" height="12rem" />
-            </ng-container>
-            <ng-container *ngIf="!loadingFoto">
-                <div class="w-full h-12rem surface-50 overflow-hidden flex align-items-center justify-content-center">
-                    <p-image *ngIf="foto"
-                    [src]="foto"
-                    [preview]="true"
-                    alt="Image"
-                    appendTo="body"
-                    styleClass="w-full h-auto">
-                    <ng-template #indicator>
-                        <i class="pi pi-search"></i>
-                    </ng-template>
-                    <ng-template #image>
-                        <img [src]="foto" alt="image" class="w-full h-auto" />
-                    </ng-template>
-                    <ng-template #preview let-style="style" let-previewCallback="previewCallback">
-                        <img [src]="foto" alt="image" class="w-full h-auto" [style]="style"
-                        (click)="previewCallback()" />
-                    </ng-template>
-                </p-image>
-                <i *ngIf="!foto && !loadingFoto" class="pi pi-user text-2xl text-400"></i>
-                <i *ngIf="!foto && loadingFoto" class="pi pi-spin pi-spinner text-2xl text-400"></i>
-            </div>
-        </ng-container>
-    </ng-template>
-    <ng-template #title>
-        <div class="-mx-2 flex">
-            <p class="text-primary-500 font-bold capitalize">{{ aluno.nome | nameAbv }}</p>
-            
-            <div class="flex align-items-center pr-2 ml-auto">
-                <p-badge *ngIf="participacao && participacao.reposicaoDe_Evento_Id"
-                value="Reposição"
-                styleClass="bg-purple-500" />
-                
-                <p-badge *ngIf="evento && aluno.primeiraAula_Id && aluno.primeiraAula_Id == evento.id"
-                value="Aula 1"
-                styleClass="bg-pink-500" />
-            </div>
-        </div>
-    </ng-template>
-    <ng-template #subtitle>
-        <p class="flex align-items-center -mx-2 text-lg text-500">
-            <span><b>Turma: </b>{{ aluno.turma }} </span>
-            <span class="w-1rem h-1rem inline-flex border-circle ml-2"
-            [style]="{ backgroundColor: aluno.corLegenda }"></span>
-        </p>
-    </ng-template>
-    <section class="-mx-2 line-height-3">
-        <ng-template #apostilaTemplate let-apostila="apostila" let-pagina="pagina" let-abaco="abaco">
-            <p class="flex">
-                <b *ngIf="abaco">Apostila Ábaco: </b>
-                <b *ngIf="!abaco">Apostila AH: </b>
-                <span class="ml-2">{{ apostila }}</span>
-                <b class="ml-auto mr-1">Página: </b>
-                <span>{{ padStartPage(pagina, 2, '0') }}</span>
-            </p>
-        </ng-template>
-        <ng-container *ngIf="participacao && evento && evento.finalizado; else alunoApostilaTemplate">
-            <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
+                [style]="{maxWidth: '960vw', width: '22rem', overflow: 'hidden' }"
+                styleClass="shadow-none">
+            <ng-template #header>
+                <ng-container *ngIf="loadingFoto">
+                    <p-skeleton width="22rem" height="12rem" />
+                </ng-container>
+                <ng-container *ngIf="!loadingFoto">
+                    <div class="w-full h-12rem surface-50 overflow-hidden flex align-items-center justify-content-center">
+                        <p-image *ngIf="foto"
+                                 [src]="foto"
+                                 [preview]="true"
+                                 alt="Image"
+                                 appendTo="body"
+                                 styleClass="w-full h-auto">
+                            <ng-template #indicator>
+                                <i class="pi pi-search"></i>
+                            </ng-template>
+                            <ng-template #image>
+                                <img [src]="foto" alt="image" class="w-full h-auto" />
+                            </ng-template>
+                            <ng-template #preview let-style="style" let-previewCallback="previewCallback">
+                                <img [src]="foto" alt="image" class="w-full h-auto" [style]="style"
+                                     (click)="previewCallback()" />
+                            </ng-template>
+                        </p-image>
+                        <i *ngIf="!foto && !loadingFoto" class="pi pi-user text-2xl text-400"></i>
+                        <i *ngIf="!foto && loadingFoto" class="pi pi-spin pi-spinner text-2xl text-400"></i>
+                    </div>
+                </ng-container>
+            </ng-template>
+            <ng-template #title>
+                <div class="-mx-2 flex">
+                    <p class="text-primary-500 font-bold capitalize">{{ aluno.nome | nameAbv }}</p>
+                    <div class="flex align-items-center pr-2 ml-auto">
+                        <p-badge *ngIf="participacao && participacao.reposicaoDe_Evento_Id"
+                                 value="Reposição"
+                                 styleClass="bg-purple-500" />
+                        <p-badge *ngIf="evento && aluno.primeiraAula_Id && aluno.primeiraAula_Id == evento.id"
+                                 value="Aula 1"
+                                 styleClass="bg-pink-500" />
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #subtitle>
+                <p class="flex align-items-center -mx-2 text-lg text-500">
+                    <span><b>Turma: </b>{{ aluno.turma }} </span>
+                    <span class="w-1rem h-1rem inline-flex border-circle ml-2"
+                          [style]="{ backgroundColor: aluno.corLegenda }"></span>
+                </p>
+            </ng-template>
+            <section class="-mx-2 line-height-3">
+                <ng-template #apostilaTemplate let-apostila="apostila" let-pagina="pagina" let-abaco="abaco">
+                    <p class="flex">
+                        <b *ngIf="abaco">Apostila Ábaco: </b>
+                        <b *ngIf="!abaco">Apostila AH: </b>
+                        <span class="ml-2">{{ apostila }}</span>
+                        <b class="ml-auto mr-1">Página: </b>
+                        <span>{{ padStartPage(pagina, 2, '0') }}</span>
+                    </p>
+                </ng-template>
+                <ng-container *ngIf="participacao && evento && evento.finalizado; else alunoApostilaTemplate">
+                    <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
                 apostila: participacao.apostila_Abaco, 
                 pagina: participacao.numeroPaginaAbaco,
                 abaco: true 
             }"></ng-container>
-            <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
+                    <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
                 apostila: participacao.apostila_AH, 
                 pagina: participacao.numeroPaginaAH,
                 abaco: false 
             }"></ng-container>
-        </ng-container>
-        <ng-template #alunoApostilaTemplate>
-            <ng-container *ngIf="aluno">
-                <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
+                </ng-container>
+                <ng-template #alunoApostilaTemplate>
+                    <ng-container *ngIf="aluno">
+                        <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
                     apostila: aluno.apostila_Abaco, 
                     pagina: aluno.numeroPaginaAbaco,
                     abaco: true 
                 }"></ng-container>
-                <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
+                        <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
                     apostila: aluno.apostila_AH, 
                     pagina: aluno.numeroPaginaAH,
                     abaco: false 
                 }"></ng-container>
-            </ng-container>
-        </ng-template>
-        <div class="mt-2 flex align-items-center gap-2">
-            <b class="white-space-nowrap" *ngIf="showChecklist">Jornada Supera: </b>
-            <p class="w-min flex align-items-center">
-                <app-aluno-checklist #alunoChecklist
-                *ngIf="visible"
-                [aluno]="aluno"
-                [aluno_Id]="aluno_Id"
-                [showChecklist]="showChecklist"
-                (alunoChanged)="alunoChanged($event)"></app-aluno-checklist>
-            </p>
-        </div   >
-    </section>
-    <ng-template #footer>
-        <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
-    </ng-template>
+                    </ng-container>
+                </ng-template>
+                <div class="mt-2 flex align-items-center gap-2">
+                    <b class="white-space-nowrap" *ngIf="showChecklist">Jornada Supera: </b>
+                    <p class="w-min flex align-items-center">
+                        <app-aluno-checklist #alunoChecklist
+                                             *ngIf="visible"
+                                             [aluno]="aluno"
+                                             [aluno_Id]="aluno_Id"
+                                             [showChecklist]="showChecklist"
+                                             (alunoChanged)="alunoChanged($event)"></app-aluno-checklist>
+                    </p>
+                </div>
+            </section>
+            <ng-template #footer>
+                <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+            </ng-template>
         </p-card>
     </ng-container>
-
 </p-popover>
 <ng-template #footerTemplate>
     <div class="flex gap-3 -mx-2 -mb-2 mt-2">
         <p-button label="Fechar"
-        severity="secondary"
-        class="w-full"
-        [outlined]="true"
-        styleClass="w-full"
-        (onClick)="hide()" />
+                  severity="secondary"
+                  class="w-full"
+                  [outlined]="true"
+                  styleClass="w-full"
+                  (onClick)="hide()" />
         <p-select [options]="menuItems"
-        [styleClass]="'p-select-menu p-select-small'"
-        appendTo="body"
-        dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
-        optionLabel="label"
-        placeholder="Opções"
-        (onChange)="menuItemChanged($event, options)"
-        #options="ngModel"
-        [(ngModel)]="menuOptionsValue"
-        [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
-        <ng-template let-selectedOption #selectedItem>
-            <div class="text-white -mr-2 text-center text-base">Opções</div>
-        </ng-template>
-        <ng-template let-item #item>
-            <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
-                <i [class]="item.icon"></i>
-                <a class="ml-2">{{ item.label }}</a>
-            </div>
-        </ng-template>
-    </p-select>
-</div>
+                  [styleClass]="'p-select-menu p-select-small'"
+                  appendTo="body"
+                  dropdownIcon="bi bi-chevron-down text-white mt-1 mr-2"
+                  optionLabel="label"
+                  placeholder="Opções"
+                  (onChange)="menuItemChanged($event, options)"
+                  #options="ngModel"
+                  [(ngModel)]="menuOptionsValue"
+                  [overlayOptions]="{ styleClass: 'p-select-aluno-menu-overlay' }">
+            <ng-template let-selectedOption #selectedItem>
+                <div class="text-white -mr-2 text-center text-base">Opções</div>
+            </ng-template>
+            <ng-template let-item #item>
+                <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                    <i [class]="item.icon"></i>
+                    <a class="ml-2">{{ item.label }}</a>
+                </div>
+            </ng-template>
+        </p-select>
+    </div>
 </ng-template>

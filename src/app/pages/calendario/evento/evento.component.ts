@@ -18,16 +18,11 @@ import { EventoService } from '../../../services/evento.service'
 import { TurmaService } from '../../../services/turma.service'
 import moment from 'moment'
 import { NgForm } from '@angular/forms'
-import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../models/evento-aula.model';
-import { EventoOficinaRequest } from '../../../models/evento-oficina.model'
-import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model'
-import { MyMap } from '../../../utils/map'
 import { PseudoEvento } from '../../../models/reposicao.model'
 import { CalendarioRequest } from '../../../models/calendario.model'
 import { RoteiroService } from '../../../services/roteiro.service'
 import { Roteiro } from '../../../models/roteiro.model'
-import { EventoAula0Request, FinalizarAulaZeroRequest, ParticipacaoAulaZeroModel } from '../../../models/evento-aula-0.model'
-import { EventoSuperacaoRequest } from '../../../models/evento-superacao.model'
+import { FinalizarAulaZeroRequest, ParticipacaoAulaZeroModel } from '../../../models/evento-aula-0.model'
 import { RequestResponse } from '../../../helpers/request-response.interface'
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model'
 import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils/validacao'
@@ -308,20 +303,14 @@ export class EventoComponent implements OnDestroy {
 
         if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(this.evento.evento_Tipo_Id) 
             && alunosPresentesSemPaginaDefinida.length > 0 ) {
-            let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul>'
+            let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul class="pl-2 my-2">'
             alunosPresentesSemPaginaDefinida.forEach(item => {
-                mensagem += `<li class="flex align-items-center">${item.aluno}: `
-                if (item.numeroPaginaAH == 0) 
-                    mensagem += `- Página AH: ${item.numeroPaginaAH}  <i class="pi pi-times-circle text-red-500"></i>`;
-                else 
-                    mensagem += `- Página AH: ${item.numeroPaginaAH}  <i class="pi pi-check-circle text-green-500"></i>`;
+                mensagem += `<li class="flex align-items-center flex-wrap white-space-nowrap gap-2"> `
+                mensagem += `<p>${item.aluno}:</p>`
+                mensagem += `- Pag. AH: ${item.numeroPaginaAH} `;
+                mensagem += `- Pag. Ábaco: ${item.numeroPaginaAbaco} `;
+                mensagem += '</li>';
 
-                if (item.numeroPaginaAbaco == 0) 
-                    mensagem += `- Página Ábaco: ${item.numeroPaginaAbaco}  <i class="pi pi-times-circle text-red-500"></i>`;
-                else 
-                    mensagem += `- Página Ábaco: ${item.numeroPaginaAbaco}  <i class="pi pi-check-circle text-green-500"></i>`;
-
-                    mensagem += '</li>';
                     
                 })
             mensagem += '</ul>';
@@ -349,7 +338,7 @@ export class EventoComponent implements OnDestroy {
     async finalizar(e: any) {
         this.loading = true
 
-        let response: RequestResponse = await lastValueFrom(this.request())
+        let response: RequestResponse = await this.request()
             .catch(res => {
                 this.loading = false;
                 return res
@@ -479,7 +468,7 @@ export class EventoComponent implements OnDestroy {
 
      send(e: any) {
         this.loading = true
-        lastValueFrom(this.request())
+        this.request()
             .then((res) => {
                 this.service.calendarioReload.emit(res.object.id)
                 this.evento.id = res.object.id
@@ -501,79 +490,8 @@ export class EventoComponent implements OnDestroy {
     }
 
     request() {
-        this.evento.data = new Date(this.evento.data)
-        switch (this.evento.evento_Tipo_Id) {
-            case EventoTipo.Aula:
-                return this.requestAulaTurma()
-            case EventoTipo.AulaZero:
-                return this.requestAula0()
-            case EventoTipo.TurmaExtra:
-                return this.requestAulaExtra()
-            case EventoTipo.Superacao:
-                return this.requestSuperacao()
-            case EventoTipo.Reuniao:
-                return this.requestReuniao()
-            case EventoTipo.Oficina:
-                return this.requestOficina()
-            default:
-                return this.requestAulaTurma()
-        }
-    }
-
-    requestAulaTurma() {
-        let request: EventoAulaRequest = MyMap(this.evento, new EventoAulaRequest())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = this.evento.professor_Id ? [this.evento.professor_Id] : [];
-        request.perfilCognitivo = this.evento.perfilCognitivo.map((x) => x.id)
-
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createAulaTurma(request)
-        return this.service.editAulaTurma(request)
-    }
-
-    requestAula0() {
-        let request = MyMap(this.evento, new EventoAula0Request())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = [this.evento.professor_Id]
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createAula0(request)
-        return this.service.editAula0(request)
-    }
-
-    requestAulaExtra() {
-        let request = MyMap(this.evento, new EventoTurmaExtraRequest())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = [this.evento.professor_Id]
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createAulaExtra(request)
-        return this.service.editAulaExtra(request)
-    }
-
-    requestSuperacao() {
-        let request = MyMap(this.evento, new EventoSuperacaoRequest())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = [this.evento.professor_Id]
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createSuperacao(request)
-        return this.service.editSuperacao(request)
-    }
-
-    requestReuniao() {
-        let request = MyMap(this.evento, new EventoReuniaoRequest())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = this.evento.professores.map((x) => x.professor_Id)
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createReuniao(request)
-        return this.service.editReuniao(request)
-    }
-
-    requestOficina() {
-        let request = MyMap(this.evento, new EventoOficinaRequest())
-        request.alunos = this.evento.alunos.map((x) => x.aluno_Id)
-        request.professores = [this.evento.professor_Id]
-        if (this.evento.id == PseudoEvento.EventoId)
-            return this.service.createOficina(request)
-        return this.service.editOficina(request)
+        let evento = this.evento;
+        return this.calendarioUtils.request(evento);
     }
 
     buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {

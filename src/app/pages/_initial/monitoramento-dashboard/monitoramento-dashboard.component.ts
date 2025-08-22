@@ -73,7 +73,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
 
     onLoading() {
         this.loading = true;
-        var index = -1;
+        let index = -1;
         this.mesesAno = Array.from({ length: 12 }, (v, i) => {
             index++;
             return {
@@ -107,8 +107,8 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
         this.onLoading();
 
         setTimeout(() => {
-            var container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;
-            var tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
+            let container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;
+            let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
             container.scrollLeft = tr.offsetLeft - tr.offsetWidth;
         }, 2000);
 
@@ -122,10 +122,25 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
 
                 // Seta meses do ano
                 this.mesesAno = this.meses.map((mesString, index) => {
-                    var mes = new Dashboard_Mes;
+                    let mes = new Dashboard_Mes;
                     mes.mes = index;
                     mes.mesString = mesString;
-                    mes.roteiros = res.roteiros.filter(x => moment(x.dataInicio).month() == index);
+                    mes.roteiros = res.roteiros.filter(x => {
+                        // return moment(x.dataInicio).month() == index;
+                        let ehDoMes = moment(x.dataInicio).month() == index;
+
+                        let ehInicioDoAno = moment(x.dataInicio).month() == 12 
+                                            && moment(x.dataInicio).year() == this.request.ano - 1;
+                        let ehFimDoAno = moment(x.dataInicio).month() == 12 
+                                            && moment(x.dataFim).year() == this.request.ano + 1;
+
+                        return ehDoMes 
+                            && x.semana > 0 
+                            // || (!ehDoMes && ehInicioDoAno && !ehFimDoAno)
+                            // || (!ehDoMes && !ehInicioDoAno && ehFimDoAno)
+                    });
+
+                    mes.roteiros.sort((x,y) => moment(x.dataInicio).toDate().getTime() - moment(y.dataInicio).toDate().getTime())
                     return mes;
                 });
 
@@ -137,7 +152,7 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     }
 
     enviarMensagem(aluno: Dashboard_Aluno) {
-        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
@@ -188,7 +203,11 @@ export class MonitoramentoDashboardComponent implements AfterViewInit {
     
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Aula_Participacao, event: any) {
         this.selectedAulaComponent.aluno = aluno;
-        this.selectedAulaComponent.item = item;
+        this.selectedAulaComponent.participacao = item;
         this.selectedAulaComponent.show(event);
+    }
+
+    alunoVigente(item: Dashboard_Aula_Participacao, aluno: Dashboard_Aluno) {
+
     }
 }

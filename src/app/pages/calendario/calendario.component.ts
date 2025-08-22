@@ -30,6 +30,7 @@ import $ from 'jquery';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
+import { SalaAulaId } from '../../models/sala-aula.model';
 
 @Component({
     selector: 'app-calendario',
@@ -564,15 +565,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     requestAulaTurma(evento: Evento) {
-        let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest);
-        request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
-        request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id);
-        request.sala_Id = request.sala_Id ?? 13 // online; 
-
-        if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createAulaTurma(request));
-        return lastValueFrom(this.service.editAulaTurma(request));
+        return this.calendarioUtils.requestAulaTurma(evento);
     }
 
 
