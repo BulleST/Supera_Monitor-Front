@@ -82,8 +82,10 @@
             <ng-template #subtitle>
                 <p class="flex align-items-center -mx-2 text-lg text-500">
                     <span><b>Turma: </b>{{ aluno.turma }} </span>
-                    <span class="w-1rem h-1rem inline-flex border-circle ml-2"
-                          [style]="{ backgroundColor: aluno.corLegenda }"></span>
+                    <app-legend-color [corLegenda]="aluno.corLegenda"
+                                      [professor_Id]="aluno.professor_Id"
+                                      [professor]="aluno.professor"
+                                      [turma_Id]="aluno.turma_Id"></app-legend-color>
                 </p>
             </ng-template>
             <section class="-mx-2 line-height-3">

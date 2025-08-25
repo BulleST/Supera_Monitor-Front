@@ -86,7 +86,9 @@
     <div class="flex" *ngIf="!loading">
         <div class="surface-50 border-round-2 column-gap-4 flex flex-column flex-wrap max-h-8rem mt-4 p-2 px-3">
             <div *ngFor="let item of legenda" class="my-1 flex align-items-center">
-                <div class="w-1rem h-1rem border-circle" [ngStyle]="{ backgroundColor: item.corLegenda }"></div>
+                
+                <app-legend-color [corLegenda]="item.corLegenda"
+                                  [professor]="item.label"></app-legend-color>
                 <span class="ml-2">{{item.label}}</span>
             </div>
         </div>

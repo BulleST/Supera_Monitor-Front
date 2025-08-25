@@ -64,7 +64,10 @@
                                                 </div>
                                                 <div class="flex align-items-center gap-2">
                                                     <div class="w-2rem pl-1 flex justify-content-center">
-                                                        <span class="w-1rem h-1rem border-circle flex " [style]="{ backgroundColor: item.corLegenda }"></span>
+                                                        <app-legend-color [corLegenda]="item.corLegenda"
+                                                                          [professor_Id]="item.professor_Id"
+                                                                          [professor]="item.professor"
+                                                                          [turma_Id]="item.turma_Id"></app-legend-color>
                                                     </div>
                                                     <span>{{item.turma}}</span>
                                                 </div>
@@ -99,7 +102,10 @@
                                     <div class="flex align-items-center gap-2 w-full">
                                         <i class="fa-solid fa-users-between-lines"></i>
                                         <p class="overflow-hidden text-overflow-ellipsis">Turma: {{aluno.turma}}</p>
-                                        <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></span>
+                                        <app-legend-color [corLegenda]="aluno.corLegenda"
+                                                          [professor_Id]="aluno.professor_Id"
+                                                          [professor]="aluno.professor"
+                                                          [turma_Id]="aluno.turma_Id"></app-legend-color>
                                     </div>
                                     <div class="flex align-items-center gap-2 w-full"> 
                                         <i class="fa-solid fa-brain"></i>
@@ -197,7 +203,10 @@
                                                     </div>
                                                     <p class="flex align-items-center gap-1 ml-2">
                                                         <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
-                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                                        <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                                          [professor_Id]="selectedOption.professor_Id"
+                                                                          [professor]="selectedOption.professor"
+                                                                          [turma_Id]="selectedOption.turma_Id"></app-legend-color>
                                                     </p>
                                                 </div>
                                             </ng-container>
@@ -217,7 +226,10 @@
                                                 <div class="flex flex-column" >
                                                     <p class="flex align-items-center gap-2 py-1">
                                                         <span>{{item.turma ?? item.descricao}}</span>
-                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                        <app-legend-color [corLegenda]="item.corLegenda"
+                                                                          [professor_Id]="item.professor_Id"
+                                                                          [professor]="item.professor"
+                                                                          [turma_Id]="item.turma_Id"></app-legend-color>
                                                     </p>
                                                     <p class="flex align-items-center gap-2 py-1">
                                                         <span class="">Sala: </span>
@@ -285,7 +297,10 @@
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
                                                 <p class="overflow-hidden text-overflow-ellipsis">Turma: {{eventoReposicaoDe.turma}}</p>
-                                                <span class="inline-flex w-1rem h-1rem border-circle flex-none" [style]="{ backgroundColor: eventoReposicaoDe.corLegenda, borderColor: eventoReposicaoDe.corLegenda }"></span>
+                                                <app-legend-color [corLegenda]="eventoReposicaoDe.corLegenda"
+                                                                  [professor_Id]="eventoReposicaoDe.professor_Id"
+                                                                  [professor]="eventoReposicaoDe.professor"
+                                                                  [turma_Id]="eventoReposicaoDe.turma_Id"></app-legend-color>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">
@@ -435,7 +450,10 @@
                                                     </div>
                                                     <p class="flex align-items-center gap-1 ml-2">
                                                         <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
-                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                                        <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                                          [professor_Id]="selectedOption.professor_Id"
+                                                                          [professor]="selectedOption.professor"
+                                                                          [turma_Id]="selectedOption.turma_Id"></app-legend-color>
                                                     </p>
                                                 </div>
                                             </ng-container>
@@ -455,7 +473,10 @@
                                                 <div class="flex flex-column" >
                                                     <p class="flex align-items-center gap-2">
                                                         <span>{{item.turma ?? item.descricao}}</span>
-                                                        <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                        <app-legend-color [corLegenda]="item.corLegenda"
+                                                                          [professor_Id]="item.professor_Id"
+                                                                          [professor]="item.professor"
+                                                                          [turma_Id]="item.turma_Id"></app-legend-color>
                                                     </p>
                                                     <p class="flex align-items-center gap-2">
                                                         <span class="">Sala: </span>
@@ -520,7 +541,10 @@
                                                     <i class="fa-solid fa-users-between-lines text-base"></i>
                                                 </div>
                                                 <p class="overflow-hidden text-overflow-ellipsis">Turma: {{eventoReposicaoPara.turma}}</p>
-                                                <span class="inline-flex w-1rem h-1rem border-circle" [style]="{ backgroundColor: eventoReposicaoPara.corLegenda, borderColor: eventoReposicaoPara.corLegenda }"></span>
+                                                <app-legend-color [corLegenda]="eventoReposicaoPara.corLegenda"
+                                                                  [professor_Id]="eventoReposicaoPara.professor_Id"
+                                                                  [professor]="eventoReposicaoPara.professor"
+                                                                  [turma_Id]="eventoReposicaoPara.turma_Id"></app-legend-color>
                                             </div>
                                         </div>
                                         <div class="md:col-5 sm:col-6 col-12 py-1">

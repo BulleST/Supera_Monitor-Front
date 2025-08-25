@@ -106,7 +106,9 @@
         <ng-template #body let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td>
-                    <span class="w-1rem h-1rem flex border-circle" [style]="{ backgroundColor: item.corLegenda ?? 'black' }"></span>
+                    <app-legend-color [corLegenda]="item.corLegenda"
+                                      [professor_Id]="item.id"
+                                      [professor]="item.nome"></app-legend-color>
                 </td>
                 <td>{{ item.nome }}</td>
                 <td>{{ item.email }}</td>

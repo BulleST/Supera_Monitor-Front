@@ -37,7 +37,6 @@
                             severity="contrast"
                             pTooltip="Atualizar monitoramento"
                             tooltipPosition="top"
-                            size="small"
                             styleClass="border-4" />
 
                 <p-button label="Ver filtros"
@@ -147,8 +146,13 @@
                 </div>
             </td>
             <td class="white-space-nowrap px-2 py-1 ">
-                <span class="w-1rem h-1rem inline-flex border-circle mr-2" [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></span>
-                <span>{{aluno.turma}}</span>
+                <div class="flex align-items-center gap-2">
+                    <app-legend-color [corLegenda]="aluno.corLegenda"
+                                      [professor_Id]="aluno.professor_Id"
+                                      [professor]="aluno.professor"
+                                      [turma_Id]="aluno.turma_Id"></app-legend-color>
+                    <span>{{aluno.turma}}</span>
+                </div>
             </td>
             <ng-container *ngIf="aluno.aulas.length == 0">
                 <ng-container *ngFor="let mes of mesesAno">
@@ -190,7 +194,9 @@
                                     aluno: aluno
                             }"></ng-container> -->
 
-                        
+                        <ng-container *ngIf="item.show == false">
+                            <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                        </ng-container>
                         <ng-container *ngIf="item.show == true">
                             <div (click)="showAula(aluno, item, $event)" class="flex align-items-stretch w-full h-full cursor-pointer">
                                 <div class="flex flex-column max-w-full w-max h-full flex-none">
@@ -199,8 +205,12 @@
                                     {
                                         <div class="event-status surface-800 border-800">
                                             <span>Cancelada</span>
-                                            <i *ngIf="!item.participacao.alunoContactado " class="pi pi-times text-white" ></i>
-                                            <i *ngIf="item.participacao.alunoContactado " class="pi pi-check text-white" ></i>
+                                            <ng-container *ngIf="item.participacao.alunoContactado">
+                                                <i class="pi pi-check text-xs text-white" pTooltip="Aluno contatado: clique para ver mais" ></i>
+                                            </ng-container>
+                                            <ng-container *ngIf="!item.participacao.alunoContactado">
+                                                <i class="pi pi-times text-xs text-white" pTooltip="Aluno não contatado: clique para ver mais"></i>
+                                            </ng-container>
                                         </div>
                                         <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                     }

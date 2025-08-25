@@ -32,7 +32,11 @@
                             <p class="font-bold">{{ item.nome }}</p>
                             <div class="flex align-items-center justify-content-between">
                                 <p class="text-sm">
-                                    <span class="w-1rem h-1rem inline-flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                    
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [professor]="item.professor"
+                                                      [turma_Id]="item.id"></app-legend-color>
                                     <span>{{ item.professor }}</span>
                                 </p>
                             </div>
@@ -64,7 +68,10 @@
                     <div class="flex align-items-center justify-content-between w-full gap-2">
                         <div>
                             <p class="font-bold mb-1 flex align-items-center ">
-                                <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.id"
+                                                      [professor]="item.nome"></app-legend-color>
                                 <span class="mr-2">{{ item.nome }}</span>
                             </p>
                             <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
@@ -111,7 +118,11 @@
                             <span class="w-2rem h-2rem p-2 inline-flex align-itens-center mr-1">
                                 <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
                                 <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
-                                    <span class="w-1rem h-1rem border-circle inline-flex" [style]="{ backgroundColor: corLegenda, borderColor: corLegenda }"></span>
+                                    
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [professor]="item.professor"
+                                                      [turma_Id]="item.turma_Id"></app-legend-color>
                                 </ng-template>
                             </span>
                             <span>Turma: {{ item.turma }}</span>

@@ -3,21 +3,63 @@
            styleClass="-mt-1"
            appendTo="body">
     <ng-container *ngIf="aluno && participacao">
-        <div style="width: 18rem;">
-            <!-- Cancelada -->
-            <ng-container *ngIf="!participacao.aula.active && !participacao.aula.reagendamentoPara_Evento_Id">
-                <p class="surface-800 text-base text-white py-1 px-2">
-                    <i class="pi pi-times mr-2"></i>
-                    <span>Aula Cancelada</span>
-                </p>
-            </ng-container>
-            <!-- Reposição -->
-            <ng-container *ngIf="participacao.participacao.reposicaoPara_Evento_Id && participacao.participacao.reposicaoPara_Evento">
-                <p class="bg-purple-600 text-base text-white py-1 px-2">
-                    <i class="pi pi-exclamation-triangle mr-2"></i>
-                    <span>Reposição da aula do dia {{participacao.participacao.reposicaoPara_Evento.data | date : 'dd/MM \'às\' HH\'h\'mm'}}</span>
-                </p>
-            </ng-container>
+        <div style="width: 20rem;">
+
+            <p class="mb-2">
+                <!-- Cancelada -->
+                @if (!participacao.aula.active && !participacao.participacao.reposicaoPara_Evento_Id) 
+                {
+                    <p-tag value="Aula Cancelada"
+                        styleClass="surface-800 border-800 text-white"/>
+                }
+                <!-- Reposicao -->
+                @else if (participacao.participacao.reposicaoPara_Evento_Id) 
+                {
+                    <p-tag value="Reposição agendada"
+                        styleClass="bg-purple-600 border-purple-600 text-white"/>
+                }
+                <!-- Falta Na Reposição -->
+                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === false && participacao.participacao.reposicaoDe_Evento_Id) 
+                {
+                    <p-tag value="Faltou na repoosição"
+                        styleClass="bg-blue-500 border-blue-500 text-white"/>
+                }
+                <!-- Falta na Aula -->
+                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === false && !participacao.participacao.reposicaoDe_Evento_Id) 
+                {
+                    <p-tag value="Faltou"
+                        styleClass="bg-red-500 border-red-500 text-white"/>
+                }
+                <!-- Falta Agendada -->
+                @else if ( participacao.participacao.presente === false 
+                    && participacao.participacao.active === false 
+                    && !participacao.participacao.reposicaoDe_Evento_Id) 
+                {
+                    <p-tag value="Falta Agendada"
+                        styleClass="bg-red-500 border-red-500 text-white"/>
+                }
+                <!-- Presente na Reposição -->
+                @else if (participacao.aula.finalizado === true 
+                    && participacao.participacao.presente === true 
+                    && participacao.participacao.reposicaoDe_Evento_Id) 
+                {
+                    <p-tag value="Presente na reposição"
+                        styleClass="bg-green-300 border-green-300 text-green-700"/>
+                }
+                <!-- Presente -->
+                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === true && !participacao.participacao.reposicaoDe_Evento_Id) 
+                {
+                    <p-tag value="Presente"
+                        styleClass="bg-green-500 border-green-500 text-white"/>
+                }
+                @else 
+                {
+                    
+                    <p-tag value="Aula"
+                        styleClass="surface-200 border-200 text-white"/>
+                }
+            </p>
+        
             <p-badge *ngIf="aluno.primeiraAula_Id == participacao.aula.id"
                      styleClass=" bg-pink-500 border-pink-500"
                      value="Aula 1"
@@ -43,7 +85,7 @@
             <ng-container *ngIf="participacao.aula.professor">
                 <p class="flex align-items-center gap-2">
                     <i class="fa fa-person-chalkboard flex w-1rem justify-content-center"></i>
-                    <span class="">Professor: </span>
+                    <span class="">Educador: </span>
                     <span>{{participacao.aula.professor}}</span>
                     <app-legend-color [corLegenda]="participacao.aula.corLegenda"
                         [professor_Id]="participacao.aula.professor_Id"
@@ -51,12 +93,12 @@
                 </p>
             </ng-container>
             <div class="my-2">
-                <p>Observações: </p>
-                <div class="max-w-15rem max-h-15rem white-space-normal overflow-hidden text-overflow-ellipsis">
-                    <p *ngIf="participacao.aula.observacao" [innerHTML]="participacao.aula.observacao"></p>
-                    <p *ngIf="participacao.participacao.observacao" [innerHTML]="participacao.participacao.observacao"></p>
-                    <p *ngIf="!participacao.aula.observacao && !participacao.participacao.observacao" class="text-500">Nenhuma observação </p>
-                </div>
+                <p>
+                    <span class="font-bold">Observações: </span>
+                    <span *ngIf="participacao.aula.observacao" [innerHTML]="participacao.aula.observacao"></span>
+                    <span *ngIf="participacao.participacao.observacao" [innerHTML]="participacao.participacao.observacao"></span>
+                    <span *ngIf="!participacao.aula.observacao && !participacao.participacao.observacao" class="text-500">Nenhuma observação </span>
+                </p>
             </div>
             <div class="flex align-items-center gap-2">
                 <p-button label="Fechar"
@@ -79,10 +121,11 @@
                         <div class="text-white -mr-2 text-center text-base">Opções</div>
                     </ng-template>
                     <ng-template let-item #item>
-                        <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
-                            <i [class]="item.icon"></i>
-                            <a class="ml-2">{{ item.label }}</a>
-                        </div>
+                       
+                            <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                                <i [class]="item.icon"></i>
+                                <a [routerLink]="item.routerLink" class="ml-2">{{ item.label }}</a>
+                            </div>
                     </ng-template>
                 </p-select>
             </div>

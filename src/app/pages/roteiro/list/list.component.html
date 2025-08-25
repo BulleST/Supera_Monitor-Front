@@ -72,10 +72,17 @@
                     <div class="py-1 cursor-pointer"
                          (click)="edit(evento)"
                          title="Clique para ver mais">
-                        <p class="text-sm">
-                            <i class="pi pi-calendar mr-2 text-sm"></i>
-                            <span>Semana {{evento.semana}}</span>
-                        </p>
+                         <ng-container *ngIf="evento.recesso">
+                             <p class="text-sm">
+                                 <span>Recesso</span>
+                             </p>
+                         </ng-container>
+                         <ng-container *ngIf="!evento.recesso">
+                             <p class="text-sm">
+                                 <i class="pi pi-calendar mr-2 text-sm"></i>
+                                 <span>Semana {{evento.semana}}</span>
+                             </p>
+                         </ng-container>
                         <p class="text-xl font-bold">{{evento.tema}}</p>
                     </div>
                 </ng-container>

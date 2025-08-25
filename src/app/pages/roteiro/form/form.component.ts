@@ -11,6 +11,7 @@ import { NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
 import { FileSelectEvent } from 'primeng/fileupload';
 import { PrimeNG } from 'primeng/config';
+import { getRandomColor } from '../../../utils/ramdom-color';
 
 @Component({
     selector: 'app-form',
@@ -184,6 +185,15 @@ export class FormComponent implements OnDestroy {
                 this.send(e)
             }
         })
+    }
+
+    recessoChanged() {
+        if (this.object.recesso) {
+            this.object.corLegenda = '#ff0000'
+        } 
+        else {
+            this.object.corLegenda = getRandomColor();
+        }
     }
 
 

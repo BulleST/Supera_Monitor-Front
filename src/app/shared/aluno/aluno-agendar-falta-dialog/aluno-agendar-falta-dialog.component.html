@@ -70,7 +70,10 @@
                                     </div>
                                     <div class="flex align-items-center gap-2">
                                         <div class="w-2rem pl-1 flex justify-content-center">
-                                            <span class="w-1rem h-1rem border-circle flex " [style]="{ backgroundColor: item.corLegenda }"></span>
+                                            <app-legend-color [corLegenda]="item.corLegenda"
+                                                              [professor_Id]="item.professor_Id"
+                                                              [professor]="item.professor"
+                                                              [turma_Id]="item.turma_Id"></app-legend-color>
                                         </div>
                                         <span>{{item.turma}}</span>
                                     </div>
@@ -144,7 +147,10 @@
                                                         <i class="fa-solid fa-users-between-lines text-base"></i>
                                                     </div>
                                                     <p class="overflow-hidden text-overflow-ellipsis">Turma: {{evento.turma}}</p>
-                                                    <span class="inline-flex w-1rem h-1rem border-circle flex-none" [style]="{ backgroundColor: evento.corLegenda, borderColor: evento.corLegenda }"></span>
+                                                    <app-legend-color [corLegenda]="evento.corLegenda"
+                                                                      [professor_Id]="evento.professor_Id"
+                                                                      [professor]="evento.professor"
+                                                                      [turma_Id]="evento.turma_Id"></app-legend-color>
                                                 </div>
                                             </div>
                                             <div class="col-12 py-1">

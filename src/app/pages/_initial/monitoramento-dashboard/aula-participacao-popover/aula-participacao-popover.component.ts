@@ -29,6 +29,9 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     menuItems: MenuItem[] = [];
     menuOptionsValue: any;
 
+    eventoEncryptedId: string = '';
+    alunoEncryptedId: string = '';
+
     constructor(
         private router: Router,
         private crypto: Crypto,
@@ -41,8 +44,14 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['item']) this.participacao = changes['item'].currentValue;
-        if (changes['aluno']) this.aluno = changes['aluno'].currentValue;
+        if (changes['item']) {
+            this.participacao = changes['item'].currentValue;
+            this.eventoEncryptedId = this.crypto.encrypt(this.participacao.aula.id) as string;
+        }
+        if (changes['aluno']) {
+            this.aluno = changes['aluno'].currentValue;
+            this.alunoEncryptedId = this.crypto.encrypt(this.aluno.id) as string;
+        }
         this.loadMenuItems();
     }
 
@@ -72,6 +81,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             label: 'Ver aula',
             icon: 'pi pi-search order-1 text-primary-500 ',
             styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100 -mx-2',
+            routerLink: 'calendario/aula/' + this.eventoEncryptedId,
             command: () => this.goToAula(),
         })
 
@@ -115,8 +125,20 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
 
-    goToAula() {
+    async goToAula() {
 
+        let evento: Evento;
+        let participacao = this.participacao;
+        if (participacao.aula.id == PseudoEvento.EventoId) {
+            let turma_Id = participacao.aula.turma_Id!;
+            let data = moment(participacao.aula.data).format('YYYY-MM-DDTHH:mm:ss')
+            evento = await lastValueFrom(this.service.getPseudoAula(turma_Id, data as any))
+        }
+        else {
+            evento = await lastValueFrom(this.service.get(participacao.aula.id))
+        }
+
+        this.service.setEvento(evento);
     }
 
     async goToAgendarFalta() {

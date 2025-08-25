@@ -86,6 +86,7 @@ export class Dashboard_Roteiro {
     dataInicio: Date = new Date;
     dataFim: Date = new Date;
     corLegenda: string = '';
+    recesso: boolean = false; 
 }
 
 export class Dashboard_Aluno {

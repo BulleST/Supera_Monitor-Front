@@ -48,7 +48,8 @@
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
-            <div class="field col-6"> <!-- Data -->
+             <!-- Data -->
+            <div class="field col-6">
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #_data="ngModel"
@@ -73,7 +74,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Horário -->
+             <!-- Horário -->
+            <div class="field col-6">
                 <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker inputId="horario"
                               name="horario"
@@ -97,7 +99,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_horario.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Educador -->
+             <!-- Educador -->
+            <div class="field col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
@@ -120,9 +123,11 @@
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
-                                <p class="font-bold mb-1 flex align-items-center ">
-                                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
-                                    <span class="mr-2">{{ item.nome }}</span>
+                                <p class="font-bold mb-1 flex align-items-center gap-2">
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.id"
+                                                      [professor]="item.nome"></app-legend-color>
+                                    <span>{{ item.nome }}</span>
                                     <p-badge *ngIf="item.disponivel == false"
                                              value="Indisponível"
                                              severity="danger"
@@ -149,7 +154,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Sala -->
+             <!-- Sala -->
+            <div class="field col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="salaAulas"
@@ -195,7 +201,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['restricaoMobilidade']">{{sala_Id.errors['restricaoMobilidade']}}</p>
                 </div>
             </div>
-            <div class="field col-12"> <!-- Aluno -->
+             <!-- Aluno -->
+            <div class="field col-12">
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-multiselect [options]="alunos"
                                [loading]="loadingAlunos || loadingEventos"

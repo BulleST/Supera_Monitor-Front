@@ -66,7 +66,10 @@
                                             </div>
                                             <p class="flex align-items-center gap-1 ml-2">
                                                 <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
-                                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda, borderColor: selectedOption.corLegenda }"></span>
+                                                <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                                  [professor_Id]="selectedOption.professor_Id"
+                                                                  [professor]="selectedOption.professor"
+                                                                  [turma_Id]="selectedOption.turma_Id"></app-legend-color>
                                             </p>
                                         </div>
                                     </ng-container>
@@ -86,7 +89,10 @@
                                         <div class="flex flex-column w-full">
                                             <p class="flex align-items-center gap-2 py-1">
                                                 <span>{{item.turma ?? item.descricao}}</span>
-                                                <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                                <app-legend-color [corLegenda]="item.corLegenda"
+                                                                  [professor_Id]="item.professor_Id"
+                                                                  [professor]="item.professor"
+                                                                  [turma_Id]="item.turma_Id"></app-legend-color>
                                             </p>
                                             <p class="flex align-items-center gap-2 py-1">
                                                 <span class="">Sala: </span>
@@ -239,7 +245,9 @@
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
                                 <p class="font-bold mb-1 flex align-items-center ">
-                                    <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.id"
+                                                      [professor]="item.nome"></app-legend-color>
                                     <span class="mr-2">{{ item.nome }}</span>
                                     <p-badge *ngIf="item.disponivel === false"
                                              value="Indisponível"
@@ -558,7 +566,10 @@
         <div class="flex align-items-center gap-2">
             <!-- Cor legenda -->
             <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
-                <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+                <app-legend-color [corLegenda]="item.corLegenda"
+                                  [professor_Id]="item.professor_Id"
+                                  [professor]="item.professor"
+                                  [turma_Id]="item.turma_Id"></app-legend-color>
             </div>
             <!-- Turma -->
             <p [pTooltip]="'Turma: ' + item.turma">
@@ -577,7 +588,10 @@
             </p>
             <p>{{item.eventoReposicaoEmAndamento.descricao}}</p>
             <p *ngIf="item.eventoReposicaoEmAndamento.professor">
-                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.eventoReposicaoEmAndamento.corLegenda, borderColor: item.eventoReposicaoEmAndamento.corLegenda }"></span>
+                <app-legend-color [corLegenda]="item.eventoReposicaoEmAndamento.corLegenda"
+                                  [professor_Id]="item.eventoReposicaoEmAndamento.professor_Id"
+                                  [professor]="item.eventoReposicaoEmAndamento.professor"
+                                  [turma_Id]="item.eventoReposicaoEmAndamento.turma_Id"></app-legend-color>
                 <span>{{item.eventoReposicaoEmAndamento.professor}}</span>
             </p>
             <p *ngIf="item.eventoReposicaoEmAndamento.turma && item.eventoReposicaoEmAndamento.turma != item.eventoReposicaoEmAndamento.descricao"> {{item.eventoReposicaoEmAndamento.turma}} </p>

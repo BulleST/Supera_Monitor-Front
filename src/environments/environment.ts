@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  url: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back',
-//   url: 'https://localhost:7281/back',
+  // url: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back',
+  url: 'https://localhost:7281/back',
 };
 

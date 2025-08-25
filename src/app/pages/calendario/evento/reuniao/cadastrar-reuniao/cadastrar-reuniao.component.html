@@ -318,19 +318,13 @@
     <div class="cursor-pointer">
         <div class="flex align-items-center gap-2">
             <!-- Whatsapp -->
-            <!-- 
-                      (onClick)="enviarMensagem(item)"
-                      (auxclick)="enviarMensagem(item)"
-                      (contextmenu)="enviarMensagem(item)" -->
-                <span class="w-1rem h-1rem border-circle flex" pTooltip="{{item.professor}}" [style]="{ backgroundColor: item.corLegenda, borderColor: item.corLegenda }"></span>
+            
+                <app-legend-color [corLegenda]="item.corLegenda"
+                                    [professor_Id]="item.professor_Id"
+                                    [professor]="item.professor"></app-legend-color>
             <!-- Nome -->
             <p class="mr-2">{{ item.nome }}</p>
-            <!-- <p-button type="button"
-                      [disabled]="!item.telefone"
-                      icon="pi pi-whatsapp {{!item.telefone ? 'text-300' : ''}}"
-                      severity="success"
-                      [text]="true" 
-                      size="small"/> -->
+           
             <p-tag *ngIf="item.eventoReposicaoEmAndamento"
                    value="{{item.eventoReposicaoEmAndamento.data | date : 'dd/MMMM HH:mm'}}"
                    icon="pi pi-calendar"
@@ -353,7 +347,10 @@
             </p>
             <p>{{item.eventoReposicaoEmAndamento.descricao}}</p>
             <p *ngIf="item.eventoReposicaoEmAndamento.professor">
-                <span class="w-1rem h-1rem border-circle inline-flex mr-2" [style]="{ backgroundColor: item.eventoReposicaoEmAndamento.corLegenda, borderColor: item.eventoReposicaoEmAndamento.corLegenda }"></span>
+                <app-legend-color [corLegenda]="item.corLegenda"
+                                  [professor_Id]="item.professor_Id"
+                                  [professor]="item.professor"
+                                  [turma_Id]="item.turma_Id"></app-legend-color>
                 <span>{{item.eventoReposicaoEmAndamento.professor}}</span>
             </p>
             <p *ngIf="item.eventoReposicaoEmAndamento.turma && item.eventoReposicaoEmAndamento.turma != item.eventoReposicaoEmAndamento.descricao"> {{item.eventoReposicaoEmAndamento.turma}} </p>

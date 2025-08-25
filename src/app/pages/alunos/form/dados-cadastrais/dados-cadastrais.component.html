@@ -469,7 +469,10 @@
                         <div class="w-full">
                             <div class="flex align-items-center justify-content-between gap-3">
                                 <p class="flex align-items-center">
-                                    <span class="w-1rem h-1rem flex mr-1 border-circle" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [professor]="item.professor"
+                                                      [turma_Id]="item.id"></app-legend-color>
                                     <span>{{ item.nome }}</span>
                                 </p>
                                 <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
@@ -487,7 +490,10 @@
                 <label for="professor">Educador: </label>
                 <p-iconfield>
                     <p-inputicon *ngIf="selectedTurma">
-                        <span class="w-1rem h-1rem inline-flex mr-2 border-circle" [style]="{ backgroundColor: selectedTurma.corLegenda}"></span>
+                        <app-legend-color [corLegenda]="selectedTurma.corLegenda"
+                                          [professor_Id]="selectedTurma.professor_Id"
+                                          [professor]="selectedTurma.professor"
+                                          [turma_Id]="selectedTurma.id"></app-legend-color>
                     </p-inputicon>
                     <input type="text"
                            pInputText

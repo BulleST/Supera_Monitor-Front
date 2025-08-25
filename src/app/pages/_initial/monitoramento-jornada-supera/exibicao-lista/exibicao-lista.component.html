@@ -139,13 +139,12 @@
                 </div>
             </td>
             <td class="white-space-nowrap fadein">
-                <div class="flex aliign-items-center">
-                    <span class="w-1rem h-1rem inline-flex border-circle flex-none mr-2"
-                          [pTooltip]="aluno.professor"
-                          [style]="{ 
-                                backgroundColor: aluno.corLegenda, 
-                                borderColor: aluno.corLegenda 
-                            }"></span>
+                <div class="flex align-items-center gap-2">
+                    <app-legend-color [corLegenda]="aluno.corLegenda"
+                                      [professor_Id]="aluno.professor_Id"
+                                      [professor]="aluno.professor"
+                                      [turma_Id]="aluno.turma_Id"></app-legend-color>
+                    
                     <span>{{aluno.turma}}</span>
                 </div>
             </td>

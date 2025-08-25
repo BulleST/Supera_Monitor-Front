@@ -112,7 +112,10 @@
         <ng-template #body let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td>
-                    <span class="w-1rem h-1rem flex border-circle" [ngStyle]="{ backgroundColor: item.corLegenda ?? 'black' }"></span>
+                    <app-legend-color [corLegenda]="item.corLegenda"
+                                      [professor_Id]="item.professor_Id"
+                                      [professor]="item.professor"
+                                      [turma_Id]="item.id"></app-legend-color>
                 </td>
                 <td>{{item.nome}}</td>
                 <td>{{item.professor}}</td>

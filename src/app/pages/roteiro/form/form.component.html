@@ -46,7 +46,8 @@
     </ng-template>
     <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
         <div class="formgrid grid">
-            <div class="field col-12"> <!-- Tema -->
+            <!-- Tema -->
+            <div class="field col-12">
                 <label for="tema">Tema: <span class="text-red-500">*</span></label>
                 <input type="text"
                        pInputText
@@ -60,7 +61,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="tema.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field sm:col-3 col-12"> <!-- Início -->
+            <!-- Início -->
+            <div class="field sm:col-3 col-12"> 
                 <label for="dataInicio">Início: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataInicio="ngModel"
@@ -84,7 +86,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicio.errors['invalid']">{{dataInicio.errors['invalid']}}</p>
                 </div>
             </div>
-            <div class="field sm:col-3 col-12"> <!-- Fim -->
+            <!-- Fim -->
+            <div class="field sm:col-3 col-12"> 
                 <label for="dataFim">Fim: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #dataFim="ngModel"
@@ -107,8 +110,9 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataFim.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col"> <!-- Semana -->
-                <label for="semana">Semana: <span class="text-red-500">* </span> <!-- <small> (calculado automaticamente)</small> --> </label>
+            <!-- Semana -->
+            <div class="field col"> 
+                <label for="semana">Semana: <span class="text-red-500">* </span> </label>
                 <input type="text"
                        pInputText
                        prefix="Semana "
@@ -120,36 +124,43 @@
                        name="semana"
                        class="w-full"
                        [required]="true">
-                <!-- <p-inputmask 
-                       id="semana"
-                       name="semana" 
-                       #semana="ngModel" 
-                       [(ngModel)]="object.semana" 
-                       mask="[Semana] 9*"
-                       class="w-full" /> -->
                 <div *ngIf="semana.touched && semana.invalid && semana.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="semana.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
+            <!-- Legenda -->
             <div class="px-2 col-12"><p-divider layout="horizontal" /></div>
-            <div class="field col-12 mt-2 "> <!-- Legenda -->
-                <div class="flex align-items-center justify-content-start">
+            <div class="field col-12 mt-2 ">
+                <div class="flex align-items-center justify-content-start gap-2">
                     <label for="corLegenda">Legenda:</label>
-                    <!-- <div class="flex align-items-center my-3 mt-2 -ml-2">
-                    </div> -->
                     <p-colorpicker
                                    #corLegenda="ngModel"
                                    [(ngModel)]="object.corLegenda"
                                    inputId="corLegenda"
                                    name="corLegenda"
                                    appendTo="body"
-                                   styleClass="ml-2"
                                    [required]="true"
-                                   value="#ffffff" />
-                    <span class="ml-2">{{object.corLegenda}}</span>
-                    <span class="ml-2" *ngIf="!object.corLegenda">Selecione uma cor</span>
+                                   [disabled]="object.recesso"
+                                   styleClass="opacity-100"
+                                   inputStyleClass="opacity-100" />
+                    <span *ngIf="object.corLegenda">{{object.corLegenda}}</span>
+                    <span *ngIf="!object.corLegenda">Selecione uma cor</span>
+
+                    <p-checkbox 
+                        inputId="recesso"
+                        name="recesso"
+                        #recesso="ngModel"
+                        [(ngModel)]="object.recesso" 
+                        [binary]="true"
+                        (onChange)="recessoChanged()" />
+
+                    <label for="recesso">Recesso</label>
                 </div>
-                <p class="flex align-items-center text-sm mt-1"><i class="pi pi-exclamation-circle mr-2"></i> Obs.: Esse campo representa a cor utilizada para o professor na visão do calendário de aulas.</p>
+                <p class="flex align-items-center text-sm mt-1 gap-1">
+                        <i class="pi pi-exclamation-circle"></i> 
+                        <span>Obs.: Campo para visualização do tema</span> 
+                        <small class="text-red-500"> (vermelho caso recesso)</small>.
+                </p>
                 <div *ngIf="corLegenda.touched && corLegenda.invalid && corLegenda.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="corLegenda.errors['required']">Esse campo é obrigatório.</p>
                 </div>

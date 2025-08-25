@@ -179,7 +179,9 @@
                             <div *ngIf="selectedOption">
                                 <p class="font-bold mb-1 flex align-items-center ">
                                     <span class="mr-2">{{ selectedOption.nome }}</span>
-                                    <span class="w-1rem h-1rem border-circle flex" [style]="{ backgroundColor: selectedOption.corLegenda}"></span>
+                                    <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                      [professor_Id]="selectedOption.id"
+                                                      [professor]="selectedOption.nome"></app-legend-color>
                                 </p>
                             </div>
                         </ng-template>
@@ -187,7 +189,9 @@
                             <div class="flex align-items-center justify-content-between w-full gap-2">
                                 <div>
                                     <p class="font-bold mb-1 flex align-items-center ">
-                                        <span class="w-1rem h-1rem border-circle flex mr-2" [style]="{ backgroundColor: item.corLegenda }"></span>
+                                        <app-legend-color [corLegenda]="item.corLegenda"
+                                                          [professor_Id]="item.id"
+                                                          [professor]="item.nome"></app-legend-color>S
                                         <span class="mr-2">{{ item.nome }}</span>
                                         <p-badge *ngIf="item.disponivel == false"
                                                  value="Indisponível"

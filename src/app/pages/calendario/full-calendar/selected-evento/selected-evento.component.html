@@ -163,8 +163,10 @@
                                             <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}</p>
                                             <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}</p>
                                             <p *ngIf="participacao.reposicaoDe_Evento.professor">
-                                                <span class="inline-flex w-1rem h-1rem border-circle mr-2"
-                                                      [style]="{ backgroundColor: participacao.reposicaoDe_Evento.corLegenda }"></span>
+                                                <app-legend-color [corLegenda]="participacao.reposicaoDe_Evento.corLegenda"
+                                                                  [professor_Id]="participacao.reposicaoDe_Evento.professor_Id"
+                                                                  [professor]="participacao.reposicaoDe_Evento.professor"
+                                                                  [turma_Id]="participacao.reposicaoDe_Evento.turma_Id"></app-legend-color>
                                                 <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
                                             </p>
                                         </div>
@@ -218,8 +220,10 @@
                         [ngClass]="{
                             'text-red-500': evento.finalizado && professor.presente === false,
                         }">
-                            <span class="inline-flex w-1rem h-1rem border-circle mr-2"
-                                  [style]="{ backgroundColor: professor.corLegenda }"></span>
+                                    <app-legend-color [corLegenda]="professor.corLegenda"
+                                                      [professor_Id]="professor.id"
+                                                      [professor]="professor.nome"></app-legend-color>
+                           
                             <span class="">{{ professor.nome }}</span>
                             <span>
                                 <span *ngIf="evento.finalizado" class="ml-2">
@@ -251,7 +255,7 @@
                                           label="Inscrever Aluno"
                                           icon="pi pi-user-plus text-primary-500"
                                           [text]="true"
-                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
+                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos || evento.id != PseudoEvento.EventoId"
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
