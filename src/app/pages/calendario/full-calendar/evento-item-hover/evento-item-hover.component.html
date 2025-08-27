@@ -75,7 +75,12 @@
             <div class="event-footer">
                 <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                     <span class="event-alunos">
-                        <span>{{ alunosStr }}</span>
+                        <ng-container *ngIf="evento.alunos.length < 3">
+                            <span *ngFor="let aluno of evento.alunos" class="capitalize">{{ aluno.aluno | nameAbv }}</span>
+                        </ng-container>
+                        <ng-container *ngIf="evento.alunos.length > 2">
+                            <span *ngFor="let aluno of evento.alunos" class="capitalize">{{ aluno.aluno | firstWord }}</span>
+                        </ng-container>
                     </span>
                 </ng-container>
                 <!-- Se Cancelado -->

@@ -141,7 +141,6 @@
                                     </span>
 
                                     <div class="ml-auto">
-                                        
                                         <app-aluno-participacao-status 
                                             [evento]="evento" 
                                             [participacao]="participacao"></app-aluno-participacao-status>
@@ -163,31 +162,30 @@
                 </div>
                 <div class="h-10rem overflow-auto w-full">
                     <div *ngFor="let professor of evento.professores; let i = index">
-                        <div class="w-full flex align-items-center justify-content-start p-1"
-                        [ngClass]="{
-                            'text-red-500': evento.finalizado && professor.presente === false,
-                        }">
-                                    <app-legend-color [corLegenda]="professor.corLegenda"
-                                                      [professor_Id]="professor.id"
-                                                      [professor]="professor.nome"></app-legend-color>
-                           
+                        <div class="w-full flex align-items-center justify-content-start p-1">
+                            <app-legend-color [corLegenda]="professor.corLegenda"
+                                                [professor_Id]="professor.id"
+                                                [professor]="professor.nome"></app-legend-color>
+                    
                             <span class="">{{ professor.nome }}</span>
-                            <span>
-                                <span *ngIf="evento.finalizado" class="ml-2">
-                                    <span *ngIf="professor.presente == true"
-                                          class="pi pi-check pi-thumbs-down-fill text-green-500"
-                                          pTooltip="Presente"></span>
-                                    <span *ngIf="professor.presente == false"
-                                          class="pi pi-thumbs-down-fill text-red-500"
-                                          pTooltip="Faltou"></span>
-                                </span>
-                            </span>
+                            <ng-container *ngIf="evento.finalizado && professor.presente === true">
+                                <p-tag
+                                    value="Presente"
+                                    severity="success"
+                                />
+                            </ng-container>
+                            <ng-container *ngIf="evento.finalizado && professor.presente === false">
+                                <p-tag
+                                    value="Faltou"
+                                    severity="danger"
+                                />
+                            </ng-container>
                         </div>
                     </div>
                 </div>
             </ng-container>
             <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
-            <div class="p-2 flex align-items-center gap-2">
+            <div class="p-2 flex align-items-center gap-4">
                 <ng-container *ngIf="!evento.finalizado && evento.active">
                     <p-button icon="pi pi-cog"
                               iconPos="right"

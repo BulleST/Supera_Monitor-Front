@@ -1,5 +1,18 @@
+<!-- 
+    <p>feriado: {{feriado}}</p>
+    <p>aulaCancelada: {{aulaCancelada}}</p>
+    <p>primeiraAula: {{primeiraAula}}</p>
+    <p>presenteAula: {{presenteAula}}</p>
+    <p>presenteReposicao: {{presenteReposicao}}</p>
+    <p>faltaAula: {{faltaAula}}</p>
+    <p>faltaReposicao: {{faltaReposicao}}</p>
+    <p>faltaAgendada: {{faltaAgendada}}</p>
+    <p>reposicaoAgendada: {{reposicaoAgendada}}</p>
+    <p>alunoContactado: {{alunoContactado}}</p>
+    <p>alunoContactadoData: {{alunoContactadoData}}</p>
+    <p>contatoObservacao: {{contatoObservacao}}</p>
+    <p>observacao: {{observacao}}</p> -->
 <div class="flex align-items-center gap-1">
-        
     <!-- Cancelada -->
     <ng-container *ngIf="aulaCancelada && !feriado">
         <p-tag value="Aula Cancelada"
@@ -56,8 +69,7 @@
            (mouseleave)="reposicaoTooltip.hide()"  /> 
     </ng-container>
     <!-- Presente na Aula -->
-    <ng-container *ngIf="presenteReposicao">
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+    <ng-container *ngIf="presenteAula">
         <p-tag value="Presente"
            styleClass="bg-green-500 border-green-500 text-white line-height-3 font-light" /> 
     </ng-container>
