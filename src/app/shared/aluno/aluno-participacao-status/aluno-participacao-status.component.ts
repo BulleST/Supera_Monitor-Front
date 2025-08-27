@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoService } from '../../../services/evento.service';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
@@ -12,7 +12,7 @@ import { Feriado } from '../../../models/feriado.model';
 	selector: 'app-aluno-participacao-status',
 	standalone: false,
 	templateUrl: './aluno-participacao-status.component.html',
-	styleUrl: './aluno-participacao-status.component.css'
+	styleUrl: './aluno-participacao-status.component.css',
 })
 export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
 	@Input() evento?: Evento;
@@ -20,6 +20,7 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
 
 	@Input() eventoDashItem?: Dashboard_Item;
 	@Input() eventoDashAluno?: Dashboard_Aluno;
+	@Output() contatarClick = new EventEmitter<boolean>();
 
 	reposicaoDe?: Evento | Dashboard_Aula
 	loadingReposicaoDe = false;
@@ -50,6 +51,7 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
 		private crypto: Crypto,
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
+        private cdr: ChangeDetectorRef
 	) {
 
 	}
@@ -69,9 +71,6 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
 			this.participacao = changes['participacao'].currentValue;
 		}
         this.setStatus();
-        this.getStatus();
-        this.getReposicaoDe();
-        this.getReposicaoPara();
 	}
 
     setStatus() {
@@ -149,16 +148,26 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
             this.contatoObservacao = this.participacao.contatoObservacao;
 
         } 
-
-        
-
-
     }
 
 
 	ngOnDestroy(): void {
 		this.subscription.forEach(item => item.unsubscribe());
 	}
+
+    update(evento?: Evento, participacao?: Evento_Participacao_Aluno) {
+		if (evento) {
+			this.evento = evento;
+		}
+		if (participacao) {
+			this.participacao = participacao;
+		}
+
+        this.setStatus();
+        this.getStatus();
+        this.cdr.detectChanges();
+
+    }
 
 	getReposicaoDe() {
         this.reposicaoDe = this.participacao?.reposicaoDe_Evento ?? this.eventoDashItem?.participacao.reposicaoDe_Evento;
@@ -222,6 +231,8 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
         let eventoIdEncrypted = this.crypto.encrypt(eventoId);
         let alunoIdEncrypted = this.crypto.encrypt(alunoId);
         this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
+
+        this.contatarClick.emit(true);
     }
 
 	getStatus() {

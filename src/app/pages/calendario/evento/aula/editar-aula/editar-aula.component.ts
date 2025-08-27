@@ -20,6 +20,7 @@ import { CalendarioUtils } from '../../../../../utils/calendario-utils'
 import { EventoService } from '../../../../../services/evento.service'
 import { AlunoPopoverComponent } from '../../../../../shared/aluno/aluno-popover/aluno-popover.component'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
+import { AlunoParticipacaoStatusComponent } from '../../../../../shared/aluno/aluno-participacao-status/aluno-participacao-status.component'
 
 @Component({
     selector: 'app-editar-aula',
@@ -188,8 +189,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    presente(item: Evento_Participacao_Aluno) {
+    presente(item: Evento_Participacao_Aluno, status: AlunoParticipacaoStatusComponent) {
         item.presente = !item.presente;
+        status.update(this.evento, item)
     }
 
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {

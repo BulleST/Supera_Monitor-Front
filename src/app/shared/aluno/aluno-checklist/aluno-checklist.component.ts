@@ -131,11 +131,11 @@ export class AlunoChecklistComponent implements OnChanges, OnDestroy {
             }
             // Se não tem um checklist vigente e o aluno possui checklist em atraso
             else if (!this.checklistVigente && itensAtrasados.length > 0) {
-                this.texto = '90 dias vencidos com pendências';
+                this.texto = '+90 dias';
             }
             // Se não tem checklist vigente e o aluno não possui checklist em atraso
             else if (!this.checklistVigente && itensAtrasados.length == 0 && itensEmAndamento.length == 0) {
-                this.texto = '90 dias concluídos';
+                this.texto = '+90 dias';
             }
         
             // Atrasado

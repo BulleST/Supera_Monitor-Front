@@ -12,97 +12,111 @@
     <p>alunoContactadoData: {{alunoContactadoData}}</p>
     <p>contatoObservacao: {{contatoObservacao}}</p>
     <p>observacao: {{observacao}}</p> -->
-<div class="flex align-items-center gap-1">
+<div class="flex align-items-center gap-1 white-space-nowrap">
     <!-- Cancelada -->
     <ng-container *ngIf="aulaCancelada && !feriado">
+        
+                                    <!-- <ng-template #alunoContactadoTemplate>
+                                        <ng-container *ngIf="item.participacao.presente != true">
+                                            <ng-container *ngIf="item.participacao.alunoContactado">
+                                                <i class="pi pi-check text-xs" title="Aluno contatado"> </i>
+                                            </ng-container>
+                                            <ng-container *ngIf="!item.participacao.alunoContactado">
+                                                <i class="pi pi-times text-xs" title="Aluno não contatado"></i>
+                                            </ng-container>
+                                        </ng-container>
+                                    </ng-template> -->
+
         <p-tag value="Aula Cancelada"
-            styleClass="surface-800 border-800 text-white line-height-3 font-light"/>
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+                [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="surface-800 border-800 text-white line-height-3 font-light" />
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Feriado  -->
     <ng-container *ngIf="aulaCancelada && feriado">
         <p-tag value="Aula Cancelada"
-            styleClass="surface-800 border-800 text-white line-height-3 font-light"/>
+                [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="surface-800 border-800 text-white line-height-3 font-light" />
         <p-tag [value]="feriado.name"
-            styleClass="bg-red-600 border-red-6000 text-white line-height-3 font-light"/>
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+               styleClass="bg-red-600 border-red-6000 text-white line-height-3 font-light" />
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
-    <!-- Primeira Aula --> 
+    <!-- Primeira Aula -->
     <ng-container *ngIf="primeiraAula">
         <p-tag value="Aula 1"
-            styleClass="bg-pink-500 border-pink-500 text-white line-height-3 font-light" /> 
+        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-pink-500 border-pink-500 text-white line-height-3 font-light" />
     </ng-container>
-    <!-- Reposicao agendada --> 
+    <!-- Reposicao agendada -->
     <ng-container *ngIf="reposicaoAgendada">
         <p-tag value="Reposição agendada"
-           styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light"
-           (mouseenter)="reposicaoTooltip.show($event)"
-           (mouseleave)="reposicaoTooltip.hide()" />
+        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light"
+               (mouseenter)="reposicaoTooltip.show($event)"
+               (mouseleave)="reposicaoTooltip.hide()" />
     </ng-container>
     <!-- Falta Agendada -->
     <ng-container *ngIf="faltaAgendada">
         <p-tag value="Falta Agendada"
-           styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Falta Na Reposição -->
     <ng-container *ngIf="faltaReposicao">
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
         <p-tag value="Faltou na reposição"
-           styleClass="bg-blue-500 border-blue-500 text-white line-height-3 font-light"
-           (mouseenter)="reposicaoTooltip.show($event)"
-           (mouseleave)="reposicaoTooltip.hide()"  />
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-blue-500 border-blue-500 text-white line-height-3 font-light"
+               (mouseenter)="reposicaoTooltip.show($event)"
+               (mouseleave)="reposicaoTooltip.hide()" />
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Falta Na Aula -->
     <ng-container *ngIf="faltaAula">
         <p-tag value="Faltou"
-           styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Presente na Reposição -->
     <ng-container *ngIf="presenteReposicao">
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container> 
+        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
         <p-tag value="Presente na reposição"
-           styleClass="bg-green-300 border-green-300 text-green-700 line-height-3 font-light"
-           (mouseenter)="reposicaoTooltip.show($event)"
-           (mouseleave)="reposicaoTooltip.hide()"  /> 
+               styleClass="bg-green-300 border-green-300 text-green-700 line-height-3 font-light"
+               (mouseenter)="reposicaoTooltip.show($event)"
+               (mouseleave)="reposicaoTooltip.hide()" />
     </ng-container>
     <!-- Presente na Aula -->
     <ng-container *ngIf="presenteAula">
         <p-tag value="Presente"
-           styleClass="bg-green-500 border-green-500 text-white line-height-3 font-light" /> 
+               styleClass="bg-green-500 border-green-500 text-white line-height-3 font-light" />
     </ng-container>
-    
 </div>
-<ng-template #alunoContactadoTemplate> 
-    @if (!alunoContactado) { 
-        
+<ng-template #alunoContactadoTemplate>
+    <ng-container *ngIf="alunoContactado">
         <p-button
-              icon="bi bi-telephone-x"
-                label="Contatar"
-              pTooltip="Aluno não contatado - Clique para ver mais"
-              (onClick)="goToContatoFalta()"
-              size="small"
-              rounded /> 
-    } 
-    @else { 
+                  icon="pi pi-check-circle"
+                  label="Aluno contatado"
+                  severity="success"
+                  pTooltip="Aluno contatado - Clique para ver mais"
+                  (onClick)="alunoContatadoTooltip.toggle($event)"
+                  [text]="true" />
+    </ng-container>
+    <ng-container *ngIf="!alunoContactado">
         <p-button
-            icon="pi pi-check-circle"
-            label="Aluno contatado"
-            severity="success"
-            pTooltip="Aluno contatado - Clique para ver mais"
-            (onClick)="alunoContatadoTooltip.toggle($event)"
-            [text]="true" /> 
-    } 
+                  icon="bi bi-telephone-x"
+                  label="Contatar"
+                  title="Aluno não contatado - Clique para ver mais"
+                  (onClick)="goToContatoFalta()"
+                  size="small"
+                  rounded />
+    </ng-container>
 </ng-template>
-
 <app-aluno-reposicao-tooltip #reposicaoTooltip
-    [evento]="evento ?? eventoDashItem?.aula"
-    [reposicaoDe]="reposicaoDe"
-    [reposicaoPara]="reposicaoPara"
-></app-aluno-reposicao-tooltip>
-
+                             [evento]="evento ?? eventoDashItem?.aula"
+                             [reposicaoDe]="reposicaoDe"
+                             [reposicaoPara]="reposicaoPara"></app-aluno-reposicao-tooltip>
 <p-popover #alunoContatadoTooltip appendTo="body">
     <div class="w-30rem">
         <p class="flex gap-2 align-items-center mb-3">

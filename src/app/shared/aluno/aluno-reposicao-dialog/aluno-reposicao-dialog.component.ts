@@ -111,7 +111,6 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
 
         let eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
-            console.log('eventoReposicaoDe', res)
             if (res) {
                 this.eventoReposicaoDe = res;
                 this.blockReposicaoDeField = true;
@@ -139,7 +138,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     visibleChange() {
         if (!this.visible) {
             let params = this.activatedRoute.snapshot.params;
-            let routeBack = params['aluno_id'] ? ['../../../'] : ['../..'];
+            let routeBack = params['aluno_id'] ? ['../../../'] : ['../../'];
             this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
 
             this.eventoService.setEvento(undefined)

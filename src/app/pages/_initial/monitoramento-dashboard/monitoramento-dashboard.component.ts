@@ -13,7 +13,6 @@ import { AulaParticipacaoPopoverComponent } from './aula-participacao-popover/au
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import { Table } from 'primeng/table';
-import { Roteiro } from '../../../models/roteiro.model';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -34,7 +33,7 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     @ViewChildren('popoverRoteiro') popoverRoteiro!: QueryList<Popover>;
 
     @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent ;
-    @ViewChild('selectedAulaComponent') aulaParticipacaoPopoverComponent!: AulaParticipacaoPopoverComponent ;
+    @ViewChild('aulaParticipacaoPopoverComponent') aulaParticipacaoPopoverComponent!: AulaParticipacaoPopoverComponent;
     @ViewChild('toolbar') toolbar!: ElementRef;
     
     request: DashboardRequest = new DashboardRequest;
@@ -198,8 +197,11 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     }
     
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
+        console.log('aulaParticipacaoPopoverComponent', this.aulaParticipacaoPopoverComponent)
         this.aulaParticipacaoPopoverComponent.aluno = aluno;
         this.aulaParticipacaoPopoverComponent.item = item;
+
+        
         this.aulaParticipacaoPopoverComponent.show(event);
     }
 

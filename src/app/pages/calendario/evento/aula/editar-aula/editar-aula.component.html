@@ -263,7 +263,9 @@
                                            (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                             <span>{{ item.aluno | nameAbv }}</span>
                                         </p>
-                                        <app-aluno-participacao-status [evento]="evento" [participacao]="item"></app-aluno-participacao-status>
+                                        <app-aluno-participacao-status #status 
+                                            [evento]="evento" 
+                                            [participacao]="item"></app-aluno-participacao-status>
                                     </div>
                                     <p class="text-500 text-sm white-space-nowrap" [pTooltip]="item.turma">
                                         {{ item.turma }}
@@ -287,7 +289,7 @@
                                           [outlined]="item.presente == undefined || item.presente === null"
                                           iconPos="right"
                                           size="small"
-                                          (onClick)="presente(item)" />
+                                          (onClick)="presente(item, status)" />
                             </header>
                             <div class="formgrid grid px-3 bg-white">
                                 <!-- Ábaco -->
@@ -394,45 +396,52 @@
                 <p-table #table
                          [value]="evento.alunos"
                          dataKey="id"
-                         stripedRows>
+                         stripedRows
+                         styleClass="-mt-2">
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
                      <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                         <tr class="static z-0">
                             <!-- Nome -->
-                            <td pFrozenColumn class="p-0 pb-1">
+                            <td pFrozenColumn class="pb-1 z-2 " style="border-right: 2px var(--p-primary-500) solid;">
                                 <app-aluno-popover #popoverAluno
                                                    [aluno_Id]="item.aluno_Id"
                                                    [evento]="evento"
                                                    [showChecklist]="true"></app-aluno-popover>
-                                <div class="flex align-items-start gap-1 w-20rem">
-                                    <p-button type="button"
-                                              (onClick)="enviarMensagem(item)"
-                                              (auxclick)="enviarMensagem(item)"
-                                              (contextmenu)="enviarMensagem(item)"
-                                              [disabled]="!item.celular"
-                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                              severity="success"
-                                              [text]="true"
-                                              class="-mt-1" />
-                                    <div class="flex flex-column w-full">
-                                        <div class="flex align-items-center gap-2">
-                                            <span class="p-button-link overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline capitalize"
-                                                  (click)="popoverAluno.show($event)"
-                                                  pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
-                                            <app-aluno-participacao-status [evento]="evento" [participacao]="item"></app-aluno-participacao-status>
+                                <div>
+                                    <div class="flex align-items-center gap-1 ">
+                                        <p-button type="button"
+                                                  (onClick)="enviarMensagem(item)"
+                                                  (auxclick)="enviarMensagem(item)"
+                                                  (contextmenu)="enviarMensagem(item)"
+                                                  [disabled]="!item.celular"
+                                                  icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                                  severity="success"
+                                                  [text]="true"
+                                                  class="-mt-1" />
+                                        <p class="p-button-link cursor-pointer hover:underline" (click)="popoverAluno.show($event)" pTooltip="Ver detalhes">
+                                            <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 capitalize">
+                                                {{ item.aluno | nameAbv }}
+                                            </span>
+                                        </p>
+                                        <div class="my-1">
+                                            <app-aluno-participacao-status 
+                                                    #status
+                                                    [evento]="evento" 
+                                                    [participacao]="item"></app-aluno-participacao-status>
                                         </div>
-                                        <span class="text-sm w-min">
-                                            <app-aluno-checklist
-                                                                 [showChecklist]="true"
-                                                                 [aluno_Id]="item.aluno_Id"></app-aluno-checklist>
-                                        </span>
                                     </div>
+                                    <p class="text-sm w-min ml-2 flex align-items-center gap-2 line-height-1">
+                                        <b>Jornada: </b>
+                                        <app-aluno-checklist
+                                            [showChecklist]="true"
+                                            [aluno_Id]="item.aluno_Id"></app-aluno-checklist>
+                                    </p>
                                 </div>
                             </td>
                             <!-- Apostila -->
-                            <td class="p-0 pt-2 pb-1">
+                            <td class="pt-2 pb-1">
                                 <div class="flex gap-2">
                                     <!-- Abaco -->
                                     <div class="flex flex-column ">
@@ -534,7 +543,7 @@
                                               [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
                                               [outlined]="item.presente == undefined || item.presente === null"
                                               iconPos="right"
-                                              (onClick)="presente(item)" />
+                                              (onClick)="presente(item, status)" />
                                     <p-button *ngIf="item.presente === false"
                                               [disabled]="!item.celular"
                                               label="Enviar mensagem"
@@ -549,7 +558,7 @@
                                 </div>
                             </td>
                             <!-- Observações  -->
-                            <td class="p-0 pb-1 pt-2">
+                            <td class="pb-1 pt-2">
                                 <div class="flex flex-column">
                                     <label for="observacao" 
                                         class="ml-1 text-sm">Observações: <span class="text-red-500" *ngIf="item.presente === false">*</span></label>

@@ -85,7 +85,6 @@ export class EventoComponent implements OnDestroy {
         private turmaService: TurmaService,
         private roteiroService: RoteiroService,
         private calendarioUtils: CalendarioUtils,
-        private mensagemWhatsapp: MensagemWhatsapp,
     ) {
         let params = this.activatedRoute.snapshot.params
         if (!params['evento_id'] || !params['evento_nome'] || !['aula', 'aula-zero', 'aula', 'superacao', 'reuniao', 'oficina'].includes(params['evento_nome'])) {

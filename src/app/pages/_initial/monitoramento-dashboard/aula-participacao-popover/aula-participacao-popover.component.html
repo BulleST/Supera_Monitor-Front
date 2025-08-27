@@ -3,13 +3,14 @@
            styleClass="-mt-1"
            appendTo="body">
     <ng-container *ngIf="aluno && item">
-        <div style="width: 20rem;">
+        <div style="min-width: 20rem;">
             <p class="mb-2 flex align-items-center gap-2">
                 <app-aluno-participacao-status
                     [eventoDashItem]="item"
                     [eventoDashAluno]="aluno" 
                     [evento]="evento" 
-                    [participacao]="participacao"></app-aluno-participacao-status>
+                    [participacao]="participacao"
+                    (contatarClick)="hide()"></app-aluno-participacao-status>
             </p>
         
             <p class="flex align-items-center gap-2">
@@ -39,14 +40,19 @@
                         [professor]="item.aula.professor"></app-legend-color>
                 </p>
             </ng-container>
-            <p *ngIf="item.aula.observacao">
-                <b>Observações da aula:</b>
-                <span [innerHTML]="item.aula.observacao"></span>
-            </p>
-            <p *ngIf="!item.participacao.active && !item.participacao.presente">
-                <b>Motivo da falta:</b>
-                <span [innerHTML]="item.participacao.observacao"></span>
-            </p>
+            <ng-container *ngIf="item.aula.observacao">
+                <p>
+                    <b class="inline-flex mr-2">Observações da aula:</b>
+                    <span [innerHTML]="item.aula.observacao"></span>
+                </p>
+            </ng-container>
+            <ng-container *ngIf="!item.participacao.active && !item.participacao.presente">
+                <p>
+                    <b class="inline-flex mr-2">Motivo da falta:</b>
+                    <span [innerHTML]="item.participacao.observacao"></span>
+                </p>
+            </ng-container>
+            <p-divider layout="horizontal"/>
             <div class="flex align-items-center gap-2">
                 <p-button label="Fechar"
                           severity="secondary"
@@ -76,11 +82,15 @@
                         <div class="text-white -mr-2 text-center text-base">Opções</div>
                     </ng-template>
                     <ng-template let-item #item>
-                       
-                            <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
-                                <i [class]="item.icon"></i>
-                                <a [routerLink]="item.routerLink" class="ml-2">{{ item.label }}</a>
-                            </div>
+                        <div class="{{item.styleClass}} -mx-2 -my-2 border-round-lg px-3 py-2 w-13rem">
+                            <i [class]="item.icon"></i>
+                            <a (click)="item.command($event)"
+                                (auxclick)="item.command($event)"
+                                (dblclick)="item.command($event)"
+                                class="ml-2" >
+                                <span>{{ item.label }}</span>
+                            </a>
+                        </div>
                     </ng-template>
                 </p-select>
 </ng-template>
