@@ -263,9 +263,7 @@
                                            (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                             <span>{{ item.aluno | nameAbv }}</span>
                                         </p>
-                                        <ng-component *ngTemplateOutlet="reposicaoTemplate; context: { item }"></ng-component>
-                                        <ng-component *ngTemplateOutlet="primeiraAulaTemplate; context: { item }"></ng-component>
-                                        <ng-component *ngTemplateOutlet="faltaAgendadaTemplate; context: { item }"></ng-component>
+                                        <app-aluno-participacao-status [evento]="evento" [participacao]="item"></app-aluno-participacao-status>
                                     </div>
                                     <p class="text-500 text-sm white-space-nowrap" [pTooltip]="item.turma">
                                         {{ item.turma }}
@@ -423,9 +421,7 @@
                                             <span class="p-button-link overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline capitalize"
                                                   (click)="popoverAluno.show($event)"
                                                   pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
-                                            <ng-component *ngTemplateOutlet="reposicaoTemplate; context: { item }"></ng-component>
-                                            <ng-component *ngTemplateOutlet="primeiraAulaTemplate; context: { item }"></ng-component>
-                                            <ng-component *ngTemplateOutlet="faltaAgendadaTemplate; context: { item }"></ng-component>
+                                            <app-aluno-participacao-status [evento]="evento" [participacao]="item"></app-aluno-participacao-status>
                                         </div>
                                         <span class="text-sm w-min">
                                             <app-aluno-checklist
@@ -577,31 +573,3 @@
         </div>
     </ng-container>
 </div>
-<app-aluno-reposicao-tooltip #reposicaoTooltip></app-aluno-reposicao-tooltip>
-<ng-template #reposicaoTemplate let-item="item">
-    <p-badge *ngIf="item.reposicaoDe_Evento_Id"
-                styleClass="ml-2 bg-purple-500"
-                value="Reposição"
-                size="small"
-                class="my-1"
-                (mouseenter)="reposicaoTooltip.show($event, item)"
-                (mouseleave)="reposicaoTooltip.hide()"></p-badge>
-</ng-template>
-<ng-template #primeiraAulaTemplate let-item="item">
-    <p-badge *ngIf="item.primeiraAula_Id == evento.id"
-                styleClass="bg-pink-500"
-                value="Aula 1"
-                size="small"
-                severity="danger"
-                class="my-1"
-                [pTooltip]="'Primeira aula'" />
-</ng-template>
-<ng-template #faltaAgendadaTemplate let-item="item">
-    <p-badge *ngIf="item.active === false && item.presente === false" 
-                styleClass="bg-red-500"
-                value="Falta agendada"
-                size="small"
-                severity="danger"
-                class="my-1"
-                [pTooltip]="'Falta agendada'" />
-</ng-template>

@@ -111,8 +111,8 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 	visibleChange() {
 		if (!this.visible) {
 			let params = this.activatedRoute.snapshot.params;
+			this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
 			this.service.setEvento(undefined)
-			this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
 		}
 	}
 
@@ -198,7 +198,14 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
         }
 
 
-        await lastValueFrom(this.service.atualizarParticipacao(this.participacao))
+        let request = {
+            participacao_Id: this.participacao.id,
+            observacao: this.participacao.observacao,
+            contatoObservacao: this.participacao.contatoObservacao,
+            alunoContactado: this.participacao.alunoContactado,
+            statusContato_Id: this.participacao.statusContato_Id,
+        }
+        await lastValueFrom(this.service.atualizarParticipacao(request))
             .then(res => {
                 this.loading = false;
                 if (res.success) {

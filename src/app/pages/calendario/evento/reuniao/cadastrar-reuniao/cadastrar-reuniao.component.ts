@@ -161,18 +161,17 @@ let feriados = this.service.feriados.subscribe(res => {
         if (this.roteiros.length && this.feriados.length) {
             let recessos = this.roteiros.filter(x => x.recesso === true);
             let recessosDate = recessos.flatMap(x => {
-                let length = moment(x.dataFim).diff(x.dataInicio)
+                let length = moment(x.dataFim).diff(x.dataInicio, 'day')
                 let range = Array.from({ length }, (item, index) => {
                     return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
                 });
+                range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
                 return range;
             });
             
-            let feriadosDate = this.feriados.map(x => x.date);
+              let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
-
-            console.log(this.invalidDates);
         }
     }
     getTipo(e: Evento) {

@@ -14,6 +14,7 @@ import moment from 'moment';
 import 'moment/locale/pt-br';
 import { Table } from 'primeng/table';
 import { Roteiro } from '../../../models/roteiro.model';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
     selector: 'app-monitoramento-dashboard',
@@ -33,7 +34,7 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     @ViewChildren('popoverRoteiro') popoverRoteiro!: QueryList<Popover>;
 
     @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent ;
-    @ViewChild('selectedAulaComponent') selectedAulaComponent!: AulaParticipacaoPopoverComponent ;
+    @ViewChild('selectedAulaComponent') aulaParticipacaoPopoverComponent!: AulaParticipacaoPopoverComponent ;
     @ViewChild('toolbar') toolbar!: ElementRef;
     
     request: DashboardRequest = new DashboardRequest;
@@ -62,6 +63,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
         private crypto: Crypto,
+        private activatedRoute: ActivatedRoute,
+        private router: Router,
     ) {
         let calendarioReload = this.service.calendarioReload.subscribe(res => this.update())
         this.subscription.push(calendarioReload);
@@ -195,9 +198,9 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     }
     
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
-        this.selectedAulaComponent.aluno = aluno;
-        this.selectedAulaComponent.item = item;
-        this.selectedAulaComponent.show(event);
+        this.aulaParticipacaoPopoverComponent.aluno = aluno;
+        this.aulaParticipacaoPopoverComponent.item = item;
+        this.aulaParticipacaoPopoverComponent.show(event);
     }
 
     filtrarStatus(value: DashboardItemStatus | null, roteiro: Dashboard_Roteiro, table: Table) {
@@ -224,4 +227,20 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
 
         table.filteredValue = alunosFiltered;
     }
+
+    
+	getStatus(item: Dashboard_Item) {
+        let participacao = item.participacao;
+		let statusList = this.service.statusContato.value;
+        let statusContato_Id = participacao.statusContato_Id
+		return statusList.find(x => x.value == statusContato_Id)?.label ?? 'Aluno não contatado';
+	}
+        async goToContatoFalta(item: Dashboard_Item) {
+            let evento = await lastValueFrom(this.service.get(item.aula.id))
+            
+            this.service.setEvento(evento);
+            let eventoIdEncrypted = this.crypto.encrypt(item.aula.id);
+            let alunoIdEncrypted = this.crypto.encrypt(item.participacao.aluno_Id);
+            this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
+        }
 }

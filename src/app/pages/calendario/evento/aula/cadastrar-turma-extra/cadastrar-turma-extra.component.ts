@@ -21,7 +21,7 @@ import { RoteiroService } from '../../../../../services/roteiro.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../../services/evento.service';
 import { getError, showError } from '../../../../../utils';
-import { Evento,  EventoTipo } from '../../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { MyMap as MyMap } from '../../../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
@@ -184,79 +184,77 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         }
     }
 
-  
-  
-      loadProfessores() {
-              this.loadingProfessores = true;
-              lastValueFrom(this.professorService.getList())
-                  .then(res => this.loadingProfessores = false)
-                  .catch(res => this.loadingProfessores = false);
-      }
-  
 
-  
-  
-      loadPerfilCognitivo() {
-            this.loadingPerfisCognitivos = true;
-            lastValueFrom(this.perfilCognitivoService.getList())
-                .then(res => this.loadingPerfisCognitivos = false)
-                .catch(res => this.loadingPerfisCognitivos = false);
-      }
-  
-      loadRoteiros() {
-              this.loadingRoteiros = true;
-              lastValueFrom(this.roteiroService.getList())
-                  .then(res => this.loadingRoteiros = false)
-                  .catch(res => this.loadingRoteiros = false);
-      }
-  
-      loadSalas() {
-              this.loadingSalaAulas = true;
-              lastValueFrom(this.salaAulaService.getList())
-                  .then(res => this.loadingSalaAulas = false)
-                  .catch(res => this.loadingSalaAulas = false);
-      }
-  
-      loadTurmas() {
-          this.loadingTurmas = true;
-          lastValueFrom(this.turmaService.getList())
-              .then(res => this.loadingTurmas = false)
-              .catch(res => this.loadingTurmas = false);
-      }
-  
-      loadAlunos() {
-          this.loadingAlunos = true;
-          lastValueFrom(this.alunoService.getList())
-              .then(res => this.loadingAlunos = false)
-              .catch(res => this.loadingAlunos = false);
-      }
-  
-      loadFeriados() {
-          this.loadingFeriados = true;
-          lastValueFrom(this.service.getFeriados(this.ano))
-              .then(res => this.loadingFeriados = false)
-              .catch(res => this.loadingFeriados = false);
-      }
-  
-      setInvalidDates() {
-          if (this.roteiros.length && this.feriados.length) {
-              let recessos = this.roteiros.filter(x => x.recesso === true);
-              let recessosDate = recessos.flatMap(x => {
-                  let length = moment(x.dataFim).diff(x.dataInicio)
-                  let range = Array.from({ length }, (item, index) => {
-                      return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
-                  });
-                  return range;
-              });
-              
-              let feriadosDate = this.feriados.map(x => x.date);
-  
-              this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
-  
-              console.log(this.invalidDates);
-          }
-      }
-  
+
+    loadProfessores() {
+        this.loadingProfessores = true;
+        lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
+    }
+
+
+
+
+    loadPerfilCognitivo() {
+        this.loadingPerfisCognitivos = true;
+        lastValueFrom(this.perfilCognitivoService.getList())
+            .then(res => this.loadingPerfisCognitivos = false)
+            .catch(res => this.loadingPerfisCognitivos = false);
+    }
+
+    loadRoteiros() {
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList())
+            .then(res => this.loadingRoteiros = false)
+            .catch(res => this.loadingRoteiros = false);
+    }
+
+    loadSalas() {
+        this.loadingSalaAulas = true;
+        lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
+    }
+
+    loadTurmas() {
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => this.loadingTurmas = false)
+            .catch(res => this.loadingTurmas = false);
+    }
+
+    loadAlunos() {
+        this.loadingAlunos = true;
+        lastValueFrom(this.alunoService.getList())
+            .then(res => this.loadingAlunos = false)
+            .catch(res => this.loadingAlunos = false);
+    }
+
+    loadFeriados() {
+        this.loadingFeriados = true;
+        lastValueFrom(this.service.getFeriados(this.ano))
+            .then(res => this.loadingFeriados = false)
+            .catch(res => this.loadingFeriados = false);
+    }
+
+    setInvalidDates() {
+        if (this.roteiros.length && this.feriados.length) {
+            let recessos = this.roteiros.filter(x => x.recesso === true);
+            let recessosDate = recessos.flatMap(x => {
+                let length = moment(x.dataFim).diff(x.dataInicio, 'day')
+                let range = Array.from({ length }, (item, index) => {
+                    return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
+                });
+                range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
+                return range;
+            });
+
+            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+            this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
+        }
+    }
+
     showError(header: string, message: string, e: any, innerMessage?: string) {
         showError(this.confirmationService, header, message, e, innerMessage);
     }
@@ -808,7 +806,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             })
 
     }
-    
+
     sendMensagemAlunos() {
         this.mensagensEnviadasAlunos = this.target.sort((x, y) => x.nome < y.nome ? -1 : 1);// .filter(x => !!x.celular);
         this.confirmationService.confirm({

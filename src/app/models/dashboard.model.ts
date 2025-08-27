@@ -79,8 +79,10 @@ export class Dashboard_Participacao {
     observacao?: string;
     deactivated?: Date;
     active: boolean = true;
-    alunoContactado: boolean = false; 
-    observacoesContato?: string; 
+
+    alunoContactado?: Date; 
+    statusContato_Id?: number;
+    contatoObservacao?: string;
 }
 
 export class Dashboard_Roteiro {

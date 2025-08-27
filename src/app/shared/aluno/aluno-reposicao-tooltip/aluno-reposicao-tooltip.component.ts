@@ -5,6 +5,9 @@ import { lastValueFrom } from 'rxjs';
 import { Popover } from 'primeng/popover';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
+import { Dashboard_Aula, Dashboard_Participacao } from '../../../models/dashboard.model';
+import { Evento } from '../../../models/evento.model';
+import moment from 'moment';
 
 @Component({
     selector: 'app-aluno-reposicao-tooltip',
@@ -13,51 +16,69 @@ import { RoteiroService } from '../../../services/roteiro.service';
     styleUrl: './aluno-reposicao-tooltip.component.css'
 })
 export class AlunoReposicaoTooltipComponent implements OnChanges {
-    @Input() participacao!: Evento_Participacao_Aluno;
-    roteiro!: Roteiro;
+    @Input() evento?: Evento | Dashboard_Aula
+    @Input() reposicaoDe?: Evento | Dashboard_Aula
+    @Input() reposicaoPara?: Evento | Dashboard_Aula
+    roteiroDe?: Roteiro;
+    roteiroPara?: Roteiro;
+    roteiro?: Roteiro;
     loading = false;
 
     @ViewChild('popover') popover!: Popover;
+    roteiros: Roteiro[] = []
 
     constructor(
-        private service: EventoService,
         private roteiroService: RoteiroService,
     ) {
+
+        this.roteiroService.list.subscribe(res => this.roteiros = res)
 
     }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['participacao']) {
-            this.participacao = changes['participacao'].currentValue;
-            this.loadReposicaoDe();
+        if (changes['evento']) {
+            this.evento = changes['evento'].currentValue;
+        }
+        if (changes['reposicaoDe']) {
+            this.reposicaoDe = changes['reposicaoDe'].currentValue;
+        }
+        if (changes['reposicaoPara']) {
+            this.reposicaoPara = changes['reposicaoPara'].currentValue;
         }
     }
 
-    loadReposicaoDe() {
-        if (this.participacao.reposicaoDe_Evento_Id && !this.participacao.reposicaoDe_Evento) {
-            this.loading = true;
-            lastValueFrom(this.service.get(this.participacao.reposicaoDe_Evento_Id))
-            .then(res => {
-                this.participacao.reposicaoDe_Evento = res;
-                this.loading = false;
-            })
+    async loadRoteiro() {
+        if (!this.roteiros.length) 
+            this.roteiros = await lastValueFrom(this.roteiroService.getList())
+
+        if (this.reposicaoDe) {
+            if (this.reposicaoDe.roteiro_Id) {
+                this.roteiroDe = this.roteiros.find(x => x.id == this.reposicaoDe?.roteiro_Id)
+            } else {
+                this.roteiroDe = this.roteiros.find(x => moment(this.reposicaoDe?.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
+            }
+        }
+        if (this.reposicaoPara) {
+            if (this.reposicaoPara.roteiro_Id) {
+                this.roteiroPara = this.roteiros.find(x => x.id == this.reposicaoPara?.roteiro_Id)
+            } else {
+                this.roteiroPara = this.roteiros.find(x => moment(this.reposicaoPara?.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
+            }
+        }
+
+        if (this.evento) {
+            if (this.evento.roteiro_Id) {
+                this.roteiro = this.roteiros.find(x => x.id == this.evento?.roteiro_Id)
+            } else {
+                this.roteiro = this.roteiros.find(x => moment(this.evento?.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
+            }
         }
     }
 
-    loadRoteiro() {
-        if (this.participacao.reposicaoDe_Evento && !this.roteiro) {
-            lastValueFrom(this.roteiroService.get(this.participacao!.reposicaoDe_Evento!.roteiro_Id!))
-            .then(res => {
-                this.roteiro = res;
-            })
-        }
-    }
-
-
-    show(e: any, participacao: Evento_Participacao_Aluno) {
-        this.participacao = participacao;
-        this.loadReposicaoDe();
+    show(e: any) {
         this.popover.show(e);
+
+        this.loadRoteiro();
     }
 
     hide() {

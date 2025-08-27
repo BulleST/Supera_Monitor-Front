@@ -1,16 +1,33 @@
 <p-popover #popover appendTo="body">
-    <ng-container *ngIf="participacao && participacao.reposicaoDe_Evento">
+    <ng-container *ngIf="reposicaoDe">
         <div class="w-25rem">
-            <p class="text-purple-500">Reposição do dia {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM HH:mm' }}</p>
+            <p class="text-purple-500">Reposição do dia {{ reposicaoDe.data | date : 'dd/MM HH:mm' }}</p>
             <p *ngIf="roteiro">
                 <i class="pi pi-start-fill" [style]="{ color: roteiro.corLegenda }"></i>
-                <span>Semana {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}</span>
+                <span>Semana {{ reposicaoDe.semana }} - {{ reposicaoDe.tema }}</span>
             </p>
             <p>
                 <span>Observações: </span>
                 <span
-                      *ngIf="participacao.reposicaoDe_Evento.observacao">{{ participacao.reposicaoDe_Evento.observacao }}</span>
-                <span *ngIf="!participacao.reposicaoDe_Evento.observacao"
+                      *ngIf="reposicaoDe.observacao">{{ reposicaoDe.observacao }}</span>
+                <span *ngIf="!reposicaoDe.observacao"
+                      class="text-200">Nenhuma observação.</span>
+            </p>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="reposicaoPara">
+        <div class="w-25rem">
+            <p class="text-purple-500">Reposição agendada para {{ reposicaoPara.data | date : 'dd/MM HH:mm' }}</p>
+            <p *ngIf="roteiro">
+                <i class="pi pi-start-fill" [style]="{ color: roteiro.corLegenda }"></i>
+                <span>Semana {{ reposicaoPara.semana }} - {{ reposicaoPara.tema }}</span>
+            </p>
+            <p>
+                <span>Observações: </span>
+                <span *ngIf="reposicaoPara.observacao">
+                    {{ reposicaoPara.observacao }}
+                </span>
+                <span *ngIf="!reposicaoPara.observacao"
                       class="text-200">Nenhuma observação.</span>
             </p>
         </div>

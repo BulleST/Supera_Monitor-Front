@@ -1,20 +1,19 @@
 import { Component, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Dashboard_Aluno, Dashboard_Aula, Dashboard_Item, DashboardItemStatus } from '../../../../models/dashboard.model';
+import { Dashboard_Aluno, Dashboard_Item, DashboardItemStatus } from '../../../../models/dashboard.model';
 import { Popover } from 'primeng/popover';
 import { Router } from '@angular/router';
 import { Crypto, MensagemWhatsapp } from '../../../../utils';
 import { lastValueFrom } from 'rxjs';
 import { EventoService } from '../../../../services/evento.service';
 import moment from 'moment';
-import { Evento, EventoTipo } from '../../../../models/evento.model';
-import { ToastrService } from 'ngx-toastr';
+import { Evento } from '../../../../models/evento.model';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
-import { Aluno } from '../../../../models/alunos.model';
 import { PseudoEvento } from '../../../../models/reposicao.model';
 import { AlunoService } from '../../../../services/alunos.service';
 import { MenuItem } from 'primeng/api';
 import { SelectChangeEvent } from 'primeng/select';
 import { NgModel } from '@angular/forms';
+
 @Component({
     selector: 'app-aula-participacao-popover',
     standalone: false,
@@ -33,6 +32,9 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     alunoEncryptedId: string = '';
 
     DashboardItemStatus = DashboardItemStatus;
+
+    evento?: Evento
+    participacao?: Evento_Participacao_Aluno
     
     constructor(
         private router: Router,
@@ -40,7 +42,6 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         private service: EventoService,
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private toastr: ToastrService,
     ) {
 
     }
@@ -60,16 +61,12 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     show(e: any) {
         this.loadMenuItems();
         this.popover.show(e);
-        try {
-            this.popover.align();
-        }
-        catch (e) {
-
-        }
+        this.loadEvento();
     }
 
     hide() {
         this.popover.hide();
+        this.service.setEvento(undefined);
     }
 
     loadMenuItems() {
@@ -126,6 +123,20 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         }
     }
 
+    async loadEvento() {
+        let evento: Evento;
+        if (this.item.aula.id == PseudoEvento.EventoId) {
+            evento = await lastValueFrom(this.service.getPseudoAula(this.item.aula.turma_Id!, this.item.aula.data))
+        } 
+        else {
+            evento = await lastValueFrom(this.service.get(this.item.aula.id))
+        }
+
+        this.evento = evento;
+        this.service.setEvento(evento)
+        
+        this.participacao = evento.alunos.find(x => x.aluno_Id == this.item.participacao.aluno_Id);
+    }
 
     async goToAula() {
 
@@ -144,7 +155,6 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     async goToAgendarFalta() {
-
         let participacao = this.item;
 
         let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
@@ -181,20 +191,14 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         this.router.navigate(['dashboard', 'reposicao', 'agendar', this.crypto.encrypt(this.aluno.id)])
     }
 
-
     async enviarMensagemFalta(e: any) {
         let evento: Evento = await lastValueFrom(this.service.get(this.item.aula.id));
         let participacao = evento.alunos.find(x => x.id == this.item.participacao.id) as Evento_Participacao_Aluno;
         this.mensagemWhatsapp.enviarMensagemFalta(evento, participacao, e);
     }
 
-
-
-
-
     @HostListener('wheel', ['$event'])
     onWheel(event: WheelEvent): void {
-
         this.hide();
     }
 }

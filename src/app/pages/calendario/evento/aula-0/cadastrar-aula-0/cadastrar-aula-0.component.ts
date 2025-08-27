@@ -5,7 +5,7 @@ import { Aluno } from '../../../../../models/alunos.model'
 import { Professor } from '../../../../../models/professor.model'
 import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model'
 import { ActivatedRoute, Router } from '@angular/router'
-import { ConfirmationService, SelectItemGroup } from 'primeng/api'
+import { ConfirmationService } from 'primeng/api'
 import { ToastrService } from 'ngx-toastr'
 import { Crypto, getError, showError } from '../../../../../utils'
 import moment from 'moment'
@@ -28,13 +28,13 @@ import { DatePickerYearChangeEvent } from 'primeng/datepicker'
 import { MultiSelectChangeEvent } from 'primeng/multiselect'
 import $ from 'jquery'
 import { CalendarioUtils } from '../../../../../utils/calendario-utils'
-import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service'
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
 import { MyMap } from '../../../../../utils/map'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
 import { RoteiroService } from '../../../../../services/roteiro.service'
 import { Roteiro } from '../../../../../models/roteiro.model'
+import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe'
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -70,14 +70,14 @@ export class CadastrarAula0Component implements OnDestroy {
 
     eventos: Evento[] = []
     loadingEventos = false
-    
+
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
 
     feriados: Feriado[] = []
     loadingFeriados = false
     ano: number = new Date().getFullYear()
-    
+
     invalidDates: Date[] = []
 
     @ViewChild('form') form!: NgForm
@@ -103,6 +103,7 @@ export class CadastrarAula0Component implements OnDestroy {
         private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
+        private salaAulaPipe: SalaAulaPipe,
     ) {
         this.object.descricao = 'Aula 0'
 
@@ -133,7 +134,6 @@ export class CadastrarAula0Component implements OnDestroy {
             this.loadProfessores();
         }
 
-        
         let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active))
         this.subscription.push(salaAula)
 
@@ -168,7 +168,7 @@ export class CadastrarAula0Component implements OnDestroy {
             }
         })
 
-        this.visible = true
+        this.visible = true;
     }
 
     ngOnDestroy(): void {
@@ -180,67 +180,66 @@ export class CadastrarAula0Component implements OnDestroy {
             this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
         }
     }
-    
-        loadProfessores() {
-                this.loadingProfessores = true;
-                lastValueFrom(this.professorService.getList())
-                    .then(res => this.loadingProfessores = false)
-                    .catch(res => this.loadingProfessores = false);
-        }
-    
-        loadRoteiros() {
-                this.loadingRoteiros = true;
-                lastValueFrom(this.roteiroService.getList())
-                    .then(res => this.loadingRoteiros = false)
-                    .catch(res => this.loadingRoteiros = false);
-        }
-    
-        loadSalas() {
-                this.loadingSalaAulas = true;
-                lastValueFrom(this.salaAulaService.getList())
-                    .then(res => this.loadingSalaAulas = false)
-                    .catch(res => this.loadingSalaAulas = false);
-        }
-    
-        loadTurmas() {
-            this.loadingTurmas = true;
-            lastValueFrom(this.turmaService.getList())
-                .then(res => this.loadingTurmas = false)
-                .catch(res => this.loadingTurmas = false);
-        }
-    
-        loadAlunos() {
-            this.loadingAlunos = true;
-            lastValueFrom(this.alunoService.getList())
-                .then(res => this.loadingAlunos = false)
-                .catch(res => this.loadingAlunos = false);
-        }
-    
-        loadFeriados() {
-            this.loadingFeriados = true;
-            lastValueFrom(this.service.getFeriados(this.ano))
-                .then(res => this.loadingFeriados = false)
-                .catch(res => this.loadingFeriados = false);
-        }
-    
-        setInvalidDates() {
-            if (this.roteiros.length && this.feriados.length) {
-                let recessos = this.roteiros.filter(x => x.recesso === true);
-                let recessosDate = recessos.flatMap(x => {
-                    let length = moment(x.dataFim).diff(x.dataInicio)
-                    let range = Array.from({ length }, (item, index) => {
-                        return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
-                    });
-                    return range;
+
+    loadProfessores() {
+        this.loadingProfessores = true;
+        lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
+    }
+
+    loadRoteiros() {
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList())
+            .then(res => this.loadingRoteiros = false)
+            .catch(res => this.loadingRoteiros = false);
+    }
+
+    loadSalas() {
+        this.loadingSalaAulas = true;
+        lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
+    }
+
+    loadTurmas() {
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => this.loadingTurmas = false)
+            .catch(res => this.loadingTurmas = false);
+    }
+
+    loadAlunos() {
+        this.loadingAlunos = true;
+        lastValueFrom(this.alunoService.getList())
+            .then(res => this.loadingAlunos = false)
+            .catch(res => this.loadingAlunos = false);
+    }
+
+    loadFeriados() {
+        this.loadingFeriados = true;
+        lastValueFrom(this.service.getFeriados(this.ano))
+            .then(res => this.loadingFeriados = false)
+            .catch(res => this.loadingFeriados = false);
+    }
+
+    setInvalidDates() {
+        if (this.roteiros.length && this.feriados.length) {
+            let recessos = this.roteiros.filter(x => x.recesso === true);
+            let recessosDate = recessos.flatMap(x => {
+                let length = moment(x.dataFim).diff(x.dataInicio, 'day')
+                let range = Array.from({ length }, (item, index) => {
+                    return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
                 });
-                
-                let feriadosDate = this.feriados.map(x => x.date);
-    
-                this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
-    
-                console.log(this.invalidDates);
-            }
+                range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
+                return range
+            });
+
+            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+
+            this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }
+    }
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e)
@@ -316,7 +315,7 @@ export class CadastrarAula0Component implements OnDestroy {
 
         let data = this.data
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.professores = validaProfessores(data,this.object.duracaoMinutos,this.professores,this.eventos,undefined,undefined)
+        this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined)
 
         if (this.object.professor_Id) {
             let e: SelectChangeEvent = {
@@ -342,19 +341,25 @@ export class CadastrarAula0Component implements OnDestroy {
         let mensagemErro: string | null = null
 
         if (item) {
+
             if (!item.disponivel && item.disponivelEvent) {
-                mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(
-                    item.disponivelEvent.data,
-                ).format('HH[h]mm')} no mesmo dia.`
-            } else if (!item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
-                mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(
-                    item.expedienteFim,
-                ).format('HH:mm')}`
+                let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+                let tipo = this.getTipo(item.disponivelEvent)
+                mensagemErro = `Existe uma outra ${tipo} às ${data} no mesmo dia.`
+            } 
+            else if (!item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+                let inicio = moment(item.expedienteInicio).format('HH[h]mm');
+                let fim = moment(item.expedienteFim).format('HH[h]mm');
+                mensagemErro = `O expediente do educador é das ${inicio} às ${fim}`
             }
         }
 
         if (mensagemErro) {
-            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            this.showError(
+                'Educador indisponível', 
+                mensagemErro, 
+                e.originalEvent
+            )
             model.control.setValue(undefined)
         }
         model.control.setErrors({ indisponivel: mensagemErro })
@@ -371,20 +376,25 @@ export class CadastrarAula0Component implements OnDestroy {
         let item = this.salaAulas.find(x => x.id == e.value)
         if (item && item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' })
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm')
+            let tipo = this.getTipo(item.disponivelEvent)
             this.showError(
                 'Sala Indisponível',
-                `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(
-                    item.disponivelEvent.data,
-                ).format('HH[h]mm')}</b>.`,
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
                 e.originalEvent,
             )
             return
         } else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
             let alunos = alunosComRestricaoMobilidade.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
+            let sala = this.salaAulaPipe.transform({ 
+                sala_Id: salaAula.id,
+                numeroSala: salaAula.numeroSala,
+                andar: salaAula.andar,
+            })
             this.showError(
                 'Restrição de Mobilidade',
-                `O(s) aluno(s) ${alunos}} tem restrição de mobilidade e não podem participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`,
+                `O(s) aluno(s) ${alunos}} tem restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`,
                 e.originalEvent,
             )
             return
@@ -402,35 +412,38 @@ export class CadastrarAula0Component implements OnDestroy {
 
         // se o aluno foi selecionado, selected = false
         // se o aluno foi deselecionado, selected = true
-        if (selected == false) { 
+        if (selected == false) {
             let aluno = (e.originalEvent as any).option as Aluno;
             let nome = this.nameFirstWordPipe.transform(aluno.nome);
-            
+
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
                 let tipo = this.getTipo(aluno.disponivelEvent);
                 let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
-                this.showError('Aluno Indisponível', `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, e.originalEvent);
-                
+
+                this.showError(
+                    'Aluno Indisponível', 
+                    `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, 
+                    e.originalEvent
+                );
+
                 this.selectAlunoReject(aluno, model);
                 return
             }
-            
+
             aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
-
+            
             let mensagem = ''
-            mensagem += await this.aulaZeroMensagem(aluno, mensagem);
-            mensagem += await this.restricaoMobilidadeMensagem(aluno, mensagem);
-            mensagem += await this.maisDeUmAlunoMensagem(aluno, mensagem);
+            
+            mensagem += await this.aulaZeroMensagem(aluno);
+            mensagem += await this.restricaoMobilidadeMensagem(aluno);
+            mensagem += await this.maisDeUmAlunoMensagem(aluno);
 
-
-            console.log('mensagem', mensagem)
             if (mensagem) {
                 this.confirmationService.confirm({
                     target: e.originalEvent.target as any,
                     header: 'Selecionar aluno',
                     message: `<p>Algumas observações são relevantes antes de continuar:</p>
                                 ${mensagem}
-                                <p>Tem certeza que deseja continuar?</p>
                             `,
                     acceptLabel: `Continuar`,
                     rejectLabel: 'Não',
@@ -439,34 +452,34 @@ export class CadastrarAula0Component implements OnDestroy {
                     acceptButtonStyleClass: 'p-button-rounded',
                     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => {
-                        this.send(e)
                     },
                     reject: () => {
                         this.selectAlunoReject(aluno, model);
                     }
                 })
             }
-          
+
             model.control.updateValueAndValidity()
 
         }
     }
 
 
-    async aulaZeroMensagem(aluno: Aluno, mensagem: string) {
+    async aulaZeroMensagem(aluno: Aluno) {
+        let mensagem = '';
         if (aluno.aulaZero_Id) {
             let aulaZero: Evento = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
             let participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
-            
+
             mensagem += '<br>'
             mensagem += `<p>Outra aula zero já foi cadastrada: </p>`;
-            
+
             if (!aulaZero.active) {
                 mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
-            } 
+            }
             else if (aulaZero.active && participacaoAulaZero.presente === false && participacaoAulaZero.active === true) {
                 mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Faltou (${participacaoAulaZero.observacao})</p>`;
-            } 
+            }
             else {
                 mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
                 mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
@@ -475,35 +488,36 @@ export class CadastrarAula0Component implements OnDestroy {
         return mensagem;
     }
 
-    async restricaoMobilidadeMensagem(aluno: Aluno, mensagem: string) {
+    async restricaoMobilidadeMensagem(aluno: Aluno) {
+
+        let mensagem = '';
+
         let restricoes = aluno.restricoes.filter(x => x.active === true)
         let restricaoMobilidade = aluno.restricaoMobilidade
-        
+
         if (restricoes.length > 0 || restricaoMobilidade) {
             mensagem += '<br>'
             mensagem += '<p class="font-bold">Restrições:</p> <ul class="my-2 pl-2">'
-            
-            if (restricaoMobilidade) 
+
+            if (restricaoMobilidade)
                 mensagem += '<li>Restrição de mobilidade </li>'
             if (restricoes.length > 0)
                 mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
-            
+
             mensagem += `</ul>`
             mensagem += `<p class="text-sm text-red-500">Tem certeza que deseja ignorar as restrições e continuar?</p>`;
         }
         return mensagem;
     }
 
-   async maisDeUmAlunoMensagem(aluno: Aluno, mensagem: string) {
+    async maisDeUmAlunoMensagem(aluno: Aluno) {
+
+        let mensagem = '';
 
         if (this.selectedAlunos.length == 0) {
             mensagem += '<br>'
             mensagem += `<p>Nenhum aluno selecionado.</p>`;
         }
-        // else if (this.selectedAlunos.length == 1) {
-        //     mensagem += '<br>'
-        //     mensagem += `<p>1 aluno selecionado</p>`;
-        // }
         else if (this.selectedAlunos.length > 1) {
             mensagem += '<br>'
             mensagem += `<p>${this.selectedAlunos.length} alunos selecionados</p>`;
@@ -515,9 +529,9 @@ export class CadastrarAula0Component implements OnDestroy {
 
     selectAlunoReject(aluno: Aluno, model: NgModel) {
         let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
-        if (index) 
+        if (index)
             this.selectedAlunos.splice(index, 1);
-        
+
         model.control.setValue(this.selectedAlunos);
         model.control.updateValueAndValidity()
     }
@@ -591,6 +605,8 @@ export class CadastrarAula0Component implements OnDestroy {
     async send(e: any) {
         this.loading = true
 
+        this.object.data = this.data;
+
         await lastValueFrom(this.service.createAula0(this.object))
             .then(async res => {
                 this.loading = false
@@ -633,7 +649,7 @@ export class CadastrarAula0Component implements OnDestroy {
             accept: () => {
                 this.visible = false
                 this.visibleChange();
-                
+
                 this.enviarMensagemAgendamento(aluno)
             },
             reject: () => {
@@ -682,7 +698,7 @@ export class CadastrarAula0Component implements OnDestroy {
         if (this.selectedAlunos) {
             const id = 31
             this.selectedAlunos.forEach(async alunoItem => {
-                
+
                 const aluno = await lastValueFrom(this.alunoService.get(alunoItem.id));
 
                 const alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item
@@ -690,7 +706,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')
                 const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')
                 const account = this.accountService.accountValue?.name
-                
+
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
                     if (alunoChecklist && !alunoChecklist.finalizado) {
