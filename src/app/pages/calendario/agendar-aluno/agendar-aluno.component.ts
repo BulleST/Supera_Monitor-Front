@@ -1,35 +1,34 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Evento, EventoTipo } from '../../../../models/evento.model';
+import { Evento, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Aluno } from '../../../../models/alunos.model';
-import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos, playSuccess, playAlert } from '../../../../utils';
+import { Aluno } from '../../../models/alunos.model';
+import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos, playSuccess, playAlert } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { AlunoService } from '../../../../services/alunos.service';
-import { EventoService } from '../../../../services/evento.service';
-import { CalendarioRequest } from '../../../../models/calendario.model';
+import { AlunoService } from '../../../services/alunos.service';
+import { EventoService } from '../../../services/evento.service';
+import { CalendarioRequest } from '../../../models/calendario.model';
 import moment from 'moment';
 import { SelectChangeEvent } from 'primeng/select';
 import { NgForm, NgModel } from '@angular/forms';
-import { PseudoEvento } from '../../../../models/reposicao.model';
-import { Aluno_CheckList_Item } from '../../../../models/checklist.model';
-import { AccountService } from '../../../../services/account.service';
-import { ChecklistService } from '../../../../services/checklist.service';
-import { Turma } from '../../../../models/turma.model';
-import { TurmaService } from '../../../../services/turma.service';
-import { SalaAula, SalaAulaId } from '../../../../models/sala-aula.model';
-import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
-import { SalaAulaService } from '../../../../services/sala-aula.service';
+import { PseudoEvento } from '../../../models/reposicao.model';
+import { Aluno_CheckList_Item } from '../../../models/checklist.model';
+import { AccountService } from '../../../services/account.service';
+import { ChecklistService } from '../../../services/checklist.service';
+import { Turma } from '../../../models/turma.model';
+import { TurmaService } from '../../../services/turma.service';
+import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
+import { SalaAulaService } from '../../../services/sala-aula.service';
 
 @Component({
-    selector: 'app-inserir-aluno',
-    standalone: false,
-    templateUrl: './inserir-aluno.component.html',
-    styleUrl: './inserir-aluno.component.css',
-    providers: [ConfirmationService]
+  selector: 'app-agendar-aluno',
+  standalone: false,
+  templateUrl: './agendar-aluno.component.html',
+  styleUrl: './agendar-aluno.component.css',
+  providers: [ConfirmationService]
 })
-export class InserirAlunoComponent {
+export class AgendarAlunoComponent {
     evento: Evento = new Evento;
 
     visible: boolean = false;

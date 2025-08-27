@@ -59,7 +59,7 @@ export class MonitoramentoJornadaSuperaComponent implements OnDestroy {
                 aluno.checklistCompleto = aluno.checklistCompleto.map((checklist, indexChecklist) => {
                     let index = checklist.items.findIndex(x => x.id == res.id);
                     if (index != -1) {
-                        var item = checklist.items[index];
+                        let item = checklist.items[index];
                         item.finalizado = true;
                         item.dataFinalizacao = res.dataFinalizacao;
                         item.account_Finalizacao_Id = res.account_Finalizacao_Id;

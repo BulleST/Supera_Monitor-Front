@@ -1,0 +1,196 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-dialog [header]="'Contato'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '550px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title flex gap-2 align-items-center">
+                <i class="pi pi-calendar text-xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <span>Contato</span>
+            </span>
+        </div>
+    </ng-template>
+    <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+        <div class="formgrid grid">
+            <!-- Turma -->
+            <div class="field col-6">
+                <label for="descricao">Turma:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+                    <input type="text"
+                            pInputText
+                            [value]="evento.descricao"
+                            id="descricao"
+                            name="descricao"
+                            fluid
+                            readonly>
+                </p-iconfield>
+            </div>
+            <!-- Data -->
+            <div class="field col-3">
+                <label for="data">Data:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-calendar" />
+                    <input type="text"
+                            pInputText
+                            [value]="evento.data | date : 'dd/MM'"
+                            id="data"
+                            name="data"
+                            fluid
+                            readonly>
+                </p-iconfield>
+            </div>
+            <!-- Horário -->
+            <div class="field col-3">
+                <label for="horario">Horário:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-clock" />
+                    <input type="text"
+                            pInputText
+                            [value]="evento.data | date : 'HH:mm'"
+                            id="horario"
+                            name="horario"
+                            fluid
+                            readonly>
+                </p-iconfield>
+            </div>
+            <!-- Roteiro -->
+            <div class="field col-6">
+                <label for="semana">Semana:</label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-star-fill" />
+                    <ng-container *ngIf="evento.semana && evento.tema; else roteiroIndefinidoTemplate">
+                        <input type="text"
+                                pInputText
+                                [value]="'Semana ' + evento.semana + ' - ' + evento.tema "
+                                id="semana"
+                                name="semana"
+                                fluid
+                                readonly>
+                    </ng-container>
+                    <ng-template #roteiroIndefinidoTemplate>
+                        <input type="text"
+                        pInputText
+                        [value]="'Indefinido'"
+                        id="semana"
+                        name="semana"
+                        fluid
+                        readonly>
+                    </ng-template>
+                </p-iconfield>
+            </div>
+            <!-- OBS -->
+            <div class="field col-12">
+                <label for="observacao" class="font-bold">
+                    <span *ngIf="passado">Por que o aluno faltou? </span>
+                    <span *ngIf="!passado">Por que o aluno irá faltar? </span>
+                    <span class="text-red-500">*</span>
+                </label>
+                <textarea pTextarea
+                            id="observacao"
+                            name="observacao"
+                            [(ngModel)]="participacao.observacao"
+                            #observacao="ngModel"
+                            [required]="true"
+                            placeholder="Insira aqui o motivo..."
+                            rows="2"
+                            fluid></textarea>
+                <ng-container *ngIf="observacao.touched && observacao.errors">
+                    <p class="text-red-500" *ngIf="observacao.errors['required']">Esse campo é obrigatório</p>
+                </ng-container>
+            </div>
+            
+            <!-- O aluno foi contatado? -->
+            <div class="col-12 flex align-items-center gap-2 mb-2">
+                <span class="font-bold">O aluno foi contatado?</span>
+
+                <p-button 
+                    [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+                    [label]="alunoContactado ? 'Sim' : 'Não'"
+                    [severity]="alunoContactado ? 'success' : 'danger'"
+                    (onClick)="alunoContactadoChanged()"
+                    size="small"
+                />
+                
+                <ng-container  *ngIf="evento && participacao && !participacao.alunoContactado">
+                    <p-button type="button"
+                        (onClick)="enviarMensagemFalta($event)"
+                        (auxclick)="enviarMensagemFalta($event)"
+                        (contextmenu)="enviarMensagemFalta($event)"
+                        [disabled]="!participacao.celular"
+                        icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
+                        [severity]="participacao.celular ? 'success' : 'secondary'"
+                        pTooltip="Enviar mensagem de falta"
+                        label="Enviar mensagem"
+                        [text]="true" />
+                </ng-container>
+
+
+
+            </div>
+            
+            <ng-container  *ngIf="evento && participacao && participacao.alunoContactado">
+                <!-- Quando -->
+                <div class="field col">
+                    <label for="alunoContactado" class="font-bold">Quando?</label>
+                    <p-datepicker
+                              #_alunoContactado="ngModel"
+                              [(ngModel)]="participacao.alunoContactado"
+                              [disabled]="!participacao.alunoContactado"
+                              placeholder="dd/mm/yy hh:mm"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              inputId="alunoContactado"
+                              name="alunoContactado"
+                              [showTime]="true"
+                              hourFormat="24"
+                              [required]="true"
+                              [selectOtherMonths]="true"
+                              [keepInvalid]="true"
+                              [disabledDays]="[0]"
+                              appendTo="body"
+                              fluid  />
+                </div>
+            </ng-container>
+            <!-- Status do contato -->
+            <div class="field col">
+                <label for="statusContato_Id" class="font-bold">Status do contato: <span class="text-red-500">*</span></label>
+                <p-select [options]="status"
+                    inputId="statusContato_Id"
+                    name="statusContato_Id"
+                    [(ngModel)]="participacao.statusContato_Id"
+                    #statusContato_Id="ngModel"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    filterBy="label"
+                    appendTo="body"
+                    fluid />
+            </div>
+            <!-- Retorno do contato -->
+            <div class="field col">
+                <label for="contatoObservacao" class="font-bold">Retorno do contato: </label>
+                <input pInputText 
+                    id="contatoObservacao"
+                    name="contatoObservacao"
+                    [(ngModel)]="participacao.contatoObservacao"
+                    #contatoObservacao="ngModel"
+                    fluid />
+            </div>
+        </div>
+        <div class="col-12 px-1 flex align-items-center justify-content-end">
+            <p-button type="submit"
+                      fluid
+                      label="Salvar"
+                      icon="pi pi-check"
+                      [loading]="loading"
+                      [rounded]="true"
+                      [disabled]="form.invalid || loading || !evento || !participacao" />
+        </div>
+    </form>
+</p-dialog>

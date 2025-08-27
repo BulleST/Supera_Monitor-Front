@@ -110,6 +110,25 @@ export class CalendarioUtils {
         }
     }
 
+    setHexOpacity(hexColor: string, opacityPercentage: number) {
+        // Remove '#' if present
+        const baseHex = hexColor.startsWith('#') ? hexColor.slice(1) : hexColor;
+
+        // Calculate the alpha value (0-255)
+        const alpha = Math.round((opacityPercentage / 100) * 255);
+
+        // Convert alpha to two-digit hexadecimal
+        let alphaHex = alpha.toString(16).toUpperCase();
+
+        // Pad with leading zero if necessary
+        if (alphaHex.length === 1) {
+            alphaHex = '0' + alphaHex;
+        }
+
+        return `#${baseHex}${alphaHex}`;
+    }
+
+
     getEventoTipo(evento: Evento) {
         if (evento.evento_Tipo_Id == EventoTipo.Aula) return 'aula'
         else if (evento.evento_Tipo_Id == EventoTipo.AulaZero) return 'aula zero'

@@ -4,7 +4,7 @@ import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 
-import { CalendarOptions, DatesSetArg, EventApi } from '@fullcalendar/core';
+import { CalendarOptions, DatesSetArg, EventApi, EventHoveringArg } from '@fullcalendar/core';
 import multiMonthPlugin from '@fullcalendar/multimonth';
 import dayGridPlugin from '@fullcalendar/daygrid';
 
@@ -16,9 +16,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Feriado } from '../../../models/feriado.model';
 import { EventoService } from '../../../services/evento.service';
-import { PseudoEvento } from '../../../models/reposicao.model';
 import { EventoTipo } from '../../../models/evento.model';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
+import { ScreenWidth } from '../../../utils/mobile';
 
 @Component({
     selector: 'app-list',
@@ -37,11 +37,13 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
     currentTitle = '';
     calendarioList: Roteiro[] = [];
+    
+    items: MenuItem[] = [];
 
     @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
     currentEvents = signal<EventApi[]>([]);
     calendarioOptions: CalendarOptions = {
-        initialView: 'dayGridMonth',
+        initialView: 'multiMonthYear',
         themeSystem: 'standard',
         locale: 'pt-BR',
         plugins: [
@@ -52,11 +54,12 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         dayHeaders: true,
         weekends: true,
         hiddenDays: [0],
-        height: '500px',
+        height: '100%',
         expandRows: true,
         editable: false,
         showNonCurrentDates: true,
-        defaultAllDay: false,
+        fixedWeekCount: false,
+        defaultAllDay: true,
         dayHeaderFormat: { weekday: 'long' },
         headerToolbar: { left: '', center: '', right: '' },
         nowIndicator: true,
@@ -67,10 +70,15 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         handleWindowResize: false,
         weekNumbers: false,
         lazyFetching: true,
+        multiMonthMaxColumns: 2,
+        // dayMaxEvents: 2,
+        // dayMaxEventRows: false,
         datesSet: this.datesSet.bind(this),
         eventsSet: this.events.bind(this),
+        eventMouseEnter: this.eventMouseEnter.bind(this),
+        eventMouseLeave: this.eventMouseLeave.bind(this),
     }
-    items: MenuItem[] = []
+    
     constructor(
         private changeDetector: ChangeDetectorRef,
         private service: RoteiroService,
@@ -83,7 +91,8 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         private calendarioUtils: CalendarioUtils,
     ) {
 
-        var screen = this.mobileService.get().subscribe(res => {
+        let screen = this.mobileService.get().subscribe(res => {
+            this.calendarioOptions.multiMonthMaxColumns = (ScreenWidth.lg, ScreenWidth.xl).includes(res) ? 2 : 1
             if (this.fullCalendar) {
                 setTimeout(() => {
                     this.setCalendario();
@@ -92,7 +101,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         });
         this.subscription.push(screen);
 
-        var open = this.header.menuAsideOpen.subscribe(res => {
+        let open = this.header.menuAsideOpen.subscribe(res => {
             if (this.fullCalendar) {
                 setTimeout(() => {
                     this.setCalendario();
@@ -101,7 +110,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         });
         this.subscription.push(open);
 
-        var list = this.service.list.subscribe(res => {
+        let list = this.service.list.subscribe(res => {
             this.calendarioList = res;
             this.setCalendario();
         });
@@ -127,9 +136,9 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     }
 
     async prev() {
-        var anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().prev();
-        var ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -137,9 +146,9 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     }
 
     async next() {
-        var anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().next();
-        var ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -147,9 +156,9 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     }
 
     async today() {
-        var anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().today();
-        var ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -175,42 +184,69 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
     }
     setCalendario() {
-        var calendar = this.fullCalendar.getApi();
+        let calendar = this.fullCalendar.getApi();
         calendar.removeAllEvents();
 
-        var events: any[] = [];
-        this.feriados.forEach(item => {
-            var event = {
-                id: this.calendarioUtils.eventRandomId(),
-                textColor: 'white',
-                backgroundColor: 'red',
-                borderColor: 'red',
-                title: item.name,
-                start: moment(item.date).toDate(),
-                end: moment(item.date).toDate(),
-                allDay: true,
-                extendedProps: {
-                    id: PseudoEvento.EventoId,
-                    data: moment(item.date).toDate(),
-                    descricao: item.name,
-                    evento_Tipo_Id: EventoTipo.Feriado,
-                    ...item,
-                },
-            }
+        let events: any[] = [];
 
-            events.push(event)
-        })
+        // let roteirosDates = this.calendarioList.flatMap(x => {
+        //     let length = moment(x.dataFim).diff(x.dataInicio)
+        //     let range = Array.from({ length }, (item, index) => {
+        //         return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').format('DD/MM/YY');
+        //     });
+        //     return range;
+        // });
+        // console.log('roteirosDates', roteirosDates)
+        // this.feriados.filter(x => !roteirosDates.includes(moment(x.date).format('DD/MM/YY')) ).forEach(item => {
+        //     let event = {
+        //         id: this.calendarioUtils.eventRandomId(),
+        //         textColor: 'white',
+        //         backgroundColor: 'red',
+        //         borderColor: 'red',
+        //         title: item.name,
+        //         start: moment(item.date).toDate(),
+        //         end: moment(item.date).toDate(),
+        //         allDay: true,
+        //         extendedProps: {
+        //             id: PseudoEvento.EventoId,
+        //             data: moment(item.date).toDate(),
+        //             descricao: item.name,
+        //             evento_Tipo_Id: EventoTipo.Feriado,
+        //             ...item,
+        //         },
+        //     }
+
+        //     events.push(event)
+        // })
         this.calendarioList.filter(x => x.active == true)
             .forEach(x => {
-                var event = {
+
+                let color = this.calendarioUtils.setHexOpacity(x.corLegenda, 30);
+
+                let event = {
                     id: this.calendarioUtils.eventRandomId(),
                     title: x.tema,
-                    extendedProps: x,
-                    start: x.dataInicio,
-                    end: x.dataFim,
-                    backgroundColor: x.corLegenda,
-                    borderColor: x.corLegenda,
-                    textColor: this.calendarioUtils.getTextColor(x.corLegenda ?? '#fff')
+                    extendedProps: {
+                        ...x,
+                        textColor: x.corLegenda
+                    },
+                    start: moment(x.dataInicio).startOf('day').toDate(),
+                    end: moment(x.dataFim).endOf('day').add(1, 'minute').toDate(),
+
+                    // backgroundColor: x.corLegenda,
+                    // borderColor: x.corLegenda,
+                    // textColor: this.calendarioUtils.getTextColor(x.corLegenda ?? '#fff')
+                    
+                    // backgroundColor: 'var(--p-surface-50)',
+                    // borderColor: 'var(--p-surface-50)',
+                    // textColor: '#2e2e2e'
+
+                    backgroundColor: color,
+                    borderColor: color,
+                    textColor: '#2e2e2e',
+                    
+
+
                 };
                 events.push(event);
             });
@@ -226,6 +262,34 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         this.changeDetector.detectChanges(); // workaround for pressionChangedAfterItHasBeenCheckedError
     }
 
+    eventMouseEnter(arg: EventHoveringArg) {
+            let evento = arg.event.extendedProps as Roteiro;
+
+            let backColor = this.calendarioUtils.setHexOpacity(evento.corLegenda, 70);
+            let textColor = this.calendarioUtils.getTextColor(backColor);
+            arg.event.setProp('backgroundColor', backColor)
+            arg.event.setProp('borderColor', backColor)
+            arg.event.setProp('textColor', textColor)
+            arg.event.setExtendedProp('textColor', evento.corLegenda)
+    }
+
+    eventMouseLeave(arg: EventHoveringArg) {
+            let evento = arg.event.extendedProps as Roteiro;
+            let color = this.calendarioUtils.setHexOpacity(evento.corLegenda, 30);
+            let textColor = this.calendarioUtils.getTextColor(evento.corLegenda ?? '#fff');
+            
+            arg.event.setProp('backgroundColor', color)
+            arg.event.setProp('borderColor', color)
+            arg.event.setProp('textColor', '#2e2e2e')
+            arg.event.setExtendedProp('textColor', evento.corLegenda)
+
+
+
+            // arg.el.style.backgroundColor = color;
+            // arg.el.style.borderColor = color;
+            // arg.el.style.color = '#2e2e2e';
+    }
+
     async datesSet(arg: DatesSetArg) {
         this.currentTitle = moment(arg.view.currentStart).locale('pt').format('MMMM [de] YYYY');
         this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1);
@@ -234,14 +298,14 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     }
 
     edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
+        let encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 
 
-    async loadCalendario() {
+    loadCalendario() {
         this.loading = true;
-        lastValueFrom(this.service.getList())
+        return lastValueFrom(this.service.getList())
             .then(res => {
                 this.loading = false;
                 this.calendarioList = res;
@@ -251,13 +315,13 @@ export class ListComponent implements OnDestroy, AfterViewInit {
             })
     }
 
-    async loadFeriados() {
+    loadFeriados() {
         this.loadingFeriados = true;
-        var ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
-        await lastValueFrom(this.eventoService.getFeriados(ano))
+        let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        return lastValueFrom(this.eventoService.getFeriados(ano))
             .then(res => {
                 res.forEach(item => {
-                    var index = this.feriados.findIndex(x => moment(x.date).isSame(item.date))
+                    let index = this.feriados.findIndex(x => moment(x.date).isSame(item.date))
                     if (index == -1) {
                         this.feriados.push(item);
                     }

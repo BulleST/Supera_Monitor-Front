@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
@@ -15,13 +15,13 @@ import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { AlunoService } from '../../../../../services/alunos.service';
 import { NgForm, NgModel } from '@angular/forms';
 import { Roteiro } from '../../../../../models/roteiro.model';
-import { EventoTurmaExtraRequest, EventoAulaRequest } from '../../../../../models/evento-aula.model';
+import { EventoTurmaExtraRequest } from '../../../../../models/evento-aula.model';
 import moment from 'moment';
 import { RoteiroService } from '../../../../../services/roteiro.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../../services/evento.service';
 import { getError, showError } from '../../../../../utils';
-import { Evento, EventoCancelamentoRequest, EventoTipo } from '../../../../../models/evento.model';
+import { Evento,  EventoTipo } from '../../../../../models/evento.model';
 import { MyMap as MyMap } from '../../../../../utils/map';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
@@ -33,7 +33,6 @@ import $ from 'jquery';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playSuccess } from '../../../../../utils/audio';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 
 @Component({
@@ -80,7 +79,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     target: Aluno[] = [];
     source: Aluno[] = [];
-    loadingList = false;
+    loadingAlunos = false;
 
     loadingEventosReposicaoAluno = false;
     selectedEventoReposicao?: Evento;
@@ -93,7 +92,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     feriados: Feriado[] = [];
     loadingFeriados = false;
-    feriadoDates: Date[] = [];
+    invalidDates: Date[] = [];
     ano: number = new Date().getFullYear();
 
     constructor(
@@ -107,77 +106,65 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         private toastrService: ToastrService,
         private salaAulaService: SalaAulaService,
         private alunoService: AlunoService,
-        private alunoRestricaoService: AlunoRestricaoService,
         private roteiroService: RoteiroService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
     ) {
+        let feriados = this.service.feriados.subscribe(res => {
+            this.feriados = res;
+            this.setInvalidDates();
+        });
+        this.subscription.push(feriados);
+
+        if (this.feriados.length == 0) {
+            this.loadFeriados();
+        }
+
         let roteiros = this.roteiroService.list.subscribe(res => {
-            this.roteiros = res;
+            this.roteiros = res.filter(x => x.active);
+            this.setInvalidDates();
             this.setRoteiroAtual();
         });
         this.subscription.push(roteiros);
 
         if (this.roteiros.length == 0) {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList('cadastrar aula extra'))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
+            this.loadRoteiros();
         }
 
-        let professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active));
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
-            this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+            this.loadProfessores();
         }
 
-        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active));
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
-            this.loadingSalaAulas = true;
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
+            this.loadSalas();
         }
 
         let perfisCognitivos = this.perfilCognitivoService.list.subscribe(res => this.perfisCognitivos = res);
         this.subscription.push(perfisCognitivos);
 
         if (this.perfisCognitivos.length == 0) {
-            this.loadingPerfisCognitivos = true;
-            lastValueFrom(this.perfilCognitivoService.getList())
-                .then(res => this.loadingPerfisCognitivos = false)
-                .catch(res => this.loadingPerfisCognitivos = false);
+            this.loadPerfilCognitivo();
         }
 
-        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active));
         this.subscription.push(turmas);
 
-
         if (this.turmas.length == 0) {
-            this.loadingTurmas = true;
-            lastValueFrom(this.turmaService.getList())
-                .then(res => this.loadingTurmas = false)
-                .catch(res => this.loadingTurmas = false);
+            this.loadTurmas();
         }
 
         let alunos = this.alunoService.list.subscribe(res => this.source = res.filter(x => x.active == true && x.turma_Id));
         this.subscription.push(alunos);
 
         if (this.source.length == 0) {
-            this.loadingList = true;
-            lastValueFrom(this.alunoService.getList())
-                .then(res => this.loadingList = false)
-                .catch(res => this.loadingList = false);
+            this.loadAlunos();
         }
-
-
-        this.loadFeriados();
 
         let eventos = this.service.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
@@ -197,18 +184,79 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         }
     }
 
-    loadFeriados() {
-        this.loadingFeriados = true;
-        return lastValueFrom(this.service.getFeriados(this.ano))
-            .then(res => {
-                this.feriados = res
-                this.feriadoDates = this.feriados.map(x => moment(x.date).toDate());
-                this.loadingFeriados = false;
-                return res;
-            })
-            .catch(res => this.loadingFeriados = false);
-    }
+  
+  
+      loadProfessores() {
+              this.loadingProfessores = true;
+              lastValueFrom(this.professorService.getList())
+                  .then(res => this.loadingProfessores = false)
+                  .catch(res => this.loadingProfessores = false);
+      }
+  
 
+  
+  
+      loadPerfilCognitivo() {
+            this.loadingPerfisCognitivos = true;
+            lastValueFrom(this.perfilCognitivoService.getList())
+                .then(res => this.loadingPerfisCognitivos = false)
+                .catch(res => this.loadingPerfisCognitivos = false);
+      }
+  
+      loadRoteiros() {
+              this.loadingRoteiros = true;
+              lastValueFrom(this.roteiroService.getList())
+                  .then(res => this.loadingRoteiros = false)
+                  .catch(res => this.loadingRoteiros = false);
+      }
+  
+      loadSalas() {
+              this.loadingSalaAulas = true;
+              lastValueFrom(this.salaAulaService.getList())
+                  .then(res => this.loadingSalaAulas = false)
+                  .catch(res => this.loadingSalaAulas = false);
+      }
+  
+      loadTurmas() {
+          this.loadingTurmas = true;
+          lastValueFrom(this.turmaService.getList())
+              .then(res => this.loadingTurmas = false)
+              .catch(res => this.loadingTurmas = false);
+      }
+  
+      loadAlunos() {
+          this.loadingAlunos = true;
+          lastValueFrom(this.alunoService.getList())
+              .then(res => this.loadingAlunos = false)
+              .catch(res => this.loadingAlunos = false);
+      }
+  
+      loadFeriados() {
+          this.loadingFeriados = true;
+          lastValueFrom(this.service.getFeriados(this.ano))
+              .then(res => this.loadingFeriados = false)
+              .catch(res => this.loadingFeriados = false);
+      }
+  
+      setInvalidDates() {
+          if (this.roteiros.length && this.feriados.length) {
+              let recessos = this.roteiros.filter(x => x.recesso === true);
+              let recessosDate = recessos.flatMap(x => {
+                  let length = moment(x.dataFim).diff(x.dataInicio)
+                  let range = Array.from({ length }, (item, index) => {
+                      return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
+                  });
+                  return range;
+              });
+              
+              let feriadosDate = this.feriados.map(x => x.date);
+  
+              this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
+  
+              console.log(this.invalidDates);
+          }
+      }
+  
     showError(header: string, message: string, e: any, innerMessage?: string) {
         showError(this.confirmationService, header, message, e, innerMessage);
     }
@@ -566,7 +614,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         lastValueFrom(this.service.getList(request))
             .then(res => {
 
-                let feriadosDates = this.feriadoDates.map(x => moment(x).format('YYYY-MM-DD'));
+                let feriadosDates = this.invalidDates.map(x => moment(x).format('YYYY-MM-DD'));
                 aluno.aulasParaRepor = res.filter(evento => {
                     let ehAula = evento.evento_Tipo_Id == EventoTipo.Aula;
                     let ehAulaFinalizada = evento.finalizado;

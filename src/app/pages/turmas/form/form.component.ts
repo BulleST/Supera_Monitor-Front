@@ -85,7 +85,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList('turmas/form.component'))
+            lastValueFrom(this.professorService.getList())
                 .then(res => this.loadingProfessores = false)
                 .catch(res => this.loadingProfessores = false);
         }

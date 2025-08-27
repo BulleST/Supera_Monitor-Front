@@ -1,18 +1,16 @@
 import { Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ConfirmationService, FilterMatchMode, FilterService, MenuItem } from 'primeng/api';
+import { ConfirmationService, MenuItem } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ColumnTable, Crypto, DisplayType, FilterType, getError, insertOrReplace, showError } from '../../../utils';
+import { ColumnTable, Crypto, DisplayType, FilterType, getError, showError } from '../../../utils';
 import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Professor, Professor_NivelCertificacao, professorColumns } from '../../../models/professor.model';
 import { ProfessorService } from '../../../services/professor.service';
 import { UserService } from '../../../services/user.service';
 import { ToastrService } from 'ngx-toastr';
-import { playAlert, playSuccess } from '../../../utils/audio';
 import { ContextMenu } from 'primeng/contextmenu';
-import moment from 'moment';
 
 @Component({
     selector: 'app-list',
@@ -93,7 +91,7 @@ export class ListComponent implements OnDestroy {
     update() {
         this.list = [];
         this.tableLoading = true;
-        lastValueFrom(this.service.getList('professot/list.component'))
+        lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
             .catch(res => {
                 this.tableLoading = false;

@@ -49,43 +49,27 @@
     </div>
 </p-toolbar>
 <p-contextmenu #contextMenu [model]="items" appendTo="body" />
-<full-calendar
-               [options]="calendarioOptions"
-               #fullCalendar
-               class="p-1 "
-               [ngStyle]="{height: '30rem'}">
+<full-calendar [options]="calendarioOptions" #fullCalendar >
     <ng-template #eventContent let-arg>
         <ng-container *ngIf="!loading; else loadingEvent">
             <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
             <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
-                <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
-                    <div class="py-1">
-                        <p class="text-xs">
-                            <i class="pi pi-calendar mr-2 text-xs"></i>
-                            <span>Feriado</span>
-                        </p>
-                        <p class="text-base font-bold">{{evento.descricao}}</p>
-                        <p class="text-xs">{{evento.level}} - {{evento.type}}</p>
-                    </div>
-                </ng-container>
-                <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
-                    <div class="py-1 cursor-pointer"
+                    <div class="py-1 cursor-pointer "
                          (click)="edit(evento)"
                          title="Clique para ver mais">
-                         <ng-container *ngIf="evento.recesso">
-                             <p class="text-sm">
-                                 <span>Recesso</span>
-                             </p>
-                         </ng-container>
-                         <ng-container *ngIf="!evento.recesso">
-                             <p class="text-sm">
-                                 <i class="pi pi-calendar mr-2 text-sm"></i>
-                                 <span>Semana {{evento.semana}}</span>
-                             </p>
-                         </ng-container>
-                        <p class="text-xl font-bold">{{evento.tema}}</p>
+                    
+                        <p class="text-sm my-1">
+                            <i class="pi pi-calendar mr-2 text-sm"></i>
+                            <span *ngIf="evento.recesso" >Recesso</span>
+                            <span *ngIf="!evento.recesso" >Semana {{evento.semana}}</span>
+                        </p>
+                        <!-- <pre>{{arg|json}}</pre> -->
+                        <div class="flex align-items-center justify-content-center gap-2 my-2">
+                            <i class="pi pi-star-fill" [style]="{ color: evento.textColor}"></i>
+                            <p class="text-lg font-bold">{{evento.tema}}</p>
+                            <i class="pi pi-star-fill" [style]="{ color: evento.textColor}"></i>
+                        </div>
                     </div>
-                </ng-container>
             </ng-template>
         </ng-container>
         <ng-template #loadingEvent>

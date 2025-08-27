@@ -52,7 +52,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList('jornada filtro'))
+            lastValueFrom(this.professorService.getList())
                 .then(res => this.loadingProfessores = false)
                 .catch(res => this.loadingProfessores = false);
         }

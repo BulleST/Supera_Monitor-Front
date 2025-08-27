@@ -1,7 +1,7 @@
 export class EventoAgendarFaltaRequest {
     participacao_Id: number = 0;
-    status_Id: number = undefined as unknown as number;
+    statusContato_Id?: number;
     observacao: string = '';
-    observacaoContato: string = '';
-    alunoContactado: boolean = false;
+    contatoObservacao?: string;
+    alunoContactado?: Date;
 }

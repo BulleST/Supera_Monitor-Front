@@ -197,26 +197,6 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
-    goToReagendamento() {
-        if (this.evento) {
-            this.service.setEvento(this.evento);
-
-            let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
-            switch (this.evento.evento_Tipo_Id) {
-                case EventoTipo.Aula: route = 'aula'; break;
-                case EventoTipo.AulaZero: route = 'aula-zero'; break;
-                case EventoTipo.TurmaExtra: route = 'aula'; break;
-                case EventoTipo.Superacao: route = 'superacao'; break;
-                case EventoTipo.Reuniao: route = 'reuniao'; break;
-                case EventoTipo.Oficina: route = 'oficina'; break;
-                default: route = 'aula'; break;
-            }
-
-            this.router.navigate(['calendario', route, 'reagendar', this.crypto.encrypt(this.evento.id)]);
-            this.hidePopover();
-        }
-    }
-
     goToPrimeiraAula() {
         if (this.evento) {
             this.service.setEvento(this.evento);
@@ -247,31 +227,35 @@ export class SelectedEventoComponent implements OnChanges {
 
     async goToEvento() {
         if (this.evento) {
-            this.evento.data = new Date(this.evento.data);
-            let alunos = this.alunoService.list.value;
+            let evento: Evento = this.evento; 
 
-            if (!alunos.length) {
-                await lastValueFrom(this.alunoService.getList()).then(res => alunos = res);
+
+            if (evento.id != PseudoEvento.EventoId) {
+                evento = await lastValueFrom(this.service.get(evento.id))
+            }
+            else {
+                if (evento.evento_Tipo_Id == EventoTipo.Aula) {
+                    await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
+                    .then(res => evento = res)
+                    .catch(res => this.toastr.error(res.message, 'Erro'))
+                }
             }
 
-            this.evento.alunos = this.evento.alunos.map(participacao => {
-                const aluno = alunos.find(x => x.id == participacao.aluno_Id);
-                if (aluno) {
-                    participacao.alunoChecklist = aluno.alunoChecklist;
-                    participacao.checklistCompleto = aluno.checklistCompleto;
-                    participacao.checklist_Id = aluno.checklist_Id;
-                    participacao.checklist = aluno.checklist;
-                    participacao.presente = this.evento?.finalizado ? participacao.presente : true;
+            evento.alunos = evento.alunos.map(x => {
+                if (!evento.finalizado) {
+                    if (x.presente !== true && x.presente !== false) {
+                        x.presente = true;
+                    }
                 }
-                return participacao;
-            });
+                return x
+            })
+            
+            evento.professores = evento.professores.map(x => {
+                x.presente = evento.finalizado ? x.presente : true;
+                return x
+            })
 
-            this.evento.professores.map(item => {
-                item.presente = true;
-                return item;
-            });
-
-            this.service.setEvento(this.evento);
+            this.service.setEvento(evento);
             let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
 
             switch (this.evento.evento_Tipo_Id) {

@@ -1,3 +1,4 @@
+import { Feriado } from "./feriado.model";
 import { Roteiro } from "./roteiro.model";
 
 export class DashboardRequest {
@@ -17,6 +18,9 @@ export class Dashboard_Item {
     show: boolean = true;
     aula: Dashboard_Aula = new Dashboard_Aula;
     participacao: Dashboard_Participacao = new Dashboard_Participacao;
+    roteiro: Dashboard_Roteiro = new Dashboard_Roteiro;
+    feriado?: Feriado;
+    status: DashboardItemStatus = DashboardItemStatus.Aula;
 }
 
 export class Dashboard_Aula {
@@ -105,4 +109,16 @@ export class Dashboard_Mes {
     mes: number = 0;
     mesString: string = '';
     roteiros: Roteiro[] = [];
+}
+
+export enum DashboardItemStatus {
+    Cancelada = 'Cancelada',
+    Feriado = 'Feriado',
+    Reposicao = 'Reposição Agendada',
+    FaltaNaReposicao = 'Faltou na Reposição',
+    FaltaNaAula = 'Faltou na Aula',
+    FaltaAgendada = 'Falta Agendada',
+    PresenteNaReposicao = 'Presente na Reposição',
+    Presente = 'Presente',
+    Aula = 'Aula',       
 }

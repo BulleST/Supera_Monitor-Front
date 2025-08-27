@@ -79,13 +79,13 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
         this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
 
-        var checklists = this.checklistService.list.value;
-        var item = checklists.flatMap(x => x.items).find(x => x.id == alunoChecklistItem.checklist_Item_Id) as Checklist_Item;
+        let checklists = this.checklistService.list.value;
+        let item = checklists.flatMap(x => x.items).find(x => x.id == alunoChecklistItem.checklist_Item_Id) as Checklist_Item;
         this.alunoChecklistOnConfirmDialog.item = item;
 
         this.alunoChecklistOnConfirmDialog.show();
 
-        var onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
+        let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
             model.control.setValue(false);
             model.control.updateValueAndValidity();
             this.alunoChecklistOnConfirmDialog.hide();
@@ -93,7 +93,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             onFinish.unsubscribe();
         });
 
-        var onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+        let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
 
             alunoChecklistItem.observacoes = res.observacoes;
             alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;

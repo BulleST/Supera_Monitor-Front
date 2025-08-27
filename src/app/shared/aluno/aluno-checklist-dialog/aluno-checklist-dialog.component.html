@@ -69,6 +69,7 @@
                                             [styleClass]="checklistItem.finalizado ? 'cursor-auto' : ''"
                                             [binary]="true"
                                             [readonly]="checklistItem.finalizado"
+                                            [disabled]="!aluno.active"
                                             (ngModelChange)="checkboxMark(checklistItem, finalizado)" />
                                 <label class="font-medium  mt-2"
                                        [for]="'checklistitem-' + checklistItem.id">

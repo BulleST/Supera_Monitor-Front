@@ -33,6 +33,8 @@ import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
 import { MyMap } from '../../../../../utils/map'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
+import { RoteiroService } from '../../../../../services/roteiro.service'
+import { Roteiro } from '../../../../../models/roteiro.model'
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -68,11 +70,15 @@ export class CadastrarAula0Component implements OnDestroy {
 
     eventos: Evento[] = []
     loadingEventos = false
+    
+    roteiros: Roteiro[] = [];
+    loadingRoteiros = false;
 
     feriados: Feriado[] = []
     loadingFeriados = false
-    feriadoDates: Date[] = []
     ano: number = new Date().getFullYear()
+    
+    invalidDates: Date[] = []
 
     @ViewChild('form') form!: NgForm
     @ViewChild('formDiv') formDiv!: HTMLFormElement
@@ -90,7 +96,7 @@ export class CadastrarAula0Component implements OnDestroy {
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
         private alunoService: AlunoService,
-        private alunoRestricaoService: AlunoRestricaoService,
+        private roteiroService: RoteiroService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private checklistService: ChecklistService,
@@ -100,47 +106,56 @@ export class CadastrarAula0Component implements OnDestroy {
     ) {
         this.object.descricao = 'Aula 0'
 
-        let professores = this.professorService.list.subscribe(res => this.professores = res)
+        let feriados = this.service.feriados.subscribe(res => {
+            this.feriados = res;
+            this.setInvalidDates();
+        });
+        this.subscription.push(feriados);
+
+        if (this.feriados.length == 0) {
+            this.loadFeriados();
+        }
+
+        let roteiros = this.roteiroService.list.subscribe(res => {
+            this.roteiros = res.filter(x => x.active);
+            this.setInvalidDates();
+        });
+        this.subscription.push(roteiros);
+
+        if (this.roteiros.length == 0) {
+            this.loadRoteiros();
+        }
+
+        let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active))
         this.subscription.push(professores)
 
         if (this.professores.length == 0) {
-            this.loadingProfessores = true
-            lastValueFrom(this.professorService.getList())
-                .then(res => (this.loadingProfessores = false))
-                .catch(res => (this.loadingProfessores = false))
+            this.loadProfessores();
         }
 
-        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res)
+        
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active))
         this.subscription.push(salaAula)
 
         if (this.salaAulas.length == 0) {
-            this.loadingSalaAulas = true
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => (this.loadingSalaAulas = false))
-                .catch(res => (this.loadingSalaAulas = false))
+            this.loadSalas();
         }
 
-        let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active))
         this.subscription.push(turmas)
 
         if (this.turmas.length == 0) {
-            this.loadingTurmas = true
-            lastValueFrom(this.turmaService.getList())
-                .then(res => (this.loadingTurmas = false))
-                .catch(res => (this.loadingTurmas = false))
+            this.loadTurmas();
         }
 
         let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active))
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
-            this.loadingAlunos = true
-            lastValueFrom(this.alunoService.getList())
-                .then(res => (this.loadingAlunos = false))
-                .catch(res => (this.loadingAlunos = false))
+            this.loadAlunos();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res)
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active))
         this.subscription.push(eventos)
 
         this.loadFeriados()
@@ -165,11 +180,67 @@ export class CadastrarAula0Component implements OnDestroy {
             this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
         }
     }
-
-    getCorTurma(turma_Id?: number) {
-        if (turma_Id) return this.turmas.find(x => x.id == turma_Id)?.corLegenda ?? ''
-        else return null
-    }
+    
+        loadProfessores() {
+                this.loadingProfessores = true;
+                lastValueFrom(this.professorService.getList())
+                    .then(res => this.loadingProfessores = false)
+                    .catch(res => this.loadingProfessores = false);
+        }
+    
+        loadRoteiros() {
+                this.loadingRoteiros = true;
+                lastValueFrom(this.roteiroService.getList())
+                    .then(res => this.loadingRoteiros = false)
+                    .catch(res => this.loadingRoteiros = false);
+        }
+    
+        loadSalas() {
+                this.loadingSalaAulas = true;
+                lastValueFrom(this.salaAulaService.getList())
+                    .then(res => this.loadingSalaAulas = false)
+                    .catch(res => this.loadingSalaAulas = false);
+        }
+    
+        loadTurmas() {
+            this.loadingTurmas = true;
+            lastValueFrom(this.turmaService.getList())
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false);
+        }
+    
+        loadAlunos() {
+            this.loadingAlunos = true;
+            lastValueFrom(this.alunoService.getList())
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false);
+        }
+    
+        loadFeriados() {
+            this.loadingFeriados = true;
+            lastValueFrom(this.service.getFeriados(this.ano))
+                .then(res => this.loadingFeriados = false)
+                .catch(res => this.loadingFeriados = false);
+        }
+    
+        setInvalidDates() {
+            if (this.roteiros.length && this.feriados.length) {
+                let recessos = this.roteiros.filter(x => x.recesso === true);
+                let recessosDate = recessos.flatMap(x => {
+                    let length = moment(x.dataFim).diff(x.dataInicio)
+                    let range = Array.from({ length }, (item, index) => {
+                        return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').toDate()
+                    });
+                    return range;
+                });
+                
+                let feriadosDate = this.feriados.map(x => x.date);
+    
+                this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
+    
+                console.log(this.invalidDates);
+            }
+        }
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e)
@@ -182,16 +253,6 @@ export class CadastrarAula0Component implements OnDestroy {
         }
     }
 
-    async loadFeriados() {
-        this.loadingFeriados = true
-        await lastValueFrom(this.service.getFeriados(this.ano))
-            .then(res => {
-                this.feriados = res
-                this.loadingFeriados = false
-                this.feriadoDates = res.map(x => moment(x.date).toDate())
-            })
-            .catch(res => (this.loadingFeriados = false))
-    }
 
     enviarMensagem(aluno: Aluno) {
         if (!aluno.celular) {

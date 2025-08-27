@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
+import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -37,6 +37,7 @@ import { LegendColorComponent } from './professor/legend-color/legend-color.comp
 import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
 import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
 import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
+import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
 
 @NgModule({
     declarations: [
@@ -48,6 +49,8 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
         AlunoReposicaoTooltipComponent,
+        AlunoAgendarFaltaDialogComponent,
+        AlunoParticipacaoFaltaContatoDialogComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
@@ -57,7 +60,6 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
         TableHeaderFilterComponent,
         LegendColorComponent,
         IndisponivelTooltipComponent,
-        AlunoAgendarFaltaDialogComponent,
         CalendarioComponent,
     ],
     exports: [
@@ -80,6 +82,8 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
         AlunoReposicaoTooltipComponent,
+        AlunoAgendarFaltaDialogComponent,
+        AlunoParticipacaoFaltaContatoDialogComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
@@ -88,7 +92,6 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
         TableHeaderFilterComponent,
         LegendColorComponent,
         IndisponivelTooltipComponent,
-        AlunoAgendarFaltaDialogComponent,
     ],
     imports: [
         CommonModule,

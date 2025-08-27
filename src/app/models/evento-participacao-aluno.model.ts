@@ -51,10 +51,9 @@ export class Evento_Participacao_Aluno {
     checklist?: string;
     checklist_Id?: number;
 
-    // Não mapeado
-    loadingFoto?: boolean = false;
+    // // Não mapeado
+    // loadingFoto?: boolean = false;
     
-    // from GET checklist/all/aula/aula_id
     checklistCompleto: AlunoChecklistCompleto[] = [];
     alunoChecklist: Aluno_CheckList_Item[] = [];
     
@@ -68,49 +67,7 @@ export class Evento_Participacao_Aluno {
     primeiraAula_Id?: number;
     aulaZero_Id?: number;
 
-    alunoContactado: boolean = false; 
-    observacoesContato?: string; 
-}
-
-export var alunoParticipacao: Evento_Participacao_Aluno[] = [];
-for (let index = 0; index < 11; index++) {
-    // alunoParticipacao.push({
-    //     id: -1,
-    //     aluno_Id: index,
-    //     aluno: 'João',
-    //     aluno_Foto: '',
-    //     celular: '5511953463376',
-    //     evento_Id: PseudoAula.AulaId,
-    //     reposicaoDe_Evento_Id: undefined,
-    //     reposicaoDe_Evento: undefined,
-    //     presente: undefined,
-    //     observacao: undefined,
-
-    //     apostila_Abaco: 'Abaco 1',
-    //     apostila_Abaco_Id: 0,
-    //     numeroPaginaAbaco: 1,
-
-    //     apostila_AH: 'AH 1',
-    //     apostila_AH_Id: 0,
-    //     numeroPaginaAH: 1,
-
-    //     apostila_Kit: 'Kit 1',
-    //     apostila_Kit_Id: 0,
-
-    //     // perfilCognitivo_Id: number = 0,
-    //     perfilCognitivo: 'Junior',
-
-    //     // turma_Id: number = 0, // Turma do aluno
-    //     turma: 'Turma A', // Turma do aluno
-
-    //     checklist: 'Aula 0',
-    //     checklist_Id: 0,
-
-    //     // Não mapeado
-    //     loadingFoto: undefined,
-
-    //     // from GET checklist/all/aula/aula_id
-    //     checklists: [],
-
-    // })
+    alunoContactado?: Date; 
+    statusContato_Id?: number;
+    contatoObservacao?: string;
 }

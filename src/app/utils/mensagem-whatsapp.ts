@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Evento, EventoTipo } from "../models/evento.model";
-import moment from "moment";
+import moment, { months } from "moment";
 import { CalendarioUtils } from "./calendario-utils";
 import { ToastrService } from "ngx-toastr";
 import { Clipboard } from "@angular/cdk/clipboard";
@@ -40,7 +40,7 @@ export class MensagemWhatsapp {
             });
     }
 
-    enviarMensagemFalta(evento: Evento, participacao: Evento_Participacao_Aluno, e: any) {
+    async enviarMensagemFalta(evento: Evento, participacao: Evento_Participacao_Aluno, e: any) {
         if (!participacao.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
             return;
@@ -50,36 +50,45 @@ export class MensagemWhatsapp {
             this.showError('Aluno presente', 'O aluno já está presente.', e.target);
             return;
         }
+        
+        let sugestoes: Evento[] = [];
+        let prazo = moment(evento.data).add(1, 'month')
 
-        lastValueFrom(this.eventoService.getList({
-            intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
-            intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
-            perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
-        }))
-            .then(res => {
-                let sugestoes = res.filter(aula => {
-                    const alunosAtivos = aula.alunos.filter(x => x.active);
-                    const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
-                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                    const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
-                    const ehPerfilCognitivoCompativel = participacao.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
-                    const aulaNaoFinalizada = !aula.finalizado;
-                    const aulaEstaAtiva = aula.active;
-                    const naoEhFeriado = !aula.feriado;
+        // Se estiver dentro do prazo de 1 mes, insere sugestão
+        if (moment(prazo).isSameOrAfter(new Date, 'date')) {
+            let request = {
+                intervaloDe: moment(evento.data, 'YYYY-MM-DD').toDate(),
+                intervaloAte: moment(evento.data, 'YYYY-MM-DD').add(1, 'month').toDate(),
+                perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
+            }
+            await lastValueFrom(this.eventoService.getList(request))
+                .then(res => {
+                    sugestoes = res.filter(aula => {
+                        const alunosAtivos = aula.alunos.filter(x => x.active);
+                        const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+                        const temVagas = alunosAtivos.length < aula.capacidadeMaximaAlunos;
+                        const ehPerfilCognitivoCompativel = participacao.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
+                        const aulaNaoFinalizada = !aula.finalizado;
+                        const aulaEstaAtiva = aula.active;
+                        const naoEhFeriado = !aula.feriado;
+        
+                        return alunoNaoEstaNaAula
+                            && ehAula
+                            && temVagas
+                            && ehPerfilCognitivoCompativel
+                            && aulaNaoFinalizada
+                            && aulaEstaAtiva
+                            && naoEhFeriado;
+                    });
+                })
+        } 
 
-                    return alunoNaoEstaNaAula
-                        && ehAula
-                        && temVagas
-                        && ehPerfilCognitivoCompativel
-                        && aulaNaoFinalizada
-                        && aulaEstaAtiva
-                        && naoEhFeriado;
-                });
 
-                let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, evento, sugestoes);
-                window.open(object.link, '_blank');
-                this.copiarMensagem(object.mensagem);
-            })
+
+        let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, evento, sugestoes);
+        window.open(object.link, '_blank');
+        this.copiarMensagem(object.mensagem);
     }
 
     enviarMensagemCondicao(aluno: any, id: number) {
@@ -138,7 +147,7 @@ export class MensagemWhatsapp {
         };
     }
 
-    enviarMensagemFaltaSend(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
+    enviarMensagemFaltaSend(nome: string, celular: string, evento: Evento, sugestoes: Evento[] = []) {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
@@ -150,7 +159,25 @@ export class MensagemWhatsapp {
             \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
 
         if (evento.evento_Tipo_Id == EventoTipo.Aula || evento.evento_Tipo_Id == EventoTipo.TurmaExtra) {
-            mensagem += `\r\nSugiro agendarmos uma reposição, para você não perder o conteúdo. `
+            
+            
+        let prazo = moment(evento.data).add(1, 'months');
+        if (moment(new Date).isAfter(prazo, 'date')) 
+        {
+            
+            mensagem += `\r\nInfelizmente, o prazo de um mês para agendar reposição acabou em ${prazo.format('DD/MM/YY')}.`;
+        } 
+        else {
+            
+            
+            mensagem += `\r\nPrecisamos agendar uma reposição, para você não perder o conteúdo. `
+            if (moment(prazo).isSame(new Date, 'date')) {
+                mensagem += `\r\nVocê tem até *hoje* para agendar sua reposição.`
+            }
+            else {
+                mensagem += `\r\nVocê tem até o dia *${prazo.format('DD/MM/YY')}* para agendar sua reposição.`
+            }
+
             if (sugestoes.length > 0) {
                 mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
                     \r\n `;
@@ -163,6 +190,8 @@ export class MensagemWhatsapp {
                     \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
                     \r\n
                     \r\nIremos aguardar sua resposta...`;
+        }
+
         }
         else if (evento.evento_Tipo_Id == EventoTipo.Oficina) {
             mensagem += `\r\n O não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.

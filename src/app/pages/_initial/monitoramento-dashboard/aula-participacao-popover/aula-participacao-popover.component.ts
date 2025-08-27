@@ -1,5 +1,5 @@
 import { Component, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Dashboard_Aluno, Dashboard_Aula, Dashboard_Item } from '../../../../models/dashboard.model';
+import { Dashboard_Aluno, Dashboard_Aula, Dashboard_Item, DashboardItemStatus } from '../../../../models/dashboard.model';
 import { Popover } from 'primeng/popover';
 import { Router } from '@angular/router';
 import { Crypto, MensagemWhatsapp } from '../../../../utils';
@@ -22,7 +22,7 @@ import { NgModel } from '@angular/forms';
     styleUrl: './aula-participacao-popover.component.css'
 })
 export class AulaParticipacaoPopoverComponent implements OnChanges {
-    @Input() participacao!: Dashboard_Item;
+    @Input() item!: Dashboard_Item;
     @Input() aluno!: Dashboard_Aluno;
 
     @ViewChild('popover') popover!: Popover;
@@ -32,6 +32,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     eventoEncryptedId: string = '';
     alunoEncryptedId: string = '';
 
+    DashboardItemStatus = DashboardItemStatus;
+    
     constructor(
         private router: Router,
         private crypto: Crypto,
@@ -45,8 +47,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['item']) {
-            this.participacao = changes['item'].currentValue;
-            this.eventoEncryptedId = this.crypto.encrypt(this.participacao.aula.id) as string;
+            this.item = changes['item'].currentValue;
+            this.eventoEncryptedId = this.crypto.encrypt(this.item.aula.id) as string;
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
@@ -71,7 +73,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     loadMenuItems() {
-        if (!this.participacao || !this.aluno) {
+        if (!this.item || !this.aluno) {
             return
         }
         this.menuItems = [];
@@ -86,10 +88,10 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         })
 
         // Agendar Falta
-        if (this.participacao.aula.active === true
-            && this.participacao.aula.finalizado === false
-            && this.participacao.participacao.presente !== true
-            && this.participacao.participacao.active === true) {
+        if (this.item.aula.active === true
+            && this.item.aula.finalizado === false
+            && this.item.participacao.presente !== true
+            && this.item.participacao.active === true) {
             this.menuItems.push({
                 label: 'Agendar falta',
                 icon: 'pi pi-thumbs-down text-red-500 ',
@@ -98,7 +100,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             })
         }
         // Agendar reposição
-        if (this.participacao.participacao.presente !== true) {
+        if (this.item.participacao.presente !== true) {
             this.menuItems.push({
                 label: 'Agendar reposição',
                 icon: 'pi pi-calendar ',
@@ -106,7 +108,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             })
         }
         // Enviar Mensagem de Falta
-        if (this.participacao.participacao.presente === false) {
+        if (this.item.participacao.presente === false) {
             this.menuItems.push({
                 label: 'Enviar Mensagem de Falta',
                 icon: 'pi pi-whatsapp text-green-500 ',
@@ -128,7 +130,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     async goToAula() {
 
         let evento: Evento;
-        let participacao = this.participacao;
+        let participacao = this.item;
         if (participacao.aula.id == PseudoEvento.EventoId) {
             let turma_Id = participacao.aula.turma_Id!;
             let data = moment(participacao.aula.data).format('YYYY-MM-DDTHH:mm:ss')
@@ -143,7 +145,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
     async goToAgendarFalta() {
 
-        let participacao = this.participacao;
+        let participacao = this.item;
 
         let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
         let evento: Evento;
@@ -162,7 +164,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     async goToReposicao() {
-        let participacao = this.participacao;
+        let participacao = this.item;
         let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
         let evento: Evento;
         if (participacao.aula.id == PseudoEvento.EventoId) {
@@ -181,8 +183,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
 
     async enviarMensagemFalta(e: any) {
-        let evento: Evento = await lastValueFrom(this.service.get(this.participacao.aula.id));
-        let participacao = evento.alunos.find(x => x.id == this.participacao.participacao.id) as Evento_Participacao_Aluno;
+        let evento: Evento = await lastValueFrom(this.service.get(this.item.aula.id));
+        let participacao = evento.alunos.find(x => x.id == this.item.participacao.id) as Evento_Participacao_Aluno;
         this.mensagemWhatsapp.enviarMensagemFalta(evento, participacao, e);
     }
 

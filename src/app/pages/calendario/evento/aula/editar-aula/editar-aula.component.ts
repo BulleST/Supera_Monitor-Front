@@ -50,7 +50,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     @Output() width = new EventEmitter<string>()
     onSave = new EventEmitter<Evento>()
 
-    perfilCognitivo = ''
     EventoTipo = EventoTipo
     SalaAulaId = SalaAulaId
 
@@ -84,16 +83,8 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue
 
-            if (!this.evento.finalizado) {
-                this.evento.alunos.filter(x => x.active).forEach(item => item.presente = true)
-            }
             this.setApostilasAlunos()
             this.setRoteiro();
-
-            if (this.evento.perfilCognitivo.length > 0) {
-                this.perfilCognitivo = this.evento.perfilCognitivo[0].nome
-            }
-
         }
 
         if (changes['duracaoEvento'])
@@ -183,8 +174,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
     }
 
-
-
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
@@ -199,10 +188,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    inputFocus(e: any) {
-        e.target.select()
-    }
-
     presente(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
@@ -212,34 +197,45 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     async setApostilasAlunos() {
+        console.log('setApostilasAlunos')
+        console.log('apostilas', this.apostilas)
         if (this.apostilas.length == 0) {
             this.loadingApostila = true
             await lastValueFrom(this.apostilaService.getApostilas())
                 .then((res) => {
                     this.loadingApostila = false
-                    this.apostilas = res
+                    this.apostilas = res;
+                    console.log('apostilas', this.apostilas)
                 })
                 .catch((res) => (this.loadingApostila = false))
         }
 
         this.evento.alunos.forEach(aluno => {
-            aluno.apostilasAbacoList = this.apostilas.filter(x => {
-                const abaco = x.apostila_Tipo_Id == ApostilaTipo.Abaco;
+            console.log('aluno', aluno.aluno, JSON.parse(JSON.stringify(aluno)))
+
+            aluno.apostilasAbacoList = this.apostilas.filter(apostila => {
+                const ehAbaco = apostila.apostila_Tipo_Id == ApostilaTipo.Abaco;
                 const temKit = aluno.apostila_Kit_Id;
                 const temApostilaNoDia = aluno.apostila_Abaco_Id;
+                const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
+                const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
+
+                const condicao =  ehAbaco && (ehKitCompativel || ehApostilaDoDia)
+
                 
-                return abaco 
-                    && (!temKit || aluno.apostila_Kit_Id == x.apostila_Kit_Id)
-                    && (!temApostilaNoDia || aluno.apostila_Abaco_Id == x.id)
+                return condicao
             });
-            aluno.apostilasAHList = this.apostilas.filter(x => {
-                const ah = x.apostila_Tipo_Id == ApostilaTipo.AH;
+
+            aluno.apostilasAHList = this.apostilas.filter(apostila => {
+                const ehAH = apostila.apostila_Tipo_Id == ApostilaTipo.AH;
                 const temKit = aluno.apostila_Kit_Id;
                 const temApostilaNoDia = aluno.apostila_AH_Id;
-                return ah 
-                    && (!temKit || aluno.apostila_Kit_Id == x.apostila_Kit_Id)
-                    && (!temApostilaNoDia || aluno.apostila_AH_Id == x.id)
-                
+                const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
+                const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
+
+                const condicao =  ehAH && (ehKitCompativel || ehApostilaDoDia)
+
+                return condicao;                
             });
 
             aluno.numeroPaginaAbaco = aluno.numeroPaginaAbaco ?? 0;
@@ -264,6 +260,12 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         })
     }
 
+
+    inputFocus(e: any, item: Evento_Participacao_Aluno) {
+        e.target.select()
+        this.clonedRow[item.aluno_Id as number] = { ...item }
+    }
+
     clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
 
     //
@@ -271,7 +273,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAbacoClick(item: Evento_Participacao_Aluno) {
+        console.log('apostilaAbacoClick', item)
         this.clonedRow[item.aluno_Id as number] = { ...item }
+        console.log('clonedRow', this.clonedRow)
     }
 
     apostilaAbacoChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {

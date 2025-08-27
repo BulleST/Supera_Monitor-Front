@@ -64,6 +64,9 @@ export class AlunoChecklistDialogComponent implements OnChanges {
     }
     
     checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
+        if (!this.aluno.active) {
+            return;
+        }
         this.selectedAlunoChecklistItem = alunoChecklistItem;
         this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
         this.alunoChecklistOnConfirmDialog.aluno = this.aluno;

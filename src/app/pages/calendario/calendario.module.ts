@@ -22,13 +22,14 @@ import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { HeaderComponent } from './full-calendar/header/header.component';
 import { CalculoPerfilCognitivoComponent } from './full-calendar/calculo-perfil-cognitivo/calculo-perfil-cognitivo.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 import { PrimeiraAulaAlunoComponent } from './evento/aula/primeira-aula-aluno/primeira-aula-aluno.component';
-import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
-import { CalendarioAlunoOptionsComponent } from './evento/aula-1/calendario/calendario.component';
+import { CalendarioAlunoOptionsComponent } from './agendar-aula-1/calendario/calendario.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
 import { LegendaComponent } from './full-calendar/legenda/legenda.component';
 import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
+import { AlunoContatoFaltaComponent } from './aluno-contato-falta/aluno-contato-falta.component';
+import { AgendarAula1Component } from './agendar-aula-1/agendar-aula-1.component';
+import { AgendarAlunoComponent } from './agendar-aluno/agendar-aluno.component';
 
 @NgModule({
     declarations: [
@@ -37,7 +38,7 @@ import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
         CadastrarOficinaComponent,
         CadastrarReuniaoComponent,
         CadastrarAula0Component,
-        CadastrarAula1Component,
+        AgendarAula1Component,
         CadastrarInscricaoComponent,
         CancelarEventoComponent,
         EventoComponent,
@@ -53,10 +54,12 @@ import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
         ToolbarComponent,
         HeaderComponent,
         CalculoPerfilCognitivoComponent,
-        InserirAlunoComponent,
         AgendarReposicaoComponent,
-        LegendaComponent,
         AgendarFaltaComponent,
+        AgendarAula1Component,
+        AgendarAlunoComponent,
+        LegendaComponent,
+        AlunoContatoFaltaComponent,
         
     ],
     imports: [

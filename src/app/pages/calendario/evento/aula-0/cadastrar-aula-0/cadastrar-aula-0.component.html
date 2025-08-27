@@ -67,7 +67,7 @@
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
-                              [disabledDates]="feriadoDates"
+                              [disabledDates]="invalidDates"
                               appendTo="body"
                               fluid />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">

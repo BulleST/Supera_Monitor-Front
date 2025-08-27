@@ -203,14 +203,6 @@
                 <label for="perfilCognitivo_Id">Perfil Cognitivo: <span
                           *ngIf="evento.finalizado"
                           class="text-red-500">*</span></label>
-                <input
-                       type="text"
-                       pInputText
-                       [value]="perfilCognitivo"
-                       styleClass="w-full"
-                       class="w-full hidden"
-                       id="turma"
-                       readonly />
                 <div class="flex flex-wrap gap-2">
                     <p-chip
                             *ngFor="let perfil of evento.perfilCognitivo"
@@ -266,27 +258,18 @@
                                           severity="success"
                                           [text]="true" />
                                 <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
-                                    <div class="flex align-items-center">
+                                    <div class="flex align-items-center gap-2">
                                         <p class="p-button-link capitalize text-lg font-bold"
                                            (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
                                             <span>{{ item.aluno | nameAbv }}</span>
                                         </p>
-                                        <p-badge *ngIf="item.reposicaoDe_Evento_Id"
-                                                 styleClass="ml-2 bg-purple-500"
-                                                 value="Reposição"
-                                                 size="small"
-                                                 (mouseenter)="reposicaoTooltip.show($event, item)"
-                                                 (mouseleave)="reposicaoTooltip.hide()"></p-badge>
+                                        <ng-component *ngTemplateOutlet="reposicaoTemplate; context: { item }"></ng-component>
+                                        <ng-component *ngTemplateOutlet="primeiraAulaTemplate; context: { item }"></ng-component>
+                                        <ng-component *ngTemplateOutlet="faltaAgendadaTemplate; context: { item }"></ng-component>
                                     </div>
                                     <p class="text-500 text-sm white-space-nowrap" [pTooltip]="item.turma">
                                         {{ item.turma }}
                                     </p>
-                                    <p-badge *ngIf="item.primeiraAula_Id == evento.id"
-                                             styleClass="ml-2 bg-pink-500"
-                                             value="Aula 1"
-                                             size="small"
-                                             severity="danger"
-                                             [pTooltip]="'Primeira aula'" />
                                 </div>
 
                                 <p-button type="button" *ngIf="item.presente === false"
@@ -316,7 +299,7 @@
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
                                         <p-select [options]="item.apostilasAbacoList"
                                                     (onChange)="apostilaAbacoChange(item, $event)"
-                                                    (focus)="apostilaAbacoClick(item)"
+                                                    (onFocus)="apostilaAbacoClick(item)"
                                                     [(ngModel)]="item.apostilaAbacoObject"
                                                     #apostila_Abaco="ngModel"
                                                     name="apostila_Abaco[{{i}}]"
@@ -337,7 +320,7 @@
                                     <label for="numeroPaginaAbaco">Página: <span class="text-red-500">*</span></label>
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
                                                    (onInput)="numeroPaginaAbacoChange(item, $event)"
-                                                   (onFocus)="inputFocus($event)"
+                                                   (onFocus)="inputFocus($event, item)"
                                                    name="numeroPaginaAbaco[{{i}}]"
                                                    inputId="numeroPaginaAbaco[{{i}}]"
                                                    [min]="0"
@@ -355,7 +338,7 @@
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
                                         <p-select [options]="item.apostilasAHList"
                                                     (ngModelChange)="apostilaAHChange(item, $event)"
-                                                    (focus)="apostilaAHClick(item)"
+                                                    (onFocus)="apostilaAHClick(item)"
                                                     [(ngModel)]="item.apostilaAHObject"
                                                     [disabled]="!evento.active"
                                                     #apostila_AH="ngModel"
@@ -376,7 +359,7 @@
                                 <div class="field col-6">
                                     <label for="numeroPaginaAH">Página: <span class="text-red-500">*</span></label>
                                     <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
-                                                   (onFocus)="inputFocus($event)"
+                                                   (onFocus)="inputFocus($event, item)"
                                                    (onInput)="numeroPaginaAHChange(item, $event)"
                                                    name="numeroPaginaAH[{{i}}]"
                                                    inputId="numeroPaginaAH[{{i}}]"
@@ -395,8 +378,9 @@
                                               id="observacao[{{i}}]"
                                               name="observacao[{{i}}]"
                                               [(ngModel)]="item.observacao"
-                                              (focus)="inputFocus($event)"
-                                              [readonly]="!evento.finalizado"
+                                              (onFocus)="inputFocus($event, item)"
+                                              [readonly]="evento.finalizado"
+                                              [disabled]="evento.finalizado"
                                               [placeholder]="evento.finalizado ? 'Nenhuma observação' : 'Observações...'"
                                               rows="2"
                                               fluid></textarea>
@@ -416,15 +400,7 @@
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
-                    <!-- <ng-template #header>
-                        <tr class="sticky top-0 z-2">
-                            <th pFrozenColumn class="z-4">Nome</th>
-                            <th>Apostila</th>
-                            <th>Presença</th>
-                            <th>Observação</th>
-                        </tr>
-                    </ng-template> -->
-                    <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
+                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                         <tr class="static z-0">
                             <!-- Nome -->
                             <td pFrozenColumn class="p-0 pb-1">
@@ -447,19 +423,9 @@
                                             <span class="p-button-link overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 cursor-pointer hover:underline capitalize"
                                                   (click)="popoverAluno.show($event)"
                                                   pTooltip="Ver detalhes">{{ item.aluno | nameAbv }}</span>
-                                            <p-badge *ngIf="item.primeiraAula_Id == evento.id"
-                                                     class="-mt-1 mb-1"
-                                                     styleClass="ml-2 bg-pink-500"
-                                                     value="Aula 1"
-                                                     size="small"
-                                                     severity="danger"
-                                                     [pTooltip]="'Primeira aula'" />
-                                            <p-badge *ngIf="item.reposicaoDe_Evento_Id"
-                                                     styleClass=" -mt-1 mb-1 bg-purple-500"
-                                                     value="Reposição"
-                                                     size="small"
-                                                     (mouseenter)="reposicaoTooltip.show($event, item)"
-                                                     (mouseleave)="reposicaoTooltip.hide()"></p-badge>
+                                            <ng-component *ngTemplateOutlet="reposicaoTemplate; context: { item }"></ng-component>
+                                            <ng-component *ngTemplateOutlet="primeiraAulaTemplate; context: { item }"></ng-component>
+                                            <ng-component *ngTemplateOutlet="faltaAgendadaTemplate; context: { item }"></ng-component>
                                         </div>
                                         <span class="text-sm w-min">
                                             <app-aluno-checklist
@@ -470,17 +436,17 @@
                                 </div>
                             </td>
                             <!-- Apostila -->
-                            <td class="p-0 pb-1">
+                            <td class="p-0 pt-2 pb-1">
                                 <div class="flex gap-2">
                                     <!-- Abaco -->
-                                    <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1"
+                                    <div class="flex flex-column ">
+                                        <label class="ml-1 text-sm"
                                                for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
                                             <p-select [options]="item.apostilasAbacoList"
                                                       (onChange)="apostilaAbacoChange(item, $event)"
-                                                      (focus)="apostilaAbacoClick(item)"
+                                                      (onFocus)="apostilaAbacoClick(item)"
                                                       [(ngModel)]="item.apostilaAbacoObject"
                                                       #apostila_Abaco="ngModel"
                                                       styleClass="min-w-10rem"
@@ -498,13 +464,13 @@
                                         </p-iconfield>
                                     </div>
                                     <!-- Página -->
-                                    <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1"
+                                    <div class="flex flex-column ">
+                                        <label class="ml-1 text-sm"
                                                for="numeroPaginaAbaco[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
                                                        id="numeroPaginaAbaco[{{ rowIndex }}]"
                                                        name="numeroPaginaAbaco[{{ rowIndex }}]"
-                                                       (onFocus)="inputFocus($event)"
+                                                       (onFocus)="inputFocus($event, item)"
                                                        (onInput)="numeroPaginaAbacoChange(item, $event)"
                                                        #numeroPaginaAbaco="ngModel"
                                                        [min]="0"
@@ -517,14 +483,14 @@
                                                        [disabled]="item.presente === false || evento.finalizado" />
                                     </div>
                                     <!-- AH -->
-                                    <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1"
+                                    <div class="flex flex-column ">
+                                        <label class="ml-1 text-sm"
                                                for="apostila_AH[{{ rowIndex }}]">AH:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
                                             <p-select [options]="item.apostilasAHList"
                                                       (onChange)="apostilaAHChange(item, $event)"
-                                                      (focus)="apostilaAHClick(item)"
+                                                      (onFocus)="apostilaAHClick(item)"
                                                       [(ngModel)]="item.apostilaAHObject"
                                                       #apostila_AH="ngModel"
                                                       styleClass="min-w-10rem"
@@ -543,13 +509,13 @@
                                         </p-iconfield>
                                     </div>
                                     <!-- Página -->
-                                    <div class="flex flex-column gap-1">
-                                        <label class="ml-1 text-sm line-height-1"
+                                    <div class="flex flex-column ">
+                                        <label class="ml-1 text-sm"
                                                for="numeroPaginaAH[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
                                                        id="numeroPaginaAH[{{ rowIndex }}]"
                                                        name="numeroPaginaAH[{{ rowIndex }}]"
-                                                       (onFocus)="inputFocus($event)"
+                                                       (onFocus)="inputFocus($event, item)"
                                                        (onInput)="numeroPaginaAHChange(item, $event)"
                                                        #numeroPaginaAH="ngModel"
                                                        [min]="0"
@@ -564,8 +530,8 @@
                                 </div>
                             </td>
                             <!-- Presente -->
-                            <td class="p-0 pb-1">
-                                <div class="mt-3 flex align-items-start gap-2">
+                            <td class="pb-1 pt-2">
+                                <div class="flex align-items-end gap-2" style="height: 50px">
                                     <p-button [disabled]=" evento.finalizado || !evento.active"
                                               [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                                               [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
@@ -587,18 +553,21 @@
                                 </div>
                             </td>
                             <!-- Observações  -->
-                            <td class="p-0 pb-1">
-                                <div class="flex flex-column gap-1">
-                                    <label for="observacao" class="ml-1 text-sm line-height-1">Observações: <span class="text-red-500" *ngIf="item.presente === false">*</span></label>
+                            <td class="p-0 pb-1 pt-2">
+                                <div class="flex flex-column">
+                                    <label for="observacao" 
+                                        class="ml-1 text-sm">Observações: <span class="text-red-500" *ngIf="item.presente === false">*</span></label>
                                     <textarea pTextarea
                                             placeholder="Insira as observações..."
                                             [(ngModel)]="item.observacao"
-                                            (focus)="inputFocus($event)"
+                                            (onFocus)="inputFocus($event, item)"
                                             id="observacao[{{rowIndex}}]"
                                             name="observacao[{{rowIndex}}]"
                                             class="10rem "
                                             [rows]="1"
-                                            [required]="item.presente === false"></textarea>
+                                            [required]="item.presente === false"
+                                            [readonly]="evento.finalizado"
+                                            [disabled]="evento.finalizado"></textarea>
                                 </div>
                             </td>
                         </tr>
@@ -609,3 +578,30 @@
     </ng-container>
 </div>
 <app-aluno-reposicao-tooltip #reposicaoTooltip></app-aluno-reposicao-tooltip>
+<ng-template #reposicaoTemplate let-item="item">
+    <p-badge *ngIf="item.reposicaoDe_Evento_Id"
+                styleClass="ml-2 bg-purple-500"
+                value="Reposição"
+                size="small"
+                class="my-1"
+                (mouseenter)="reposicaoTooltip.show($event, item)"
+                (mouseleave)="reposicaoTooltip.hide()"></p-badge>
+</ng-template>
+<ng-template #primeiraAulaTemplate let-item="item">
+    <p-badge *ngIf="item.primeiraAula_Id == evento.id"
+                styleClass="bg-pink-500"
+                value="Aula 1"
+                size="small"
+                severity="danger"
+                class="my-1"
+                [pTooltip]="'Primeira aula'" />
+</ng-template>
+<ng-template #faltaAgendadaTemplate let-item="item">
+    <p-badge *ngIf="item.active === false && item.presente === false" 
+                styleClass="bg-red-500"
+                value="Falta agendada"
+                size="small"
+                severity="danger"
+                class="my-1"
+                [pTooltip]="'Falta agendada'" />
+</ng-template>

@@ -2,65 +2,67 @@
            [dismissable]="true"
            styleClass="-mt-1"
            appendTo="body">
-    <ng-container *ngIf="aluno && participacao">
+    <ng-container *ngIf="aluno && item">
         <div style="width: 20rem;">
 
-            <p class="mb-2">
+            <p class="mb-2 flex align-items-center gap-2">
                 <!-- Cancelada -->
-                @if (!participacao.aula.active && !participacao.participacao.reposicaoPara_Evento_Id) 
+                @if (item.status == DashboardItemStatus.Cancelada)
                 {
                     <p-tag value="Aula Cancelada"
-                        styleClass="surface-800 border-800 text-white"/>
+                        styleClass="surface-800 border-800 text-white line-height-3 font-light"/>
+                }
+                <!-- Feriado  -->
+                @else if (item.status == DashboardItemStatus.Feriado)
+                {
+                    <p-tag value="Aula Cancelada"
+                        styleClass="surface-800 border-800 text-white line-height-3 font-light"/>
+                    <p-tag [value]="item.feriado!.name"
+                        styleClass="bg-red-600 border-red-6000 text-white line-height-3 font-light"/>
                 }
                 <!-- Reposicao -->
-                @else if (participacao.participacao.reposicaoPara_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.Reposicao)
                 {
                     <p-tag value="Reposição agendada"
-                        styleClass="bg-purple-600 border-purple-600 text-white"/>
+                        styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light"/>
                 }
                 <!-- Falta Na Reposição -->
-                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === false && participacao.participacao.reposicaoDe_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.FaltaNaReposicao)
                 {
                     <p-tag value="Faltou na repoosição"
-                        styleClass="bg-blue-500 border-blue-500 text-white"/>
+                        styleClass="bg-blue-500 border-blue-500 text-white line-height-3 font-light"/>
                 }
-                <!-- Falta na Aula -->
-                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === false && !participacao.participacao.reposicaoDe_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.FaltaNaAula)
                 {
                     <p-tag value="Faltou"
-                        styleClass="bg-red-500 border-red-500 text-white"/>
+                        styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light"/>
                 }
                 <!-- Falta Agendada -->
-                @else if ( participacao.participacao.presente === false 
-                    && participacao.participacao.active === false 
-                    && !participacao.participacao.reposicaoDe_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.FaltaAgendada)
                 {
                     <p-tag value="Falta Agendada"
-                        styleClass="bg-red-500 border-red-500 text-white"/>
+                        styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light"/>
                 }
                 <!-- Presente na Reposição -->
-                @else if (participacao.aula.finalizado === true 
-                    && participacao.participacao.presente === true 
-                    && participacao.participacao.reposicaoDe_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.PresenteNaReposicao)
                 {
                     <p-tag value="Presente na reposição"
-                        styleClass="bg-green-300 border-green-300 text-green-700"/>
+                        styleClass="bg-green-300 border-green-300 text-green-700 line-height-3 font-light"/>
                 }
                 <!-- Presente -->
-                @else if (participacao.aula.finalizado === true && participacao.participacao.presente === true && !participacao.participacao.reposicaoDe_Evento_Id) 
+                @else if (item.status == DashboardItemStatus.Presente)
                 {
                     <p-tag value="Presente"
-                        styleClass="bg-green-500 border-green-500 text-white"/>
+                        styleClass="bg-green-500 border-green-500 text-white line-height-3 font-light"/>
                 }
-                @else 
+                @else if (item.status == DashboardItemStatus.Aula)
                 {
-                    
                     <p-tag value="Aula"
-                        styleClass="surface-200 border-200 text-white"/>
+                        styleClass="surface-200 border-200 text-white line-height-3 font-light"/>
                 }
             </p>
         
-            <p-badge *ngIf="aluno.primeiraAula_Id == participacao.aula.id"
+            <p-badge *ngIf="aluno.primeiraAula_Id == item.aula.id"
                      styleClass=" bg-pink-500 border-pink-500"
                      value="Aula 1"
                      size="small"
@@ -68,36 +70,36 @@
             <p class="flex align-items-center gap-2">
                 <i class="pi pi-calendar flex w-1rem justify-content-center"></i>
                 <span class="">Data:</span>
-                <span>{{participacao.aula.data | date:'dd/MM/yy '}}</span>
+                <span>{{item.aula.data | date:'dd/MM/yy '}}</span>
             </p>
             <p class="flex align-items-center gap-2">
                 <i class="pi pi-clock flex w-1rem justify-content-center"></i>
                 <span class="">Horário:</span>
-                <span>{{participacao.aula.data | date:'HH:mm'}}</span>
+                <span>{{item.aula.data | date:'HH:mm'}}</span>
             </p>
-            <ng-container *ngIf="participacao.aula.turma">
+            <ng-container *ngIf="item.aula.turma">
                 <p class="flex align-items-center gap-2">
                     <i class="fa fa-users-between-lines flex w-1rem justify-content-center"></i>
                     <span class="">Turma: </span>
-                    <span>{{participacao.aula.turma}}</span>
+                    <span>{{item.aula.turma}}</span>
                 </p>
             </ng-container>
-            <ng-container *ngIf="participacao.aula.professor">
+            <ng-container *ngIf="item.aula.professor">
                 <p class="flex align-items-center gap-2">
                     <i class="fa fa-person-chalkboard flex w-1rem justify-content-center"></i>
                     <span class="">Educador: </span>
-                    <span>{{participacao.aula.professor}}</span>
-                    <app-legend-color [corLegenda]="participacao.aula.corLegenda"
-                        [professor_Id]="participacao.aula.professor_Id"
-                        [professor]="participacao.aula.professor"></app-legend-color>
+                    <span>{{item.aula.professor}}</span>
+                    <app-legend-color [corLegenda]="item.aula.corLegenda"
+                        [professor_Id]="item.aula.professor_Id"
+                        [professor]="item.aula.professor"></app-legend-color>
                 </p>
             </ng-container>
             <div class="my-2">
                 <p>
                     <span class="font-bold">Observações: </span>
-                    <span *ngIf="participacao.aula.observacao" [innerHTML]="participacao.aula.observacao"></span>
-                    <span *ngIf="participacao.participacao.observacao" [innerHTML]="participacao.participacao.observacao"></span>
-                    <span *ngIf="!participacao.aula.observacao && !participacao.participacao.observacao" class="text-500">Nenhuma observação </span>
+                    <span *ngIf="item.aula.observacao" [innerHTML]="item.aula.observacao"></span>
+                    <span *ngIf="item.participacao.observacao" [innerHTML]="item.participacao.observacao"></span>
+                    <span *ngIf="!item.aula.observacao && !item.participacao.observacao" class="text-500">Nenhuma observação </span>
                 </p>
             </div>
             <div class="flex align-items-center gap-2">
@@ -107,6 +109,14 @@
                           [outlined]="true"
                           styleClass="w-full"
                           (onClick)="hide()" />
+                <ng-container *ngTemplateOutlet="selectMenu"></ng-container>
+            </div>
+        </div>
+    </ng-container>
+</p-popover>
+
+<ng-template #selectMenu>
+    
                 <p-select [options]="menuItems"
                           [styleClass]="'p-select-menu p-select-small'"
                           appendTo="body"
@@ -128,7 +138,4 @@
                             </div>
                     </ng-template>
                 </p-select>
-            </div>
-        </div>
-    </ng-container>
-</p-popover>
+</ng-template>

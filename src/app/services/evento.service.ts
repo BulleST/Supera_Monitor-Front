@@ -8,7 +8,7 @@ import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
 import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { Dashboard_Response, DashboardRequest } from '../models/dashboard.model';
+import { Dashboard_Item, DashboardItemStatus, Dashboard_Response, DashboardRequest } from '../models/dashboard.model';
 import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -23,6 +23,7 @@ import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
 import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
+import { Evento_Participacao_Aluno } from '../models/evento-participacao-aluno.model';
 
 @Injectable({
     providedIn: 'root',
@@ -102,9 +103,17 @@ export class EventoService extends Service {
 
         evento.professores = evento.professores ?? [];
         evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1))
+        evento.professores = evento.professores.map(x => {
+            x.active = !x.deactivated;
+            return x
+        })
 
         evento.alunos = evento.alunos ?? [];
         evento.alunos.sort((x, y) => (x.aluno < y.aluno ? -1 : 1))
+        evento.alunos = evento.alunos.map(x => {
+            x.active = !x.deactivated;
+            return x
+        })
 
         evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.filter(x => x.active === true).length;
 
@@ -157,6 +166,7 @@ export class EventoService extends Service {
     }
 
     getPseudoAula(turma_Id: number, dataHora: Date) {
+        dataHora = moment(dataHora).format('YYYY-MM-DD[T]HH:mm:ss') as any
         return this.http.post<Evento>(`${this.url}/eventos/pseudo-aula`, { turma_Id, dataHora })
             .pipe(tap(evento => {
                 evento = this.mapEvento(evento);
@@ -213,33 +223,73 @@ export class EventoService extends Service {
             .post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)
             .pipe(
                 map((dashboard) => {
-                    dashboard.alunos = dashboard.alunos.map((aluno) => {
-                        aluno.aulas = aluno.aulas.map((aula) => {
-                            aula.participacao.active = !aula.participacao.deactivated;
-                            aula.aula.active = !aula.aula.deactivated;
-                            aula.aula.data = moment(aula.aula.data).toDate();
+                    dashboard.roteiros = dashboard.roteiros.map(roteiro => {
+                        roteiro.dataInicio = moment(roteiro.dataInicio).toDate();
+                        roteiro.dataFim = moment(roteiro.dataFim).toDate();
+                        return roteiro
+                    })
+                    dashboard.roteiros.sort((x,y) => x.dataInicio.getTime() - y.dataInicio.getTime());
+                    
+                    dashboard.alunos = dashboard.alunos.map(aluno => {
+
+                        if (aluno.aulas.length == 0) {
+                            aluno.aulas = dashboard.roteiros.map(roteiro => {
+                                let item = new Dashboard_Item;
+                                item.roteiro = roteiro;
+                                item.show = false;
+                                item.status = DashboardItemStatus.Aula
+                                return item;
+                            })
+                        } else {
+                        aluno.aulas = aluno.aulas.map(item => {
+                            item.participacao.active = !item.participacao.deactivated;
+                            item.aula.active = !item.aula.deactivated;
+                            item.aula.data = moment(item.aula.data).toDate();
 
                             // Procura se a aula foi reagendada
-                            if (aula.aula.reagendamentoPara_Evento_Id) {
-                                aula.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoPara_Evento_Id)?.aula;
+                            if (item.aula.reagendamentoPara_Evento_Id) {
+                                item.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoPara_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula é reagendamento de outra
-                            if (aula.aula.reagendamentoDe_Evento_Id) {
-                                aula.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.aula.reagendamentoDe_Evento_Id)?.aula;
+                            if (item.aula.reagendamentoDe_Evento_Id) {
+                                item.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoDe_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula foi reposta
-                            if (aula.participacao.reposicaoPara_Evento_Id) {
-                                aula.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoPara_Evento_Id)?.aula;
+                            if (item.participacao.reposicaoPara_Evento_Id) {
+                                item.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoPara_Evento_Id)?.aula;
                             }
 
                             // Procura se a aula foi reposicao de outra
-                            if (aula.participacao.reposicaoDe_Evento_Id) {
-                                aula.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == aula.participacao.reposicaoDe_Evento_Id)?.aula;
+                            if (item.participacao.reposicaoDe_Evento_Id) {
+                                item.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoDe_Evento_Id)?.aula;
                             }
-                            return aula;
+
+
+                            // Status
+                            if (!item.aula.active && !item.feriado && !item.participacao.reposicaoPara_Evento_Id) 
+                                item.status = DashboardItemStatus.Cancelada;
+                            else if (!item.aula.active && item.feriado && !item.participacao.reposicaoPara_Evento_Id) 
+                                item.status = DashboardItemStatus.Feriado;
+                            else if (item.participacao.reposicaoPara_Evento_Id) 
+                                item.status = DashboardItemStatus.Reposicao;
+                            else if (item.aula.finalizado === true && item.participacao.presente === false && item.participacao.reposicaoDe_Evento_Id) 
+                                item.status = DashboardItemStatus.FaltaNaReposicao;
+                            else if (item.aula.finalizado === true && item.participacao.presente === false && !item.participacao.reposicaoDe_Evento_Id) 
+                                item.status = DashboardItemStatus.FaltaNaAula;
+                            else if ( item.participacao.presente === false && item.participacao.active === false && !item.participacao.reposicaoDe_Evento_Id) 
+                                item.status = DashboardItemStatus.FaltaAgendada;
+                            else if (item.aula.finalizado === true && item.participacao.presente === true && item.participacao.reposicaoDe_Evento_Id) 
+                                item.status = DashboardItemStatus.PresenteNaReposicao;
+                            else if (item.aula.finalizado === true && item.participacao.presente === true && !item.participacao.reposicaoDe_Evento_Id) 
+                                item.status = DashboardItemStatus.Presente;
+                            else 
+                                item.status = DashboardItemStatus.Aula;
+
+                            return item;
                         });
+                        }
                         return aluno;
                     });
 
@@ -348,5 +398,9 @@ export class EventoService extends Service {
 
     cancelarParticipacao(request: EventoAgendarFaltaRequest) {
         return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
+    }
+
+    atualizarParticipacao(request: Evento_Participacao_Aluno) {
+        return this.http.put<RequestResponse>(`${this.url}/eventos/participacao/atualizar`, request);
     }
 }

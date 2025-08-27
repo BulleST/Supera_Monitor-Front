@@ -52,7 +52,7 @@
                               [selectOtherMonths]="true"
                               [keepInvalid]="true"
                               [disabledDays]="[0]"
-                              [disabledDates]="feriadoDates"
+                              [disabledDates]="invalidDates"
                               appendTo="body"
                               fluid />
                 <div *ngIf="_data.touched && _data.invalid && _data.errors">
@@ -162,7 +162,7 @@
                                      styleClass="h-30rem"
                                      [scrollable]="true"
                                      scrollHeight="30rem"
-                                     [loading]="loadingList"
+                                     [loading]="loadingProfessores"
                                      [showLoader]="false"
                                      selectionMode="single"
                                      [(selection)]="selectedSource"
@@ -239,7 +239,7 @@
                              [cdkDropListDisabled]="!data || !horario ">
                             <p-table #dtTarget
                                      [value]="target"
-                                     [loading]="loadingList"
+                                     [loading]="loadingProfessores"
                                      styleClass="h-30rem"
                                      [scrollable]="true"
                                      scrollHeight="30rem"

@@ -50,6 +50,8 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
 
     onHide = new EventEmitter<boolean>();
 
+    alunoContactado = false;
+
     status = [
         { value: 1, label: 'Não compareceu' },
         { value: 2, label: 'Aguardando Retorno' },
@@ -275,6 +277,16 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         if (this.evento) {
             let participacao = this.evento.alunos.find(x => x.aluno_Id == this.aluno?.id) as Evento_Participacao_Aluno;
             this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e);
+        }
+    }
+
+    alunoContactadoChanged() {
+        this.alunoContactado = !this.alunoContactado;
+        if (!this.alunoContactado) {
+            this.request.alunoContactado = undefined
+        }
+        else {
+            this.request.alunoContactado = new Date;
         }
     }
 

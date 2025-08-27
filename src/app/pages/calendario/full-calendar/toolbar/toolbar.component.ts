@@ -147,6 +147,8 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         });
         this.subscription.push(roteiros);
 
+        this.updateCalendar();
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -163,6 +165,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     updateCalendar() {
+        this.getData();
         this.requestLoadRoteiros();
         this.update.emit(true)
         this.getTemaSemana();
@@ -204,8 +207,25 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
                 this.fullCalendar.getApi().gotoDate(this.calendarioRequest.intervaloDe);
                 this.setTitle();
                 this.getTemaSemana();
+                this.setData()
             }
         }
+    }
+
+    getData() {
+        let data = localStorage.getItem('data');
+        if (data) {
+            this.data = moment(data).toDate();
+        }
+        else {
+            this.data = new Date();
+            this.setData()
+        }
+        console.log('getData', data, this.data)
+    }
+
+    setData() {
+        localStorage.setItem('data', moment(this.data).format('YYYY-MM-DD'))
     }
         
     prev() {
@@ -214,6 +234,8 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.data = api.view.activeStart;
         this.setTitle();
         this.getTemaSemana();
+        this.setData();
+
     }
 
     next() {
@@ -222,6 +244,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.data = this.fullCalendar.getApi().view.activeStart;
         this.setTitle();
         this.getTemaSemana();
+        this.setData();
     }
 
     today() {
@@ -230,6 +253,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         this.data = api.view.activeStart;
         this.setTitle();
         this.getTemaSemana();
+        this.setData();
     }
 
     dataChanged(model: NgModel) {
@@ -255,6 +279,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             model.control.markAsUntouched();
             model.control.markAsPristine();
         }
+        this.setData();
     }
 
     getTemaSemana() {
@@ -277,6 +302,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         }
 
         this.dayViewOnChange.emit(this.dayView);
+        this.setData();
 
     }
     requestLoadRoteiros() {

@@ -44,7 +44,6 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     EventoTipo = EventoTipo
     restricaoCheck: boolean = false
 
-    aluno: Aluno = new Aluno()
     evento: Evento = new Evento()
     eventos: Evento[] = []
     tipoString = ''
@@ -120,22 +119,24 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
     setAlunos() {
         if (this.alunos.length && this.evento) {
-            this.alunos = this.alunos.filter(x => x.active)
+            this.alunos = this.alunos.filter(x => moment(x.deactivated).isSameOrAfter(this.evento.data, 'date'))
 
             if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
-                this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id))
+                this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id));
             }
         }
     }
 
     getTipo(e: Evento) {
-        return this.calendarioUtils.getEventoTipo(e)
+        return this.calendarioUtils.getEventoTipo(e);
     }
 
     getPerfilCognitivo(perfilCognitivo: PerfilCognitivo[]) {
-        if (!perfilCognitivo || perfilCognitivo.length == 0) return ''
-        return perfilCognitivo.map((x) => x.nome).join(', ')
+        
+        if (!perfilCognitivo || perfilCognitivo.length == 0)
+            return '';
+        return perfilCognitivo.map((x) => x.nome).join(', ');
     }
 
     showError(header: string, message: string, e: any, innerMessage?: string) {
@@ -164,7 +165,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             let data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
             this.confirmationService.confirm({
                 target: e.target,
-                message: `Tem certeza que deseja marcar primeira aula do aluno <b>${this.aluno.nome} </b> para o dia <b>${data}</b>?`,
+                message: `Tem certeza que deseja marcar primeira aula do aluno <b>${this.selectedAluno.nome} </b> para o dia <b>${data}</b>?`,
                 header: 'Agendar primeira aula',
                 acceptIcon: 'pi pi-check',
                 rejectIcon: 'pi pi-times',
@@ -237,6 +238,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     }
 
     sendMensagemAluno(e: any, evento: Evento) {
+        let aluno = this.selectedAluno as Aluno
         this.confirmationService.confirm({
             target: e.target,
             message: `Primeira aula agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
@@ -251,7 +253,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             accept: () => {
                 this.visible = false
                 this.visibleChange()
-                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(this.aluno.nome, this.aluno.celular, evento)
+                let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
                 window.open(object.link, '_target')
                 this.mensagemWhatsapp.copiarMensagem(object.mensagem)
             },
@@ -263,7 +265,8 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     }
 
    async markChecklistAsDone() {
-        const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id));   
+        let aluno = this.selectedAluno as Aluno
+        aluno = await lastValueFrom(this.alunoService.get(aluno.id));   
         // Agendamento na 1ª aula 
         if (aluno) {
             const id = 38;

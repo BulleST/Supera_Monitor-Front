@@ -10,11 +10,12 @@ import { FormComponent as AlunoFormComponent } from '../alunos/form/form.compone
 import { CalendarioComponent } from './calendario.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { CadastrarTurmaExtraComponent } from './evento/aula/cadastrar-turma-extra/cadastrar-turma-extra.component';
-import { InserirAlunoComponent } from './evento/inserir-aluno/inserir-aluno.component';
 import { PrimeiraAulaAlunoComponent } from './evento/aula/primeira-aula-aluno/primeira-aula-aluno.component';
-import { CadastrarAula1Component } from './evento/aula-1/cadastrar-aula-1.component';
 import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
 import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
+import { AgendarAula1Component } from './agendar-aula-1/agendar-aula-1.component';
+import { AgendarAlunoComponent } from './agendar-aluno/agendar-aluno.component';
+import { AlunoContatoFaltaComponent } from './aluno-contato-falta/aluno-contato-falta.component';
 
 
 const routes: Routes = [{
@@ -22,11 +23,12 @@ const routes: Routes = [{
         { path: 'turma-extra/agendar', component: CadastrarTurmaExtraComponent },
         { path: 'aula-zero/agendar', component: CadastrarAula0Component },
         { path: 'aula/primeira-aula/:evento_id', component: PrimeiraAulaAlunoComponent },
-        { path: 'primeira-aula/agendar', component: CadastrarAula1Component },
+        { path: 'primeira-aula/agendar', component: AgendarAula1Component },
         { path: 'superacao/agendar', component: CadastrarSuperacaoComponent },
         { path: 'reuniao/agendar', component: CadastrarReuniaoComponent },
         { path: 'oficina/agendar', component: CadastrarOficinaComponent },
         { path: 'oficina/inscrever/:evento_id', component: CadastrarInscricaoComponent },
+        { path: 'contato/:evento_id/:aluno_id', component: AlunoContatoFaltaComponent },
         
         { path: 'reposicao/agendar', component: AgendarReposicaoComponent },
         { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
@@ -36,7 +38,7 @@ const routes: Routes = [{
         { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
 
         { path: ':evento_nome/:evento_id', component: EventoComponent },
-        { path: ':evento_nome/inserir-aluno/:evento_id', component: InserirAlunoComponent },
+        { path: ':evento_nome/inserir-aluno/:evento_id', component: AgendarAlunoComponent },
         { path: ':evento_nome/cancelar/:evento_id', component: CancelarEventoComponent },
         
     ]

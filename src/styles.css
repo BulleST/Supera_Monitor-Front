@@ -554,3 +554,12 @@ p-scroller {
     border: navajowhite;
     padding: 0 !important;
 }
+
+
+.p-fluid {
+    width: 100%;
+}
+
+.p-fluid .p-inputtext {
+    width: 100%;
+}

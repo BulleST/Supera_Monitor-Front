@@ -15,8 +15,6 @@ import { Evento_Participacao_Aluno } from '../../models/evento-participacao-alun
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
 import { PseudoEvento, ReposicaoAlunoRequest } from '../../models/reposicao.model';
-import { EventoAulaRequest } from '../../models/evento-aula.model';
-import { MyMap } from '../../utils/map';
 import { RequestResponse } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
@@ -30,7 +28,6 @@ import $ from 'jquery';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
-import { SalaAulaId } from '../../models/sala-aula.model';
 
 @Component({
     selector: 'app-calendario',
@@ -142,11 +139,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingPerfilCognitivo = false);
         }
 
-        let calendarioReload = this.service.calendarioReload.subscribe(res => this.update('calenadrioReload'));
+        let calendarioReload = this.service.calendarioReload.subscribe(res => this.update());
         this.subscription.push(calendarioReload);
 
         let calendarView = this.service.calendarView.subscribe(view => {
-            console.log('calendarViewChanged', view)
             if (view == CalendarioView.MeuCalendario) {
                 let account = this.accountService.accountValue;
                 this.calendarioRequest.professor_Id = account?.professor_Id;
@@ -159,9 +155,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             this.service.calendarioReload.emit(1);
         })
         this.subscription.push(calendarView);
-
-        this.calendarioRequest.intervaloDe = moment(new Date).startOf('week').add(1, 'day').toDate();
-        this.calendarioRequest.intervaloAte = moment(new Date).endOf('week').toDate();
     }
 
     ngOnDestroy(): void {
@@ -174,7 +167,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
 
     // INICIO Controles do calendario
-    async update(where: string) {
+    async update() {
         this.unselectAula();
 
         let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
@@ -193,13 +186,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 await this.requestCancelarEventos(anoAte);
             }
         }
-        await this.requestLoadCalendario('update')
+        await this.requestLoadCalendario()
         this.setCalendario();
         this.scrollToTime();
 
     }
-
-
 
     scrollToTime() {
         let scrollTime = moment().subtract(1, 'hour').startOf('hour')
@@ -285,11 +276,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     datesSet(arg: DatesSetArg) {
         this.loading = true;
+        
         this.calendarioRequest.intervaloDe = arg.start;
         this.calendarioRequest.intervaloAte = moment(arg.end).subtract(1, 'day').toDate(); // Full calendar está terminando no domingo da semana seguinte
         this.unselectAula();
 
-        this.update('datesset');
+        this.update();
 
     }
 
@@ -550,9 +542,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         return lastValueFrom(this.service.cancelarEventos(ano))
     }
 
-    requestLoadCalendario(where: string) {
+    requestLoadCalendario() {
         this.loading = true;
-        // this.calendarVisible.update(() => true);
         return lastValueFrom(this.service.getList(this.calendarioRequest))
             .then(list => {
                 this.eventos = list;

@@ -91,23 +91,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
             this.evento.professor_Id = this.evento.professores[0].professor_Id;
-
-            if (!this.evento.finalizado) {
-                this.evento.alunos = this.evento.alunos.map(aluno => {
-                    aluno.presente = true;
-                    aluno.numeroPaginaAH = null as any;
-                    aluno.apostila_AH_Id = null as any;
-                    aluno.numeroPaginaAbaco = null as any;
-                    aluno.apostila_Abaco_Id = null as any;
-                    // Initialize new fields as undefined
-                    aluno.turma_Id = null as any;
-                    aluno.perfilCognitivo_Id = null as any;
-                    aluno.apostila_Kit_Id = null as any;
-                    return aluno;
-                });
-            } else {
-
-            }
         }
         if (changes['professores'])
             this.professores = changes['professores'].currentValue;

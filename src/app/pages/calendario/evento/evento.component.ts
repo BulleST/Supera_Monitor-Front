@@ -111,7 +111,7 @@ export class EventoComponent implements OnDestroy {
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true
-            lastValueFrom(this.professorService.getList('calendario/evento/evento.component'))
+            lastValueFrom(this.professorService.getList())
                 .then((res) => (this.loadingProfessores = false))
                 .catch((res) => (this.loadingProfessores = false))
         }

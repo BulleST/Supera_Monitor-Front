@@ -1,19 +1,19 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Roteiro } from '../../../models/roteiro.model';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
-import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Item } from '../../../models/dashboard.model';
+import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Item, Dashboard_Response, DashboardItemStatus, Dashboard_Roteiro } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { Crypto } from '../../../utils';
-import { ActivatedRoute, Router } from '@angular/router';
 import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 import { AulaParticipacaoPopoverComponent } from './aula-participacao-popover/aula-participacao-popover.component';
 import moment from 'moment';
 import 'moment/locale/pt-br';
+import { Table } from 'primeng/table';
+import { Roteiro } from '../../../models/roteiro.model';
 
 @Component({
     selector: 'app-monitoramento-dashboard',
@@ -22,7 +22,7 @@ import 'moment/locale/pt-br';
     styleUrl: './monitoramento-dashboard.component.css',
     providers: [ConfirmationService],
 })
-export class MonitoramentoDashboardComponent implements AfterViewInit, OnDestroy {
+export class MonitoramentoDashboardComponent implements OnDestroy {
     alunos: Dashboard_Aluno[] = [];
     loading = false;
     mesesAno: Dashboard_Mes[] = [];
@@ -43,78 +43,62 @@ export class MonitoramentoDashboardComponent implements AfterViewInit, OnDestroy
     hoje = new Date;
     height = 'flex';
     subscription: Subscription[] = [];
+    DashboardItemStatus = DashboardItemStatus;
+
+    filterStatus = [ 
+        { label: 'Todos', value: null, styleClass: 'pi pi-bars' },
+        { label: DashboardItemStatus.Cancelada, value: DashboardItemStatus.Cancelada, styleClass: 'surface-800' },
+        { label: DashboardItemStatus.Feriado, value: DashboardItemStatus.Feriado, styleClass: 'bg-red-600' },
+        { label: DashboardItemStatus.Reposicao, value: DashboardItemStatus.Reposicao, styleClass: 'bg-purple-500' },
+        { label: DashboardItemStatus.FaltaNaReposicao, value: DashboardItemStatus.FaltaNaReposicao, styleClass: 'bg-blue-600' },
+        { label: DashboardItemStatus.FaltaNaAula, value: DashboardItemStatus.FaltaNaAula, styleClass: 'bg-red-500' },
+        { label: DashboardItemStatus.FaltaAgendada, value: DashboardItemStatus.FaltaAgendada, styleClass: 'bg-red-500' },
+        { label: DashboardItemStatus.PresenteNaReposicao, value: DashboardItemStatus.PresenteNaReposicao, styleClass: 'bg-green-300' },
+        { label: DashboardItemStatus.Presente, value: DashboardItemStatus.Presente, styleClass: 'bg-green-500' },
+        { label: DashboardItemStatus.Aula, value: DashboardItemStatus.Aula, styleClass: 'surface-200' },
+    ]
 
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
         private crypto: Crypto,
-        private router: Router,
-        private activatedRoute: ActivatedRoute,
     ) {
-        let calendarioReload = this.service.calendarioReload.subscribe(res => {
-            this.update();
-        })
+        let calendarioReload = this.service.calendarioReload.subscribe(res => this.update())
         this.subscription.push(calendarioReload);
-
     }
-
-    ngAfterViewInit(): void {
-        this.calcHeight();
-     }
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-
-    calcHeight() {
-        let header = document.querySelector('app-header') as HTMLElement;
-        let toolbar = document.querySelector('#toolbar') as HTMLElement;
-        let windowHeight = window.outerHeight;
-        let calculation = windowHeight - (header?.offsetHeight ?? 0) - (toolbar?.offsetHeight ?? 0) - 210;
-        this.height = calculation + 'px';
-        // let dashContent = document.querySelector('#dash-content') as HTMLElement;
-        // dashContent.style.height = calculation + 'px';
-    }
     randomDate(start: Date, end: Date) {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
     }
 
-    onLoading() {
+ onLoading() {
         this.loading = true;
-        let index = -1;
         this.mesesAno = Array.from({ length: 12 }, (v, i) => {
-            index++;
             return {
                 mes: i,
                 mesString: moment().month(i).format('MMMM'),
                 roteiros: Array.from({ length: 4 }, (vv, ii) => {
+                    let dia = new Date(this.request.ano, i, 1);
+                    let inicio = moment(dia).add(ii, 'week').startOf('week')
+                    let fim = moment(dia).add(ii, 'week').endOf('week')
                     return {
                         id: -1,
-                        semana: ii + 1,
+                        semana: moment(inicio).week(),
                         tema: 'Carregando...',
-                        dataInicio: moment().set({
-                            month: i,
-                            year: this.request.ano,
-                            day: 1,
-                            week: index
-                        }).toDate(),
-                        dataFim: moment().set({
-                            month: i,
-                            year: this.request.ano,
-                            day: 6,
-                            week: index
-                        }).toDate(),
-                    } as Roteiro;
+                        dataInicio: inicio.toDate(),
+                        dataFim: fim.toDate(),
+                    } as Dashboard_Roteiro;
                 })
             } as Dashboard_Mes;
         })
         this.alunos = [];
     }
-
     update() {
         this.onLoading();
-
         setTimeout(() => {
             let container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;
             let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
@@ -127,29 +111,29 @@ export class MonitoramentoDashboardComponent implements AfterViewInit, OnDestroy
     setDashboard() {
         this.loading = true;
         lastValueFrom(this.service.getDashboard(this.request))
-            .then(res => {
-
+            .then((res: Dashboard_Response) => {
                 // Seta meses do ano
                 this.mesesAno = this.meses.map((mesString, index) => {
                     let mes = new Dashboard_Mes;
                     mes.mes = index;
                     mes.mesString = mesString;
-                    mes.roteiros = res.roteiros.filter(x => {
-                        // return moment(x.dataInicio).month() == index;
-                        let ehDoMes = moment(x.dataInicio).month() == index;
 
-                        let ehInicioDoAno = moment(x.dataInicio).month() == 12 
-                                            && moment(x.dataInicio).year() == this.request.ano - 1;
-                        let ehFimDoAno = moment(x.dataInicio).month() == 12 
-                                            && moment(x.dataFim).year() == this.request.ano + 1;
+                    mes.roteiros = res.roteiros.filter(roteiro => {
+                        let ehDoMes = moment(roteiro.dataInicio).month() == index;
+                        let inicioEhDezembro = moment(roteiro.dataInicio).month() == 11;
+                        let fimEhJaneiro = moment(roteiro.dataFim).month() == 0;
+                        let ehAnoAnterior = moment(roteiro.dataInicio).year() == this.request.ano - 1
+                        let ehAnoPosterior = moment(roteiro.dataFim).year() == this.request.ano + 1
 
-                        return ehDoMes 
-                            && x.semana > 0 
-                            // || (!ehDoMes && ehInicioDoAno && !ehFimDoAno)
-                            // || (!ehDoMes && !ehInicioDoAno && ehFimDoAno)
+                        let ehInicioDoAno = inicioEhDezembro && fimEhJaneiro && ehAnoAnterior;
+                        let ehFimDoAno = inicioEhDezembro && fimEhJaneiro && ehAnoPosterior;
+
+                        return (ehDoMes && !ehInicioDoAno && !ehFimDoAno)
+                            || (!ehDoMes && ehInicioDoAno && !ehFimDoAno && index == 0)
+                            || (ehDoMes && !ehInicioDoAno && ehFimDoAno && index == 11)
                     });
 
-                    mes.roteiros.sort((x,y) => moment(x.dataInicio).toDate().getTime() - moment(y.dataInicio).toDate().getTime())
+                    mes.roteiros.sort((x,y) => x.dataInicio.getTime() - y.dataInicio.getTime())
                     return mes;
                 });
 
@@ -212,11 +196,32 @@ export class MonitoramentoDashboardComponent implements AfterViewInit, OnDestroy
     
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
         this.selectedAulaComponent.aluno = aluno;
-        this.selectedAulaComponent.participacao = item;
+        this.selectedAulaComponent.item = item;
         this.selectedAulaComponent.show(event);
     }
 
-    alunoVigente(item: Dashboard_Item, aluno: Dashboard_Aluno) {
+    filtrarStatus(value: DashboardItemStatus | null, roteiro: Dashboard_Roteiro, table: Table) {
+        let alunosFiltered = this.alunos.filter(aluno => {
+            let item = aluno.aulas.find(x => x.roteiro.id == roteiro.id 
+                                        && moment(x.roteiro.dataInicio).isSame(roteiro.dataInicio, 'date')
+                                        && moment(x.roteiro.dataFim).isSame(roteiro.dataFim, 'date')
+                                        && x.roteiro.semana == roteiro.semana)  
 
+            if (!value) {
+                return true;
+            }
+
+            if (!item) {
+                return false;
+            }
+
+            if (item.status === value && item.show) {
+                return true;
+            }
+
+            return false;
+        });
+
+        table.filteredValue = alunosFiltered;
     }
 }

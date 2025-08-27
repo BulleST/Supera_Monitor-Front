@@ -45,17 +45,17 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
     ) {
         this.applyFilter = new EventEmitter<DashboardRequest>();
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
             this.loadingProfessores = true;
-                lastValueFrom(this.professorService.getList('dashboard filtro'))
+                lastValueFrom(this.professorService.getList())
                 .then(res => this.loadingProfessores = false)
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -65,7 +65,7 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res);
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -93,8 +93,8 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
             this.request.aluno_Id = parseInt(localStorage.getItem('aluno_Id')!)
         }
 
-        var anoMin = 2025;
-        var currentAno = new Date().getFullYear();
+        let anoMin = 2025;
+        let currentAno = new Date().getFullYear();
         for (let ano = anoMin; ano <= currentAno; ano++) {
             this.anos.push(ano)
         }
@@ -218,7 +218,7 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
     }
 
     enviarMensagem(aluno: Aluno) {
-        var object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+        let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }

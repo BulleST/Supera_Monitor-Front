@@ -225,7 +225,7 @@
                 <div class="field col-3">
                     <label for="horario">Horário:</label>
                     <p-iconfield>
-                        <p-inputicon styleClass="pi pi-calendar" />
+                        <p-inputicon styleClass="pi pi-clock" />
                         <input type="text"
                                 pInputText
                                 [value]="evento?.data | date : 'HH:mm'"
@@ -281,37 +281,63 @@
 
             
             <div class="col-12 flex align-items-center gap-2 mb-2">
-                <label for="alunoContactado" class="font-bold">O aluno foi contatado?</label>
+                <span class="font-bold">O aluno foi contatado?</span>
 
                 <p-button 
-                    [icon]="request.alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-                    [label]="request.alunoContactado ? 'Sim' : 'Não'"
-                    [severity]="request.alunoContactado ? 'success' : 'danger'"
-                    (onClick)="request.alunoContactado = !request.alunoContactado"
+                    [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+                    [label]="alunoContactado ? 'Sim' : 'Não'"
+                    [severity]="alunoContactado ? 'success' : 'danger'"
+                    (onClick)="alunoContactadoChanged()"
                     size="small"
                 />
-     
+                
+                <ng-container  *ngIf="evento && aluno && !request.alunoContactado">
+                    <p-button type="button"
+                        (onClick)="enviarMensagemFalta($event)"
+                        (auxclick)="enviarMensagemFalta($event)"
+                        (contextmenu)="enviarMensagemFalta($event)"
+                        [disabled]="!aluno.celular"
+                        icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
+                        severity="success"
+                        pTooltip="Enviar mensagem de falta"
+                        label="Enviar mensagem"
+                        [text]="true" />
+                </ng-container>
 
-                <p-button type="button" *ngIf="evento && aluno && !request.alunoContactado"
-                    (onClick)="enviarMensagemFalta($event)"
-                    (auxclick)="enviarMensagemFalta($event)"
-                    (contextmenu)="enviarMensagemFalta($event)"
-                    [disabled]="!aluno.celular"
-                    icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                    severity="success"
-                    pTooltip="Enviar mensagem de falta"
-                    label="Enviar mensagem"
-                    [text]="true" />
 
 
             </div>
-            <div class="field col-6">
-                <label for="status_Id" class="font-bold">Status do contato: <span class="text-red-500">*</span></label>
+            
+            <ng-container  *ngIf="evento && aluno && request.alunoContactado">
+                <div class="field col">
+                    <label for="alunoContactado" class="font-bold">Quando?</label>
+
+                    <p-datepicker
+                              #_alunoContactado="ngModel"
+                              [(ngModel)]="request.alunoContactado"
+                              [disabled]="!request.alunoContactado"
+                              placeholder="dd/mm/yy hh:mm"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              inputId="alunoContactado"
+                              name="alunoContactado"
+                              [showTime]="true"
+                              hourFormat="24"
+                              [required]="true"
+                              [selectOtherMonths]="true"
+                              [keepInvalid]="true"
+                              [disabledDays]="[0]"
+                              appendTo="body"
+                              fluid  />
+                </div>
+            </ng-container>
+            <div class="field col">
+                <label for="statusContato_Id" class="font-bold">Status do contato: <span class="text-red-500">*</span></label>
                 <p-select [options]="status"
-                    inputId="status_Id"
-                    name="status_Id"
-                    [(ngModel)]="request.status_Id"
-                    #status_Id="ngModel"
+                    inputId="statusContato_Id"
+                    name="statusContato_Id"
+                    [(ngModel)]="request.statusContato_Id"
+                    #statusContato_Id="ngModel"
                     optionLabel="label"
                     optionValue="value"
                     [filter]="true"
@@ -319,17 +345,18 @@
                     appendTo="body"
                     fluid />
             </div>
-            <div class="field col-6">
-                <label for="observacaoContato" class="font-bold">Retorno do contato: </label>
+            <div class="field col">
+                <label for="contatoObservacao" class="font-bold">Retorno do contato: </label>
                 <input pInputText 
-                    id="observacaoContato"
-                    name="observacaoContato"
-                    [(ngModel)]="request.observacaoContato"
-                    #observacaoContato="ngModel"
+                    id="contatoObservacao"
+                    name="contatoObservacao"
+                    [(ngModel)]="request.contatoObservacao"
+                    #contatoObservacao="ngModel"
                     fluid />
             </div>
         </div>
         <div class="col-12 px-1 flex align-items-center justify-content-end">
+           
             <p-button type="submit"
                       fluid
                       label="Marcar falta"
