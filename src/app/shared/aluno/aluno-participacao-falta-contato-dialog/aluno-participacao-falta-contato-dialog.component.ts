@@ -11,6 +11,8 @@ import { NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { PseudoEvento } from '../../../models/reposicao.model';
+import { Roteiro } from '../../../models/roteiro.model';
+import { RoteiroService } from '../../../services/roteiro.service';
 
 @Component({
 	selector: 'app-aluno-participacao-falta-contato-dialog',
@@ -30,6 +32,9 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 	alunoContactado: boolean = false;
 
 	passado: boolean = false;
+
+    roteiro?: Roteiro;
+    roteiros: Roteiro[] = [];
 	
 
     status = [
@@ -49,6 +54,7 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private service: EventoService,
+		private roteiroService: RoteiroService,
 		private crypto: Crypto,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private confirmationService: ConfirmationService,
@@ -57,29 +63,41 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 	
 	) {
 
+        let roteiros = this.roteiroService.list.subscribe(res => {
+            this.roteiros = res;
+            this.setRoteiro();
+        });
+        this.subscription.push(roteiros);
+
+        if (this.roteiros.length == 0) {
+            lastValueFrom(this.roteiroService.getList())
+        }
+
 		this.activatedRoute.params.subscribe(res => {
 			if (!res['evento_id']) {
 				this.visible = false;
 				this.visibleChange();
 			}
 			if (!res['aluno_id']) {
-				this.alunoId = this.crypto.decrypt(res['aluno_id']);
 				this.visible = false;
 				this.visibleChange();
 			}
+            this.alunoId = this.crypto.decrypt(res['aluno_id']);
 		})
 
 		let evento = this.service.getEvento().subscribe(res => {
-			let params = this.activatedRoute.snapshot.paramMap;
 			if (res) {
 				this.evento = res;
 				this.participacao = res.alunos.find(x => x.aluno_Id == this.alunoId) as Evento_Participacao_Aluno;
 
+                if (this.evento && this.participacao) {
+                    let hoje = moment(new Date)
+                    this.passado = moment(this.evento.data).isSameOrBefore(hoje, 'date');
+                    this.alunoContactado = !!this.participacao.alunoContactado;
+                    this.visible = true;
+                    this.setRoteiro();
+                }
 
-				this.passado = moment().isSameOrBefore(this.evento.data, 'date');
-				this.alunoContactado = !!this.participacao.alunoContactado;
-
-				this.visible = true;
 			}
 		});
 		this.subscription.push(evento);
@@ -90,7 +108,6 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 		this.subscription.forEach(item => item.unsubscribe());
 	}
 
-
 	visibleChange() {
 		if (!this.visible) {
 			let params = this.activatedRoute.snapshot.params;
@@ -99,10 +116,22 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 		}
 	}
 
+
+    setRoteiro() {
+        if (this.roteiros && this.evento) {
+            this.roteiro = this.roteiros.find(x => x.id == this.evento.roteiro_Id);
+            if (!this.evento.roteiro_Id)
+                this.evento.roteiro_Id = this.roteiro?.id;
+                this.evento.tema = this.roteiro?.tema;
+                this.evento.semana = this.roteiro?.semana;
+        }
+    }
+
     alunoContactadoChanged() {
         this.alunoContactado = !this.alunoContactado;
         if (!this.alunoContactado) {
-            this.participacao.alunoContactado = undefined
+            this.participacao.alunoContactado = undefined;
+            this.participacao.statusContato_Id = undefined;
         }
         else {
             this.participacao.alunoContactado = new Date;

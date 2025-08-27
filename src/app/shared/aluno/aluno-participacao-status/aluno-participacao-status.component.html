@@ -1,0 +1,104 @@
+<div class="flex align-items-center gap-1">
+
+    
+    <!-- Primeira Aula -->
+    @if (participacao.primeiraAula_Id == evento.id)
+    {
+        <p-tag value="Aula 1"
+            styleClass="bg-pink-500 border-pink-500 text-white line-height-3 font-light"/>
+    }
+    <!-- Reposicao agendada-->
+    @if (reposicaoPara)
+    {
+        <p-tag value="Reposição agendada"
+            styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light"/>
+        <ng-container *ngTemplateOutlet="alunoContactado"></ng-container>
+
+    }
+    <!-- Falta Na Reposição -->
+    @else if (evento.finalizado && participacao.presente === false && reposicaoDe)
+    {
+        <p-tag value="Faltou na repoosição"
+            styleClass="bg-blue-500 border-blue-500 text-white line-height-3 font-light"/>
+        <ng-container *ngTemplateOutlet="alunoContactado"></ng-container>
+    }
+    <!-- Falta Na Aula -->
+    @else if (evento.finalizado && participacao.presente === false && !reposicaoDe)
+    {
+        <p-tag value="Faltou"
+            styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light"/>
+
+        <ng-container *ngTemplateOutlet="alunoContactado"></ng-container>
+    }
+    <!-- Falta Agendada -->
+    @else if (participacao.active === false && participacao.presente === false)
+    {
+        <p-tag value="Falta Agendada"
+            styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light"/>
+
+        <ng-container *ngTemplateOutlet="alunoContactado"></ng-container>
+    }
+    <!-- Presente na Reposição -->
+    @else if (evento.finalizado && participacao.presente === true && reposicaoDe)
+    {
+        <p-tag value="Presente na reposição"
+            styleClass="bg-green-300 border-green-300 text-green-700 line-height-3 font-light"/>
+    }
+    <!-- Presente na Aula -->
+    @else if (evento.finalizado && participacao.presente === true && !reposicaoDe)
+    {
+        <p-tag value="Presente"
+            styleClass="bg-green-500 border-green-500 text-white line-height-3 font-light"/>
+    }
+</div>
+
+
+<ng-template #alunoContactado>
+    @if (!participacao.alunoContactado) {
+        <p-button 
+            icon="pi pi-times text-xs"
+            severity="danger"
+            pTooltip="Aluno não contatado - Clique para ver mais"
+            (onClick)="goToContatoFalta()"
+            size="small"
+            styleClass="bg-red-500 p-1"
+            rounded
+        />
+    } 
+    @else {
+        <p-button 
+            icon="pi pi-check-circle"
+            severity="success"
+            pTooltip="Aluno contatado - Clique para ver mais"
+            (onClick)="alunoContatadoTooltip.toggle($event)"
+            [text]="true"
+        />
+    }
+</ng-template>
+
+<p-popover #alunoContatadoTooltip appendTo="body">
+    <p class="flex gap-1 align-content-center">
+        <b>Data:</b>
+        <span>{{ participacao.alunoContactado | date : 'dd/MM \'às\' HH:mm' }}</span>
+    </p>
+    <p class="flex gap-1 align-content-center">
+        <b>Status:</b>
+        <span>{{ statusContato?.label ?? 'Aluno não contactado' }}</span>
+    </p>
+    <p class="flex gap-1 align-content-center">
+        <b>Retorno:</b>
+        <span>{{ participacao.contatoObservacao }}</span>
+    </p>
+    <p class="flex gap-1 align-content-center">
+        <b>Motivo falta:</b>
+        <span *ngIf="participacao.observacao">{{ participacao.observacao }}</span>
+        <span *ngIf="!participacao.observacao">Não informada</span>
+    </p>
+    <div>
+        <p-button label="Editar" 
+        icon="pi pi-pen "
+        size="small"
+        (onClick)="goToContatoFalta()"/>
+    </div>
+
+</p-popover>

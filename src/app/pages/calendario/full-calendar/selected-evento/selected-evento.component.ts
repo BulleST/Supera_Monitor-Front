@@ -281,6 +281,15 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
+    goToContatoFalta(participacao: Evento_Participacao_Aluno) {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+            let eventoIdEncrypted = this.crypto.encrypt(this.evento.id);
+            let alunoIdEncrypted = this.crypto.encrypt(participacao.aluno_Id);
+            this.router.navigate([ 'contato', eventoIdEncrypted, alunoIdEncrypted ], { relativeTo: this.activatedRoute });
+        }
+    }
+
 
     loadReposicoes() {
         if (this.evento) {

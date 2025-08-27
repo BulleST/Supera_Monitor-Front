@@ -4,7 +4,6 @@ import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Aluno_CheckList_Item, Checklist } from '../models/checklist.model';
 import { RequestResponse } from '../helpers/request-response.interface';
-import { Aluno_Checklist_Item_View } from '../models/aluno-checklist-item-list.model';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno } from '../models/alunos.model';

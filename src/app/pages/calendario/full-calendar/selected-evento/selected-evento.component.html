@@ -100,8 +100,7 @@
                          [ngClass]="{ 'cursor-disabled': aluno.presente && evento.finalizado }"
                          class="p-0 m-0">
                         <div *cdkDragPlaceholder></div>
-                        <div *cdkDragPreview
-                             class="p-2">
+                        <div *cdkDragPreview class="p-2">
                             <span class="-mt-2 ml-2 text-xs">Pressione esc para cancelar</span>
                             <div class="shadow-2">
                                 <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: aluno }"></ng-container>
@@ -117,89 +116,37 @@
                                                [evento]="evento"
                                                [eventoReposicao]="participacao.reposicaoDe_Evento ? undefined : evento"
                                                [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover>
-                            <div class="w-full flex align-items-center justify-content-start p-2 pl-3 pr-2 border-round-md"
+                            <div class="w-full p-2 px-3"
                                  [ngClass]="{
                                         'surface-50': i % 2 == 0,
                                         'surface-0': i % 2 != 0
                                     }">
-                                <div class="w-1rem h-1rem mr-2 border-circle overflow-hidden flex align-items-center justify-content-center">
-                                    <i class="pi pi-user text-primary text-sm"></i>
-                                </div>
-                                <span>
+                                <div class="flex align-items-center gap-2">
+                                    <p-button type="button"
+                                        (onClick)="enviarMensagem(participacao)"
+                                        (auxclick)="enviarMensagem(participacao)"
+                                        (contextmenu)="enviarMensagem(participacao)"
+                                        [disabled]="!participacao.celular"
+                                        icon="pi pi-whatsapp"
+                                        [severity]="participacao.celular ? 'success' : 'secondary'"
+                                        [text]="true"
+                                        [rounded]="true"
+                                        pTooltip="Enviar mensagem"
+                                        styleClass="p-0 w-auto h-auto" />
+                                    <!-- Nome -->
                                     <span class="hover:underline hover:text-primary-500 hover:font-bold"
                                           [pTooltip]="participacao.nome"
-                                          (click)="popoverAluno.show($event)"
-                                          [ngClass]="{
-                                            'text-red-500': evento.finalizado && participacao.presente === false,
-                                            'text-800': !evento.finalizado && !participacao.reposicaoDe_Evento_Id,
-                                            'text-purple-500': !evento.finalizado && participacao.reposicaoDe_Evento_Id,
-                                            'text-pink-500': !evento.finalizado && aluno.primeiraAula_Id === evento.id
-                                            }">
+                                          (click)="popoverAluno.show($event)">
                                         <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                     </span>
-                                    <p-badge *ngIf="participacao.reposicaoDe_Evento_Id"
-                                             styleClass="ml-2 bg-purple-500"
-                                             value="Reposição"
-                                             size="small"
-                                             [pTooltip]="reposicaoDe_Evento"
-                                             tooltipPosition="bottom" />
-                                    <p-badge *ngIf="aluno.primeiraAula_Id == evento.id"
-                                             styleClass="ml-2 bg-pink-500"
-                                             value="Aula 1"
-                                             size="small"
-                                             severity="danger"
-                                             [pTooltip]="'Primeira aula'" />
-                                    <span *ngIf="evento.finalizado" class="ml-2">
-                                        <span *ngIf="participacao.presente === true"
-                                              class="pi pi-thumbs-up-fill text-green-500 p-2"
-                                              pTooltip="Presente"></span>
-                                        <span *ngIf="participacao.presente === false"
-                                              class="pi pi-thumbs-down-fill text-red-500 p-2"
-                                              pTooltip="Faltou"></span>
-                                    </span>
-                                    <ng-template #reposicaoDe_Evento>
-                                        <div *ngIf="participacao.reposicaoDe_Evento"  class="w-15rem">
-                                            <p> Data: {{ participacao.reposicaoDe_Evento.data | date : 'dd/MM/YY HH:mm' }}</p>
-                                            <p> Semana: {{ participacao.reposicaoDe_Evento.semana }} - {{ participacao.reposicaoDe_Evento.tema }}</p>
-                                            <p *ngIf="participacao.reposicaoDe_Evento.turma"> Turma: {{ participacao.reposicaoDe_Evento.turma }}</p>
-                                            <p *ngIf="participacao.reposicaoDe_Evento.professor">
-                                                <app-legend-color [corLegenda]="participacao.reposicaoDe_Evento.corLegenda"
-                                                                  [professor_Id]="participacao.reposicaoDe_Evento.professor_Id"
-                                                                  [professor]="participacao.reposicaoDe_Evento.professor"
-                                                                  [turma_Id]="participacao.reposicaoDe_Evento.turma_Id"></app-legend-color>
-                                                <span>Educador: {{ participacao.reposicaoDe_Evento.professor }}</span>
-                                            </p>
-                                        </div>
-                                    </ng-template>
-                                </span>
-                                <p class="ml-auto pl-2">
-                                    <p-button type="button"
-                                              *ngIf="!evento.finalizado || participacao.presente === true"
-                                              (onClick)="enviarMensagem(participacao)"
-                                              (auxclick)="enviarMensagem(participacao)"
-                                              (contextmenu)="enviarMensagem(participacao)"
-                                              [disabled]="!participacao.celular"
-                                              icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
-                                              severity="success"
-                                              [text]="true"
-                                              [rounded]="true"
-                                              size="small"
-                                              pTooltip="Enviar mensagem"
-                                              styleClass="p-1 h-auto w-auto" />
-                                    <p-button type="button"
-                                              *ngIf="participacao.presente === false"
-                                              (onClick)="enviarMensagemFalta(participacao, $event)"
-                                              (auxclick)="enviarMensagemFalta(participacao, $event)"
-                                              (contextmenu)="enviarMensagemFalta(participacao, $event)"
-                                              [disabled]="!participacao.celular"
-                                              icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
-                                              severity="success"
-                                              [text]="true"
-                                              [rounded]="true"
-                                              size="small"
-                                              pTooltip="Enviar mensagem de falta"
-                                              styleClass="p-1 h-auto w-auto" />
-                                </p>
+
+                                    <div class="ml-auto">
+                                        
+                                        <app-aluno-participacao-status 
+                                            [evento]="evento" 
+                                            [participacao]="participacao"></app-aluno-participacao-status>
+                                    </div>
+                                </div>
                             </div>
                         </ng-template>
                     </div>
@@ -320,3 +267,4 @@
         </div>
     </ng-container>
 </p-popover>
+

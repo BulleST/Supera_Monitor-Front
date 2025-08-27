@@ -19,25 +19,26 @@ import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/al
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
 import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
 import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
+import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
+import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
+import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
+import { AlunoParticipacaoStatusComponent } from './aluno/aluno-participacao-status/aluno-participacao-status.component';
 
 // Outros componentes
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
 import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
 import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/evento-item-hover/evento-item-hover.component';
+import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
+import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
+import { LegendColorComponent } from './professor/legend-color/legend-color.component';
+import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
+import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
 
 // Pipes
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
-import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
-import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
-import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
-import { LegendColorComponent } from './professor/legend-color/legend-color.component';
-import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
-import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
-import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
-import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
 
 @NgModule({
     declarations: [
@@ -51,6 +52,7 @@ import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-part
         AlunoReposicaoTooltipComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
+        AlunoParticipacaoStatusComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
@@ -84,6 +86,7 @@ import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-part
         AlunoReposicaoTooltipComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
+        AlunoParticipacaoStatusComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
