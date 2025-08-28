@@ -11,10 +11,11 @@ export class EventoChamadaAlunoRequest {
     participacao_Id: number = PseudoEvento.EventoId;
     presente?: boolean;
     observacao?: string;
-    apostila_Abaco_Id?: number = 0;
-    numeroPaginaAbaco?: number = 0;
-    apostila_AH_Id?: number = 0;
-    numeroPaginaAH?: number = 0;
+    apostila_Abaco_Id?: number;
+    numeroPaginaAbaco?: number;
+    apostila_AH_Id?: number;
+    numeroPaginaAH?: number;
+    reposicaoDe_Evento_Id?: number;
 }
 
 export class EventoChamadaProfessorRequest {

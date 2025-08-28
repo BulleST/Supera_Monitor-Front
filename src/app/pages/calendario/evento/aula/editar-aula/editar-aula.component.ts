@@ -199,8 +199,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
     async setApostilasAlunos() {
-        console.log('setApostilasAlunos')
-        console.log('apostilas', this.apostilas)
         if (this.apostilas.length == 0) {
             this.loadingApostila = true
             await lastValueFrom(this.apostilaService.getApostilas())

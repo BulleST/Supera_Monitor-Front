@@ -1,11 +1,11 @@
-<p-popover #popover appendTo="body" styleClass="mt-2">
+<p-popover #popover appendTo="body">
     <app-aluno-checklist-dialog #alunoChecklistDialog
                                 [loading]="loadingAluno"></app-aluno-checklist-dialog>
     <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog
                                            [alunoChecklistItem]="alunoChecklistItem"
                                            [aluno]="aluno"></app-aluno-checklist-on-confirm-dialog>
     <ng-container *ngIf="visible">
-        <p-card *ngIf="loadingAluno"
+        <p-card *ngIf="loadingAluno && !aluno && !participacao"
                 [style]="{maxWidth: '960vw', width: '20rem', overflow: 'hidden' }"
                 styleClass="shadow-none">
             <section>
@@ -35,15 +35,15 @@
                 <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
             </ng-template>
         </p-card>
-        <p-card *ngIf="aluno && !loadingAluno"
+        <p-card *ngIf="aluno || participacao" 
                 [style]="{maxWidth: '960vw', width: '22rem', overflow: 'hidden' }"
-                styleClass="shadow-none">
+                styleClass="shadow-none aluno-card-popover">
             <ng-template #header>
                 <ng-container *ngIf="loadingFoto">
                     <p-skeleton width="22rem" height="12rem" />
                 </ng-container>
                 <ng-container *ngIf="!loadingFoto">
-                    <div class="w-full h-12rem surface-50 overflow-hidden flex align-items-center justify-content-center">
+                    <div class="w-full h-12rem surface-100 overflow-hidden flex align-items-center justify-content-center">
                         <p-image *ngIf="foto"
                                  [src]="foto"
                                  [preview]="true"
@@ -67,65 +67,96 @@
                 </ng-container>
             </ng-template>
             <ng-template #title>
-                <div class="-mx-2 flex">
-                    <p class="text-primary-500 font-bold capitalize">{{ aluno.nome | nameAbv }}</p>
-                    <div class="flex align-items-center pr-2 ml-auto">
-                        <p-badge *ngIf="participacao && participacao.reposicaoDe_Evento_Id"
-                                 value="Reposição"
-                                 styleClass="bg-purple-500" />
-                        <p-badge *ngIf="evento && aluno.primeiraAula_Id && aluno.primeiraAula_Id == evento.id"
-                                 value="Aula 1"
-                                 styleClass="bg-pink-500" />
-                    </div>
+                <div class="flex align-items-center justify-content-between gap-2">
+                    <!--  max-w-30rem overflow-hidden text-overflow-ellipsis -->
+                    <p class="text-primary-500 font-bold capitalize white-space-nowrap" 
+                        [pTooltip]="participacao?.aluno ?? aluno.nome">
+                        {{ (participacao?.aluno ?? aluno.nome) | nameAbv }}
+                    </p>
+                    <ng-container *ngIf="participacao && evento">
+                        <app-aluno-participacao-status
+                            [evento]="evento"
+                            [participacao]="participacao"
+                        ></app-aluno-participacao-status>
+                    </ng-container>
                 </div>
             </ng-template>
             <ng-template #subtitle>
-                <p class="flex align-items-center -mx-2 text-lg text-500">
-                    <span><b>Turma: </b>{{ aluno.turma }} </span>
-                    <app-legend-color [corLegenda]="aluno.corLegenda"
-                                      [professor_Id]="aluno.professor_Id"
-                                      [professor]="aluno.professor"
-                                      [turma_Id]="aluno.turma_Id"></app-legend-color>
-                </p>
+                <div>
+                    <p class="flex align-items-baseline gap-2 text-lg ">
+                        <app-legend-color [corLegenda]="aluno.corLegenda"
+                                          [professor_Id]="aluno.professor_Id"
+                                          [professor]="aluno.professor"
+                                          [turma_Id]="participacao?.turma_Id ?? aluno.turma_Id"></app-legend-color>
+                        <span class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis text-700">
+                            <b>Turma: </b>
+                            <span>{{participacao?.turma ??  aluno.turma }} </span>
+                        </span>
+                    </p>
+                </div>
             </ng-template>
-            <section class="-mx-2 line-height-3">
+            <section class="flex flex-column gap-1">
+                <!-- Perfil -->
+                <p class="flex align-items-center gap-2">
+                    <i class="fa fa-brain"></i>
+                    <b>Perfil Cognitivo: </b>
+                    <span>{{ participacao?.perfilCognitivo ?? aluno.perfilCognitivo }}</span>
+                </p>
+                <!-- Idade -->
+                <p class="flex align-items-center gap-2" *ngIf="aluno">
+                    <i class="bi bi-cake-fill"></i>
+                    <b>Idade: </b>
+                    <span>{{ aluno.idade }} anos</span>
+                    <b>-</b>
+                    <span>{{ aluno.dataNascimento | date : 'dd/MM/yyyy'}}</span>
+                </p>
+                <!-- KIT -->
+                <p class="flex align-items-center gap-2">
+                    <i class="bi bi-book"></i>
+                    <b>KIT: </b>
+                    <span>{{ participacao?.kit ?? aluno.kit }}</span>
+                </p>
+                <!-- Apostila -->
                 <ng-template #apostilaTemplate let-apostila="apostila" let-pagina="pagina" let-abaco="abaco">
-                    <p class="flex">
-                        <b *ngIf="abaco">Apostila Ábaco: </b>
-                        <b *ngIf="!abaco">Apostila AH: </b>
-                        <span class="ml-2">{{ apostila }}</span>
-                        <b class="ml-auto mr-1">Página: </b>
-                        <span>{{ padStartPage(pagina, 2, '0') }}</span>
+                    <p class="flex align-items-center justify-content-between gap-2">
+                        <i class="bi bi-book"></i>
+                        <b *ngIf="abaco">Ábaco: </b>
+                        <b *ngIf="!abaco">AH: </b>
+                        <span>{{ apostila }}</span>
+                        <b class="ml-auto">Página: </b>
+                        <span>{{ pagina }}</span>
                     </p>
                 </ng-template>
                 <ng-container *ngIf="participacao && evento && evento.finalizado; else alunoApostilaTemplate">
                     <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                apostila: participacao.apostila_Abaco, 
-                pagina: participacao.numeroPaginaAbaco,
-                abaco: true 
-            }"></ng-container>
+                        apostila: participacao.apostila_Abaco, 
+                        pagina: participacao.numeroPaginaAbaco,
+                        abaco: true }">
+                    </ng-container>
                     <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                apostila: participacao.apostila_AH, 
-                pagina: participacao.numeroPaginaAH,
-                abaco: false 
-            }"></ng-container>
+                        apostila: participacao.apostila_AH, 
+                        pagina: participacao.numeroPaginaAH,
+                        abaco: false }">
+                    </ng-container>
                 </ng-container>
                 <ng-template #alunoApostilaTemplate>
                     <ng-container *ngIf="aluno">
                         <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                    apostila: aluno.apostila_Abaco, 
-                    pagina: aluno.numeroPaginaAbaco,
-                    abaco: true 
-                }"></ng-container>
+                            apostila: aluno.apostila_Abaco, 
+                            pagina: aluno.numeroPaginaAbaco,
+                            abaco: true }">
+                        </ng-container>
                         <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                    apostila: aluno.apostila_AH, 
-                    pagina: aluno.numeroPaginaAH,
-                    abaco: false 
-                }"></ng-container>
+                            apostila: aluno.apostila_AH, 
+                            pagina: aluno.numeroPaginaAH,
+                            abaco: false }">
+                        </ng-container>
                     </ng-container>
                 </ng-template>
-                <div class="mt-2 flex align-items-center gap-2">
-                    <b class="white-space-nowrap" *ngIf="showChecklist">Jornada Supera: </b>
+                <!-- Jornada -->
+                <div class="flex align-items-center gap-2" *ngIf="showChecklist">
+                    <i class="pi pi-check-square"></i>
+                    <b>Jornada: </b>
                     <p class="w-min flex align-items-center">
                         <app-aluno-checklist #alunoChecklist
                                              *ngIf="visible"
@@ -135,15 +166,25 @@
                                              (alunoChanged)="alunoChanged($event)"></app-aluno-checklist>
                     </p>
                 </div>
+                <!-- Status -->
+                <div class="flex align-items-center gap-2">
+                    <i class="pi pi-lock"></i>
+                    <b>Situação: </b>
+                    <p-tag 
+                        [icon]="aluno.active ? 'fa fa-lock-open' : 'fa fa-lock'"
+                        [severity]="aluno.active ? 'success' : 'danger'"
+                        [value]="aluno.active ? 'Ativo' : 'Inativo'"
+                    />
+                </div>
             </section>
             <ng-template #footer>
-                <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
+                    <ng-container *ngTemplateOutlet="footerTemplate"></ng-container>
             </ng-template>
         </p-card>
     </ng-container>
 </p-popover>
 <ng-template #footerTemplate>
-    <div class="flex gap-3 -mx-2 -mb-2 mt-2">
+    <div class="flex gap-3">
         <p-button label="Fechar"
                   severity="secondary"
                   class="w-full"

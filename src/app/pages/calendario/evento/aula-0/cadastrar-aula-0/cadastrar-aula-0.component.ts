@@ -433,8 +433,27 @@ export class CadastrarAula0Component implements OnDestroy {
             aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
             
             let mensagem = ''
+            if (aluno.aulaZero_Id) {
+                let aulaZero: Evento = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
+                let participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+
+                if (participacaoAulaZero.presente && aulaZero.finalizado) {
+                    let data = moment(aulaZero.data).format('DD/MM/YY [às] HH[h]mm');
+                    let educador = aulaZero.professor;
+                    this.showError(
+                        'Não autorizado', 
+                        `O aluno ${nome} já participou de de uma aula zero no dia <b>${data}</b> com o educador(a) ${educador}.`, 
+                        e.originalEvent
+                    );
+
+                    this.selectAlunoReject(aluno, model);
+                    return
+                }
+
+                mensagem += await this.aulaZeroMensagem(aluno, aulaZero, participacaoAulaZero);
+            }
             
-            mensagem += await this.aulaZeroMensagem(aluno);
+            
             mensagem += await this.restricaoMobilidadeMensagem(aluno);
             mensagem += await this.maisDeUmAlunoMensagem(aluno);
 
@@ -465,27 +484,20 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
 
-    async aulaZeroMensagem(aluno: Aluno) {
-        let mensagem = '';
-        if (aluno.aulaZero_Id) {
-            let aulaZero: Evento = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
-            let participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+    async aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
+        let mensagem = '<br>';
+        mensagem += `<p>Outra aula zero já foi cadastrada: </p>`;
 
-            mensagem += '<br>'
-            mensagem += `<p>Outra aula zero já foi cadastrada: </p>`;
-
-            if (!aulaZero.active) {
-                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
-            }
-            else if (aulaZero.active && participacaoAulaZero.presente === false && participacaoAulaZero.active === true) {
-                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Faltou (${participacaoAulaZero.observacao})</p>`;
-            }
-            else {
-                mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
-                mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
-            }
+        if (!aulaZero.active) {
+            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
         }
-        return mensagem;
+        else if (aulaZero.active && participacaoAulaZero.presente === false && participacaoAulaZero.active === true) {
+            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Faltou (${participacaoAulaZero.observacao})</p>`;
+        }
+        else {
+            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
+            mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
+        }
     }
 
     async restricaoMobilidadeMensagem(aluno: Aluno) {

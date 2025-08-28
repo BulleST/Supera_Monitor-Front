@@ -23,7 +23,6 @@ import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
 import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
-import { Evento_Participacao_Aluno } from '../models/evento-participacao-aluno.model';
 
 @Injectable({
     providedIn: 'root',
@@ -317,70 +316,70 @@ export class EventoService extends Service {
     editAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, request);
     }
 
     createAula0(model: EventoAula0Request) {
-        console.log('model', model)
+        console.log('createAula0 data 1', model.data)
         let request = MyMap(model, new EventoAula0Request()) as EventoAula0Request;
-        console.log('request', request)
+        console.log('createAula0 data 2', request.data)
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        console.log(' request.data',  request.data)
-        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, model);
+        console.log('createAula0 data 3', request.data)
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, request);
     }
 
     editAula0(model: EventoAula0Request) {
         let request = MyMap(model, new EventoAula0Request()) as EventoAula0Request;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, request);
     }
 
     createAulaExtra(model: EventoTurmaExtraRequest) {
         let request = MyMap(model, new EventoTurmaExtraRequest()) as EventoTurmaExtraRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, model);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/extra`, request);
     }
 
     editAulaExtra(model: EventoTurmaExtraRequest) {
         let request = MyMap(model, new EventoTurmaExtraRequest()) as EventoTurmaExtraRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/aulas`, request);
     }
 
     createSuperacao(model: EventoSuperacaoRequest) {
         let request = MyMap(model, new EventoSuperacaoRequest()) as EventoSuperacaoRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<RequestResponse>(`${this.url}/eventos/superacao`, model);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/superacao`, request);
     }
 
     editSuperacao(model: EventoSuperacaoRequest) {
         let request = MyMap(model, new EventoSuperacaoRequest()) as EventoSuperacaoRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/superacao`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/superacao`, request);
     }
 
     createOficina(model: EventoOficinaRequest) {
         let request = MyMap(model, new EventoOficinaRequest()) as EventoOficinaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<RequestResponse>(`${this.url}/eventos/oficinas`, model);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/oficinas`, request);
     }
 
     editOficina(model: EventoOficinaRequest) {
         let request = MyMap(model, new EventoOficinaRequest()) as EventoOficinaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/oficinas`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/oficinas`, request);
     }
 
     createReuniao(model: EventoReuniaoRequest) {
         let request = MyMap(model, new EventoReuniaoRequest()) as EventoReuniaoRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<RequestResponse>(`${this.url}/eventos/reunioes`, model);
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reunioes`, request);
     }
 
     editReuniao(model: EventoReuniaoRequest) {
         let request = MyMap(model, new EventoReuniaoRequest()) as EventoReuniaoRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.put<RequestResponse>(`${this.url}/eventos/reunioes`, model);
+        return this.http.put<RequestResponse>(`${this.url}/eventos/reunioes`, request);
     }
 
     cancelar(request: EventoCancelamentoRequest) {

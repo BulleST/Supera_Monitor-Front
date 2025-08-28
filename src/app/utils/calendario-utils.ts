@@ -140,7 +140,9 @@ export class CalendarioUtils {
     }
 
     request(evento: Evento) {
+        console.log('request data 1', evento.data);
         evento.data = moment(evento.data).locale('pt-br').toDate()
+        console.log('request data 2', evento.data);
         switch (evento.evento_Tipo_Id) {
             case EventoTipo.Aula:
                 return this.requestAulaTurma(evento)

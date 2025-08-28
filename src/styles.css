@@ -246,8 +246,10 @@ a {
     background-color: transparent !important;
 }
 
+.p-textarea[readonly],
 .p-inputtext[readonly] {
     cursor: default;
+    pointer-events: none;
 }
 
 .p-datatable-column-filter-button:not(.p-column-filter-inline .p-datatable-column-filter-button) {

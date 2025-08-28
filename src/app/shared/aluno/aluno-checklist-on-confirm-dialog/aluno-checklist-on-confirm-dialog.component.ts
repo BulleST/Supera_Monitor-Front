@@ -60,12 +60,14 @@ export class AlunoChecklistOnConfirmDialogComponent implements OnChanges {
 
     show(aluno?: Aluno, alunoChecklistItem?: Aluno_CheckList_Item) {
         this.visible = true;
+        
         if (aluno) {
             this.aluno = aluno;
         }
 
         if (alunoChecklistItem)
             this.alunoChecklistItem = alunoChecklistItem;
+
         if (!this.aluno) {
             this.loadAluno();
         }

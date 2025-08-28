@@ -11,7 +11,7 @@ import { Turma } from '../../../models/turma.model'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
 import { SalaAulaService } from '../../../services/sala-aula.service'
-import { Crypto, getError, MensagemWhatsapp, showError } from '../../../utils'
+import { Crypto, getError, showError } from '../../../utils'
 import { ProfessorService } from '../../../services/professor.service'
 import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
@@ -105,7 +105,7 @@ export class EventoComponent implements OnDestroy {
                 .catch((res) => (this.loadingRoteiros = false))
         }
 
-        let professores = this.professorService.list.subscribe(res => this.professores = res.filter(x => x.active == true))
+        let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
 
         if (this.professores.length == 0) {
@@ -115,7 +115,7 @@ export class EventoComponent implements OnDestroy {
                 .catch((res) => (this.loadingProfessores = false))
         }
 
-        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active == true))
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res)
         this.subscription.push(salaAula)
 
         if (this.salaAulas.length == 0) {
@@ -125,7 +125,7 @@ export class EventoComponent implements OnDestroy {
                 .catch((res) => (this.loadingSalaAulas = false))
         }
 
-        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active == true))
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res)
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
@@ -135,7 +135,7 @@ export class EventoComponent implements OnDestroy {
                 .catch((res) => (this.loadingAlunos = false))
         }
 
-        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true))
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
         this.subscription.push(turmas)
 
         if (this.turmas.length == 0) {
@@ -179,7 +179,8 @@ export class EventoComponent implements OnDestroy {
     }
 
     get roteiroEvento(): Roteiro | undefined {
-        if (!this.evento?.roteiro_Id) return undefined;
+        if (!this.evento?.roteiro_Id) 
+            return this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
         return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
     }
     ngOnDestroy(): void {
@@ -205,10 +206,10 @@ export class EventoComponent implements OnDestroy {
         this.loadingEventos = true
         let request: CalendarioRequest = new CalendarioRequest()
 
-        request.intervaloDe = moment(this.evento.data, 'YYYY-MM-DD').toDate()
-        request.intervaloAte = moment(this.evento.data, 'YYYY-MM-DD')
-            .add(1, 'day')
-            .toDate()
+        let data = moment(this.evento.data).format('YYYY-MM-DD')
+
+        request.intervaloDe = moment(data).toDate()
+        request.intervaloAte = moment(data).add(1, 'day').toDate()
 
         this.loadingEventos = true
         await lastValueFrom(this.service.getList(request))
@@ -224,17 +225,35 @@ export class EventoComponent implements OnDestroy {
 
     validaSalaAulas() {
         let data = this.evento.data;
-        this.salaAulas = validaSalaAulas(data, this.evento.duracaoMinutos, this.salaAulas, this.eventos, undefined, this.evento.id)
+        this.salaAulas = validaSalaAulas(
+                                data, 
+                                this.evento.duracaoMinutos, 
+                                this.salaAulas, 
+                                this.eventos, 
+                                undefined, 
+                                this.evento.id)
     }
 
     validaProfessores() {
         let data = this.evento.data
-        this.professores = validaProfessores(data, this.evento.duracaoMinutos, this.professores, this.eventos, undefined, this.evento.id)
+        this.professores = validaProfessores(
+                                data, 
+                                this.evento.duracaoMinutos, 
+                                this.professores, 
+                                this.eventos, 
+                                undefined, 
+                                this.evento.id)
     }
 
     validaAlunos() {
         let data = this.evento.data
-        this.alunos = validaAlunos(data, this.evento.duracaoMinutos, this.alunos, this.eventos, undefined, this.evento.id)
+        this.alunos = validaAlunos(
+                                data, 
+                                this.evento.duracaoMinutos, 
+                                this.alunos, 
+                                this.eventos, 
+                                undefined, 
+                                this.evento.id)
     }
 
     professorChanged(professor: Professor) {
@@ -253,13 +272,6 @@ export class EventoComponent implements OnDestroy {
         return this.calendarioUtils.getEventoTipo(e)
     }
 
-    goToAluno(aluno: Evento_Participacao_Aluno) {
-        this.router.navigate([
-            'calendario',
-            'aluno',
-            this.crypto.encrypt(aluno.aluno_Id),
-        ])
-    }
 
     finalizarConfirmation(e: any) {
 
@@ -308,6 +320,7 @@ export class EventoComponent implements OnDestroy {
         let response: RequestResponse = await this.request()
             .catch(res => {
                 this.loading = false;
+                this.showError('Erro', 'Não foi possível salvar alterações', e);
                 return res
             })
 
@@ -332,18 +345,19 @@ export class EventoComponent implements OnDestroy {
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
-                alunos: this.evento.alunos.map(x => {
+                alunos: this.evento.alunos.map(item => {
                     return {
-                        participacao_Id: x.id,
-                        observacao: x.observacao,
-                        presente: x.presente,
-                        apostila_Abaco_Id: x.apostila_Abaco_Id,
-                        apostila_AH_Id: x.apostila_AH_Id,
-                        numeroPaginaAbaco: x.numeroPaginaAbaco,
-                        numeroPaginaAH: x.numeroPaginaAH,
+                        participacao_Id: item.id,
+                        observacao: item.observacao,
+                        presente: item.presente,
+                        apostila_Abaco_Id: item.apostila_Abaco_Id,
+                        apostila_AH_Id: item.apostila_AH_Id,
+                        numeroPaginaAbaco: item.numeroPaginaAbaco,
+                        numeroPaginaAH: item.numeroPaginaAH,
+                        reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
                     }
                 }),
-                professores: this.evento.professores.map((item) => {
+                professores: this.evento.professores.map(item => {
                     return {
                         participacao_Id: item.id,
                         observacao: item.observacao,
@@ -353,11 +367,11 @@ export class EventoComponent implements OnDestroy {
             }
 
             if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
-                request.professores = this.evento.professores.map(x => {
+                request.professores = this.evento.professores.map(item => {
                     return {
-                        participacao_Id: x.id,
-                        observacao: x.observacao,
-                        presente: x.presente,
+                        participacao_Id: item.id,
+                        observacao: item.observacao,
+                        presente: item.presente,
                     }
                 })
             }

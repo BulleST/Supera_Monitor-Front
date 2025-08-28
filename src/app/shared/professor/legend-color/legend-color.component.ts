@@ -23,7 +23,7 @@ export class LegendColorComponent implements OnChanges, OnDestroy {
     loadingTurmas = false;
     professores: Professor[] = [];
     loadingProfessores = false;
-        subscription: Subscription[] = [];
+    subscription: Subscription[] = [];
     
 
     constructor(
@@ -44,6 +44,7 @@ export class LegendColorComponent implements OnChanges, OnDestroy {
         if (changes['professor']) this.professor = changes['professor'].currentValue;
         if (changes['turma']) this.turma = changes['turma'].currentValue;
         if (changes['turma_Id']) this.turma_Id = changes['turma_Id'].currentValue;
+        this.setLegenda();
     }
 
     ngOnDestroy(): void {

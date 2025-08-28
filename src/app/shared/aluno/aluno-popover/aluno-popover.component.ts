@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
 import { MenuItem, MenuItemCommandEvent } from 'primeng/api';
 import { AlunoChecklistDialogComponent } from '../aluno-checklist-dialog/aluno-checklist-dialog.component';
-import { Select, SelectChangeEvent } from 'primeng/select';
+import { SelectChangeEvent } from 'primeng/select';
 import { Evento } from '../../../models/evento.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Aluno_Checklist_Item_View } from '../../../models/aluno-checklist-item-list.model';
@@ -30,10 +30,10 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     @Input() eventoReposicao?: Evento;
     @Input() participacao?: Evento_Participacao_Aluno;
     @Input() alunoChecklistItem?: Aluno_CheckList_Item | Aluno_Checklist_Item_View;
+    @Input() aluno!: Aluno;
 
     checklistObservacao = '';
     subscription: Subscription[] = [];
-    aluno!: Aluno;
     loadingAluno = false;
     loadingFoto = false;
     foto?: string;
@@ -53,7 +53,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         private router: Router,
         private crypto: Crypto,
         private activatedRoute: ActivatedRoute,
-        private calendarioUtils: CalendarioUtils,
     ) {
     }
 
@@ -103,8 +102,9 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         lastValueFrom(this.alunoService.getFoto(this.aluno_Id))
             .then(res => {
                 this.loadingFoto = false;
-                this.aluno!.aluno_Foto = res;
                 this.foto = res;
+                if (this.aluno)
+                    this.aluno.aluno_Foto = res;
             })
             .catch(res => this.loadingFoto = false);
     }
@@ -113,7 +113,8 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         if (this.aluno && this.aluno.aulaZero_Id) {
             lastValueFrom(this.eventoService.get(this.aluno.aulaZero_Id))
                 .then(res => {
-                    this.aluno.aulaZero = res;
+                    if (this.aluno)
+                        this.aluno.aulaZero = res;
                 })
         }
     }
@@ -122,7 +123,8 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         if (this.aluno && this.aluno.primeiraAula_Id) {
             lastValueFrom(this.eventoService.get(this.aluno.primeiraAula_Id))
                 .then(res => {
-                    this.aluno.primeiraAula = res;
+                    if (this.aluno)
+                        this.aluno.primeiraAula = res;
                 })
         }
     }
@@ -132,22 +134,23 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
 
         // Editar aluno
         this.menuItems.push({
-            label: 'Editar aluno',
+            label: 'Ver aluno',
             icon: 'pi pi-user-edit text-primary-500 ',
             styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100',
-            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
             command: () => this.goToAluno(),
         })
+
+        let nome = this.participacao?.aluno ?? this.aluno?.nome ?? '';
+        let celular = this.participacao?.celular ?? this.aluno?.celular ?? '';
 
         // Enviar mensagem
         this.menuItems.push({
             label: 'Enviar mensagem',
             icon: 'pi pi-whatsapp text-green-500',
-            styleClass: 'text-green-500 bg-green-50 hover:bg-green-100',
-            disabled: this.aluno.active === false || !this.aluno?.celular,
-            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
+            styleClass:  celular ? 'text-green-500 bg-green-50 hover:bg-green-100' :  'text-500 surface-50',
+            disabled: !celular,
             command: () => {
-                let object = this.mensagemWhatsapp.enviarMensagem(this.aluno.nome, this.aluno.celular);
+                let object = this.mensagemWhatsapp.enviarMensagem(nome, celular);
                 window.open(object.link, '_blank');
                 this.mensagemWhatsapp.copiarMensagem(object.mensagem);
             },
@@ -158,10 +161,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 label: 'Jornada Supera',
                 icon: 'pi pi-check-square text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
-                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
-                command: () => {
-                    this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
-                    this.alunoChecklistDialog.aluno = this.aluno;
+                command: async () => {
                     this.alunoChecklistDialog.show(this.aluno);
                 },
             })
@@ -175,8 +175,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 label: 'Agendar reposição',
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
-                disabled: this.aluno.active === false,
-                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
+                disabled: !this.aluno.active,
                 command: () => {
                     this.goToAgendarReposicao();
                 },
@@ -187,9 +186,10 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         this.menuItems.push({
             label: 'Agendar falta',
             icon: 'fas fa-thumbs-down text-red-500',
-            styleClass: 'text-red-500 surface-50 hover:surface-100',
-            disabled: this.aluno.active === false,
-            tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
+            styleClass: this.aluno.active ? 'text-red-500 surface-50 hover:surface-100' : '',
+            disabled: !this.aluno.active 
+                    || this.participacao?.presente === false 
+                    || this.evento?.finalizado,
             command: (e: MenuItemCommandEvent) => {
                 this.goToAgendarFalta(e)
             },
@@ -201,12 +201,10 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 label: 'Finalizar checklist',
                 icon: 'pi pi-check text-primary-500',
                 styleClass: 'text-primary-500 bg-primary-100 hover:bg-primary-200',
-                disabled: this.aluno.active === false,
-                tooltip: this.aluno.active === false ? 'Aluno inativo' : undefined,
+                disabled: !this.aluno.active,
                 command: () => {
-                    this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem as Aluno_CheckList_Item;
-                    this.alunoChecklistOnConfirmDialog.aluno = this.aluno;
-                    this.alunoChecklistOnConfirmDialog.show();
+                    let checklist = this.alunoChecklistItem as Aluno_CheckList_Item
+                    this.alunoChecklistOnConfirmDialog.show(this.aluno, checklist);
                 },
             })
         }
@@ -220,19 +218,36 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         }
     }
 
-    show(e: any) {
+    show(e: any, aluno?: Aluno) {
         this.visible = true;
-
         this.popover.show(e);
-        this.loadAluno();
+
+        console.log('show')
+        console.log('aluno', this.aluno)
+        console.log('participacao', this.participacao)
+        
+        if (aluno) {
+            this.aluno = aluno
+        } 
+        else {
+            this.loadAluno();
+        }
         this.loadFoto();
     }
 
-    toggle(e: any) {
+    toggle(e: any, aluno?: Aluno) {
         this.visible = !this.visible;
         this.popover.toggle(e);
+        console.log('toggle')
+        console.log('aluno', this.aluno)
+        console.log('participacao', this.participacao)
         if (this.popover.overlayVisible) {
-            this.loadAluno();
+            if (aluno) {
+                this.aluno = aluno
+            } 
+            else {
+                this.loadAluno();
+            }
             this.loadFoto();
         }
     }

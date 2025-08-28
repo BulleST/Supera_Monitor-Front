@@ -39,7 +39,7 @@ export class Evento_Participacao_Aluno {
     apostilasAHList: Apostila[] = [];
 
 
-    apostila_Kit?: string;
+    kit?: string;
     apostila_Kit_Id?: number;
 
     perfilCognitivo_Id?: number = 0;
