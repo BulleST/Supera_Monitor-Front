@@ -76,7 +76,7 @@ export class EventoComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private toastrService: ToastrService,
+        private toastr: ToastrService,
         private crypto: Crypto,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
@@ -386,7 +386,7 @@ export class EventoComponent implements OnDestroy {
                         this.service.calendarioReload.emit(this.evento.id)
                         this.markChecklistAsDone()
 
-                        this.toastrService.success(
+                        this.toastr.success(
                             `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
                             'Sucesso',
                         )
@@ -407,7 +407,7 @@ export class EventoComponent implements OnDestroy {
                     this.service.calendarioReload.emit(this.evento.id)
                     this.markChecklistAsDone()
 
-                    this.toastrService.success(
+                    this.toastr.success(
                         `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
                         'Sucesso',
                     )
@@ -454,7 +454,7 @@ export class EventoComponent implements OnDestroy {
                 this.service.calendarioReload.emit(res.object.id)
                 this.evento.id = res.object.id
                 this.service.setEvento(this.evento)
-                this.toastrService.success('Dados atualizados com sucesso.')
+                this.toastr.success('Dados atualizados com sucesso.')
                 this.router.navigate(['calendario'])
                 this.loading = false
             })
@@ -507,7 +507,7 @@ export class EventoComponent implements OnDestroy {
 
             this.markChecklistAsDone();
 
-            this.toastrService.success(
+            this.toastr.success(
                 `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
                 'Sucesso'
             );

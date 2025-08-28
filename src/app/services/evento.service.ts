@@ -64,13 +64,13 @@ export class EventoService extends Service {
         if (!this.evento.value) {
             let eventoString = localStorage.getItem('evento');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
+            evento = this.mapEvento(evento);
             this.evento.next(evento);
         }
         return this.evento;
     }
 
     setEvento(value: Evento | undefined) {
-        console.log('setEvento')
         this.evento.next(value);
         if (value) localStorage.setItem('evento', JSON.stringify(value));
         else localStorage.removeItem('evento');
@@ -80,6 +80,7 @@ export class EventoService extends Service {
         if (!this.eventoReposicaoDe.value) {
             let eventoString = localStorage.getItem('evento-reposicao-de');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
+            evento = this.mapEvento(evento);
             this.eventoReposicaoDe.next(evento);
         }
         return this.eventoReposicaoDe;
@@ -96,6 +97,7 @@ export class EventoService extends Service {
         if (!this.eventoReposicaoPara.value) {
             let eventoString = localStorage.getItem('evento-reposicao-para');
             let evento = eventoString ? JSON.parse(eventoString) : undefined;
+            evento = this.mapEvento(evento);
             this.eventoReposicaoPara.next(evento);
         }
         return this.eventoReposicaoPara;
@@ -122,6 +124,9 @@ export class EventoService extends Service {
         evento.alunos.sort((x, y) => (x.aluno < y.aluno ? -1 : 1))
         evento.alunos = evento.alunos.map(x => {
             x.active = !x.deactivated;
+            x.deactivated = x.deactivated ? moment(x.deactivated).toDate() : undefined;
+            x.alunoContactado = x.alunoContactado ? moment(x.alunoContactado).toDate() : undefined;
+            x.created = moment(x.created).toDate();
             return x
         })
 

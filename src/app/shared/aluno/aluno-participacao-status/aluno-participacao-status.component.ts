@@ -71,6 +71,7 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
 			this.participacao = changes['participacao'].currentValue;
 		}
         this.setStatus();
+        this.getStatus();
 	}
 
     setStatus() {
@@ -236,8 +237,12 @@ export class AlunoParticipacaoStatusComponent implements OnChanges, OnDestroy {
     }
 
 	getStatus() {
+        console.log('getStatus')
 		let statusList = this.service.statusContato.value;
+        console.log('statusList', statusList)
         let statusContato_Id = this.participacao?.statusContato_Id ?? this.eventoDashItem?.participacao.statusContato_Id;
+        console.log('statusContato_Id', statusContato_Id)
 		this.statusContato = statusList.find(x => x.value == statusContato_Id);
+        console.log('statusContato', this.statusContato)
 	}
 }

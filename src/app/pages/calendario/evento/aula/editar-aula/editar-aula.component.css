@@ -26,3 +26,8 @@ select:hover {
 select:focus {
     border-color: var(--p-select-focus-border-color);
 }
+
+
+::ng-deep .p-select-no-dropdown .p-select-dropdown {
+    display: none;
+}

@@ -281,6 +281,7 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     }
 
     alunoContactadoChanged() {
+        console.log('alunoContactadoChanged', this.request.alunoContactado)
         this.alunoContactado = !this.alunoContactado;
         if (!this.alunoContactado) {
             this.request.alunoContactado = undefined

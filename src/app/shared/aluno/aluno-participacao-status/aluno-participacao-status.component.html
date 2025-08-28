@@ -1,42 +1,20 @@
-<!-- 
-    <p>feriado: {{feriado}}</p>
-    <p>aulaCancelada: {{aulaCancelada}}</p>
-    <p>primeiraAula: {{primeiraAula}}</p>
-    <p>presenteAula: {{presenteAula}}</p>
-    <p>presenteReposicao: {{presenteReposicao}}</p>
-    <p>faltaAula: {{faltaAula}}</p>
-    <p>faltaReposicao: {{faltaReposicao}}</p>
-    <p>faltaAgendada: {{faltaAgendada}}</p>
-    <p>reposicaoAgendada: {{reposicaoAgendada}}</p>
-    <p>alunoContactado: {{alunoContactado}}</p>
-    <p>alunoContactadoData: {{alunoContactadoData}}</p>
-    <p>contatoObservacao: {{contatoObservacao}}</p>
-    <p>observacao: {{observacao}}</p> -->
-<div class="flex align-items-center gap-1 white-space-nowrap">
+<div class="flex align-items-center gap-2 white-space-nowrap">
     <!-- Cancelada -->
     <ng-container *ngIf="aulaCancelada && !feriado">
-        
-                                    <!-- <ng-template #alunoContactadoTemplate>
-                                        <ng-container *ngIf="item.participacao.presente != true">
-                                            <ng-container *ngIf="item.participacao.alunoContactado">
-                                                <i class="pi pi-check text-xs" title="Aluno contatado"> </i>
-                                            </ng-container>
-                                            <ng-container *ngIf="!item.participacao.alunoContactado">
-                                                <i class="pi pi-times text-xs" title="Aluno não contatado"></i>
-                                            </ng-container>
-                                        </ng-container>
-                                    </ng-template> -->
-
         <p-tag value="Aula Cancelada"
-                [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-               styleClass="surface-800 border-800 text-white line-height-3 font-light" />
+               (click)="alunoContactado ? alunoContatadoTooltip.toggle($event) : undefined"
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               [title]="alunoContactado ? 'Aluno contatado - Clique para ver mais' : 'Aluno não contatado'"
+               styleClass="cursor-pointer surface-800 border-800 text-white line-height-3 font-light" />
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Feriado  -->
     <ng-container *ngIf="aulaCancelada && feriado">
         <p-tag value="Aula Cancelada"
-                [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-               styleClass="surface-800 border-800 text-white line-height-3 font-light" />
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               (click)="alunoContactado ? alunoContatadoTooltip.toggle($event) : undefined"
+               [title]="alunoContactado ? 'Aluno contatado - Clique para ver mais' : 'Aluno não contatado'"
+               styleClass="cursor-pointer surface-800 border-800 text-white line-height-3 font-light" />
         <p-tag [value]="feriado.name"
                styleClass="bg-red-600 border-red-6000 text-white line-height-3 font-light" />
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
@@ -49,7 +27,7 @@
     <!-- Reposicao agendada -->
     <ng-container *ngIf="reposicaoAgendada">
         <p-tag value="Reposição agendada"
-        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
                styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light"
                (mouseenter)="reposicaoTooltip.show($event)"
                (mouseleave)="reposicaoTooltip.hide()" />
@@ -57,16 +35,20 @@
     <!-- Falta Agendada -->
     <ng-container *ngIf="faltaAgendada">
         <p-tag value="Falta Agendada"
-        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-               styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               (click)="alunoContactado ? alunoContatadoTooltip.toggle($event) : undefined"
+               [title]="alunoContactado ? 'Aluno contatado - Clique para ver mais' : 'Aluno não contatado'"
+               styleClass="cursor-pointer bg-red-500 border-red-500 text-white line-height-3 font-light" />
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Falta Na Reposição -->
     <ng-container *ngIf="faltaReposicao">
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
         <p-tag value="Faltou na reposição"
-        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-               styleClass="bg-blue-500 border-blue-500 text-white line-height-3 font-light"
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               (click)="alunoContactado ? alunoContatadoTooltip.toggle($event) : undefined"
+               [title]="alunoContactado ? 'Aluno contatado - Clique para ver mais' : 'Aluno não contatado'"
+               styleClass="cursor-pointer bg-blue-500 border-blue-500 text-white line-height-3 font-light"
                (mouseenter)="reposicaoTooltip.show($event)"
                (mouseleave)="reposicaoTooltip.hide()" />
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
@@ -74,13 +56,14 @@
     <!-- Falta Na Aula -->
     <ng-container *ngIf="faltaAula">
         <p-tag value="Faltou"
-        [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
-               styleClass="bg-red-500 border-red-500 text-white line-height-3 font-light" />
+               [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
+               (click)="alunoContactado ? alunoContatadoTooltip.toggle($event) : undefined"
+               [title]="alunoContactado ? 'Aluno contatado - Clique para ver mais' : 'Aluno não contatado'"
+               styleClass="cursor-pointer bg-red-500 border-red-500 text-white line-height-3 font-light" />
         <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
     </ng-container>
     <!-- Presente na Reposição -->
     <ng-container *ngIf="presenteReposicao">
-        <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
         <p-tag value="Presente na reposição"
                styleClass="bg-green-300 border-green-300 text-green-700 line-height-3 font-light"
                (mouseenter)="reposicaoTooltip.show($event)"
@@ -93,7 +76,7 @@
     </ng-container>
 </div>
 <ng-template #alunoContactadoTemplate>
-    <ng-container *ngIf="alunoContactado">
+    <!-- <ng-container *ngIf="alunoContactado">
         <p-button
                   icon="pi pi-check-circle"
                   label="Aluno contatado"
@@ -101,7 +84,7 @@
                   pTooltip="Aluno contatado - Clique para ver mais"
                   (onClick)="alunoContatadoTooltip.toggle($event)"
                   [text]="true" />
-    </ng-container>
+    </ng-container> -->
     <ng-container *ngIf="!alunoContactado">
         <p-button
                   icon="bi bi-telephone-x"
@@ -129,7 +112,9 @@
             </p>
             <p class="flex gap-1 align-items-center">
                 <b>Status do contato:</b>
-                <span>{{ statusContato?.label ?? 'Aluno não contactado' }}</span>
+                <!-- <span *ngIf="eventoDashItem">{{ eventoDashItem.participacao.statusContato_Id}}</span>
+                <span *ngIf="participacao">{{ participacao.statusContato_Id}}</span> -->
+                <span>{{ statusContato?.label }}</span>
             </p>
             <p class="flex gap-1 align-items-center">
                 <b>Retorno do contato:</b>

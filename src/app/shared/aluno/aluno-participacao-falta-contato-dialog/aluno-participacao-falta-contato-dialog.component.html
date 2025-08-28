@@ -155,7 +155,6 @@
                     <div class="field col">
                         <label for="alunoContactado" class="font-bold">
                             <span>Quando?</span>
-                            <span *ngIf="alunoContactado" class="text-red-500">*</span>
                         </label>
                         <p-datepicker
                                 #_alunoContactado="ngModel"
@@ -167,8 +166,8 @@
                                 inputId="alunoContactado"
                                 name="alunoContactado"
                                 [showTime]="true"
+                                dateFormat="dd.mm.yy"
                                 hourFormat="24"
-                                [required]="alunoContactado"
                                 [selectOtherMonths]="true"
                                 [keepInvalid]="true"
                                 [disabledDays]="[0]"
@@ -180,7 +179,6 @@
                 <div class="field col">
                     <label for="statusContato_Id" class="font-bold">
                         <span>Status do contato: </span>
-                        <span *ngIf="alunoContactado" class="text-red-500">*</span>
                     </label>
                     <p-select [options]="status"
                         inputId="statusContato_Id"
@@ -192,21 +190,19 @@
                         [filter]="true"
                         filterBy="label"
                         appendTo="body"
-                        [required]="alunoContactado"
                         [disabled]="!alunoContactado"
                         fluid />
                 </div>
                 <!-- Retorno do contato -->
                 <div class="field col">
                     <label for="contatoObservacao" class="font-bold">
-                        <span>Retorno do contato:  </span>
-                        <span *ngIf="alunoContactado" class="text-red-500">*</span></label>
+                        Retorno do contato:
+                    </label>
                     <input pInputText 
                         id="contatoObservacao"
                         name="contatoObservacao"
                         [(ngModel)]="participacao.contatoObservacao"
                         #contatoObservacao="ngModel"
-                        [required]="alunoContactado"
                         [disabled]="!alunoContactado"
                         fluid />
                 </div>

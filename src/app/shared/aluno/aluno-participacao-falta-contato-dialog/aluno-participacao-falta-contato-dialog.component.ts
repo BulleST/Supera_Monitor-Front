@@ -93,7 +93,7 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
                 if (this.evento && this.participacao) {
                     let hoje = moment(new Date)
                     this.passado = moment(this.evento.data).isSameOrBefore(hoje, 'date');
-                    this.alunoContactado = !!this.participacao.alunoContactado;
+                    this.alunoContactado = this.participacao.alunoContactado ? true : false;
                     this.visible = true;
                     this.setRoteiro();
                 }
@@ -128,6 +128,7 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
     }
 
     alunoContactadoChanged() {
+        console.log('alunoContactadoChanged', this.participacao.alunoContactado)
         this.alunoContactado = !this.alunoContactado;
         if (!this.alunoContactado) {
             this.participacao.alunoContactado = undefined;
