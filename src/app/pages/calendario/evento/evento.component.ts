@@ -77,7 +77,6 @@ export class EventoComponent implements OnDestroy {
         private router: Router,
         private confirmationService: ConfirmationService,
         private toastr: ToastrService,
-        private crypto: Crypto,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
         private alunoService: AlunoService,
@@ -169,6 +168,15 @@ export class EventoComponent implements OnDestroy {
                 this.duracaoEvento = horaRedonda
                     ? horas.toString().padStart(2, '0') + 'h'
                     : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
+
+
+                    if (!this.evento.finalizado) {
+                        this.evento.alunos.filter(x => x.active == true)
+                            .map(x => {
+                                x.presente = true;
+                                return x
+                            })
+                    }
             }
         })
         this.subscription.push(evento)

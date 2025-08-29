@@ -41,17 +41,20 @@ export class CalculoPerfilCognitivoComponent implements OnChanges {
     calcula() {
         if (this.data && this.eventos) {
 
-            var dataPerfilCog: PerfilCognitivo_Calculo_Data = {
+            let dataPerfilCog: PerfilCognitivo_Calculo_Data = {
                 data: this.data,
                 perfilCognitivo: [],
                 total: 0
             };
 
-            var dataFormated = moment(this.data).format('YYYY-MM-DD');
-            var eventosData = this.eventos.filter(x => moment(x.data).format('YYYY-MM-DD') == dataFormated);
-            var alunosData = eventosData.flatMap(x => x.alunos).filter(x => x.active);
+            let dataFormated = moment(this.data).format('YYYY-MM-DD');
+            let eventosData = this.eventos.filter(x => moment(x.data).format('YYYY-MM-DD') == dataFormated);
+            let alunosData = eventosData
+                                .flatMap(x => x.alunos)
+                                .filter(x => x.active);
+                                
             this.perfilCognitivo.forEach(item => {
-                var alunosPerfil = alunosData.filter(x => x.perfilCognitivo_Id == item.id);
+                let alunosPerfil = alunosData.filter(x => x.perfilCognitivo_Id == item.id);
                 dataPerfilCog.total += alunosPerfil.length;
                 dataPerfilCog.perfilCognitivo.push({
                     id: item.id,

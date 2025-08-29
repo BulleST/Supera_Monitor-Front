@@ -151,7 +151,7 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
     goToInscricaoOficina() {
-        if (this.evento) {
+        if (this.evento && this.evento.vagasDisponiveisEvento > 0) {
             this.service.setEvento(this.evento);
             this.router.navigate(['calendario', 'oficina', 'inscrever', this.crypto.encrypt(this.evento.id)])
         }
@@ -159,29 +159,23 @@ export class SelectedEventoComponent implements OnChanges {
 
     goToInserirAlunoConfirm(e: any) {
         if (this.evento) {
-            if (this.evento.alunos.length >= this.evento.capacidadeMaximaAlunos) {
-
-                // playAlert();
-
-                this.confirmationService.confirm({
-                    target: e.target,
-                    message: `Tem certeza que deseja inserir mais um aluno nessa ${this.tipoEventoString}?`,
-                    header: `Inserir aluno`,
-                    acceptIcon: 'pi pi-check',
-                    acceptLabel: `Sim`,
-                    acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-                    rejectIcon: 'pi pi-times',
-                    rejectLabel: 'Não',
-                    rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                    accept: async () => {
-                        this.goToInserirAluno();
-                    },
-                });
-            } else {
-                this.goToInserirAluno();
-            }
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Tem certeza que deseja inserir mais um aluno nessa ${this.tipoEventoString}?`,
+                header: `Inserir aluno`,
+                acceptIcon: 'pi pi-check',
+                acceptLabel: `Sim`,
+                acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+                rejectIcon: 'pi pi-times',
+                rejectLabel: 'Não',
+                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                accept: async () => {
+                    this.goToInserirAluno();
+                }
+            });
         }
     }
+
 
     goToInserirAluno() {
         if (this.evento) {
@@ -227,7 +221,7 @@ export class SelectedEventoComponent implements OnChanges {
 
     async goToEvento() {
         if (this.evento) {
-            let evento: Evento = this.evento; 
+            let evento: Evento = this.evento;
 
 
             if (evento.id != PseudoEvento.EventoId) {
@@ -236,8 +230,8 @@ export class SelectedEventoComponent implements OnChanges {
             else {
                 if (evento.evento_Tipo_Id == EventoTipo.Aula) {
                     await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
-                    .then(res => evento = res)
-                    .catch(res => this.toastr.error(res.message, 'Erro'))
+                        .then(res => evento = res)
+                        .catch(res => this.toastr.error(res.message, 'Erro'))
                 }
             }
 
@@ -249,7 +243,7 @@ export class SelectedEventoComponent implements OnChanges {
                 }
                 return x
             })
-            
+
             evento.professores = evento.professores.map(x => {
                 x.presente = evento.finalizado ? x.presente : true;
                 return x
@@ -277,7 +271,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEventoReposicaoDe(undefined)
             this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate([ 'reposicao', 'agendar'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['reposicao', 'agendar'], { relativeTo: this.activatedRoute });
         }
     }
 
@@ -286,7 +280,7 @@ export class SelectedEventoComponent implements OnChanges {
             this.service.setEvento(this.evento);
             let eventoIdEncrypted = this.crypto.encrypt(this.evento.id);
             let alunoIdEncrypted = this.crypto.encrypt(participacao.aluno_Id);
-            this.router.navigate([ 'contato', eventoIdEncrypted, alunoIdEncrypted ], { relativeTo: this.activatedRoute });
+            this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
         }
     }
 

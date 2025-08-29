@@ -107,21 +107,49 @@
                             {{ getPerfilCognitivo(evento.perfilCognitivo) }}
                         </span>
                     </ng-container>
-                    <ng-container *ngIf="![EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                        <span class="event-vagas">
-                            <ng-container *ngIf="evento.vagas < 0">
-                                <span class="text-red-500 fadeout animation-iteration-infinite">
-                                    <i class="pi pi-times-circle"></i>
+                    
+                    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                        <span class="event-vagas" [pTooltip]="tooltipVagas">
+                            <p class="flex flex-row align-items-center gap-1">
+                                <i class="pi pi-calendar text-xs"></i>
+                                <span>
+                                    {{evento.vagasDisponiveisEvento}}/{{evento.alunosAtivosEvento}}
                                 </span>
-                                <span>{{evento.capacidadeMaximaAlunos}}</span>
-                            </ng-container>
-                            <ng-container *ngIf="evento.vagas == 0">Não há vagas</ng-container>
-                            <ng-container *ngIf="evento.vagas == 1">1 vaga</ng-container>
-                            <ng-container *ngIf="evento.vagas > 1">{{evento.vagas}} vagas</ng-container>
-                            <span class="font-bold">/</span>
-                            <ng-container *ngIf="evento.alunos.length == 0">Nenhum aluno</ng-container>
-                            <ng-container *ngIf="evento.alunos.length == 1">1 aluno</ng-container>
-                            <ng-container *ngIf="evento.alunos.length > 1">{{evento.alunos.length}} alunos</ng-container>
+                            </p>
+                            <p class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                <i class="fa fa-users-between-lines text-xs"></i>
+                                <span>
+                                    {{evento.vagasDisponiveisTurma}}/{{evento.alunosAtivosTurma}}
+                                </span>
+                            </p>
+                            <ng-template #tooltipVagas>
+                                <p class="flex flex-row align-items-center gap-1 white-space-nowrap">
+                                    <i class="pi pi-calendar text-xs"></i>
+                                    <span>
+                                        No dia: 
+                                        <span *ngIf="evento.vagasDisponiveisEvento == 0">Nenhuma vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisEvento == 1">1 vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisEvento > 1">{{ evento.vagasDisponiveisEvento }} vagas / </span>
+                                        
+                                        <span *ngIf="evento.alunosAtivosEvento == 0">Nenhum aluno</span>
+                                        <span *ngIf="evento.alunosAtivosEvento == 1">1 aluno</span>
+                                        <span *ngIf="evento.alunosAtivosEvento > 1">{{ evento.alunosAtivosEvento }} alunos</span>
+                                    </span>
+                                </p>
+                                <p class="flex flex-row align-items-center gap-1 white-space-nowrap" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                    <i class="fa fa-users-between-lines text-xs"></i>
+                                    <span>
+                                        Na turma: 
+                                        <span *ngIf="evento.vagasDisponiveisTurma == 0">Nenhuma vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisTurma == 1">1 vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisTurma > 1">{{ evento.vagasDisponiveisTurma }} vagas / </span>
+                                        
+                                        <span *ngIf="evento.alunosAtivosTurma == 0">Nenhum aluno</span>
+                                        <span *ngIf="evento.alunosAtivosTurma == 1">1 aluno</span>
+                                        <span *ngIf="evento.alunosAtivosTurma > 1">{{ evento.alunosAtivosTurma }} alunos</span>
+                                    </span>
+                                </p>
+                            </ng-template>
                         </span>
                     </ng-container>
                 </ng-template>

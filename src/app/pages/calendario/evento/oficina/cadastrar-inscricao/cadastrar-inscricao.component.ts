@@ -1,7 +1,6 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
-import { Professor } from '../../../../../models/professor.model';
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAulaId } from '../../../../../models/sala-aula.model';
 import { Turma } from '../../../../../models/turma.model';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -9,27 +8,20 @@ import { ConfirmationService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Crypto, getError, showError } from '../../../../../utils';
-import { SalaAulaService } from '../../../../../services/sala-aula.service';
-import { ProfessorService } from '../../../../../services/professor.service';
 import { AlunoService } from '../../../../../services/alunos.service';
 import { EventoService } from '../../../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { TurmaService } from '../../../../../services/turma.service';
 import { CalendarioRequest } from '../../../../../models/calendario.model';
 import moment from 'moment';
-import { SelectChangeEvent } from 'primeng/select';
 import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
-import { MyMap } from '../../../../../utils/map';
-import { EventoOficinaRequest } from '../../../../../models/evento-oficina.model';
 import { RequestResponse } from '../../../../../helpers/request-response.interface';
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
-import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao';
-import $ from 'jquery';
+import { validaAlunos } from '../../../../../utils/validacao';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
-import { playAlert, playSuccess } from '../../../../../utils/audio';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 
 @Component({

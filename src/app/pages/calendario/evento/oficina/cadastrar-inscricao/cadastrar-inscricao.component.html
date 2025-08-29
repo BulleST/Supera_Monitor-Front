@@ -58,9 +58,8 @@
                                [loading]="loadingAlunos"
                                [(ngModel)]="alunosSelected"
                                (onChange)="alunoChanged($event, aluno_Id)"
-                               [maxSelectedLabels]="evento.vagas"
-                               [maxlength]="evento.vagas"
-                               [selectionLimit]="evento.vagas"
+                               [maxSelectedLabels]="evento.vagasDisponiveisEvento"
+                               [selectionLimit]="evento.vagasDisponiveisEvento"
                                display="chip"
                                optionLabel="nome"
                                #aluno_Id="ngModel"
@@ -176,13 +175,13 @@
             </div>
             <!-- Limite de Alunos -->
             <div class="field md:col-4 sm:col-4 col-12">
-                <label for="capacidadeMaximaAlunos">Limite de Alunos:</label>
+                <label for="capacidadeMaximaEvento">Limite de Alunos:</label>
                 <input type="text"
                        pInputText
-                       [value]="evento.capacidadeMaximaAlunos"
+                       [value]="evento.capacidadeMaximaEvento"
                        styleClass="w-full"
                        class="w-full"
-                       id="capacidadeMaximaAlunos"
+                       id="capacidadeMaximaEvento"
                        readonly />
             </div>
             <!-- Educador -->

@@ -20,7 +20,7 @@ import { Apostila_Kit } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { PerfilCognitivoService } from '../../../../../services/perfil-cognitivo.services';
 import { EventoService } from '../../../../../services/evento.service';
-import { FinalizarAulaZeroRequest, ParticipacaoAulaZeroModel } from '../../../../../models/evento-aula-0.model';
+import { ParticipacaoAulaZeroModel } from '../../../../../models/evento-aula-0.model';
 import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
 
 @Component({

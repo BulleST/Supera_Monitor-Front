@@ -72,20 +72,56 @@
                     <div class="flex flex-column align-items-end">
                         <div class="flex align-items-center">
                             <span class="ml-auto">
-                                <ng-container *ngIf="[ EventoTipo.Reuniao, EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id) == false">
-                                    <span [ngSwitch]=" evento.capacidadeMaximaAlunos - evento.alunos.length">
-                                        <span *ngSwitchCase="evento.capacidadeMaximaAlunos">Nenhum aluno / {{ evento.capacidadeMaximaAlunos }} vagas</span>
-                                        <span *ngSwitchCase="0">Não há vagas / {{ evento.alunos.length }} alunos</span>
-                                        <span *ngSwitchCase="1">1 vaga / {{ evento.alunos.length }} alunos</span>
-                                        <span *ngSwitchDefault>{{ evento.capacidadeMaximaAlunos - evento.alunos.length }} vagas / {{ evento.alunos.length }} alunos </span>
+                                
+                                <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                                    <span class="event-vagas" [pTooltip]="tooltipVagas">
+                                        <p class="flex flex-row align-items-center gap-1">
+                                            <i class="pi pi-calendar text-xs"></i>
+                                            <span>
+                                                {{evento.vagasDisponiveisEvento}}/{{evento.alunosAtivosEvento}}
+                                            </span>
+                                        </p>
+                                        <p class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                            <i class="fa fa-users-between-lines text-xs"></i>
+                                            <span>
+                                                {{evento.vagasDisponiveisTurma}}/{{evento.alunosAtivosTurma}}
+                                            </span>
+                                        </p>
+                                        <ng-template #tooltipVagas>
+                                            <p class="flex flex-row align-items-center gap-1 white-space-nowrap">
+                                                <i class="pi pi-calendar text-xs"></i>
+                                                <span>
+                                                    No dia: 
+                                                    <span *ngIf="evento.vagasDisponiveisEvento == 0">Nenhuma vaga / </span>
+                                                    <span *ngIf="evento.vagasDisponiveisEvento == 1">1 vaga / </span>
+                                                    <span *ngIf="evento.vagasDisponiveisEvento > 1">{{ evento.vagasDisponiveisEvento }} vagas / </span>
+                                                    
+                                                    <span *ngIf="evento.alunosAtivosEvento == 0">Nenhum aluno</span>
+                                                    <span *ngIf="evento.alunosAtivosEvento == 1">1 aluno</span>
+                                                    <span *ngIf="evento.alunosAtivosEvento > 1">{{ evento.alunosAtivosEvento }} alunos</span>
+                                                </span>
+                                            </p>
+                                            <p class="flex flex-row align-items-center gap-1 white-space-nowrap" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                                <i class="fa fa-users-between-lines text-xs"></i>
+                                                <span>
+                                                    Na turma: 
+                                                    <span *ngIf="evento.vagasDisponiveisTurma == 0">Nenhuma vaga / </span>
+                                                    <span *ngIf="evento.vagasDisponiveisTurma == 1">1 vaga / </span>
+                                                    <span *ngIf="evento.vagasDisponiveisTurma > 1">{{ evento.vagasDisponiveisTurma }} vagas / </span>
+                                                    
+                                                    <span *ngIf="evento.alunosAtivosTurma == 0">Nenhum aluno</span>
+                                                    <span *ngIf="evento.alunosAtivosTurma == 1">1 aluno</span>
+                                                    <span *ngIf="evento.alunosAtivosTurma > 1">{{ evento.alunosAtivosTurma }} alunos</span>
+                                                </span>
+                                            </p>
+                                        </ng-template>
                                     </span>
                                 </ng-container>
-                                <ng-container
-                                              *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
-                                    <span>{{ evento.alunos.length }} alunos</span>
+                                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                                    <span>{{ evento.alunos.length }} aluno(s)</span>
                                 </ng-container>
                             </span>
-                            <span class="ml-2 text-primary fa-solid fa-user-graduate"></span>
+                            <span class="ml-2 text-primary fa fa-user-graduate"></span>
                         </div>
                     </div>
                 </div>
@@ -169,16 +205,10 @@
                     
                             <span class="">{{ professor.nome }}</span>
                             <ng-container *ngIf="evento.finalizado && professor.presente === true">
-                                <p-tag
-                                    value="Presente"
-                                    severity="success"
-                                />
+                                <p-tag value="Presente" severity="success" />
                             </ng-container>
                             <ng-container *ngIf="evento.finalizado && professor.presente === false">
-                                <p-tag
-                                    value="Faltou"
-                                    severity="danger"
-                                />
+                                <p-tag value="Faltou" severity="danger" />
                             </ng-container>
                         </div>
                     </div>
@@ -195,17 +225,20 @@
                               (onClick)="popoverMenu.toggle($event)" />
                     <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
                         <div class="flex flex-column">
+                            <!-- Só pode inserir na oficina se tiver vagas e se a oficina não for mais pseudo -->
                             <ng-container *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                                <!-- Inserir inscricao -->
                                 <p-button (onClick)="goToInscricaoOficina()"
                                           label="Inscrever Aluno"
                                           icon="pi pi-user-plus text-primary-500"
                                           [text]="true"
-                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos || evento.id != PseudoEvento.EventoId"
+                                          [disabled]="evento.vagasDisponiveisEvento < 1 || evento.id == PseudoEvento.EventoId"
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
                             </ng-container>
                             <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
+                                <!-- Inserir aluno -->
                                 <p-button (onClick)="goToInserirAlunoConfirm($event)"
                                           label="Inserir Aluno"
                                           icon="pi pi-user-plus text-primary-500"
@@ -214,15 +247,18 @@
                                           styleClass="justify-content-start surface-50"
                                           fluid />
                             </ng-container>
+                            <!-- Só pode inserir reposicao se tiver vagas -->
                             <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
+                                <!-- Reposição -->
                                 <p-button (onClick)="goToReposicao()"
                                           label="Agendar Reposição"
                                           icon="pi pi-user-plus text-primary-500"
                                           [text]="true"
-                                          [disabled]="evento.alunos.length >= evento.capacidadeMaximaAlunos"
+                                          [disabled]="evento.vagasDisponiveisEvento < 1"
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
                                           fluid />
+                                <!-- Primeira aula -->
                                 <p-button (onClick)="goToPrimeiraAula()"
                                           label="Agendar 1ª Aula"
                                           icon="pi pi-user-plus text-pink-500"
@@ -231,6 +267,7 @@
                                           styleClass="justify-content-start surface-50"
                                           fluid />
                             </ng-container>
+                            <!-- Cancelamento -->
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar"
                                       icon="pi pi-times-circle text-red-500"
@@ -249,7 +286,7 @@
                     </span>
                 </ng-container>
                 <ng-container *ngIf="!evento.active">
-                    <span class="mr-auto gap-2 flex align-items-center">
+                    <span class="mr-auto gap-2 flex align-items-center" [pTooltip]="'Obs: ' + evento.observacao">
                         <span class="font-bold">Cancelado</span>
                         <i class="pi pi-times-circle text-red-500 text-lg"></i>
                     </span>

@@ -101,12 +101,13 @@
 }
 
 .event.event-hover .event-alunos {
-font-size: 1rem;}
+    font-size: 1rem;
+}
 
 .event.event-hover .event-vagas {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 10px;
 }
 
 .event.event-hover .event-cancelado {

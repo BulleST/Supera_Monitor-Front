@@ -37,7 +37,9 @@ const routes: Routes = [{
         { path: 'agendar-falta', component: AgendarFaltaComponent },
         { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
 
-        { path: ':evento_nome/:evento_id', component: EventoComponent },
+        { path: ':evento_nome/:evento_id', component: EventoComponent, children: [
+            { path: 'contato/:aluno_id', component: AlunoContatoFaltaComponent },
+        ] },
         { path: ':evento_nome/inserir-aluno/:evento_id', component: AgendarAlunoComponent },
         { path: ':evento_nome/cancelar/:evento_id', component: CancelarEventoComponent },
         

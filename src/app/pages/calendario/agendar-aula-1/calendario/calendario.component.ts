@@ -22,8 +22,6 @@ import { ProfessorService } from '../../../../services/professor.service'
 import { RequestResponse } from '../../../../helpers/request-response.interface'
 import { ToastrService } from 'ngx-toastr'
 import { AlunoService } from '../../../../services/alunos.service'
-import { MyMap } from '../../../../utils/map'
-import { EventoAulaRequest } from '../../../../models/evento-aula.model'
 import { Aluno_CheckList_Item } from '../../../../models/checklist.model'
 import { ChecklistService } from '../../../../services/checklist.service'
 import { AccountService } from '../../../../services/account.service'
@@ -193,10 +191,9 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         await lastValueFrom(this.service.getList(this.calendarioRequest))
             .then((list) => {
                 this.eventos = list.filter(evento => {
-                    let temVaga = evento.alunos.length <= evento.capacidadeMaximaAlunos;
-                    let eventoPerfil = evento.perfilCognitivo.map(x => x.id)
-                    let ehPerfilCompativel = (this.aluno.perfilCognitivo_Id && eventoPerfil.includes(this.aluno.perfilCognitivo_Id))
-                        || (!this.aluno.perfilCognitivo_Id);
+                    const temVaga = evento.vagasDisponiveisEvento > 0;
+                    const eventoPerfil = evento.perfilCognitivo.map(x => x.id)
+                    const ehPerfilCompativel = !this.aluno.perfilCognitivo_Id || eventoPerfil.includes(this.aluno.perfilCognitivo_Id);
 
                     return temVaga && ehPerfilCompativel;
                 })

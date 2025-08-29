@@ -111,6 +111,7 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 	visibleChange() {
 		if (!this.visible) {
 			let params = this.activatedRoute.snapshot.params;
+            console.log(params)
 			this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
 			this.service.setEvento(undefined)
 		}

@@ -616,14 +616,12 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 aluno.aulasParaRepor = res.filter(evento => {
                     let ehAula = evento.evento_Tipo_Id == EventoTipo.Aula;
                     let ehAulaFinalizada = evento.finalizado;
-                    let ehReagendada = evento.reagendamentoPara_Evento_Id;
                     let alunoEstaNaAula = evento.alunos.find(x => x.active === true)
                     let alunoMarcouReposicao = alunoEstaNaAula?.reposicaoDe_Evento_Id || alunoEstaNaAula?.reposicaoPara_Evento_Id;
                     let alunoGanhouPresenca = alunoEstaNaAula?.presente === true;
                     let condicao = ehAula
                         && alunoEstaNaAula
                         && ((ehAulaFinalizada && !alunoGanhouPresenca) || !ehAulaFinalizada && aluno)
-                        && !ehReagendada
                         && !alunoMarcouReposicao
                     return condicao;
                 });
@@ -765,11 +763,13 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         this.object.data = new Date(this.data);
         this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any;
+        this.object.perfilCognitivo = this.perfilCognitivoSelected.map(x => x.id)
 
+        let data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm');
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula',
-            message: `Tem certeza que deseja agendar essa aula para o dia <b class="text-primary-500">${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}</b>?`,
+            message: `Tem certeza que deseja agendar essa aula para o dia <b class="text-primary-500">${data}</b>?`,
             acceptLabel: `Agendar aula`,
             rejectLabel: 'Cancelar',
             acceptIcon: 'pi pi-check',
@@ -786,7 +786,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         this.loading = true;
 
-        this.object.perfilCognitivo = this.perfilCognitivoSelected.map(x => x.id)
 
         lastValueFrom(this.service.createAulaExtra(this.object))
             .then(res => {

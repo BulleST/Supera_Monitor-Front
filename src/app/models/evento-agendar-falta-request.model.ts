@@ -4,4 +4,5 @@ export class EventoAgendarFaltaRequest {
     observacao: string = '';
     contatoObservacao?: string;
     alunoContactado?: Date;
+    reposicaoDe_Evento_Id?: number;
 }

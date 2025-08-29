@@ -121,7 +121,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         if (this.alunos.length && this.evento) {
             this.alunos = this.alunos.filter(x => moment(x.deactivated).isSameOrAfter(this.evento.data, 'date'))
 
-            if (this.evento.capacidadeMaximaAlunos == this.evento.alunos.length) {
+            if (this.evento.vagasDisponiveisEvento === 0) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id));
             }

@@ -11,8 +11,6 @@ export class EventoAulaRequest {
     observacao: string = '';
     descricao: string = '';
     perfilCognitivo: number[] = [];
-    alunos: number[] = [];
-    professores: number[] = [];
     capacidadeMaximaAlunos = 12;
 }
 

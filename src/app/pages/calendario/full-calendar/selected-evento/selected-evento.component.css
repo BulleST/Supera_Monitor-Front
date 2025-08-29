@@ -75,3 +75,8 @@
     gap: 0.5rem;
     border-bottom: 2px solid var(--p-primary-500);
 }
+.event-vagas {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

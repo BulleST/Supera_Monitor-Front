@@ -130,7 +130,7 @@ export class EventoService extends Service {
             return x
         })
 
-        evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.filter(x => x.active === true).length;
+        // evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.filter(x => x.active === true).length;
 
         if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
             let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
@@ -325,11 +325,8 @@ export class EventoService extends Service {
     }
 
     createAula0(model: EventoAula0Request) {
-        console.log('createAula0 data 1', model.data)
         let request = MyMap(model, new EventoAula0Request()) as EventoAula0Request;
-        console.log('createAula0 data 2', request.data)
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        console.log('createAula0 data 3', request.data)
         return this.http.post<RequestResponse>(`${this.url}/eventos/aulas/zero`, request);
     }
 

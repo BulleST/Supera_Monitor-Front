@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
-import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos, playSuccess, playAlert } from '../../../utils';
+import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { AlunoService } from '../../../services/alunos.service';

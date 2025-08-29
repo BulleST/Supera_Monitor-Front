@@ -262,7 +262,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                     this.eventosReposicaoParaList = res.filter(aula => {
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                        const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaAlunos;
+                        const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaEvento;
                         const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
                         const aulaNaoFinalizada = !aula.finalizado;
                         const aulaEstaAtiva = aula.active;

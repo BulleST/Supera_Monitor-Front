@@ -565,3 +565,7 @@ p-scroller {
 .p-fluid .p-inputtext {
     width: 100%;
 }
+
+.p-select-no-dropdown .p-select-dropdown {
+    display: none;
+}

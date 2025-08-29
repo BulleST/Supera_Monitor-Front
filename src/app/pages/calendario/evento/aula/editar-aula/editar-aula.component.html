@@ -58,15 +58,15 @@
             </div>
             <!-- Limite de Alunos -->
             <div class="field sm:col-2 col-2">
-                <label for="capacidadeMaximaAlunos">Limite de Alunos: <span class="text-red-500">*</span></label>
-                <p-inputnumber #capacidadeMaximaAlunos="ngModel"
-                               [(ngModel)]="evento.capacidadeMaximaAlunos"
-                               id="capacidadeMaximaAlunos"
-                               name="capacidadeMaximaAlunos"
+                <label for="capacidadeMaximaEvento">Limite de Alunos: <span class="text-red-500">*</span></label>
+                <p-inputnumber #capacidadeMaximaEvento="ngModel"
+                               [(ngModel)]="evento.capacidadeMaximaEvento"
+                               id="capacidadeMaximaEvento"
+                               name="capacidadeMaximaEvento"
                                [required]="true"
                                fluid />
-                <div *ngIf="capacidadeMaximaAlunos.touched && capacidadeMaximaAlunos.invalid && capacidadeMaximaAlunos.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaAlunos.errors['required']">Esse campo é obrigatório.</p>
+                <div *ngIf="capacidadeMaximaEvento.touched && capacidadeMaximaEvento.invalid && capacidadeMaximaEvento.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaEvento.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
             <!-- Educador -->

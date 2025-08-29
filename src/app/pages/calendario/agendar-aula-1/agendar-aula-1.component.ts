@@ -84,7 +84,7 @@ export class AgendarAula1Component implements OnDestroy, AfterViewInit {
 					const eventoAtivo = evento.active;
 					const ehAula = [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id);
 					const ehPerfilCompativel = !this.selectedAluno?.perfilCognitivo_Id || evento.perfilCognitivo.map(x => x.id).includes(this.selectedAluno?.perfilCognitivo_Id)
-					const eventoTemVaga = evento.vagas > 0;
+					const eventoTemVaga = evento.vagasDisponiveisEvento > 0;
 					const alunoEstaNaAula = evento.alunos.map(x => x.aluno_Id).includes(this.selectedAluno!.id);
 
 					return eventoAtivo

@@ -15,7 +15,6 @@ import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
-import { EventoService } from '../../../../../services/evento.service';
 import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({

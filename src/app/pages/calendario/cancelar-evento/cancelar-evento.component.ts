@@ -12,13 +12,11 @@ import { PseudoEvento } from '../../../models/reposicao.model'
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model'
 import { Evento, EventoCancelamentoRequest, EventoTipo } from '../../../models/evento.model'
 
-import { MyMap } from '../../../utils/map'
 import { Crypto, getError, showError } from '../../../utils'
 import { CalendarioUtils } from '../../../utils/calendario-utils'
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp'
 
 import { TurmaService } from '../../../services/turma.service'
-import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
 import { ProfessorService } from '../../../services/professor.service'
 
@@ -26,9 +24,6 @@ import { RequestResponse } from '../../../helpers/request-response.interface'
 
 import { Turma } from '../../../models/turma.model'
 import { SalaAulaId } from '../../../models/sala-aula.model'
-import { EventoAulaRequest } from '../../../models/evento-aula.model'
-import { EventoOficinaRequest } from '../../../models/evento-oficina.model'
-import { EventoReuniaoRequest } from '../../../models/evento-reuniao.model'
 
 @Component({
     selector: 'app-cancelar-evento',

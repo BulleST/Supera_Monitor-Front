@@ -1,11 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
-import { EventoService } from '../../../services/evento.service';
 import { lastValueFrom } from 'rxjs';
 import { Popover } from 'primeng/popover';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
-import { Dashboard_Aula, Dashboard_Participacao } from '../../../models/dashboard.model';
+import { Dashboard_Aula } from '../../../models/dashboard.model';
 import { Evento } from '../../../models/evento.model';
 import moment from 'moment';
 

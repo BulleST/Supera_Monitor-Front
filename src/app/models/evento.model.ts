@@ -19,11 +19,6 @@ export class Evento {
     observacao: string = '';
     finalizado: boolean = false;
 
-    reagendamentoDe_Evento_Id?: number;
-    reagendamentoDe_Evento?: Evento;
-    
-    reagendamentoPara_Evento_Id?: number;
-    reagendamentoPara_Evento?: Evento;
 
     alunos: Evento_Participacao_Aluno[] = [];
     professores: Evento_Participacao_Professor[] = [];
@@ -35,8 +30,17 @@ export class Evento {
     turma_Id?: number;
     turma?: string;
     perfilCognitivo: PerfilCognitivo[] = [];
-    capacidadeMaximaAlunos: number = 12;
-    vagas: number = 0;
+    
+    
+    capacidadeMaximaEvento: number = 12;
+    alunosAtivosEvento: number = 0;
+    vagasDisponiveisEvento: number = 0;
+    capacidadeMaximaTurma: number = 12;
+    alunosAtivosTurma: number = 0;
+    vagasDisponiveisTurma: number = 0;
+
+    // capacidadeMaximaAlunos: number = 12;
+    // vagas: number = 0;
     roteiro_Id?: number;
     semana?: number;
     tema?: string;
@@ -64,6 +68,7 @@ export class EventoReagendamentoRequest {
     data: Date = new Date;
     observacao: string = ''
 }
+
 export class EventoCancelamentoRequest {
     id: number = PseudoEvento.EventoId;
     observacao: string = ''

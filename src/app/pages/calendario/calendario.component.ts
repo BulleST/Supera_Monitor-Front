@@ -336,7 +336,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
             let erroMessage = '';
 
-            if (target.alunos.length >= target.capacidadeMaximaAlunos) {
+            if (target.vagasDisponiveisEvento === 0) {
                 erroMessage = 'Essa aula atingiu o limite permitido de alunos.';
             }
 

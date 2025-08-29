@@ -212,7 +212,7 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         lastValueFrom(this.eventoService.getList(request))
             .then(eventos => {
                 this.sugestaoReposicao = eventos.filter(ev => {
-                    const temVagas = ev.vagas > 0;
+                    const temVagas = ev.vagasDisponiveisEvento > 0;
                     const ehPerfilCompativel = !aluno.perfilCognitivo_Id || ev.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id)
                     const ehMesmoEvento = ev.id == evento.id
                         && moment(ev.data).isSame(evento.data, 'minute')
@@ -281,7 +281,6 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     }
 
     alunoContactadoChanged() {
-        console.log('alunoContactadoChanged', this.request.alunoContactado)
         this.alunoContactado = !this.alunoContactado;
         if (!this.alunoContactado) {
             this.request.alunoContactado = undefined
@@ -341,7 +340,8 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
             }
         }
 
-        this.request.participacao_Id = participacao.id
+        this.request.participacao_Id = participacao.id;
+        this.request.reposicaoDe_Evento_Id = participacao.reposicaoDe_Evento_Id;
 
         await lastValueFrom(this.eventoService.cancelarParticipacao(this.request))
             .then(res => {
