@@ -333,22 +333,8 @@ export class EventoComponent implements OnDestroy {
             })
 
         if (response.success) {
-            this.evento.id = response.object.id
-            this.evento.alunos = this.evento.alunos.map((participacao) => {
-                let participacaoResponse = response.object.alunos.find((x: Evento_Participacao_Aluno) => x.aluno_Id == participacao.aluno_Id) as Evento_Participacao_Aluno;
-                participacao.id = participacaoResponse.id
-                participacao.evento_Id = participacaoResponse.evento_Id
-                participacao.presente = participacao.presente ?? false;
-                return participacao;
-            })
-
-            this.evento.professores = this.evento.professores.map((participacao) => {
-                let participacaoResponse = response.object.professores.find((x: Evento_Participacao_Professor) => x.professor_Id == participacao.professor_Id) as Evento_Participacao_Professor;
-                participacao.id = participacaoResponse.id
-                participacao.evento_Id = participacaoResponse.evento_Id
-                participacao.presente = [EventoTipo.Reuniao].includes(this.evento.evento_Tipo_Id) ? participacao.presente ?? false : true;
-                return participacao;
-            })
+            this.evento.id = response.object.id;
+           
 
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
@@ -357,7 +343,7 @@ export class EventoComponent implements OnDestroy {
                     return {
                         participacao_Id: item.id,
                         observacao: item.observacao,
-                        presente: item.presente,
+                        presente: item.presente ?? false,
                         apostila_Abaco_Id: item.apostila_Abaco_Id,
                         apostila_AH_Id: item.apostila_AH_Id,
                         numeroPaginaAbaco: item.numeroPaginaAbaco,
@@ -369,7 +355,7 @@ export class EventoComponent implements OnDestroy {
                     return {
                         participacao_Id: item.id,
                         observacao: item.observacao,
-                        presente: true,
+                        presente: item.presente ?? false
                     }
                 }),
             }
@@ -405,8 +391,8 @@ export class EventoComponent implements OnDestroy {
                         this.loading = false
                     })
             }
-
-            lastValueFrom(this.service.finalizar(request))
+            else {
+   lastValueFrom(this.service.finalizar(request))
                 .then((res) => {
                     this.evento.finalizado = true
                     this.loading = false
@@ -425,6 +411,9 @@ export class EventoComponent implements OnDestroy {
                     this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
                     this.loading = false
                 })
+            }
+
+         
         }
     }
 
@@ -508,17 +497,6 @@ export class EventoComponent implements OnDestroy {
             const request = this.buildFinalizarAulaZeroRequest();
             await lastValueFrom(this.service.finalizarAulaZero(request));
 
-            this.evento.finalizado = true;
-            this.visible = false;
-            this.visibleChange();
-            this.service.calendarioReload.emit(this.evento.id);
-
-            this.markChecklistAsDone();
-
-            this.toastr.success(
-                `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
-                'Sucesso'
-            );
         } catch (error: any) {
             this.error = error?.message || 'Erro desconhecido';
             this.showError(
