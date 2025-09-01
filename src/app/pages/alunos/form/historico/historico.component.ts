@@ -1,10 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Aluno_Historico } from '../../../../models/aluno-historico.model';
 import moment from 'moment';
 import 'moment/locale/pt-br'
 import { Aluno } from '../../../../models/alunos.model';
 import { lastValueFrom } from 'rxjs';
 import { AlunoService } from '../../../../services/alunos.service';
+import { FilterMatchMode } from 'primeng/api';
 
 @Component({
     selector: 'app-historico',
@@ -15,57 +16,17 @@ import { AlunoService } from '../../../../services/alunos.service';
 export class HistoricoComponent implements OnChanges {
 
     @Input() object: Aluno = new Aluno;
+    @Output() atualizar = new EventEmitter<boolean>();
     loading = false;
-    // list: Aluno_Historico[] = [
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2025, 2, 28, 10, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Transferencia de turma: O aluno foi transferido da turma A para turma B',
-    //     },
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2025, 2, 27, 15, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Reposição agendada: O aluno agendou reposição do dia 25/03/25 para o dia 28/03/25 com a turma ABC',
-    //     },
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2025, 2, 25, 15, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Superação agendada: O aluno agendou superação  para o dia 28/03/25 com o professor João',
-    //     },
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2025, 2, 4, 15, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-    //     },
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2024, 2, 4, 15, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-    //     },
-    //     {
-    //         id: 0,
-    //         aluno_Id: 0,
-    //         data: new Date(2025, 0, 4, 15, 30),
-    //         account_Created: 'Letícia',
-    //         descricao: 'Inscrição Oficina: O aluno se inscreveu na oficina "Pessoas legais" no dia 25/03/25',
-    //     },
-    // ]
+    FilterMathMode= FilterMatchMode
     list: Aluno_Historico[] = [];
 
 
     constructor(
         private service: AlunoService
-    ) { }
+    ) { 
+        this.atualizar.subscribe(res => this.update())
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['object']) {

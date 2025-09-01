@@ -1,82 +1,79 @@
 <app-confirm-dialog></app-confirm-dialog>
-
 <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
-
 <div class="formgrid grid">
     <!-- Foto -->
     <div class="lg:col-3 md:col-3 col-12 px-0 ">
-            
-            <p-fileupload #fileUpload
-                    class="w-full"
-                    styleclass="gap-0 w-full bg-transparent"
-                    name="myfile[]"
-                    accept="image/*"
-                    (onSelect)="onSelectedFiles($event)"
-                    styleClass="border-none"
-                    [showUploadButton]="false"
-                    [showCancelButton]="false"
-                    [chooseStyleClass]="'hidden'"
-                    headerTemplate="">
+        <p-fileupload #fileUpload
+                      styleclass="gap-0 bg-transparent"
+                      name="myfile[]"
+                      accept="image/*"
+                      (onSelect)="onSelectedFiles($event)"
+                      styleClass="border-none"
+                      [showUploadButton]="false"
+                      [showCancelButton]="false"
+                      [chooseStyleClass]="'hidden'"
+                      headerTemplate=""
+                      fluid>
             <ng-template #content
-                    let-files
-                    let-uploadedFiles="uploadedFiles"
-                    let-removeFileCallback="removeFileCallback"
-                    let-removeUploadedFileCallback="removeUploadedFileCallback">
+                         let-files
+                         let-uploadedFiles="uploadedFiles"
+                         let-removeFileCallback="removeFileCallback"
+                         let-removeUploadedFileCallback="removeUploadedFileCallback">
             </ng-template>
             <ng-template #file>
-            <div class="w-full flex flex-column align-items-center justify-content-center">
-                <p-button (onClick)="choose(fileUpload)"
-                            icon="pi pi-images"
-                            [rounded]="true"
-                            label="Selecionar foto"
-                            class="-mb-5 relative z-2" />
-                <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
-                    <div *ngIf="loadingFile" 
-                        class="w-full flex align-items-center justify-content-center absolute z-1">
-                        <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" 
-                            style="padding-top: 100%; height: 0"></div>
-                        <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
-                        style="font-size: 2rem"></i>
-                    </div>
-                    <div id="divImage"
-                        class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                        [ngStyle]="{ 
+                <div class="w-full flex flex-column align-items-center justify-content-center">
+                    <p-button (onClick)="choose(fileUpload)"
+                              icon="pi pi-images"
+                              [rounded]="true"
+                              label="Selecionar foto"
+                              class="-mb-5 relative z-2" />
+                    <div class="flex align-items-center justify-content-center relative  md:w-full w-16rem">
+                        <div *ngIf="loadingFile"
+                             class="w-full flex align-items-center justify-content-center absolute z-1">
+                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full"
+                                 style="padding-top: 100%; height: 0"></div>
+                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl"
+                               style="font-size: 2rem"></i>
+                        </div>
+                        <div id="divImage"
+                             class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                             [ngStyle]="{ 
                             paddingTop: '100%', 
                             height: '0', 
                             backgroundImage: 'url(' + foto + ')' 
                         }">
+                        </div>
                     </div>
                 </div>
-            </div>
             </ng-template>
             <ng-template #empty>
-            <div class="w-full flex flex-column align-items-center justify-content-center">
-                <p-button (onClick)="choose(fileUpload)"
-                            icon="pi pi-images"
-                            [rounded]="true"
-                            label="Selecionar foto"
-                            class="-mb-5 relative z-2" />
-                <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
-                    <ng-container *ngIf="loadingFile">
-                        <div class="w-full flex align-items-center justify-content-center absolute z-1">
-                            <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
-                            <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl" 
-                            style="font-size: 2rem"></i>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngIf="!foto">
-                        <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
-                        <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
-                    </ng-container>
-                    <ng-container *ngIf="foto">
-                        <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
-                            [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + foto + ')' }">
-                        </div>
-                    </ng-container>
+                <div class="w-full flex flex-column align-items-center justify-content-center">
+                    <p-button (onClick)="choose(fileUpload)"
+                              icon="pi pi-images"
+                              [rounded]="true"
+                              label="Selecionar foto"
+                              class="-mb-5 relative z-2" />
+                    <div class="flex align-items-center justify-content-center relative md:w-full w-16rem" (click)="choose(fileUpload)">
+                        <ng-container *ngIf="loadingFile">
+                            <div class="w-full flex align-items-center justify-content-center absolute z-1">
+                                <div class="border-circle border-1 border-100 bg-black-alpha-50 cursor-default overflow-hidden w-full" style="padding-top: 100%; height: 0"></div>
+                                <i class="pi pi-spin pi-spinner text-white absolute z-1 text-4xl"
+                                   style="font-size: 2rem"></i>
+                            </div>
+                        </ng-container>
+                        <ng-container *ngIf="!foto">
+                            <div class="bg-white hover:shadow-1 border-circle border-1 border-100 hover:border-primary-500 hover:surface-50 cursor-pointer  overflow-hidden w-full relative z-0" style="padding-top: 100%; height: 0"></div>
+                            <i *ngIf="!loadingFile" class="pi pi-user absolute  md:text-7xl sm:text-4xl text-7xl text-300 hover:text-400"></i>
+                        </ng-container>
+                        <ng-container *ngIf="foto">
+                            <div id="divImage" class="border-circle border-1 border-primary-500 cursor-pointer overflow-hidden w-full relative z-0 bg-cover bg-center bg-no-repeat"
+                                 [ngStyle]="{ paddingTop: '100%', height: '0', backgroundImage: 'url(' + foto + ')' }">
+                            </div>
+                        </ng-container>
+                    </div>
                 </div>
-            </div>
             </ng-template>
-            </p-fileupload>
+        </p-fileupload>
     </div>
     <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
         <div class="hidden md:block surface-300" style="height: 95%; width: 2px;"></div>
@@ -90,8 +87,8 @@
                        [(ngModel)]="object.nome"
                        id="nome"
                        name="nome"
-                       class="w-full"
-                       [required]="true">
+                       [required]="true"
+                       fluid>
                 <div *ngIf="nome.touched && nome.invalid && nome.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -105,8 +102,8 @@
                        [(ngModel)]="object.rm"
                        id="rm"
                        name="rm"
-                       class="w-full"
-                       readonly>
+                       readonly
+                       fluid>
             </div>
             <!-- Data de Nascimento -->
             <div class="field lg:col-3 md:col-3 sm:col-4 xs:col-6 col-12">
@@ -121,11 +118,9 @@
                               [maxDate]="maxDate"
                               inputId="dataNascimento"
                               name="dataNascimento"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="true"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
                 <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="dataNascimento.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -138,15 +133,14 @@
                           [(ngModel)]="object.pessoa_Sexo_Id"
                           [loading]="loadingSexos"
                           #pessoa_Sexo_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="pessoa_Sexo_Id"
                           inputId="pessoa_Sexo_Id"
                           optionLabel="nome"
                           optionValue="id"
                           [showClear]="true"
                           appendTo="body"
-                          [required]="true" />
+                          [required]="true"
+                          fluid />
                 <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="pessoa_Sexo_Id.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -155,19 +149,17 @@
             <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
                 <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
                 <p-iconfield>
-                        <p-inputicon styleClass="pi pi-phone" />
-                        <p-inputmask
-                                    inputId="telefone"
-                                    name="telefone"
-                                     #telefone="ngModel"
-                                     [(ngModel)]="object.telefone"
-                                     mask="+99 (99) 9999-9999"
-                                     placeholder="+55 (99) 9999-9999"
-                                     [autoClear]="true"
-                                     class="w-full"
-                                     styleClass="w-full pl-5"
-                                     
-                                     [required]="true" />
+                    <p-inputicon styleClass="pi pi-phone" />
+                    <p-inputmask
+                                 inputId="telefone"
+                                 name="telefone"
+                                 #telefone="ngModel"
+                                 [(ngModel)]="object.telefone"
+                                 mask="+99 (99) 9999-9999"
+                                 placeholder="+55 (99) 9999-9999"
+                                 [autoClear]="true"
+                                 [required]="true"
+                                 fluid />
                 </p-iconfield>
                 <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
@@ -179,16 +171,15 @@
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-mobile" />
                     <p-inputmask
-                                inputId="celular"
-                                name="celular"
+                                 inputId="celular"
+                                 name="celular"
                                  #celular="ngModel"
                                  [(ngModel)]="object.celular"
                                  mask="+99 (99) 9.9999-9999"
                                  placeholder="+55 (99) 9.9999-9999"
                                  [autoClear]="true"
-                                 class="w-full"
-                                     styleClass="w-full pl-5"
-                                 [required]="true" />
+                                 [required]="true"
+                                 fluid />
                 </p-iconfield>
                 <div *ngIf="celular.touched && celular.invalid && celular.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
@@ -206,9 +197,9 @@
                            name="email"
                            #email="ngModel"
                            [(ngModel)]="object.email"
-                           class="w-full"
                            [required]="true"
-                           placeholder="example@gmail.com">
+                           placeholder="example@gmail.com"
+                           fluid>
                 </p-iconfield>
                 <div *ngIf="email.touched && email.invalid && email.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="email.errors['required']">Esse campo é obrigatório.</p>
@@ -225,8 +216,8 @@
                            [(ngModel)]="object.endereco"
                            id="endereco"
                            name="endereco"
-                           class="w-full"
-                           placeholder="Rua das Pedras 123 - Vila das Amoras SP">
+                           placeholder="Rua das Pedras 123 - Vila das Amoras SP"
+                           fluid>
                 </p-iconfield>
                 <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
@@ -234,26 +225,12 @@
             </div>
             <!-- Início Vigência -->
             <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
-                <label for="dataInicioVigencia">Início Vigência: <span class="text-red-500">*</span></label>
-                <p-datepicker
-                              #dataInicioVigencia="ngModel"
-                              [(ngModel)]="object.dataInicioVigencia"
-                              [showIcon]="true"
-                              [iconDisplay]="'input'"
-                              [selectOtherMonths]="true"
-                              [minDate]="minDate"
-                              [maxDate]="maxDate"
-                              inputId="dataInicioVigencia"
-                              name="dataInicioVigencia"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              iconP
-                              styleClass="w-full"
-                              [required]="true"
-                              appendTo="body" />
-                <div *ngIf="dataInicioVigencia.touched && dataInicioVigencia.invalid && dataInicioVigencia.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="dataInicioVigencia.errors['required']">Esse campo é obrigatório.</p>
-                </div>
+                <label for="dataInicioVigencia">Início Vigência: </label>
+                <input pInputText
+                       type="text"
+                       [value]="object.dataInicioVigencia | date : 'dd/MM/yyyy'"
+                       readonly
+                       fluid />
             </div>
             <!-- Fim Vigência -->
             <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
@@ -267,24 +244,22 @@
                               [minDate]="minDate"
                               inputId="dataFimVigencia"
                               name="dataFimVigencia"
-                              class="w-full"
-                              inputStyleClass="w-full"
-                              styleClass="w-full"
                               [required]="false"
-                              appendTo="body" />
+                              appendTo="body"
+                              fluid />
             </div>
             <!-- Restrições -->
             <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
                 <div class="flex align-items-center gap-2 justify-content-between mb-1 relative" #divRestricoes>
                     <label for="restricoes">Restrições: </label>
-                    <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1" 
-                        (click)="popoverExplicacaoRestricoes.show($event)">
+                    <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1"
+                         (click)="popoverExplicacaoRestricoes.show($event)">
                         <span>Info</span>
                         <span class="pi pi-question-circle"></span>
                     </div>
-                    <p-popover #popoverExplicacaoRestricoes 
-                    [appendTo]="divRestricoes" 
-                    styleClass="w-30rem max-w-screen -mt-1">
+                    <p-popover #popoverExplicacaoRestricoes
+                               [appendTo]="divRestricoes"
+                               styleClass="w-30rem max-w-screen -mt-1">
                         <div class="max-h-20rem overflow-auto text-lg ">
                             <p class="text-red-500 font-bold mb-4">ATENÇÃO:</p>
                             <p>As restrições indicam dificuldades do aluno, como problemas auditivos, visuais, motores etc.</p>
@@ -303,13 +278,13 @@
                            [value]="restricoesText"
                            id="restricoes"
                            name="restricoes"
-                           class="w-full pr-7"
                            [required]="true"
                            placeholder="Selecione"
                            [readonly]="true"
                            (focusin)="restricoes.show($event)"
                            (click)="restricoes.show($event)"
-                           (keydown.tab)="restricoes.hide()">
+                           (keydown.tab)="restricoes.hide()"
+                           fluid>
                 </p-iconfield>
                 <p-popover #restricoes appendTo="body">
                     <div class="p-2 border-bottom-1 border-200 ">
@@ -322,7 +297,8 @@
                                    class="w-full pr-7"
                                    [required]="true"
                                    (keyup.enter)="cadastrarRestricao($event, restricao, restricoes)"
-                                   placeholder="Inserir nova restrição...">
+                                   placeholder="Inserir nova restrição..."
+                                   fluid>
                             <p-inputicon>
                                 <span class="text-primary-500 cursor-pointer hover:text-primary-600 hover:bg-primary-100 p-1 px-2 border-round-md -mr-2" (click)="cadastrarRestricao($event, restricao, restricoes)">enter</span>
                             </p-inputicon>
@@ -363,17 +339,16 @@
             <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
                 <label for="etapaChecklist">Etapa da jornada: </label>
                 <div tabindex="0"
-                    id="etapaChecklist"
-                    style="height: 29px"
-                    class="p-inputtext flex align-items-center w-full outline-none hover:border-500 focus:border-primary-500" 
-                    (focusin)="checklistPopover.show($event)"
-                    (keydown.tab)="checklistPopover.hide()">
-                        
+                     id="etapaChecklist"
+                     style="height: 29px"
+                     class="p-inputtext p-fluid flex align-items-center w-full outline-none hover:border-500 focus:border-primary-500"
+                     (focusin)="checklistPopover.show($event)"
+                     (keydown.tab)="checklistPopover.hide()">
                     <app-aluno-checklist #alunoChecklist *ngIf="object"
-                        class="w-full"
-                        [aluno_Id]="aluno_Id"
-                        [aluno]="object"
-                        [showChecklist]="true"></app-aluno-checklist>
+                                         [aluno_Id]="aluno_Id"
+                                         [aluno]="object"
+                                         [showChecklist]="true"
+                                         class="w-full"></app-aluno-checklist>
                 </div>
                 <p-popover #checklistPopover appendTo="body">
                     <div [style]="{ maxHeight: '50vh', height: '50vh' }" class="overflow-auto">
@@ -388,17 +363,15 @@
                                         <p class="pl-2 ml-auto text-green-500" *ngIf="checklist.itensFinalizados.length == checklist.items.length && checklist.id != object.checklist_Id"> Finalizado <i class="pi pi-check-circle ml-2"></i> </p>
                                     </div>
                                     <div class="px-2">
-                                        <!-- <pre>{{checklist.items|json}}</pre> -->
-                                        
                                         <ng-container *ngFor="let checklistItem of checklist.items; let index = index">
                                             <div class="flex align-items-baseline gap-2 my-1 w-min-content pr-3 p-2"
-                                                    [ngClass]="{
+                                                 [ngClass]="{
                                                         'surface-50': index % 2 == 0,
                                                         'bg-white': index % 2 != 0,
                                                     }"
-                                                    style="height: 42px;"
-                                                    [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
-                                                    tooltipPosition="top">
+                                                 style="height: 42px;"
+                                                 [pTooltip]="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao ? finalizadoTooltip: undefined"
+                                                 tooltipPosition="top">
                                                 <p-checkbox *ngIf="!checklistItem.finalizado"
                                                             [inputId]="'checklistitem-' + checklistItem.id"
                                                             [name]="'checklistitem-' + checklistItem.id"
@@ -406,27 +379,26 @@
                                                             [(ngModel)]="checklistItem.finalizado"
                                                             [binary]="true"
                                                             (ngModelChange)="checklistMark(checklistItem, checkboxModel)" />
-                                                <div *ngIf="checklistItem.finalizado" 
-                                                    class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
+                                                <div *ngIf="checklistItem.finalizado"
+                                                     class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
                                                     <div class="p-checkbox-box">
                                                         <i class="pi pi-check p-checkbox-icon "></i>
                                                     </div>
                                                 </div>
                                                 <label class="font-medium" [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
                                                 <ng-container *ngIf="checklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                                                  <div class="pl-2 ml-auto">
-                                                    
-                                                    <p-button type="button"
-                                                        icon="pi pi-whatsapp "
-                                                        [severity]="!object.celular ? 'secondary' : 'success'"
-                                                        [disabled]="!object.celular"
-                                                        [rounded]="true"
-                                                        pTooltip="Enviar mensagem"
-                                                        label="Enviar mensagem"
-                                                        (onClick)="enviarMensagemCondicao(checklistItem)"
-                                                        (auxclick)="enviarMensagemCondicao(checklistItem)"
-                                                        (contextmenu)="enviarMensagemCondicao(checklistItem)"/>
-                                                  </div>
+                                                    <div class="pl-2 ml-auto">
+                                                        <p-button type="button"
+                                                                  icon="pi pi-whatsapp "
+                                                                  [severity]="!object.celular ? 'secondary' : 'success'"
+                                                                  [disabled]="!object.celular"
+                                                                  [rounded]="true"
+                                                                  pTooltip="Enviar mensagem"
+                                                                  label="Enviar mensagem"
+                                                                  (onClick)="enviarMensagemCondicao(checklistItem)"
+                                                                  (auxclick)="enviarMensagemCondicao(checklistItem)"
+                                                                  (contextmenu)="enviarMensagemCondicao(checklistItem)" />
+                                                    </div>
                                                 </ng-container>
                                                 <ng-template #finalizadoTooltip>
                                                     <p class="ml-auto pl-2" *ngIf="checklistItem.account_Finalizacao && checklistItem.dataFinalizacao">Finalizado por <b>{{checklistItem.account_Finalizacao}}</b> em <b>{{checklistItem.dataFinalizacao | date : 'dd/mm/yy'}}</b></p>
@@ -443,19 +415,17 @@
         </div>
     </div>
     <div class="col-12 px-3 mt-2 flex overflow-hidden">
-
         <div class="formgrid grid">
             <!-- Turma -->
             <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
+                <!-- <pre>{{selectedTurma|json}}</pre> -->
                 <p-select
                           [options]="turmasDisponiveis"
                           [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
                           [showClear]="true"
                           #turma_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="turma_Id"
                           inputId="turma_Id"
                           optionLabel="nome"
@@ -464,22 +434,23 @@
                           appendTo="body"
                           placeholder="Selecione"
                           optionDisabled="deactivated"
-                          (onChange)="turmaChanged(turma_Id, $event)">
+                          (onChange)="turmaChanged(turma_Id, $event)"
+                          fluid>
                     <ng-template #item let-item>
                         <div class="w-full">
                             <div class="flex align-items-center justify-content-between gap-3">
-                                <p class="flex align-items-center">
+                                <p class="flex align-items-center gap-2">
                                     <app-legend-color [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.professor_Id"
                                                       [professor]="item.professor"
                                                       [turma_Id]="item.id"></app-legend-color>
                                     <span>{{ item.nome }}</span>
                                 </p>
-                                <span>{{ item.capacidadeMaximaAlunos - item.alunosAtivos }} vaga(s)</span>
+                                <span>{{ item.vagas }} vaga(s)</span>
                             </div>
-                            <p class="text-xs mt-1">
+                            <p class="text-xs mt-1 ml-1">
                                 <i class="fa-solid fa-brain mr-2"></i>
-                                 {{item.perfilCognitivoString}}
+                                {{item.perfilCognitivoString}}
                             </p>
                         </div>
                     </ng-template>
@@ -500,8 +471,8 @@
                            [value]="selectedTurma?.professor ?? 'Selecione a turma para definir o educador'"
                            id="professor"
                            name="professor"
-                           class="w-full"
-                           readonly>
+                           readonly
+                           fluid>
                 </p-iconfield>
             </div>
             <!-- Perfil Cognitivo -->
@@ -510,18 +481,17 @@
                 <p-iconfield>
                     <p-inputicon styleClass="fa-solid fa-brain" />
                     <p-select [options]="perfisCognitivos"
-                                [(ngModel)]="object.perfilCognitivo_Id"
-                                [loading]="loadingPerfisCognitivos"
-                                [showClear]="true"
-                                #perfilCognitivo_Id="ngModel"
-                                styleClass="w-full"
-                                class="w-full"
-                                name="perfilCognitivo_Id"
-                                inputId="perfilCognitivo_Id"
-                                optionLabel="nome"
-                                optionValue="id"
-                                [showClear]="true"
-                                appendTo="body" />
+                              [(ngModel)]="object.perfilCognitivo_Id"
+                              [loading]="loadingPerfisCognitivos"
+                              [showClear]="true"
+                              #perfilCognitivo_Id="ngModel"
+                              name="perfilCognitivo_Id"
+                              inputId="perfilCognitivo_Id"
+                              optionLabel="nome"
+                              optionValue="id"
+                              [showClear]="true"
+                              appendTo="body"
+                              fluid />
                 </p-iconfield>
             </div>
             <!-- KIT Apostila -->
@@ -534,15 +504,14 @@
                           [loading]="loadingKits"
                           [showClear]="true"
                           #apostila_Kit_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="apostila_Kit_Id"
                           inputId="apostila_Kit_Id"
                           optionLabel="nome"
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          optionDisabled="deactivated">
+                          optionDisabled="deactivated"
+                          fluid>
                     <ng-template let-item #item>
                         <div class="flex flex-column">
                             <p class="font-bold">{{ item.nome }}</p>
@@ -562,8 +531,8 @@
                        [value]="object.apostila_Abaco ?? 'Indefinido'"
                        id="apostila_Abaco"
                        name="apostila_Abaco"
-                       class="w-full"
-                       readonly>
+                       readonly
+                       fluid>
             </div>
             <!-- Página -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
@@ -573,8 +542,8 @@
                        [value]="object.numeroPaginaAbaco ?? 'Indefinido'"
                        id="numeroPaginaAbaco"
                        name="numeroPaginaAbaco"
-                       class="w-full"
-                       readonly>
+                       readonly
+                       fluid>
             </div>
             <!-- Apostila AH -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
@@ -584,8 +553,8 @@
                        [value]="object.apostila_AH ?? 'Indefinido'"
                        id="apostila_AH"
                        name="apostila_AH"
-                       class="w-full"
-                       readonly>
+                       readonly
+                       fluid>
             </div>
             <!-- Página -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
@@ -595,8 +564,8 @@
                        [value]="object.numeroPaginaAH ?? 'Indefinido'"
                        id="numeroPaginaAH"
                        name="numeroPaginaAH"
-                       class="w-full"
-                       readonly>
+                       readonly
+                       fluid>
             </div>
         </div>
     </div>

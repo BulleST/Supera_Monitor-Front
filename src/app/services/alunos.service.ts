@@ -191,11 +191,13 @@ export class AlunoService extends Service {
 
     getHistorico(id: number) {
         return this.http.get<Aluno_Historico[]>(`${this.url}/alunos/historico/${id}`)
-            .pipe(map((res: any) => {
-                return res.map((x: any) => {
-                    x.account_Created == x.account.name;
+            .pipe(tap(res => {
+                res = res.map(x => {
+                    x.data = moment(x.data).toDate();
                     return x
-                })
+                });
+                res.sort((x, y) => x.data.getTime() - y.data.getTime());
+                return of(res)
             }))
     }
 

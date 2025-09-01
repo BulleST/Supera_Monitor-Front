@@ -57,11 +57,10 @@ export class ListComponent implements OnDestroy {
             this.nivelCertificados = res;
             this.loadingNivelCertificados = false;
 
-            var columnIndex = professorColumns.findIndex(x => x.field == 'professor_NivelCertificacao')
-    
-            var column = professorColumns[columnIndex];
-    
-            
+            let columnIndex = professorColumns.findIndex(x => x.field == 'professor_NivelCertificacao')
+            let column = professorColumns[columnIndex];
+                
+            column.filterOptions.value = res.map(x=> x.descricao)
             column.filterOptions!.primeElementOptions.options = res.map(x => {
                 return {
                     label: x.descricao,
@@ -73,14 +72,14 @@ export class ListComponent implements OnDestroy {
             this.tableColumns = professorColumns;
         })
         
-        this.update();
-
-        var screen = this.mobileService.get().subscribe(res => this.screen = res);
+        
+        let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
-
-        var list = this.service.list.subscribe(res => this.list = res);
+        
+        let list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
-
+        
+        if (!this.list) this.update();
     }
 
 
@@ -89,7 +88,6 @@ export class ListComponent implements OnDestroy {
     }
 
     update() {
-        this.list = [];
         this.tableLoading = true;
         lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
@@ -111,7 +109,7 @@ export class ListComponent implements OnDestroy {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen text-orange-500',
                 command: () => {
-                    var encrypted = this.crypto.encrypt(item.id);
+                    let encrypted = this.crypto.encrypt(item.id);
                     this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
                 }
             },
@@ -130,7 +128,7 @@ export class ListComponent implements OnDestroy {
             //     label: 'Calendário de aulas',
             //     icon: 'fa-solid fa-calendar',
             //     command: () => {
-            //         var encrypted = this.crypto.encrypt(item.id);
+            //         let encrypted = this.crypto.encrypt(item.id);
             //         this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
             //     }
             // },
@@ -158,7 +156,7 @@ export class ListComponent implements OnDestroy {
     }
 
     getOption(col: ColumnTable, row: any) {
-        var item = col.options.items.find((x: any) => x.value == row[col.field]);
+        let item = col.options.items.find((x: any) => x.value == row[col.field]);
         return item;
     }
 
@@ -169,7 +167,7 @@ export class ListComponent implements OnDestroy {
 
 
     deactivated(e: any, item: any) {
-        var deactivated = !item.active;
+        let deactivated = !item.active;
 
         // playAlert();
 
@@ -271,7 +269,7 @@ export class ListComponent implements OnDestroy {
             //     label: 'Calendário de aulas',
             //     icon: 'fa-solid fa-calendar',
             //     command: () => {
-            //         var encrypted = this.crypto.encrypt(item.id);
+            //         let encrypted = this.crypto.encrypt(item.id);
             //         this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
             //     }
             // },
@@ -285,7 +283,7 @@ export class ListComponent implements OnDestroy {
     }
 
     edit(item: any) {
-        var encrypted = this.crypto.encrypt(item.id);
+        let encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
     }
 
@@ -297,7 +295,7 @@ export class ListComponent implements OnDestroy {
         let matchMode = filterDt['matchMode'];
         let filter: any = dt.filters[col.field];
 
-        var a = filter(value)
+        let a = filter(value)
 
 
 

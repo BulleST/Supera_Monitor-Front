@@ -115,7 +115,7 @@ export class ListComponent implements OnDestroy {
             this.loadApostilas();
         }
 
-        this.update()
+        if (!this.list.length) this.update()
     }
 
     ngOnDestroy(): void {
@@ -124,40 +124,40 @@ export class ListComponent implements OnDestroy {
 
     loadAlunos() {
         this.tableLoading = true;
-        lastValueFrom(this.service.getList())
+        return lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
             .catch(res => this.tableLoading = false);
     }
 
     loadTurmas() {
         this.loadingTurmas = true;
-        lastValueFrom(this.turmaService.getList())
+        return lastValueFrom(this.turmaService.getList())
             .then(res => this.loadingTurmas = false)
             .catch(res => this.loadingTurmas = false);
 
     }
     loadPerfis() {
         this.loadingPerfilCognitivo = true;
-        lastValueFrom(this.perfilCognitivoService.getList())
+        return lastValueFrom(this.perfilCognitivoService.getList())
             .then(res => this.loadingPerfilCognitivo = false)
             .catch(res => this.loadingPerfilCognitivo = false);
 
     }
     loadKits() {
         this.loadingKit = true;
-        lastValueFrom(this.apostilaService.getKit())
+        return lastValueFrom(this.apostilaService.getKit())
             .then(res => this.loadingKit = false)
             .catch(res => this.loadingKit = false);
     }
     loadApostilas() {
         this.loadingApostilas = true;
-        lastValueFrom(this.apostilaService.getApostilas())
+        return lastValueFrom(this.apostilaService.getApostilas())
             .then(res => this.loadingApostilas = false)
             .catch(res => this.loadingApostilas = false);
     }
 
     update() {
-        this.list = [];
+        // this.list = [];
         this.loadAlunos();
         this.loadTurmas();
         this.loadPerfis();
@@ -167,7 +167,8 @@ export class ListComponent implements OnDestroy {
 
     showContextMenu(e: any, item: Aluno) {
         const toggle = this.tableSelectedItem?.id == item.id;
-
+        let idEncrypted = this.crypto.encrypt(item.id);
+        
         this.tableSelectedItem = item;
         this.tableMenu = [
             {
@@ -178,14 +179,14 @@ export class ListComponent implements OnDestroy {
             },
             { separator: true },
             {
-                label: 'Detalhes',
+                label: 'Editar',
                 icon: 'fa-solid fa-pen text-orange-500',
-                command: () => this.edit(item)
+                routerLink: ['./', 'editar', idEncrypted]
             },
             {
                 label: item.active ? 'Desabilitar' : 'Habilitar',
                 icon: item.active ? 'fa-solid fa-lock text-red-500' : 'fa-solid fa-lock-open text-green-400',
-                command: (event: any) => this.deactivated(event, item)
+                command: e => this.deactivated(e, item)
             }
         ];
 
@@ -214,45 +215,55 @@ export class ListComponent implements OnDestroy {
     }
 
 
-
-    edit(item: any) {
-        let encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
-    }
-
-    deactivated(e: any, item: any) {
-        // playAlert();
-
+    deactivated(e: any, item: Aluno) {
+        let turma  = this.turmas.find(x => x.id == item.turma_Id)
         let deactivated = !item.active;
+        let status = deactivated ?  'Habilitar' : 'Desabilitar';
+        let mensagem = `<p>Tem certeza que deseja ${status.toLocaleLowerCase()} o aluno selecionado?</p>`
+        
+        if (!status && turma) {
+            mensagem += `<p>Se continuar, a turma <b>${turma.nome}</b> ganhará uma vaga a ser preenchida por outra pessoa</p>`
+        }
+        // Se a turma não houver vagas, insere ele em outra turma
+        else if (status && turma && turma.vagas == 0) {
+            return this.showError(
+                'Não autorizado', 
+                'A turma em que esse aluno estava matriculado está lotada. Selecione outra turma antes de habilitar esse aluno',
+                e)
+
+        }
+
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} o aluno selecionado?`,
-            header: deactivated ? 'Habilitar' : 'Desabilitar',
+            message: mensagem,
+            header: status,
             acceptIcon: `${deactivated ? 'pi pi-lock-open' : 'pi pi-lock'}`,
             rejectIcon: 'pi pi-times',
-            acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
+            acceptLabel: status,
             rejectLabel: 'Cancelar',
             acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
-                    .then(res => {
+                    .then(async res => {
                         if (res.success) {
+                            this.loadTurmas()
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
                             insertOrReplace(this.service, item);
                             item = res.object;
                         } else {
-                            this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, res.message, e);
+                            this.showError(`${status} aluno falhou.`, res.message, e);
                         }
                     })
                     .catch(res => {
-                        this.showError(`${deactivated ? 'Habilitar' : 'Desabilitar'} aluno falhou.`, getError(res), e);
+                        this.showError(`${status} aluno falhou.`, getError(res), e);
                     })
             },
         });
     }
 
+    
     showError(header: string, message: string, e: any, innerMessage?: string) {
         showError(this.confirmationService, header, message, e, innerMessage)
     }
@@ -369,7 +380,7 @@ export class ListComponent implements OnDestroy {
                 novoAluno.turma_Id = novaTurma.id;
 
                 lastValueFrom(this.service.edit(novoAluno))
-                    .then(res => {
+                    .then(async res => {
                         this.tableLoading = false;
                         if (res.success) {
                             this.toastr.success('Transferência finalizada com sucesso');
@@ -377,6 +388,8 @@ export class ListComponent implements OnDestroy {
                             this.turmaTransferenciaReject(item, model, e)
                             this.showError('Ops', `Não foi possível finalizar transferência. <br> ${res.message}`, e.originalEvent)
                         }
+                        this.loadTurmas()
+
                     })
                     .catch(res => {
                         this.tableLoading = false;
@@ -468,7 +481,6 @@ export class ListComponent implements OnDestroy {
     }
 
     kitChangedConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
-        let kit = model.value;
         let novoKit = this.listKits.find(x => x.id == item.apostila_Kit_Id) as Apostila_Kit;
 
         item.kit = novoKit.nome;
@@ -488,8 +500,7 @@ export class ListComponent implements OnDestroy {
                 this.tableLoading = true;
 
                 let novoAluno = await lastValueFrom(this.service.get(item.id));
-                novoAluno.apostila_Kit_Id = kit.id;
-
+                novoAluno.apostila_Kit_Id = novoKit.id;
 
                 lastValueFrom(this.service.edit(novoAluno))
                     .then(res => {
@@ -515,8 +526,8 @@ export class ListComponent implements OnDestroy {
     }
 
     apostilaKitChangedReject(item: Aluno, model: NgModel, e: any) {
-        let oldapostilaKit = this.listKits.find(x => x.id == item.apostila_Kit_Id);
-        model.control.setValue(oldapostilaKit)
+        let oldApostilaKit = this.listKits.find(x => x.id == item.apostila_Kit_Id);
+        model.control.setValue(oldApostilaKit)
     }
 
     onEditInit(e: TableEditInitEvent) {

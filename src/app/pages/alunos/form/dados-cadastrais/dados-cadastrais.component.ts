@@ -159,24 +159,25 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     loadTurmasDisponiveis() {
 
-        if (this.object?.id && this.turmas.length) {
+        if (this.object && this.turmas.length) {
 
             // Filtra turmas que o aluno poderia participar:
             // Ou a turma atual
             // Ou alguma turma do mesmo perfil cognitivo
             // E turmas com vagas
             this.turmasDisponiveis = this.turmas.filter(turma => {
-                const alunoTemTurma = !!this.object.turma_Id;
-                const alunoTemPerfil = !!this.object.perfilCognitivo_Id;
                 const ehTurmaDoAluno = turma.id == this.object.turma_Id;
                 const ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
-                const temVagas = turma.alunosAtivos < turma.capacidadeMaximaAlunos;
+                const alunoTemPerfil = this.object.perfilCognitivo_Id;
+                const temVagas = turma.vagas > 0;
                 //
                 // Se o perfil da turma é compatível com o perfil do aluno OU o aluno não tiver perfil definido
                 // Se a turma tiver vagas OU se for uma turma que o aluno já participa
                 //
-                const condicao = ((alunoTemPerfil && ehPerfilDoAluno) || !alunoTemPerfil) 
-                                && (temVagas || (!temVagas && alunoTemTurma && ehTurmaDoAluno))
+                const condicao = ehTurmaDoAluno 
+                            || ((!alunoTemPerfil || ehPerfilDoAluno)
+                            && temVagas)
+                
                 return condicao
             });
 

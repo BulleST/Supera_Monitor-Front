@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { ConfirmationService, MenuItem } from 'primeng/api'
 import { Table } from 'primeng/table'
-import { ColumnTable, Crypto, DisplayType, FilterType, showError, insertOrReplace } from '../../../utils'
+import { ColumnTable, Crypto, DisplayType, FilterType, showError } from '../../../utils'
 import { Role } from '../../../models/account-perfil.model'
 import { MobileService, ScreenWidth } from '../../../utils/mobile'
 import { Turma, turmaColumns } from '../../../models/turma.model'
@@ -52,7 +52,8 @@ export class ListComponent implements OnDestroy {
 
         let list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list)
-        this.update()
+        
+        if (!this.list.length) this.update()
     }
 
     ngOnDestroy(): void {
@@ -60,7 +61,6 @@ export class ListComponent implements OnDestroy {
     }
 
     update() {
-        this.list = []
         this.tableLoading = true
         lastValueFrom(this.service.getList())
             .then(res => (this.tableLoading = false))
@@ -91,30 +91,24 @@ export class ListComponent implements OnDestroy {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'
-                } a turma “<b>${item.nome}</b>”?`,
+            message: `Tem certeza que deseja ${deactivated ? 'habilitar' : 'desabilitar'} a turma “<b>${item.nome}</b>”?`,
             header: deactivated ? 'Habilitar' : 'Desabilitar',
-            
             acceptButtonStyleClass: 'p-button-rounded',
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            
-            acceptIcon: deactivated ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock',
+            acceptIcon: deactivated ? 'fa fa-lock-open' : 'fa fa-lock',
             rejectIcon: 'pi pi-times',
-
             acceptLabel: `${deactivated ? 'Habilitar' : 'Desabilitar'}`,
             rejectLabel: 'Cancelar',
-
             accept: () => {
                 lastValueFrom(this.service.deactivated(item.id, deactivated))
                     .then(res => {
                         if (res.success) {
                             this.toastrService.success(
                                 deactivated
-                                    ? `O registro foi habilitado com sucesso.`
-                                    : `O registro foi desabilitado com sucesso.`,
+                                    ? `Turma habilitada com sucesso.`
+                                    : `Turma desabilitada com sucesso.`,
                             );
                             item = res.object;
-                            // playSuccess();
                         } else {
                             this.showError('Erro', res.message, e)
                         }
@@ -138,6 +132,7 @@ export class ListComponent implements OnDestroy {
 
     showContextMenu(e: any, item: Turma) {
         const toggle = this.tableSelectedItem?.id == item.id;
+        let idEncrypted = this.crypto.encrypt(item.id);
 
         this.tableSelectedItem = item;
         this.tableMenu = [
@@ -151,7 +146,7 @@ export class ListComponent implements OnDestroy {
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen text-orange-500',
-                command: () => this.edit(item)
+                routerLink: ['./', 'editar', idEncrypted]
             },
             {
                 label: item.active ? 'Desabilitar' : 'Habilitar',
@@ -167,9 +162,5 @@ export class ListComponent implements OnDestroy {
         }
     }
 
-    edit(item: any) {
-        let encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
-    }
 
 }

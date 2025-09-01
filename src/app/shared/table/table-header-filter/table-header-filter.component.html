@@ -4,7 +4,8 @@
                     [field]="col.field"
                     [type]="col.filterOptions.type"
                     [matchMode]="col.filterOptions.matchMode ?? FilterMatchMode.CONTAINS"
-                    class="p-column-filter-inline">
+                    class="p-column-filter-inline"
+                    []>
         <ng-template #filter let-value let-filter="filterCallback">
             <p-iconfield [class.filter-icon-field]="col.filterOptions && col.filterOptions.icon">
                 <ng-container *ngIf="col.filterOptions">
@@ -15,7 +16,7 @@
                     <!-- Field -->
                     <ng-container *ngIf="col.filterOptions.primeElement == 'inputtext'">
                         <input pInputText
-                               [(ngModel)]="col.filterOptions.value"
+                               [ngModel]="col.filterOptions.value"
                                [email]="col.filterOptions.primeElementOptions.email"
                                [id]="col.field"
                                [name]="col.field"
@@ -29,7 +30,7 @@
                                        [showButtons]="true"
                                        [step]="1"
                                        [useGrouping]="false"
-                                       [(ngModel)]="col.filterOptions.value"
+                                       [ngModel]="col.filterOptions.value"
                                        [id]="col.field"
                                        [name]="col.field"
                                        [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
@@ -43,7 +44,7 @@
                         <p-inputmask
                                      [mask]="col.filterOptions.primeElementOptions.format"
                                      [unmask]="true"
-                                     [(ngModel)]="col.filterOptions.value"
+                                     [ngModel]="col.filterOptions.value"
                                      [inputId]="col.field"
                                      [name]="col.field"
                                      [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
@@ -58,7 +59,7 @@
                                       [dateFormat]="col.filterOptions.primeElementOptions.format"
                                       [inputId]="col.field"
                                       [name]="col.field"
-                                      [(ngModel)]="col.filterOptions.value"
+                                      [ngModel]="col.filterOptions.value"
                                       [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                       class="w-full"
                                       styleClass="w-full"
@@ -76,7 +77,7 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'select'">
                         <p-select
                                   [options]="col.filterOptions.primeElementOptions.options"
-                                  [(ngModel)]="col.filterOptions.value"
+                                  [ngModel]="col.filterOptions.value"
                                   [inputId]="col.field"
                                   [name]="col.field"
                                   [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
@@ -99,13 +100,13 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'multiselect'">
                         <p-multiselect
                                        [options]="col.filterOptions.primeElementOptions.options"
-                                       [(ngModel)]="col.filterOptions.value"
+                                       [ngModel]="col.filterOptions.value"
+                                       (ngModelChange)="filter(col.filterOptions.value)"
                                        [inputId]="col.field"
                                        [name]="col.field"
                                        [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                        optionLabel="label"
                                        optionValue="value"
-                                       (ngModelChange)="filter(col.filterOptions.value)"
                                        appendTo="body">
                             <ng-template let-option #item>
                                 <p-button *ngIf="option.severity"
@@ -122,7 +123,7 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'toggleswitch'">
                         <p-toggleswitch
                                         #toggleSwitch
-                                        [(ngModel)]="col.filterOptions.value"
+                                        [ngModel]="col.filterOptions.value"
                                         [inputId]="col.field"
                                         [name]="col.field"
                                         (ngModelChange)="filter(col.filterOptions.value)">
