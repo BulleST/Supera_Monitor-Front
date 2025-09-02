@@ -83,9 +83,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             center: '',
             right: ''
         },
-        scrollTime: moment().subtract(2, 'hour').startOf('hour').format('HH:mm:ss').toString(),
-        nowIndicator: true,
+        scrollTime: '08:00:00',
+        // scrollTime: moment().subtract(2, 'hour').startOf('hour').format('HH:mm:ss').toString(),
         scrollTimeReset: true,
+        nowIndicator: true,
         eventStartEditable: false,
         eventDurationEditable: false,
         handleWindowResize: false,
@@ -193,10 +194,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     scrollToTime() {
-        let scrollTime = moment().subtract(1, 'hour').startOf('hour')
-        this.fullCalendar.getApi().scrollToTime({
-            hour: scrollTime.hour()
-        })
+        if (this.fullCalendar && this.fullCalendar.getApi()) {
+            // let scrollTime = moment().subtract(1, 'hour').startOf('hour')
+            // this.fullCalendar.getApi().scrollToTime({
+            //     hour: scrollTime.hour()
+            // })
+        }
     }
 
     setCalendario() {
@@ -205,24 +208,26 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.cdkEventItensId = [];
 
         // Apenas eventos que não caem em um feriado
-        let eventos = this.eventos.filter(evento => {
-            let temFeriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'))
-            evento.feriado = temFeriado;
-            return !temFeriado;
-        });
+        // let eventos = this.eventos.filter(evento => {
+        //     let temFeriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'))
+        //     evento.feriado = temFeriado;
+        //     return !temFeriado;
+        // });
 
         let calendar = this.fullCalendar.getApi();
         let de = this.calendarioRequest.intervaloDe;
         let ate = this.calendarioRequest.intervaloAte;
         let feriados = this.feriados.filter(x => moment(x.date).isBetween(de, ate, 'days', '[]'));
 
-        let events = eventos.map(item => {
+        let events = this.eventos.map(item => {
             const id = 'event-' + this.calendarioUtils.eventRandomId();
             const eventStyles = this.calendarioUtils.getEventStyles(item)
 
             if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
             }
+
+            item.feriado = this.feriados.find(x => moment(x.date).isSame(item.data, 'date'))
 
             let event: any = {
                 id: id,
@@ -245,8 +250,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 backgroundColor: 'red',
                 borderColor: 'red',
                 title: item.name,
-                start: moment(item.date).toDate(),
-                end: moment(item.date).toDate(),
+                start: moment(item.date).startOf('day').toDate(),
+                end: moment(item.date).endOf('day').toDate(),
                 allDay: true,
                 extendedProps: {
                     id: PseudoEvento.EventoId,

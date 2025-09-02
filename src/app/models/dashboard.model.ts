@@ -116,11 +116,11 @@ export class Dashboard_Mes {
 export enum DashboardItemStatus {
     Cancelada = 'Cancelada',
     Feriado = 'Feriado',
-    Reposicao = 'Reposição Agendada',
+    ReposicaoAgendada = 'Reposição Agendada',
     FaltaNaReposicao = 'Faltou na Reposição',
     FaltaNaAula = 'Faltou na Aula',
     FaltaAgendada = 'Falta Agendada',
     PresenteNaReposicao = 'Presente na Reposição',
-    Presente = 'Presente',
+    PresenteNaAula = 'Presente',
     Aula = 'Aula',       
 }

@@ -205,13 +205,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 .then((res) => {
                     this.loadingApostila = false
                     this.apostilas = res;
-                    console.log('apostilas', this.apostilas)
                 })
                 .catch((res) => (this.loadingApostila = false))
         }
 
         this.evento.alunos.forEach(aluno => {
-            console.log('aluno', aluno.aluno, JSON.parse(JSON.stringify(aluno)))
 
             aluno.apostilasAbacoList = this.apostilas.filter(apostila => {
                 const ehAbaco = apostila.apostila_Tipo_Id == ApostilaTipo.Abaco;
@@ -273,9 +271,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     //
 
     apostilaAbacoClick(item: Evento_Participacao_Aluno) {
-        console.log('apostilaAbacoClick', item)
         this.clonedRow[item.aluno_Id as number] = { ...item }
-        console.log('clonedRow', this.clonedRow)
     }
 
     apostilaAbacoChange(item: Evento_Participacao_Aluno, e: SelectChangeEvent) {

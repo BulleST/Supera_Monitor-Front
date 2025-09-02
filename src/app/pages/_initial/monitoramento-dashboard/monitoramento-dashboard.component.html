@@ -246,13 +246,13 @@
                                 </p>
                             </div>
                         </ng-template>
-                        <ng-template #dataTemplate>
+                        <ng-template #dataTemplate let-data="data">
                             <div class="flex w-full">
                                 <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none border-right-none">
-                                    {{item.aula.data | date: 'dd/MM'}} 
+                                    {{data | date: 'dd/MM'}} 
                                 </p>
                                 <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none">
-                                    {{item.aula.data | date: 'HH\'h\'mm'}}
+                                    {{data | date: 'HH\'h\'mm'}}
                                 </p>
                             </div>
                         </ng-template>
@@ -284,7 +284,7 @@
                                             <span>Cancelada</span>
                                             <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
                                         </div>
-                                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                        <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.data }"></ng-container>
                                     </ng-container>
                                     <!-- Feriado  -->
                                     <ng-container *ngIf="item.status == DashboardItemStatus.Feriado">
@@ -292,15 +292,14 @@
                                             <span>Feriado</span>
                                             <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
                                         </div>
-                                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                        <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.data }"></ng-container>
                                     </ng-container>
                                     <!-- Reposicao -->
-                                    <ng-container *ngIf="item.status == DashboardItemStatus.Reposicao">
+                                    <ng-container *ngIf="item.status == DashboardItemStatus.ReposicaoAgendada">
                                         <div class="event-status bg-purple-600 border-purple-600">
                                             <span>Reposição</span>
-                                            <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
                                         </div>
-                                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                        <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.participacao.reposicaoPara_Evento?.data }"></ng-container>
                                     </ng-container>
                                     <!-- Faltou Na Reposição -->
                                     <ng-container *ngIf="item.status == DashboardItemStatus.FaltaNaReposicao">
@@ -316,13 +315,13 @@
                                             <span>Faltou</span>
                                             <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
                                         </div>
-                                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                        <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.data }"></ng-container>
                                     </ng-container>
                                     <!-- Falta Agendada -->
                                     <ng-container *ngIf="item.status == DashboardItemStatus.FaltaAgendada">
                                         <div class="event-status bg-red-500 border-red-500">
                                             <span>Falta Agendada</span>
-                                            <ng-container *ngTemplateOutlet="alunoContactadoTemplate"></ng-container>
+                                            <ng-container *ngTemplateOutlet="alunoContactadoTemplate; context: { data: item.aula.data }"></ng-container>
                                         </div>
                                         <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
                                     </ng-container>
@@ -340,7 +339,7 @@
                                         </div>
                                     </ng-container>
                                     <!-- Presente -->
-                                    <ng-container *ngIf="item.status == DashboardItemStatus.Presente">
+                                    <ng-container *ngIf="item.status == DashboardItemStatus.PresenteNaAula">
                                         <div class="event-status-presente bg-green-500 border-green-500">
                                             <div class="apostila">
                                                 <span>{{item.participacao.apostila_Abaco}}</span>
@@ -356,7 +355,7 @@
                                         <div class="event-status surface-200 border-200">
                                             <span class="opacity-0">Aula normal</span>
                                         </div>
-                                        <ng-container *ngTemplateOutlet="dataTemplate"></ng-container>
+                                        <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.data }"></ng-container>
                                     </ng-container>
                                 </div>
                                 <!-- Primeira Aula -->

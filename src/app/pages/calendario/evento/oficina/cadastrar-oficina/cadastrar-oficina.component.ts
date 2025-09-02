@@ -191,7 +191,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
     }
     
     async verificaDisponibilidade() {
-        console.log('verificaDisponibilidade', this.data.getDay())
         let valid = true;
 
         if (this.data.getDay() === 1 && !this.horario) {
@@ -206,7 +205,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
         this.loadingEventos = true;
         let data = moment(this.data).set({ hour: this.horario.getHours(), minute: this.horario.getMinutes(), second: 0 }).toDate();
 
-        console.log(data)
 
         let request: CalendarioRequest = new CalendarioRequest;
         request.intervaloDe = data;

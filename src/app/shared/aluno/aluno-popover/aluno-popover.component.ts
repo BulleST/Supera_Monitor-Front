@@ -130,6 +130,11 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     }
 
     loadMenuItems() {
+
+        let aluno = this.aluno as Aluno;
+        let nome = this.participacao?.aluno ?? this.aluno?.nome ?? '';
+        let celular = this.participacao?.celular ?? this.aluno?.celular ?? '';
+
         this.menuItems = [];
 
         // Editar aluno
@@ -140,8 +145,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
             command: () => this.goToAluno(),
         })
 
-        let nome = this.participacao?.aluno ?? this.aluno?.nome ?? '';
-        let celular = this.participacao?.celular ?? this.aluno?.celular ?? '';
 
         // Enviar mensagem
         this.menuItems.push({
@@ -162,7 +165,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 icon: 'pi pi-check-square text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
                 command: async () => {
-                    this.alunoChecklistDialog.show(this.aluno);
+                    this.alunoChecklistDialog.show(aluno);
                 },
             })
         }
@@ -175,7 +178,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 label: 'Agendar reposição',
                 icon: 'pi pi-calendar text-500',
                 styleClass: 'text-500 surface-50 hover:surface-100',
-                disabled: !this.aluno.active,
+                disabled: !aluno.active,
                 command: () => {
                     this.goToAgendarReposicao();
                 },
@@ -186,8 +189,8 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         this.menuItems.push({
             label: 'Agendar falta',
             icon: 'fas fa-thumbs-down text-red-500',
-            styleClass: this.aluno.active ? 'text-red-500 surface-50 hover:surface-100' : '',
-            disabled: !this.aluno.active 
+            styleClass: aluno.active ? 'text-red-500 surface-50 hover:surface-100' : '',
+            disabled: !aluno.active 
                     || this.participacao?.presente === false 
                     || this.evento?.finalizado,
             command: (e: MenuItemCommandEvent) => {
@@ -201,7 +204,7 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
                 label: 'Finalizar checklist',
                 icon: 'pi pi-check text-primary-500',
                 styleClass: 'text-primary-500 bg-primary-100 hover:bg-primary-200',
-                disabled: !this.aluno.active,
+                disabled: !aluno.active,
                 command: () => {
                     let checklist = this.alunoChecklistItem as Aluno_CheckList_Item
                     this.alunoChecklistOnConfirmDialog.show(this.aluno, checklist);
@@ -222,9 +225,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
         this.visible = true;
         this.popover.show(e);
 
-        console.log('show')
-        console.log('aluno', this.aluno)
-        console.log('participacao', this.participacao)
         
         if (aluno) {
             this.aluno = aluno
@@ -238,9 +238,6 @@ export class AlunoPopoverComponent implements OnChanges, OnDestroy {
     toggle(e: any, aluno?: Aluno) {
         this.visible = !this.visible;
         this.popover.toggle(e);
-        console.log('toggle')
-        console.log('aluno', this.aluno)
-        console.log('participacao', this.participacao)
         if (this.popover.overlayVisible) {
             if (aluno) {
                 this.aluno = aluno

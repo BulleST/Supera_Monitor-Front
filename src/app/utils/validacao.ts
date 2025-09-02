@@ -124,7 +124,6 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
         item.disponivel = !evento;
         item.disponivelEvent = evento;
 
-        // console.log('sala final', item.description, item);
         return item;
     });
 }

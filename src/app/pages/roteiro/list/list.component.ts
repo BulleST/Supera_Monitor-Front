@@ -196,7 +196,6 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         //     });
         //     return range;
         // });
-        // console.log('roteirosDates', roteirosDates)
         // this.feriados.filter(x => !roteirosDates.includes(moment(x.date).format('DD/MM/YY')) ).forEach(item => {
         //     let event = {
         //         id: this.calendarioUtils.eventRandomId(),

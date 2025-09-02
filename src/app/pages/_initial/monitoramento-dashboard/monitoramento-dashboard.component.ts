@@ -49,12 +49,12 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         { label: 'Todos', value: null, styleClass: 'pi pi-bars' },
         { label: DashboardItemStatus.Cancelada, value: DashboardItemStatus.Cancelada, styleClass: 'surface-800' },
         { label: DashboardItemStatus.Feriado, value: DashboardItemStatus.Feriado, styleClass: 'bg-red-600' },
-        { label: DashboardItemStatus.Reposicao, value: DashboardItemStatus.Reposicao, styleClass: 'bg-purple-500' },
+        { label: DashboardItemStatus.ReposicaoAgendada, value: DashboardItemStatus.ReposicaoAgendada, styleClass: 'bg-purple-500' },
         { label: DashboardItemStatus.FaltaNaReposicao, value: DashboardItemStatus.FaltaNaReposicao, styleClass: 'bg-blue-600' },
         { label: DashboardItemStatus.FaltaNaAula, value: DashboardItemStatus.FaltaNaAula, styleClass: 'bg-red-500' },
         { label: DashboardItemStatus.FaltaAgendada, value: DashboardItemStatus.FaltaAgendada, styleClass: 'bg-red-500' },
         { label: DashboardItemStatus.PresenteNaReposicao, value: DashboardItemStatus.PresenteNaReposicao, styleClass: 'bg-green-300' },
-        { label: DashboardItemStatus.Presente, value: DashboardItemStatus.Presente, styleClass: 'bg-green-500' },
+        { label: DashboardItemStatus.PresenteNaAula, value: DashboardItemStatus.PresenteNaAula, styleClass: 'bg-green-500' },
         { label: DashboardItemStatus.Aula, value: DashboardItemStatus.Aula, styleClass: 'surface-200' },
     ]
 
@@ -197,11 +197,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     }
     
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
-        console.log('aulaParticipacaoPopoverComponent', this.aulaParticipacaoPopoverComponent)
         this.aulaParticipacaoPopoverComponent.aluno = aluno;
         this.aulaParticipacaoPopoverComponent.item = item;
-
-        
         this.aulaParticipacaoPopoverComponent.show(event);
     }
 

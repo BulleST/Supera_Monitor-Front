@@ -238,7 +238,6 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     rejectEvento(model: NgModel) {
         model.control.setValue(null);
         this.evento = undefined;
-        console.log('rejectEvento', 'setEvento')
         this.eventoService.setEvento(undefined)
 
     }

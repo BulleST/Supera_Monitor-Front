@@ -111,7 +111,6 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
 	visibleChange() {
 		if (!this.visible) {
 			let params = this.activatedRoute.snapshot.params;
-            console.log(params)
 			this.router.navigate(['../../../'], { relativeTo: this.activatedRoute });
 			this.service.setEvento(undefined)
 		}
@@ -129,7 +128,6 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
     }
 
     alunoContactadoChanged() {
-        console.log('alunoContactadoChanged', this.participacao.alunoContactado)
         this.alunoContactado = !this.alunoContactado;
         if (!this.alunoContactado) {
             this.participacao.alunoContactado = undefined;

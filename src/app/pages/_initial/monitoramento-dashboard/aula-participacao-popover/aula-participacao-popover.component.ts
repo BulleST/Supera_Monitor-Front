@@ -56,13 +56,16 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         }
     }
 
-    show(e: any) {
-        this.cdr.detectChanges();
-        this.eventoEncryptedId = this.crypto.encrypt(this.item.aula.id) as string;
+   async show(e: any) {
+    this.cdr.detectChanges();
+    this.eventoEncryptedId = this.crypto.encrypt(this.item.aula.id) as string;
         this.alunoEncryptedId = this.crypto.encrypt(this.item.participacao.aluno_Id) as string;
-        this.loadMenuItems();
         this.popover.show(e);
-        this.loadEvento();
+        await this.loadEvento()
+        .then(res => {
+            this.loadMenuItems();
+
+        })
     }
 
     hide() {

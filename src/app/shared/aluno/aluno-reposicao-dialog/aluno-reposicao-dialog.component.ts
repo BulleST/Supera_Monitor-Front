@@ -260,16 +260,28 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                 .then(res => {
 
                     this.eventosReposicaoParaList = res.filter(aula => {
+                        console.groupCollapsed(moment(aula.data).format('DD/MM/YY HH:mm'), aula)
+                        const aulaAtiva = aula.active;
+                        console.log('aulaAtiva', aulaAtiva)
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
+                        console.log('alunoNaoEstaNaAula', alunoNaoEstaNaAula)
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+                        console.log('ehAula', ehAula)
                         const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaEvento;
+                        console.log('temVagas', temVagas)
                         const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
+                        console.log('perfilCognitivo', perfilCognitivo)
                         const aulaNaoFinalizada = !aula.finalizado;
+                        console.log('aulaNaoFinalizada', aulaNaoFinalizada)
                         const aulaEstaAtiva = aula.active;
+                        console.log('aulaEstaAtiva', aulaEstaAtiva)
                         const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
+                        console.log('ehPerfilCognitivoCompativel', ehPerfilCognitivoCompativel)
                         const naoEhFeriado = !aula.feriado;
-
-                        return alunoNaoEstaNaAula
+                        console.log('naoEhFeriado', naoEhFeriado)
+                        console.groupEnd()
+                        return aulaAtiva
+                            && alunoNaoEstaNaAula
                             && ehAula
                             && temVagas
                             && perfilCognitivo
