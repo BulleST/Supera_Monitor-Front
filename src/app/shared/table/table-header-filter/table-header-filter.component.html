@@ -4,8 +4,7 @@
                     [field]="col.field"
                     [type]="col.filterOptions.type"
                     [matchMode]="col.filterOptions.matchMode ?? FilterMatchMode.CONTAINS"
-                    class="p-column-filter-inline"
-                    []>
+                    class="p-column-filter-inline">
         <ng-template #filter let-value let-filter="filterCallback">
             <p-iconfield [class.filter-icon-field]="col.filterOptions && col.filterOptions.icon">
                 <ng-container *ngIf="col.filterOptions">

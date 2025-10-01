@@ -17,7 +17,9 @@ export class MobileService {
     set() {
         try {
             var width: number = $(window).width() ?? 0;
-            if (width < 768) {
+            if (width < 500) {
+                this.value.next(ScreenWidth.xs)
+            } else if (width < 768) {
                 this.value.next(ScreenWidth.sm)
             } else if (width < 992) {
                 this.value.next(ScreenWidth.md)
@@ -36,6 +38,7 @@ export class MobileService {
 }
 
 export enum ScreenWidth {
+    xs = 'xs',
     sm = 'sm',
     md = 'md',
     lg = 'lg',

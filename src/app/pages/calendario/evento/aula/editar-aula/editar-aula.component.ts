@@ -5,7 +5,7 @@ import { Professor } from '../../../../../models/professor.model'
 import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model'
 import { ConfirmationService } from 'primeng/api'
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp'
-import { SelectChangeEvent } from 'primeng/select'
+import { Select, SelectChangeEvent } from 'primeng/select'
 import { ControlContainer, NgForm, NgModel } from '@angular/forms'
 import moment from 'moment'
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
@@ -21,6 +21,7 @@ import { EventoService } from '../../../../../services/evento.service'
 import { AlunoPopoverComponent } from '../../../../../shared/aluno/aluno-popover/aluno-popover.component'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
 import { AlunoParticipacaoStatusComponent } from '../../../../../shared/aluno/aluno-participacao-status/aluno-participacao-status.component'
+import { InputNumber } from 'primeng/inputnumber'
 
 @Component({
     selector: 'app-editar-aula',
@@ -62,6 +63,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
 
     @ViewChildren('alunoPopover') alunoPopover!: QueryList<AlunoPopoverComponent>;
+
+    @ViewChildren('apostilaAbacoInput') apostilaAbacoInput!: QueryList<InputNumber>;
+    @ViewChildren('apostilaAHInput') apostilaAHInput!: QueryList<InputNumber>;
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -218,9 +222,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
                 const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
 
-                const condicao =  ehAbaco && (ehKitCompativel || ehApostilaDoDia)
+                const condicao = ehAbaco && (ehKitCompativel || ehApostilaDoDia)
 
-                
+
                 return condicao
             });
 
@@ -231,9 +235,9 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
                 const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
 
-                const condicao =  ehAH && (ehKitCompativel || ehApostilaDoDia)
+                const condicao = ehAH && (ehKitCompativel || ehApostilaDoDia)
 
-                return condicao;                
+                return condicao;
             });
 
             aluno.numeroPaginaAbaco = aluno.numeroPaginaAbaco ?? 0;
@@ -259,12 +263,11 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
     }
 
 
+    clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
+
     inputFocus(e: any, item: Evento_Participacao_Aluno) {
-        e.target.select()
         this.clonedRow[item.aluno_Id as number] = { ...item }
     }
-
-    clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
 
     //
     // Abaco
@@ -324,7 +327,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 acceptIcon: 'pi pi-check',
                 rejectIcon: 'pi pi-times',
                 acceptLabel: `Sim, regredir página`,
-                rejectLabel: 'Não, foi um engano',
+                rejectLabel: 'Não',
                 acceptButtonStyleClass: 'p-button-rounded',
                 rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                 reject: () => {
@@ -388,7 +391,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 message: `O aluno está regredindo a página da apostila "${current.apostila_AH}"?`,
                 header: 'Regredir página?',
                 acceptLabel: `Sim, regredir página`,
-                rejectLabel: 'Não, foi um engano',
+                rejectLabel: 'Não',
                 acceptIcon: 'pi pi-check',
                 rejectIcon: 'pi pi-times',
                 acceptButtonStyleClass: 'p-button-rounded',
@@ -412,7 +415,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
             this.roteiro = roteiro
         }
     }
-    
+
     showDivVaziaEnviarMensagemFalta(item: Evento_Participacao_Aluno) {
         return this.evento.alunos.filter(x => x.presente === false).length > 0 && item.presente !== false
     }
@@ -433,4 +436,30 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
 
         return luminance > 150 ? '#000' : '#fff';
     }
+
+
+    apostilaAbacoInputNumberNext(index: number, inputNumber: InputNumber) {
+        const next = index + 1;
+        let element = this.apostilaAbacoInput.get(next)
+        element?.input.nativeElement.focus();
+    }
+
+    apostilaAHInputNumberNext(index: number, inputNumber: InputNumber) {
+        const next = index + 1;
+        let element = this.apostilaAHInput.get(next)
+        element?.input.nativeElement.focus();
+    }
+
+    apostilaAbacoInputNumberPrev(index: number, inputNumber: InputNumber) {
+        const next = index - 1;
+        let element = this.apostilaAbacoInput.get(next)
+        element?.input.nativeElement.focus();
+    }
+
+    apostilaAHInputNumberPrev(index: number, inputNumber: InputNumber) {
+        const next = index - 1;
+        let element = this.apostilaAbacoInput.get(next)
+        element?.input.nativeElement.focus();
+    }
+
 }

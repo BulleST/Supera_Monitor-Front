@@ -151,7 +151,7 @@ export class EventoComponent implements OnDestroy {
             if (res) {
                 this.evento = res
                 this.visible = true
-                this.verificaDisponibilidade()
+                // this.verificaDisponibilidade()
                 this.tipoString = this.getTipo(this.evento)
                 let alunosEvento = this.evento.alunos.map(x => x.aluno_Id)
                 this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id))
@@ -282,30 +282,6 @@ export class EventoComponent implements OnDestroy {
 
 
     finalizarConfirmation(e: any) {
-
-        let alunosPresentesSemPaginaDefinida = this.evento.alunos.filter(x => x.active === true 
-            && x.presente === true
-            && (x.numeroPaginaAH == 0 || x.numeroPaginaAbaco == 0)
-        )
-
-        if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(this.evento.evento_Tipo_Id) 
-            && alunosPresentesSemPaginaDefinida.length > 0 ) {
-            let mensagem = 'Os seguintes alunos(as) ganharam presença mas estão sem página definida. <ul class="pl-2 my-2">'
-            alunosPresentesSemPaginaDefinida.forEach(item => {
-                mensagem += `<li class="flex align-items-center flex-wrap white-space-nowrap gap-2"> `
-                mensagem += `<p>${item.aluno}:</p>`
-                mensagem += `- Pag. AH: ${item.numeroPaginaAH} `;
-                mensagem += `- Pag. Ábaco: ${item.numeroPaginaAbaco} `;
-                mensagem += '</li>';
-
-                    
-                })
-            mensagem += '</ul>';
-            return this.showError('Validar páginas', mensagem, e)
-        }
-
-
-
         this.confirmationService.confirm({
             target: e.target,
             message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,

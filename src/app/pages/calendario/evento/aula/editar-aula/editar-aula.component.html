@@ -103,7 +103,6 @@
                                     <app-legend-color [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.id"
                                                       [professor]="item.nome"></app-legend-color>
-
                                     <span class="mr-2">{{ item.nome }}</span>
                                     <p-badge *ngIf="item.disponivel == false"
                                              value="Indisponível"
@@ -183,10 +182,9 @@
                                  value="Indisponível"
                                  severity="danger"
                                  [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                 
-                                 <ng-template #indisponivelTemplate>
-                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                 </ng-template>
+                        <ng-template #indisponivelTemplate>
+                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                        </ng-template>
                     </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
@@ -238,7 +236,7 @@
             </div>
             <hr class="mb-2 border-orange-500 border-1" />
             <!-- CARDS -->
-            <ng-container *ngIf="[ScreenWidth.sm].includes(screen)">
+            <ng-container *ngIf="[ScreenWidth.xs].includes(screen)">
                 <div class="flex align-items-stretch flex-wrap py-2">
                     <ng-container *ngFor="let item of evento.alunos; let i = index">
                         <app-aluno-popover #popoverAluno
@@ -260,16 +258,16 @@
                                                   size="small"
                                                   styleClass="p-1 w-auto h-auto"
                                                   [text]="true" />
-                                        <p class="p-button-link cursor-pointer hover:underline white-space-nowrap" 
-                                            (click)="popoverAluno.show($event)" 
-                                            [pTooltip]="item.aluno">
+                                        <p class="p-button-link cursor-pointer hover:underline white-space-nowrap"
+                                           (click)="popoverAluno.show($event)"
+                                           [pTooltip]="item.aluno">
                                             <span class="text-lg font-bold capitalize">
                                                 {{ item.aluno | nameAbv }}
                                             </span>
                                         </p>
-                                        <app-aluno-participacao-status #status 
-                                            [evento]="evento" 
-                                            [participacao]="item"></app-aluno-participacao-status>
+                                        <app-aluno-participacao-status #status
+                                                                       [evento]="evento"
+                                                                       [participacao]="item"></app-aluno-participacao-status>
                                     </div>
                                     <div class="flex align-items-center gap-2 pl-1">
                                         <app-legend-color [turma_Id]="item.turma_Id"></app-legend-color>
@@ -278,28 +276,25 @@
                                         </p>
                                     </div>
                                 </div>
-
                                 <div class="flex gap-2">
-                                    
-                                <p-button type="button" *ngIf="item.presente === false"
-                                          (onClick)="enviarMensagemFalta(item, $event)"
-                                          (auxclick)="enviarMensagemFalta(item, $event)"
-                                          (contextmenu)="enviarMensagemFalta(item, $event)"
-                                          [disabled]="!item.celular"
-                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                          severity="success"
-                                          pTooltip="Enviar mensagem de falta"
-                                          [text]="true" />
-
-                                <p-button [disabled]=" evento.finalizado || !evento.active"
-                                          [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
-                                          [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
-                                          [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
-                                          [outlined]="item.presente == undefined || item.presente === null"
-                                          iconPos="right"
-                                          size="small"
-                                          styleClass="opacity-100"
-                                          (onClick)="presente(item, status)" />
+                                    <p-button type="button" *ngIf="item.presente === false"
+                                              (onClick)="enviarMensagemFalta(item, $event)"
+                                              (auxclick)="enviarMensagemFalta(item, $event)"
+                                              (contextmenu)="enviarMensagemFalta(item, $event)"
+                                              [disabled]="!item.celular"
+                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                              severity="success"
+                                              pTooltip="Enviar mensagem de falta"
+                                              [text]="true" />
+                                    <p-button [disabled]=" evento.finalizado || !evento.active"
+                                              [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
+                                              [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
+                                              [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
+                                              [outlined]="item.presente == undefined || item.presente === null"
+                                              iconPos="right"
+                                              size="small"
+                                              styleClass="opacity-100"
+                                              (onClick)="presente(item, status)" />
                                 </div>
                             </header>
                             <div class="formgrid grid px-3 bg-white">
@@ -309,22 +304,22 @@
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
                                         <p-select [options]="item.apostilasAbacoList"
-                                                    (onChange)="apostilaAbacoChange(item, $event)"
-                                                    (onFocus)="apostilaAbacoClick(item)"
-                                                    [(ngModel)]="item.apostilaAbacoObject"
-                                                    #apostila_Abaco="ngModel"
-                                                    name="apostila_Abaco[{{i}}]"
-                                                    inputId="apostila_Abaco[{{i}}]"
-                                                    optionLabel="nome"
-                                                    [filter]="true"
-                                                    filterBy="nome"
-                                                    placeholder="Selecione"
-                                                    styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                    [required]="!!item.presente"
-                                                    [readonly]="item.presente === false || evento.finalizado"
-                                                    [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                    appendTo="body"
-                                                    fluid />
+                                                  (onChange)="apostilaAbacoChange(item, $event)"
+                                                  (onFocus)="apostilaAbacoClick(item)"
+                                                  [(ngModel)]="item.apostilaAbacoObject"
+                                                  #apostila_Abaco="ngModel"
+                                                  name="apostila_Abaco[{{i}}]"
+                                                  inputId="apostila_Abaco[{{i}}]"
+                                                  optionLabel="nome"
+                                                  [filter]="true"
+                                                  filterBy="nome"
+                                                  placeholder="Selecione"
+                                                  styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+                                                  [required]="!!item.presente"
+                                                  [readonly]="item.presente === false || evento.finalizado"
+                                                  [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
+                                                  appendTo="body"
+                                                  fluid />
                                     </p-iconfield>
                                 </div>
                                 <!-- Página Abaco -->
@@ -348,23 +343,23 @@
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
                                         <p-select [options]="item.apostilasAHList"
-                                                    (ngModelChange)="apostilaAHChange(item, $event)"
-                                                    (onFocus)="apostilaAHClick(item)"
-                                                    [(ngModel)]="item.apostilaAHObject"
-                                                    [disabled]="!evento.active"
-                                                    #apostila_AH="ngModel"
-                                                    name="apostila_AH[{{i}}]"
-                                                    inputId="apostila_AH[{{i}}]"
-                                                    optionLabel="nome"
-                                                    [filter]="true"
-                                                    filterBy="nome"
-                                                    placeholder="Selecione"
-                                                    styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                    [required]="!!item.presente"
-                                                    [readonly]="item.presente === false || evento.finalizado"
-                                                    [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                    appendTo="body"
-                                                    fluid />
+                                                  (ngModelChange)="apostilaAHChange(item, $event)"
+                                                  (onFocus)="apostilaAHClick(item)"
+                                                  [(ngModel)]="item.apostilaAHObject"
+                                                  [disabled]="!evento.active"
+                                                  #apostila_AH="ngModel"
+                                                  name="apostila_AH[{{i}}]"
+                                                  inputId="apostila_AH[{{i}}]"
+                                                  optionLabel="nome"
+                                                  [filter]="true"
+                                                  filterBy="nome"
+                                                  placeholder="Selecione"
+                                                  styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+                                                  [required]="!!item.presente"
+                                                  [readonly]="item.presente === false || evento.finalizado"
+                                                  [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
+                                                  appendTo="body"
+                                                  fluid />
                                     </p-iconfield>
                                 </div>
                                 <!-- Página AH -->
@@ -390,7 +385,7 @@
                                               name="observacao[{{i}}]"
                                               [(ngModel)]="item.observacao"
                                               (onFocus)="inputFocus($event, item)"
-                                              [readonly]="evento.finalizado" 
+                                              [readonly]="evento.finalizado"
                                               [placeholder]="evento.finalizado ? 'Nenhuma observação' : 'Observações...'"
                                               rows="2"
                                               fluid></textarea>
@@ -402,7 +397,7 @@
                 </div>
             </ng-container>
             <!-- TABLE -->
-            <ng-container *ngIf="[ScreenWidth.xl, ScreenWidth.lg, ScreenWidth.md].includes(screen)">
+            <ng-container *ngIf="[ScreenWidth.xl, ScreenWidth.lg, ScreenWidth.md, ScreenWidth.sm].includes(screen)">
                 <p-table #table
                          [value]="evento.alunos"
                          dataKey="id"
@@ -411,10 +406,10 @@
                     <ng-template pTemplate="emptymessage">
                         <p class="text-400 p-1">Nenhum aluno inscrito</p>
                     </ng-template>
-                     <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
+                    <ng-template #body let-item let-editing="editing" let-rowIndex="rowIndex">
                         <tr class="static z-0">
                             <!-- Nome -->
-                            <td pFrozenColumn class="pb-1 z-2 " >
+                            <td pFrozenColumn class="pb-1 z-2 ">
                                 <app-aluno-popover #popoverAluno
                                                    [aluno_Id]="item.aluno_Id"
                                                    [evento]="evento"
@@ -440,15 +435,14 @@
                                         <p class="text-sm w-min ml-2 flex align-items-center gap-2 line-height-1">
                                             <b>Jornada: </b>
                                             <app-aluno-checklist
-                                                [showChecklist]="true"
-                                                [aluno_Id]="item.aluno_Id"></app-aluno-checklist>
+                                                                 [showChecklist]="true"
+                                                                 [aluno_Id]="item.aluno_Id"></app-aluno-checklist>
                                         </p>
                                     </div>
-                                    
-                                    <app-aluno-participacao-status 
-                                            #status
-                                            [evento]="evento" 
-                                            [participacao]="item"></app-aluno-participacao-status>
+                                    <app-aluno-participacao-status
+                                                                   #status
+                                                                   [evento]="evento"
+                                                                   [participacao]="item"></app-aluno-participacao-status>
                                 </div>
                             </td>
                             <td class="pt-2 pb-1">
@@ -466,7 +460,7 @@
                                                       (contextmenu)="enviarMensagemFalta(item, $event)"
                                                       (auxclick)="enviarMensagemFalta(item, $event)"
                                                       styleClass="h-full"
-                                                    class="h-full" />
+                                                      class="h-full" />
                                             <p-button [disabled]=" evento.finalizado || !evento.active"
                                                       [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                                                       [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
@@ -475,11 +469,10 @@
                                                       iconPos="right"
                                                       (onClick)="presente(item, status)"
                                                       styleClass="h-full w-7rem"
-                                                    class="h-full w-7rem" />
-        
+                                                      class="h-full w-7rem" />
                                         </div>
                                     </div>
-                                    <!-- Abaco -->
+                                    <!-- Ábaco -->
                                     <div class="flex flex-column w-10rem">
                                         <label class="ml-1 text-sm"
                                                for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
@@ -488,6 +481,7 @@
                                             <p-select [options]="item.apostilasAbacoList"
                                                       (onChange)="apostilaAbacoChange(item, $event)"
                                                       (onFocus)="apostilaAbacoClick(item)"
+                                                      autocomplete="off"
                                                       [(ngModel)]="item.apostilaAbacoObject"
                                                       #apostila_Abaco="ngModel"
                                                       name="apostila_Abaco[{{ rowIndex }}]"
@@ -505,19 +499,23 @@
                                             </p-select>
                                         </p-iconfield>
                                     </div>
-                                    <!-- Página -->
+                                    <!-- Página Ábaco -->
                                     <div class="flex flex-column ">
                                         <label class="ml-1 text-sm"
                                                for="numeroPaginaAbaco[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
-                                                       id="numeroPaginaAbaco[{{ rowIndex }}]"
+                                                       inputId="numeroPaginaAbaco[{{ rowIndex }}]"
                                                        name="numeroPaginaAbaco[{{ rowIndex }}]"
+                                                       #numeroPaginaAbaco="ngModel"
+                                                       #apostilaAbacoInput
                                                        (onFocus)="inputFocus($event, item)"
                                                        (onInput)="numeroPaginaAbacoChange(item, $event)"
-                                                       #numeroPaginaAbaco="ngModel"
+                                                       (keydown.arrowdown)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
+                                                       (keydown.arrowUp)="apostilaAbacoInputNumberPrev(rowIndex, apostilaAbacoInput)"
+                                                       autocomplete="off"
                                                        [min]="0"
                                                        [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
-                                                       [step]="1"
+                                                       [step]="0"
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true"
@@ -549,39 +547,42 @@
                                             </p-select>
                                         </p-iconfield>
                                     </div>
-                                    <!-- Página -->
+                                    <!-- Página AH -->
                                     <div class="flex flex-column ">
                                         <label class="ml-1 text-sm"
                                                for="numeroPaginaAH[{{ rowIndex }}]">Página:</label>
                                         <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
-                                                       id="numeroPaginaAH[{{ rowIndex }}]"
+                                                       inputId="numeroPaginaAH[{{ rowIndex }}]"
                                                        name="numeroPaginaAH[{{ rowIndex }}]"
                                                        (onFocus)="inputFocus($event, item)"
                                                        (onInput)="numeroPaginaAHChange(item, $event)"
+                                                       (keydown.arrowDown)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
+                                                       (keydown.arrowUp)="apostilaAHInputNumberPrev(rowIndex, apostilaAHInput)"
+                                                       autocomplete="off"
                                                        #numeroPaginaAH="ngModel"
+                                                       #apostilaAHInput
                                                        [min]="0"
                                                        [max]="item.apostilaAHObject?.numeroTotalPaginas"
-                                                       [step]="1"
+                                                       [step]="0"
                                                        inputStyleClass="w-4rem h-full text-center"
                                                        class="h-full"
                                                        [required]="true"
                                                        [readonly]="item.presente === false || evento.finalizado" />
                                     </div>
                                     <!-- Observações -->
-                                    <div class="flex flex-column" >
-                                        <label for="observacao" 
-                                            class="ml-1 text-sm">Observações:</label>
+                                    <div class="flex flex-column">
+                                        <label for="observacao"
+                                               class="ml-1 text-sm">Observações:</label>
                                         <textarea pTextarea
-                                                placeholder="Insira as observações..."
-                                                [(ngModel)]="item.observacao"
-                                                (onFocus)="inputFocus($event, item)"
-                                                id="observacao[{{rowIndex}}]"
-                                                name="observacao[{{rowIndex}}]"
-                                                class="10rem {{ item.presente === false || evento.finalizado ? 'pointer-events-none' : '' }}"
-                                                style="height: 32px"
-                                                [readonly]="evento.finalizado"
-                                                placeholder="Selecione"
-                                                ></textarea>
+                                                  placeholder="Insira as observações..."
+                                                  [(ngModel)]="item.observacao"
+                                                  (onFocus)="inputFocus($event, item)"
+                                                  id="observacao[{{rowIndex}}]"
+                                                  name="observacao[{{rowIndex}}]"
+                                                  class="10rem {{ item.presente === false || evento.finalizado ? 'pointer-events-none' : '' }}"
+                                                  style="height: 32px"
+                                                  [readonly]="evento.finalizado"
+                                                  placeholder="Selecione"></textarea>
                                     </div>
                                 </div>
                             </td>

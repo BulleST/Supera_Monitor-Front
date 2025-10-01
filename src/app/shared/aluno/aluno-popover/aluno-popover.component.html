@@ -70,8 +70,8 @@
                 <div class="flex align-items-center justify-content-between gap-2">
                     <!--  max-w-30rem overflow-hidden text-overflow-ellipsis -->
                     <p class="text-primary-500 font-bold capitalize white-space-nowrap" 
-                        [pTooltip]="participacao?.aluno ?? aluno?.nome">
-                        {{ (participacao?.aluno ?? aluno?.nome) | nameAbv }}
+                        [pTooltip]="participacao?.aluno ?? aluno.nome">
+                        {{ (participacao?.aluno ?? aluno.nome) | nameAbv }}
                     </p>
                     <ng-container *ngIf="participacao && evento">
                         <app-aluno-participacao-status
@@ -84,37 +84,37 @@
             <ng-template #subtitle>
                 <div>
                     <p class="flex align-items-baseline gap-2 text-lg ">
-                        <app-legend-color [corLegenda]="aluno?.corLegenda"
-                                          [professor_Id]="aluno?.professor_Id"
-                                          [professor]="aluno?.professor"
-                                          [turma_Id]="participacao?.turma_Id ?? aluno?.turma_Id"></app-legend-color>
+                        <app-legend-color  *ngIf="aluno" [corLegenda]="aluno.corLegenda"
+                                          [professor_Id]="aluno.professor_Id"
+                                          [professor]="aluno.professor"
+                                          [turma_Id]="participacao?.turma_Id ?? aluno.turma_Id"></app-legend-color>
                         <span class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis text-700">
                             <b>Turma: </b>
-                            <span>{{participacao?.turma ??  aluno?.turma }} </span>
+                            <span>{{participacao?.turma ??  aluno.turma }} </span>
                         </span>
                     </p>
                 </div>
             </ng-template>
             <section class="flex flex-column gap-1">
                 <!-- Perfil -->
-                <p class="flex align-items-center gap-2">
+                <p class="flex align-items-center gap-2" *ngIf="aluno">
                     <i class="fa fa-brain"></i>
                     <b>Perfil Cognitivo: </b>
-                    <span>{{ participacao?.perfilCognitivo ?? aluno?.perfilCognitivo }}</span>
+                    <span>{{ participacao?.perfilCognitivo ?? aluno.perfilCognitivo }}</span>
                 </p>
                 <!-- Idade -->
                 <p class="flex align-items-center gap-2" *ngIf="aluno">
                     <i class="bi bi-cake-fill"></i>
                     <b>Idade: </b>
-                    <span>{{ aluno?.idade }} anos</span>
+                    <span>{{ aluno.idade }} anos</span>
                     <b>-</b>
-                    <span>{{ aluno?.dataNascimento | date : 'dd/MM/yyyy'}}</span>
+                    <span>{{ aluno.dataNascimento | date : 'dd/MM/yyyy'}}</span>
                 </p>
                 <!-- KIT -->
                 <p class="flex align-items-center gap-2">
                     <i class="bi bi-book"></i>
                     <b>KIT: </b>
-                    <span>{{ participacao?.kit ?? aluno?.kit }}</span>
+                    <span>{{ participacao?.kit ?? aluno.kit }}</span>
                 </p>
                 <!-- Apostila -->
                 <ng-template #apostilaTemplate let-apostila="apostila" let-pagina="pagina" let-abaco="abaco">
@@ -142,13 +142,13 @@
                 <ng-template #alunoApostilaTemplate>
                     <ng-container *ngIf="aluno">
                         <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                            apostila: aluno?.apostila_Abaco, 
-                            pagina: aluno?.numeroPaginaAbaco,
+                            apostila: aluno.apostila_Abaco, 
+                            pagina: aluno.numeroPaginaAbaco,
                             abaco: true }">
                         </ng-container>
                         <ng-container *ngTemplateOutlet="apostilaTemplate; context: { 
-                            apostila: aluno?.apostila_AH, 
-                            pagina: aluno?.numeroPaginaAH,
+                            apostila: aluno.apostila_AH, 
+                            pagina: aluno.numeroPaginaAH,
                             abaco: false }">
                         </ng-container>
                     </ng-container>
@@ -170,10 +170,9 @@
                 <div class="flex align-items-center gap-2" *ngIf="aluno">
                     <i class="pi pi-lock"></i>
                     <b>Situação: </b>
-                    <p-tag 
-                        [icon]="aluno?.active ? 'fa fa-lock-open' : 'fa fa-lock'"
-                        [severity]="aluno?.active ? 'success' : 'danger'"
-                        [value]="aluno?.active ? 'Ativo' : 'Inativo'"
+                    <p-tag [icon]="aluno.active ? 'fa fa-lock-open' : 'fa fa-lock'"
+                        [severity]="aluno.active ? 'success' : 'danger'"
+                        [value]="aluno.active ? 'Ativo' : 'Inativo'"
                     />
                 </div>
             </section>
