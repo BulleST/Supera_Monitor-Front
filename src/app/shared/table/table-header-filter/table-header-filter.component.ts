@@ -15,6 +15,5 @@ export class TableHeaderFilterComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges): void {
         if(changes['col']) this.col = changes['col'].currentValue;
-
     }
 }

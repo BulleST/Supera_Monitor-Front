@@ -316,12 +316,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         let prev = this.clonedRow[item.aluno_Id];
         let current = item;
 
-
-        if (item.presente === true && item.numeroPaginaAbaco === 0) {
-            item.numeroPaginaAbaco = 1;
-            return this.showError('OPS!', 'Se o aluno esteve presente, ele deve avançar pelo menos na página 1, certo?!', e);
-        }
-
         if (current.numeroPaginaAbaco <= prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
             this.confirmationService.confirm({
                 target: e.target,
@@ -388,10 +382,6 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         let prev = this.clonedRow[item.aluno_Id];
         let current = item;
 
-        if (item.presente === true && item.numeroPaginaAH === 0) {
-            item.numeroPaginaAH = 1;
-            return this.showError('OPS!', 'Se o aluno esteve presente, ele deve avançar pelo menos na página 1, certo?!', e);
-        }
         if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
             this.confirmationService.confirm({
                 target: e.target,
