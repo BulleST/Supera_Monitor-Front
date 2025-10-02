@@ -266,8 +266,15 @@ export class ListComponent implements OnDestroy, AfterViewInit {
     }
 
     edit(item: any) {
-        let encrypted = this.crypto.encrypt(item.id);
-        this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+        this.service.setRoteiro(item);
+        if (item.id == -1) {
+        
+            this.router.navigate(['cadastrar'], { relativeTo: this.activatedRoute });
+        } else {
+
+            let encrypted = this.crypto.encrypt(item.id);
+            this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
+        }
     }
 
 

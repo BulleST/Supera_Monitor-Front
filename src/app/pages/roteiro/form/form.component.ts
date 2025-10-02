@@ -46,7 +46,7 @@ export class FormComponent implements OnDestroy {
         private config: PrimeNG
     ) {
 
-        var list = this.service.list.subscribe(res => this.jornadas = res);
+        let list = this.service.list.subscribe(res => this.jornadas = res);
         this.subscription.push(list);
 
         this.loadPage();
@@ -59,11 +59,12 @@ export class FormComponent implements OnDestroy {
     }
 
     loadPage() {
-        var params = this.activatedRoute.params.subscribe(async res => {
-            this.isEditPage = !!res['id'];
+        let params = this.activatedRoute.params.subscribe(async res => {
+            let id = this.crypto.decrypt(res['id'])
+            this.isEditPage = !id || id == -1 ? false : true;
+
             if (this.isEditPage) {
                 this.loading = true;
-                var id = this.crypto.decrypt(res['id'])
 
                 lastValueFrom(this.service.get(id))
                     .then(res => {
@@ -77,6 +78,8 @@ export class FormComponent implements OnDestroy {
                     });
             } else {
                 this.visible = true;
+                let roteiro = this.service.getRoteiro().subscribe(res => this.object = res ?? new Roteiro);
+                this.subscription.push(roteiro)
             }
         })
         this.subscription.push(params);
@@ -84,13 +87,13 @@ export class FormComponent implements OnDestroy {
 
     visibleChange() {
         if (!this.visible) {
-            var route = this.isEditPage ? ['../../'] : ['../'];
+            let route = this.isEditPage ? ['../../'] : ['../'];
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
 
     onSelectedFiles(event: FileSelectEvent) {
-        var files = event.currentFiles;
+        let files = event.currentFiles;
         files.forEach((file) => {
             this.totalSize += parseInt(this.formatSize(file.size));
         });
@@ -130,7 +133,7 @@ export class FormComponent implements OnDestroy {
             }
 
             this.jornadas.forEach(jornada => {
-                var data = new Date(jornada.dataInicio);
+                let data = new Date(jornada.dataInicio);
 
                 while (moment(data).isSameOrBefore(jornada.dataFim, 'date')) {
                     this.invalidDates.push(data);
@@ -148,9 +151,9 @@ export class FormComponent implements OnDestroy {
             this.loadingJornada = false;
         }
 
-        var list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
-        var data = moment(ngModel.value).toDate()
-        var existe = list.find(x => data >= x.dataInicio && data <= x.dataFim && x.id != this.object.id);
+        let list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
+        let data = moment(ngModel.value).toDate()
+        let existe = list.find(x => data >= x.dataInicio && data <= x.dataFim && x.id != this.object.id);
 
         if (existe) {
             this.toastrService.error('Essa data já está em um outro tema.');

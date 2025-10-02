@@ -5,7 +5,7 @@ import { MyMap } from '../utils/map';
 import moment from 'moment';
 import 'moment/locale/pt-br'
 import { Service } from '../helpers/service.service';
-import { getError, insertOrReplace, playError, playSuccess } from '../utils';
+import { getError } from '../utils';
 import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 
 @Injectable({
@@ -13,6 +13,31 @@ import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 })
 export class RoteiroService extends Service {
     override list = new BehaviorSubject<Roteiro[]>([]);
+    roteiro = new BehaviorSubject<Roteiro | undefined>(undefined);
+
+    mapRoteiro(roteiro: Roteiro) {
+
+        roteiro.dataInicio = moment(roteiro.dataInicio, 'YYYY-MM-DD').toDate();
+        roteiro.dataFim = moment(roteiro.dataFim, 'YYYY-MM-DD').set({ hours: 23, minute: 59 }).toDate();
+        roteiro.corLegenda = roteiro.corLegenda ?? this.getRandomColor();
+        roteiro.active = !roteiro.deactivated;
+        return roteiro
+    }
+
+    getRoteiro() {
+        if (!this.roteiro.value) {
+            let objString = localStorage.getItem('roteiro');
+            let obj = objString ? this.mapRoteiro(JSON.parse(objString)) : undefined;
+            this.roteiro.next(obj);
+        }
+        return this.roteiro;
+    }
+
+    setRoteiro(value: Roteiro | undefined) {
+        this.roteiro.next(value);
+        if (value) localStorage.setItem('roteiro', JSON.stringify(value));
+        else localStorage.removeItem('roteiro');
+    }
 
     getList(ano?: number) {
         return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/${ano}`)
@@ -21,7 +46,7 @@ export class RoteiroService extends Service {
                     list = list.map(x => {
                         x.dataInicio = moment(x.dataInicio, 'YYYY-MM-DD').toDate();
                         x.dataFim = moment(x.dataFim, 'YYYY-MM-DD').set({ hours: 23, minute: 59 }).toDate();
-                        x.corLegenda =  x.corLegenda ?? this.getRandomColor();
+                        x.corLegenda = x.corLegenda ?? this.getRandomColor();
                         x.active = !x.deactivated;
                         return x
                     })
@@ -38,10 +63,10 @@ export class RoteiroService extends Service {
         var letters = '0123456789ABCDEF';
         var color = '#';
         for (var i = 0; i < 6; i++) {
-          color += letters[Math.floor(Math.random() * 16)];
+            color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
-      }
+    }
 
     get(id: number) {
         // return this.http.get<Roteiro>(`${this.url}/roteiros/${id}`)
@@ -50,7 +75,7 @@ export class RoteiroService extends Service {
                 this.getList().subscribe();
 
             var item = this.list.value.find(x => x.id == id) as Roteiro;
-            if (!item){
+            if (!item) {
                 this.toastrService.error(`Roteiro não encontrado.`);
                 subscription.error('Roteiro não encontrado.')
             }
@@ -60,8 +85,8 @@ export class RoteiroService extends Service {
             if (item.dataFim)
                 item.dataFim = new Date(moment(item.dataFim).format('YYYY-MM-DD[T]HH:mm:ss'))
 
-             subscription.next(item);
-             subscription.complete()
+            subscription.next(item);
+            subscription.complete()
         })
     }
 
@@ -74,7 +99,7 @@ export class RoteiroService extends Service {
                     // insertOrReplace(this, res.object, 'list');
                     // this.toastrService.success(`Registro cadastrado com sucesso.`);
                     // // playSuccess();
-                    
+
                     return res;
                 },
                 error: err => {
@@ -82,18 +107,18 @@ export class RoteiroService extends Service {
                     return err;
                 }
             }));
-        }
-        
-        edit(model: Roteiro) {
-            var request = MyMap(model, new RoteiroRequest);
-            return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
+    }
+
+    edit(model: Roteiro) {
+        var request = MyMap(model, new RoteiroRequest);
+        return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 next: res => {
                     // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
                     // insertOrReplace(this, res.object, 'list');
                     // this.toastrService.success(`Registro atualizado com sucesso.`);
                     // // playSuccess();
-                    
+
                     return res;
                 },
                 error: err => {
