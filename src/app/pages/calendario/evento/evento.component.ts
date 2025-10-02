@@ -306,21 +306,27 @@ export class EventoComponent implements OnDestroy {
             this.evento.id = response.object.id;
             let eventoResponse = response.object as Evento;
            
+            console.log('this.evento.alunos', this.evento.alunos)
+            console.log('eventoResponse.alunos', eventoResponse.alunos)
+
+            
 
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
-                alunos: eventoResponse.alunos.map(item => {
-                    let participacao = this.evento.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
+                alunos: this.evento.alunos.map(item => {
+                    let participacao = eventoResponse.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
+                    console.log('item', item)
+                    console.log('participacao', participacao)
                     return {
-                        participacao_Id: item.id,
-                        observacao: participacao.observacao,
-                        presente: participacao.presente,
-                        apostila_Abaco_Id:  participacao.apostilaAbacoObject?.id,
-                        apostila_AH_Id: participacao.apostilaAHObject?.id,
-                        numeroPaginaAbaco: participacao.numeroPaginaAbaco,
-                        numeroPaginaAH: participacao.numeroPaginaAH,
-                        reposicaoDe_Evento_Id: participacao.reposicaoDe_Evento_Id,
+                        participacao_Id: participacao.id,
+                        observacao: item.observacao,
+                        presente: item.presente,
+                        apostila_Abaco_Id:  item.apostilaAbacoObject?.id,
+                        apostila_AH_Id: item.apostilaAHObject?.id,
+                        numeroPaginaAbaco: item.numeroPaginaAbaco,
+                        numeroPaginaAH: item.numeroPaginaAH,
+                        reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
                     }
                 }),
                 professores: eventoResponse.professores.map(item => {
