@@ -16,7 +16,7 @@
                 <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
                     <span class="flex align-items-center gap-2">
                         <i class="pi pi-star-fill fadein" [style]="{ color: roteiroEvento?.corLegenda ?? '#000' }"></i>
-                        <span>{{evento.tema}} - Semana: {{evento.semana}}</span>
+                        <span>{{roteiroEvento?.tema}} - Semana: {{roteiroEvento?.semana}}</span>
                     </span>
                 </ng-container>
                 <p *ngIf="!evento.active" class="block text-red-500 p-dialog-subtitle font-semibold">Esta {{ getTipo(evento) }} foi desativada no dia {{ evento.deactivated | date : 'dd/MM/yyyy HH:mm' }}</p>
