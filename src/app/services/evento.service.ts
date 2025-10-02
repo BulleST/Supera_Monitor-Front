@@ -142,7 +142,7 @@ export class EventoService extends Service {
             .pipe(tap({
                 next: async (eventos) => {
                     if (this.roteiroService.list.value.length == 0)
-                        await lastValueFrom(this.roteiroService.getList('calendario'));
+                        await lastValueFrom(this.roteiroService.getList(request.intervaloDe?.getFullYear()));
 
                     let list = this.eventos.value as Evento[];
                     eventos = eventos.map(evento => {
@@ -209,7 +209,7 @@ export class EventoService extends Service {
             .pipe(tap({
                 next: async eventos => {
                     if (this.roteiroService.list.value.length == 0)
-                        await lastValueFrom(this.roteiroService.getList('oficinas'));
+                        await lastValueFrom(this.roteiroService.getList(moment().year()));
 
                     let eventosExistentes = this.eventos.value as Evento[];
                     eventos = eventos.map(evento => {

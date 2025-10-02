@@ -99,7 +99,7 @@ export class EventoComponent implements OnDestroy {
 
         if (this.roteiros.length == 0) {
             this.loadingRoteiros = true
-            lastValueFrom(this.roteiroService.getList())
+            lastValueFrom(this.roteiroService.getList(moment().year()))
                 .then((res) => (this.loadingRoteiros = false))
                 .catch((res) => (this.loadingRoteiros = false))
         }
@@ -168,8 +168,6 @@ export class EventoComponent implements OnDestroy {
                 this.duracaoEvento = horaRedonda
                     ? horas.toString().padStart(2, '0') + 'h'
                     : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
-
-
                     if (!this.evento.finalizado) {
                         this.evento.alunos.filter(x => x.active == true)
                             .map(x => {
@@ -182,15 +180,12 @@ export class EventoComponent implements OnDestroy {
         this.subscription.push(evento)
     }
 
-    getDeactivatedInformation(evento: Evento) {
-        return `${moment(evento.deactivated!).format('DD/MM/YYYY - HH:mm')}`
-    }
-
     get roteiroEvento(): Roteiro | undefined {
         if (!this.evento?.roteiro_Id) 
             return this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
         return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
     }
+    
     ngOnDestroy(): void {
         this.subscription.forEach((e) => e.unsubscribe())
     }
@@ -199,7 +194,6 @@ export class EventoComponent implements OnDestroy {
         if (!this.visible) {
             let route = '../../../';
             this.router.navigate([route], { relativeTo: this.activatedRoute })
-
             this.service.setEvento(undefined)
         }
     }

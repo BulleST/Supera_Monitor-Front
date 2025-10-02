@@ -19,7 +19,7 @@
                         <span>{{evento.tema}} - Semana: {{evento.semana}}</span>
                     </span>
                 </ng-container>
-                <p *ngIf="!evento.active" class="block text-red-500 p-dialog-subtitle font-semibold">Esta {{ getTipo(evento) }} foi desativado no dia {{ getDeactivatedInformation(evento) }}</p>
+                <p *ngIf="!evento.active" class="block text-red-500 p-dialog-subtitle font-semibold">Esta {{ getTipo(evento) }} foi desativada no dia {{ evento.deactivated | date : 'dd/MM/yyyy HH:mm' }}</p>
             </div>
         </div>
     </ng-template>

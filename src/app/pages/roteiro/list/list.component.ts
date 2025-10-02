@@ -139,6 +139,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().prev();
         let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        await this.loadCalendario();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -149,6 +150,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().next();
         let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        await this.loadCalendario();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -159,6 +161,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         let anoPrev = this.fullCalendar.getApi().view.activeStart.getFullYear();
         this.fullCalendar.getApi().today();
         let ano = this.fullCalendar.getApi().view.activeStart.getFullYear();
+        await this.loadCalendario();
         if (anoPrev != ano) {
             await this.loadFeriados();
             this.setCalendario();
@@ -183,40 +186,11 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         ];
 
     }
+
     setCalendario() {
         let calendar = this.fullCalendar.getApi();
         calendar.removeAllEvents();
-
         let events: any[] = [];
-
-        // let roteirosDates = this.calendarioList.flatMap(x => {
-        //     let length = moment(x.dataFim).diff(x.dataInicio)
-        //     let range = Array.from({ length }, (item, index) => {
-        //         return moment(x.dataInicio, 'YYYY-MM-DD').add(index, 'day').format('DD/MM/YY');
-        //     });
-        //     return range;
-        // });
-        // this.feriados.filter(x => !roteirosDates.includes(moment(x.date).format('DD/MM/YY')) ).forEach(item => {
-        //     let event = {
-        //         id: this.calendarioUtils.eventRandomId(),
-        //         textColor: 'white',
-        //         backgroundColor: 'red',
-        //         borderColor: 'red',
-        //         title: item.name,
-        //         start: moment(item.date).toDate(),
-        //         end: moment(item.date).toDate(),
-        //         allDay: true,
-        //         extendedProps: {
-        //             id: PseudoEvento.EventoId,
-        //             data: moment(item.date).toDate(),
-        //             descricao: item.name,
-        //             evento_Tipo_Id: EventoTipo.Feriado,
-        //             ...item,
-        //         },
-        //     }
-
-        //     events.push(event)
-        // })
         this.calendarioList.filter(x => x.active == true)
             .forEach(x => {
 
@@ -281,12 +255,6 @@ export class ListComponent implements OnDestroy, AfterViewInit {
             arg.event.setProp('borderColor', color)
             arg.event.setProp('textColor', '#2e2e2e')
             arg.event.setExtendedProp('textColor', evento.corLegenda)
-
-
-
-            // arg.el.style.backgroundColor = color;
-            // arg.el.style.borderColor = color;
-            // arg.el.style.color = '#2e2e2e';
     }
 
     async datesSet(arg: DatesSetArg) {
@@ -294,6 +262,7 @@ export class ListComponent implements OnDestroy, AfterViewInit {
         this.currentTitle = this.currentTitle[0].toUpperCase() + this.currentTitle.substring(1);
         this.fullCalendar.getApi().updateSize();
         this.setCalendario();
+
     }
 
     edit(item: any) {
@@ -304,7 +273,8 @@ export class ListComponent implements OnDestroy, AfterViewInit {
 
     loadCalendario() {
         this.loading = true;
-        return lastValueFrom(this.service.getList())
+        let ano = this.fullCalendar.getApi().view.currentStart.getFullYear()
+        return lastValueFrom(this.service.getList(ano))
             .then(res => {
                 this.loading = false;
                 this.calendarioList = res;

@@ -34,8 +34,7 @@ export interface Aluno_CheckList_Item {
     checklist_Id: number;
     checklist_Item_Id: number;
     ordem: number;
-
-
+    
     aluno: Aluno;
     status: any;
 }

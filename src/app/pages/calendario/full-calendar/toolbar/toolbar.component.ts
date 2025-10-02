@@ -165,7 +165,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     updateCalendar() {
-        console.log('updateCalendar')
         // this.getData();
         this.requestLoadRoteiros();
         this.update.emit(this.calendarioRequest)
@@ -289,9 +288,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     getTemaSemana() {
         let data = this.data;
         let roteiro = this.roteiros.find(x => moment(data).isBetween(x.dataInicio, x.dataFim, undefined, '[]'));
-        console.log('data', data)
-        console.log('roteiros', this.roteiros)
-        console.log('roteiro', roteiro)
         if (roteiro) {
             this.currentRoteiro = roteiro;
             this.currentRoteiroTitle = `Semana ${roteiro.semana} - ${roteiro.tema} `
@@ -315,7 +311,8 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
 
     requestLoadRoteiros() {
         this.loadingRoteiro = true;
-        return lastValueFrom(this.roteiroService.getList('loadRoteiros'))
+        let ano = this.data.getFullYear();
+        return lastValueFrom(this.roteiroService.getList(ano))
             .then(res => {
                 this.loadingRoteiro = false;
                 this.getTemaSemana()

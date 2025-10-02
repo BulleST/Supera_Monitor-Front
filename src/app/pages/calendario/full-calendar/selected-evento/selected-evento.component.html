@@ -286,11 +286,14 @@
                     </span>
                 </ng-container>
                 <ng-container *ngIf="!evento.active">
-                    <span class="mr-auto gap-2 flex align-items-center" [pTooltip]="'Obs: ' + evento.observacao">
+                    <span class="mr-auto gap-2 flex align-items-center" [pTooltip]="obsTemplate" tooltipPosition="bottom">
                         <span class="font-bold">Cancelado</span>
                         <i class="pi pi-times-circle text-red-500 text-lg"></i>
                     </span>
                 </ng-container>
+                <ng-template #obsTemplate>
+                    <p [innerHTML]="'Motivo: ' + evento.observacao" class="white-space-nowrap"></p>
+                </ng-template>
                 <p-button *ngIf="evento.active"
                           label="Ver {{ tipoEventoString }}"
                           icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "

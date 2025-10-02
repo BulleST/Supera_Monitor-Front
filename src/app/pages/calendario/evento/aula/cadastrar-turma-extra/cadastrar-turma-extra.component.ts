@@ -193,9 +193,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             .catch(res => this.loadingProfessores = false);
     }
 
-
-
-
     loadPerfilCognitivo() {
         this.loadingPerfisCognitivos = true;
         lastValueFrom(this.perfilCognitivoService.getList())
@@ -205,7 +202,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     loadRoteiros() {
         this.loadingRoteiros = true;
-        lastValueFrom(this.roteiroService.getList())
+        lastValueFrom(this.roteiroService.getList(moment().year()))
             .then(res => this.loadingRoteiros = false)
             .catch(res => this.loadingRoteiros = false);
     }

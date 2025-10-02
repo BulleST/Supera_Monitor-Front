@@ -147,7 +147,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
     loadRoteiros() {
             this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList())
+            lastValueFrom(this.roteiroService.getList(moment().year()))
                 .then(res => this.loadingRoteiros = false)
                 .catch(res => this.loadingRoteiros = false);
     }

@@ -70,7 +70,7 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
         this.subscription.push(roteiros);
 
         if (this.roteiros.length == 0) {
-            lastValueFrom(this.roteiroService.getList())
+            lastValueFrom(this.roteiroService.getList(moment().year()))
         }
 
 		this.activatedRoute.params.subscribe(res => {

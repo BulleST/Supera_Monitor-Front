@@ -47,7 +47,7 @@ export class AlunoReposicaoTooltipComponent implements OnChanges {
 
     async loadRoteiro() {
         if (!this.roteiros.length) 
-            this.roteiros = await lastValueFrom(this.roteiroService.getList())
+            this.roteiros = await lastValueFrom(this.roteiroService.getList(moment().year()))
 
         if (this.reposicaoDe) {
             if (this.reposicaoDe.roteiro_Id) {

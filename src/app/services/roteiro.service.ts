@@ -14,9 +14,8 @@ import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
 export class RoteiroService extends Service {
     override list = new BehaviorSubject<Roteiro[]>([]);
 
-    getList(where: string = 'não sei') {
-
-        return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/`)
+    getList(ano?: number) {
+        return this.http.get<Roteiro[]>(`${this.url}/roteiros/all/${ano}`)
             .pipe(tap({
                 next: list => {
                     list = list.map(x => {
@@ -48,7 +47,7 @@ export class RoteiroService extends Service {
         // return this.http.get<Roteiro>(`${this.url}/roteiros/${id}`)
         return new Observable<Roteiro>(subscription => {
             if (this.list.value.length == 0)
-                this.getList('get ' + id).subscribe();
+                this.getList().subscribe();
 
             var item = this.list.value.find(x => x.id == id) as Roteiro;
             if (!item){
