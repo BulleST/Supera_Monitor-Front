@@ -1,5 +1,4 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { playError } from "./audio";
 import { ConfirmationService } from "primeng/api";
 
 export function showError(confirmationService: ConfirmationService, header: string, message: string, e: any, innerMessage?: string) {
@@ -32,7 +31,8 @@ export function showError(confirmationService: ConfirmationService, header: stri
 
 function showInnerMessage(confirmationService: ConfirmationService, e: any, message: string) {
     confirmationService.confirm({
-        target: e.target ?? e,
+        // target: e.target ?? e,
+        key: 'error',
         message: message,
         header: 'Erro interno',
         icon: 'pi pi-times-circle text-4xl -mr-2 text-red-500',

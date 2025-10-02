@@ -9,3 +9,15 @@
         </div>
     </ng-template>
 </p-confirmdialog>
+
+<p-confirmdialog styleClass="w-25rem" key="error">
+    <ng-template #message let-message>
+        <div class=" flex align-items-center gap-2">
+            <span class="text-4xl mr-2 text-primary-500">
+                <i *ngIf="message.icon" [ngClass]="message.icon"></i>
+                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl "></i>
+            </span>
+            <div [innerHTML]="message.message"></div>
+        </div>
+    </ng-template>
+</p-confirmdialog>
