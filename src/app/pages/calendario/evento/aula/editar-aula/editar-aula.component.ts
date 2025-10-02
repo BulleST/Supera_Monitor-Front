@@ -214,17 +214,13 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
 
         this.evento.alunos.forEach(aluno => {
-
             aluno.apostilasAbacoList = this.apostilas.filter(apostila => {
                 const ehAbaco = apostila.apostila_Tipo_Id == ApostilaTipo.Abaco;
                 const temKit = aluno.apostila_Kit_Id;
                 const temApostilaNoDia = aluno.apostila_Abaco_Id;
                 const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
                 const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
-
-                const condicao = ehAbaco && (ehKitCompativel || ehApostilaDoDia)
-
-
+                const condicao = ehAbaco && (ehKitCompativel || ehApostilaDoDia);
                 return condicao
             });
 
@@ -234,9 +230,7 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
                 const temApostilaNoDia = aluno.apostila_AH_Id;
                 const ehKitCompativel = !temKit || aluno.apostila_Kit_Id == apostila.apostila_Kit_Id;
                 const ehApostilaDoDia = !temApostilaNoDia || aluno.apostila_Abaco_Id == apostila.id;
-
                 const condicao = ehAH && (ehKitCompativel || ehApostilaDoDia)
-
                 return condicao;
             });
 

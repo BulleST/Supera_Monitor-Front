@@ -476,6 +476,10 @@
                                     <div class="flex flex-column w-10rem">
                                         <label class="ml-1 text-sm"
                                                for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
+                                               <!-- <p>apostila_Abaco_Id: {{item.apostila_Abaco_Id}}</p>
+                                                <pre>
+                                                    {{item.apostilaAbacoObject | json}}
+                                                </pre> -->
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
                                             <p-select [options]="item.apostilasAbacoList"

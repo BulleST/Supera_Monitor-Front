@@ -311,15 +311,16 @@ export class EventoComponent implements OnDestroy {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
                 alunos: eventoResponse.alunos.map(item => {
+                    let participacao = this.evento.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
                     return {
                         participacao_Id: item.id,
-                        observacao: item.observacao,
-                        presente: item.presente ?? false,
-                        apostila_Abaco_Id: item.apostila_Abaco_Id,
-                        apostila_AH_Id: item.apostila_AH_Id,
-                        numeroPaginaAbaco: item.numeroPaginaAbaco,
-                        numeroPaginaAH: item.numeroPaginaAH,
-                        reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
+                        observacao: participacao.observacao,
+                        presente: participacao.presente,
+                        apostila_Abaco_Id:  participacao.apostilaAbacoObject?.id,
+                        apostila_AH_Id: participacao.apostilaAHObject?.id,
+                        numeroPaginaAbaco: participacao.numeroPaginaAbaco,
+                        numeroPaginaAH: participacao.numeroPaginaAH,
+                        reposicaoDe_Evento_Id: participacao.reposicaoDe_Evento_Id,
                     }
                 }),
                 professores: eventoResponse.professores.map(item => {
