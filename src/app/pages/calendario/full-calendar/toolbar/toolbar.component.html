@@ -91,7 +91,8 @@
             </div>
             <!-- Atualizar -->
             <div class="">
-                <p-button icon="pi pi-sync "
+                <p-button icon="pi pi-sync"
+                            [loading]="loading"
                           (onClick)="updateCalendar()"
                           severity="contrast"
                           label="atualizar"

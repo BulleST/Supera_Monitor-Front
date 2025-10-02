@@ -304,12 +304,13 @@ export class EventoComponent implements OnDestroy {
 
         if (response.success) {
             this.evento.id = response.object.id;
+            let eventoResponse = response.object as Evento;
            
 
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
-                alunos: this.evento.alunos.map(item => {
+                alunos: eventoResponse.alunos.map(item => {
                     return {
                         participacao_Id: item.id,
                         observacao: item.observacao,
@@ -321,7 +322,7 @@ export class EventoComponent implements OnDestroy {
                         reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
                     }
                 }),
-                professores: this.evento.professores.map(item => {
+                professores: eventoResponse.professores.map(item => {
                     return {
                         participacao_Id: item.id,
                         observacao: item.observacao,

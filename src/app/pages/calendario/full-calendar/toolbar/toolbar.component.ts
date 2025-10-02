@@ -23,6 +23,7 @@ import { RoteiroService } from '../../../../services/roteiro.service';
 export class ToolbarComponent implements OnChanges, OnDestroy {
     @Input() fullCalendar!: FullCalendarComponent;
     @Input() calendarioRequest!: CalendarioRequest;
+    @Input() loading!: boolean;
     @Output() update = new EventEmitter<CalendarioRequest>();
     @Output() dayViewOnChange = new EventEmitter<CalendarioDayView>();
     
@@ -156,7 +157,12 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             this.fullCalendar = changes['fullCalendar'].currentValue;
             this.setTitle();
             this.getTemaSemana();
-
+        }
+        if (changes['calendarioRequest']) {
+            this.calendarioRequest = changes['calendarioRequest'].currentValue;
+        }
+        if (changes['loading']) {
+            this.loading = changes['loading'].currentValue;
         }
     }
 

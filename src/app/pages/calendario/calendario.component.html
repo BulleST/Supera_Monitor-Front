@@ -43,6 +43,7 @@
             <app-toolbar id="toolbar"
                          [calendarioRequest]="calendarioRequest"
                          [fullCalendar]="fullCalendar"
+                         [loading]="loading"
                          (dayViewOnChange)="calendarDayViewChanged($event)"
                          (update)="calendarioRequest = $event; update()"></app-toolbar>
         </div>
