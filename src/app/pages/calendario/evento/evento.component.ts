@@ -149,9 +149,9 @@ export class EventoComponent implements OnDestroy {
 
         let evento = this.service.getEvento().subscribe(async (res) => {
             if (res) {
-                this.evento = res
+                this.evento = res;
                 this.visible = true
-                // this.verificaDisponibilidade()
+                this.verificaDisponibilidade()
                 this.tipoString = this.getTipo(this.evento)
                 let alunosEvento = this.evento.alunos.map(x => x.aluno_Id)
                 this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id))
@@ -168,13 +168,6 @@ export class EventoComponent implements OnDestroy {
                 this.duracaoEvento = horaRedonda
                     ? horas.toString().padStart(2, '0') + 'h'
                     : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
-                    if (!this.evento.finalizado) {
-                        this.evento.alunos.filter(x => x.active == true)
-                            .map(x => {
-                                x.presente = true;
-                                return x
-                            })
-                    }
             }
         })
         this.subscription.push(evento)
@@ -203,6 +196,7 @@ export class EventoComponent implements OnDestroy {
     }
 
     async verificaDisponibilidade() {
+
         let valid = true
 
         this.loadingEventos = true
@@ -226,9 +220,8 @@ export class EventoComponent implements OnDestroy {
     }
 
     validaSalaAulas() {
-        let data = this.evento.data;
         this.salaAulas = validaSalaAulas(
-                                data, 
+                                this.evento.data, 
                                 this.evento.duracaoMinutos, 
                                 this.salaAulas, 
                                 this.eventos, 
@@ -237,9 +230,8 @@ export class EventoComponent implements OnDestroy {
     }
 
     validaProfessores() {
-        let data = this.evento.data
         this.professores = validaProfessores(
-                                data, 
+                                this.evento.data, 
                                 this.evento.duracaoMinutos, 
                                 this.professores, 
                                 this.eventos, 
@@ -248,9 +240,8 @@ export class EventoComponent implements OnDestroy {
     }
 
     validaAlunos() {
-        let data = this.evento.data
         this.alunos = validaAlunos(
-                                data, 
+                                this.evento.data, 
                                 this.evento.duracaoMinutos, 
                                 this.alunos, 
                                 this.eventos, 
@@ -306,18 +297,11 @@ export class EventoComponent implements OnDestroy {
             this.evento.id = response.object.id;
             let eventoResponse = response.object as Evento;
            
-            console.log('this.evento.alunos', this.evento.alunos)
-            console.log('eventoResponse.alunos', eventoResponse.alunos)
-
-            
-
             let request: EventoChamadaRequest = {
                 evento_Id: this.evento.id,
                 observacao: this.evento.observacao,
                 alunos: this.evento.alunos.map(item => {
                     let participacao = eventoResponse.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
-                    console.log('item', item)
-                    console.log('participacao', participacao)
                     return {
                         participacao_Id: participacao.id,
                         observacao: item.observacao,
@@ -423,7 +407,7 @@ export class EventoComponent implements OnDestroy {
     }
 
      send(e: any) {
-        this.loading = true
+        this.loading = true;
         this.request()
             .then((res) => {
                 this.service.calendarioReload.emit(res.object.id)
@@ -446,8 +430,7 @@ export class EventoComponent implements OnDestroy {
     }
 
     request() {
-        let evento = this.evento;
-        return this.calendarioUtils.request(evento);
+        return this.calendarioUtils.request(this.evento);
     }
 
     buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {

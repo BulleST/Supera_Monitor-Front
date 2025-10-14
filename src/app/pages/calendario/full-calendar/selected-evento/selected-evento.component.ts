@@ -69,7 +69,6 @@ export class SelectedEventoComponent implements OnChanges {
             this.evento = changes['evento'].currentValue;
             if (this.evento) {
                 this.tipoEventoString = this.calendarioUtils.getEventoTipo(this.evento);
-                this.loadReposicoes();
             } else {
                 this.hidePopover();
             }
@@ -114,10 +113,7 @@ export class SelectedEventoComponent implements OnChanges {
     showPopover(e: any, evento: Evento) {
         this.evento = evento;
         this.tipoEventoString = this.calendarioUtils.getEventoTipo(this.evento);
-        this.loadReposicoes();
         this.popover.show(e);
-        this.changeDetector.markForCheck();
-        this.changeDetector.detectChanges();
         setTimeout(() => {
             if (this.popover.container) {
                 this.popover.align();
@@ -223,32 +219,34 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             let evento: Evento = this.evento;
 
-
             if (evento.id != PseudoEvento.EventoId) {
-                evento = await lastValueFrom(this.service.get(evento.id))
-            }
-            else {
-                if (evento.evento_Tipo_Id == EventoTipo.Aula) {
-                    await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
+                await lastValueFrom(this.service.get(evento.id))
                         .then(res => evento = res)
                         .catch(res => this.toastr.error(res.message, 'Erro'))
-                }
+            }
+            else if (evento.evento_Tipo_Id == EventoTipo.Aula) {
+                await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
+                    .then(res => evento = res)
+                    .catch(res => this.toastr.error(res.message, 'Erro'))
             }
 
-            evento.alunos = evento.alunos.map(x => {
-                if (!evento.finalizado) {
-                    if (x.presente !== true && x.presente !== false) {
-                        x.presente = true;
+            if (evento.alunos && evento.alunos.length) {
+                evento.alunos = evento.alunos.map(x => {
+                    if (!evento.finalizado) {
+                        if (x.presente !== true && x.presente !== false) {
+                            x.presente = true;
+                        }
                     }
-                }
-                return x
-            })
+                    return x
+                });
+            }
 
-            evento.professores = evento.professores.map(x => {
-                x.presente = evento.finalizado ? x.presente : true;
-                return x
-            })
-
+            if (evento.professores && evento.professores.length) {
+                evento.professores = evento.professores.map(x => {
+                    x.presente = evento.finalizado ? x.presente : true;
+                    return x
+                })
+            }
             this.service.setEvento(evento);
             let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula';
 
@@ -285,22 +283,7 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
 
-    loadReposicoes() {
-        if (this.evento) {
-            this.evento.alunos.forEach(async item => {
-                if (item.reposicaoDe_Evento_Id && !item.reposicaoDe_Evento) {
-                    item.loadingReposicaoDe_Evento = true;
-                    lastValueFrom(this.service.get(item.reposicaoDe_Evento_Id))
-                        .then(res => {
-                            item.reposicaoDe_Evento = res;
-                            item.loadingReposicaoDe_Evento = false;
-                        }).catch(res => item.loadingReposicaoDe_Evento = false);
-                }
-            })
-
-        }
-    }
-
+    
     @HostListener('mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {
         const x = event.clientX;

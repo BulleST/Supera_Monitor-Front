@@ -52,7 +52,7 @@
                    [value]="duracaoEvento"
                    id="duracaoEvento"
                    name="duracaoEvento"
-                   readonly 
+                   readonly
                    fluid />
         </p-iconfield>
     </div>
@@ -60,12 +60,12 @@
     <div class="field md:col-4 sm:col-4 col-12">
         <label for="capacidadeMaximaEvento">Limite de Alunos: <span class="text-red-500">*</span></label>
         <p-inputnumber #capacidadeMaximaEvento="ngModel"
-                        [(ngModel)]="evento.capacidadeMaximaEvento"
-                        id="capacidadeMaximaEvento"
-                        name="capacidadeMaximaEvento"
-                        class="w-full"
-                        [required]="true"
-                   fluid />
+                       [(ngModel)]="evento.capacidadeMaximaEvento"
+                       id="capacidadeMaximaEvento"
+                       name="capacidadeMaximaEvento"
+                       class="w-full"
+                       [required]="true"
+                       fluid />
         <div *ngIf="capacidadeMaximaEvento.touched && capacidadeMaximaEvento.invalid && capacidadeMaximaEvento.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="capacidadeMaximaEvento.errors['required']">Esse campo é obrigatório.</p>
         </div>
@@ -90,35 +90,34 @@
                   [readonly]="evento.finalizado"
                   [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
                   appendTo="body"
-                   fluid>
-                   <ng-template let-item #item>
-                       <div class="flex align-items-center justify-content-between w-full gap-2">
-                           <div>
-                               <p class="font-bold mb-1 flex align-items-center gap-2">
-                                   <app-legend-color [corLegenda]="item.corLegenda"
-                                                     [professor_Id]="item.id"
-                                                     [professor]="item.nome"></app-legend-color>
-                                   <span>{{ item.nome }}</span>
-                                   <p-badge *ngIf="item.disponivel == false"
-                                            value="Indisponível"
-                                            severity="danger"
-                                            [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                            
-                                            <ng-template #indisponivelTemplate>
-                                                <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                            </ng-template>
-                               </p>
-                               <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                   <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
-                               </ng-container>
-                           </div>
-                           <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                  [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                                  [value]="item.active ? 'Ativo': 'Inativo'"
-                                  [severity]="item.active ? 'success': 'danger'"
-                                  [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                       </div>
-                   </ng-template>
+                  fluid>
+            <ng-template let-item #item>
+                <div class="flex align-items-center justify-content-between w-full gap-2">
+                    <div>
+                        <p class="font-bold mb-1 flex align-items-center gap-2">
+                            <app-legend-color [corLegenda]="item.corLegenda"
+                                              [professor_Id]="item.id"
+                                              [professor]="item.nome"></app-legend-color>
+                            <span>{{ item.nome }}</span>
+                            <p-badge *ngIf="item.disponivel == false"
+                                     value="Indisponível"
+                                     severity="danger"
+                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                            <ng-template #indisponivelTemplate>
+                                <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                            </ng-template>
+                        </p>
+                        <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                            <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                        </ng-container>
+                    </div>
+                    <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                           [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                           [value]="item.active ? 'Ativo': 'Inativo'"
+                           [severity]="item.active ? 'success': 'danger'"
+                           [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                </div>
+            </ng-template>
         </p-select>
         <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
             <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
@@ -159,10 +158,9 @@
                          value="Indisponível"
                          severity="danger"
                          [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                         
-                         <ng-template #indisponivelTemplate>
-                             <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                         </ng-template>
+                <ng-template #indisponivelTemplate>
+                    <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                </ng-template>
             </ng-template>
         </p-select>
         <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
@@ -232,7 +230,6 @@
                               icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                               severity="success"
                               [text]="true" />
-                              
                     <p-button [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                               [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
                               [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-thumbs-up-fill'"
@@ -243,7 +240,6 @@
                               class="my-auto" />
                 </header>
                 <div class="formgrid grid px-3 bg-white">
-                    
                     <!-- Observações -->
                     <div class="field col-12">
                         <label for="observacao[{{i}}]"></label>

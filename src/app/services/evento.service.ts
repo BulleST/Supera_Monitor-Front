@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
-import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest } from '../models/evento.model';
+import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest, EventoTipo } from '../models/evento.model';
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
 import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
@@ -70,6 +70,9 @@ export class EventoService extends Service {
     }
 
     setEvento(value: Evento | undefined) {
+        if (value) {
+            value.data = moment(value.data).locale('pt-BR').format('YYYY-MM-DDTHH:mm') as any;
+        }
         this.evento.next(value);
         if (value) localStorage.setItem('evento', JSON.stringify(value));
         else localStorage.removeItem('evento');
@@ -107,9 +110,8 @@ export class EventoService extends Service {
     }
 
     mapEvento(evento: Evento) {
-        evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').toDate();
+        evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').locale('pt-BR').toDate();
         evento.active = !evento.deactivated;
-
         evento.professores = evento.professores ?? [];
         evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1))
         evento.professores = evento.professores.map(x => {
@@ -127,12 +129,9 @@ export class EventoService extends Service {
             return x
         })
 
-        // evento.vagas = evento.capacidadeMaximaAlunos - evento.alunos.filter(x => x.active === true).length;
-
         if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
             let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
-            if (roteiro)
-                evento.roteiro_Id = roteiro.id;
+            evento.roteiro_Id = roteiro?.id ?? -PseudoEvento.EventoId;
         }
         return evento;
     }
@@ -240,8 +239,8 @@ export class EventoService extends Service {
                         roteiro.dataFim = moment(roteiro.dataFim).toDate();
                         return roteiro
                     })
-                    dashboard.roteiros.sort((x,y) => x.dataInicio.getTime() - y.dataInicio.getTime());
-                    
+                    dashboard.roteiros.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime());
+
                     dashboard.alunos = dashboard.alunos.map(aluno => {
 
                         if (aluno.aulas.length == 0) {
@@ -253,54 +252,54 @@ export class EventoService extends Service {
                                 return item;
                             })
                         } else {
-                        aluno.aulas = aluno.aulas.map(item => {
-                            item.participacao.active = !item.participacao.deactivated;
-                            item.aula.active = !item.aula.deactivated;
-                            item.aula.data = moment(item.aula.data).toDate();
+                            aluno.aulas = aluno.aulas.map(item => {
+                                item.participacao.active = !item.participacao.deactivated;
+                                item.aula.active = !item.aula.deactivated;
+                                item.aula.data = moment(item.aula.data).toDate();
 
-                            // Procura se a aula foi reagendada
-                            if (item.aula.reagendamentoPara_Evento_Id) {
-                                item.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoPara_Evento_Id)?.aula;
-                            }
+                                // Procura se a aula foi reagendada
+                                if (item.aula.reagendamentoPara_Evento_Id) {
+                                    item.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoPara_Evento_Id)?.aula;
+                                }
 
-                            // Procura se a aula é reagendamento de outra
-                            if (item.aula.reagendamentoDe_Evento_Id) {
-                                item.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoDe_Evento_Id)?.aula;
-                            }
+                                // Procura se a aula é reagendamento de outra
+                                if (item.aula.reagendamentoDe_Evento_Id) {
+                                    item.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoDe_Evento_Id)?.aula;
+                                }
 
-                            // Procura se a aula foi reposta
-                            if (item.participacao.reposicaoPara_Evento_Id) {
-                                item.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoPara_Evento_Id)?.aula;
-                            }
+                                // Procura se a aula foi reposta
+                                if (item.participacao.reposicaoPara_Evento_Id) {
+                                    item.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoPara_Evento_Id)?.aula;
+                                }
 
-                            // Procura se a aula foi reposicao de outra
-                            if (item.participacao.reposicaoDe_Evento_Id) {
-                                item.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoDe_Evento_Id)?.aula;
-                            }
+                                // Procura se a aula foi reposicao de outra
+                                if (item.participacao.reposicaoDe_Evento_Id) {
+                                    item.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoDe_Evento_Id)?.aula;
+                                }
 
 
-                            // Status
-                            if (!item.aula.active && !item.feriado && !item.participacao.reposicaoPara_Evento_Id) 
-                                item.status = DashboardItemStatus.Cancelada;
-                            else if (!item.aula.active && item.feriado && !item.participacao.reposicaoPara_Evento_Id) 
-                                item.status = DashboardItemStatus.Feriado;
-                            else if (item.participacao.reposicaoPara_Evento_Id) 
-                                item.status = DashboardItemStatus.ReposicaoAgendada;
-                            else if (item.aula.finalizado === true && item.participacao.presente === false && item.participacao.reposicaoDe_Evento_Id) 
-                                item.status = DashboardItemStatus.FaltaNaReposicao;
-                            else if (item.aula.finalizado === true && item.participacao.presente === false && !item.participacao.reposicaoDe_Evento_Id) 
-                                item.status = DashboardItemStatus.FaltaNaAula;
-                            else if ( item.participacao.presente === false && item.participacao.active === false && !item.participacao.reposicaoDe_Evento_Id) 
-                                item.status = DashboardItemStatus.FaltaAgendada;
-                            else if (item.aula.finalizado === true && item.participacao.presente === true && item.participacao.reposicaoDe_Evento_Id) 
-                                item.status = DashboardItemStatus.PresenteNaReposicao;
-                            else if (item.aula.finalizado === true && item.participacao.presente === true && !item.participacao.reposicaoDe_Evento_Id) 
-                                item.status = DashboardItemStatus.PresenteNaAula;
-                            else 
-                                item.status = DashboardItemStatus.Aula;
+                                // Status
+                                if (!item.aula.active && !item.feriado && !item.participacao.reposicaoPara_Evento_Id)
+                                    item.status = DashboardItemStatus.Cancelada;
+                                else if (!item.aula.active && item.feriado && !item.participacao.reposicaoPara_Evento_Id)
+                                    item.status = DashboardItemStatus.Feriado;
+                                else if (item.participacao.reposicaoPara_Evento_Id)
+                                    item.status = DashboardItemStatus.ReposicaoAgendada;
+                                else if (item.aula.finalizado === true && item.participacao.presente === false && item.participacao.reposicaoDe_Evento_Id)
+                                    item.status = DashboardItemStatus.FaltaNaReposicao;
+                                else if (item.aula.finalizado === true && item.participacao.presente === false && !item.participacao.reposicaoDe_Evento_Id)
+                                    item.status = DashboardItemStatus.FaltaNaAula;
+                                else if (item.participacao.presente === false && item.participacao.active === false && !item.participacao.reposicaoDe_Evento_Id)
+                                    item.status = DashboardItemStatus.FaltaAgendada;
+                                else if (item.aula.finalizado === true && item.participacao.presente === true && item.participacao.reposicaoDe_Evento_Id)
+                                    item.status = DashboardItemStatus.PresenteNaReposicao;
+                                else if (item.aula.finalizado === true && item.participacao.presente === true && !item.participacao.reposicaoDe_Evento_Id)
+                                    item.status = DashboardItemStatus.PresenteNaAula;
+                                else
+                                    item.status = DashboardItemStatus.Aula;
 
-                            return item;
-                        });
+                                return item;
+                            });
                         }
                         return aluno;
                     });

@@ -198,7 +198,7 @@
                 </div>
                 <div class="h-10rem overflow-auto w-full">
                     <div *ngFor="let professor of evento.professores; let i = index">
-                        <div class="w-full flex align-items-center justify-content-start p-1">
+                        <div class="w-full flex align-items-center justify-content-start gap-2 p-1">
                             <app-legend-color [corLegenda]="professor.corLegenda"
                                                 [professor_Id]="professor.id"
                                                 [professor]="professor.nome"></app-legend-color>

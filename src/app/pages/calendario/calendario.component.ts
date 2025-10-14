@@ -291,12 +291,15 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     async selectEvento(e: any, item: Evento) {
-
         this.popoverComponent.hidePopover();
-        item = JSON.parse(JSON.stringify(item));
+        let evento: Evento = { ...item };
+        evento = this.loadReposicoes(evento);
+        this.selectedEvento = evento;
+        this.popoverComponent.showPopover(e, evento);
+    }
 
-        if (item.alunos && item.alunos.length) {
-            item.alunos.map(async aluno => {
+    loadReposicoes(evento: Evento) {
+         evento.alunos.map(async aluno => {
                 if (aluno.reposicaoDe_Evento_Id) {
                     aluno.reposicaoDe_Evento = await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
                 }
@@ -305,15 +308,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 }
                 return aluno;
             })
-        }
-
-        this.selectedEvento = item;
-        this.popoverComponent.evento = item;
-        this.popoverComponent.showPopover(e, item);
-
-        this.changeDetector.markForCheck();
-        this.changeDetector.detectChanges();
-
+        return evento;
     }
 
     unselectAula() {

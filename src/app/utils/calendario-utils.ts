@@ -140,7 +140,6 @@ export class CalendarioUtils {
     }
 
     request(evento: Evento) {
-        evento.data = moment(evento.data).locale('pt-br').toDate()
         switch (evento.evento_Tipo_Id) {
             case EventoTipo.Aula:
                 return this.requestAulaTurma(evento)
@@ -158,7 +157,7 @@ export class CalendarioUtils {
     requestAulaTurma(evento: Evento) {
         let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id)
-        request.sala_Id = request.sala_Id ?? SalaAulaId.online; // online;
+        request.sala_Id = request.sala_Id ?? SalaAulaId.online; 
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento ?? evento.capacidadeMaximaTurma;
 
         if (evento.id == PseudoEvento.EventoId)
@@ -181,7 +180,8 @@ export class CalendarioUtils {
         let request = MyMap(evento, new EventoOficinaRequest())
         request.alunos = evento.alunos.map(x => x.aluno_Id)
         request.professores = evento.professores.map(x => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? SalaAulaId.online; // online;
+        request.sala_Id = request.sala_Id ?? SalaAulaId.online; 
+        request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento;
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request))
         return lastValueFrom(this.service.editOficina(request))
