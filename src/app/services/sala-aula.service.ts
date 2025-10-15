@@ -19,7 +19,6 @@ export class SalaAulaService extends Service {
     constructor(
         http: HttpClient,
         toastr: ToastrService,
-        private salaAulaPipe: SalaAulaPipe,
     ) {
         super(http, toastr)
 
@@ -29,11 +28,6 @@ export class SalaAulaService extends Service {
         return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)
             .pipe(tap({
                 next: list => {
-                    list = list.map(item => {
-                        item.active = !item.deactivated;
-                        item.description = this.salaAulaPipe.transform(item);
-                        return item;
-                    })
                     this.list.next(list);
                     return of(list);
                 },
@@ -44,18 +38,7 @@ export class SalaAulaService extends Service {
     }
 
     get(id: number) {
-        return new Promise<SalaAula>(async (resolve, reject) => {
-            if (this.list.value.length == 0)
-                await lastValueFrom(this.getList());
-
-            var item = this.list.value.find(x => x.id == id) as SalaAula;
-            if (!item) {
-                this.toastrService.error(`Sala de aula não encontrada.`);
-               return reject('Sala de aula não encontrada.')
-            }
-
-            return resolve(item);
-        })
+        return this.http.get<SalaAula>(`${this.url}/salas/${id}`)
     }
 
     create(model: SalaAula) {

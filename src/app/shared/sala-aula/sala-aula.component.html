@@ -1,21 +1,7 @@
-<ng-container *ngIf="[SalaAulaId.online, SalaAulaId.professores, SalaAulaId.financeiro].includes(sala_Id); else salaTemplate">
-    <ng-container *ngIf="sala_Id == SalaAulaId.online; then onlineTemplate"></ng-container>
-    <ng-container *ngIf="sala_Id == SalaAulaId.professores; then pedagogicaTemplate"></ng-container>
-    <ng-container *ngIf="sala_Id == SalaAulaId.financeiro; then financeiroTemplate"></ng-container>
+<p class="line-height-1">{{ sala }}</p>
+<ng-container *ngIf="![SalaAulaId.Online1, SalaAulaId.Online2].includes(sala_Id)">
+    <span class="text-sm">
+        <ng-container *ngIf="andar == 0">Térreo</ng-container>
+        <ng-container *ngIf="andar > 0">{{andar}}º andar</ng-container>
+    </span>
 </ng-container>
-
-<ng-template #salaTemplate> 
-    <ng-container *ngIf="numeroSala !== undefined 
-                        && numeroSala !== null 
-                        && andar !== undefined 
-                        && andar !== null; 
-                    else indefinidoTemplate">
-        {{numeroSala}} - {{andar}}º andar
-    </ng-container>
-    <ng-template #indefinidoTemplate>
-        <b>Indefinido</b>
-    </ng-template>
-</ng-template>
-<ng-template #onlineTemplate>Online</ng-template>
-<ng-template #pedagogicaTemplate>Sala pedagógica</ng-template>
-<ng-template #financeiroTemplate>Sala do Financeiro</ng-template>

@@ -7,8 +7,7 @@ import { PseudoEvento } from '../models/reposicao.model'
 import { MyMap } from './map'
 import { EventoOficinaRequest } from '../models/evento-oficina.model'
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model'
-import { EventoAulaRequest, EventoTurmaExtraRequest } from '../models/evento-aula.model'
-import { SalaAulaId } from '../models/sala-aula.model'
+import { EventoAulaRequest } from '../models/evento-aula.model'
 import 'moment/locale/pt-br';
 import moment from 'moment';
 
@@ -157,7 +156,6 @@ export class CalendarioUtils {
     requestAulaTurma(evento: Evento) {
         let request: EventoAulaRequest = MyMap(evento, new EventoAulaRequest())
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id)
-        request.sala_Id = request.sala_Id ?? SalaAulaId.online; 
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento ?? evento.capacidadeMaximaTurma;
 
         if (evento.id == PseudoEvento.EventoId)
@@ -169,7 +167,6 @@ export class CalendarioUtils {
         let request = MyMap(evento, new EventoReuniaoRequest())
         request.alunos = evento.alunos.map(x => x.aluno_Id)
         request.professores = evento.professores.map(x => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? SalaAulaId.professores // professores;
 
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createReuniao(request))
@@ -180,7 +177,6 @@ export class CalendarioUtils {
         let request = MyMap(evento, new EventoOficinaRequest())
         request.alunos = evento.alunos.map(x => x.aluno_Id)
         request.professores = evento.professores.map(x => x.professor_Id)
-        request.sala_Id = request.sala_Id ?? SalaAulaId.online; 
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento;
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request))

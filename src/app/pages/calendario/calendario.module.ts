@@ -30,6 +30,7 @@ import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
 import { AlunoContatoFaltaComponent } from './aluno-contato-falta/aluno-contato-falta.component';
 import { AgendarAula1Component } from './agendar-aula-1/agendar-aula-1.component';
 import { AgendarAlunoComponent } from './agendar-aluno/agendar-aluno.component';
+import { SalaAulaPipe } from '../../utils/sala-aula.pipe';
 
 @NgModule({
     declarations: [

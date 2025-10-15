@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Professor } from "../models/professor.model";
 import { Evento } from "../models/evento.model";
-import { SalaAula, SalaAulaId } from "../models/sala-aula.model";
+import { SalaAula } from "../models/sala-aula.model";
 import { Aluno } from "../models/alunos.model";
 
 export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[], eventos: Evento[], turma_Id?: number, evento_Id?: number) {
@@ -94,9 +94,6 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
     let intervaloAte = moment(intervaloDe).add(duracaoMinutos - 1, 'minutes');
 
     return salaAulas.map(item => {
-        if (item.id == SalaAulaId.online) {
-            return item;
-        }
 
         let evento = eventos.find(e => {
             let eventoIntervaloDe = moment(e.data);
@@ -106,16 +103,17 @@ export function validaSalaAulas(data: Date, duracaoMinutos: number, salaAulas: S
             let c1 = intervaloDe.isBetween(eventoIntervaloDe, eventoIntervaloAte, undefined, '[]');
             let c2 = intervaloAte.isBetween(eventoIntervaloDe, eventoIntervaloAte, undefined, '[]');
 
+            let intervaloValido = (c1 || c2);
             let ehSalaDoEvento = e.sala_Id == item.id;
             let ehTurmaDiferente = turma_Id ? e.turma_Id != turma_Id : true;
             let ehEventoDiferente = evento_Id ? e.id != evento_Id : true;
             let ehEventoAtivo = e.active;
 
-            if ((c1 || c2) 
-                        && ehSalaDoEvento 
-                        && ehTurmaDiferente 
-                        && ehEventoDiferente 
-                        && ehEventoAtivo) {
+            if (intervaloValido
+                && ehSalaDoEvento 
+                && ehTurmaDiferente 
+                && ehEventoDiferente 
+                && ehEventoAtivo) {
                 return e;
             }
             return false

@@ -18,8 +18,9 @@ import { AccountService } from '../../../services/account.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { Turma } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
-import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
+import { SalaAula } from '../../../models/sala-aula.model';
 import { SalaAulaService } from '../../../services/sala-aula.service';
+import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 
 @Component({
   selector: 'app-agendar-aluno',
@@ -36,7 +37,6 @@ export class AgendarAlunoComponent {
     subscription: Subscription[] = [];
     tipoString = '';
     PseudoEvento = PseudoEvento;
-    SalaAulaId = SalaAulaId;
 
     selectedAluno?: Aluno;
     alunos: Aluno[] = [];
@@ -55,7 +55,6 @@ export class AgendarAlunoComponent {
         private activatedRoute: ActivatedRoute,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private crypto: Crypto,
         private alunoService: AlunoService,
         private service: EventoService,
         private calendarioUtils: CalendarioUtils,
@@ -65,6 +64,7 @@ export class AgendarAlunoComponent {
         private checklistService: ChecklistService,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
+        private salaPipe: SalaAulaPipe,
 
 
     ) {
@@ -261,7 +261,9 @@ export class AgendarAlunoComponent {
         return this.turmas.find((x) => x.id == turma_Id)?.corLegenda ?? '';
     }
 
-
+    get salaAula() {
+       return this.salaPipe.transform({ sala_Id: this.evento.sala_Id });
+    }
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)

@@ -24,13 +24,13 @@ export class Turma extends Basic_List {
     corLegenda: string = '';
     linkGrupo?: string;
     sala_Id: number = undefined as unknown as number;
+    sala: string = '';
     numeroSala: number = undefined as unknown as number;
     andar: number = undefined as unknown as number;
     capacidadeMaximaAlunos: number = 12;
     perfilCognitivo: PerfilCognitivo[] = [];
     perfilCognitivoString: string = '';
     diasDeAulaString: string = '';
-    salaDeAulaString: string = '';
     capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
     vagas: number = 0;
@@ -91,7 +91,7 @@ export var turmaColumns: ColumnTable[] = [
         }
     },
     {
-        field: 'salaDeAulaString',
+        field: 'sala',
         label: 'Sala',
         displayType: DisplayType.text,
         sortable: true,

@@ -117,35 +117,32 @@
                               [loading]="loadingSalaAulas"
                               (onChange)="salaAulaChanged($event, sala_Id)"
                               #sala_Id="ngModel"
-                              styleClass="w-full"
-                              class="w-full"
                               name="sala_Id"
                               inputId="sala_Id"
+                              optionLabel="descricao"
                               optionValue="id"
                               [required]="true"
                               [filter]="true"
-                              filterBy="description"
+                              filterBy="descricao"
                               appendTo="body"
-                              optionDisabled="deactivated">
-                        <ng-template #selectedItem let-selectedOption>
-                            <app-sala-aula [numeroSala]="selectedOption.numeroSala"
-                                           [andar]="selectedOption.andar"
-                                           [sala_Id]="selectedOption.id"></app-sala-aula>
-                        </ng-template>
+                              optionDisabled="deactivated"
+                              fluid>
                         <ng-template let-item #item>
-                            <span class="mr-2">
-                                <app-sala-aula [numeroSala]="item.numeroSala"
-                                               [andar]="item.andar"
-                                               [sala_Id]="item.id"></app-sala-aula>
-                            </span>
+                                
+
+                            <app-sala-aula [sala_Id]="item.id"
+                                [andar]="item.andar"
+                                [numeroSala]="item.numeroSala"
+                                [descricao]="item.descricao"></app-sala-aula>
+
                             <p-badge *ngIf="item.disponivel == false"
                                      value="Indisponível"
                                      severity="danger"
                                      [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
                                      
-                                     <ng-template #indisponivelTemplate>
-                                         <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                     </ng-template>
+                            <ng-template #indisponivelTemplate>
+                                <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                            </ng-template>
                         </ng-template>
                     </p-select>
                 </p-iconfield>

@@ -19,7 +19,6 @@ export class TurmaService extends Service {
     constructor(
         http: HttpClient,
         toastr: ToastrService,
-        private salaAulaPipe: SalaAulaPipe
     ) {
 
         super(http, toastr)
@@ -33,7 +32,6 @@ export class TurmaService extends Service {
         turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
         turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
         turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
-        turma.salaDeAulaString = this.salaAulaPipe.transform(turma);
         turma.capacidadeMaximaAlunosString = `${turma.capacidadeMaximaAlunos} alunos`;
 
         turma.vagas = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
@@ -58,19 +56,14 @@ export class TurmaService extends Service {
     }
 
     get(id: number) {
-        // return this.http.get<Turma>(`${this.url}/roteiros/${id}`)
-        return new Promise<Turma>(async (resolve, reject) => {
-            if (this.list.value.length == 0)
-                await lastValueFrom(this.getList());
-
-            let item = this.list.value.find(x => x.id == id) as Turma;
-            if (!item) {
-                this.toastrService.error(`Turma não encontrada.`);
-               return reject('Turma não encontrada.')
-            }
-
-            return resolve(item);
-        })
+        return this.http.get<Turma>(`${this.url}/turmas/${id}`).pipe(tap({
+                next: turma => {                    
+                    return of(this.mapTurma(turma));
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar turma. \n ${getError(err)}`);
+                }
+            }));
     }
 
     create(model: Turma) {

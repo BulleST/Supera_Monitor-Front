@@ -15,7 +15,7 @@ import { SelectChangeEvent } from 'primeng/select';
 import { PerfilCognitivoService } from '../../../services/perfil-cognitivo.services';
 import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
 import { SalaAulaService } from '../../../services/sala-aula.service';
-import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
+import { SalaAula } from '../../../models/sala-aula.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { Evento } from '../../../models/evento.model';
 import { EventoService } from '../../../services/evento.service';
@@ -37,7 +37,6 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     error: string = '';
     isEditPage = false;
     subscription: Subscription[] = [];
-    SalaAulaId = SalaAulaId;
 
     diasSemana = [
         // { id: 0, label: 'Domingo' },
@@ -140,7 +139,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 this.loading = true;
                 let id = this.crypto.decrypt(res['id'])
 
-                this.service.get(id)
+                lastValueFrom(this.service.get(id))
                     .then(res => {
                         this.object = res;
                         this.loading = false;

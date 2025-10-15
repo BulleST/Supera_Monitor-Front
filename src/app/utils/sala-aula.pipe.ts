@@ -1,40 +1,33 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { SalaAulaId } from '../models/sala-aula.model';
+import { SalaAulaService } from '../services/sala-aula.service';
+import { SalaAula } from '../models/sala-aula.model';
+import { lastValueFrom } from 'rxjs';
 
 @Pipe({
     name: 'salaAulaPipe'
 })
 
 export class SalaAulaPipe implements PipeTransform {
+
+    salas: SalaAula[] = [];
+
+    constructor(
+        private service: SalaAulaService
+    ) {
+        this.service.list.subscribe(res => this.salas = res);
+
+
+        if (!this.salas.length) {
+            lastValueFrom(this.service.getList())
+        }
+
+    }
+
+
     transform(value: any): any {
         var id = 'sala_Id' in value ? value.sala_Id : value.id;
-        if (SalaAulaId.online == id) {
-            return 'Online'
-        } else if (SalaAulaId.financeiro == id) {
-            return 'Sala do Financeiro'
-        } else if (SalaAulaId.professores == id) {
-            return 'Sala pedagógica'
-        } else {
-            if (value.numeroSala !== undefined && value.numeroSala !== null && value.andar !== undefined && value.andar !== null) {
-                return `${value.numeroSala} - ${value.andar}º andar`;
-            } else {
-                return 'Indefinido';
-            }
-        }
+        let sala = this.salas.find(x => x.id == id);
+
+        return sala?.descricao;
     }
 }
-
-/*
-
-<ng-container *ngIf="[SalaAulaId.online, SalaAulaId.professores, SalaAulaId.financeiro].includes(sala_Id); else salaTemplate">
-    <ng-container *ngIf="sala_Id == SalaAulaId.online; then onlineTemplate"></ng-container>
-    <ng-container *ngIf="sala_Id == SalaAulaId.professores; then pedagogicaTemplate"></ng-container>
-    <ng-container *ngIf="sala_Id == SalaAulaId.financeiro; then financeiroTemplate"></ng-container>
-</ng-container>
-
-
-<ng-template #salaTemplate> {{numeroSala}} - {{andar}}º andar</ng-template>
-<ng-template #onlineTemplate>Online</ng-template>
-<ng-template #pedagogicaTemplate>Sala pedagógica</ng-template>
-<ng-template #financeiroTemplate>Sala do Financeiro</ng-template>
-*/

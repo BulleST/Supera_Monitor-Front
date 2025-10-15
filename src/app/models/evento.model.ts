@@ -10,7 +10,7 @@ export class Evento {
     data: Date = new Date;
 
     evento_Tipo_Id: number = EventoTipo.Aula;
-    sala_Id: number = SalaAulaId.online;
+    sala_Id: number = SalaAulaId.Online1;
     numeroSala: number = undefined as unknown as number;
     andar: number = undefined as unknown as number;
     duracaoMinutos: number = 60; 

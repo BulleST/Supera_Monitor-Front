@@ -60,7 +60,7 @@ export class LegendColorComponent implements OnChanges, OnDestroy {
                 this.professor = professor.nome;
             }
             else if (this.turma_Id) {
-                let turma = await this.turmaService.get(this.turma_Id);
+                let turma = await lastValueFrom(this.turmaService.get(this.turma_Id));
                 this.corLegenda = turma.corLegenda;
                 this.professor = turma.professor;
                 this.turma = turma.nome;

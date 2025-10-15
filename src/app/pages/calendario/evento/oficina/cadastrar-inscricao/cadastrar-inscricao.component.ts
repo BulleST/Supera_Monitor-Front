@@ -23,6 +23,7 @@ import { AccountService } from '../../../../../services/account.service';
 import { validaAlunos } from '../../../../../utils/validacao';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
+import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
@@ -54,7 +55,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     loadingEventos = false;
 
     PseudoEvento = PseudoEvento;
-    SalaAulaId = SalaAulaId;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -65,10 +65,10 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private mensagemWhatsapp: MensagemWhatsapp,
         private turmaService: TurmaService,
         private service: EventoService,
+        private salaPipe: SalaAulaPipe,
         private checklistService: ChecklistService,
         private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
-        private crypto: Crypto,
     ) {
 
         let params = this.activatedRoute.snapshot.params;
@@ -154,6 +154,11 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 let alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
         }
+    }
+
+    get sala() {
+        return this.salaPipe.transform({sala_Id: this.evento.sala_Id});
+
     }
 
 

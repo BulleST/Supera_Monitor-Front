@@ -4,6 +4,7 @@
                appendTo="body"
                triggerEvent="onclick" />
 <app-confirm-dialog></app-confirm-dialog>
+
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -120,14 +121,7 @@
                 <td>{{item.nome}}</td>
                 <td>{{item.professor}}</td>
                 <td>{{item.diasDeAulaString}}</td>
-                <td >
-                  
-                    <!-- {{item.salaDeAulaString}} -->
-                    <app-sala-aula
-                                    [sala_Id]="item.sala_Id"
-                                   [andar]="item.andar"
-                                   [numeroSala]="item.numeroSala"></app-sala-aula>
-                </td>
+                <td>{{item.sala}}</td>
                 <td>{{item.perfilCognitivoString}}</td>
                 <td>{{item.capacidadeMaximaAlunos}} aluno(s)</td>
                 <td>

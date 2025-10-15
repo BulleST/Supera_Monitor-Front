@@ -138,7 +138,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             this.loadProfessores();
         }
 
-        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res.filter(x => x.active));
+        let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res);
         this.subscription.push(salaAula);
 
         if (this.salaAulas.length == 0) {
