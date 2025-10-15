@@ -303,7 +303,6 @@ export class EventoComponent implements OnDestroy {
                 observacao: this.evento.observacao,
                 alunos: this.evento.alunos.map(item => {
                     let participacao = eventoResponse.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
-        console.log('participacao aluno', participacao);
                     return {
                         participacao_Id: participacao.id,
                         observacao: item.observacao,
