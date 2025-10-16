@@ -7,7 +7,7 @@ import { Crypto, getError } from '../../../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoSuperacaoRequest } from '../../../../../models/evento-superacao.model';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula } from '../../../../../models/sala-aula.model';
+import { SalaAndar, SalaAula } from '../../../../../models/sala-aula.model';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
 import { ProfessorService } from '../../../../../services/professor.service';
 import { AlunoService } from '../../../../../services/alunos.service';
@@ -368,7 +368,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 this.showError('Aluno Indisponível', `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, e.originalEvent);
                 return
             } 
-            else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
+            else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > SalaAndar.Terreo) {
 
                 model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
                 this.showError('Restrição de Mobilidade',`O ${nome} tem restrição de mobilidade e não pode participar da superação na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent)

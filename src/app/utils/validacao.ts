@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Professor } from "../models/professor.model";
 import { Evento } from "../models/evento.model";
-import { SalaAula } from "../models/sala-aula.model";
+import { SalaAndar, SalaAula } from "../models/sala-aula.model";
 import { Aluno } from "../models/alunos.model";
 
 export function validaAlunoSalaAula(sala_Id: number, aluno_Id: number, salas: SalaAula[], alunos: Aluno[]) {
@@ -12,7 +12,7 @@ export function validaAlunoSalaAula(sala_Id: number, aluno_Id: number, salas: Sa
         return true;
     }
 
-    if (aluno.restricaoMobilidade && sala.andar > 0) {
+    if (aluno.restricaoMobilidade && sala.andar > SalaAndar.Terreo) {
         return false;
     }
 

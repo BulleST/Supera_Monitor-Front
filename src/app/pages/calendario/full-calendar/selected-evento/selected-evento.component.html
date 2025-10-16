@@ -30,8 +30,8 @@
                         <div class="flex align-items-center gap-2">
                             <span>{{evento.sala}}</span>
                             <span>-</span>
-                            <span *ngIf="evento.andar == 0">Térreo</span>
-                            <span *ngIf="evento.andar > 0">{{evento.andar}}º andar</span>
+                            <span *ngIf="evento.andar == SalaAndar.Terreo">Térreo</span>
+                            <span *ngIf="evento.andar > SalaAndar.Terreo">{{evento.andar}}º andar</span>
                         </div>
                     </div>
                     <!-- Educador -->

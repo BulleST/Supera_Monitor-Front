@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { Evento } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Professor } from '../../../../../models/professor.model';
-import { SalaAula } from '../../../../../models/sala-aula.model';
+import { SalaAndar, SalaAula } from '../../../../../models/sala-aula.model';
 import { ConfirmationService } from 'primeng/api';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { SelectChangeEvent } from 'primeng/select';
@@ -22,6 +22,7 @@ import { PerfilCognitivoService } from '../../../../../services/perfil-cognitivo
 import { EventoService } from '../../../../../services/evento.service';
 import { ParticipacaoAulaZeroModel } from '../../../../../models/evento-aula-0.model';
 import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
+import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
 
 @Component({
     selector: 'app-editar-aula-0',
@@ -67,8 +68,8 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         private calendarioUtils: CalendarioUtils,
         private apostilaService: ApostilaService,
         private perfilCognitivoService: PerfilCognitivoService,
-        private eventoService: EventoService,
-        private salaAulaPipe: SalaAulaPipe,
+        private nameFirstWordPipe: NameFirstWordPipe,
+        
     ) {
         // Fetch kits data
         this.apostilaService.getKit().subscribe();
@@ -146,31 +147,41 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        let salaAula = this.salaAulas.find((x) => x.id == e.value) as SalaAula;
-        this.validaSala.emit(salaAula);
+        let item = this.salaAulas.find((x) => x.id == e.value) as SalaAula;
+        let alunosRestricao = this.evento.alunos.filter(x => x.restricaoMobilidade);
 
-        let alunosComRestricaoMobilidade = this.evento.alunos.filter(x => x.restricaoMobilidade);
-        if (salaAula && salaAula.disponivel == false && salaAula.disponivelEvent) {
+        this.validaSala.emit(item); 
+
+        if (item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            let data = moment(salaAula.disponivelEvent.data).format('HH[h]mm');
-            let turma = salaAula.disponivelEvent.turma ?? salaAula.disponivelEvent.descricao;
-            let mensagem = `Essa sala está atribuída para outra aula com a turma <b>${turma}</b> no mesmo dia às <b>${data}</b>.`;
-            this.showError('Sala Indisponível', mensagem, e.originalEvent);
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+            let tipo = this.getTipo(item.disponivelEvent);
+            this.showError(
+                'Sala Indisponível',
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
+                e.originalEvent,
+            );
             return;
         } 
-        else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
-
-            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
-
-            let alunos = alunosComRestricaoMobilidade.map((x) => x.aluno.split(' '[0])).join(', ');
-            let sala = this.salaAulaPipe.transform({ salaAula });
-            let mensagem = `O(s) aluno(s) ${alunos} tem restrição de mobilidade e não podem participar da aula zero na sala ${sala}`;
-            this.showError('Restrição de Mobilidade', mensagem, e.originalEvent);
+        
+        if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+            let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.aluno)).join(', ')
+            let sala = item.descricao;
+            let mensagem = alunosRestricao.length > 1 ?
+                        `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
+                        : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+            
+            this.showError(
+                'Restrição de Mobilidade',
+                mensagem,
+                e.originalEvent
+            );
             return;
         }
 
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
+        model.control.setErrors({ indisponivel: null })
+        model.control.updateValueAndValidity()
     }
 
     perfilFocus(aluno: Evento_Participacao_Aluno) {
@@ -225,6 +236,16 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         if (aluno.perfilCognitivo_Id && !turma.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id)){
             model.control.setValue(null)
             return this.showError('Não autorizado', 'A turma ' + turma.nome + ' não abrange o perfil cognitivo selecionado', e.originalEvent);
+        }
+        
+        if (turma.andar > SalaAndar.Terreo && aluno.restricaoMobilidade) {
+            model.control.setValue(null)
+            return this.showError(
+                'Restricao de Mobilidade', 
+                `O aluno(a) ${aluno.aluno} possui restrição de mobilidade e não pode participar dessa turma que ocorre na sala ${turma.sala} - ${turma.andar}º andar.`,
+                e.originalEvent
+            );
+                
         }
 
         this.calculaVagas(aluno)

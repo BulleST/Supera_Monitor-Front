@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Evento_Participacao_Professor } from '../../../../models/evento-participacao-professor.model';
 import $ from 'jquery';
 import { PseudoEvento } from '../../../../models/reposicao.model';
-import { SalaAulaId } from '../../../../models/sala-aula.model';
+import { SalaAndar, SalaAulaId } from '../../../../models/sala-aula.model';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
@@ -39,6 +39,7 @@ export class SelectedEventoComponent implements OnChanges {
     EventoTipo = EventoTipo;
     PseudoEvento = PseudoEvento;
     SalaAulaId = SalaAulaId;
+    SalaAndar = SalaAndar;
 
     mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
     mensagensEnviadasProfessor: Evento_Participacao_Professor[] = [];

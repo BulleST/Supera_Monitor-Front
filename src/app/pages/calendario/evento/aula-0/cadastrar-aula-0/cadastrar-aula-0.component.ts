@@ -3,7 +3,7 @@ import { EventoAula0Request } from '../../../../../models/evento-aula-0.model'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { Aluno } from '../../../../../models/alunos.model'
 import { Professor } from '../../../../../models/professor.model'
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model'
+import { SalaAndar, SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmationService } from 'primeng/api'
 import { ToastrService } from 'ngx-toastr'
@@ -106,8 +106,6 @@ export class CadastrarAula0Component implements OnDestroy {
         private nameFirstWordPipe: NameFirstWordPipe,
     ) {
         this.object.descricao = 'Aula 0';
-        this.object.sala_Id = SalaAulaId.NeuroSalaNeuronio;
-        this.object.professor_Id = 43;
 
         let feriados = this.service.feriados.subscribe(res => {
             this.feriados = res;
@@ -372,7 +370,6 @@ export class CadastrarAula0Component implements OnDestroy {
         let item = this.salaAulas.find(x => x.id == e.value) as SalaAula;
         let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
 
-        console.log('salaAulaChanged sala', item)
         this.validaSalaAulas()
 
 
@@ -388,13 +385,17 @@ export class CadastrarAula0Component implements OnDestroy {
             return;
         } 
         
-        if (alunosRestricao.length && item.andar > 1) {
+        if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
             let sala = item.descricao;
+            let mensagem = alunosRestricao.length > 1 ?
+                    `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
+                    : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+            
             this.showError(
                 'Restrição de Mobilidade',
-                `O(s) aluno(s) ${alunos}} tem restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`,
+                mensagem,
                 e.originalEvent
             );
             return;

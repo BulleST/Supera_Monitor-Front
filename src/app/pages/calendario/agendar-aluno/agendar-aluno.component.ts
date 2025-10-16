@@ -18,7 +18,7 @@ import { AccountService } from '../../../services/account.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { Turma } from '../../../models/turma.model';
 import { TurmaService } from '../../../services/turma.service';
-import { SalaAula } from '../../../models/sala-aula.model';
+import { SalaAndar, SalaAula } from '../../../models/sala-aula.model';
 import { SalaAulaService } from '../../../services/sala-aula.service';
 import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 
@@ -193,7 +193,7 @@ export class AgendarAlunoComponent {
             this.showError('Aluno Indisponível', `${aluno.nome.split(' ')[0]} tem ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
             return;
         }
-        else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > 1) {
+        else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > SalaAndar.Terreo) {
 
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
             this.showError('Restrição de Mobilidade', `O ${aluno.nome.split(' ')[0]} tem restrição de mobilidade e não pode participar da aula zero na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent);

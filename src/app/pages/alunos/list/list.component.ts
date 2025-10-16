@@ -22,6 +22,7 @@ import { PerfilCognitivoService } from '../../../services/perfil-cognitivo.servi
 import { NgModel } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { SelectChangeEvent } from 'primeng/select';
+import { SalaAndar } from '../../../models/sala-aula.model';
 
 @Component({
     selector: 'app-list',
@@ -306,7 +307,7 @@ export class ListComponent implements OnDestroy {
     turmaChanged(item: Aluno, model: NgModel, e: SelectChangeEvent) {
         let turma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
         let restricoes = item.restricoes.filter(x => x.active)
-        if ((item.restricaoMobilidade && turma.andar > 1) || restricoes.length > 0) {
+        if ((item.restricaoMobilidade && turma.andar > SalaAndar.Terreo) || restricoes.length > 0) {
             this.alunoRestricaoConfirm(item, model, e);
         }
         else {

@@ -12,6 +12,12 @@ export class SalaAula {
     disponivelEvent?: Evento;
 }
 
+export enum SalaAndar {
+    Terreo = 0,
+    Andar1 = 1,
+    Andar2 = 2
+}
+
 
 export enum SalaAulaId {
     Online1 = 1,

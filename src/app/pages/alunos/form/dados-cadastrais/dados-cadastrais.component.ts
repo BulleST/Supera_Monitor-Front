@@ -23,6 +23,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Popover } from 'primeng/popover';
 import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { CheckboxChangeEvent } from 'primeng/checkbox';
+import { SalaAndar } from '../../../../models/sala-aula.model';
 
 @Component({
     selector: 'app-dados-cadastrais',
@@ -290,7 +291,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         }
     }
     mobilidadeReduzidaChange(e: CheckboxChangeEvent, turmaModel: NgModel) {
-        if (e.checked && this.selectedTurma && this.selectedTurma?.andar > 1) {
+        if (e.checked && this.selectedTurma && this.selectedTurma?.andar > SalaAndar.Terreo) {
             turmaModel.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
             this.showError('Restrição de Mobilidade', `O ${this.object.nome.split(' ')[0]} tem restrição de mobilidade e não poderia participar das aulascom a turma ${this.selectedTurma.nome} na sala ${this.selectedTurma.numeroSala} - ${this.selectedTurma.andar}º andar.`, e.originalEvent);
             return;
@@ -313,7 +314,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 this.turmaReject(model);
                 return;
             }
-            else if (this.object.restricaoMobilidade && this.selectedTurma.andar > 1) {
+            else if (this.object.restricaoMobilidade && this.selectedTurma.andar > SalaAndar.Terreo) {
                 model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' });
                 this.showError('Restrição de Mobilidade', `O ${this.object.nome.split(' ')[0]} tem restrição de mobilidade e não poderia participar das aulascom a turma ${this.selectedTurma.nome} na sala ${this.selectedTurma.numeroSala} - ${this.selectedTurma.andar}º andar.`, e.originalEvent);
                 return;
