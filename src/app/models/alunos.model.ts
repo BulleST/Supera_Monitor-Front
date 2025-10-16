@@ -258,6 +258,41 @@ export var alunosColumns: ColumnTable[] = [
         }
     },
     {
+        field: 'restricaoMobilidade',
+        label: 'Restrição de Mobilidade',
+        displayType: DisplayType.options,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.boolean,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: undefined,
+            primeElement: 'select',
+            primeElementOptions: {
+                icon: undefined,
+                format: undefined,
+                placeholder: undefined,
+                options: [
+                    {
+                        value: undefined,
+                        label: "Todos",
+                        icon: 'pi pi-bars text-primary-500'
+                    },
+                    {
+                        value: true,
+                        label: "Sim",
+                        icon: "pi pi-check text-red-500",
+                    },
+                    {
+                        value: false,
+                        label: "Não",
+                        icon: "pi pi-times text-500",
+                    }
+                ]
+
+            }
+        },
+    },
+    {
         field: 'active',
         label: 'Status',
         displayType: DisplayType.options,

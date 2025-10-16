@@ -267,6 +267,26 @@
                     {{aluno.numeroPaginaAH}}
                 </td>
                 <td class="w-5rem">
+                    <p-checkbox 
+                        [ngModel]="aluno.restricaoMobilidade" 
+                        [binary]="true"
+                        [readonly]="true" />
+                    <!-- <ng-container *ngIf="aluno.restricaoMobilidade">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-4rem"
+                               icon="pi pi-check mr-2 text-xs font-bold"
+                               value="Sim"
+                               severity="danger"
+                               [pTooltip]="'Sim'" />
+                    </ng-container>
+                    <ng-container *ngIf="!aluno.restricaoMobilidade">
+                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-4rem"
+                               icon="pi pi-times mr-2 text-xs font-bold"
+                               value="Não"
+                               severity="secondary"
+                               [pTooltip]=" 'Não'" />
+                    </ng-container> -->
+                </td>
+                <td class="w-5rem">
                     <ng-container *ngIf="aluno.active">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
                                icon="pi pi-check mr-2 text-xs"

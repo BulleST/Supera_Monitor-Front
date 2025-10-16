@@ -93,6 +93,7 @@ export class AlunoService extends Service {
         }
 
 
+        aluno.restricaoMobilidade = aluno.restricaoMobilidade ?? false;
         aluno.restricoes = aluno.restricoes ?? [];
         aluno.restricoes = aluno.restricoes.map(item => {
             item.active = !item.deactivated;

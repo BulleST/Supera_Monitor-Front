@@ -76,13 +76,13 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'select'">
                         <p-select
                                   [options]="col.filterOptions.primeElementOptions.options"
-                                  [ngModel]="col.filterOptions.value"
+                                  [ngModel]="value"
                                   [inputId]="col.field"
                                   [name]="col.field"
                                   [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                   optionLabel="label"
                                   optionValue="value"
-                                  (ngModelChange)="filter(col.filterOptions.value)"
+                                  (ngModelChange)="filter($event)"
                                   appendTo="body">
                             <ng-template let-option #item>
                                 <p-button *ngIf="option.severity"
@@ -100,7 +100,7 @@
                         <p-multiselect
                                        [options]="col.filterOptions.primeElementOptions.options"
                                        [ngModel]="col.filterOptions.value"
-                                       (ngModelChange)="filter(col.filterOptions.value)"
+                                       (ngModelChange)="filter($event)"
                                        [inputId]="col.field"
                                        [name]="col.field"
                                        [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
