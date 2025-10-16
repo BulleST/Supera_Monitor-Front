@@ -175,9 +175,14 @@ export class CalendarioUtils {
 
     requestOficina(evento: Evento) {
         let request = MyMap(evento, new EventoOficinaRequest())
-        request.alunos = evento.alunos.map(x => x.aluno_Id)
-        request.professores = evento.professores.map(x => x.professor_Id)
+        request.alunos = evento.alunos.map(x => x.aluno_Id);
+        request.professores = evento.professores.map(x => x.professor_Id);
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento;
+
+        if (request.professores.length == 0) {
+            request.professores = [evento.professor_Id];
+        }
+        
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request))
         return lastValueFrom(this.service.editOficina(request))

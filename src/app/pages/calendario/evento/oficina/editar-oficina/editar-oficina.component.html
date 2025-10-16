@@ -72,6 +72,7 @@
     </div>
     <!-- Educador -->
     <div class="field md:col-4 sm:col-4 col-6">
+        <pre>{{evento.professor_Id}}</pre>
         <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
         <p-select
                   [options]="professores"
