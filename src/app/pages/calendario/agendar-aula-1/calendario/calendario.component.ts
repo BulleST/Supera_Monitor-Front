@@ -25,6 +25,8 @@ import { AlunoService } from '../../../../services/alunos.service'
 import { Aluno_CheckList_Item } from '../../../../models/checklist.model'
 import { ChecklistService } from '../../../../services/checklist.service'
 import { AccountService } from '../../../../services/account.service'
+import { SalaAndar } from '../../../../models/sala-aula.model'
+import { faThinkPeaks } from '@fortawesome/free-brands-svg-icons'
 
 @Component({
     selector: 'app-calendario-aluno-options',
@@ -37,29 +39,30 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     @Input() aluno!: Aluno;
     @Output() onClose = new EventEmitter<boolean>();
 
-    subscription: Subscription[] = []
-    loading = false
+    subscription: Subscription[] = [];
+    loading = false;
 
-    legenda: { corLegenda: string; label: string }[] = []
-    @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent
-    @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover
+    legenda: { corLegenda: string; label: string }[] = [];
+    @ViewChild('fullCalendar') fullCalendar!: FullCalendarComponent;
+    @ViewChild('popoverSelectedAula') popoverSelectedAula!: Popover;
 
-    selectedEvento?: Evento = undefined
-    selectedAula?: EventImpl
-    professores: Professor[] = []
-    loadingProfessores = false
-    restricaoCheck = false
+    selectedEvento?: Evento = undefined;
+    selectedAula?: EventImpl;
+    professores: Professor[] = [];
+    loadingProfessores = false;
+    restricaoCheck = false;
 
-    feriados: Feriado[] = []
-    loadingFeriados = false
-    ano = new Date().getFullYear()
-    currentTitle = ''
-    EventoTipo = EventoTipo
+    feriados: Feriado[] = [];
+    loadingFeriados = false;
+    ano = new Date().getFullYear();
+    currentTitle = '';
+    EventoTipo = EventoTipo;
+    data: Date = moment().toDate();
 
-    calendarVisible = signal(false)
-    currentEvents = signal<EventApi[]>([])
-    eventos: Evento[] = []
-    calendarioRequest: CalendarioRequest = new CalendarioRequest()
+    calendarVisible = signal(false);
+    currentEvents = signal<EventApi[]>([]);
+    eventos: Evento[] = [];
+    calendarioRequest: CalendarioRequest = new CalendarioRequest();
     calendarioOptions: CalendarOptions = {
         initialView: 'dayGridMonth',
         themeSystem: 'standard',
@@ -89,7 +92,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         datesSet: (arg: DatesSetArg) => {
             this.datesSet(arg);
         },
-    }
+    };
 
     constructor(
         private confirmationService: ConfirmationService,
@@ -112,13 +115,11 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         if (this.professores.length == 0) {
             this.loadingProfessores = true
             lastValueFrom(this.professorService.getList())
-                .then((res) => (this.loadingProfessores = false))
-                .catch((res) => (this.loadingProfessores = false))
+                .then(res => this.loadingProfessores = false)
+                .catch(res => this.loadingProfessores = false)
         }
 
-        let feriados = this.service.feriados.subscribe(
-            (res) => (this.feriados = res),
-        )
+        let feriados = this.service.feriados.subscribe(res => this.feriados = res);
         this.subscription.push(feriados)
     }
 
@@ -127,25 +128,31 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     async ngOnChanges(changes: SimpleChanges) {
-        this.fullCalendar.getApi().today()
 
-        if (changes['object']) {
-            this.aluno = changes['object'].currentValue
+        if (changes['aluno']) {
+            this.aluno = changes['aluno'].currentValue;
+
+            console.log('ngOnChanges', this.aluno)
 
             if (!this.fullCalendar) {
                 // Fazer o compilador do JS calar a boca no primeiro render... poha
                 return
             }
 
+
+
             if (!this.aluno) {
                 this.fullCalendar.getApi().removeAllEvents()
                 return
             }
 
+            this.fullCalendar.getApi().today()
+
             if (this.aluno.id) {
-                this.calendarioRequest.intervaloDe = moment().startOf('month').toDate()
-                this.calendarioRequest.intervaloAte = moment().endOf('month').toDate()
-                this.calendarioRequest.perfil_Cognitivo_Id = this.aluno!.perfilCognitivo_Id
+                this.calendarioRequest.intervaloDe = moment().startOf('month').toDate();
+                this.calendarioRequest.intervaloAte = moment().endOf('month').toDate();
+                this.calendarioRequest.perfil_Cognitivo_Id = this.aluno!.perfilCognitivo_Id;
+
                 this.update('')
             }
         }
@@ -187,15 +194,29 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         this.changeDetector.detectChanges()
     }
 
-    async getCalendario() {
-        await lastValueFrom(this.service.getList(this.calendarioRequest))
-            .then((list) => {
+    getCalendario() {
+        return lastValueFrom(this.service.getList(this.calendarioRequest))
+            .then(list => {
                 this.eventos = list.filter(evento => {
-                    const temVaga = evento.vagasDisponiveisEvento > 0;
-                    const eventoPerfil = evento.perfilCognitivo.map(x => x.id)
-                    const ehPerfilCompativel = !this.aluno.perfilCognitivo_Id || eventoPerfil.includes(this.aluno.perfilCognitivo_Id);
+                    const eventoAtivo = evento.active;
+                    const ehAula = [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id);
+                    const ehPerfilCompativel = !this.aluno.perfilCognitivo_Id || evento.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id)
+                    const eventoTemVaga = evento.vagasDisponiveisEvento > 0;
+                    const participacao = evento.alunos.find(x => x.aluno_Id == this.aluno.id);
+                    const participacaoAtiva = participacao?.active;
+                    const salaValida = !this.aluno.restricaoMobilidade || (this.aluno.restricaoMobilidade && evento.andar == SalaAndar.Terreo);
+                    const vigenciaInicio = moment(this.aluno.dataInicioVigencia).isSameOrBefore(evento.data, 'date'); 
+                    const vigenciaFim = this.aluno.dataFimVigencia && moment(this.aluno.dataFimVigencia).isSameOrAfter(evento.data, 'date') || !this.aluno.dataFimVigencia;
+                    const vigencia = vigenciaInicio && vigenciaFim; 
 
-                    return temVaga && ehPerfilCompativel;
+                    let final = eventoAtivo
+                        && ehAula
+                        && ehPerfilCompativel
+                        && ((eventoTemVaga && !participacaoAtiva) || participacaoAtiva)
+                        && salaValida
+                        && vigencia;
+
+                    return final;
                 })
             })
     }
@@ -259,12 +280,12 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     async loadFeriados() {
         this.loadingFeriados = true
         await lastValueFrom(this.service.getFeriados(this.ano))
-            .then((res) => (this.loadingFeriados = false))
-            .catch((res) => (this.loadingFeriados = false))
+            .then(res => this.loadingFeriados = false)
+            .catch(res => this.loadingFeriados = false)
     }
 
     async datesSet(arg: DatesSetArg) {
-
+        console.log('datesSet', arg);
         this.currentTitle = moment(arg.view.currentStart)
             .locale('pt')
             .format('MMMM [de] YYYY')
@@ -274,23 +295,16 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         this.calendarioRequest.intervaloDe = arg.view.currentStart
         this.calendarioRequest.intervaloAte = arg.view.currentEnd
 
+        let ano = moment(this.data).year();
+        let temFeriado = this.feriados.filter(x => moment(x.date).year() == ano);
 
-        if (
-            this.ano != this.calendarioRequest.intervaloDe.getFullYear() ||
-            this.feriados.length == 0
-        ) {
-            this.ano = this.calendarioRequest.intervaloDe.getFullYear()
+        if (!temFeriado.length || !this.feriados.length) {
+            this.ano = ano;
             await this.loadFeriados()
         }
-        if (!this.aluno) {
-            this.fullCalendar.getApi().removeAllEvents()
-            return
-        }
 
-        if (this.aluno.id) {
-            await this.getCalendario()
-            this.setCalendario()
-        }
+        await this.getCalendario()
+        this.setCalendario()
     }
 
     sendConfirmation(evento: Evento, e: any): void {
@@ -299,7 +313,7 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         this.confirmationService.confirm({
             key: 'confirmarPrimeiraAula',
             header: 'Confirmar agendamento',
-            icon: 'pi pi-whatsapp text-green-500',
+            icon: 'pi pi-calendar text-green-500',
             acceptLabel: `Concluir`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
@@ -313,7 +327,6 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     async send(e: any) {
         this.loading = true
 
-        let request = new PrimeiraAulaRequest()
 
         if (!this.aluno) {
             return this.showError('Erro', `Selecione um aluno.`, e)
@@ -323,28 +336,30 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
             return this.showError('Erro', `Selecione uma aula`, e)
         }
 
-        request.aluno_Id = this.aluno.id
-        request.evento_Id = this.selectedEvento.id
+        let request: PrimeiraAulaRequest = {
+            aluno_Id: this.aluno.id,
+            evento_Id: this.selectedEvento.id
+        }
 
         let response: RequestResponse = { success: true, message: '', object: undefined };
 
         // Se a aula target não existir, cria a aula
         if (request.evento_Id == PseudoEvento.EventoId) {
             response = await this.calendarioUtils.requestAulaTurma(this.selectedEvento)
-            request.evento_Id = response.object.id
-
-            if (!response.success) {
-                return this.showError('Erro', `Primeira aula não foi agendada. Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`, e)
+                            .catch(res => {
+                                this.loading = false;
+                                this.showError('Erro', `Primeira aula não foi agendada. Ocorreu um erro ao agendar primeira aula.`, e, res.message)
+                                return  res
+                            })
+                            
+            this.loading = false;
+            if (response.success) {
+                request.evento_Id = response.object.id;
             }
-        }
-
-        // Se a aula target não existir, cria a aula
-        if (request.evento_Id == PseudoEvento.EventoId) {
-            response = await this.requestAulaTurma(this.selectedEvento)
-            request.evento_Id = response.object.id
-            if (!response.success) {
-                return this.showError('Primeira aula não agendada', `Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`, e)
+            else {
+                return;
             }
+
         }
 
         lastValueFrom(this.alunoService.primeiraAula(request))

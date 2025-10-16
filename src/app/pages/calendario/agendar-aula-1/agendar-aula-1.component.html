@@ -1,11 +1,10 @@
 <p-dialog
-          [header]="'Agendar Primeira Aula'"
           [maximizable]="true"
           [draggable]="true"
           [modal]="true"
           [(visible)]="visible"
           (visibleChange)="visibleChange()"
-          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          [style]="{ width: '700px', maxWidth: '95vw', maxHeight: '95vh' }"
           appendTo="body">
     <ng-template #header>
         <div class="w-full flex align-items-center">
@@ -23,7 +22,7 @@
         <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
         <p-select [options]="alunos"
                   [loading]="loadingAlunos"
-                  [(ngModel)]="alunoSelectedId"
+                  [(ngModel)]="selectedAlunoId"
                   (onChange)="alunoChanged($event, aluno_Id)"
                   optionLabel="nome"
                   optionValue="id"
@@ -90,13 +89,39 @@
             <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['restricaoMobilidade']">{{aluno_Id.errors['restricaoMobilidade']}}.</p>
         </div>
     </div>
+    <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
+        <li> Apenas aulas <strong>com vagas disponíveis</strong> serão exibidas. </li>
+        <li> Apenas aulas dentro do <strong>período de vigência</strong> do aluno serão exibidas. 
+            <ng-container *ngIf="selectedAluno">
+                <span>( De {{selectedAluno.dataInicioVigencia|date:'dd/MM/yy'}}</span>
+                <span *ngIf="selectedAluno.dataFimVigencia"> Até {{selectedAluno.dataFimVigencia |date:'dd/MM/yy'}})</span>
+                <span *ngIf="!selectedAluno.dataFimVigencia">)</span>
+            </ng-container>
+        </li>
+        <li> Apenas aulas dentro do <strong>perfil cognitivo</strong> do aluno serão exibidas.
+            <i class="fa fa-brain text-sm mx-2"></i>
+            <ng-container *ngIf="selectedAluno">
+                <span>( {{selectedAluno.perfilCognitivo}})</span>
+            </ng-container> 
+        </li>
+        <li> Apenas aulas no <strong>térreo</strong> serão exibidas SE o aluno tiver <b>restrição de mobilidade</b> 
+            
+            <ng-container *ngIf="selectedAluno ">
+                <span class="text-red-500 mx-2" *ngIf="selectedAluno.restricaoMobilidade">
+                    <i class="bi bi-person-wheelchair text-sm"></i>
+                    ( Tem restrição )
+                </span>
+                <span class="text-green-500 mx-2" *ngIf="!selectedAluno.restricaoMobilidade">
+                    <i class="pi pi-check text-sm"></i>
+                    ( Não tem restrição )
+                </span>
+            </ng-container> 
+        </li>
+        <li> Apenas alunos que <strong>ainda não realizaram primeira aula</strong> são exibidos. </li>
+    </ul>
     <!-- Calendario -->
     <div class="mt-1 h-full" *ngIf="selectedAluno">
         <app-calendario-aluno-options [aluno]="selectedAluno"
                                       (onClose)="visible = false; visibleChange()"></app-calendario-aluno-options>
     </div>
-    <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
-        <li> Apenas eventos com o <strong>perfil cognitivo correspondente ao aluno</strong> são exibidos. </li>
-        <li> Apenas alunos que <strong>ainda não realizaram primeira aula</strong> são exibidos. </li>
-    </ul>
 </p-dialog>

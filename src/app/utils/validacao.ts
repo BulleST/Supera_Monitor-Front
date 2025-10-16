@@ -43,7 +43,6 @@ export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[]
             let ehEventoAtivo = e.active;
 
             if (intervaloValido 
-                && participacao 
                 && participacaoAtiva 
                 && ehTurmaDiferente 
                 && ehEventoDiferente 
@@ -91,7 +90,7 @@ export function validaProfessores(data: Date, duracaoMinutos: number, professore
 
             let participacao = e.professores.find(x => x.professor_Id == professor.id);
             let participacaoAtiva = participacao?.active;
-            let professorEstaNoEvento = e.professor_Id == professor.id || !!participacao
+            let professorEstaNoEvento = e.professor_Id == professor.id || participacao
             let ehTurmaDiferente = turma_Id ? e.turma_Id != turma_Id : true;
             let ehEventoDiferente = evento_Id ? e.id != evento_Id : true;
             let ehEventoAtivo = e.active;

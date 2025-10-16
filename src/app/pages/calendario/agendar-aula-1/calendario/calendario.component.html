@@ -1,11 +1,8 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog
-                 key="confirmarPrimeiraAula"
+<p-confirmdialog key="confirmarPrimeiraAula"
                  styleClass="w-32rem"
                  [acceptVisible]="restricaoCheck || (!aluno.restricaoMobilidade && aluno.restricoes.length === 0)">
-    <ng-template
-                 #message
-                 let-message>
+    <ng-template #message let-message>
         <div class="flex align-items-start">
             <div>
                 <div class="flex flex-column flex-1 gap-2">
@@ -117,10 +114,9 @@
 </p-confirmdialog>
 
 <div class="flex-1 p-2">
-    <p-toolbar styleClass="border-none bg-transparent p-0 px-2">
+    <p-toolbar styleClass="border-none bg-transparent p-0 px-2 mb-3">
         <div class="p-toolbar-group-start flex-1">
-            <h2
-                class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+            <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
                 <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
                 <span
                       class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
@@ -129,50 +125,50 @@
             </h2>
         </div>
         <div class="p-toolbar-group-end flex align-items-center gap-2 flex-wrap">
+            <p-datepicker [(ngModel)]="data" 
+            dateFormat="dd/mm/yy"
+            (ngModelChange)="fullCalendar.getApi().gotoDate(data)"
+            [showIcon]="true"
+            [readonlyInput]="true"
+            [appendTo]="'body'"
+            [disabledDays]="[0]"
+            iconDisplay="input"></p-datepicker>
             <!-- Prev -->
             <p-button
                       icon="pi pi-angle-left text-sm"
-                      styleClass="w-full h-full surface-100 border-100"
                       [style]="{width: '2.4rem', overflow: 'hidden',}"
                       (onClick)="prev()"
                       [disabled]="!aluno"
                       severity="secondary"
                       iconPos="right"
                       pTooltip="Anterior"
-                      tooltipPosition="top"
-                      size="small" />
+                      tooltipPosition="top" />
             <!-- Hoje -->
             <p-button
                       label="hoje"
-                      styleClass="h-full surface-800 border-800"
                       (onClick)="today()"
                       [disabled]="!aluno"
                       severity="help"
                       pTooltip="Hoje"
-                      tooltipPosition="top"
-                      size="small" />
+                      tooltipPosition="top"/>
             <!-- Next -->
             <p-button
                       icon="pi pi-angle-right text-sm"
-                      styleClass="w-full h-full surface-100 border-100"
                       [style]="{width: '2.4rem', overflow: 'hidden',}"
                       (onClick)="next()"
                       [disabled]="!aluno"
                       severity="secondary"
                       pTooltip="Próximo"
-                      tooltipPosition="top"
-                      size="small" />
+                      tooltipPosition="top"/>
             <!-- Atualizar -->
             <p-button
                       icon="pi pi-sync text-sm"
-                      styleClass="w-full h-full surface-100 border-100"
                       (onClick)="update('button')"
                       [disabled]="!aluno"
                       severity="secondary"
                       label="atualizar"
                       pTooltip="Atualizar calendário"
-                      tooltipPosition="top"
-                      size="small" />
+                      tooltipPosition="top"/>
         </div>
     </p-toolbar>
     <full-calendar [options]="calendarioOptions"#fullCalendar>
