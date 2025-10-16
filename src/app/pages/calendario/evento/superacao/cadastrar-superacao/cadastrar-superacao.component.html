@@ -102,7 +102,7 @@
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
                           [options]="professores"
-                          [(ngModel)]="professorSelected"
+                          [(ngModel)]="object.professor_Id"
                           [loading]="loadingProfessores || loadingEventos"
                           [disabled]="loadingProfessores || loadingEventos || !data || !horario"
                           (onChange)="professorChanged($event, professor_Id)"
@@ -213,32 +213,48 @@
                                placeholder="Selecione"
                                appendTo="body"
                                panelStyleClass="p-select-stripped"
+                               [virtualScroll]="true"
+                               [virtualScrollItemSize]="54"
                                display="chip"
                                fluid>
-                    <ng-template let-item #item>
-                        <div class="w-full flex flex-column align-items-stretch">
-                            <div class="flex align-items-center gap-2">
-                                <p-button type="button"
-                                          (onClick)="enviarMensagem(item)"
-                                          (auxclick)="enviarMensagem(item)"
-                                          (contextmenu)="enviarMensagem(item)"
-                                          [disabled]="!item.celular"
-                                          icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                          severity="success"
-                                          [text]="true"
-                                          styleClass="px-0 w-auto" />
-                                <span class="mr-2 capitalize">{{item.nome | nameAbv }}</span>
-                                <p-badge *ngIf="item.disponivel == false"
-                                         value="Indisponível"
-                                         severity="danger"
-                                         [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined"
-                                         class="ml-auto" />
-                                <ng-template #indisponivelTemplate>
-                                    <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                </ng-template>
-                            </div>
-                        </div>
-                    </ng-template>
+                               <ng-template let-item #item>
+                                <div class="flex align-items-center justify-content-between w-full gap-2">
+                                    <div>
+                                        <div class="flex align-items-center">
+                                            <p-button type="button"
+                                                      icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                                      (onClick)="enviarMensagem(item)"
+                                                      (auxclick)="enviarMensagem(item)"
+                                                      (contextmenu)="enviarMensagem(item)"
+                                                      severity="success"
+                                                      [text]="true"
+                                                      [disabled]="!item.celular"
+                                                      pTooltip="Enviar mensagem"
+                                                      size="small">
+                                            </p-button>
+                                            <p class="font-bold">
+                                                <span class="mr-2">{{item.nome}}</span>
+                                                <p-badge *ngIf="item.disponivel == false"
+                                                         value="Indisponível"
+                                                         severity="danger"
+                                                         [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                                                         
+                                                         <ng-template #indisponivelTemplate>
+                                                             <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                                         </ng-template>
+                                            </p>
+                                        </div>
+                                        <p class="flex align-items-center gap-2 pl-2">
+                                            <app-legend-color [corLegenda]="item.corLegenda"
+                                                              [professor_Id]="item.professor_Id"
+                                                              [professor]="item.professor"
+                                                              [turma_Id]="item.turma_Id"></app-legend-color>
+                                            <span class="font-normal">Turma {{item.turma}}</span>
+                                        </p>
+                                    </div>
+                                    <p-badge [value]="item.perfilCognitivo" />
+                                </div>
+                            </ng-template>
                 </p-multiselect>
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>

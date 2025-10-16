@@ -49,7 +49,7 @@ export class CadastrarAula0Component implements OnDestroy {
     error: string = ''
     subscription: Subscription[] = []
     object: EventoAula0Request = new EventoAula0Request()
-   
+
     data: Date = undefined as unknown as Date
     horario: Date = undefined as unknown as Date
 
@@ -336,7 +336,6 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        // this.validaProfessores();
         let item = this.professores.find(x => x.id == e.value) as Professor
         let mensagemErro: string | null = null
 
@@ -383,16 +382,16 @@ export class CadastrarAula0Component implements OnDestroy {
                 e.originalEvent,
             );
             return;
-        } 
-        
+        }
+
         if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
             let sala = item.descricao;
             let mensagem = alunosRestricao.length > 1 ?
-                    `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
-                    : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
-            
+                `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
+                : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+
             this.showError(
                 'Restrição de Mobilidade',
                 mensagem,
@@ -442,7 +441,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.selectAlunoReject(aluno, model);
                 return;
             }
-            
+
             let aulaZero: Evento;
             let participacaoAulaZero: Evento_Participacao_Aluno;
             let mensagem = '';
@@ -466,10 +465,10 @@ export class CadastrarAula0Component implements OnDestroy {
                     this.selectAlunoReject(aluno, model);
                     return
                 }
-                
+
                 mensagem += await this.aulaZeroMensagem(aluno, aulaZero, participacaoAulaZero);
             }
-            
+
 
             aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
 
@@ -496,15 +495,14 @@ export class CadastrarAula0Component implements OnDestroy {
                     }
                 })
             }
-            
+
             model.control.setErrors({ indisponivel: null });
             model.control.updateValueAndValidity()
 
         }
     }
 
-     aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
-        console.log('aulaZeroMensagem', aulaZero, participacaoAulaZero)
+    aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
         let mensagem = `<br>
                     <p>Outra aula zero já foi cadastrada: </p>`;
 

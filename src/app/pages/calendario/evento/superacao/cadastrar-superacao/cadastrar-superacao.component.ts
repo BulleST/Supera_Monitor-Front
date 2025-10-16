@@ -1,9 +1,9 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmationService, SelectItemGroup } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError } from '../../../../../utils';
+import { Crypto, getError, validaAlunoSalaAula } from '../../../../../utils';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoSuperacaoRequest } from '../../../../../models/evento-superacao.model';
 import { Professor } from '../../../../../models/professor.model';
@@ -59,7 +59,6 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
-    professorSelected?: Professor;
     professores: Professor[] = [];
     loadingProfessores = false;
 
@@ -78,7 +77,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     feriados: Feriado[] = [];
     loadingFeriados = false;
     ano: number = new Date().getFullYear();
-    
+
     invalidDates: Date[] = [];
 
     @ViewChild('form') form!: NgForm;
@@ -182,24 +181,24 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     loadProfessores() {
-            this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+        this.loadingProfessores = true;
+        lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
     }
 
     loadRoteiros() {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList(moment().year()))
+            .then(res => this.loadingRoteiros = false)
+            .catch(res => this.loadingRoteiros = false);
     }
 
     loadSalas() {
-            this.loadingSalaAulas = true;
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
+        this.loadingSalaAulas = true;
+        lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
     }
 
     loadTurmas() {
@@ -234,8 +233,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
                 return range;
             });
-            
-              let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+
+            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }
@@ -259,7 +258,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         this.loadingEventos = true;
 
         let hora = moment(this.horario);
-        let data = moment(this.data).set( { hour: hora.hour(), minute: hora.minute(), second: 0 } );
+        let data = moment(this.data).set({ hour: hora.hour(), minute: hora.minute(), second: 0 });
 
         moment.locale('pt-br')
 
@@ -291,12 +290,12 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
         this.professores = validaProfessores(data, this.object.duracaoMinutos, this.professores, this.eventos, undefined, undefined);
 
-        if (this.professorSelected) {
+        if (this.object.professor_Id) {
             let e: SelectChangeEvent = {
-                value: this.professorSelected,
-                originalEvent: { target: $('#professor_Id').get(0) as any } as any
+                value: this.object.professor_Id,
+                originalEvent: { target: $('#professor_Id').get(0) as any } as any,
             }
-            this.professorChanged(e, this.professor_Id);
+            this.professorChanged(e, this.professor_Id)
         }
     }
 
@@ -307,41 +306,75 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
-        let item = e.value as Professor;
-        let mensagemErro: string | null = null;
+        let item = this.professores.find(x => x.id == e.value) as Professor
+        let mensagemErro: string | null = null
 
-        if (item && !item.disponivel && item.disponivelEvent) {
-            mensagemErro = `Existe uma outra ${this.getTipo(item.disponivelEvent)} às ${moment(item.disponivelEvent.data).format('HH[h]mm')} no mesmo dia.`
-        }
-        else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
-            mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
-        } else {
-            mensagemErro = null;
+        if (item) {
+
+            if (!item.disponivel && item.disponivelEvent) {
+                let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+                let tipo = this.getTipo(item.disponivelEvent)
+                mensagemErro = `Existe uma outra ${tipo} às ${data} no mesmo dia.`
+            }
+            else if (!item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
+                let inicio = moment(item.expedienteInicio).format('HH[h]mm');
+                let fim = moment(item.expedienteFim).format('HH[h]mm');
+                mensagemErro = `O expediente do educador é das ${inicio} às ${fim}`
+            }
         }
 
         if (mensagemErro) {
-            this.showError('Educador indisponível', mensagemErro, e.originalEvent)
+            this.showError(
+                'Educador indisponível',
+                mensagemErro,
+                e.originalEvent
+            )
+            model.control.setValue(undefined)
         }
-        model.control.setErrors({ indisponivel: mensagemErro });
-        model.control.updateValueAndValidity();
+        model.control.setErrors({ indisponivel: mensagemErro })
+        model.control.updateValueAndValidity()
     }
-
-
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        this.validaSalaAulas();
+        let item = this.salaAulas.find(x => x.id == e.value) as SalaAula;
+        let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
 
-        let item = this.salaAulas.find(x => x.id == e.value);
-        if (item && item.disponivel == false && item.disponivelEvent) {
+        this.validaSalaAulas()
+
+
+        if (item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+            let tipo = this.getTipo(item.disponivelEvent);
+            this.showError(
+                'Sala Indisponível',
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
+                e.originalEvent,
+            );
             return;
         }
-        model.control.setErrors({ indisponivel: null });
-        model.control.updateValueAndValidity();
+
+        if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
+            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+            let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
+            let sala = item.descricao;
+            let mensagem = alunosRestricao.length > 1 ?
+                `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
+                : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+
+            this.showError(
+                'Restrição de Mobilidade',
+                mensagem,
+                e.originalEvent
+            );
+            return;
+        }
+
+        model.control.setErrors({ indisponivel: null })
+        model.control.updateValueAndValidity()
     }
 
-    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+    async alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
 
         this.validaAlunos()
 
@@ -349,119 +382,145 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         // se o aluno foi selecionado, selected = false
         // se o aluno foi deselecionado, selected = true
-        if (selected == false) { 
-            let alunos = e.value as Aluno[];
+        if (selected == false) {
             let aluno = (e.originalEvent as any).option as Aluno;
-            let salaAula = this.salaAulas.find(x => x.id == this.object.sala_Id) as SalaAula
             let nome = this.nameFirstWordPipe.transform(aluno.nome);
-               
+
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
                 let tipo = this.getTipo(aluno.disponivelEvent);
                 let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
-                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                
-                if (index) {
-                    this.selectedAlunos.splice(index, 1);
-                }
-                
-                model.control.setValue(this.selectedAlunos);
-                this.showError('Aluno Indisponível', `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, e.originalEvent);
-                return
-            } 
-            else if (aluno.restricaoMobilidade && salaAula && salaAula.andar > SalaAndar.Terreo) {
 
-                model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
-                this.showError('Restrição de Mobilidade',`O ${nome} tem restrição de mobilidade e não pode participar da superação na sala ${salaAula.numeroSala} - ${salaAula.andar}º andar.`, e.originalEvent)
-                return
-            } 
-            else if (alunos.length > 1) {
+                this.showError(
+                    'Aluno Indisponível',
+                    `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`,
+                    e.originalEvent
+                );
 
+                this.selectAlunoReject(aluno, model);
+                return
+            }
+
+            const salaValid = validaAlunoSalaAula(this.object.sala_Id, aluno.id, this.salaAulas, this.alunos);
+            if (!salaValid) {
+                this.showError(
+                    'Restrição de Mobilidade',
+                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    e.originalEvent
+                );
+
+                this.selectAlunoReject(aluno, model);
+                return;
+            }
+
+            let mensagem = '';
+
+            aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
+
+            mensagem += await this.restricoesMensagem(aluno);
+            mensagem += await this.maisDeUmAlunoMensagem(aluno);
+
+            if (mensagem) {
                 this.confirmationService.confirm({
-                    target: e.originalEvent.target as EventTarget,
-                    header: `Selecionar ${alunos.length} alunos?`,
-                    message: 'Tem certeza que deseja selecionar mais de um aluno para a aula? <br> Se recusar, apenas o primeiro aluno selecionado será mantido. <br> Não esqueça de confirmar a disponibilidade',
+                    target: e.originalEvent.target as any,
+                    header: 'Selecionar aluno',
+                    message: `<p>Algumas observações são relevantes antes de continuar:</p>
+                                ${mensagem}
+                            `,
                     acceptLabel: `Continuar`,
-                    rejectLabel: 'Cancelar',
+                    rejectLabel: 'Não',
                     acceptIcon: 'pi pi-check',
                     rejectIcon: 'pi pi-times',
                     acceptButtonStyleClass: 'p-button-rounded',
                     rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                     accept: () => {
-                        model.control.setErrors(null);
-                        model.control.updateValueAndValidity()
-                        this.loadAluno(e.originalEvent, aluno, model)
                     },
                     reject: () => {
-                        this.selectedAlunos = [this.selectedAlunos[0]];
-                        model.control.updateValueAndValidity()
-
-                    },
+                        this.selectAlunoReject(aluno, model);
+                    }
                 })
             }
 
+            model.control.setErrors({ indisponivel: null });
             model.control.updateValueAndValidity()
 
         }
     }
 
-    loadAluno(e: any, selectedAluno: Aluno, model: NgModel) {
-        if (this.selectedAlunos.length > 0) {
-            this.loadingAlunos = true
-            this.loading = true
-            lastValueFrom(this.alunoService.get(selectedAluno.id))
-                .then(res => {
-                    this.loadingAlunos = false
-                    this.loading = false
-                    
-                    let aluno = res;
-                    let restricoes = aluno.restricoes.filter(x => x.active === true)
-                    let restricaoMobilidade = aluno.restricaoMobilidade
+    selectAlunoReject(aluno: Aluno, model: NgModel) {
+        let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+        if (index != -1)
+            this.selectedAlunos.splice(index, 1);
 
-                    if (restricoes.length > 0 || restricaoMobilidade) {
-                        let mensagem = 'Esse aluno possui algumas restrições:  <ul>'
-
-                        if (restricaoMobilidade) mensagem += '<li>Restrição de mobilidade </li>'
-
-                        mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
-                        mensagem += `</ul> Tem certeza que deseja inserir ele nessa superação?`
-
-                        this.confirmationService.confirm({
-                            target: e.target,
-                            header: 'Inserir aluno',
-                            message: mensagem,
-                            acceptLabel: `Continuar`,
-                            acceptIcon: 'pi pi-check',
-                            acceptButtonStyleClass: 'p-button-rounded',
-                            rejectIcon: 'pi pi-times',
-                            rejectLabel: 'Cancelar',
-                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                            accept: () => { },
-                            reject: () => {
-                                let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
-                                if (index != -1) this.selectedAlunos.splice(index, 1, aluno)
-
-                                model.control.setValue(this.selectedAlunos);
-                                model.control.updateValueAndValidity();
-                            },
-                        })
-                    }
-                })
-                .catch(res => {
-                    this.showError('Erro', `Não foi possível carregar restrições de ${selectedAluno.nome}`, e)
-                    this.loadingAlunos = false
-                    this.loading = false
-                })
-        }
+        model.control.setValue(this.selectedAlunos);
+        model.control.updateValueAndValidity();
     }
+    async restricoesMensagem(aluno: Aluno) {
+        let mensagem = '';
+        let restricoes = aluno.restricoes.filter(x => x.active === true);
+
+        if (restricoes.length > 0 || aluno.restricaoMobilidade) {
+            mensagem += `<br>
+                        <p class="font-bold">Restrições:</p> 
+                        <ul class="my-2 pl-2">`;
+
+
+            if (restricoes.length > 0)
+                mensagem += restricoes.map(x => `<li>${x.descricao}</li>`);
+
+            if (aluno.restricaoMobilidade)
+                mensagem += '<li><b>Restrição de mobilidade</b></li>';
+
+            mensagem += `</ul>`;
+            mensagem += `<p class="text-sm text-red-500">
+                            Tem certeza que deseja ignorar as restrições e continuar?
+                        </p>`;
+        }
+        return mensagem;
+    }
+
+    async maisDeUmAlunoMensagem(aluno: Aluno) {
+
+        let mensagem = '';
+
+        if (this.selectedAlunos.length == 0) {
+            mensagem += '<br>'
+            mensagem += `<p>Nenhum aluno selecionado.</p>`;
+        }
+        else if (this.selectedAlunos.length > 1) {
+            mensagem += '<br>'
+            mensagem += `<p>${this.selectedAlunos.length} alunos selecionados</p>`;
+            mensagem += `<p class="text-sm text-red-500">Tem certeza que deseja selecionar mais de um aluno?</p>`;
+        }
+
+        return mensagem;
+    }
+
+    loadAluno(e: any, selectedAluno: Aluno, model: NgModel) {
+        this.loadingAlunos = true
+        this.loading = true
+        return lastValueFrom(this.alunoService.get(selectedAluno.id))
+            .then(res => {
+                this.loadingAlunos = false
+                this.loading = false
+                return res;
+            })
+            .catch(res => {
+                this.showError('Erro', `Não foi possível carregar dados do aluno ${selectedAluno.nome}`, e)
+                this.loadingAlunos = false
+                this.loading = false
+                return undefined
+            })
+    }
+
+
 
     getTipo(e: Evento) {
         return this.calendarioUtils.getEventoTipo(e)
     }
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
-
 
     sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
@@ -470,18 +529,15 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         if (!this.selectedAlunos || !this.selectedAlunos.length)
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
-        if (!this.professorSelected)
-            return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e);
 
-
-        // playAlert();
-
-        this.object.alunos = this.selectedAlunos.map(x => x.id);
-        this.object.data = new Date(this.data);
-        this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any
-        this.object.professores = [this.professorSelected.id];
-        this.object.professor_Id = this.professorSelected.id;
+        this.object.data = moment().set({
+            date: moment(this.data).date(),
+            month: moment(this.data).month(),
+            year: moment(this.data).year(),
+            hour: moment(this.horario).hour(),
+            minutes: moment(this.horario).minutes(),
+            second: 0,
+        }).toDate();
 
         this.confirmationService.confirm({
             target: e.target,
@@ -503,6 +559,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     send(e: any) {
         this.loading = true;
+        this.object.alunos = this.selectedAlunos.map(x => x.id);
+        this.object.professores = [this.object.professor_Id];
+
         lastValueFrom(this.service.createSuperacao(this.object))
             .then(res => {
                 this.loading = false;
@@ -546,7 +605,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
         }
     }
-    
+
     enviarMensagemAgendamento(aluno: Aluno) {
         if (!aluno.celular) {
             this.showError('Erro', 'Nenhum celular cadastrado', aluno)
@@ -575,25 +634,22 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     markChecklistAsDone() {
         // Agendar superação
         // Id 22 ou 29
+        const professor = this.professores.find(x => x.id == this.object.professor_Id);
         this.selectedAlunos.forEach(async aluno => {
             const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-
             const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
 
-            const professor = this.professorSelected?.nome;
             const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm');
             const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
             const account = this.accountService.accountValue?.name;
 
             if (alunoChecklist) {
-                const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
-                
+                const mensagem = `Superação agendada para o dia ${data} com o educador ${professor?.nome}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
+
                 if (alunoChecklist && !alunoChecklist.finalizado) {
                     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
                 }
             }
         })
     }
-
-
 }
