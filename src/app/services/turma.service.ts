@@ -34,8 +34,8 @@ export class TurmaService extends Service {
         turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
         turma.capacidadeMaximaAlunosString = `${turma.capacidadeMaximaAlunos} alunos`;
 
-        turma.vagas = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
-        turma.vagas = turma.vagas < 0 ? 0 : turma.vagas;
+        turma.vagasDisponiveis = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
+        turma.vagasDisponiveis = turma.vagasDisponiveis < 0 ? 0 : turma.vagasDisponiveis;
         turma.temGrupo = !!turma.linkGrupo;
 
         return turma;

@@ -56,7 +56,7 @@
                 <label for="aluno_Id">Selecionar alunos: <span class="text-red-500">*</span></label>
                 <p-multiSelect [options]="alunos"
                                [loading]="loadingAlunos"
-                               [(ngModel)]="alunosSelected"
+                               [(ngModel)]="selectedAlunos"
                                (onChange)="alunoChanged($event, aluno_Id)"
                                [maxSelectedLabels]="evento.vagasDisponiveisEvento"
                                [selectionLimit]="evento.vagasDisponiveisEvento"

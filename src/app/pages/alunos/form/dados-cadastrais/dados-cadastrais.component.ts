@@ -170,7 +170,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 const ehTurmaDoAluno = turma.id == this.object.turma_Id;
                 const ehPerfilDoAluno = turma.perfilCognitivo.map(perfil => perfil.id).includes(this.object.perfilCognitivo_Id);
                 const alunoTemPerfil = this.object.perfilCognitivo_Id;
-                const temVagas = turma.vagas > 0;
+                const temVagas = turma.vagasDisponiveis > 0;
                 //
                 // Se o perfil da turma é compatível com o perfil do aluno OU o aluno não tiver perfil definido
                 // Se a turma tiver vagas OU se for uma turma que o aluno já participa

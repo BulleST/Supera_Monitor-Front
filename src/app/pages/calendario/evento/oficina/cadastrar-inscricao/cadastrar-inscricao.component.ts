@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Aluno } from '../../../../../models/alunos.model';
-import { SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAndar, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { Turma } from '../../../../../models/turma.model';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -20,10 +20,11 @@ import { RequestResponse } from '../../../../../helpers/request-response.interfa
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
-import { validaAlunos } from '../../../../../utils/validacao';
+import { validaAlunos, validaAlunoSalaAula } from '../../../../../utils/validacao';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
+import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
@@ -43,7 +44,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     duracaoEvento = '';
     EventoTipo = EventoTipo;
 
-    alunosSelected: Aluno[] = [];
+    selectedAlunos: Aluno[] = [];
     mensagensEnviadasAlunos: Aluno[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
@@ -69,6 +70,8 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private checklistService: ChecklistService,
         private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
+        private nameFirstWordPipe: NameFirstWordPipe,
+
     ) {
 
         let params = this.activatedRoute.snapshot.params;
@@ -108,7 +111,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 this.visible = true;
                 this.verificaDisponibilidade();
 
-
                 let minutos = this.evento.duracaoMinutos % 60
                 let horas = this.evento.duracaoMinutos / 60;
                 let horaRedonda = (horas - Math.floor(horas)) == 0;
@@ -117,7 +119,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                     horas.toString().padStart(2, '0') + 'h' :
                     horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
 
-                    this.setAlunos();
+                this.setAlunos();
             }
         });
         this.subscription.push(evento);
@@ -149,18 +151,14 @@ export class CadastrarInscricaoComponent implements OnDestroy {
 
     setAlunos() {
         if (this.evento && this.alunos.length) {
-            
-
-                let alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
-                this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
+            let alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
+            this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
         }
     }
 
     get sala() {
-        return this.salaPipe.transform({sala_Id: this.evento.sala_Id});
-
+        return this.salaPipe.transform({ sala_Id: this.evento.sala_Id });
     }
-
 
     async verificaDisponibilidade() {
         let valid = true;
@@ -208,22 +206,55 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
 
-    // alunoChanged(e: SelectChangeEvent, model: NgModel) {
-    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
-        let aluno = e.itemValue as Aluno;
-        let alunos = e.value as Aluno[];
-        let index = alunos.findIndex(x => x.id == aluno.id);
-        if (index == -1) {
-            // está removendo alunos
-        } else {
+    async alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+
+        this.validaAlunos()
+
+        let selected = (e.originalEvent as any).selected
+
+        // se o aluno foi selecionado, selected = false
+        // se o aluno foi deselecionado, selected = true
+        if (selected == false) {
+            let aluno = (e.originalEvent as any).option as Aluno;
+            let nome = this.nameFirstWordPipe.transform(aluno.nome);
+
             if (aluno && aluno.disponivel == false && aluno.disponivelEvent) {
-                model.control.setErrors({ indisponivel: 'Aluno indisponível' });
-                this.showError('Aluno Indisponível', `Esse aluno tem outra ${this.getTipo(aluno.disponivelEvent)} no mesmo dia às <b>${moment(aluno.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+                let tipo = this.getTipo(aluno.disponivelEvent);
+                let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
+
+                this.showError(
+                    'Aluno Indisponível',
+                    `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`,
+                    e.originalEvent
+                );
+
+                this.selectAlunoReject(aluno, model);
+                return
+            }
+
+            if (aluno.restricaoMobilidade && this.evento.andar > SalaAndar.Terreo) {
+                this.showError(
+                    'Restrição de Mobilidade',
+                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    e.originalEvent
+                );
+
+                this.selectAlunoReject(aluno, model);
                 return;
             }
-        }
+            
+            model.control.setErrors({ indisponivel: null });
+            model.control.updateValueAndValidity()
 
-        model.control.setErrors({ indisponivel: null });
+        }
+    }
+
+    selectAlunoReject(aluno: Aluno, model: NgModel) {
+        let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
+        if (index != -1)
+            this.selectedAlunos.splice(index, 1);
+
+        model.control.setValue(this.selectedAlunos);
         model.control.updateValueAndValidity();
     }
 
@@ -249,7 +280,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
-        if (!this.alunosSelected.length) {
+        if (!this.selectedAlunos.length) {
             return this.showError('Não foi possível salvar', 'Selecione um aluno para continuar com inscrição', e)
         }
 
@@ -258,7 +289,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             header: 'Inscrever alunos',
-            message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.alunosSelected.map(x => x.nome.split(' ')[0]).join(', ')}?`,
+            message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.selectedAlunos.map(x => x.nome.split(' ')[0]).join(', ')}?`,
             acceptLabel: `Salvar e inscrever`,
             rejectLabel: 'Cancelar',
             acceptIcon: 'pi pi-check',
@@ -284,18 +315,18 @@ export class CadastrarInscricaoComponent implements OnDestroy {
 
         let count = 0
         await new Promise<boolean>((resolve, reject) => {
-            this.alunosSelected.forEach(aluno => {
+            this.selectedAlunos.forEach(aluno => {
                 lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
                     .then(res => {
                         count++;
-                        if (count == this.alunosSelected.length) {
+                        if (count == this.selectedAlunos.length) {
                             resolve(true);
                         }
                     })
                     .catch(res => {
                         count++;
                         this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
-                        if (count == this.alunosSelected.length) {
+                        if (count == this.selectedAlunos.length) {
                             resolve(true);
                         }
                     })
@@ -315,9 +346,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     requestOficina() {
         return this.calendarioUtils.requestOficina(this.evento);
     }
-    
+
     sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.alunosSelected.sort((x, y) => x.nome < y.nome ? -1 : 1);
+        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
         this.confirmationService.confirm({
             key: 'enviarMensagem',
             message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
@@ -357,11 +388,11 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         // Agendar 1ª Oficina ou 2ª 
         // checklist_Item_Id 12 ou 23
 
-        this.alunosSelected.forEach(async aluno => {
+        this.selectedAlunos.forEach(async aluno => {
 
             const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
             const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
-            
+
             if (alunoChecklist) {
                 const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
                 const account = this.accountService.accountValue?.name;

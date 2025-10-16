@@ -33,7 +33,7 @@ export class Turma extends Basic_List {
     diasDeAulaString: string = '';
     capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
-    vagas: number = 0;
+    vagasDisponiveis: number = 0;
     temGrupo: boolean = false;
 }
 

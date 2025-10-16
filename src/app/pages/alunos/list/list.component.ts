@@ -226,7 +226,7 @@ export class ListComponent implements OnDestroy {
             mensagem += `<p>Se continuar, a turma <b>${turma.nome}</b> ganhará uma vaga a ser preenchida por outra pessoa</p>`
         }
         // Se a turma não houver vagas, insere ele em outra turma
-        else if (status && turma && turma.vagas == 0) {
+        else if (status && turma && turma.vagasDisponiveis == 0) {
             return this.showError(
                 'Não autorizado', 
                 'A turma em que esse aluno estava matriculado está lotada. Selecione outra turma antes de habilitar esse aluno',
@@ -297,7 +297,7 @@ export class ListComponent implements OnDestroy {
     turmaFocus(item: Aluno) {
         this.turmasFiltered = this.turmas.filter(turma => {
             const turmaAtiva = turma.active;
-            const turmaTemVagas = turma.vagas > 0;
+            const turmaTemVagas = turma.vagasDisponiveis > 0;
             const ehPerfilCompativel = !item.perfilCognitivo_Id || turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
             return turmaAtiva && ehPerfilCompativel && (turmaTemVagas && item.turma_Id != turma.id || item.turma_Id == turma.id)
         })

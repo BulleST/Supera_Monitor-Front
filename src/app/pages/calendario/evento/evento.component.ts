@@ -3,7 +3,6 @@ import { Evento, EventoTipo } from '../../../models/evento.model'
 import { ConfirmationService } from 'primeng/api'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model'
-import { Evento_Participacao_Professor } from '../../../models/evento-participacao-professor.model'
 import { Aluno } from '../../../models/alunos.model'
 import { Professor } from '../../../models/professor.model'
 import { SalaAula } from '../../../models/sala-aula.model'
@@ -11,7 +10,7 @@ import { Turma } from '../../../models/turma.model'
 import { ActivatedRoute, Router } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
 import { SalaAulaService } from '../../../services/sala-aula.service'
-import { Crypto, getError, showError } from '../../../utils'
+import { getError, showError } from '../../../utils'
 import { ProfessorService } from '../../../services/professor.service'
 import { AlunoService } from '../../../services/alunos.service'
 import { EventoService } from '../../../services/evento.service'
@@ -37,8 +36,6 @@ import { CalendarioUtils } from '../../../utils/calendario-utils'
 })
 export class EventoComponent implements OnDestroy {
     evento: Evento = new Evento()
-    // queryParams: EventoQueryParams = new EventoQueryParams;
-
     visible: boolean = false
     loading = false
     error: string = ''
@@ -98,63 +95,63 @@ export class EventoComponent implements OnDestroy {
         this.subscription.push(roteiros)
 
         if (this.roteiros.length == 0) {
-            this.loadingRoteiros = true
+            this.loadingRoteiros = true;
             lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then((res) => (this.loadingRoteiros = false))
-                .catch((res) => (this.loadingRoteiros = false))
+                .then(res => this.loadingRoteiros = false)
+                .catch(res => this.loadingRoteiros = false);
         }
 
         let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
 
         if (this.professores.length == 0) {
-            this.loadingProfessores = true
+            this.loadingProfessores = true;
             lastValueFrom(this.professorService.getList())
-                .then((res) => (this.loadingProfessores = false))
-                .catch((res) => (this.loadingProfessores = false))
+                .then(res => this.loadingProfessores = false)
+                .catch(res => this.loadingProfessores = false);
         }
 
         let salaAula = this.salaAulaService.list.subscribe(res => this.salaAulas = res)
         this.subscription.push(salaAula)
 
         if (this.salaAulas.length == 0) {
-            this.loadingSalaAulas = true
+            this.loadingSalaAulas = true;
             lastValueFrom(this.salaAulaService.getList())
-                .then((res) => (this.loadingSalaAulas = false))
-                .catch((res) => (this.loadingSalaAulas = false))
+                .then(res => this.loadingSalaAulas = false)
+                .catch(res => this.loadingSalaAulas = false);
         }
 
         let alunos = this.alunoService.list.subscribe(res => this.alunos = res)
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
-            this.loadingAlunos = true
+            this.loadingAlunos = true;
             lastValueFrom(this.alunoService.getList())
-                .then((res) => (this.loadingAlunos = false))
-                .catch((res) => (this.loadingAlunos = false))
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false);
         }
 
         let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
         this.subscription.push(turmas)
 
         if (this.turmas.length == 0) {
-            this.loadingTurmas = true
+            this.loadingTurmas = true;
             lastValueFrom(this.turmaService.getList())
-                .then((res) => (this.loadingTurmas = false))
-                .catch((res) => (this.loadingTurmas = false))
+                .then(res => this.loadingTurmas = false)
+                .catch(res => this.loadingTurmas = false);
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true))
+        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos)
 
-        let evento = this.service.getEvento().subscribe(async (res) => {
+        let evento = this.service.getEvento().subscribe(async res => {
             if (res) {
                 this.evento = res;
-                this.visible = true
-                this.verificaDisponibilidade()
-                this.tipoString = this.getTipo(this.evento)
-                let alunosEvento = this.evento.alunos.map(x => x.aluno_Id)
-                this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id))
+                this.visible = true;
+                this.verificaDisponibilidade();
+                this.tipoString = this.getTipo(this.evento);
+                let alunosEvento = this.evento.alunos.map(x => x.aluno_Id);
+                this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id));
 
                 if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
                     let roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
@@ -174,11 +171,11 @@ export class EventoComponent implements OnDestroy {
     }
 
     get roteiroEvento(): Roteiro | undefined {
-        if (!this.evento?.roteiro_Id) 
+        if (!this.evento?.roteiro_Id)
             return this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
         return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
     }
-    
+
     ngOnDestroy(): void {
         this.subscription.forEach((e) => e.unsubscribe())
     }
@@ -209,8 +206,8 @@ export class EventoComponent implements OnDestroy {
 
         this.loadingEventos = true
         await lastValueFrom(this.service.getList(request))
-            .then((res) => (this.loadingEventos = false))
-            .catch((res) => (this.loadingEventos = false))
+            .then(res => (this.loadingEventos = false))
+            .catch(res => (this.loadingEventos = false))
 
         this.validaProfessores()
         this.validaSalaAulas()
@@ -221,32 +218,32 @@ export class EventoComponent implements OnDestroy {
 
     validaSalaAulas() {
         this.salaAulas = validaSalaAulas(
-                                this.evento.data, 
-                                this.evento.duracaoMinutos, 
-                                this.salaAulas, 
-                                this.eventos, 
-                                undefined, 
-                                this.evento.id)
+            this.evento.data,
+            this.evento.duracaoMinutos,
+            this.salaAulas,
+            this.eventos,
+            undefined,
+            this.evento.id)
     }
 
     validaProfessores() {
         this.professores = validaProfessores(
-                                this.evento.data, 
-                                this.evento.duracaoMinutos, 
-                                this.professores, 
-                                this.eventos, 
-                                undefined, 
-                                this.evento.id)
+            this.evento.data,
+            this.evento.duracaoMinutos,
+            this.professores,
+            this.eventos,
+            undefined,
+            this.evento.id)
     }
 
     validaAlunos() {
         this.alunos = validaAlunos(
-                                this.evento.data, 
-                                this.evento.duracaoMinutos, 
-                                this.alunos, 
-                                this.eventos, 
-                                undefined, 
-                                this.evento.id)
+            this.evento.data,
+            this.evento.duracaoMinutos,
+            this.alunos,
+            this.eventos,
+            undefined,
+            this.evento.id)
     }
 
     professorChanged(professor: Professor) {
@@ -266,123 +263,6 @@ export class EventoComponent implements OnDestroy {
     }
 
 
-    finalizarConfirmation(e: any) {
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
-            header: `Finalizar ${this.tipoString}`,
-            acceptIcon: 'pi pi-check',
-            acceptLabel: `Finalizar`,
-            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Ainda não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: async () => {
-                this.finalizar(e)
-            },
-        })
-    }
-
-    async finalizar(e: any) {
-        this.loading = true
-
-        let response: RequestResponse = await this.request()
-            .catch(res => {
-                this.loading = false;
-                this.showError('Erro', 'Não foi possível salvar alterações', e);
-                return res
-            })
-
-        console.log('response', response);
-        if (response.success) {
-            this.evento.id = response.object.id;
-            let eventoResponse = response.object as Evento;
-           
-            let request: EventoChamadaRequest = {
-                evento_Id: this.evento.id,
-                observacao: this.evento.observacao,
-                alunos: this.evento.alunos.map(item => {
-                    let participacao = eventoResponse.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
-                    return {
-                        participacao_Id: participacao.id,
-                        observacao: item.observacao,
-                        presente: item.presente,
-                        apostila_Abaco_Id:  item.apostilaAbacoObject?.id,
-                        apostila_AH_Id: item.apostilaAHObject?.id,
-                        numeroPaginaAbaco: item.numeroPaginaAbaco,
-                        numeroPaginaAH: item.numeroPaginaAH,
-                        reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
-                    }
-                }),
-                professores: eventoResponse.professores.map(item => {
-                    return {
-                        participacao_Id: item.id,
-                        observacao: item.observacao,
-                        presente: item.presente ?? false
-                    }
-                }),
-            }
-
-            if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
-                request.professores = this.evento.professores.map(item => {
-                    return {
-                        participacao_Id: item.id,
-                        observacao: item.observacao,
-                        presente: item.presente,
-                    }
-                })
-            }
-
-            if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
-                return this.finalizarAulaZero()
-                    .then((res) => {
-                        this.evento.finalizado = true
-                        this.loading = false
-                        this.visible = false
-                        this.visibleChange()
-                        this.service.calendarioReload.emit(this.evento.id)
-                        this.markChecklistAsDone()
-
-                        this.toastr.success(
-                            `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
-                            'Sucesso',
-                        )
-                    })
-                    .catch((res) => {
-                        this.error = res.message
-                        this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
-                        this.loading = false
-                    })
-            }
-            else {
-   lastValueFrom(this.service.finalizar(request))
-                .then((res) => {
-                    this.evento.finalizado = true
-                    this.loading = false
-                    this.visible = false
-                    this.visibleChange()
-                    this.service.calendarioReload.emit(this.evento.id)
-                    this.markChecklistAsDone()
-
-                    this.toastr.success(
-                        `${this.capitalizeFirstLetter(this.tipoString)} finalizada com sucesso.`,
-                        'Sucesso',
-                    )
-                })
-                .catch((res) => {
-                    this.error = res.message
-                    this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
-                    this.loading = false
-                })
-            }
-
-         
-        }
-    }
-
-    capitalizeFirstLetter(input: string) {
-        return input.charAt(0).toUpperCase() + input.slice(1);
-    }
 
     sendConfirmation(e: any, form: NgForm) {
         if (form.invalid) {
@@ -407,10 +287,10 @@ export class EventoComponent implements OnDestroy {
         })
     }
 
-     send(e: any) {
+    send(e: any) {
         this.loading = true;
-        this.request()
-            .then((res) => {
+        this.requestCreateEdit()
+            .then(res => {
                 this.service.calendarioReload.emit(res.object.id)
                 this.evento.id = res.object.id
                 this.service.setEvento(this.evento)
@@ -418,7 +298,7 @@ export class EventoComponent implements OnDestroy {
                 this.router.navigate(['calendario'])
                 this.loading = false
             })
-            .catch((res) => {
+            .catch(res => {
                 this.loading = false
                 this.showError('OPA!', `Não foi possível salvar dados.`, e, getError(res))
             })
@@ -430,9 +310,67 @@ export class EventoComponent implements OnDestroy {
         })
     }
 
-    request() {
+    requestCreateEdit() {
         return this.calendarioUtils.request(this.evento);
     }
+
+    finalizarConfirmation(e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: `Tem certeza que deseja finalizar ${this.tipoString}? <br>Ao finalizar, não será possível alterar nenhuma informação.`,
+            header: `Finalizar ${this.tipoString}`,
+            acceptIcon: 'pi pi-check',
+            acceptLabel: `Finalizar`,
+            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+            rejectIcon: 'pi pi-times',
+            rejectLabel: 'Ainda não',
+            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+            accept: async () => {
+                this.finalizar(e)
+            },
+        })
+    }
+
+    async finalizar(e: any) {
+        this.loading = true
+
+        let response: RequestResponse = await this.requestCreateEdit()
+            .catch(res => {
+                this.loading = false;
+                this.showError('Erro', 'Não foi possível salvar alterações', e);
+                return res
+            })
+
+        if (response.success) {
+            this.evento.id = response.object.id;
+            let eventoResponse = response.object as Evento;
+
+            this.requestFinalizar(eventoResponse)
+                .then(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.markChecklistAsDone()
+                        this.visible = false
+                        this.visibleChange()
+                        this.service.calendarioReload.emit(this.evento.id)
+
+                        this.toastr.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
+                    }
+                    else {
+                        this.toastr.error(`Não foi possível finalizar ${this.tipoString}.`, 'Erro');
+                        this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, res.message)
+                    }
+                })
+                .catch(res => {
+                    this.error = res.message
+                    this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
+                    this.loading = false
+                })
+
+
+        }
+    }
+
 
     buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {
         const alunos: ParticipacaoAulaZeroModel[] = this.evento.alunos.map(aluno => {
@@ -454,21 +392,55 @@ export class EventoComponent implements OnDestroy {
         };
     }
 
-    async finalizarAulaZero() {
-        try {
-            const request = this.buildFinalizarAulaZeroRequest();
-            await lastValueFrom(this.service.finalizarAulaZero(request));
+    buildFinalizar(eventoResponse: Evento): EventoChamadaRequest {
 
-        } catch (error: any) {
-            this.error = error?.message || 'Erro desconhecido';
-            this.showError(
-                'Erro',
-                `Não foi possível finalizar ${this.tipoString}.`,
-                error,
-                getError(error)
-            );
-        } finally {
-            this.loading = false;
+        let request: EventoChamadaRequest = {
+            evento_Id: this.evento.id,
+            observacao: this.evento.observacao,
+            alunos: this.evento.alunos.map(item => {
+                let participacao = eventoResponse.alunos.find(x => x.aluno_Id == item.aluno_Id) as Evento_Participacao_Aluno;
+                return {
+                    participacao_Id: participacao.id,
+                    observacao: item.observacao,
+                    presente: item.presente,
+                    apostila_Abaco_Id: item.apostilaAbacoObject?.id,
+                    apostila_AH_Id: item.apostilaAHObject?.id,
+                    numeroPaginaAbaco: item.numeroPaginaAbaco,
+                    numeroPaginaAH: item.numeroPaginaAH,
+                    reposicaoDe_Evento_Id: item.reposicaoDe_Evento_Id,
+                }
+            }),
+            professores: eventoResponse.professores.map(item => {
+                return {
+                    participacao_Id: item.id,
+                    observacao: item.observacao,
+                    presente: item.presente ?? false
+                }
+            }),
+        }
+
+        if (this.evento.evento_Tipo_Id == EventoTipo.Reuniao) {
+            request.professores = this.evento.professores.map(item => {
+                return {
+                    participacao_Id: item.id,
+                    observacao: item.observacao,
+                    presente: item.presente,
+                }
+            })
+        }
+
+        return request;
+    }
+
+    requestFinalizar(eventoResponse: Evento) {
+        if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
+            const request = this.buildFinalizarAulaZeroRequest();
+            return lastValueFrom(this.service.finalizarAulaZero(request));
+        }
+        else {
+            const request = this.buildFinalizar(eventoResponse);
+            return lastValueFrom(this.service.finalizar(request))
         }
     }
+
 }

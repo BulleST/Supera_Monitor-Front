@@ -205,9 +205,11 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
             // Turma ativa
             turma.active 
             // Turma com vagas ou turma do aluno
-            && ((aluno.turma_Id && aluno.turma_Id == turma.id) || (aluno.turma_Id != turma.id && turma.vagas > 0))
+            && ((aluno.turma_Id && aluno.turma_Id == turma.id) || (aluno.turma_Id != turma.id && turma.vagasDisponiveis > 0))
             // Turma compatível com o perfil do aluno
             && ((aluno.perfilCognitivo_Id && turma.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id)) || (!aluno.perfilCognitivo_Id))
+            // Turma que seja no térreo se o aluno tiver restrição de mobilidade
+            && ((aluno.restricaoMobilidade && turma.andar == SalaAndar.Terreo) || !aluno.restricaoMobilidade)
         );
 
     }
@@ -228,7 +230,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
             return this.showError('Não autorizado', 'A turma ' + turma.nome + ' foi desabilitada', e.originalEvent);
         }
 
-        if (turma.vagas == 0) {
+        if (turma.vagasDisponiveis == 0) {
             model.control.setValue(null)
             return this.showError('Não autorizado', 'A turma ' + turma.nome + ' atingiu a capacidade máxima permitida', e.originalEvent);
         }
@@ -245,7 +247,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
                 `O aluno(a) ${aluno.aluno} possui restrição de mobilidade e não pode participar dessa turma que ocorre na sala ${turma.sala} - ${turma.andar}º andar.`,
                 e.originalEvent
             );
-                
         }
 
         this.calculaVagas(aluno)
@@ -254,15 +255,13 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
     calculaVagas(aluno: Evento_Participacao_Aluno) {
         this.turmas.map(x => {
-            x.vagas = x.capacidadeMaximaAlunos - x.alunosAtivos;
             if (x.id == aluno.turma_Id) {
-                x.vagas = x.vagas - 1;
+                x.vagasDisponiveis = x.vagasDisponiveis - 1;
             }
         })
         this.turmasFiltered.map(x => {
-            x.vagas = x.capacidadeMaximaAlunos - x.alunosAtivos;
             if (x.id == aluno.turma_Id) {
-                x.vagas = x.vagas - 1;
+                x.vagasDisponiveis = x.vagasDisponiveis - 1;
             }
         })
 

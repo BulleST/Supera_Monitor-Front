@@ -496,7 +496,8 @@ export class CadastrarAula0Component implements OnDestroy {
                     }
                 })
             }
-
+            
+            model.control.setErrors({ indisponivel: null });
             model.control.updateValueAndValidity()
 
         }
