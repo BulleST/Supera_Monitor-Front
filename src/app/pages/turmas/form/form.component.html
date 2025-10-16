@@ -128,18 +128,16 @@
                               optionDisabled="deactivated"
                               fluid>
                         <ng-template let-item #item>
-                                
-
-                            <app-sala-aula [sala_Id]="item.id"
-                                [andar]="item.andar"
-                                [numeroSala]="item.numeroSala"
-                                [descricao]="item.descricao"></app-sala-aula>
-
-                            <p-badge *ngIf="item.disponivel == false"
-                                     value="Indisponível"
-                                     severity="danger"
-                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                     
+                            <div class="w-full flex align-items-center justify-content-between">
+                                <app-sala-aula [sala_Id]="item.id"
+                                               [andar]="item.andar"
+                                               [numeroSala]="item.numeroSala"
+                                               [descricao]="item.descricao"></app-sala-aula>
+                                <p-badge *ngIf="item.disponivel == false"
+                                         value="Indisponível"
+                                         severity="danger"
+                                         [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                            </div>
                             <ng-template #indisponivelTemplate>
                                 <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
                             </ng-template>
@@ -188,16 +186,14 @@
                                     <p class="font-bold mb-1 flex align-items-center ">
                                         <app-legend-color [corLegenda]="item.corLegenda"
                                                           [professor_Id]="item.id"
-                                                          [professor]="item.nome"></app-legend-color>S
-                                        <span class="mr-2">{{ item.nome }}</span>
+                                                          [professor]="item.nome"></app-legend-color>S <span class="mr-2">{{ item.nome }}</span>
                                         <p-badge *ngIf="item.disponivel == false"
                                                  value="Indisponível"
                                                  severity="danger"
                                                  [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                                 
-                                                 <ng-template #indisponivelTemplate>
-                                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                                 </ng-template>
+                                        <ng-template #indisponivelTemplate>
+                                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                        </ng-template>
                                     </p>
                                     <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
                                         <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
@@ -234,21 +230,21 @@
             </div>
             <div class="field lg:col-6 sm:col-3 col-6"> <!-- Perfil Cognitivo -->
                 <label for="perfilCognitivo">Perfil Cognitivo: <span class="text-red-500">*</span></label>
-                <p-multiselect 
-                    [options]="perfisCognitivos"
-                    [(ngModel)]="object.perfilCognitivo"
-                    [loading]="loadingPerfisCognitivos"
-                    (ngModelChange)="perfilChange(perfilCognitivo)"
-                    #perfilCognitivo="ngModel"
-                    inputId="perfilCognitivo"
-                    name="perfilCognitivo"
-                    placeholder="Selecione"
-                    optionLabel="nome"
-                    [filter]="true"
-                    filterBy="nome"
-                    [required]="true"
-                    styleClass="w-full" 
-                    appendTo="body" />
+                <p-multiselect
+                               [options]="perfisCognitivos"
+                               [(ngModel)]="object.perfilCognitivo"
+                               [loading]="loadingPerfisCognitivos"
+                               (ngModelChange)="perfilChange(perfilCognitivo)"
+                               #perfilCognitivo="ngModel"
+                               inputId="perfilCognitivo"
+                               name="perfilCognitivo"
+                               placeholder="Selecione"
+                               optionLabel="nome"
+                               [filter]="true"
+                               filterBy="nome"
+                               [required]="true"
+                               styleClass="w-full"
+                               appendTo="body" />
                 <div *ngIf="perfilCognitivo.touched && perfilCognitivo.invalid && perfilCognitivo.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="perfilCognitivo.errors['required']">Esse campo é obrigatório.</p>
                 </div>
@@ -258,14 +254,14 @@
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-whatsapp text-green-500" />
                     <!-- <p-inputicon styleClass="pi pi-link" /> -->
-                    <input type="url" 
-                        pInputText 
-                        placeholder="Link" 
-                        name="linkGrupo"
-                        id="linkGrupo"
-                        #linkGrupo="ngModel"
-                        [(ngModel)]="object.linkGrupo"
-                        class="w-full"/>
+                    <input type="url"
+                           pInputText
+                           placeholder="Link"
+                           name="linkGrupo"
+                           id="linkGrupo"
+                           #linkGrupo="ngModel"
+                           [(ngModel)]="object.linkGrupo"
+                           class="w-full" />
                 </p-iconfield>
                 <p class="text-sm text-primary-500 mt-1 ml-1">Obs.: Esse link será enviado na mensagem de boas-vindas</p>
             </div>
@@ -291,7 +287,7 @@
                           label="Salvar"
                           icon="pi pi-check"
                           [loading]="loading"
-                          [rounded]="true"/>
+                          [rounded]="true" />
             </div>
         </div>
     </form>

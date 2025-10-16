@@ -165,35 +165,31 @@
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
                           optionValue="id"
+                          optionLabel="descricao"
                           name="sala_Id"
                           inputId="sala_Id"
                           [required]="true"
                           [filter]="true"
-                          filterBy="nome"
+                          filterBy="descricao"
                           appendTo="body"
                           optionDisabled="deactivated"
                           placeholder="Selecione"
                           fluid>
-                    <ng-template #selectedItem let-selectedOption>
-                        <app-sala-aula [numeroSala]="selectedOption.numeroSala"
-                                       [andar]="selectedOption.andar"
-                                       [sala_Id]="selectedOption.id"></app-sala-aula>
-                    </ng-template>
-                    <ng-template let-item #item>
-                        <span class="mr-2">
-                            <app-sala-aula [numeroSala]="item.numeroSala"
-                                           [andar]="item.andar"
-                                           [sala_Id]="item.id"></app-sala-aula>
-                        </span>
-                        <p-badge *ngIf="item.disponivel == false"
-                                 value="Indisponível"
-                                 severity="danger"
-                                 [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                 
-                                 <ng-template #indisponivelTemplate>
-                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                 </ng-template>
-                    </ng-template>
+                          <ng-template let-item #item>
+                              <div class="w-full flex align-items-center justify-content-between">
+                                  <app-sala-aula [sala_Id]="item.id"
+                                                 [andar]="item.andar"
+                                                 [numeroSala]="item.numeroSala"
+                                                 [descricao]="item.descricao"></app-sala-aula>
+                                  <p-badge *ngIf="item.disponivel == false"
+                                           value="Indisponível"
+                                           severity="danger"
+                                           [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                              </div>
+                              <ng-template #indisponivelTemplate>
+                                  <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                              </ng-template>
+                          </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>

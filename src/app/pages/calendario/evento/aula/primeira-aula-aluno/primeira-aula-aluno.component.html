@@ -132,11 +132,11 @@
             <div>
                 <div class="inline-flex gap-2">
                     <label>Sala:</label>
-                    <app-sala-aula
-                                   class="text-primary font-bold"
+                    <app-sala-aula class="text-primary font-bold"
                                    [andar]="evento.andar"
                                    [numeroSala]="evento.numeroSala"
-                                   [sala_Id]="evento.sala_Id" />
+                                   [sala_Id]="evento.sala_Id"
+                                   [descricao]="evento.sala" />
                 </div>
             </div>
             <ng-container *ngIf="selectedAluno">

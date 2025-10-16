@@ -23,11 +23,11 @@
         <!-- Sala -->
         <ng-container *ngIf="evento.sala_Id">
             <p>
-                <span>Sala: </span>
                 <app-sala-aula
                                [numeroSala]="evento.numeroSala"
                                [andar]="evento.andar"
-                               [sala_Id]="evento.sala_Id"></app-sala-aula>
+                               [sala_Id]="evento.sala_Id"
+                               [descricao]="evento.sala"></app-sala-aula>
             </p>
         </ng-container>
     </div>

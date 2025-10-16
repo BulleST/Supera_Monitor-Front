@@ -58,16 +58,8 @@
         <ng-template #eventBody>
             <div class="event-body">
                 <span class="event-descricao">{{evento.descricao}}</span>
-                <ng-container *ngIf="evento.sala_Id">
-                    <span class="event-sala">
-                        <ng-container *ngTemplateOutlet="salaTemplate"></ng-container>
-                    </span>
-                    <ng-template #salaTemplate>
-                        <b>Sala: </b>
-                        <app-sala-aula [numeroSala]="evento.numeroSala"
-                                       [andar]="evento.andar"
-                                       [sala_Id]="evento.sala_Id"></app-sala-aula>
-                    </ng-template>
+                <ng-container *ngIf="evento.sala">
+                    <span class="event-sala">{{evento.sala}}</span>
                 </ng-container>
             </div>
         </ng-template>

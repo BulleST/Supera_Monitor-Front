@@ -22,7 +22,7 @@ import { Evento, EventoTipo } from '../../../../../models/evento.model'
 import { CalendarioRequest } from '../../../../../models/calendario.model'
 import { ChecklistService } from '../../../../../services/checklist.service'
 import { AccountService } from '../../../../../services/account.service'
-import { validaAlunos, validaProfessores, validaSalaAulas } from '../../../../../utils/validacao'
+import { validaAlunos, validaProfessores, validaSalaAulas, validaAlunoSalaAula } from '../../../../../utils/validacao'
 import { Feriado } from '../../../../../models/feriado.model'
 import { DatePickerYearChangeEvent } from 'primeng/datepicker'
 import { MultiSelectChangeEvent } from 'primeng/multiselect'
@@ -49,8 +49,9 @@ export class CadastrarAula0Component implements OnDestroy {
     error: string = ''
     subscription: Subscription[] = []
     object: EventoAula0Request = new EventoAula0Request()
-    data: Date = undefined as unknown as Date
-    horario: Date = undefined as unknown as Date
+   
+    data: Date = moment('2025-10-16T16:00').toDate() as unknown as Date
+    horario: Date = moment('2025-10-16T16:00').toDate() as unknown as Date
 
     blockAlunoField = false
 
@@ -103,9 +104,10 @@ export class CadastrarAula0Component implements OnDestroy {
         private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
-        private salaAulaPipe: SalaAulaPipe,
     ) {
-        this.object.descricao = 'Aula 0'
+        this.object.descricao = 'Aula 0';
+        this.object.sala_Id = SalaAulaId.NeuroSalaNeuronio;
+        this.object.professor_Id = 43;
 
         let feriados = this.service.feriados.subscribe(res => {
             this.feriados = res;
@@ -346,7 +348,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 let data = moment(item.disponivelEvent.data).format('HH[h]mm');
                 let tipo = this.getTipo(item.disponivelEvent)
                 mensagemErro = `Existe uma outra ${tipo} às ${data} no mesmo dia.`
-            } 
+            }
             else if (!item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
                 let inicio = moment(item.expedienteInicio).format('HH[h]mm');
                 let fim = moment(item.expedienteFim).format('HH[h]mm');
@@ -356,8 +358,8 @@ export class CadastrarAula0Component implements OnDestroy {
 
         if (mensagemErro) {
             this.showError(
-                'Educador indisponível', 
-                mensagemErro, 
+                'Educador indisponível',
+                mensagemErro,
                 e.originalEvent
             )
             model.control.setValue(undefined)
@@ -367,37 +369,35 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
-        let salaAula = this.salaAulas.find(x => x.id == e.value) as SalaAula
+        let item = this.salaAulas.find(x => x.id == e.value) as SalaAula;
+        let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
 
+        console.log('salaAulaChanged sala', item)
         this.validaSalaAulas()
 
-        let alunosComRestricaoMobilidade = this.selectedAlunos.filter(x => x.restricaoMobilidade)
 
-        let item = this.salaAulas.find(x => x.id == e.value)
-        if (item && item.disponivel == false && item.disponivelEvent) {
-            model.control.setErrors({ indisponivel: 'Sala indisponível' })
-            let data = moment(item.disponivelEvent.data).format('HH[h]mm')
-            let tipo = this.getTipo(item.disponivelEvent)
+        if (item.disponivel == false && item.disponivelEvent) {
+            model.control.setErrors({ indisponivel: 'Sala indisponível' });
+            let data = moment(item.disponivelEvent.data).format('HH[h]mm');
+            let tipo = this.getTipo(item.disponivelEvent);
             this.showError(
                 'Sala Indisponível',
                 `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
                 e.originalEvent,
-            )
-            return
-        } else if (alunosComRestricaoMobilidade.length && salaAula && salaAula.andar > 1) {
+            );
+            return;
+        } 
+        
+        if (alunosRestricao.length && item.andar > 1) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
-            let alunos = alunosComRestricaoMobilidade.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
-            let sala = this.salaAulaPipe.transform({ 
-                sala_Id: salaAula.id,
-                numeroSala: salaAula.numeroSala,
-                andar: salaAula.andar,
-            })
+            let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
+            let sala = item.descricao;
             this.showError(
                 'Restrição de Mobilidade',
                 `O(s) aluno(s) ${alunos}} tem restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`,
-                e.originalEvent,
-            )
-            return
+                e.originalEvent
+            );
+            return;
         }
 
         model.control.setErrors({ indisponivel: null })
@@ -421,8 +421,8 @@ export class CadastrarAula0Component implements OnDestroy {
                 let data = moment(aluno.disponivelEvent.data).format('HH[h]mm');
 
                 this.showError(
-                    'Aluno Indisponível', 
-                    `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`, 
+                    'Aluno Indisponível',
+                    `${nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`,
                     e.originalEvent
                 );
 
@@ -430,31 +430,49 @@ export class CadastrarAula0Component implements OnDestroy {
                 return
             }
 
-            aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
+            const salaValid = validaAlunoSalaAula(this.object.sala_Id, aluno.id, this.salaAulas, this.alunos);
+            if (!salaValid) {
+                this.showError(
+                    'Restrição de Mobilidade',
+                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    e.originalEvent
+                );
+
+                this.selectAlunoReject(aluno, model);
+                return;
+            }
             
-            let mensagem = ''
+            let aulaZero: Evento;
+            let participacaoAulaZero: Evento_Participacao_Aluno;
+            let mensagem = '';
+
             if (aluno.aulaZero_Id) {
-                let aulaZero: Evento = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
-                let participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+                aulaZero = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
+                participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+
+                console.log('aulaZero', aulaZero)
+                console.log('participacaoAulaZero', participacaoAulaZero)
 
                 if (participacaoAulaZero.presente && aulaZero.finalizado) {
                     let data = moment(aulaZero.data).format('DD/MM/YY [às] HH[h]mm');
                     let educador = aulaZero.professor;
                     this.showError(
-                        'Não autorizado', 
-                        `O aluno ${nome} já participou de de uma aula zero no dia <b>${data}</b> com o educador(a) ${educador}.`, 
+                        'Não autorizado',
+                        `O aluno ${nome} já participou de de uma aula zero no dia <b>${data}</b> com o educador(a) ${educador}.`,
                         e.originalEvent
                     );
 
                     this.selectAlunoReject(aluno, model);
                     return
                 }
-
+                
                 mensagem += await this.aulaZeroMensagem(aluno, aulaZero, participacaoAulaZero);
             }
             
-            
-            mensagem += await this.restricaoMobilidadeMensagem(aluno);
+
+            aluno = await this.loadAluno(e.originalEvent, aluno, model) as Aluno;
+
+            mensagem += await this.restricoesMensagem(aluno);
             mensagem += await this.maisDeUmAlunoMensagem(aluno);
 
             if (mensagem) {
@@ -483,10 +501,10 @@ export class CadastrarAula0Component implements OnDestroy {
         }
     }
 
-
-    async aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
-        let mensagem = '<br>';
-        mensagem += `<p>Outra aula zero já foi cadastrada: </p>`;
+     aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
+        console.log('aulaZeroMensagem', aulaZero, participacaoAulaZero)
+        let mensagem = `<br>
+                    <p>Outra aula zero já foi cadastrada: </p>`;
 
         if (!aulaZero.active) {
             mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
@@ -498,26 +516,29 @@ export class CadastrarAula0Component implements OnDestroy {
             mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
             mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
         }
+        return mensagem;
     }
 
-    async restricaoMobilidadeMensagem(aluno: Aluno) {
-
+    async restricoesMensagem(aluno: Aluno) {
         let mensagem = '';
+        let restricoes = aluno.restricoes.filter(x => x.active === true);
 
-        let restricoes = aluno.restricoes.filter(x => x.active === true)
-        let restricaoMobilidade = aluno.restricaoMobilidade
+        if (restricoes.length > 0 || aluno.restricaoMobilidade) {
+            mensagem += `<br>
+                        <p class="font-bold">Restrições:</p> 
+                        <ul class="my-2 pl-2">`;
 
-        if (restricoes.length > 0 || restricaoMobilidade) {
-            mensagem += '<br>'
-            mensagem += '<p class="font-bold">Restrições:</p> <ul class="my-2 pl-2">'
 
-            if (restricaoMobilidade)
-                mensagem += '<li>Restrição de mobilidade </li>'
             if (restricoes.length > 0)
-                mensagem += restricoes.map(x => `<li>${x.descricao}</li>`)
+                mensagem += restricoes.map(x => `<li>${x.descricao}</li>`);
 
-            mensagem += `</ul>`
-            mensagem += `<p class="text-sm text-red-500">Tem certeza que deseja ignorar as restrições e continuar?</p>`;
+            if (aluno.restricaoMobilidade)
+                mensagem += '<li><b>Restrição de mobilidade</b></li>';
+
+            mensagem += `</ul>`;
+            mensagem += `<p class="text-sm text-red-500">
+                            Tem certeza que deseja ignorar as restrições e continuar?
+                        </p>`;
         }
         return mensagem;
     }
@@ -541,11 +562,11 @@ export class CadastrarAula0Component implements OnDestroy {
 
     selectAlunoReject(aluno: Aluno, model: NgModel) {
         let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
-        if (index)
+        if (index != -1)
             this.selectedAlunos.splice(index, 1);
 
         model.control.setValue(this.selectedAlunos);
-        model.control.updateValueAndValidity()
+        model.control.updateValueAndValidity();
     }
 
 
@@ -625,10 +646,7 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.object = res.object
                 this.service.calendarioReload.emit(res.object.id)
                 this.markChecklistAsDone()
-                // Refresh alunos list after event registration
-                await lastValueFrom(this.alunoService.getList())
                 this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado')
-                // playSuccess();
 
                 if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
                     this.sendMensagemAluno(e, res.object)
@@ -728,4 +746,6 @@ export class CadastrarAula0Component implements OnDestroy {
             })
         }
     }
+
+
 }

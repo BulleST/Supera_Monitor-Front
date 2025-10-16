@@ -25,12 +25,14 @@
                     <!-- Sala -->
                     <div class="selected-evento-linha">
                         <span class="selected-evento-linha-icon">
-                            <i class="fa-solid fa-users-between-lines"></i>
+                            <i class="fa-solid fa-building"></i>
                         </span>
-                        <span>Sala: </span>
-                        <app-sala-aula [sala_Id]="evento.sala_Id"
-                                       [andar]="evento.andar"
-                                       [numeroSala]="evento.numeroSala"></app-sala-aula>
+                        <div class="flex align-items-center gap-2">
+                            <span>{{evento.sala}}</span>
+                            <span>-</span>
+                            <span *ngIf="evento.andar == 0">Térreo</span>
+                            <span *ngIf="evento.andar > 0">{{evento.andar}}º andar</span>
+                        </div>
                     </div>
                     <!-- Educador -->
                     <div class="selected-evento-linha"

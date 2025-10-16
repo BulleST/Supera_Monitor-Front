@@ -139,61 +139,44 @@
             </div>
             <!-- Sala -->
             <div class="field sm:col-3 col-5">
-                <label for="sala_Id">Sala: <span
-                          *ngIf="evento.finalizado"
-                          class="text-red-500">*</span></label>
+                <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
                 <p-select
                           [options]="salaAulas"
                           [(ngModel)]="evento.sala_Id"
                           [loading]="loadingSalaAulas"
                           (onChange)="salaAulaChanged($event, sala_Id)"
                           #sala_Id="ngModel"
-                          styleClass="w-full"
-                          class="w-full"
                           name="sala_Id"
                           inputId="sala_Id"
                           optionValue="id"
+                          optionLabel="descricao"
                           [required]="true"
                           [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
+                          filterBy="descricao"
                           optionDisabled="deactivated"
                           [readonly]="evento.finalizado || !evento.active"
-                          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'">
-                    <ng-template
-                                 #selectedItem
-                                 let-selectedOption>
-                        <app-sala-aula
-                                       [numeroSala]="selectedOption.numeroSala"
-                                       [andar]="selectedOption.andar"
-                                       [sala_Id]="selectedOption.id"></app-sala-aula>
-                    </ng-template>
-                    <ng-template
-                                 let-item
-                                 #item>
-                        <span class="mr-2">
-                            <app-sala-aula
-                                           [numeroSala]="item.numeroSala"
+                          [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
+                          appendTo="body"
+                          fluid>
+                    <ng-template let-item #item>
+                        <div class="w-full flex align-items-center justify-content-between">
+                            <app-sala-aula [sala_Id]="item.id"
                                            [andar]="item.andar"
-                                           [sala_Id]="item.id"></app-sala-aula>
-                        </span>
-                        <p-badge
-                                 *ngIf="item.disponivel == false"
-                                 value="Indisponível"
-                                 severity="danger"
-                                 [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                                           [numeroSala]="item.numeroSala"
+                                           [descricao]="item.descricao"></app-sala-aula>
+                            <p-badge *ngIf="item.disponivel == false"
+                                     value="Indisponível"
+                                     severity="danger"
+                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                        </div>
                         <ng-template #indisponivelTemplate>
                             <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
                         </ng-template>
                     </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
-                    <p
-                       class="text-red-500 mt-2 mb-0"
-                       *ngIf="sala_Id.errors['required']"> Esse campo é obrigatório. </p>
-                    <p
-                       class="text-red-500 mt-2 mb-0"
-                       *ngIf="sala_Id.errors['indisponivel']"> Sala indisponível. </p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']"> Esse campo é obrigatório. </p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']"> Sala indisponível. </p>
                 </div>
             </div>
             <!-- Perfil Cognitivo -->
@@ -591,24 +574,6 @@
                             <!-- Presente -->
                             <td class="pb-1 pt-2">
                             </td>
-                            <!-- Observações  -->
-                            <!-- <td class="pb-1 pt-2">
-                                <div class="flex flex-column" >
-                                    <label for="observacao" 
-                                        class="ml-1 text-sm">Observações:</label>
-                                    <textarea pTextarea
-                                            placeholder="Insira as observações..."
-                                            [(ngModel)]="item.observacao"
-                                            (onFocus)="inputFocus($event, item)"
-                                            id="observacao[{{rowIndex}}]"
-                                            name="observacao[{{rowIndex}}]"
-                                            class="10rem {{ item.presente === false || evento.finalizado ? 'pointer-events-none' : '' }}"
-                                            style="height: 32px"
-                                            [readonly]="evento.finalizado"
-                                            placeholder="Selecione"
-                                            ></textarea>
-                                </div>
-                            </td> -->
                         </tr>
                     </ng-template>
                 </p-table>

@@ -4,6 +4,23 @@ import { Evento } from "../models/evento.model";
 import { SalaAula } from "../models/sala-aula.model";
 import { Aluno } from "../models/alunos.model";
 
+export function validaAlunoSalaAula(sala_Id: number, aluno_Id: number, salas: SalaAula[], alunos: Aluno[]) {
+    const aluno = alunos.find(x => x.id == aluno_Id);
+    const sala = salas.find(x => x.id == sala_Id);
+
+    if (!aluno || !sala){
+        return true;
+    }
+
+    if (aluno.restricaoMobilidade && sala.andar > 0) {
+        return false;
+    }
+
+    return true;
+
+}
+
+
 export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[], eventos: Evento[], turma_Id?: number, evento_Id?: number) {
     let intervaloDe = moment(data);
     let intervaloAte = moment(data).add(duracaoMinutos - 1, 'minutes');

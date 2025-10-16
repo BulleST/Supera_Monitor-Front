@@ -8,17 +8,17 @@ import { SalaAulaId } from "./sala-aula.model";
 export class Evento {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
-
     evento_Tipo_Id: number = EventoTipo.Aula;
-    sala_Id: number = SalaAulaId.Online1;
-    numeroSala: number = undefined as unknown as number;
-    andar: number = undefined as unknown as number;
-    duracaoMinutos: number = 60; 
-
     descricao: string = '';
     observacao: string = '';
     finalizado: boolean = false;
+    duracaoMinutos: number = 60; 
 
+    
+    sala: string = '';
+    sala_Id: number = undefined as unknown as number;
+    numeroSala: number = undefined as unknown as number;
+    andar: number = undefined as unknown as number;
 
     alunos: Evento_Participacao_Aluno[] = [];
     professores: Evento_Participacao_Professor[] = [];

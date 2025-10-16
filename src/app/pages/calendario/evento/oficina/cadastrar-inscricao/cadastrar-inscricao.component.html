@@ -63,8 +63,7 @@
                                display="chip"
                                optionLabel="nome"
                                #aluno_Id="ngModel"
-                               styleClass="w-full"
-                               class="w-full"
+                               fluid
                                name="aluno_Id"
                                inputId="aluno_Id"
                                [required]="true"
@@ -85,7 +84,7 @@
                                                   icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                                   severity="success"
                                                   [text]="true"
-                                                  size="small"/>
+                                                  size="small" />
                                     </div>
                                     <p class="font-bold mb-1">
                                         <span class="mr-2 capitalize">{{item.nome | nameAbv }}</span>
@@ -93,10 +92,9 @@
                                                  value="Indisponível"
                                                  severity="danger"
                                                  [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                                 
-                                                 <ng-template #indisponivelTemplate>
-                                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                                 </ng-template>
+                                        <ng-template #indisponivelTemplate>
+                                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                        </ng-template>
                                     </p>
                                 </div>
                                 <p class="mb-1 flex align-items-center gap-2 ">
@@ -128,7 +126,7 @@
                        [value]="evento.descricao"
                        id="descricao"
                        name="descricao"
-                       class="w-full"
+                       fluid
                        [readonly]="true">
             </div>
             <!-- Data -->
@@ -139,8 +137,7 @@
                     <input type="text"
                            pInputText
                            [value]="evento.data | date : 'dd/MM/yyyy'"
-                           styleClass="w-full"
-                           class="w-full"
+                           fluid
                            id="professor"
                            readonly />
                 </p-iconfield>
@@ -152,9 +149,8 @@
                     <input type="text"
                            pInputText
                            [value]="evento.data | date : 'HH:mm'"
-                           styleClass="w-full"
-                           class="w-full"
-                           id="v"
+                           fluid
+                           id="horario"
                            readonly />
                     <p-inputicon styleClass="pi pi-clock" />
                 </p-iconfield>
@@ -165,9 +161,7 @@
                 <p-iconfield>
                     <input type="text"
                            pInputText
-                           [value]="duracaoEvento"
-                           styleClass="w-full"
-                           class="w-full"
+                           [value]="duracaoEvento" fluid
                            id="duracaoEvento"
                            readonly />
                     <p-inputicon styleClass="pi pi-hourglass" />
@@ -179,8 +173,7 @@
                 <input type="text"
                        pInputText
                        [value]="evento.capacidadeMaximaEvento"
-                       styleClass="w-full"
-                       class="w-full"
+                       fluid
                        id="capacidadeMaximaEvento"
                        readonly />
             </div>
@@ -190,8 +183,7 @@
                 <input type="text"
                        pInputText
                        [value]="evento.professor ?? 'Indefinido'"
-                       styleClass="w-full"
-                       class="w-full"
+                       fluid
                        id="professor"
                        readonly />
             </div>
@@ -201,16 +193,14 @@
                 <input type="text"
                        pInputText
                        [value]="sala"
-                       styleClass="w-full"
-                       class="w-full"
+                       fluid
                        id="sala"
                        readonly />
             </div>
             <!-- Observações -->
             <div class="field col-12">
                 <label for="observacao">Observações:</label>
-                <textarea pTextarea
-                          class="w-full"
+                <textarea pTextarea fluid
                           name="observacao"
                           id="observacao"
                           [value]="evento.observacao"
