@@ -11,5 +11,5 @@ export interface Evento_Participacao_Professor {
 
     created: Date 
     deactivated?: Date;
-    active: boolean ;
+    active: boolean;
 }

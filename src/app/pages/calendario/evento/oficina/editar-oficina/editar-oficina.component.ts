@@ -64,7 +64,8 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
         if (changes['isChamadaPage']) this.isChamadaPage = changes['isChamadaPage'].currentValue;
-        this.width.emit('650px')
+        this.width.emit('650px');
+
     }
 
     ngOnDestroy(): void {

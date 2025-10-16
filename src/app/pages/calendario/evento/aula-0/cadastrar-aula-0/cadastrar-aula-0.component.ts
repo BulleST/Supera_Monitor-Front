@@ -50,8 +50,8 @@ export class CadastrarAula0Component implements OnDestroy {
     subscription: Subscription[] = []
     object: EventoAula0Request = new EventoAula0Request()
    
-    data: Date = moment('2025-10-16T16:00').toDate() as unknown as Date
-    horario: Date = moment('2025-10-16T16:00').toDate() as unknown as Date
+    data: Date = undefined as unknown as Date
+    horario: Date = undefined as unknown as Date
 
     blockAlunoField = false
 

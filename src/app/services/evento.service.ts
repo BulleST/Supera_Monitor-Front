@@ -112,12 +112,9 @@ export class EventoService extends Service {
     mapEvento(evento: Evento) {
         evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').locale('pt-BR').toDate();
         evento.active = !evento.deactivated;
-        evento.professores = evento.professores ?? [];
-        evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1))
-        evento.professores = evento.professores.map(x => {
-            x.active = !x.deactivated;
-            return x
-        })
+        
+        evento.professores = evento.professores.filter(x => x.active) ?? [];
+        evento.professores = evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1));
 
         evento.alunos = evento.alunos ?? [];
         evento.alunos.sort((x, y) => (x.aluno < y.aluno ? -1 : 1))
