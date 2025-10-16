@@ -1,34 +1,18 @@
-
-::ng-deep .popover-event-hover .p-popover-content {
-    height: auto;
-    padding: 0px;
-}
-
-.event.event-hover.event-feriado {
-    min-height: 70px;
-
-}
-
-.event.event-hover {
-    width: calc(100% + 20px );
-    height: 100%;
-    min-width: 170px;
-    min-height: 120px;
-    display: flex;
-    flex-flow: column;
-    flex: 1 1 0% !important;
-    padding: 0.35rem;
+ .event.event-hover{
+   width: 190px;
+    height: 90px;
+    padding: 7px;
+    margin: 0;
+    cursor: pointer;
     border-radius: 4px;
-    border-style: solid;
-    border-width: 2px;
-    box-shadow: 0 0 3px 0px rgba(0, 0, 0, .5)
+    transition: .1s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.event.event-hover.event-reuniao {
-    min-height: 60px;
-}
 
-.event.event-hover .event-header {
+.event-hover .event-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -36,90 +20,115 @@
     gap: 0.25rem;
     white-space: nowrap;
     text-overflow: ellipsis;
-    overflow: hidden;
-    font-size: 1rem;
+    line-height: 1;
 }
 
-.event.event-hover .event-time {
+.event-hover .event-time {
     display: flex;
     align-items: center;
     gap: 0.25rem;
     margin-right: auto;
+    font-size: .9rem;
+    line-height: 1;
 }
 
-.event.event-hover .event-educador {
+.event-hover .event-time .pi {
+    font-size: .8rem;
 }
 
-.event.event-hover .event-body {
+.event-hover .event-educador {
+    font-size: .9rem;
+    line-height: 1;
+}
+.event-hover .event-body {
     width: 100%;
-    height: 3rem;
-    margin-top: auto;
-    margin-bottom: auto;
-    overflow: hidden;
+    /* margin: 5px 0 0; */
+    margin: auto 0;
+    display: block;
+}
+
+.event-hover .event-descricao {
+    font-size: 1.1rem;
+    font-weight: bold;
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.25;
 }
 
-.event.event-hover.event-reuniao .event-body,
-.event.event-hover.event-oficina .event-body,
-.event.event-hover.event-aula-zero .event-body,
-.event.event-hover.event-superacao .event-body {
-    height: unset;
-}
-
-.event.event-hover .event-descricao {
-    width: 100%;
-    font-size: 1.2rem;
-    font-weight: bold;
-}
-.event.event-hover.event-reuniao .event-descricao {
-    font-size: 1rem;
-}
-
-.event.event-hover .event-sala {
-    font-size: 1rem;
-    display: flex;
-    gap: 2px;
-}
-
-.event.event-hover.event-reuniao .event-sala {
+.event-hover .event-sala {
     font-size: .9rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
-.event.event-hover .event-footer {
+.event-hover .event-footer {
     width: 100%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    flex-flow: row wrap;
     gap: 4px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     line-height: 1;
-    font-size: 1rem;
+    text-align: left;
 }
 
-.event.event-hover .event-alunos {
-    font-size: 1rem;
+.event-hover .event-alunos {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    gap: 2px;
+    font-size: .8rem;
+
+}
+.event-hover .event-alunos .pi {
+    font-size: .78rem;
 }
 
-.event.event-hover .event-vagas {
+.event-hover .event-vagas {
     display: flex;
     align-items: center;
     gap: 10px;
+    line-height: .9;
+    font-size: .8rem;
+}
+.event-hover .event-vagas .pi {
+    font-size: .7rem;
 }
 
-.event.event-hover .event-cancelado {
+
+.event-hover .event-cancelado {
     display: flex;
     align-items: center;
     gap: 3px;
-    font-size: 1rem;
+    padding: 0 2px 1px;
+    margin-left: -1px;
+    margin-bottom: -1px;
 }
 
-.event.event-hover .event-finalizado {
+.event-hover .event-finalizado {
     display: flex;
     align-items: center;
     gap: 3px;
-    font-size: 1rem;
+    padding: 0 2px 1px;
+    margin-left: -1px;
+    margin-bottom: -1px;
+} 
+
+.event-hover .event.event-hover .event-feriado .event-hover .event-header {
+    font-size: .8rem;
+    display: flex;
+}
+.event-hover .event.event-hover .event-feriado .event-hover .event-body {
+    display: flex;
+}
+.event-hover .event.event-hover .event-feriado .event-hover .event-body .event-hover .event-descricao {
+    overflow: visible;
+    white-space: normal;
+    text-overflow: unset;
+    font-size: .95rem;
+    text-align: left;
+    line-height: 1.1;
 }

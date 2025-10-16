@@ -5,6 +5,8 @@ import moment from 'moment';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { CalendarioDayView } from '../../../../models/calendario.model';
+import { NameAbvPipe } from '../../../../utils/name.pipe';
+import { NameFirstWordPipe } from '../../../../utils/name-first-word.pipe';
 
 @Component({
     selector: 'app-evento-item',
@@ -22,11 +24,19 @@ export class EventoItemComponent implements OnChanges {
     alunosStr = '';
     CalendarioDayView = CalendarioDayView;
 
+    constructor(
+        private nameFirstWordPipe: NameFirstWordPipe,
+        private nameAbv: NameAbvPipe
+    ) {
+
+    }
+
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            if (this.evento.alunos) 
-                this.alunosStr = this.evento.alunos.map(x => x.aluno.split(' ')[0]).join(', ');
+            if (this.evento.alunos)  {
+                this.alunosStr = this.evento.alunos.map(x => this.nameFirstWordPipe.transform(x.aluno)).join(', ');
+            }
         }
         if (changes['arg']) {
             this.arg = changes['arg'].currentValue;

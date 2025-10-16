@@ -72,9 +72,9 @@
     </ng-template>
     <ng-template #eventBody>
         <div class="event-body">
-            <span class="event-descricao">{{evento.descricao}}</span>
+            <p class="event-descricao">{{evento.descricao}}</p>
             <ng-container *ngIf="evento.sala">
-                <span class="event-sala">{{evento.sala}}</span>
+                <p class="event-sala">{{evento.sala}}</p>
             </ng-container>
         </div>
     </ng-template>
@@ -100,7 +100,13 @@
             <ng-template #notFinalizado>
                 <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
                     <span class="event-alunos">
+                        <i class="pi pi-users"></i>
                         <span>{{ alunosStr }}</span>
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="[EventoTipo.Reuniao].includes(evento.evento_Tipo_Id)">
+                    <span class="event-alunos">
+                        <span>{{ evento.professores.length }} educadores</span>
                     </span>
                 </ng-container>
                 <ng-container *ngIf="evento.perfilCognitivo.length > 0">
@@ -111,18 +117,18 @@
                 </ng-container>
                 <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
                     <span class="event-vagas" [pTooltip]="tooltipVagas">
-                        <p class="flex flex-row align-items-center gap-1">
-                            <i class="pi pi-calendar text-xs"></i>
+                        <span class="flex flex-row align-items-center gap-1 line-height-1">
+                            <i class="pi pi-calendar"></i>
                             <span>
                                 {{evento.vagasDisponiveisEvento}}/{{evento.alunosAtivosEvento}}
                             </span>
-                        </p>
-                        <p class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                        </span>
+                        <span class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
                             <i class="fa fa-users-between-lines text-xs"></i>
                             <span>
                                 {{evento.vagasDisponiveisTurma}}/{{evento.alunosAtivosTurma}}
                             </span>
-                        </p>
+                        </span>
                         <ng-template #tooltipVagas>
                             <p class="flex flex-row align-items-center gap-1 white-space-nowrap">
                                 <i class="pi pi-calendar text-xs"></i>

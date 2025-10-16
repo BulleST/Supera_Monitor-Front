@@ -76,9 +76,10 @@
             <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
                 <i class="bi bi-door-closed"></i>
                 <span>Sala: </span>
-                <app-sala-aula [sala_Id]="evento.sala_Id"
-                               [numeroSala]="evento.numeroSala"
-                               [andar]="evento.andar"></app-sala-aula>
+                <span>{{evento.sala}}</span>
+                <span>-</span>
+                <span *ngIf="evento.andar == SalaAndar.Terreo">Terreo</span>
+                <span *ngIf="evento.andar != SalaAndar.Terreo">{{evento.andar}}ºandar</span>
             </span>
         </p>
         <div class="formgrid grid mt-2">

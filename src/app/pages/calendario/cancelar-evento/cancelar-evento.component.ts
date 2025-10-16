@@ -23,7 +23,7 @@ import { ProfessorService } from '../../../services/professor.service'
 import { RequestResponse } from '../../../helpers/request-response.interface'
 
 import { Turma } from '../../../models/turma.model'
-import { SalaAulaId } from '../../../models/sala-aula.model'
+import { SalaAulaId, SalaAndar } from '../../../models/sala-aula.model'
 
 @Component({
     selector: 'app-cancelar-evento',
@@ -33,23 +33,24 @@ import { SalaAulaId } from '../../../models/sala-aula.model'
     providers: [ConfirmationService],
 })
 export class CancelarEventoComponent implements OnDestroy {
-    evento: Evento = new Evento()
-    visible: boolean = false
-    loading = false
-    error: string = ''
-    subscription: Subscription[] = []
+    evento: Evento = new Evento();
+    visible: boolean = false;
+    loading = false;
+    error: string = '';
+    subscription: Subscription[] = [];
     tipoEventoString = '';
     EventoTipo = EventoTipo;
 
-    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
-    alunos: Evento_Participacao_Aluno[] = []
+    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
+    alunos: Evento_Participacao_Aluno[] = [];
 
-    professores: Professor[] = []
-    loadingProfessores = false
+    professores: Professor[] = [];
+    loadingProfessores = false;
 
-    turmas: Turma[] = []
-    loadingTurmas = false
-    SalaAulaId = SalaAulaId
+    turmas: Turma[] = [];
+    loadingTurmas = false;
+    SalaAulaId = SalaAulaId;
+    SalaAndar = SalaAndar;
 
     constructor(
         private activatedRoute: ActivatedRoute,

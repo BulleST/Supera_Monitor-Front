@@ -57,9 +57,9 @@
         </ng-template>
         <ng-template #eventBody>
             <div class="event-body">
-                <span class="event-descricao">{{evento.descricao}}</span>
+                <p class="event-descricao">{{evento.descricao}}</p>
                 <ng-container *ngIf="evento.sala">
-                    <span class="event-sala">{{evento.sala}}</span>
+                    <p class="event-sala">{{evento.sala}}</p>
                 </ng-container>
             </div>
         </ng-template>
