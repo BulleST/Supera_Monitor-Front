@@ -39,6 +39,7 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
+import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
 
 @NgModule({
     declarations: [
@@ -63,6 +64,7 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         LegendColorComponent,
         IndisponivelTooltipComponent,
         CalendarioComponent,
+        ReposicaoDeSelectComponent,
     ],
     exports: [
         FormsModule,
@@ -95,6 +97,7 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         TableHeaderFilterComponent,
         LegendColorComponent,
         IndisponivelTooltipComponent,
+        ReposicaoDeSelectComponent,
     ],
     imports: [
         CommonModule,

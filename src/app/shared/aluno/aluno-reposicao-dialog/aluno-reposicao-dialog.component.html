@@ -1,5 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-dialog [header]="'Agendar reposição'"
+<p-dialog 
         [maximizable]="true"
         [draggable]="true"
         [modal]="true"
@@ -10,7 +10,10 @@
         id="reposicao">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
-            <span class="p-dialog-title"><i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> Agendar reposição</span>
+            <span class="p-dialog-title">
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> 
+                <span>Agendar reposição</span>
+            </span>
         </div>
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
@@ -183,7 +186,6 @@
                                             [filter]="true"
                                             filterBy="descricao,turma,professor,data,sala"
                                             optionLabel="descricao"
-                                            optionDisabled="deactivated"
                                             placeholder="Selecione uma aula para repor"
                                             (onChange)="eventoReposicaoChanged()"
                                             panelStyleClass="p-select-stripped"
@@ -195,10 +197,10 @@
                                         <ng-template #selectedItem let-selectedOption>
                                             <ng-container *ngIf="selectedOption">
                                                 <div class="flex align-items-center">
-                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 border-1 text-white ">
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 border-1 border-primary-500 text-white ">
                                                         <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
                                                     </div>
-                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                                    <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-100 text-primary-500 ">
                                                         <span>{{selectedOption.data | date : 'HH:mm'}}</span>
                                                     </div>
                                                     <p class="flex align-items-center gap-1 ml-2">
@@ -231,21 +233,22 @@
                                                                           [professor]="item.professor"
                                                                           [turma_Id]="item.turma_Id"></app-legend-color>
                                                     </p>
-                                                    <p class="flex align-items-center gap-2 py-1">
-                                                        <span class="">Sala: </span>
-                                                        <app-sala-aula [andar]="item.andar"
-                                                                    [numeroSala]="item.numeroSala"
-                                                                    [sala_Id]="item.sala_Id"></app-sala-aula>
-
-                                                        <span class="ml-auto text-base">
-                                                                {{item.vagasDisponiveisEvento }} vaga(s)
-                                                        </span>
-                                                    </p>
+                                                    <p class="flex align-items-center gap-1 py-1">
+                                                        <span>{{item.sala}}</span>
+                                                        <span>-</span>
+                                                        <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
+                                                        <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
+                                                        </p>
                                                 </div>
                                             </div>
                                         </ng-template>
                                     
                                     </p-select>
+                                    <!-- <app-reposicao-de-select *ngIf="aluno"
+                                        [selected]="eventoReposicaoDe"
+                                        [readonly]="blockReposicaoDeField"
+                                        [aluno]="aluno"
+                                    ></app-reposicao-de-select> -->
                                 </p-iconfield>
                                 <div *ngIf="eventoReposicao_Id.touched && eventoReposicao_Id.invalid && eventoReposicao_Id.errors">
                                     <p class="text-red-500 mt-2 mb-0" *ngIf="eventoReposicao_Id.errors['required']">Esse campo é obrigatório.</p>
@@ -308,7 +311,13 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="bi bi-door-closed text-base"></i>
                                                 </div>
-                                                <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(eventoReposicaoDe)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis flex align-items-center gap-2">
+                                                    <span>Sala: </span>
+                                                    <span>{{eventoReposicaoDe.sala}}</span>
+                                                    <span>-</span>
+                                                    <span *ngIf="eventoReposicaoDe.andar == SalaAndar.Terreo">Térreo</span>
+                                                    <span *ngIf="eventoReposicaoDe.andar > SalaAndar.Terreo">{{eventoReposicaoDe.andar}}º andar</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -321,7 +330,10 @@
                                                     }"></i>
                                                 </div>
                                                 <div class="flex align-items-center gap-2 w-full">
-                                                    <p class="overflow-hidden text-overflow-ellipsis">Roteiro: {{eventoReposicaoDe.tema + ' - Semana ' + eventoReposicaoDe.semana}}</p>
+                                                    <p class="overflow-hidden text-overflow-ellipsis">
+                                                        Roteiro: 
+                                                        {{eventoReposicaoDe.tema + ' - Semana ' + eventoReposicaoDe.semana}}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -479,12 +491,13 @@
                                                                           [turma_Id]="item.turma_Id"></app-legend-color>
                                                     </p>
                                                     <p class="flex align-items-center gap-2">
-                                                        <span class="">Sala: </span>
-                                                        <app-sala-aula [andar]="item.andar"
-                                                                    [numeroSala]="item.numeroSala"
-                                                                    [sala_Id]="item.sala_Id"></app-sala-aula>
+                                                        <span >Sala: </span>
+                                                        <span>{{item.sala}}</span>
+                                                        <span>-</span>
+                                                        <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
+                                                        <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
                                                         <span class="ml-auto text-base">
-                                                                {{item.vagasDisponiveisEvento}} vaga(s)
+                                                            {{item.vagasDisponiveisEvento}} vaga(s)
                                                         </span>
                                                     </p>
                                                 </div>
@@ -552,7 +565,13 @@
                                                 <div class="w-2rem text-center flex-none">
                                                     <i class="bi bi-door-closed text-base"></i>
                                                 </div>
-                                                <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(eventoReposicaoPara)}}</p>
+                                                <p class="overflow-hidden text-overflow-ellipsis flex align-items-center gap-2">
+                                                        <span>Sala: </span>
+                                                        <span>{{eventoReposicaoPara.sala}}</span>
+                                                        <span>-</span>
+                                                        <span *ngIf="eventoReposicaoPara.andar == SalaAndar.Terreo">Térreo</span>
+                                                        <span *ngIf="eventoReposicaoPara.andar > SalaAndar.Terreo">{{eventoReposicaoPara.andar}}º andar</span>
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -663,3 +682,6 @@
         </div>
     </form>
 </p-dialog>
+
+
+

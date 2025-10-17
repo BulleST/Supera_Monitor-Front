@@ -17,6 +17,7 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { SelectChangeEvent } from 'primeng/select';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
+import { SalaAndar } from '../../../models/sala-aula.model';
 
 @Component({
     selector: 'app-aluno-reposicao-dialog',
@@ -50,6 +51,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     blockReposicaoParaField = false;
 
     onHide = new EventEmitter<boolean>();
+    SalaAndar = SalaAndar;
+
 
     constructor(
         private eventoService: EventoService,
@@ -163,11 +166,15 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
+    get roteiroDe() {
+        if (this.roteiros.length == 0 || this.eventoReposicaoDe) {
+            return undefined
+        }
+    }
+
     setAlunos() {
         if (this.alunos.length) {
-            this.alunos = this.alunos.filter(x => {
-                x.active == true && !!x.turma_Id
-            })
+            this.alunos = this.alunos.filter(x => x.active == true && !!x.turma_Id)
             if (this.eventoReposicaoPara) {
 
                 // Em caso de rota por selected-evento.component > opções > agendar reposicao
@@ -203,51 +210,50 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     loadEventosReposicaoDe() {
-        if (this.aluno) {
-            let request: CalendarioRequest = {
-                aluno_Id: this.aluno.id,
-                intervaloDe: moment().subtract(1, 'month').toDate(),
-                intervaloAte: moment().endOf('year').toDate(),
-            }
+        // if (this.aluno) {
+        //     let request: CalendarioRequest = {
+        //         aluno_Id: this.aluno.id,
+        //         intervaloDe: moment().subtract(1, 'month').toDate(),
+        //         intervaloAte: moment().endOf('year').toDate(),
+        //     }
 
-            this.loadingEventosReposicaoDe = true;
-            lastValueFrom(this.eventoService.getList(request))
-                .then(res => {
-                    this.eventosReposicaoDeList = res.filter(aula => {
-                        const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
-                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                        const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
-                        const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
-                        const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
+        //     this.loadingEventosReposicaoDe = true;
+        //     lastValueFrom(this.eventoService.getList(request))
+        //         .then(res => {
+        //             this.eventosReposicaoDeList = res.filter(aula => {
+        //                 const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
+        //                 const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+        //                 const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
+        //                 const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
+        //                 const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
 
+        //                 return alunoEstaNaAula
+        //                     && ehAula
+        //                     && naoMarcouReposicaoAinda
+        //                     && naoEhReposicao
+        //                     && naoGanhouPresenca
+        //             });
+        //             this.loadingEventosReposicaoDe = false;
 
-                        return alunoEstaNaAula
-                            && ehAula
-                            && naoMarcouReposicaoAinda
-                            && naoEhReposicao
-                            && naoGanhouPresenca
-                    });
-                    this.loadingEventosReposicaoDe = false;
-
-                    if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
-                        this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id
-                            && moment(x.data).isSame(this.eventoReposicaoDe!.data)
-                            && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
-                    }
-                })
-                .catch(res => {
-                    this.loadingEventosReposicaoDe = true;
-                    this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
-                });
-        }
+        //             if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
+        //                 this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id
+        //                     && moment(x.data).isSame(this.eventoReposicaoDe!.data)
+        //                     && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
+        //             }
+        //         })
+        //         .catch(res => {
+        //             this.loadingEventosReposicaoDe = true;
+        //             this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
+        //         });
+        // }
     }
 
     async loadEventosReposicaoPara() {
 
         if (!this.aluno) {
-            return
+            return undefined
         }
-        if (this.aluno && this.eventoReposicaoDe) {
+        else if (this.aluno && this.eventoReposicaoDe) {
             let request: CalendarioRequest = {
                 perfil_Cognitivo_Id: this.aluno!.perfilCognitivo_Id,
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
@@ -269,6 +275,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                         const aulaEstaAtiva = aula.active;
                         const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
                         const naoEhFeriado = !aula.feriado;
+                        const salaValida = !this.aluno?.restricaoMobilidade || (this.aluno.restricaoMobilidade && aula.andar == SalaAndar.Terreo)
+                        
                         return aulaAtiva
                             && alunoNaoEstaNaAula
                             && ehAula
@@ -277,10 +285,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && aulaNaoFinalizada
                             && aulaEstaAtiva
                             && ehPerfilCognitivoCompativel
-                            && naoEhFeriado;
+                            && naoEhFeriado
+                            && salaValida;
 
                     });
-
 
                     this.loadingEventosReposicaoPara = false;
                 })
