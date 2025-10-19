@@ -1,0 +1,60 @@
+<p-select
+          [options]="items"
+          [(ngModel)]="selected"
+          placeholder="Select Item"
+          [virtualScroll]="true"
+          [virtualScrollItemSize]="38"
+          optionLabel="descricao"
+          fluid
+          appendTo="body" >
+          <ng-template #footer>
+            <p-button label="carregar mais"
+            (onClick)="carregarMais()"/>
+          </ng-template>
+          <ng-template let-selectedOption #selectedItem>
+            <div class="flex gap-2 align-items-center">
+                <span>{{selectedOption.data | date : 'dd/MM HH:mm'}}</span>
+                <span>{{selectedOption.descricao}}</span>
+            </div>
+        </ng-template>
+        <ng-template let-item #item>
+            <div class="flex gap-2 align-items-start">
+                <div class="flex flex-column text-xs line-height-1">
+                    <span class="line-height-1 bg-primary-500 text-white p-1">{{item.data | date : 'dd/MMM'}}</span>
+                    <span class="line-height-1 p-1 text-center border-1 border-100">{{item.data | date : 'HH:mm'}}</span>
+                </div>
+                <div>
+                    <div class="flex aling-items-baseline gap-2">
+                        <span class="text-sm">{{item.descricao}}</span>
+                        <app-legend-color [corLegenda]="item.corLegenda"
+                                [professor_Id]="item.professor_Id"
+                                [professor]="item.professor"
+                                [turma_Id]="item.turma_Id"></app-legend-color>
+                    </div>
+                    <div class="flex text-xs">
+                        <ng-container *ngTemplateOutlet="participacaoTemplate; context: { participacao: getParticipacaoAluno(item) }"></ng-container>
+                        <ng-template #participacaoTemplate let-participacao>
+                            @if (!item.active) {
+                                <span class="text-xs line-height-1 text-900 font-bold">Cancelada</span>
+                                <span *ngIf="item.observacao">{{item.observacao}}</span>
+                            }
+                            @else if (participacao && participacao.presente === false && item.finalizado === true) {
+                                <span class="text-xs line-height-1 text-red-500">Faltou</span>
+                                }
+                            @else if (participacao && participacao.presente === true && item.finalizado === true) {
+                                <span class="text-xs line-height-1 text-green-500">Presente</span>
+                            }
+                            @else if (participacao && participacao.presente === false && item.finalizado === false) {
+                                <span class="text-xs line-height-1 text-red-500">Agendada</span>
+                            }
+                            @else {
+                                <span class="text-xs line-height-1 text-500">Aula normal</span>
+                            }
+    
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+      </ng-template>
+    
+</p-select>

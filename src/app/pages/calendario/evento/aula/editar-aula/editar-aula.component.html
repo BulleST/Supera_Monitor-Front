@@ -221,7 +221,7 @@
             <!-- CARDS -->
             <ng-container *ngIf="[ScreenWidth.xs].includes(screen)">
                 <div class="flex align-items-stretch flex-wrap py-2">
-                    <ng-container *ngFor="let item of evento.alunos; let i = index">
+                    <ng-container *ngFor="let item of evento.alunos; let rowIndex = index">
                         <app-aluno-popover #popoverAluno
                                            [aluno_Id]="item.aluno_Id"
                                            [evento]="evento"
@@ -286,86 +286,32 @@
                                     <label for="apostila_Abaco">Ábaco: <span class="text-red-500">*</span></label>
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
-                                        <p-select [options]="item.apostilasAbacoList"
-                                                  (onChange)="apostilaAbacoChange(item, $event)"
-                                                  (onFocus)="apostilaAbacoClick(item)"
-                                                  [(ngModel)]="item.apostilaAbacoObject"
-                                                  #apostila_Abaco="ngModel"
-                                                  name="apostila_Abaco[{{i}}]"
-                                                  inputId="apostila_Abaco[{{i}}]"
-                                                  optionLabel="nome"
-                                                  [filter]="true"
-                                                  filterBy="nome"
-                                                  placeholder="Selecione"
-                                                  styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                  [required]="!!item.presente"
-                                                  [readonly]="item.presente === false || evento.finalizado"
-                                                  [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                  appendTo="body"
-                                                  fluid />
+                                        <ng-container *ngTemplateOutlet="apostilaAbacoTemplate; context: { item, rowIndex }"></ng-container>
                                     </p-iconfield>
                                 </div>
                                 <!-- Página Abaco -->
                                 <div class="field col-6">
                                     <label for="numeroPaginaAbaco">Página: <span class="text-red-500">*</span></label>
-                                    <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
-                                                   (onInput)="numeroPaginaAbacoChange(item, $event)"
-                                                   (onFocus)="inputFocus($event, item)"
-                                                   name="numeroPaginaAbaco[{{i}}]"
-                                                   inputId="numeroPaginaAbaco[{{i}}]"
-                                                   [min]="0"
-                                                   [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
-                                                   #numeroPaginaAbaco="ngModel"
-                                                   [required]="true"
-                                                   [readonly]="item.presente === false || evento.finalizado"
-                                                   fluid />
+                                    <ng-container *ngTemplateOutlet="paginaAbacoTemplate; context: { item, rowIndex }"></ng-container>
                                 </div>
                                 <!-- AH -->
                                 <div class="field col-6">
                                     <label for="apostila_AH">AH: <span class="text-red-500">*</span></label>
                                     <p-iconfield>
                                         <p-inputicon styleClass="fa-solid fa-book-open" />
-                                        <p-select [options]="item.apostilasAHList"
-                                                  (ngModelChange)="apostilaAHChange(item, $event)"
-                                                  (onFocus)="apostilaAHClick(item)"
-                                                  [(ngModel)]="item.apostilaAHObject"
-                                                  [disabled]="!evento.active"
-                                                  #apostila_AH="ngModel"
-                                                  name="apostila_AH[{{i}}]"
-                                                  inputId="apostila_AH[{{i}}]"
-                                                  optionLabel="nome"
-                                                  [filter]="true"
-                                                  filterBy="nome"
-                                                  placeholder="Selecione"
-                                                  styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                  [required]="!!item.presente"
-                                                  [readonly]="item.presente === false || evento.finalizado"
-                                                  [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                  appendTo="body"
-                                                  fluid />
+                                        <ng-container *ngTemplateOutlet="apostilaAHTemplate; context: { item, rowIndex }"></ng-container>
                                     </p-iconfield>
                                 </div>
                                 <!-- Página AH -->
                                 <div class="field col-6">
                                     <label for="numeroPaginaAH">Página: <span class="text-red-500">*</span></label>
-                                    <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
-                                                   (onFocus)="inputFocus($event, item)"
-                                                   (onInput)="numeroPaginaAHChange(item, $event)"
-                                                   name="numeroPaginaAH[{{i}}]"
-                                                   inputId="numeroPaginaAH[{{i}}]"
-                                                   [disabled]="!evento.active"
-                                                   [min]="0"
-                                                   [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
-                                                   #numeroPaginaAH="ngModel"
-                                                   [required]="true"
-                                                   [readonly]="item.presente === false || evento.finalizado"
-                                                   fluid />
+                                    <ng-container *ngTemplateOutlet="paginaAHTemplate; context: { item, rowIndex }"></ng-container>
                                 </div>
                                 <!-- Observações -->
                                 <div class="field col-12">
                                     <textarea pTextarea
-                                              id="observacao[{{i}}]"
-                                              name="observacao[{{i}}]"
+                                              id="observacao[{{rowIndex}}]"
+                                              name="observacao[{{rowIndex}}]"
                                               [(ngModel)]="item.observacao"
                                               (onFocus)="inputFocus($event, item)"
                                               [readonly]="evento.finalizado"
@@ -461,49 +407,14 @@
                                                for="apostila_Abaco[{{ rowIndex }}]">Abaco:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
-                                            <p-select [options]="item.apostilasAbacoList"
-                                                      (onChange)="apostilaAbacoChange(item, $event)"
-                                                      (onFocus)="apostilaAbacoClick(item)"
-                                                      autocomplete="off"
-                                                      [(ngModel)]="item.apostilaAbacoObject"
-                                                      #apostila_Abaco="ngModel"
-                                                      name="apostila_Abaco[{{ rowIndex }}]"
-                                                      inputId="apostila_Abaco[{{ rowIndex }}]"
-                                                      optionLabel="nome"
-                                                      [required]="true"
-                                                      filterBy="nome"
-                                                      appendTo="body"
-                                                      placeholder="Selecione"
-                                                      styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                      [required]="!!item.presente"
-                                                      [readonly]="item.presente === false || evento.finalizado"
-                                                      [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                      fluid>
-                                            </p-select>
+                                            <ng-container *ngTemplateOutlet="apostilaAbacoTemplate; context: { item, rowIndex }"></ng-container>
                                         </p-iconfield>
                                     </div>
                                     <!-- Página Ábaco -->
                                     <div class="flex flex-column ">
                                         <label class="ml-1 text-sm"
                                                for="numeroPaginaAbaco[{{ rowIndex }}]">Página:</label>
-                                        <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
-                                                       inputId="numeroPaginaAbaco[{{ rowIndex }}]"
-                                                       name="numeroPaginaAbaco[{{ rowIndex }}]"
-                                                       #numeroPaginaAbaco="ngModel"
-                                                       #apostilaAbacoInput
-                                                       (onFocus)="inputFocus($event, item)"
-                                                       (onInput)="numeroPaginaAbacoChange(item, $event)"
-                                                       (keydown.enter)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
-                                                       (keydown.arrowdown)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
-                                                       (keydown.arrowUp)="apostilaAbacoInputNumberPrev(rowIndex, apostilaAbacoInput)"
-                                                       autocomplete="off"
-                                                       [min]="0"
-                                                       [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
-                                                       [step]="0"
-                                                       inputStyleClass="w-4rem h-full text-center"
-                                                       class="h-full"
-                                                       [required]="true"
-                                                       [readonly]="item.presente === false || evento.finalizado" />
+                                        <ng-container *ngTemplateOutlet="paginaAbacoTemplate; context: { item, rowIndex }"></ng-container>
                                     </div>
                                     <!-- AH -->
                                     <div class="flex flex-column w-10rem">
@@ -511,48 +422,14 @@
                                                for="apostila_AH[{{ rowIndex }}]">AH:</label>
                                         <p-iconfield>
                                             <p-inputicon styleClass="fa-solid fa-book-open" />
-                                            <p-select [options]="item.apostilasAHList"
-                                                      (onChange)="apostilaAHChange(item, $event)"
-                                                      (onFocus)="apostilaAHClick(item)"
-                                                      [(ngModel)]="item.apostilaAHObject"
-                                                      #apostila_AH="ngModel"
-                                                      name="apostila_AH[{{ rowIndex }}]"
-                                                      inputId="apostila_AH[{{ rowIndex }}]"
-                                                      optionLabel="nome"
-                                                      [required]="true"
-                                                      filterBy="nome"
-                                                      appendTo="body"
-                                                      placeholder="Selecione"
-                                                      styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
-                                                      [required]="!!item.presente"
-                                                      [readonly]="item.presente === false || evento.finalizado"
-                                                      [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
-                                                      fluid>
-                                            </p-select>
+                                            <ng-container *ngTemplateOutlet="apostilaAHTemplate; context: { item, rowIndex }"></ng-container>
                                         </p-iconfield>
                                     </div>
                                     <!-- Página AH -->
                                     <div class="flex flex-column ">
                                         <label class="ml-1 text-sm"
                                                for="numeroPaginaAH[{{ rowIndex }}]">Página:</label>
-                                        <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
-                                                       inputId="numeroPaginaAH[{{ rowIndex }}]"
-                                                       name="numeroPaginaAH[{{ rowIndex }}]"
-                                                       (onFocus)="inputFocus($event, item)"
-                                                       (onInput)="numeroPaginaAHChange(item, $event)"
-                                                       (keydown.enter)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
-                                                       (keydown.arrowDown)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
-                                                       (keydown.arrowUp)="apostilaAHInputNumberPrev(rowIndex, apostilaAHInput)"
-                                                       autocomplete="off"
-                                                       #numeroPaginaAH="ngModel"
-                                                       #apostilaAHInput
-                                                       [min]="0"
-                                                       [max]="item.apostilaAHObject?.numeroTotalPaginas"
-                                                       [step]="0"
-                                                       inputStyleClass="w-4rem h-full text-center"
-                                                       class="h-full"
-                                                       [required]="true"
-                                                       [readonly]="item.presente === false || evento.finalizado" />
+                                        <ng-container *ngTemplateOutlet="paginaAHTemplate; context: { item, rowIndex }"></ng-container>
                                     </div>
                                     <!-- Observações -->
                                     <div class="flex flex-column">
@@ -581,3 +458,82 @@
         </div>
     </ng-container>
 </div>
+<ng-template #apostilaAbacoTemplate let-item="item" let-rowIndex="rowIndex">
+    <p-select [options]="item.apostilasAbacoList"
+              (onChange)="apostilaAbacoChange(item, $event)"
+              (onFocus)="apostilaAbacoClick(item)"
+              autocomplete="off"
+              [(ngModel)]="item.apostilaAbacoObject"
+              #apostila_Abaco="ngModel"
+              name="apostila_Abaco[{{ rowIndex }}]"
+              inputId="apostila_Abaco[{{ rowIndex }}]"
+              optionLabel="nome"
+              [required]="true"
+              filterBy="nome"
+              appendTo="body"
+              placeholder="Selecione"
+              styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+              [required]="!!item.presente"
+              [readonly]="item.presente === false || evento.finalizado"
+              [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
+              fluid />
+</ng-template>
+<ng-template #apostilaAHTemplate let-item="item" let-rowIndex="rowIndex">
+    <p-select [options]="item.apostilasAHList"
+              (onChange)="apostilaAHChange(item, $event)"
+              (onFocus)="apostilaAHClick(item)"
+              [(ngModel)]="item.apostilaAHObject"
+              #apostila_AH="ngModel"
+              name="apostila_AH[{{ rowIndex }}]"
+              inputId="apostila_AH[{{ rowIndex }}]"
+              optionLabel="nome"
+              [required]="true"
+              filterBy="nome"
+              appendTo="body"
+              placeholder="Selecione"
+              styleClass="{{ item.presente === false || evento.finalizado ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+              [required]="!!item.presente"
+              [readonly]="item.presente === false || evento.finalizado"
+              [dropdownIcon]="item.presente === false || evento.finalizado ? 'pi hidden' : 'pi pi-angle-down'"
+              fluid />
+</ng-template>
+<ng-template #paginaAHTemplate let-item="item" let-rowIndex="rowIndex">
+    <p-inputnumber [(ngModel)]="item.numeroPaginaAH"
+                   inputId="numeroPaginaAH[{{ rowIndex }}]"
+                   name="numeroPaginaAH[{{ rowIndex }}]"
+                   (onFocus)="inputFocus($event, item)"
+                   (onInput)="numeroPaginaAHChange(item, $event, numeroPaginaAH)"
+                   (keydown.enter)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
+                   (keydown.arrowDown)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
+                   (keydown.arrowUp)="apostilaAHInputNumberPrev(rowIndex, apostilaAHInput)"
+                   autocomplete="off"
+                   #numeroPaginaAH="ngModel"
+                   #apostilaAHInput
+                   [min]="0"
+                   [max]="item.apostilaAHObject?.numeroTotalPaginas"
+                   [step]="0"
+                   inputStyleClass="w-4rem h-full text-center"
+                   class="h-full"
+                   [required]="true"
+                   [readonly]="item.presente === false || evento.finalizado" />
+</ng-template>
+<ng-template #paginaAbacoTemplate let-item="item" let-rowIndex="rowIndex">
+    <p-inputnumber [(ngModel)]="item.numeroPaginaAbaco"
+                   inputId="numeroPaginaAbaco[{{ rowIndex }}]"
+                   name="numeroPaginaAbaco[{{ rowIndex }}]"
+                   #numeroPaginaAbaco="ngModel"
+                   #apostilaAbacoInput
+                   (onFocus)="inputFocus($event, item)"
+                   (onBlur)="numeroPaginaAbacoChange(item, $event, numeroPaginaAbaco)"
+                   (keydown.enter)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
+                   (keydown.arrowdown)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
+                   (keydown.arrowUp)="apostilaAbacoInputNumberPrev(rowIndex, apostilaAbacoInput)"
+                   autocomplete="off"
+                   [min]="0"
+                   [max]="item.apostilaAbacoObject?.numeroTotalPaginas"
+                   [step]="0"
+                   inputStyleClass="w-4rem h-full text-center"
+                   class="h-full"
+                   [required]="true"
+                   [readonly]="item.presente === false || evento.finalizado" />
+</ng-template>

@@ -418,6 +418,7 @@ td.p-datatable-frozen-column {
 p-multiselect.ng-touched.ng-invalid .p-inputtext,
 p-datepicker.ng-touched.ng-invalid .p-inputtext,
 p-inputmask.ng-touched.ng-invalid .p-inputtext,
+p-inputnumber.ng-touched.ng-invalid .p-inputtext,
 .p-inputtext.ng-touched.ng-invalid input,
 input.ng-invalid.ng-touched {
     border: 1px #e93636 solid;

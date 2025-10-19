@@ -309,11 +309,16 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
     }
 
-    numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any) {
+    numeroPaginaAbacoChange(item: Evento_Participacao_Aluno, e: any, model: NgModel) {
         let prev = this.clonedRow[item.aluno_Id];
         let current = item;
 
-        if (current.numeroPaginaAbaco <= prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
+
+        if (current.numeroPaginaAbaco == null) {
+            model.control.setErrors({ required: true });
+            return this.showError('Inserir página', "Insira um valor para a página!", e);
+        } 
+        else if (current.numeroPaginaAbaco < prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
             this.confirmationService.confirm({
                 target: e.target,
                 message: `O aluno está regredindo a página da apostila "${current.apostila_Abaco}"?`,
@@ -375,11 +380,15 @@ export class EditarAulaComponent implements OnChanges, OnDestroy {
         }
     }
 
-    numeroPaginaAHChange(item: Evento_Participacao_Aluno, e: any) {
+    numeroPaginaAHChange(item: Evento_Participacao_Aluno, e: any, model: NgModel) {
         let prev = this.clonedRow[item.aluno_Id];
         let current = item;
 
-        if (current.numeroPaginaAH <= prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
+        if (current.numeroPaginaAH == null) {
+            model.control.setErrors({ required: true });
+            return this.showError('Inserir página', "Insira um valor para a página!", e);
+        } 
+        if (current.numeroPaginaAH < prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
             this.confirmationService.confirm({
                 target: e.target,
                 message: `O aluno está regredindo a página da apostila "${current.apostila_AH}"?`,
