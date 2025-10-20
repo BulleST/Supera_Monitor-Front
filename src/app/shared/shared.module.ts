@@ -40,6 +40,7 @@ import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
+import { ReposicaoParaSelectComponent } from './aluno/aluni-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
 
 @NgModule({
     declarations: [
@@ -65,6 +66,7 @@ import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/repos
         IndisponivelTooltipComponent,
         CalendarioComponent,
         ReposicaoDeSelectComponent,
+        ReposicaoParaSelectComponent,
     ],
     exports: [
         FormsModule,

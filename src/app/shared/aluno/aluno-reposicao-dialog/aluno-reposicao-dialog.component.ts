@@ -210,42 +210,42 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     loadEventosReposicaoDe() {
-        // if (this.aluno) {
-        //     let request: CalendarioRequest = {
-        //         aluno_Id: this.aluno.id,
-        //         intervaloDe: moment().subtract(1, 'month').toDate(),
-        //         intervaloAte: moment().endOf('year').toDate(),
-        //     }
+        if (this.aluno) {
+            let request: CalendarioRequest = {
+                aluno_Id: this.aluno.id,
+                intervaloDe: moment().subtract(1, 'month').toDate(),
+                intervaloAte: moment().endOf('year').toDate(),
+            }
 
-        //     this.loadingEventosReposicaoDe = true;
-        //     lastValueFrom(this.eventoService.getList(request))
-        //         .then(res => {
-        //             this.eventosReposicaoDeList = res.filter(aula => {
-        //                 const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
-        //                 const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-        //                 const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
-        //                 const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
-        //                 const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
+            this.loadingEventosReposicaoDe = true;
+            lastValueFrom(this.eventoService.getList(request))
+                .then(res => {
+                    this.eventosReposicaoDeList = res.filter(aula => {
+                        const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+                        const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
+                        const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
+                        const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
 
-        //                 return alunoEstaNaAula
-        //                     && ehAula
-        //                     && naoMarcouReposicaoAinda
-        //                     && naoEhReposicao
-        //                     && naoGanhouPresenca
-        //             });
-        //             this.loadingEventosReposicaoDe = false;
+                        return alunoEstaNaAula
+                            && ehAula
+                            && naoMarcouReposicaoAinda
+                            && naoEhReposicao
+                            && naoGanhouPresenca
+                    });
+                    this.loadingEventosReposicaoDe = false;
 
-        //             if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
-        //                 this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id
-        //                     && moment(x.data).isSame(this.eventoReposicaoDe!.data)
-        //                     && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
-        //             }
-        //         })
-        //         .catch(res => {
-        //             this.loadingEventosReposicaoDe = true;
-        //             this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
-        //         });
-        // }
+                    if (this.blockReposicaoDeField && this.eventoReposicaoDe) {
+                        this.eventoReposicaoDe = this.eventosReposicaoDeList.find(x => x.id == this.eventoReposicaoDe!.id
+                            && moment(x.data).isSame(this.eventoReposicaoDe!.data)
+                            && x.turma_Id == this.eventoReposicaoDe!.turma_Id);
+                    }
+                })
+                .catch(res => {
+                    this.loadingEventosReposicaoDe = true;
+                    this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
+                });
+        }
     }
 
     async loadEventosReposicaoPara() {
