@@ -23,6 +23,9 @@ import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-
 import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
 import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
 import { AlunoParticipacaoStatusComponent } from './aluno/aluno-participacao-status/aluno-participacao-status.component';
+import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
+import { ReposicaoParaSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
+import { AlunoSelectComponent } from './aluno/aluno-reposicao-dialog/aluno-select/aluno-select.component';
 
 // Outros componentes
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
@@ -39,8 +42,6 @@ import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendar
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
-import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
-import { ReposicaoParaSelectComponent } from './aluno/aluni-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
 
 @NgModule({
     declarations: [
@@ -67,6 +68,7 @@ import { ReposicaoParaSelectComponent } from './aluno/aluni-reposicao-dialog/rep
         CalendarioComponent,
         ReposicaoDeSelectComponent,
         ReposicaoParaSelectComponent,
+        AlunoSelectComponent,
     ],
     exports: [
         FormsModule,

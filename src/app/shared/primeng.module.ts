@@ -50,6 +50,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { SliderModule } from 'primeng/slider';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { SplitButtonModule } from 'primeng/splitbutton';
+import { StepperModule } from 'primeng/stepper'
 import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
@@ -114,6 +115,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         SkeletonModule,
         SliderModule,
         SplitButtonModule,
+        StepperModule,
         SpeedDialModule,
         TableModule,
         TabsModule,
@@ -176,6 +178,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         SkeletonModule,
         SliderModule,
         SplitButtonModule,
+        StepperModule,
         SpeedDialModule,
         TableModule,
         TabsModule,

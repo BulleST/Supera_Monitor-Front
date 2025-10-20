@@ -54,6 +54,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     SalaAndar = SalaAndar;
 
 
+    activeIndex = 0;
     constructor(
         private eventoService: EventoService,
         private alunoService: AlunoService,
@@ -114,7 +115,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
 
         let eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
-            if (res) {
+            let params = this.activatedRoute.snapshot.paramMap;
+            if (res && params.get('eventoReposicaoDe')) {
                 this.eventoReposicaoDe = res;
                 this.blockReposicaoDeField = true;
                 this.loadEventosReposicaoPara();
@@ -123,7 +125,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         this.subscription.push(eventoReposicaoDe);
 
         let eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => {
-            if (res) {
+            let params = this.activatedRoute.snapshot.paramMap;
+            if (res && params.get('eventoReposicaoPara')) {
                 this.eventoReposicaoPara = res;
                 this.blockReposicaoParaField = true;
                 this.setAlunos();
@@ -276,7 +279,13 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                         const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
                         const naoEhFeriado = !aula.feriado;
                         const salaValida = !this.aluno?.restricaoMobilidade || (this.aluno.restricaoMobilidade && aula.andar == SalaAndar.Terreo)
-                        
+                        const mesmaAula = this.eventoReposicaoDe!.id == aula.id && ![aula.id].includes(PseudoEvento.EventoId);
+                        const mesmaDataHora = moment(this.eventoReposicaoDe!.data).isSame(aula.data);
+                        console.log('aula', aula.data, aula)
+                        console.log('mesmaAula', mesmaAula)
+                        console.log('mesmaDataHora', mesmaDataHora)
+                        console.log('    ')
+
                         return aulaAtiva
                             && alunoNaoEstaNaAula
                             && ehAula
@@ -286,7 +295,9 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
                             && aulaEstaAtiva
                             && ehPerfilCognitivoCompativel
                             && naoEhFeriado
-                            && salaValida;
+                            && salaValida
+                            && !mesmaAula
+                            && !mesmaDataHora;
 
                     });
 
