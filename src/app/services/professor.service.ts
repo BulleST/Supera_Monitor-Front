@@ -13,7 +13,6 @@ import { getError, insert, replace } from '../utils';
 export class ProfessorService extends Service {
     override list = new BehaviorSubject<Professor[]>([]);
 
-
     mapProfessor(item: Professor) {
         if (item.expedienteInicio)
             item.expedienteInicio = new Date(moment().format('YYYY-MM-DD') + 'T' + item.expedienteInicio);

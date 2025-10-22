@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
+import { BehaviorSubject, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { TurmaRequest, Turma } from '../models/turma.model';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError, insert, replace } from '../utils';
-import { HttpClient } from '@angular/common/http';
-import { ToastrService } from 'ngx-toastr';
-import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 
 @Injectable({
     providedIn: 'root',
@@ -16,17 +13,9 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 export class TurmaService extends Service {
     override list = new BehaviorSubject<Turma[]>([]);
 
-    constructor(
-        http: HttpClient,
-        toastr: ToastrService,
-    ) {
-
-        super(http, toastr)
-    }
-
     mapTurma(turma: Turma) {
-        let semana = [ "Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", ]
-        
+        let semana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado",]
+
         turma.active = !turma.deactivated;
         turma.activeString = turma.active ? 'Ativo' : 'Inativo';
         turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
@@ -44,7 +33,7 @@ export class TurmaService extends Service {
     getList() {
         return this.http.get<Turma[]>(`${this.url}/turmas/all/`)
             .pipe(tap({
-                next: list => {                    
+                next: list => {
                     list.map(turma => this.mapTurma(turma))
                     this.list.next(list);
                     return of(list);
@@ -57,13 +46,13 @@ export class TurmaService extends Service {
 
     get(id: number) {
         return this.http.get<Turma>(`${this.url}/turmas/${id}`).pipe(tap({
-                next: turma => {                    
-                    return of(this.mapTurma(turma));
-                },
-                error: err => {
-                    this.toastrService.error(`Não foi possível carregar turma. \n ${getError(err)}`);
-                }
-            }));
+            next: turma => {
+                return of(this.mapTurma(turma));
+            },
+            error: err => {
+                this.toastrService.error(`Não foi possível carregar turma. \n ${getError(err)}`);
+            }
+        }));
     }
 
     create(model: Turma) {
@@ -90,7 +79,7 @@ export class TurmaService extends Service {
 
     edit(model: Turma) {
         let request = MyMap(model, new TurmaRequest) as TurmaRequest;
-        
+
         request.horario = moment(model.horario).format('HH:mm:ss') as unknown as any;
         request.perfilCognitivo = model.perfilCognitivo.map(x => x.id);
         request.linkGrupo = model.linkGrupo;

@@ -38,6 +38,20 @@
         </a>
     </ng-template>
     <ng-template #end>
+        <ng-container *ngIf="account?.id == 1">
+            <div class="px-2">
+
+                <p-select
+                    [options]="options"
+                    [ngModel]="options[1]"
+                    optionLabel="label"
+                    optionValue="value"
+                    (onChange)="urlChange($event)"
+                    appendTo="body"
+                    fluid
+                />
+            </div>
+        </ng-container>
         <div class="flex justify-content-center align-items-center  pb-3"
              [class.pr-3]="menuOpen"
              *ngIf="accountData">

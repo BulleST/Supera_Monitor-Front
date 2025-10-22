@@ -1,11 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, of, Subject, subscribeOn, tap } from 'rxjs';
+import { BehaviorSubject, of, Subject, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Aluno_CheckList_Item, Checklist } from '../models/checklist.model';
 import { RequestResponse } from '../helpers/request-response.interface';
-import { ToastrService } from 'ngx-toastr';
-import { HttpClient } from '@angular/common/http';
 import { Aluno } from '../models/alunos.model';
 
 @Injectable({
@@ -19,13 +17,6 @@ export class ChecklistService extends Service {
 
     exibicaoLista = new BehaviorSubject<Aluno[]>([])
 
-    constructor(
-        http: HttpClient,
-        toastrService: ToastrService,
-    ) {
-        super(http, toastrService);
-
-    }
     
     getList() {
         return this.http.get<Checklist[]>(`${this.url}/checklist/all/`).pipe(tap({

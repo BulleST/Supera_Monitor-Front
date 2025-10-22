@@ -23,10 +23,10 @@ export class ApostilaService extends Service {
                     this.toastrService.error(`Não foi possível carregar apostilas. \n ${getError(err)}`)
                 }
             }));
-        }
-        
-        getKit() {
-            return this.http.get<Apostila_Kit[]>(`${this.url}/professor/kits/all/`)
+    }
+
+    getKit() {
+        return this.http.get<Apostila_Kit[]>(`${this.url}/professor/kits/all/`)
             .pipe(tap({
                 next: list => {
                     this.listKits.next(list);

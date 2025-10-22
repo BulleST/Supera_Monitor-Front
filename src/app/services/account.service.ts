@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, EventEmitter, Inject } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, lastValueFrom, of, throwError } from 'rxjs';
 import { ChangePassword, Login, Register, ResetPassword, UpdateAccount } from '../models/accounts.model';
@@ -8,6 +8,8 @@ import { getError } from '../utils';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { environment } from '../../environments/environment';
 import { AccountResponse } from '../models/account.model';
+import { Service } from '../helpers/service.service';
+import { UrlService } from '../utils/url.service';
 
 @Injectable({
     providedIn: 'root'
@@ -24,8 +26,12 @@ export class AccountService {
     constructor(
         private router: Router,
         private http: HttpClient,
+        private urlService: UrlService
     ) {
-        this.url = environment.url;
+
+        this.urlService.getUrl().subscribe(res => {
+            this.url = res;
+        })
 
         this.account = this.accountSubject.asObservable();
 

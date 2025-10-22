@@ -1,28 +1,16 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, of, tap } from 'rxjs';
+import { BehaviorSubject, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { SalaAula } from '../models/sala-aula.model';
 import { MyMap } from '../utils/map';
 import { getError } from '../utils';
-import { HttpClient } from '@angular/common/http';
-import { ToastrService } from 'ngx-toastr';
-import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 
 @Injectable({
     providedIn: 'root',
-
 })
 export class SalaAulaService extends Service {
     override list = new BehaviorSubject<SalaAula[]>([]);
-
-    constructor(
-        http: HttpClient,
-        toastr: ToastrService,
-    ) {
-        super(http, toastr)
-
-    }
 
     getList() {
         return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)

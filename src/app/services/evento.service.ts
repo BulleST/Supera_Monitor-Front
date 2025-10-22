@@ -23,6 +23,7 @@ import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
 import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
+import { UrlService } from '../utils/url.service';
 
 @Injectable({
     providedIn: 'root',
@@ -51,13 +52,15 @@ export class EventoService extends Service {
     roteiros: Roteiro[] = [];
 
     constructor(
+        private roteiroService: RoteiroService,
         http: HttpClient,
         toastrService: ToastrService,
-        private roteiroService: RoteiroService
+        urlService: UrlService
     ) {
-        super(http, toastrService);
 
+        super(http, toastrService, urlService);
         this.roteiroService.list.subscribe((res) => (this.roteiros = res));
+
     }
 
     getEvento() {
@@ -70,7 +73,7 @@ export class EventoService extends Service {
     }
 
     setEvento(value: Evento | undefined) {
-        
+
         this.evento.next(value);
         if (value) {
             value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
@@ -117,7 +120,7 @@ export class EventoService extends Service {
     mapEvento(evento: Evento) {
         evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').locale('pt-BR').toDate();
         evento.active = !evento.deactivated;
-        
+
         evento.professores = evento.professores.filter(x => x.active) ?? [];
         evento.professores = evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1));
 

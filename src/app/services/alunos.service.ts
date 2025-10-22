@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/alunos.model';
 import moment from 'moment';
@@ -15,6 +15,8 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
 import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../models/aluno-checklist-item-list.model';
+import { environment } from '../../environments/environment';
+import { UrlService } from '../utils/url.service';
 
 @Injectable({
     providedIn: 'root',
@@ -31,9 +33,10 @@ export class AlunoService extends Service {
         private checklistService: ChecklistService,
         http: HttpClient,
         toastrService: ToastrService,
+        urlService: UrlService,
 
     ) {
-        super(http, toastrService);
+        super(http, toastrService, urlService);
         this.checklistService.list.subscribe(res => this.checklists = res);
     }
 
@@ -41,7 +44,7 @@ export class AlunoService extends Service {
     getAluno() {
         if (!this.aluno.value) {
             let itemString = localStorage.getItem('aluno');
-            let item = itemString ? this.mapAluno(JSON.parse(itemString))  : undefined;
+            let item = itemString ? this.mapAluno(JSON.parse(itemString)) : undefined;
             this.aluno.next(item);
         }
         return this.aluno;
@@ -52,7 +55,7 @@ export class AlunoService extends Service {
         if (value) localStorage.setItem('aluno', JSON.stringify(value));
         else localStorage.removeItem('aluno');
     }
-    
+
     calculaIdade(dataNascimento: Date) {
         const hoje = new Date;
         return moment(hoje).diff(dataNascimento, 'years');

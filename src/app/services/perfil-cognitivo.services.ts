@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
-import { perfisCognitivos, PerfilCognitivo } from '../models/perfil-cognitivo.model';
+import { PerfilCognitivo } from '../models/perfil-cognitivo.model';
 import { getError } from '../utils';
 
 @Injectable({
@@ -10,7 +10,6 @@ import { getError } from '../utils';
 export class PerfilCognitivoService extends Service {
     override list = new BehaviorSubject<PerfilCognitivo[]>([]);
 
-    
     getList(where?: string) {
         return this.http.get<PerfilCognitivo[]>(`${this.url}/turmas/perfil/all/`)
             .pipe(tap({
