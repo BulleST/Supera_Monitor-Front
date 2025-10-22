@@ -35,39 +35,39 @@ import { CalendarioUtils } from '../../../utils/calendario-utils'
     providers: [ConfirmationService],
 })
 export class EventoComponent implements OnDestroy {
-    evento: Evento = new Evento()
-    visible: boolean = false
-    loading = false
-    error: string = ''
-    subscription: Subscription[] = []
-    tipoString = ''
-    duracaoEvento = ''
-    width = '1000px'
-    tipo = EventoTipo
-    encryptedId = ''
+    evento: Evento = new Evento();
+    visible: boolean = false;
+    loading = false;
+    error: string = '';
+    subscription: Subscription[] = [];
+    tipoString = '';
+    duracaoEvento = '';
+    width = '1000px';
+    tipo = EventoTipo;
+    encryptedId = '';
 
     EventoTipo = EventoTipo;
-    selectedAluno?: Evento_Participacao_Aluno
-    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = []
-    alunos: Aluno[] = []
-    loadingAlunos = false
+    selectedAluno?: Evento_Participacao_Aluno;
+    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
+    alunos: Aluno[] = [];
+    loadingAlunos = false;
 
-    professores: Professor[] = []
-    loadingProfessores = false
+    professores: Professor[] = [];
+    loadingProfessores = false;
 
-    salaAulas: SalaAula[] = []
-    loadingSalaAulas = false
+    salaAulas: SalaAula[] = [];
+    loadingSalaAulas = false;
 
-    turmas: Turma[] = []
-    loadingTurmas = false
+    turmas: Turma[] = [];
+    loadingTurmas = false;
 
-    eventos: Evento[] = []
-    loadingEventos = false
+    eventos: Evento[] = [];
+    loadingEventos = false;
 
-    roteiros: Roteiro[] = []
-    loadingRoteiros = false
+    roteiros: Roteiro[] = [];
+    loadingRoteiros = false;
 
-    @ViewChildren('componentForm') componentForm!: QueryList<any>
+    @ViewChildren('componentForm') componentForm!: QueryList<any>;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -365,6 +365,7 @@ export class EventoComponent implements OnDestroy {
                     this.error = res.message
                     this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
                     this.loading = false
+                    console.error(res);
                 })
 
 

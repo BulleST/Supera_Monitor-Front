@@ -120,7 +120,7 @@
                     <p-columnFilter 
                         field="nome"
                         type="text"
-                        matchMode="contains"
+                        [matchMode]="FilterMatchMode.CONTAINS.toString()"
                         class="w-full p-column-filter-inline"
                         fluid/>
                 </div>
@@ -130,7 +130,7 @@
                     <p-columnFilter 
                         field="turma"
                         type="text"
-                        matchMode="contains"
+                        [matchMode]="FilterMatchMode.CONTAINS.toString()"
                         class="w-full p-column-filter-inline"
                         fluid/>
                 </div>

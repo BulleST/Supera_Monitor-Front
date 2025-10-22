@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, FilterMatchMode } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
@@ -58,6 +58,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         { label: DashboardItemStatus.Aula, value: DashboardItemStatus.Aula, styleClass: 'surface-200' },
     ]
 
+    FilterMatchMode = FilterMatchMode;
+
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private service: EventoService,
@@ -65,7 +67,10 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         private activatedRoute: ActivatedRoute,
         private router: Router,
     ) {
-        let calendarioReload = this.service.calendarioReload.subscribe(res => this.update())
+        let calendarioReload = this.service.calendarioReload.subscribe(res => {
+            console.log('calendarioReload')
+            this.update();
+        });
         this.subscription.push(calendarioReload);
     }
 
@@ -99,6 +104,7 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         })
         this.alunos = [];
     }
+
     update() {
         this.onLoading();
         setTimeout(() => {

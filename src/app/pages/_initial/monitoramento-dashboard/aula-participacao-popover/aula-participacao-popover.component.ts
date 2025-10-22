@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component,  HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { Dashboard_Aluno, Dashboard_Item, DashboardItemStatus } from '../../../../models/dashboard.model';
 import { Popover } from 'primeng/popover';
 import { Router } from '@angular/router';
@@ -12,6 +12,7 @@ import { AlunoService } from '../../../../services/alunos.service';
 import { MenuItem } from 'primeng/api';
 import { SelectChangeEvent } from 'primeng/select';
 import { NgModel } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-aula-participacao-popover',
@@ -42,7 +43,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         private service: EventoService,
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private toastr: ToastrService,
     ) {
 
     }
@@ -56,16 +58,12 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         }
     }
 
-   async show(e: any) {
-    this.cdr.detectChanges();
-    this.eventoEncryptedId = this.crypto.encrypt(this.item.aula.id) as string;
+    async show(e: any) {
+        this.cdr.detectChanges();
+        this.eventoEncryptedId = this.crypto.encrypt(this.item.aula.id) as string;
         this.alunoEncryptedId = this.crypto.encrypt(this.item.participacao.aluno_Id) as string;
         this.popover.show(e);
-        await this.loadEvento()
-        .then(res => {
-            this.loadMenuItems();
-
-        })
+        this.loadMenuItems();
     }
 
     hide() {
@@ -125,27 +123,58 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         }
     }
 
-    async loadEvento() {
-        let evento: Evento;
-        if (this.item.aula.id == PseudoEvento.EventoId) {
-            evento = await lastValueFrom(this.service.getPseudoAula(this.item.aula.turma_Id!, this.item.aula.data))
-        }
-        else {
-            evento = await lastValueFrom(this.service.get(this.item.aula.id))
-        }
 
-        this.evento = evento;
-        this.participacao = evento.alunos.find(x => x.aluno_Id == this.item.participacao.aluno_Id);
+    request() {
+        if (this.item.aula.id == PseudoEvento.EventoId) {
+            return lastValueFrom(this.service.getPseudoAula(this.item.aula.turma_Id!, this.item.aula.data))
+        }
+        return lastValueFrom(this.service.get(this.item.aula.id));
     }
 
-    goToAula() {
+    async goToAula() {
+        if (!this.evento) {
+
+            this.evento = await this.request()
+                .catch(res => {
+                    this.toastr.error(res.message, 'Erro');
+                    return undefined
+                })
+        }
         if (this.evento) {
+            if (this.evento.alunos && this.evento.alunos.length) {
+                this.evento.alunos = this.evento.alunos.map(x => {
+                    if (!this.evento!.finalizado) {
+                        if (x.presente !== true && x.presente !== false) {
+                            x.presente = true;
+                        }
+                    }
+                    return x
+                });
+            }
+
+            if (this.evento.professores && this.evento.professores.length) {
+                this.evento.professores = this.evento.professores.map(x => {
+                    x.presente = this.evento!.finalizado ? x.presente : true;
+                    return x
+                })
+            }
             this.service.setEvento(this.evento);
-            this.router.navigate(['calendario', 'aula', this.eventoEncryptedId])
+
+            this.router.navigate(['dashboard', 'aula', this.crypto.encrypt(this.evento.id)]);
+            this.hide();
         }
     }
 
     async goToAgendarFalta() {
+        if (!this.evento) {
+
+            this.evento = await this.request()
+                .catch(res => {
+                    this.toastr.error(res.message, 'Erro');
+                    return undefined
+                })
+        }
+
         if (this.evento) {
             let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
             this.service.setEvento(this.evento);
@@ -155,6 +184,14 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
     }
 
     async goToReposicao() {
+        if (!this.evento) {
+
+            this.evento = await this.request()
+                .catch(res => {
+                    this.toastr.error(res.message, 'Erro');
+                    return undefined
+                })
+        }
         if (this.evento) {
             let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
             this.service.setEventoReposicaoDe(this.evento);
@@ -163,7 +200,18 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         }
     }
 
-    enviarMensagemFalta(e: any) {
+    async enviarMensagemFalta(e: any) {
+        if (!this.evento) {
+            this.evento = await this.request()
+                .catch(res => {
+                    this.toastr.error(res.message, 'Erro');
+                    return undefined
+                })
+        }
+        if (!this.participacao) {
+            this.participacao = this.evento!.alunos.find(x => x.aluno_Id == this.item.participacao.aluno_Id);
+        }
+
         if (this.evento && this.participacao) {
             this.mensagemWhatsapp.enviarMensagemFalta(this.evento, this.participacao, e);
         }

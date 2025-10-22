@@ -8,6 +8,7 @@ import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monit
 import { AgendarReposicaoComponent } from './monitoramento-dashboard/agendar-reposicao/agendar-reposicao.component';
 import { AgendarFaltaComponent } from './monitoramento-dashboard/agendar-falta/agendar-falta.component';
 import { AlunoContatoFaltaComponent } from '../calendario/aluno-contato-falta/aluno-contato-falta.component';
+import { VerAulaComponent } from './monitoramento-dashboard/ver-aula/ver-aula.component';
 
 const calendario = () => import('./../calendario/calendario.module').then(res => res.CalendarioModule);
 const alunos = () => import('./../alunos/alunos.module').then(res => res.AlunosModule);
@@ -24,6 +25,7 @@ const routes: Routes = [
                 { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
                 { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
                 { path: 'contato/:evento_id/:aluno_id', component: AlunoContatoFaltaComponent },
+                { path: 'aula/:evento_id', component: VerAulaComponent },
             ] },
             { path: 'alunos', loadChildren: alunos, canActivate: [AuthGuard] },
             { path: 'calendario', loadChildren: calendario, canActivate: [AuthGuard] },

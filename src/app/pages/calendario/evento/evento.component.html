@@ -36,9 +36,9 @@
                                      [roteiros]="roteiros"
                                      [loadingRoteiros]="loadingRoteiros"
                                      [duracaoEvento]="duracaoEvento"
-                                     (validaProfessor)="professorChanged($event)"
-                                     (validaSala)="salaAulaChanged($event)"
-                                     (width)="width = $event"></app-editar-aula>
+                                     (onProfessorChanged)="professorChanged($event)"
+                                     (onSalaChanged)="salaAulaChanged($event)"
+                                     (onWidthChanged)="width = $event"></app-editar-aula>
                 </div>
                 <div *ngSwitchCase="tipo.AulaZero" class="aula-zero">
                     <app-editar-aula-0 #componentForm
@@ -65,9 +65,9 @@
                                      [roteiros]="roteiros"
                                      [loadingRoteiros]="loadingRoteiros"
                                      [duracaoEvento]="duracaoEvento"
-                                     (validaProfessor)="professorChanged($event)"
-                                     (validaSala)="salaAulaChanged($event)"
-                                     (width)="width = $event"></app-editar-aula>
+                                     (onProfessorChanged)="professorChanged($event)"
+                                     (onSalaChanged)="salaAulaChanged($event)"
+                                     (onWidthChanged)="width = $event"></app-editar-aula>
                 </div>
                 <div *ngSwitchCase="tipo.Superacao" class="superacao">
                     <app-editar-superacao
