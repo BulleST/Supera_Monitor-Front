@@ -16,6 +16,10 @@ import { lastValueFrom } from "rxjs";
 })
 export class MensagemWhatsapp {
 
+    linkWhatsApp = 'https://web.whatsapp.com/send/?phone=<phone>&text=<message>';
+    // linkWhatsApp = 'https://api.whatsapp.com/send?phone=<phone>&text=<message>';
+    // linkWhatsApp = 'https://wa.me//<phone>?text=<message>';
+
     constructor(
         private calendarioUtils: CalendarioUtils,
         private toastr: ToastrService,
@@ -59,7 +63,7 @@ export class MensagemWhatsapp {
         if (moment(prazo).isSameOrAfter(new Date, 'date')) {
             let request = {
                 intervaloDe: moment(data, 'YYYY-MM-DD').add(1, 'day').toDate(),
-                intervaloAte:prazo.toDate(),
+                intervaloAte: prazo.toDate(),
                 perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
             }
             await lastValueFrom(this.eventoService.getList(request))
@@ -134,12 +138,19 @@ export class MensagemWhatsapp {
         return object;
     }
 
+
+    createLink(phone: string, message: string) {
+        let link = this.linkWhatsApp.replace('<phone>', phone).replace('<message>', encodeURIComponent(message));
+        return link
+    }
+
     enviarMensagem(nome: string, celular: string) {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
         let mensagem = `Olá ${nome}, tudo bem?`;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
+
         return {
             link: link,
             mensagem: mensagem
@@ -162,17 +173,17 @@ export class MensagemWhatsapp {
                 mensagem += `\r\nMotivo: Feriado - ${evento.feriado.name}.`
             else
                 mensagem += `\r\nMotivo: ${evento.observacao}.`
-        } 
+        }
         // falta agendada
         else if (!participacao.active && !participacao.presente) {
             mensagem += `\r\nNotei que você desmarcou a ${tipo} do dia ${data}.`;
-        } 
+        }
         // faltou
         else if (evento.finalizado && !participacao.presente) {
             mensagem += `\r\nNotei que você não esteve presente na ${tipo} do dia ${data} e gostaria de saber se houve um imprevisto. 
                 \r\nImprevistos acontecem e queremos saber se você está enfrentando dificuldades.`;
         }
-    
+
         // era reposicao agendada de um evento ativo
         if (evento.active && participacao.reposicaoDe_Evento_Id) {
             mensagem = `Como essa já era uma reposição de uma outra aula, não será possível agendarmos uma segunda reposição, e por isso estará com falta`;
@@ -188,11 +199,11 @@ export class MensagemWhatsapp {
             else {
                 if (!evento.active && participacao.reposicaoDe_Evento_Id) {
                     mensagem += `\r\nPrecisamos reagendar sua reposição para você não perder o conteúdo. `
-                } 
+                }
                 else {
                     mensagem += `\r\nPrecisamos agendar uma reposição, para você não perder o conteúdo. `
                 }
-                
+
                 mensagem += `\r\nVocê tem até o dia *${prazo.format('DD/MM/YY')}* para agendar sua reposição.`
 
                 if (sugestoes.length > 0) {
@@ -207,7 +218,7 @@ export class MensagemWhatsapp {
                     \r\n
                     \r\nIremos aguardar sua resposta...`;
             }
-                    
+
         }
         // Oficina
         else if (evento.evento_Tipo_Id == EventoTipo.Oficina) {
@@ -215,10 +226,7 @@ export class MensagemWhatsapp {
                 \r\n
                 \r\nFico à disposição caso precise de algo`;
         }
-
-
-
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -238,7 +246,7 @@ export class MensagemWhatsapp {
             \r\nFico à disposição caso precise de algo antes da ${tipo}.
             \r\n
             \r\nNos vemos em breve! `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -258,7 +266,7 @@ export class MensagemWhatsapp {
             \r\nPor favor, me avise sua disponibilidade para que possamos combinar um novo horário.
             \r\n
             \r\nAgradeço pela compreensão!`;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -280,7 +288,7 @@ export class MensagemWhatsapp {
             \r\n
             \r\nNos vemos em breve!
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -313,7 +321,7 @@ export class MensagemWhatsapp {
                     \r\n
                     \r\nIremos aguardar sua resposta...`;
 
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -334,7 +342,7 @@ export class MensagemWhatsapp {
             \r\n
             \r\nNos vemos em breve!
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -348,7 +356,7 @@ export class MensagemWhatsapp {
         let mensagem = `Olá ${nome},
            MENSAGEM DE FEEDBACK PÓS VENDA
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -368,7 +376,7 @@ export class MensagemWhatsapp {
                         \r\n
                         \r\nFico no aguardo, tá bom?
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -383,7 +391,7 @@ export class MensagemWhatsapp {
         let mensagem = `Olá ${nome},
            MENSAGEM DE APRESENTACAO DIRETOR FRANQUEADO
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -447,7 +455,7 @@ export class MensagemWhatsapp {
             \r\nSUA SENHA: Super@123
             \r\n
             \r\nQualquer dúvida, estou à disposição!`;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -466,7 +474,7 @@ export class MensagemWhatsapp {
                         \r\n
                         \r\nConte com a gente! 😊
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -491,7 +499,7 @@ export class MensagemWhatsapp {
                 \r\n Atenção: o não comparecimento sem aviso prévio de 24h resultará no bloqueio da participação em outras oficinas durante o mês corrente.
 
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
@@ -512,7 +520,7 @@ export class MensagemWhatsapp {
 
             Nos vemos em breve!
         `;
-        let link = `https://wa.me//${celular}?text=${encodeURIComponent(mensagem)}`;
+        let link = this.createLink(celular, mensagem);
         return {
             link: link,
             mensagem: mensagem
