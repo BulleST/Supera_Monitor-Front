@@ -131,72 +131,70 @@
                             <p-iconfield>
                                 <p-inputicon class="fa fa-users-between-lines" />
                                 <p-select
-                                        [options]="turmasFiltered"
-                                        [loading]="loadingTurmas"
-                                        [showClear]="false"
-                                        [(ngModel)]="aluno.turma_Id"
-                                        inputId="turma[{{rowIndex}}]"
-                                        name="turma[{{rowIndex}}]"
-                                        #turma_Id="ngModel"
-                                        optionLabel="nome"
-                                        optionValue="id"
-                                        placeholder="Selecione"
-                                        (onChange)="turmaChanged(aluno, turma_Id, $event)"
-                                        (onFocus)="turmaFocus(aluno)"
-                                        [filter]="true"
-                                        filterBy="nome"
-                                        appendTo="body"
-                                        fluid>
-                                        <ng-template #footer>
-                                            <div class="p-3 border-top-1 border-200">
-                                                <ng-container *ngIf="aluno.restricaoMobilidade">
-                                                    <p>Esse aluno tem restrição de mobilidade:</p>
-                                                    <p>Somente turmas do térreo serão exibidas.</p>
-                                                </ng-container>
-                                                <p>Somente turmas do mesmo perfil cognitivo serão exibidas.</p>
-                                                <p>Somente turmas com vagas serão exibidas.</p>
-                                            </div>
-                                        </ng-template>
-                                    <ng-template #selectedItem let-selectedOption>
-                                        <div class="flex align-items-center gap-2">
-                                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
-                                                            [professor]="selectedOption.professor"
-                                                            [professor_Id]="selectedOption.professor_Id"
-                                                            [turma_Id]="selectedOption.id"></app-legend-color>
-                                            <span>{{selectedOption.nome}}</span>
-                                        </div>
-                                    </ng-template>
-                                    <ng-template #item let-turma>
-                                        <div class="flex align-items-start gap-2 w-full">
-                                            <div class="w-full">
-                                                <p class="flex align-items-center gap-2">
-                                                    <app-legend-color [corLegenda]="turma.corLegenda"
-                                                                    [professor]="turma.professor"
-                                                                    [professor_Id]="turma.professor_Id"
-                                                                    [turma_Id]="turma.id"></app-legend-color>
-                                                    <span>{{turma.nome}}</span>
-                                                </p>
-                                                <div class="flex align-items-center justify-content-between gap-2 w-full">
-                                                    <p class="flex align-items-center gap-2">
-                                                        <span>{{turma.sala}}</span>
-                                                        <span>-</span>
-                                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
-                                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
-                                                    </p>
-                                                    
-                                                    <p class="" *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
-                                                    <p class="text-500" *ngIf="turma.vagasDisponiveis == 0">Nenhuma vaga</p>
-
-                                                </div>
-                                            </div>
-                                            <span class="pl-2 flex align-items-center gap-2 ml-auto">
-                                                <ng-container *ngFor="let perfil of turma.perfilCognitivo">
-                                                    <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
-                                                </ng-container>
-                                            </span>
-                                        </div>
-                                    </ng-template>
-                                </p-select>
+                          [options]="turmasDisponiveis"
+                          [loading]="loadingTurmas"
+                          [showClear]="false"
+                          [(ngModel)]="aluno.turma_Id"
+                          inputId="turma"
+                          name="turma"
+                          #turma_Id="ngModel"
+                          optionLabel="nome"
+                          optionValue="id"
+                          placeholder="Selecione"
+                          [checkmark]="true"
+                          (onChange)="turmaChanged(aluno, turma_Id, $event)"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          fluid>
+                    <ng-template #footer>
+                        <div class="p-3 border-top-1 border-200">
+                            <ng-container *ngIf="aluno.restricaoMobilidade">
+                                <p>Esse aluno tem restrição de mobilidade:</p>
+                                <p>Somente turmas do térreo serão exibidas.</p>
+                            </ng-container>
+                            <p>Somente turmas do mesmo perfil cognitivo serão exibidas.</p>
+                            <p>Somente turmas com vagas serão exibidas.</p>
+                        </div>
+                    </ng-template>
+                    <ng-template #selectedItem let-selectedOption>
+                        <div class="flex align-items-center gap-2">
+                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                              [professor]="selectedOption.professor"
+                                              [professor_Id]="selectedOption.professor_Id"
+                                              [turma_Id]="selectedOption.id"></app-legend-color>
+                            <span>{{selectedOption.nome}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template #item let-turma>
+                        <div class="flex align-items-start gap-2 w-full">
+                            <div class="w-full">
+                                <div class="flex align-items-center gap-2">
+                                    <app-legend-color [corLegenda]="turma.corLegenda"
+                                                      [professor]="turma.professor"
+                                                      [professor_Id]="turma.professor_Id"
+                                                      [turma_Id]="turma.id"></app-legend-color>
+                                    <span>{{turma.nome}}</span>
+                                    <p class="ml-auto " *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
+                                    <p class="ml-auto text-500" *ngIf="turma.vagasDisponiveis == 0">Não há vagas</p>
+                                </div>
+                                <div class="flex align-items-center justify-content-between gap-2 w-full">
+                                    <p class="flex align-items-center gap-2">
+                                        <span>{{turma.sala}}</span>
+                                        <span>-</span>
+                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
+                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="pl-2 flex align-items-center gap-2 ml-auto">
+                                <ng-container *ngFor="let perfil of turma.perfilCognitivo">
+                                    <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
+                                </ng-container>
+                            </span>
+                        </div>
+                    </ng-template>
+                </p-select>
                             </p-iconfield>
                         </ng-template>
                         <ng-template #output>

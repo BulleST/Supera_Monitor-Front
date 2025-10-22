@@ -150,15 +150,16 @@
                 <label for="telefone">Telefone: </label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-phone" />
-                    <input pTextInput
-                                 inputId="telefone"
-                                 name="telefone"
-                                 #telefone="ngModel"
-                                 [(ngModel)]="object.telefone"
-                                 mask="+99 (99) 9999-9999"
-                                 placeholder="+55 (99) 9999-9999"
-                                 [validation]="true"
-                                 fluid />
+                    <input pInputText
+                           type="text"
+                           id="telefone"
+                           name="telefone"
+                           #telefone="ngModel"
+                           [(ngModel)]="object.telefone"
+                           mask="+99 (99) 9999-9999"
+                           placeholder="+55 (99) 9999-9999"
+                           [validation]="true"
+                           fluid />
                 </p-iconfield>
             </div>
             <!-- Celular -->
@@ -166,16 +167,17 @@
                 <label for="celular">Celular: <span class="text-red-500">*</span></label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-mobile" />
-                    <p-inputmask
-                                 inputId="celular"
-                                 name="celular"
-                                 #celular="ngModel"
-                                 [(ngModel)]="object.celular"
-                                 mask="+99 (99) 9.9999-9999"
-                                 placeholder="+55 (99) 9.9999-9999"
-                                 [autoClear]="true"
-                                 [required]="true"
-                                 fluid />
+                    <input pInputText
+                           type="text"
+                           id="celular"
+                           name="celular"
+                           #celular="ngModel"
+                           [(ngModel)]="object.celular"
+                           mask="+99 (99) 9.9999-9999"
+                           placeholder="+55 (99) 9.9999-9999"
+                           [validation]="true"
+                           [required]="true"
+                           fluid />
                 </p-iconfield>
                 <div *ngIf="celular.touched && celular.invalid && celular.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="celular.errors['required']">Esse campo é obrigatório.</p>
@@ -327,7 +329,7 @@
                                 #restricaoMobilidade="ngModel"
                                 [(ngModel)]="object.restricaoMobilidade"
                                 [binary]="true"
-                                (onChange)="mobilidadeReduzidaChange($event, turma_Id)" />
+                                (onChange)="mobilidadeReduzidaChange($event)" />
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
             </div>
@@ -415,39 +417,68 @@
             <!-- Turma -->
             <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="turma_Id">Turma:</label>
-                <!-- <pre>{{selectedTurma|json}}</pre> -->
                 <p-select
                           [options]="turmasDisponiveis"
-                          [(ngModel)]="selectedTurma"
                           [loading]="loadingTurmas"
-                          [showClear]="true"
+                          [showClear]="false"
+                          [(ngModel)]="object.turma_Id"
+                          inputId="turma"
+                          name="turma"
                           #turma_Id="ngModel"
-                          name="turma_Id"
-                          inputId="turma_Id"
                           optionLabel="nome"
+                          optionValue="id"
+                          placeholder="Selecione"
+                          [checkmark]="true"
+                          (onChange)="turmaChanged($event)"
                           [filter]="true"
                           filterBy="nome"
                           appendTo="body"
-                          placeholder="Selecione"
-                          optionDisabled="deactivated"
-                          (onChange)="turmaChanged(turma_Id, $event)"
                           fluid>
-                    <ng-template #item let-item>
-                        <div class="w-full">
-                            <div class="flex align-items-center justify-content-between gap-3">
-                                <p class="flex align-items-center gap-2">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
-                                                      [professor_Id]="item.professor_Id"
-                                                      [professor]="item.professor"
-                                                      [turma_Id]="item.id"></app-legend-color>
-                                    <span>{{ item.nome }}</span>
-                                </p>
-                                <span>{{ item.vagas }} vaga(s)</span>
+                    <ng-template #footer>
+                        <div class="p-3 border-top-1 border-200">
+                            <ng-container *ngIf="object.restricaoMobilidade">
+                                <p>Esse aluno tem restrição de mobilidade:</p>
+                                <p>Somente turmas do térreo serão exibidas.</p>
+                            </ng-container>
+                            <p>Somente turmas do mesmo perfil cognitivo serão exibidas.</p>
+                            <p>Somente turmas com vagas serão exibidas.</p>
+                        </div>
+                    </ng-template>
+                    <ng-template #selectedItem let-selectedOption>
+                        <div class="flex align-items-center gap-2">
+                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                              [professor]="selectedOption.professor"
+                                              [professor_Id]="selectedOption.professor_Id"
+                                              [turma_Id]="selectedOption.id"></app-legend-color>
+                            <span>{{selectedOption.nome}}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template #item let-turma>
+                        <div class="flex align-items-start gap-2 w-full">
+                            <div class="w-full">
+                                <div class="flex align-items-center gap-2">
+                                    <app-legend-color [corLegenda]="turma.corLegenda"
+                                                      [professor]="turma.professor"
+                                                      [professor_Id]="turma.professor_Id"
+                                                      [turma_Id]="turma.id"></app-legend-color>
+                                    <span>{{turma.nome}}</span>
+                                    <p class="ml-auto " *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
+                                    <p class="ml-auto text-500" *ngIf="turma.vagasDisponiveis == 0">Não há vagas</p>
+                                </div>
+                                <div class="flex align-items-center justify-content-between gap-2 w-full">
+                                    <p class="flex align-items-center gap-2">
+                                        <span>{{turma.sala}}</span>
+                                        <span>-</span>
+                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
+                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
+                                    </p>
+                                </div>
                             </div>
-                            <p class="text-xs mt-1 ml-1">
-                                <i class="fa-solid fa-brain mr-2"></i>
-                                {{item.perfilCognitivoString}}
-                            </p>
+                            <span class="pl-2 flex align-items-center gap-2 ml-auto">
+                                <ng-container *ngFor="let perfil of turma.perfilCognitivo">
+                                    <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
+                                </ng-container>
+                            </span>
                         </div>
                     </ng-template>
                 </p-select>
@@ -481,6 +512,7 @@
                               [loading]="loadingPerfisCognitivos"
                               [showClear]="true"
                               #perfilCognitivo_Id="ngModel"
+                              (onChange)="perfilChange($event)"
                               name="perfilCognitivo_Id"
                               inputId="perfilCognitivo_Id"
                               optionLabel="nome"

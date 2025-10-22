@@ -51,7 +51,7 @@ export class ListComponent implements OnDestroy {
     @ViewChild('cm') cm!: ContextMenu;
 
     turmas: Turma[] = [];
-    turmasFiltered: Turma[] = [];
+    turmasDisponiveis: Turma[] = [];
     loadingTurmas = false;
 
     perfisFiltered: PerfilCognitivo[] = [];
@@ -296,16 +296,23 @@ export class ListComponent implements OnDestroy {
     }
 
     turmaFocus(item: Aluno) {
-        this.turmasFiltered = this.turmas.filter(turma => {
-            const turmaAtiva = turma.active;
-            const turmaTemVagas = turma.vagasDisponiveis > 0;
-            const ehTurmaDoAluno = item.turma_Id == turma.id
-            const ehPerfilCompativel = !item.perfilCognitivo_Id || turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
-            const ehAndarValido = turma.andar == SalaAndar.Terreo || !item.restricaoMobilidade
-            return turmaAtiva 
-                    && ehPerfilCompativel 
-                    && ehAndarValido 
-                    && ((turmaTemVagas && !ehTurmaDoAluno) || ehTurmaDoAluno)
+        this.turmasDisponiveis = this.turmas.filter(turma => {
+            this.turmasDisponiveis = this.turmas.filter(turma => {
+                const ehTurmaDoAluno = turma.id == item.turma_Id;
+                const turmaAtiva = turma.active;
+                const ehPerfilDoAluno = turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
+                const ehPerfilCompativel = !item.perfilCognitivo_Id || ehPerfilDoAluno;
+                const turmaTemVagas = turma.vagasDisponiveis > 0;
+                const ehAndarValido = turma.andar == SalaAndar.Terreo || !item.restricaoMobilidade
+            
+                const condicao = (turmaAtiva
+                    && ehPerfilCompativel
+                    && turmaTemVagas
+                    && ehAndarValido)
+                    || ehTurmaDoAluno;
+                    
+                    return condicao
+            });
         })
 
     }
