@@ -21,7 +21,6 @@ export class TurmaService extends Service {
         turma.perfilCognitivoString = turma.perfilCognitivo.map(x => x.nome).join(', ');
         turma.horario = new Date(moment().format('YYYY-MM-DD') + 'T' + turma.horario);
         turma.diasDeAulaString = semana[turma.diaSemana] + ' às ' + moment(turma.horario).format('HH[h]mm')
-        turma.capacidadeMaximaAlunosString = `${turma.capacidadeMaximaAlunos} alunos`;
 
         turma.vagasDisponiveis = turma.capacidadeMaximaAlunos - turma.alunosAtivos;
         turma.vagasDisponiveis = turma.vagasDisponiveis < 0 ? 0 : turma.vagasDisponiveis;

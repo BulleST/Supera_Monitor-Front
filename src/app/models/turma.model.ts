@@ -31,7 +31,6 @@ export class Turma extends Basic_List {
     perfilCognitivo: PerfilCognitivo[] = [];
     perfilCognitivoString: string = '';
     diasDeAulaString: string = '';
-    capacidadeMaximaAlunosString: string = '';
     alunosAtivos: number = 0
     vagasDisponiveis: number = 0;
     temGrupo: boolean = false;
@@ -119,7 +118,7 @@ export var turmaColumns: ColumnTable[] = [
         }
     },
     {
-        field: 'capacidadeMaximaAlunosString',
+        field: 'capacidadeMaximaAlunos',
         label: 'Limite',
         displayType: DisplayType.mask,
         sortable: true,
