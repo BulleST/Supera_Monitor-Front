@@ -38,6 +38,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
+    observacao: string = '';
 
     onHide = new EventEmitter<boolean>();
     SalaAndar = SalaAndar;
@@ -135,8 +136,12 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         showError(this.confirmationService, header, message, e);
     }
 
-    saveDisabled() {
-        return this.loading || !this.aluno || !this.eventoReposicaoDe || !this.eventoReposicaoPara;
+    saveDisabled(form: NgForm) {
+        return this.loading
+         || form.invalid
+         || !this.aluno
+         || !this.eventoReposicaoDe
+         || !this.eventoReposicaoPara;
     }
 
     sendConfirmation(form: NgForm, e: any) {
@@ -184,6 +189,8 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
         request.aluno_Id = aluno.id;
         request.source_Aula_Id = source.id;
         request.dest_Aula_Id = target.id;
+        request.observacao = this.observacao;
+
         let response: RequestResponse = { success: true, message: '', object: undefined };
 
 
@@ -233,7 +240,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     sendMensagemAluno(e: any, aluno: Aluno, source: Evento, target: Evento) {
         this.confirmationService.confirm({
             target: e.target,
-            message: `Reposição concluída com sucesso. <br> Clique para enviar mensagem de confirmação.`,
+            message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação. <br> Celular: ${aluno.celular}`,
             header: 'Enviar whatsapp',
             icon: 'pi pi-whatsapp text-green-500 text-4xl',
             acceptLabel: `Enviar mensagem`,

@@ -1,72 +1,69 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-dialog 
-        [maximizable]="true"
-        [draggable]="true"
-        [modal]="true"
-        [(visible)]="visible"
-        (visibleChange)="visibleChange()"
-        [style]="{ width: '850px', maxWidth: '95vw', maxHeight: '95vh' }"
-        appendTo="body"
-        id="reposicao">
+<p-dialog
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '850px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body"
+          id="reposicao">
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">
-                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i> 
+                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <span>Agendar reposição</span>
             </span>
         </div>
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
-
         <div class="formgrid grid">
             <!-- Aluno -->
             <app-aluno-select class="w-full flex"
-                [eventoReposicaoDe]="eventoReposicaoDe"
-                [eventoReposicaoPara]="eventoReposicaoPara"
-                (onAlunoChanged)="alunoChanged($event)"></app-aluno-select>
-
+                              [eventoReposicaoDe]="eventoReposicaoDe"
+                              [eventoReposicaoPara]="eventoReposicaoPara"
+                              (onAlunoChanged)="alunoChanged($event)"></app-aluno-select>
             <!-- Reposição de Evento -->
-            <app-reposicao-de-select 
-                #reposicaoDeComponent
-                class="w-full flex"
-                [aluno]="aluno"
-                [roteiros]="roteiros"
-                [eventoReposicaoPara]="eventoReposicaoPara"
-                (onEventoChanged)="eventoReposicaoDeChanged($event)"
-            ></app-reposicao-de-select>
-                <!-- <pre>{{eventoReposicaoDe|json}}</pre> -->
+            <app-reposicao-de-select
+                                     #reposicaoDeComponent
+                                     class="w-full flex"
+                                     [aluno]="aluno"
+                                     [roteiros]="roteiros"
+                                     [eventoReposicaoPara]="eventoReposicaoPara"
+                                     (onEventoChanged)="eventoReposicaoDeChanged($event)"></app-reposicao-de-select>
             <!-- Eventos Para -->
-            <app-reposicao-para-select 
-                #reposicaoParaComponent
-                class="w-full flex"
-                [aluno]="aluno"
-                [roteiros]="roteiros"
-                [eventoReposicaoDe]="eventoReposicaoDe"
-                (onEventoChanged)="eventoReposicaoParaChanged($event)"
-            ></app-reposicao-para-select>
-
+            <app-reposicao-para-select
+                                       #reposicaoParaComponent
+                                       class="w-full flex"
+                                       [aluno]="aluno"
+                                       [roteiros]="roteiros"
+                                       [eventoReposicaoDe]="eventoReposicaoDe"
+                                       (onEventoChanged)="eventoReposicaoParaChanged($event)"></app-reposicao-para-select>
+            <p-fieldset class="col-12 mb-4">
+                <ng-template #header>
+                    <label for="observacao" class="font-bold">Motivo da reposição: <small class="text-red-500">*</small></label>
+                </ng-template>
+                <div class="formgrid grid">
+                    <div class="field col-12">
+                        <textarea pTextarea
+                                  id="observacao"
+                                  name="observacao"
+                                  [(ngModel)]="observacao"
+                                  placeholder="Insira aqui..."
+                                  required
+                                  fluid></textarea>
+                    </div>
+                </div>
+            </p-fieldset>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"
-                        fluid
-                        label="Finalizar agendamento"
-                        icon="pi pi-check"
-                        [loading]="loading"
-                        [rounded]="true"
-                        [disabled]="saveDisabled()" />
+                          fluid
+                          label="Finalizar agendamento"
+                          icon="pi pi-check"
+                          [loading]="loading"
+                          [rounded]="true"
+                          [disabled]="saveDisabled(form)" />
             </div>
         </div>
     </form>
-    <!-- <p>loading: </p>
-    <p>{{loading}}</p>
-    <p>aluno: </p>
-    <p>{{!aluno}}</p>
-    <p>eventoReposicaoDe: </p>
-    <p>{{!eventoReposicaoDe}}</p>
-    <p>eventoReposicaoPara</p>
-    <p>{{!eventoReposicaoPara}}</p>
-    <p>loading || !aluno || !eventoReposicaoDe || !eventoReposicaoPara:</p>
-    <p>{{loading || !aluno || !eventoReposicaoDe || !eventoReposicaoPara}}</p> -->
 </p-dialog>
-
-
-

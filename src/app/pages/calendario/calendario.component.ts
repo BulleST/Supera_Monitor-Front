@@ -459,7 +459,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         request.aluno_Id = aluno.aluno_Id;
         request.source_Aula_Id = source.id;
         request.dest_Aula_Id = target.id;
-        request.observacoes = this.observacaoReposicao;
+        request.observacao = this.observacaoReposicao;
         let response: RequestResponse = { success: true, message: '', object: undefined };
 
         // Se a aula source não existir, cria a aula
@@ -501,9 +501,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     sendMensagemAluno(e: any, aluno: Evento_Participacao_Aluno, source: any, target: any) {
         if (aluno.celular) {
+
             this.confirmationService.confirm({
                 target: e.target,
-                message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
+                message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação. <br> Celular: ${aluno.celular}`,
                 header: 'Enviar whatsapp',
                 icon: 'pi pi-whatsapp text-green-500 text-4xl',
                 acceptIcon: 'pi pi-whatsapp',

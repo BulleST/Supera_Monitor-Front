@@ -1,12 +1,12 @@
 <app-confirm-dialog></app-confirm-dialog>
 <!-- Reposição De -->
 <div class="field col-12">
-    <p-fieldset legend="Reposição da aula">
+    <p-fieldset legend="Reposição da aula do dia">
         <div class="formgrid grid">
             <div class="field sm:col-4 col-12">
                 <!-- Select -->
                 <ng-container *ngIf="!readonly; else eventoSelecionadoTemplate">
-                    <label for="eventoReposicao_Id">Qual aula o aluno deseja repor? <span class="text-red-500">*</span></label>
+                    <label for="eventoReposicao_Id">Selecione a aula a ser reposta: <span class="text-red-500">*</span></label>
                     <p-iconfield>
                         <p-inputicon styleClass="fa-solid fa-users-between-lines" />
                         <p-select [options]="list"

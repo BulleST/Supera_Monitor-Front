@@ -5,7 +5,7 @@
             <!-- Descrição -->
             <div class="field sm:col-4 col-12">
                 <ng-container *ngIf="!readonly; else eventoSelecionadoParaTemplate">
-                    <label for="eventoDisponivel_Id">Para qual aula o aluno deseja agendar a reposição? <span class="text-red-500">*</span></label>
+                    <label for="eventoDisponivel_Id">Selecione a aula para reposição: <span class="text-red-500">*</span></label>
                     <p-iconfield>
                         <p-inputicon *ngIf="!loading" styleClass="fa-solid fa-users-between-lines" />
                         <p-inputicon *ngIf="loading" styleClass="pi pi-spinner pi-spin" />
