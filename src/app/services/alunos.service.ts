@@ -56,16 +56,20 @@ export class AlunoService extends Service {
         else localStorage.removeItem('aluno');
     }
 
-    calculaIdade(dataNascimento: Date) {
-        const hoje = new Date;
-        return moment(hoje).diff(dataNascimento, 'years');
+    calculaIdade(dataNascimento?: Date) {
+        if (dataNascimento) {
+            const hoje = new Date;
+            return moment(hoje).diff(dataNascimento, 'years');
+        }
+        return undefined;
     }
 
     ehAniversario(dataNascimento?: Date) {
         let hoje = new Date;
         if (!dataNascimento) {
             return false;
-        } else {
+        } 
+        else {
             return moment(hoje).week() == moment(dataNascimento).week();
         }
     }

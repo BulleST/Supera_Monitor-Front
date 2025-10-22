@@ -271,6 +271,11 @@
                         [ngModel]="aluno.restricaoMobilidade" 
                         [binary]="true"
                         [readonly]="true" />
+                        <span class="ml-2">
+
+                            <span *ngIf="aluno.restricaoMobilidade">Sim</span>
+                            <span *ngIf="!aluno.restricaoMobilidade">Não</span>
+                        </span>
                     <!-- <ng-container *ngIf="aluno.restricaoMobilidade">
                         <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-4rem"
                                icon="pi pi-check mr-2 text-xs font-bold"

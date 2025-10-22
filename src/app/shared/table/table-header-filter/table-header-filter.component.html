@@ -15,12 +15,12 @@
                     <!-- Field -->
                     <ng-container *ngIf="col.filterOptions.primeElement == 'inputtext'">
                         <input pInputText
-                               [ngModel]="col.filterOptions.value"
+                               [ngModel]="value"
                                [email]="col.filterOptions.primeElementOptions.email"
                                [id]="col.field"
                                [name]="col.field"
                                [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
-                               (ngModelChange)="filter(col.filterOptions.value)"
+                               (ngModelChange)="filter($event)"
                                style="min-width: 5rem;"
                                fluid>
                     </ng-container>
@@ -29,11 +29,11 @@
                                        [showButtons]="true"
                                        [step]="1"
                                        [useGrouping]="false"
-                                       [ngModel]="col.filterOptions.value"
+                                       [ngModel]="value"
                                        [id]="col.field"
                                        [name]="col.field"
                                        [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
-                                       (ngModelChange)="filter(col.filterOptions.value)"
+                                       (ngModelChange)="filter($event)"
                                        [style]="{'min-width': '7rem'}"
                                        [suffix]="col.filterOptions.primeElementOptions.suffix ?? ''"
                                        [prefix]="col.filterOptions.primeElementOptions.prefix ?? ''"
@@ -43,12 +43,11 @@
                         <p-inputmask
                                      [mask]="col.filterOptions.primeElementOptions.format"
                                      [unmask]="true"
-                                     [ngModel]="col.filterOptions.value"
+                                     [ngModel]="value"
                                      [inputId]="col.field"
                                      [name]="col.field"
                                      [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
-                                     (onComplete)="filter(col.filterOptions.value)"
-                                     (ngModelChange)="filter(col.filterOptions.value)" />
+                                     (ngModelChange)="filter($event)" />
                     </ng-container>
                     <ng-container *ngIf="col.filterOptions.primeElement == 'datepicker'">
                         <p-datepicker
@@ -58,7 +57,7 @@
                                       [dateFormat]="col.filterOptions.primeElementOptions.format"
                                       [inputId]="col.field"
                                       [name]="col.field"
-                                      [ngModel]="col.filterOptions.value"
+                                      [ngModel]="value"
                                       [placeholder]="col.filterOptions.primeElementOptions.placeholder ?? 'Filtrar'"
                                       class="w-full"
                                       styleClass="w-full"
@@ -66,8 +65,8 @@
                                       [timeOnly]="col.filterOptions.primeElementOptions.timeOnly"
                                       [showTime]="col.filterOptions.primeElementOptions.showTime"
                                       [hourFormat]="col.filterOptions.primeElementOptions.hourFormat"
-                                      (ngModelChange)="filter(col.filterOptions.value)"
-                                      (onSelect)="filter(col.filterOptions.value)">
+                                      (ngModelChange)="filter($event)"
+                                      (onSelect)="filter($event)">
                             <ng-template pTemplate="inputicon" let-clickCallBack="clickCallBack">
                                 <i class="{{col.filterOptions.primeElementOptions.icon}}" (click)="clickCallBack($event)"></i>
                             </ng-template>
@@ -99,7 +98,7 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'multiselect'">
                         <p-multiselect
                                        [options]="col.filterOptions.primeElementOptions.options"
-                                       [ngModel]="col.filterOptions.value"
+                                       [ngModel]="value"
                                        (ngModelChange)="filter($event)"
                                        [inputId]="col.field"
                                        [name]="col.field"
@@ -122,10 +121,10 @@
                     <ng-container *ngIf="col.filterOptions.primeElement == 'toggleswitch'">
                         <p-toggleswitch
                                         #toggleSwitch
-                                        [ngModel]="col.filterOptions.value"
+                                        [ngModel]="value"
                                         [inputId]="col.field"
                                         [name]="col.field"
-                                        (ngModelChange)="filter(col.filterOptions.value)">
+                                        (ngModelChange)="filter($event)">
                         </p-toggleswitch>
                     </ng-container>
                 </ng-container>

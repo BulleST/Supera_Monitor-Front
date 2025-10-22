@@ -125,10 +125,10 @@ export var turmaColumns: ColumnTable[] = [
         sortable: true,
         filterOptions: {
             type: FilterType.numeric,
-            matchMode: FilterMatchMode.EQUALS.toString(),
+            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
             value: undefined,
             icon: undefined,
-            primeElement: 'inputtext',
+            primeElement: 'inputnumber',
             primeElementOptions: {}
         },
         options: {
@@ -136,13 +136,13 @@ export var turmaColumns: ColumnTable[] = [
         },
     },
     {
-        field: 'vagas',
+        field: 'vagasDisponiveis',
         label: 'Vaga(s)',
         displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.numeric,
-            matchMode: FilterMatchMode.EQUALS.toString(),
+            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',

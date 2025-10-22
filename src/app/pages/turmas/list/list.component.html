@@ -125,9 +125,9 @@
                 <td>{{item.perfilCognitivoString}}</td>
                 <td>{{item.capacidadeMaximaAlunos}} aluno(s)</td>
                 <td>
-                    <ng-container *ngIf="item.vagas == 0"><span class="text-300">Nenhuma vaga </span></ng-container>
-                    <ng-container *ngIf="item.vagas == 1">{{item.vagas}} vaga</ng-container>
-                    <ng-container *ngIf="item.vagas > 1">{{item.vagas}} vagas</ng-container>
+                    <ng-container *ngIf="item.vagasDisponiveis == 0"><span class="text-300">Nenhuma vaga </span></ng-container>
+                    <ng-container *ngIf="item.vagasDisponiveis == 1">{{item.vagasDisponiveis}} vaga</ng-container>
+                    <ng-container *ngIf="item.vagasDisponiveis > 1">{{item.vagasDisponiveis}} vagas</ng-container>
                 </td>
                 <td>
                     <ng-container *ngIf="item.linkGrupo">

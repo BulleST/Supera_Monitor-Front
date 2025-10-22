@@ -79,7 +79,7 @@ export class ListComponent implements OnDestroy {
         let list = this.service.list.subscribe(res => this.list = res);
         this.subscription.push(list);
         
-        if (!this.list) this.update();
+        if (!this.list.length) this.update()
     }
 
 

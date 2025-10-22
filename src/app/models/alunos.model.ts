@@ -179,8 +179,8 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.mask,
         sortable: true,
         filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.EQUALS.toString(),
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
@@ -235,8 +235,8 @@ export var alunosColumns: ColumnTable[] = [
         displayType: DisplayType.text,
         sortable: true, 
         filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.CONTAINS.toString(),
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputtext',
@@ -246,11 +246,11 @@ export var alunosColumns: ColumnTable[] = [
     {
         field: 'numeroPaginaAH',
         label: 'Página',
-        displayType: DisplayType.mask,
+        displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
-            type: FilterType.text,
-            matchMode: FilterMatchMode.EQUALS.toString(),
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
