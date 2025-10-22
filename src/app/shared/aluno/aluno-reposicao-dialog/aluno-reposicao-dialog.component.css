@@ -1,0 +1,58 @@
+.event-container {
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+    gap: .5rem;
+    width: 100%;
+    margin: 0;
+}
+
+@media screen and (min-width: 576px) {
+    .event-container {
+        margin: 0 -1rem;
+    }
+}
+
+.event-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    row-gap: .5rem;
+}
+
+
+.event-row > div {
+    display: flex;
+    align-items: center;
+}
+
+.event-property {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+    width: 100%;
+}
+
+.event-property-icon {
+    width: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    text-align: center;
+}
+
+.event-property-icon .pi {
+    font-size: 1rem;
+}
+
+.event-property-description {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1;
+}

@@ -101,7 +101,10 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
         TableHeaderFilterComponent,
         LegendColorComponent,
         IndisponivelTooltipComponent,
+        
         ReposicaoDeSelectComponent,
+        ReposicaoParaSelectComponent,
+        AlunoSelectComponent,
     ],
     imports: [
         CommonModule,

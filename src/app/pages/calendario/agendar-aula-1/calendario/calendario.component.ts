@@ -132,14 +132,10 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
 
-            console.log('ngOnChanges', this.aluno)
-
             if (!this.fullCalendar) {
                 // Fazer o compilador do JS calar a boca no primeiro render... poha
                 return
             }
-
-
 
             if (!this.aluno) {
                 this.fullCalendar.getApi().removeAllEvents()
@@ -285,7 +281,6 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
     }
 
     async datesSet(arg: DatesSetArg) {
-        console.log('datesSet', arg);
         this.currentTitle = moment(arg.view.currentStart)
             .locale('pt')
             .format('MMMM [de] YYYY')

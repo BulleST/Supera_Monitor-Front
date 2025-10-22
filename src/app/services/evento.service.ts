@@ -70,12 +70,13 @@ export class EventoService extends Service {
     }
 
     setEvento(value: Evento | undefined) {
-        if (value) {
-            value.data = moment(value.data).locale('pt-BR').format('YYYY-MM-DDTHH:mm') as any;
-        }
+        
         this.evento.next(value);
-        if (value) localStorage.setItem('evento', JSON.stringify(value));
-        else localStorage.removeItem('evento');
+        if (value) {
+            value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
+            localStorage.setItem('evento', JSON.stringify(value));
+        }
+        else localStorage.removeItem('evento-reposicao-de');
     }
 
     getEventoReposicaoDe() {
@@ -89,8 +90,10 @@ export class EventoService extends Service {
 
     setEventoReposicaoDe(value: Evento | undefined) {
         this.eventoReposicaoDe.next(value);
-        if (value)
+        if (value) {
+            value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
             localStorage.setItem('evento-reposicao-de', JSON.stringify(value));
+        }
         else localStorage.removeItem('evento-reposicao-de');
     }
 
@@ -104,8 +107,10 @@ export class EventoService extends Service {
     }
     setEventoReposicaoPara(value: Evento | undefined) {
         this.eventoReposicaoPara.next(value);
-        if (value)
+        if (value) {
+            value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
             localStorage.setItem('evento-reposicao-para', JSON.stringify(value));
+        }
         else localStorage.removeItem('evento-reposicao-para');
     }
 

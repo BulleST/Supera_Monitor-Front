@@ -450,9 +450,6 @@ export class CadastrarAula0Component implements OnDestroy {
                 aulaZero = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
                 participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
-                console.log('aulaZero', aulaZero)
-                console.log('participacaoAulaZero', participacaoAulaZero)
-
                 if (participacaoAulaZero.presente && aulaZero.finalizado) {
                     let data = moment(aulaZero.data).format('DD/MM/YY [às] HH[h]mm');
                     let educador = aulaZero.professor;
