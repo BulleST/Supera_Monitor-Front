@@ -147,6 +147,16 @@
                                         filterBy="nome"
                                         appendTo="body"
                                         fluid>
+                                        <ng-template #footer>
+                                            <div class="p-3 border-top-1 border-200">
+                                                <ng-container *ngIf="aluno.restricaoMobilidade">
+                                                    <p>Esse aluno tem restrição de mobilidade:</p>
+                                                    <p>Somente turmas do térreo serão exibidas.</p>
+                                                </ng-container>
+                                                <p>Somente turmas do mesmo perfil cognitivo serão exibidas.</p>
+                                                <p>Somente turmas com vagas serão exibidas.</p>
+                                            </div>
+                                        </ng-template>
                                     <ng-template #selectedItem let-selectedOption>
                                         <div class="flex align-items-center gap-2">
                                             <app-legend-color [corLegenda]="selectedOption.corLegenda"
@@ -158,7 +168,7 @@
                                     </ng-template>
                                     <ng-template #item let-turma>
                                         <div class="flex align-items-start gap-2 w-full">
-                                            <div>
+                                            <div class="w-full">
                                                 <p class="flex align-items-center gap-2">
                                                     <app-legend-color [corLegenda]="turma.corLegenda"
                                                                     [professor]="turma.professor"
@@ -166,7 +176,18 @@
                                                                     [turma_Id]="turma.id"></app-legend-color>
                                                     <span>{{turma.nome}}</span>
                                                 </p>
-                                                <p class="text-xs ml-4" *ngIf="turma.vagas > 0">{{turma.vagas}} vagas</p>
+                                                <div class="flex align-items-center justify-content-between gap-2 w-full">
+                                                    <p class="flex align-items-center gap-2">
+                                                        <span>{{turma.sala}}</span>
+                                                        <span>-</span>
+                                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
+                                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
+                                                    </p>
+                                                    
+                                                    <p class="" *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
+                                                    <p class="text-500" *ngIf="turma.vagasDisponiveis == 0">Nenhuma vaga</p>
+
+                                                </div>
                                             </div>
                                             <span class="pl-2 flex align-items-center gap-2 ml-auto">
                                                 <ng-container *ngFor="let perfil of turma.perfilCognitivo">
@@ -276,20 +297,6 @@
                             <span *ngIf="aluno.restricaoMobilidade">Sim</span>
                             <span *ngIf="!aluno.restricaoMobilidade">Não</span>
                         </span>
-                    <!-- <ng-container *ngIf="aluno.restricaoMobilidade">
-                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-4rem"
-                               icon="pi pi-check mr-2 text-xs font-bold"
-                               value="Sim"
-                               severity="danger"
-                               [pTooltip]="'Sim'" />
-                    </ng-container>
-                    <ng-container *ngIf="!aluno.restricaoMobilidade">
-                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-4rem"
-                               icon="pi pi-times mr-2 text-xs font-bold"
-                               value="Não"
-                               severity="secondary"
-                               [pTooltip]=" 'Não'" />
-                    </ng-container> -->
                 </td>
                 <td class="w-5rem">
                     <ng-container *ngIf="aluno.active">

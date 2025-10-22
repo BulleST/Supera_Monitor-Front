@@ -45,6 +45,7 @@ export class ListComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     subscription: Subscription[] = [];
 
+    SalaAndar = SalaAndar;
 
     @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
     @ViewChild('cm') cm!: ContextMenu;
@@ -298,8 +299,13 @@ export class ListComponent implements OnDestroy {
         this.turmasFiltered = this.turmas.filter(turma => {
             const turmaAtiva = turma.active;
             const turmaTemVagas = turma.vagasDisponiveis > 0;
+            const ehTurmaDoAluno = item.turma_Id == turma.id
             const ehPerfilCompativel = !item.perfilCognitivo_Id || turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
-            return turmaAtiva && ehPerfilCompativel && (turmaTemVagas && item.turma_Id != turma.id || item.turma_Id == turma.id)
+            const ehAndarValido = turma.andar == SalaAndar.Terreo || !item.restricaoMobilidade
+            return turmaAtiva 
+                    && ehPerfilCompativel 
+                    && ehAndarValido 
+                    && ((turmaTemVagas && !ehTurmaDoAluno) || ehTurmaDoAluno)
         })
 
     }
@@ -307,7 +313,7 @@ export class ListComponent implements OnDestroy {
     turmaChanged(item: Aluno, model: NgModel, e: SelectChangeEvent) {
         let turma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
         let restricoes = item.restricoes.filter(x => x.active)
-        if ((item.restricaoMobilidade && turma.andar > SalaAndar.Terreo) || restricoes.length > 0) {
+        if (restricoes.length > 0) {
             this.alunoRestricaoConfirm(item, model, e);
         }
         else {
