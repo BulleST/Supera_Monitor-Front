@@ -147,23 +147,19 @@
             </div>
             <!-- Telefone -->
             <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
-                <label for="telefone">Telefone: <span class="text-red-500">*</span></label>
+                <label for="telefone">Telefone: </label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-phone" />
-                    <p-inputmask
+                    <input pTextInput
                                  inputId="telefone"
                                  name="telefone"
                                  #telefone="ngModel"
                                  [(ngModel)]="object.telefone"
                                  mask="+99 (99) 9999-9999"
                                  placeholder="+55 (99) 9999-9999"
-                                 [autoClear]="true"
-                                 [required]="true"
+                                 [validation]="true"
                                  fluid />
                 </p-iconfield>
-                <div *ngIf="telefone.touched && telefone.invalid && telefone.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="telefone.errors['required']">Esse campo é obrigatório.</p>
-                </div>
             </div>
             <!-- Celular -->
             <div class="field lg:col-3 sm:col-4 xs:col-6 col-12">
