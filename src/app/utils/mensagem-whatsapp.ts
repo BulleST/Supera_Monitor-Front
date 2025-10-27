@@ -10,6 +10,7 @@ import { Aluno } from "../models/alunos.model";
 import { showError } from "./error";
 import { ConfirmationService } from "primeng/api";
 import { lastValueFrom } from "rxjs";
+import { SalaAndar } from "../models/sala-aula.model";
 
 @Injectable({
     providedIn: 'root'
@@ -73,10 +74,11 @@ export class MensagemWhatsapp {
                         const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
                         const temVagas = alunosAtivos.length < aula.capacidadeMaximaEvento;
-                        const ehPerfilCognitivoCompativel = participacao.perfilCognitivo_Id && aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
+                        const ehPerfilCognitivoCompativel = !participacao.perfilCognitivo_Id || aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
                         const aulaNaoFinalizada = !aula.finalizado;
                         const aulaEstaAtiva = aula.active;
                         const naoEhFeriado = !aula.feriado;
+                        const salaValida = !participacao.restricaoMobilidade || aula.andar == SalaAndar.Terreo;
 
                         return alunoNaoEstaNaAula
                             && ehAula
@@ -84,7 +86,8 @@ export class MensagemWhatsapp {
                             && ehPerfilCognitivoCompativel
                             && aulaNaoFinalizada
                             && aulaEstaAtiva
-                            && naoEhFeriado;
+                            && naoEhFeriado
+                            && salaValida;
                     });
                 })
         }
