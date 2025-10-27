@@ -43,7 +43,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     onHide = new EventEmitter<boolean>();
     SalaAndar = SalaAndar;
 
-    @ViewChild('alunoComponent') alunoComponent!: AlunoSelectComponent;
+    @ViewChild('alunoSelectComponent') alunoSelectComponent!: AlunoSelectComponent;
     @ViewChild('reposicaoDeComponent') reposicaoDeComponent!: ReposicaoDeSelectComponent;
     @ViewChild('reposicaoParaComponent') reposicaoParaComponent!: ReposicaoParaSelectComponent;
 
@@ -71,7 +71,6 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
         this.show();
 
-
         const aluno = this.alunoService.getAluno().subscribe(res => this.aluno = res);
         this.subscription.push(aluno)
 
@@ -85,19 +84,43 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
+        this.subscription = [];
     }
 
 
     visibleChange() {
         if (!this.visible) {
-            let params = this.activatedRoute.snapshot.params;
-            let routeBack = params['aluno_id'] ? ['../../../'] : ['../../'];
-            this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
 
-            this.eventoService.setEvento(undefined)
-            this.eventoService.setEventoReposicaoDe(undefined)
-            this.eventoService.setEventoReposicaoPara(undefined)
-            this.alunoService.setAluno(undefined)
+            this.alunoSelectComponent.onVisibleChange.emit(false);
+            this.reposicaoDeComponent.onVisibleChange.emit(false);
+            this.reposicaoParaComponent.onVisibleChange.emit(false);
+            
+            this.ngOnDestroy();
+            
+            let routeBack = '';
+            
+            let pathname = window.location.pathname;
+            if (pathname.includes('calendario/reposicao/agendar')) {
+                routeBack += '../../';
+            } 
+            else if (pathname.includes('dashboard/reposicao/agendar')) {
+                routeBack += '../../';
+            }
+            
+            let params = this.activatedRoute.snapshot.params;
+            for (const [key, value] of Object.entries(params)) {
+                routeBack += '../'
+            }
+           
+                            
+            this.router.navigate([routeBack], { relativeTo: this.activatedRoute })
+            .then(res => {
+                this.eventoService.setEvento(undefined)
+                this.eventoService.setEventoReposicaoDe(undefined)
+                this.eventoService.setEventoReposicaoPara(undefined)
+                this.alunoService.setAluno(undefined);
+            })
+
         }
     }
 

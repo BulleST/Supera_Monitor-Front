@@ -240,9 +240,7 @@ export class AlunoService extends Service {
     get(id: number) {
         return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({
-                next: res => {
-                    return this.mapAluno(res);
-                },
+                next: res => this.mapAluno(res),
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar aluno. \n ${getError(err)}`)
                 }

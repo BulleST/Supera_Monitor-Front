@@ -19,7 +19,7 @@
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
             <!-- Aluno -->
-            <app-aluno-select class="w-full flex"
+            <app-aluno-select #alunoSelectComponent class="w-full flex"
                               [eventoReposicaoDe]="eventoReposicaoDe"
                               [eventoReposicaoPara]="eventoReposicaoPara"
                               (onAlunoChanged)="alunoChanged($event)"></app-aluno-select>

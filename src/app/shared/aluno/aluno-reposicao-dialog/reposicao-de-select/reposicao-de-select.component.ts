@@ -30,6 +30,7 @@ export class ReposicaoDeSelectComponent implements OnChanges, OnDestroy {
 	@Input() aluno?: Aluno;
 	@Input() eventoReposicaoPara?: Evento;
 	@Output() onEventoChanged = new EventEmitter<Evento>();
+	@Output() onVisibleChange = new EventEmitter<boolean>();
 
     SalaAndar = SalaAndar;
 
@@ -43,9 +44,15 @@ export class ReposicaoDeSelectComponent implements OnChanges, OnDestroy {
         
 	) {
 
+		this.onVisibleChange.subscribe(res => {
+			if (!res) {
+				this.ngOnDestroy();
+			}
+		})
+
         let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
             let params = this.activatedRoute.snapshot.paramMap;
-            this.readonly = !!params.get('eventoReposicaoDe');
+            this.readonly = !!params.get('evento_reposicao_de');
             this.evento = res;
             this.setEvento();
         });

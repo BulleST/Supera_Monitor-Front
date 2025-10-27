@@ -270,7 +270,7 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEventoReposicaoDe(undefined)
             this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate(['reposicao', 'agendar'], { relativeTo: this.activatedRoute });
+            this.router.navigate(['reposicao', 'agendar', '', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
         }
     }
 

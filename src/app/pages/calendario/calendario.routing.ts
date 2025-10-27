@@ -32,6 +32,10 @@ const routes: Routes = [{
         
         { path: 'reposicao/agendar', component: AgendarReposicaoComponent },
         { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
+        { path: 'reposicao/agendar/:evento_reposicao_para', component: AgendarReposicaoComponent },
+        { path: 'reposicao/agendar/:aluno_id/:evento_reposicao_para', component: AgendarReposicaoComponent },
+
+
         { path: 'aluno/:aluno_id', component: AlunoFormComponent },
         
         { path: 'agendar-falta', component: AgendarFaltaComponent },

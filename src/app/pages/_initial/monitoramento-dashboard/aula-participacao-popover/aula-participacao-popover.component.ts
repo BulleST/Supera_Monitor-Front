@@ -34,8 +34,10 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
     DashboardItemStatus = DashboardItemStatus;
 
-    evento?: Evento
-    participacao?: Evento_Participacao_Aluno
+    evento?: Evento;
+    participacao?: Evento_Participacao_Aluno;
+
+    menuClickLoading = false;
 
     constructor(
         private router: Router,
@@ -79,7 +81,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         // Ver aula
         this.menuItems.push({
             label: 'Ver aula',
-            icon: 'pi pi-search order-1 text-primary-500 ',
+            disabled: this.menuClickLoading,
+            icon: this.menuClickLoading ? 'pi pi-spin pi-spinner' : 'pi pi-search order-1 text-primary-500',
             styleClass: 'text-primary-500 bg-primary-50 hover:bg-primary-100 -mx-2',
             command: () => this.goToAula(),
         })
@@ -91,7 +94,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             && this.item.participacao.active === true) {
             this.menuItems.push({
                 label: 'Agendar falta',
-                icon: 'pi pi-thumbs-down text-red-500 ',
+                disabled: this.menuClickLoading,
+                icon: this.menuClickLoading ? 'pi pi-spin pi-spinner' : 'pi pi-thumbs-down text-red-500',
                 styleClass: 'text-red-500 bg-red-50 hover:bg-red-100 -mx-2',
                 command: () => this.goToAgendarFalta(),
             })
@@ -100,7 +104,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         if (this.item.participacao.presente !== true) {
             this.menuItems.push({
                 label: 'Agendar reposição',
-                icon: 'pi pi-calendar ',
+                disabled: this.menuClickLoading,
+                icon: this.menuClickLoading ? 'pi pi-spin pi-spinner' : 'pi pi-calendar',
                 command: () => this.goToReposicao(),
             })
         }
@@ -108,7 +113,8 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
         if (this.item.participacao.presente === false) {
             this.menuItems.push({
                 label: 'Enviar Mensagem de Falta',
-                icon: 'pi pi-whatsapp text-green-500 ',
+                disabled: this.menuClickLoading,
+                icon: this.menuClickLoading ? 'pi pi-spin pi-spinner' : 'pi pi-whatsapp text-green-500',
                 styleClass: 'text-green-500 bg-green-50 hover:bg-green-100 -mx-2',
                 command: e => this.enviarMensagemFalta(e),
             })
@@ -117,7 +123,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
     menuItemChanged(e: SelectChangeEvent, select: NgModel) {
         if (e.value && e.value.command) {
-            e.value.command(e);
+            // e.value.command(e);
             select.control.setValue(undefined)
             select.control.updateValueAndValidity();
         }
@@ -185,7 +191,6 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
 
     async goToReposicao() {
         if (!this.evento) {
-
             this.evento = await this.request()
                 .catch(res => {
                     this.toastr.error(res.message, 'Erro');
@@ -196,7 +201,7 @@ export class AulaParticipacaoPopoverComponent implements OnChanges {
             let aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
             this.service.setEventoReposicaoDe(this.evento);
             this.alunoService.setAluno(aluno)
-            this.router.navigate(['dashboard', 'reposicao', 'agendar', this.alunoEncryptedId])
+            this.router.navigate(['dashboard', 'reposicao', 'agendar', this.alunoEncryptedId, this.crypto.encrypt(this.evento.id)])
         }
     }
 

@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Crypto, MensagemWhatsapp } from '../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Evento } from '../../../../models/evento.model';
+import { SalaAndar } from '../../../../models/sala-aula.model';
 
 @Component({
 	selector: 'app-aluno-select',
@@ -26,6 +27,7 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 	@Input() eventoReposicaoDe?: Evento;
 	@Input() eventoReposicaoPara?: Evento;
 	@Output() onAlunoChanged = new EventEmitter<Aluno>();
+	@Output() onVisibleChange = new EventEmitter<boolean>();
 
 	constructor(
 		private service: AlunoService,
@@ -35,6 +37,12 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 		private mensagemWhatsapp: MensagemWhatsapp,
 
 	) {
+
+		this.onVisibleChange.subscribe(res => {
+			if (!res) {
+				this.ngOnDestroy();
+			}
+		})
 
 		let aluno = this.service.getAluno().subscribe(async res => {
 			let params = this.activatedRoute.snapshot.paramMap;
@@ -100,26 +108,54 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 
 	setAlunos() {
 		if (this.alunos.length) {
-			this.alunos = this.alunos.filter(x => x.active == true && !!x.turma_Id)
-			// if (this.eventoReposicaoPara) {
+			this.alunos = this.alunos.filter(x => x.active == true && !!x.turma_Id);
 
-			// 	// Em caso de rota por selected-evento.component > opções > agendar reposicao
-			// 	// Vai marcar o para
-			// 	// Filtra somente os alunos que não estão nessa aula
 
-			// 	let alunosId = this.eventoReposicaoPara.alunos.filter(x => x.active).map(X => X.aluno_Id);
-			// 	this.alunos = this.alunos.filter(x => !alunosId.includes(x.id) && x.active == true)
+			let params = this.activatedRoute.snapshot.paramMap;
 
-			// 	// OBS: 
-			// 	// Se em caso de rota por selected-evento.component > aluno-popover.component > opções > agendar reposicao
-			// 	// OU _initial/monitoramento-dashboard.component > agendar reposicao
-			// 	// o eventoReposicaoDe é marcado e a rota é inserida com o aluno_id, impossibilitando seleção de outro aluno
-			// 	// Sendo assim não precisa filtrar os alunos nesse caso
-			// }
+			if (params.get('evento_reposicao_de') && this.eventoReposicaoDe) {
 
+				// Se um evento estiver selecionado, 
+				// os unicos alunos a estarem disponiveis são os alunos daquela aula que
+				// estão ativos e que não tem reposição agendada
+					
+				let alunosAula = this.eventoReposicaoDe.alunos
+									.filter(x => x.active && !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
+									.map(x => x.aluno_Id)
+
+				this.alunos = this.alunos.filter(x => alunosAula.includes(x.id))
+
+			}
+
+			if (params.get('evento_reposicao_para') && this.eventoReposicaoPara) {
+
+				// Se um evento estiver selecionado, 
+				// os unicos alunos a estarem disponiveis são os alunos que 
+				// não estão naquela aula
+				// e que tem perfil compativel
+				// e que não tenha restrição de mobilidade caso a aula não seja no térreo
+					
+				let alunosAula = this.eventoReposicaoPara.alunos
+									.filter(x => x.active)
+									.map(x => x.aluno_Id)
+
+				let perfilAula = this.eventoReposicaoPara.perfilCognitivo.map(x => x.id)
+
+				this.alunos = this.alunos.filter(aluno => {
+
+					let alunoEstaNaAula = alunosAula.includes(aluno.id) 
+					let perfilCompativel = perfilAula.includes(aluno.perfilCognitivo_Id) || !aluno.perfilCognitivo_Id
+					let salaValida = !aluno.restricaoMobilidade || this.eventoReposicaoPara?.andar == SalaAndar.Terreo;
+
+					return !alunoEstaNaAula
+						&& perfilCompativel
+						&& salaValida;
+				});
+
+				
+			}
 		}
 	}
-
 
 	loadAluno(aluno_Id: number) {
 		this.loading = true;

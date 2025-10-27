@@ -297,24 +297,21 @@ export class ListComponent implements OnDestroy {
 
     turmaFocus(item: Aluno) {
         this.turmasDisponiveis = this.turmas.filter(turma => {
-            this.turmasDisponiveis = this.turmas.filter(turma => {
-                const ehTurmaDoAluno = turma.id == item.turma_Id;
-                const turmaAtiva = turma.active;
-                const ehPerfilDoAluno = turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
-                const ehPerfilCompativel = !item.perfilCognitivo_Id || ehPerfilDoAluno;
-                const turmaTemVagas = turma.vagasDisponiveis > 0;
-                const ehAndarValido = turma.andar == SalaAndar.Terreo || !item.restricaoMobilidade
-            
-                const condicao = (turmaAtiva
-                    && ehPerfilCompativel
-                    && turmaTemVagas
-                    && ehAndarValido)
-                    || ehTurmaDoAluno;
-                    
-                    return condicao
-            });
-        })
-
+            const ehTurmaDoAluno = turma.id == item.turma_Id;
+            const turmaAtiva = turma.active;
+            const ehPerfilDoAluno = turma.perfilCognitivo.map(x => x.id).includes(item.perfilCognitivo_Id);
+            const ehPerfilCompativel = !item.perfilCognitivo_Id || ehPerfilDoAluno;
+            const turmaTemVagas = turma.vagasDisponiveis > 0;
+            const ehAndarValido = turma.andar == SalaAndar.Terreo || !item.restricaoMobilidade
+        
+            const condicao = ehTurmaDoAluno 
+            || (turmaAtiva
+                && ehPerfilCompativel
+                && turmaTemVagas
+                && ehAndarValido);
+                
+                return condicao
+        });
     }
 
     turmaChanged(item: Aluno, model: NgModel, e: SelectChangeEvent) {

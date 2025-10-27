@@ -434,16 +434,26 @@
                           filterBy="nome"
                           appendTo="body"
                           fluid>
-                    <ng-template #footer>
-                        <div class="p-3 border-top-1 border-200">
-                            <ng-container *ngIf="object.restricaoMobilidade">
-                                <p>Esse aluno tem restrição de mobilidade:</p>
-                                <p>Somente turmas do térreo serão exibidas.</p>
-                            </ng-container>
-                            <p>Somente turmas do mesmo perfil cognitivo serão exibidas.</p>
-                            <p>Somente turmas com vagas serão exibidas.</p>
-                        </div>
-                    </ng-template>
+                        <ng-template #footer>
+                            <div class="p-3 border-top-1 border-200">
+                                <ng-container *ngIf="object.restricaoMobilidade">
+                                    <p>Esse aluno tem restrição de mobilidade:</p>
+                                    <p>
+                                        <i class="pi pi-check text-green-500 mr-1"></i>
+                                        Somente turmas do térreo serão exibidas.
+                                    </p>
+                                </ng-container>
+                                <p>
+                                    <i class="pi pi-check text-green-500 mr-1"></i>
+                                    Somente turmas do mesmo perfil cognitivo serão exibidas.
+                                </p>
+                                <p>
+                                    <i class="pi pi-check text-green-500 mr-1"></i>
+                                    Somente turmas com vagas serão exibidas.
+                                </p>
+                            </div>
+                        </ng-template>
+                      
                     <ng-template #selectedItem let-selectedOption>
                         <div class="flex align-items-center gap-2">
                             <app-legend-color [corLegenda]="selectedOption.corLegenda"

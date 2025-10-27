@@ -22,7 +22,8 @@ const routes: Routes = [
         path: '', component: InitialComponent, children: [
             { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent, canActivate: [AuthGuard] },
             { path: 'dashboard', component: MonitoramentoDashboardComponent, canActivate: [AuthGuard], children: [
-                { path: 'reposicao/agendar/:aluno_id', component: AgendarReposicaoComponent },
+                { path: 'reposicao/agendar/:aluno_id/:evento_reposicao_de', component: AgendarReposicaoComponent },
+                
                 { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
                 { path: 'contato/:evento_id/:aluno_id', component: AlunoContatoFaltaComponent },
                 { path: 'aula/:evento_id', component: VerAulaComponent },

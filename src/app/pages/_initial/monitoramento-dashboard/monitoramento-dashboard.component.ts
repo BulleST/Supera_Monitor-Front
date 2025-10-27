@@ -68,7 +68,6 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         private router: Router,
     ) {
         let calendarioReload = this.service.calendarioReload.subscribe(res => {
-            console.log('calendarioReload')
             this.update();
         });
         this.subscription.push(calendarioReload);
