@@ -18,6 +18,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { DividerModule } from 'primeng/divider';
+import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { FieldsetModule } from 'primeng/fieldset';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FloatLabelModule } from 'primeng/floatlabel';
@@ -85,6 +86,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         DataViewModule,
         DialogModule,
         DividerModule,
+        DynamicDialogModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,
@@ -148,6 +150,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         DataViewModule,
         DialogModule,
         DividerModule,
+        DynamicDialogModule,
         FieldsetModule,
         FileUploadModule,
         FloatLabelModule,

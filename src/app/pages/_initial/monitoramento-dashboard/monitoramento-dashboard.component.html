@@ -1,23 +1,29 @@
 <app-filtro-popover #filtroPopover (applyFilter)="applyFilter($event)"></app-filtro-popover>
 <app-aluno-popover #alunoPopover [showChecklist]="true"> </app-aluno-popover>
 <app-aula-participacao-popover #aulaParticipacaoPopoverComponent></app-aula-participacao-popover>
-
 <p-table #dt
-            [value]="alunos"
-            stripedRows
-            dataKey="id"
-            [showGridlines]="false"
-            scrollHeight="flex"
-            [scrollable]="true"
-            [virtualScroll]="true"
-            [virtualScrollItemSize]="46"
-            [virtualScrollDelay]="0"
-            [loading]="loading"
-            [showLoader]="false"
-            styleClass="bg-transparent ml-2"
-            [showCurrentPageReport]="true"
-            currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos"
-            size="small">
+         [value]="alunos"
+         stripedRows
+         dataKey="id"
+         [showGridlines]="false"
+         [loading]="loading"
+         [showLoader]="false"
+         styleClass="p-table-monitoramento"
+         size="small"
+         rowGroupMode="subheader"
+         groupRowsBy="turma"
+         scrollHeight="flex"
+         [scrollable]="true"
+         [customSort]="true"
+         (sortFunction)="customSort($event)">
+    <!-- 
+        [sortOrder]="1"
+        sortField="turma"
+                [virtualScroll]="true"
+                [virtualScrollItemSize]="46"
+                [virtualScrollDelay]="0" 
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Exibindo {first} de {last} de um total de {totalRecords} alunos"-->
     <ng-template #caption>
         <div class="border-none bg-white p-3 relative z-3 mb-2 shadow-1">
             <div class="p-toolbar-group-start w-full flex align-items-center justify-content-between gap-2">
@@ -25,27 +31,23 @@
                     <i class="bi bi-table mr-3 text-primary-500 text-2xl"></i>
                     <span class="text-2xl font-normal my-0 white-space-nowrap">Monitoramento</span>
                 </h2>
-
                 <p-button icon="pi pi-info-circle"
-                            label="Ver Legenda"
-                            class="ml-auto"
-                            [rounded]="true"
-                            severity="secondary"
-                            (onClick)="legendaPopover.show($event)" />
-
-
+                          label="Ver Legenda"
+                          class="ml-auto"
+                          [rounded]="true"
+                          severity="secondary"
+                          (onClick)="legendaPopover.show($event)" />
                 <p-button icon="pi pi-sync"
-                            (onClick)="update()"
-                            severity="contrast"
-                            pTooltip="Atualizar monitoramento"
-                            tooltipPosition="top"
-                            styleClass="border-4" />
-
+                          (onClick)="update()"
+                          severity="contrast"
+                          pTooltip="Atualizar monitoramento"
+                          tooltipPosition="top"
+                          styleClass="border-4" />
                 <p-button label="Ver filtros"
-                            icon="pi pi-filter"
-                            severity="primary"
-                            (onClick)="filtroPopover.toggle($event)"
-                            [rounded]="true" />
+                          icon="pi pi-filter"
+                          severity="primary"
+                          (onClick)="filtroPopover.toggle($event)"
+                          [rounded]="true" />
             </div>
             <app-legenda-popover #legendaPopover></app-legenda-popover>
         </div>
@@ -58,7 +60,7 @@
             <ng-container *ngFor="let mes of mesesAno; let i = index;">
                 <th [colSpan]="mes.roteiros.length"
                     class="surface-700 border-700 text-center"
-                    [attr.data-mes]="mes.mes"> 
+                    [attr.data-mes]="mes.mes">
                     <span class="capitalize text-white font-normal">
                         {{mes.mesString}}
                     </span>
@@ -73,7 +75,7 @@
                 [frozen]="true"
                 [pSortableColumn]="'nome'"
                 class="bg-primary-500 border-bottom-1 border-primary-500 text-white">
-                    <div class="flex align-items-center justify-content-between gap-2">
+                <div class="flex align-items-center justify-content-between gap-2">
                     <span class="pl-6">Alunos</span>
                     <p-sortIcon [field]="'nome'" />
                 </div>
@@ -89,9 +91,9 @@
             <ng-container *ngFor="let mes of mesesAno">
                 <ng-container *ngFor="let roteiro of mes.roteiros; let i = index;">
                     <th class=" px-2 capitalize cursor-pointer"
-                    (mouseenter)="popoverRoteiro.show($event)"
-                    (mouseleave)="popoverRoteiro.hide()"
-                    [ngClass]="{
+                        (mouseenter)="popoverRoteiro.show($event)"
+                        (mouseleave)="popoverRoteiro.hide()"
+                        [ngClass]="{
                             'bg-primary-500 border-primary-500': !roteiro.recesso,
                             'bg-red-500 border-red-500 text-center ': roteiro.recesso,
                         }">
@@ -117,53 +119,53 @@
         <tr>
             <th class="pl-6" pFrozenColumn>
                 <div class="w-11rem">
-                    <p-columnFilter 
-                        field="nome"
-                        type="text"
-                        [matchMode]="FilterMatchMode.CONTAINS.toString()"
-                        class="w-full p-column-filter-inline"
-                        fluid/>
+                    <p-columnFilter
+                                    field="nome"
+                                    type="text"
+                                    [matchMode]="FilterMatchMode.CONTAINS.toString()"
+                                    class="w-full p-column-filter-inline"
+                                    fluid />
                 </div>
             </th>
             <th>
                 <div class="w-11rem">
-                    <p-columnFilter 
-                        field="turma"
-                        type="text"
-                        [matchMode]="FilterMatchMode.CONTAINS.toString()"
-                        class="w-full p-column-filter-inline"
-                        fluid/>
+                    <p-columnFilter
+                                    field="turma"
+                                    type="text"
+                                    [matchMode]="FilterMatchMode.CONTAINS.toString()"
+                                    class="w-full p-column-filter-inline"
+                                    fluid />
                 </div>
             </th>
             <ng-container *ngFor="let mes of mesesAno">
                 <ng-container *ngFor="let roteiro of mes.roteiros; let i = index;">
                     <th [ngClass]="{ 'bg-red-200 border-red-500': roteiro.recesso === true }">
                         <div *ngIf="!roteiro.recesso">
-                            <p-columnFilter 
-                                field="turma"
-                                type="text"
-                                class="p-column-filter-inline"
-                                [showMenu]="false"
-                                matchMode="equals">
+                            <p-columnFilter
+                                            field="turma"
+                                            type="text"
+                                            class="p-column-filter-inline"
+                                            [showMenu]="false"
+                                            matchMode="equals">
                                 <ng-template #filter let-value let-filter="filterCallback">
                                     <p-select [options]="filterStatus"
-                                                [ngModel]="value"
-                                                inputId="status-{{roteiro.semana}}"
-                                                name="status-{{roteiro.semana}}"
-                                                placeholder="Selecione"
-                                                optionLabel="label"
-                                                optionValue="value"
-                                                #filterItem
-                                                styleClass="w-5rem"
-                                                (ngModelChange)="filtrarStatus(filterItem.value, roteiro, dt)"
-                                                appendTo="body"
-                                                fluid>
-                                                <ng-template #selectedItem let-selectedOption>
-                                                    <div  *ngIf="selectedOption" class="flex align-items-center gap-2">
-                                                        <span class="w-1rem h-1rem border-circle flex-none flex {{selectedOption.styleClass}}"></span>
-                                                        <span>{{selectedOption.label}}</span>
-                                                    </div>
-                                                </ng-template>
+                                              [ngModel]="value"
+                                              inputId="status-{{roteiro.semana}}"
+                                              name="status-{{roteiro.semana}}"
+                                              placeholder="Selecione"
+                                              optionLabel="label"
+                                              optionValue="value"
+                                              #filterItem
+                                              styleClass="w-5rem"
+                                              (ngModelChange)="filtrarStatus(filterItem.value, roteiro, dt)"
+                                              appendTo="body"
+                                              fluid>
+                                        <ng-template #selectedItem let-selectedOption>
+                                            <div *ngIf="selectedOption" class="flex align-items-center gap-2">
+                                                <span class="w-1rem h-1rem border-circle flex-none flex {{selectedOption.styleClass}}"></span>
+                                                <span>{{selectedOption.label}}</span>
+                                            </div>
+                                        </ng-template>
                                         <ng-template let-option #item>
                                             <div class="flex align-items-center gap-2">
                                                 <span class="w-1rem h-1rem border-circle flex-none flex {{option.styleClass}}"></span>
@@ -172,7 +174,6 @@
                                         </ng-template>
                                     </p-select>
                                 </ng-template>
-                            
                             </p-columnFilter>
                         </div>
                     </th>
@@ -180,26 +181,85 @@
             </ng-container>
         </tr>
     </ng-template>
-    <ng-template #body let-aluno let-i="rowIndex">
+    <ng-template #groupheader let-aluno let-expanded="expanded">
+        <tr pRowGroupHeader>
+            <td pFrozenColumn
+                alignFrozen="left"
+                [frozen]="true"
+                colspan="1"
+                [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }"
+                >
+                <!-- 
+                    [style]="{
+                    'border-left': '2px solid',
+                    'border-left-color': aluno.corLegenda
+                }" 
+            -->
+                <div class="flex align-items-center gap-2 line-height-1 py-2 justify-content-between">
+                    <i class="fa fa-users-between-lines ml-1"></i>
+                    <span class="mr-auto font-bold">{{aluno.turma}}</span>
+
+                    <!-- <app-legend-color [corLegenda]="aluno.corLegenda"
+                                      [professor_Id]="aluno.professor_Id"
+                                      [professor]="aluno.professor"
+                                      [turma_Id]="aluno.turma_Id"></app-legend-color> -->
+                </div>
+            </td>
+            <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }"></td>
+            <ng-container *ngFor="let mes of mesesAno; let indexMes = index;">
+                <ng-container *ngFor="let roteiro of mes.roteiros; let indexRoteiro = index;">
+                    <ng-container *ngIf="indexMes == mesesAno.length - 1  && indexRoteiro == mes.roteiros.length - 1; else elseTemplate">
+                        <td pFrozenColumn
+                            alignFrozen="right"
+                            [frozen]="true"
+                            [style]="{ 
+                                backgroundColor: aluno.corLegenda, 
+                                color: getTextColor(aluno.corLegenda),
+                                borderColor: aluno.corLegenda
+                            }" 
+                            class="white-space-nowrap text-right">
+                            {{calculaAlunosMesmaTurma(aluno.turma_Id)}}
+                        </td>
+                    </ng-container>
+                    <ng-template #elseTemplate>
+                        <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></td>
+                        <!-- <td></td> -->
+                    </ng-template>
+                </ng-container>
+            </ng-container>
+        </tr>
+    </ng-template>
+    <!-- <ng-template #groupfooter let-customer>
+        <tr>
+            <td colspan="5">
+                <div class="text-right font-bold pe-12">Teste</div>
+            </td>
+        </tr>
+    </ng-template> -->
+    <ng-template #body let-aluno let-rowIndex="rowIndex">
         <tr style="height: 46px">
             <td pFrozenColumn
                 alignFrozen="left"
                 [frozen]="true"
-                class="white-space-nowrap px-2 py-1 z-2">
+                class="white-space-nowrap px-2 py-1"
+                [style]="{
+                    'border-left': '1px solid',
+                    'border-left-color': aluno.corLegenda,
+                }">
                 <div class="flex align-items-center">
                     <span class="mr-2">
                         <p-button icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                    severity="success"
-                                    [rounded]="true"
-                                    [text]="true"
-                                    pTooltip="Enviar mensagem"
-                                    (onClick)="enviarMensagem(aluno)"
-                                    (auxclick)="enviarMensagem(aluno)"
-                                    (contextmenu)="enviarMensagem(aluno)"
-                                    [disabled]="!aluno.celular" />
+                                  severity="success"
+                                  [rounded]="true"
+                                  [text]="true"
+                                  pTooltip="Enviar mensagem"
+                                  (onClick)="enviarMensagem(aluno)"
+                                  (auxclick)="enviarMensagem(aluno)"
+                                  (contextmenu)="enviarMensagem(aluno)"
+                                  [disabled]="!aluno.celular" />
                     </span>
                     <p (click)="showAluno(aluno.id, $event)"
-                        class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
+                       class="text-base text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
                         <span>{{aluno.nome | nameAbv }}</span>
                     </p>
                     <span class="ml-2">
@@ -231,15 +291,15 @@
             <ng-container *ngFor="let item of aluno.aulas">
                 <ng-container *ngIf="!item.participacao.reposicaoDe_Evento_Id">
                     <td class="p-1 text-center"
-                        [pTooltip]="dataTooltip"
                         [ngClass]="{
                             'surface-100': !item.show && !item.roteiro.recesso,
                             'bg-red-200 border-red-500': item.roteiro.recesso,
                         }">
+                        <!-- [pTooltip]="dataTooltip" -->
                         <ng-template #dataTooltip>
                             <div class="flex w-full">
                                 <p class="px-2 flex-1 white-space-nowrap text-center text-xs border-1 border-900 surface-900 border-right-none">
-                                    {{item.aula.data | date: 'dd/MM'}} 
+                                    {{item.aula.data | date: 'dd/MM'}}
                                 </p>
                                 <p class="px-2 flex-1 white-space-nowrap text-center text-xs border-1 border-900 surface-900">
                                     {{item.aula.data | date: 'HH\'h\'mm'}}
@@ -249,7 +309,7 @@
                         <ng-template #dataTemplate let-data="data">
                             <div class="flex w-full">
                                 <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none border-right-none">
-                                    {{data | date: 'dd/MM'}} 
+                                    {{data | date: 'dd/MM'}}
                                 </p>
                                 <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none">
                                     {{data | date: 'HH\'h\'mm'}}
@@ -262,12 +322,10 @@
                                     data: item.aula.data,
                                     aluno: aluno
                             }"></ng-container> -->
-
                         <ng-container *ngIf="item.show == true">
-                            <div (click)="showAula(aluno, item, $event)" class="flex align-items-stretch w-full h-full cursor-pointer">
-                                <div class="flex flex-column max-w-full w-max h-full flex-none">
-                                    
-                                    
+                            <div (click)="showAula(aluno, item, $event)"
+                                 class="event-cell">
+                                <div class="event-cell-inner">
                                     <ng-template #alunoContactadoTemplate>
                                         <ng-container *ngIf="item.participacao.presente != true">
                                             <ng-container *ngIf="item.participacao.alunoContactado">
@@ -351,6 +409,7 @@
                                             </div>
                                         </div>
                                     </ng-container>
+                                    <!-- Aula Normal -->
                                     <ng-container *ngIf="item.status == DashboardItemStatus.Aula">
                                         <div class="event-status surface-200 border-200">
                                             <span class="opacity-0">Aula normal</span>
@@ -360,11 +419,11 @@
                                 </div>
                                 <!-- Primeira Aula -->
                                 <div *ngIf="item.aula.id == aluno.primeiraAula_Id"
-                                        class="primeira-aula"
-                                        pTooltip="Primeira aula"
-                                        tooltipPosition="top">
+                                     class="primeira-aula"
+                                     pTooltip="Primeira aula"
+                                     tooltipPosition="top">
                                     <span>Aula 1</span>
-                                </div> 
+                                </div>
                             </div>
                         </ng-container>
                     </td>
@@ -387,7 +446,7 @@
             <td pFrozenColumn>
                 <p-skeleton width="13rem" />
             </td>
-            <td >
+            <td>
                 <p-skeleton width="10rem" />
             </td>
             <ng-container *ngFor="let mes of mesesAno">
@@ -415,28 +474,19 @@
         {{ aluno.nome | firstWord }} faz aniversário de {{getIdade(data, aluno.dataNascimento)}} anos no dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM, EEEE '}}
     </ng-template>
 </ng-template>
-
-<ng-template #alunoContactadoTemplate let-item="item" let-aluno="aluno"> 
-    @if (!item.participacao.alunoContactado) { 
-        
-        <p-button
+<ng-template #alunoContactadoTemplate let-item="item" let-aluno="aluno"> @if (!item.participacao.alunoContactado) { <p-button
               icon="bi bi-telephone-x"
-                label="Contatar"
+              label="Contatar"
               pTooltip="Aluno não contatado - Clique para ver mais"
               (onClick)="goToContatoFalta(item)"
               size="small"
-              rounded /> 
-    } 
-    @else { 
-        <p-button
-            icon="pi pi-check-circle"
-            label="Aluno contatado"
-            severity="success"
-            pTooltip="Aluno contatado - Clique para ver mais"
-            (onClick)="alunoContatadoTooltip.toggle($event)"
-            [text]="true" /> 
-    } 
-    <p-popover #alunoContatadoTooltip appendTo="body">
+              rounded /> } @else { <p-button
+              icon="pi pi-check-circle"
+              label="Aluno contatado"
+              severity="success"
+              pTooltip="Aluno contatado - Clique para ver mais"
+              (onClick)="alunoContatadoTooltip.toggle($event)"
+              [text]="true" /> } <p-popover #alunoContatadoTooltip appendTo="body">
         <div class="w-30rem">
             <p class="flex gap-2 align-items-center mb-3">
                 <i class="pi pi-phone text-base line-height-1 text-white p-2 bg-primary-500 border-circle"></i>

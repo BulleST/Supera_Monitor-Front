@@ -1,0 +1,92 @@
+<header class="flex align-items-center gap-4 pt-4 pb-4">
+    <p class="text-xl font-bold">Aula</p>
+    <!-- Reposicao agendada -->
+    <ng-container *ngIf="item.participacao.reposicaoPara_Evento">
+        <p-tag value="Reposição agendada"
+               [icon]="true ? 'pi pi-check' : 'pi pi-times'"
+               styleClass="bg-purple-600 border-purple-600 text-white line-height-3 font-light" />
+    </ng-container>
+    <p-button icon="pi pi-times"
+              severity="secondary"
+              [text]="true"
+              (onClick)="close()"
+              class="ml-auto" />
+</header>
+<!-- Data -->
+<p class="flex align-items-center gap-2">
+    <i class="pi pi-calendar"></i>
+    <span *ngIf="item.participacao.reposicaoPara_Evento">
+        {{ item.participacao.reposicaoPara_Evento.data | date : 'dd/MM/yyyy' }}
+    </span>
+    <span [ngClass]="{
+            'text-purple-600': item.participacao.reposicaoPara_Evento
+        }">
+        {{ item.aula.data | date : 'dd/MM/yyyy' }}
+    </span>
+</p>
+<!-- Hora -->
+<p class="flex align-items-center gap-2">
+    <i class="pi pi-clock"></i>
+    <span *ngIf="item.participacao.reposicaoPara_Evento">
+        {{ item.participacao.reposicaoPara_Evento.data | date : 'HH:mm' }}
+    </span>
+    <span [ngClass]="{
+        'text-purple-600': item.participacao.reposicaoPara_Evento
+    }">
+        {{ item.aula.data | date : 'HH:mm' }}
+    </span>
+</p>
+<!-- Turma -->
+<p class="flex align-items-center gap-2">
+    <i class="fa fa-users-between-lines"></i>
+    <span *ngIf="item.participacao.reposicaoPara_Evento">
+        {{ item.participacao.reposicaoPara_Evento.turma }}
+    </span>
+    <span [ngClass]="{
+        'text-purple-600': item.participacao.reposicaoPara_Evento
+    }">
+        {{ item.aula.turma }}
+    </span>
+</p>
+<!-- Professor -->
+<p class="flex align-items-center gap-2 line-height-1 mt-1">
+    <i class="fa fa-person-chalkboard"></i>
+    <ng-container *ngIf="item.participacao.reposicaoPara_Evento">
+        <span>
+            {{ item.participacao.reposicaoPara_Evento.professor }}
+        </span>
+        <app-legend-color [corLegenda]="item.participacao.reposicaoPara_Evento.corLegenda"
+                          [professor_Id]="item.participacao.reposicaoPara_Evento.professor_Id"
+                          [professor]="item.participacao.reposicaoPara_Evento.professor"></app-legend-color>
+    </ng-container>
+    <span [ngClass]="{
+        'text-purple-600': item.participacao.reposicaoPara_Evento
+    }">
+        {{ item.aula.professor }}
+    </span>
+    <app-legend-color [corLegenda]="item.aula.corLegenda"
+                      [professor_Id]="item.aula.professor_Id"
+                      [professor]="item.aula.professor"></app-legend-color>
+</p>
+<!-- Sala -->
+<p class="flex align-items-center gap-2 line-height-1 mt-1">
+    <i class="bi bi-door-closed"></i>
+    <ng-container *ngIf="item.participacao.reposicaoPara_Evento">
+        <span class="flex gap-2 align-items-center">
+            <span>{{ item.participacao.reposicaoPara_Evento.sala ?? 'Sala 123' }}</span>
+            <span>-</span>
+            <span *ngIf="item.participacao.reposicaoPara_Evento.andar > SalaAndar.Terreo">{{item.participacao.reposicaoPara_Evento.andar}}º andar</span>
+            <span *ngIf="item.participacao.reposicaoPara_Evento.andar == SalaAndar.Terreo">Térreo</span>
+        </span>
+    </ng-container>
+    <span [ngClass]="{
+        'text-purple-600': item.participacao.reposicaoPara_Evento,
+        'flex gap-2 align-items-center': true
+    }">
+        <span>{{ item.aula.sala ?? 'Sala 123' }}</span>
+        <span>-</span>
+        <span *ngIf="item.aula.andar > SalaAndar.Terreo">{{item.aula.andar}}º andar</span>
+        <span *ngIf="item.aula.andar == SalaAndar.Terreo">Térreo</span>
+    </span>
+</p>
+<pre>{{item|json}}</pre>

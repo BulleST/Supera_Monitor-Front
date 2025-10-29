@@ -44,9 +44,10 @@ export class Dashboard_Aula {
     reagendamentoPara_Evento_Id?: number;
     reagendamentoPara_Evento?: Dashboard_Aula;
 
-    sala_Id?: number;
-    andar?: number;
-    numeroSala?: number;
+    sala: string = '';
+    sala_Id: number = 0;
+    andar: number = 0;
+    numeroSala: number = 0;
 
     roteiro_Id?: number;
     tema: string = '';
@@ -104,6 +105,9 @@ export class Dashboard_Aluno {
     aulaZero_Id?: number;
     dataNascimento?: Date;
     perfilCognitivo_Id: number = 0;
+    corLegenda: string = '';
+    turma: string = '';
+    turma_Id: number = 0;
     aulas: Dashboard_Item[] = [];
 }
 

@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ConfirmationService, FilterMatchMode } from 'primeng/api';
+import { ConfirmationService, FilterMatchMode, SortEvent } from 'primeng/api';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
@@ -7,20 +7,22 @@ import { Popover } from 'primeng/popover';
 import { EventoService } from '../../../services/evento.service';
 import { Dashboard_Mes, DashboardRequest, Dashboard_Aluno, Dashboard_Item, Dashboard_Response, DashboardItemStatus, Dashboard_Roteiro } from '../../../models/dashboard.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
-import { Crypto } from '../../../utils';
+import { CalendarioUtils, Crypto } from '../../../utils';
 import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 import { AulaParticipacaoPopoverComponent } from './aula-participacao-popover/aula-participacao-popover.component';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import { Table } from 'primeng/table';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { AlunoAulaParticipacaoComponent } from './aluno-aula-participacao/aluno-aula-participacao.component';
 
 @Component({
     selector: 'app-monitoramento-dashboard',
     standalone: false,
     templateUrl: './monitoramento-dashboard.component.html',
     styleUrl: './monitoramento-dashboard.component.css',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class MonitoramentoDashboardComponent implements OnDestroy {
     alunos: Dashboard_Aluno[] = [];
@@ -35,6 +37,7 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent ;
     @ViewChild('aulaParticipacaoPopoverComponent') aulaParticipacaoPopoverComponent!: AulaParticipacaoPopoverComponent;
     @ViewChild('toolbar') toolbar!: ElementRef;
+    @ViewChild('dt') dt!: Table;
     
     request: DashboardRequest = new DashboardRequest;
     PseudoEvento = PseudoEvento;
@@ -44,6 +47,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
     height = 'flex';
     subscription: Subscription[] = [];
     DashboardItemStatus = DashboardItemStatus;
+
+    ref: DynamicDialogRef | undefined;
 
     filterStatus = [ 
         { label: 'Todos', value: null, styleClass: 'pi pi-bars' },
@@ -66,6 +71,8 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         private crypto: Crypto,
         private activatedRoute: ActivatedRoute,
         private router: Router,
+        private dialogService: DialogService,
+        private calendarioUtils: CalendarioUtils,
     ) {
         let calendarioReload = this.service.calendarioReload.subscribe(res => {
             this.update();
@@ -79,6 +86,25 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
 
     randomDate(start: Date, end: Date) {
         return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    }
+
+    getTextColor(color: string) {
+        return this.calendarioUtils.getTextColor(color)
+    }
+
+    calculaAlunosMesmaTurma(turma_Id: number) {
+        let alunos = this.alunos.filter(x => x.turma_Id == turma_Id);
+        let soma = alunos.length;
+
+        if (soma == 0 ) {
+            return 'Nenhum aluno'
+        } 
+        else if (soma == 1) {
+            return '1 aluno'
+        } else {
+
+            return soma + ' alunos';
+        }
     }
 
  onLoading() {
@@ -144,11 +170,28 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
                     return mes;
                 });
 
-                // Seta aulas dos alunos
-                this.alunos = res.alunos;
+                this.alunos = res.alunos.sort((x,y) => {
+                    let a = x.turma == y.turma ? 0 :
+                            x.turma == 'Indefinido' ? 1 :
+                            y.turma == 'Indefinido' ? -1 :
+                            x.turma < y.turma ? -1 :
+                            x.turma > y.turma ? 1 : 0;
+                    return a;
+                });
 
                 this.loading = false;
             })
+    }
+
+    customSort(event: SortEvent) {
+        event.data?.sort((x, y) => {
+            let a = x.turma == y.turma ? 0 :
+                    x.turma == 'Indefinido' ? 1 :
+                    y.turma == 'Indefinido' ? -1 :
+                    x.turma < y.turma ? -1 :
+                    x.turma > y.turma ? 1 : 0;
+            return a;
+        });
     }
 
     enviarMensagem(aluno: Dashboard_Aluno) {
@@ -201,10 +244,37 @@ export class MonitoramentoDashboardComponent implements OnDestroy {
         this.alunoPopover.show(event)
     }
     
+    // showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
+    //     this.aulaParticipacaoPopoverComponent.aluno = aluno;
+    //     this.aulaParticipacaoPopoverComponent.item = item;
+    //     this.aulaParticipacaoPopoverComponent.show(event);
+    // }
+
     showAula(aluno: Dashboard_Aluno, item: Dashboard_Item, event: any) {
         this.aulaParticipacaoPopoverComponent.aluno = aluno;
         this.aulaParticipacaoPopoverComponent.item = item;
         this.aulaParticipacaoPopoverComponent.show(event);
+        this.ref = this.dialogService.open(AlunoAulaParticipacaoComponent, { 
+            header: 'Aula',
+            showHeader: false,
+            closable: true,
+            maximizable: false,
+            closeOnEscape: true,
+            draggable: true,
+            dismissableMask: true,
+            duplicate: true,
+            modal: true,
+            width: '95vw',
+            height: '95vh',
+            style: {
+                maxWidth: '600px',
+                maxHeigth: '600px'
+            },
+            data: {
+                aluno,
+                item,
+            }
+        });
     }
 
     filtrarStatus(value: DashboardItemStatus | null, roteiro: Dashboard_Roteiro, table: Table) {
