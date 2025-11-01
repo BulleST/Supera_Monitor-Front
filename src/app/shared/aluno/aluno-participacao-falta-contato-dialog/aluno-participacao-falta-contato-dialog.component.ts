@@ -3,7 +3,7 @@ import { Evento } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventoService } from '../../../services/evento.service';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Evento_Participacao_Aluno, statusContato } from '../../../models/evento-participacao-aluno.model';
 import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
 import moment from 'moment';
 import { ConfirmationService } from 'primeng/api';
@@ -37,20 +37,9 @@ export class AlunoParticipacaoFaltaContatoDialogComponent implements OnDestroy {
     roteiros: Roteiro[] = [];
 	
 
-    status = [
-        { value: 1, label: 'Não compareceu' },
-        { value: 2, label: 'Aguardando Retorno' },
-        { value: 3, label: 'Optou por não repor' },
-        { value: 4, label: 'Aula Cancelada' },
-        { value: 5, label: 'Reposição Agendada' },
-        { value: 6, label: 'Reposição Realizada' },
-        { value: 7, label: 'Não Compareceu na reposição' },
-        { value: 8, label: 'Reposição Desmarcada' },
-        { value: 9, label: 'Outro' },
-    ]
+    status = statusContato;
 
-
-	constructor(
+    constructor(
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private service: EventoService,

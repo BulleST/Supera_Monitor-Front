@@ -8,7 +8,6 @@ import { NavMenuComponent } from '../../parts/nav-menu/nav-menu.component';
 import { HeaderComponent } from '../../parts/header/header.component';
 import { SharedModule } from '../../shared/shared.module';
 import { MonitoramentoJornadaSuperaComponent } from './monitoramento-jornada-supera/monitoramento-jornada-supera.component';
-import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 import { NameFirstWordPipe } from '../../utils/name-first-word.pipe';
 import { AulaParticipacaoPopoverComponent } from './monitoramento-dashboard/aula-participacao-popover/aula-participacao-popover.component';
 import { FiltroPopoverComponent as FiltroJornadaSupera_Component } from './monitoramento-dashboard/filtro-popover/filtro-popover.component';
@@ -21,6 +20,10 @@ import { ExibicaoCardsComponent } from './monitoramento-jornada-supera/exibicao-
 import { ExibicaoListaComponent } from './monitoramento-jornada-supera/exibicao-lista/exibicao-lista.component';
 import { ChecklistPopoverComponent } from './monitoramento-jornada-supera/exibicao-lista/checklist-popover/checklist-popover.component';
 import { ChecklistStatusComponent } from './monitoramento-jornada-supera/exibicao-lista/checklist-status/checklist-status.component';
+import { MonitoramentoDashboardV2Component } from './monitoramento-dashboard-v2/monitoramento-dashboard-v2.component';
+import { FiltroPopoverV2Component } from './monitoramento-dashboard-v2/filtro-popover-v2/filtro-popover-v2.component';
+
+import { MonitoramentoDashboardComponent } from './monitoramento-dashboard/monitoramento-dashboard.component';
 import { AgendarReposicaoComponent } from './monitoramento-dashboard/agendar-reposicao/agendar-reposicao.component';
 import { AgendarFaltaComponent } from './monitoramento-dashboard/agendar-falta/agendar-falta.component';
 import { AlunoContatoFaltaComponent } from './monitoramento-dashboard/aluno-contato-falta/aluno-contato-falta.component';
@@ -33,9 +36,7 @@ import { AlunoAulaParticipacaoComponent } from './monitoramento-dashboard/aluno-
         HeaderComponent,
         NavMenuComponent,
         MonitoramentoJornadaSuperaComponent,
-        MonitoramentoDashboardComponent,
         FiltroJornadaSupera_Component,
-        FiltroMonitoramento_Component,
         AulaParticipacaoPopoverComponent,
         LegendaPopoverComponent,
         ChecklistComponent,
@@ -45,11 +46,17 @@ import { AlunoAulaParticipacaoComponent } from './monitoramento-dashboard/aluno-
         ExibicaoListaComponent,
         ChecklistPopoverComponent,
         ChecklistStatusComponent,
-        AgendarReposicaoComponent,
         AgendarFaltaComponent,
         AlunoContatoFaltaComponent,
         VerAulaComponent,
         AlunoAulaParticipacaoComponent,
+        
+        AgendarReposicaoComponent,
+        MonitoramentoDashboardComponent,
+        FiltroMonitoramento_Component,
+
+        MonitoramentoDashboardV2Component,
+        FiltroPopoverV2Component
     ],
     imports: [
         CommonModule,

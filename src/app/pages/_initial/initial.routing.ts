@@ -9,6 +9,7 @@ import { AgendarReposicaoComponent } from './monitoramento-dashboard/agendar-rep
 import { AgendarFaltaComponent } from './monitoramento-dashboard/agendar-falta/agendar-falta.component';
 import { AlunoContatoFaltaComponent } from '../calendario/aluno-contato-falta/aluno-contato-falta.component';
 import { VerAulaComponent } from './monitoramento-dashboard/ver-aula/ver-aula.component';
+import { MonitoramentoDashboardV2Component } from './monitoramento-dashboard-v2/monitoramento-dashboard-v2.component';
 
 const calendario = () => import('./../calendario/calendario.module').then(res => res.CalendarioModule);
 const alunos = () => import('./../alunos/alunos.module').then(res => res.AlunosModule);
@@ -21,13 +22,14 @@ const routes: Routes = [
     {
         path: '', component: InitialComponent, children: [
             { path: 'jornada-supera', component: MonitoramentoJornadaSuperaComponent, canActivate: [AuthGuard] },
-            { path: 'dashboard', component: MonitoramentoDashboardComponent, canActivate: [AuthGuard], children: [
-                { path: 'reposicao/agendar/:aluno_id/:evento_reposicao_de', component: AgendarReposicaoComponent },
+            { path: 'dashboard', component: MonitoramentoDashboardV2Component, canActivate: [AuthGuard] },
+            // { path: 'dashboard', component: MonitoramentoDashboardComponent, canActivate: [AuthGuard], children: [
+            //     { path: 'reposicao/agendar/:aluno_id/:evento_reposicao_de', component: AgendarReposicaoComponent },
                 
-                { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
-                { path: 'contato/:evento_id/:aluno_id', component: AlunoContatoFaltaComponent },
-                { path: 'aula/:evento_id', component: VerAulaComponent },
-            ] },
+            //     { path: 'agendar-falta/:aluno_id', component: AgendarFaltaComponent },
+            //     { path: 'contato/:evento_id/:aluno_id', component: AlunoContatoFaltaComponent },
+            //     { path: 'aula/:evento_id', component: VerAulaComponent },
+            // ] },
             { path: 'alunos', loadChildren: alunos, canActivate: [AuthGuard] },
             { path: 'calendario', loadChildren: calendario, canActivate: [AuthGuard] },
             { path: 'roteiro', loadChildren: roteiro, canActivate: [AuthGuard] },

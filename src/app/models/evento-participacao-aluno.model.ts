@@ -71,3 +71,16 @@ export class Evento_Participacao_Aluno {
     statusContato_Id?: number;
     contatoObservacao?: string;
 }
+
+
+export var statusContato = [
+        { value: 1, label: 'Não compareceu' },
+        { value: 2, label: 'Aguardando Retorno' },
+        { value: 3, label: 'Optou por não repor' },
+        { value: 4, label: 'Aula Cancelada' },
+        { value: 5, label: 'Reposição Agendada' },
+        { value: 6, label: 'Reposição Realizada' },
+        { value: 7, label: 'Não Compareceu na reposição' },
+        { value: 8, label: 'Reposição Desmarcada' },
+        { value: 9, label: 'Outro' },
+    ]

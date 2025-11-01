@@ -124,6 +124,7 @@ export enum DashboardItemStatus {
     FaltaNaReposicao = 'Faltou na Reposição',
     FaltaNaAula = 'Faltou na Aula',
     FaltaAgendada = 'Falta Agendada',
+    FaltaAlunoContatado = 'Falta - Aluno Contatado',
     PresenteNaReposicao = 'Presente na Reposição',
     PresenteNaAula = 'Presente',
     Aula = 'Aula',       

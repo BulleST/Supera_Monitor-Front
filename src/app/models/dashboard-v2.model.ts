@@ -2,9 +2,9 @@ import { StatusContato } from "./evento-status-contato.enum";
 import { EventoTipo } from "./evento.model";
 import { Feriado } from "./feriado.model";
 
-export interface Dashboard {
+export interface Dashboard_V2 {
     alunos: Dashboard_Aluno[];
-    roteiros: Dashboard_Roteiro[];
+    mesesRoteiro: Dashboard_Mes[];
 }
 
 export interface Dashboard_Roteiro {
@@ -16,6 +16,12 @@ export interface Dashboard_Roteiro {
     corLegenda: string;
     recesso: boolean;
 }
+
+export class Dashboard_Mes {
+    mes: number = 0;
+    mesString: string = '';
+    roteiros: Dashboard_Roteiro[] = [];
+;}
 
 export interface Dashboard_Aluno {
     id: number;
@@ -29,13 +35,14 @@ export interface Dashboard_Aluno {
     corLegenda: string;
     turma: string;
     turma_Id: number;
-    aulas: Dashboard_Aluno_Aulas[];
+    items: Dashboard_Aluno_Aula_Reposicao[];
 }
 
-export interface Dashboard_Aluno_Aulas {
+export interface Dashboard_Aluno_Aula_Reposicao {
     show: boolean;
     aula: Dashboard_Aula_Participacao;
-    reposicaoPara: Dashboard_Aula_Participacao;
+    reposicaoPara?: Dashboard_Aula_Participacao;
+    status: Dashboard_Item_Status;
 }
 
 export interface Dashboard_Aula_Participacao {
@@ -49,7 +56,6 @@ export interface Dashboard_Aula {
     data: Date;
     descricao: string;
     observacao: string;
-    duracaoMinutos: number;  // 120 minutos - 2 horas
     finalizado: boolean;
     active: boolean;
 
@@ -59,6 +65,7 @@ export interface Dashboard_Aula {
 
     tema: string;
     semana: number;
+    recesso: boolean;
     roteiroCorLegenda: string;
     
     turma: string;
@@ -83,4 +90,29 @@ export interface Dashboard_Participacao {
     alunoContactado?: Date; 
     statusContato_Id?: StatusContato;
     contatoObservacao?: string;
+}
+
+
+export class Dashboard_Request {
+    ano: number = new Date().getFullYear();
+    turma_Id?: number;
+    professor_Id?: number;
+    aluno_Id?: number;
+}
+
+
+
+export enum Dashboard_Item_Status {
+    Recesso = 'Recesso',
+    Cancelada = 'Cancelada',
+    Feriado = 'Feriado',
+    ReposicaoAgendada = 'Reposição Agendada',
+    ReposicaoFalta = 'Faltou na Reposição',
+    FaltaNaAula = 'Faltou na Aula',
+    ReposicaoDesmarcada = 'Desmarcou Reposição',
+    FaltaAgendada = 'Falta Agendada',
+    FaltaAlunoContatado = 'FaltaAlunoContatado',
+    ReposicaoPresente = 'Presente na Reposição',
+    PresenteNaAula = 'Presente',
+    Aula = 'Aula',       
 }

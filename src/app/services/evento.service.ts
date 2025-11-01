@@ -24,6 +24,7 @@ import { Feriado } from '../models/feriado.model';
 import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
 import { UrlService } from '../utils/url.service';
+import { statusContato } from '../models/evento-participacao-aluno.model';
 
 @Injectable({
     providedIn: 'root',
@@ -35,17 +36,7 @@ export class EventoService extends Service {
     eventos = new BehaviorSubject<Evento[]>([]);
     feriados = new BehaviorSubject<Feriado[]>([]);
     dashboard = new BehaviorSubject<Dashboard_Response>(new Dashboard_Response());
-    statusContato = new BehaviorSubject<{ value: any, label: string }[]>([
-        { value: 1, label: 'Não compareceu' },
-        { value: 2, label: 'Aguardando Retorno' },
-        { value: 3, label: 'Optou por não repor' },
-        { value: 4, label: 'Aula Cancelada' },
-        { value: 5, label: 'Reposição Agendada' },
-        { value: 6, label: 'Reposição Realizada' },
-        { value: 7, label: 'Não Compareceu na reposição' },
-        { value: 8, label: 'Reposição Desmarcada' },
-        { value: 9, label: 'Outro' },
-    ]);
+    statusContato = new BehaviorSubject<{ value: any, label: string }[]>(statusContato);
 
     calendarioReload = new EventEmitter<number>();
     calendarView = new EventEmitter<CalendarioView>();
@@ -253,7 +244,7 @@ export class EventoService extends Service {
                                 let item = new Dashboard_Item;
                                 item.roteiro = roteiro;
                                 item.show = false;
-                                item.status = DashboardItemStatus.Aula
+                                item.status = DashboardItemStatus.Aula;
                                 return item;
                             })
                         } else {
@@ -292,8 +283,16 @@ export class EventoService extends Service {
                                     item.status = DashboardItemStatus.ReposicaoAgendada;
                                 else if (item.aula.finalizado === true && item.participacao.presente === false && item.participacao.reposicaoDe_Evento_Id)
                                     item.status = DashboardItemStatus.FaltaNaReposicao;
-                                else if (item.aula.finalizado === true && item.participacao.presente === false && !item.participacao.reposicaoDe_Evento_Id)
-                                    item.status = DashboardItemStatus.FaltaNaAula;
+                                else if (item.aula.finalizado === true 
+                                        && item.participacao.presente === false 
+                                        && !item.participacao.reposicaoDe_Evento_Id
+                                        && !item.participacao.alunoContactado
+                                ) item.status = DashboardItemStatus.FaltaNaAula;
+                                else if (item.aula.finalizado === true 
+                                        && item.participacao.presente === false 
+                                        && !item.participacao.reposicaoDe_Evento_Id
+                                        && !!item.participacao.alunoContactado
+                                ) item.status = DashboardItemStatus.FaltaAlunoContatado;
                                 else if (item.participacao.presente === false && item.participacao.active === false && !item.participacao.reposicaoDe_Evento_Id)
                                     item.status = DashboardItemStatus.FaltaAgendada;
                                 else if (item.aula.finalizado === true && item.participacao.presente === true && item.participacao.reposicaoDe_Evento_Id)

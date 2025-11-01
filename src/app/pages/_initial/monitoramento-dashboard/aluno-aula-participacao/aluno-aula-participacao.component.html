@@ -73,7 +73,7 @@
     <i class="bi bi-door-closed"></i>
     <ng-container *ngIf="item.participacao.reposicaoPara_Evento">
         <span class="flex gap-2 align-items-center">
-            <span>{{ item.participacao.reposicaoPara_Evento.sala ?? 'Sala 123' }}</span>
+            <span>{{ item.participacao.reposicaoPara_Evento.sala  }}</span>
             <span>-</span>
             <span *ngIf="item.participacao.reposicaoPara_Evento.andar > SalaAndar.Terreo">{{item.participacao.reposicaoPara_Evento.andar}}º andar</span>
             <span *ngIf="item.participacao.reposicaoPara_Evento.andar == SalaAndar.Terreo">Térreo</span>
@@ -83,7 +83,7 @@
         'text-purple-600': item.participacao.reposicaoPara_Evento,
         'flex gap-2 align-items-center': true
     }">
-        <span>{{ item.aula.sala ?? 'Sala 123' }}</span>
+        <span>{{ item.aula.sala  }}</span>
         <span>-</span>
         <span *ngIf="item.aula.andar > SalaAndar.Terreo">{{item.aula.andar}}º andar</span>
         <span *ngIf="item.aula.andar == SalaAndar.Terreo">Térreo</span>
