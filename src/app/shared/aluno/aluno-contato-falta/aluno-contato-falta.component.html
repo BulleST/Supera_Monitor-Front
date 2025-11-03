@@ -1,0 +1,205 @@
+<app-confirm-dialog></app-confirm-dialog>
+<header class="flex align-items-baseline justify-content-between gap-2 pt-3 pl-2">
+    <div class="flex gap-2 align-items-center">
+        <span class=" w-2rem h-2rem border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center">
+            <i class="pi pi-phone"></i>
+        </span>
+        <h3>Contato</h3>
+    </div>
+    <p-button icon="pi pi-times"
+              (onClick)="close()"
+              severity="secondary"
+              size="large"
+              [text]="true"
+              styleClass="px-1" />
+</header>
+<p-divider />
+<form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+    <div class="formgrid grid">
+        <!-- Aluno -->
+        <div class="field col-6">
+            <label for="aluno">Aluno:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-user" />
+                <input type="text"
+                       pInputText
+                       [value]="aluno"
+                       id="aluno"
+                       name="aluno"
+                       fluid
+                       readonly>
+            </p-iconfield>
+        </div>
+        <!-- Turma -->
+        <div class="field col-6">
+            <label for="evento">Turma:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="fa-solid fa-users-between-lines" />
+                <input type="text"
+                       pInputText
+                       [value]="evento"
+                       id="evento"
+                       name="evento"
+                       fluid
+                       readonly>
+            </p-iconfield>
+        </div>
+        <!-- Data -->
+        <div class="field col-3">
+            <label for="data">Data:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-calendar" />
+                <input type="text"
+                       pInputText
+                       [value]="data | date : 'dd/MM'"
+                       id="data"
+                       name="data"
+                       fluid
+                       readonly>
+            </p-iconfield>
+        </div>
+        <!-- Horário -->
+        <div class="field col-3">
+            <label for="horario">Horário:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-clock" />
+                <input type="text"
+                       pInputText
+                       [value]="data | date : 'HH:mm'"
+                       id="horario"
+                       name="horario"
+                       fluid
+                       readonly>
+            </p-iconfield>
+        </div>
+        <!-- Roteiro -->
+        <div class="field col-6">
+            <label for="semana">Semana:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-star-fill" [style]="{ color: roteiroCorLegenda }" />
+                <ng-container *ngIf="semana && tema; else roteiroIndefinidoTemplate">
+                    <input type="text"
+                           pInputText
+                           [value]="'Semana ' + semana + ' - ' + tema "
+                           id="semana"
+                           name="semana"
+                           fluid
+                           readonly>
+                </ng-container>
+                <ng-template #roteiroIndefinidoTemplate>
+                    <input type="text"
+                           pInputText
+                           [value]="'Indefinido'"
+                           id="semana"
+                           name="semana"
+                           fluid
+                           readonly>
+                </ng-template>
+            </p-iconfield>
+        </div>
+        <!-- OBS -->
+        <div class="field col-12">
+            <label for="observacao">
+                <span *ngIf="passado">Por que o aluno faltou? </span>
+                <span *ngIf="!passado">Por que o aluno irá faltar? </span>
+                <span *ngIf="alunoContactado" class="text-red-500">*</span>
+            </label>
+            <textarea pTextarea
+                      id="observacao"
+                      name="observacao"
+                      [(ngModel)]="observacao"
+                      #_observacao="ngModel"
+                      [required]="true"
+                      placeholder="Insira aqui o motivo..."
+                      rows="2"
+                      [required]="contatado"
+                      fluid></textarea>
+            <ng-container *ngIf="_observacao.touched && _observacao.errors">
+                <p class="text-red-500" *ngIf="_observacao.errors['required']">Esse campo é obrigatório</p>
+            </ng-container>
+        </div>
+        <!-- O aluno foi contatado? -->
+        <div class="col-12 flex align-items-center gap-2 mb-2">
+            <span class="font-bold">O aluno foi contatado?</span>
+            <p-button
+                      [icon]="contatado ? 'pi pi-check' : 'pi pi-times'"
+                      [label]="contatado ? 'Sim' : 'Não'"
+                      [severity]="contatado ? 'success' : 'danger'"
+                      (onClick)="alunoContactadoChanged()"
+                      size="small" />
+            <p-button *ngIf="!contatado"
+                      (onClick)="enviarMensagemFalta($event)"
+                      (auxclick)="enviarMensagemFalta($event)"
+                      (contextmenu)="enviarMensagemFalta($event)"
+                      [disabled]="!celular"
+                      icon="pi pi-whatsapp {{!celular ? 'text-300' : ''}}"
+                      [severity]="celular ? 'success' : 'secondary'"
+                      pTooltip="Enviar mensagem de falta"
+                      label="Enviar mensagem"
+                      size="small" />
+        </div>
+        <ng-container *ngIf="contatado">
+            <!-- Quando -->
+            <div class="field col">
+                <label for="alunoContactado">Quando?</label>
+                <p-datepicker
+                              #_alunoContactado="ngModel"
+                              [(ngModel)]="alunoContactado"
+                              [disabled]="!contatado"
+                              placeholder="dd/mm/yy hh:mm"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              inputId="alunoContactado"
+                              name="alunoContactado"
+                              [showTime]="true"
+                              dateFormat="dd/mm/yy"
+                              hourFormat="24"
+                              [selectOtherMonths]="true"
+                              [keepInvalid]="true"
+                              [disabledDays]="[0]"
+                              appendTo="body"
+                              fluid />
+            </div>
+        </ng-container>
+        <!-- Status do contato -->
+        <div class="field col">
+            <label for="statusContato_Id">Status do contato:</label>
+            <p-select [options]="status"
+                      inputId="statusContato_Id"
+                      name="statusContato_Id"
+                      [(ngModel)]="statusContato_Id"
+                      #_statusContato_Id="ngModel"
+                      optionLabel="label"
+                      optionValue="value"
+                      [filter]="true"
+                      filterBy="label"
+                      appendTo="body"
+                      [disabled]="!contatado"
+                      fluid />
+        </div>
+        <!-- Retorno do contato -->
+        <div class="field col-12">
+            <label for="contatoObservacao"> Retorno do contato: <span class="text-red-500">*</span></label>
+            <textarea pTextarea
+                      id="contatoObservacao"
+                      name="contatoObservacao"
+                      [(ngModel)]="contatoObservacao"
+                      #_contatoObservacao="ngModel"
+                      [disabled]="!contatado"
+                      [required]="contatado"
+                      fluid></textarea>
+            <ng-container *ngIf="_contatoObservacao.touched && _contatoObservacao.errors">
+                <p class="text-red-500" *ngIf="_contatoObservacao.errors['required']">Esse campo é obrigatório</p>
+            </ng-container>
+        </div>
+    </div>
+    <div class="col-12 px-1 flex align-items-center justify-content-end">
+        <p-button type="submit"
+                  fluid
+                  label="Salvar"
+                  icon="pi pi-check"
+                  [loading]="loading"
+                  [rounded]="true"
+                  [disabled]="form.invalid || loading || !evento_Id || !participacao_Id" />
+    </div>
+</form>
