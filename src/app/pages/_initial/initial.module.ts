@@ -29,6 +29,7 @@ import { AgendarFaltaComponent } from './monitoramento-dashboard/agendar-falta/a
 import { AlunoContatoFaltaComponent } from './monitoramento-dashboard/aluno-contato-falta/aluno-contato-falta.component';
 import { VerAulaComponent } from './monitoramento-dashboard/ver-aula/ver-aula.component';
 import { AlunoAulaParticipacaoComponent } from './monitoramento-dashboard/aluno-aula-participacao/aluno-aula-participacao.component';
+import { AulaParticipacaoComponent } from './monitoramento-dashboard-v2/aula-participacao/aula-participacao.component';
 
 @NgModule({
     declarations: [
@@ -56,7 +57,8 @@ import { AlunoAulaParticipacaoComponent } from './monitoramento-dashboard/aluno-
         FiltroMonitoramento_Component,
 
         MonitoramentoDashboardV2Component,
-        FiltroPopoverV2Component
+        FiltroPopoverV2Component,
+        AulaParticipacaoComponent
     ],
     imports: [
         CommonModule,

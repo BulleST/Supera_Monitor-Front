@@ -316,6 +316,8 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
             else if (!this.selectedTurma.vagasDisponiveis
                     && this.selectedTurma.id != this.object.turma_Id) {
+                console.log('selectedTurma', this.selectedTurma);
+                console.log('object', this.object);
                 valid = false;
                 header = 'Não há vagas';
                 message = `Essa turma não tem vagas.`;
@@ -344,11 +346,12 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
     turmaChanged(e: SelectChangeEvent) {
+        this.selectedTurma = this.turmasDisponiveis.find(x => x.id == this.object.turma_Id);
+
         let valid = this.validateTurma(e.originalEvent);
         if (!valid) {
             return;
         }
-
 
         if (!this.selectedTurma) {
             this.turmaChangedConfirm(e);
@@ -429,7 +432,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.object.professor_Id = turma?.professor_Id as any;
         this.object.professor = turma?.professor as any;
         this.selectedTurma = turma;
-        this.turma_Id.control.setValue(turma);
+        this.turma_Id.control.setValue(this.oldTurmaId);
     }
 
     turmaAccept() {

@@ -20,13 +20,12 @@ import { AppRoutingModule } from './app.routing';
 
 import { registerLocaleData } from '@angular/common';
 import localeBr  from '@angular/common/locales/pt';
-
 registerLocaleData(localeBr , 'pt-BR');
 
 @NgModule({
     declarations: [
         AppComponent,
-        LoadingComponent,
+        LoadingComponent
     ],
     imports: [
         BrowserModule,

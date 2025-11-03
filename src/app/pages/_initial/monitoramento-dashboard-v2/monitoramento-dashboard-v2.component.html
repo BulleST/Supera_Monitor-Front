@@ -277,25 +277,31 @@
                         </div>
                     </ng-template>
                     <div class="event-cell">
-                        <div class="event-cell-inner">
+                        <div class="event-cell-inner" (click)="showAula(item, aluno)">
                             <div class="event-status"
                             [ngClass]="{
                                 'bg-red-200 bg-red-200 text-red-700': item.status == Dashboard_Item_Status.Recesso,
-                                'surface-950 surface-950': item.status == Dashboard_Item_Status.Cancelada,
+                                'surface-900 surface-900': item.status == Dashboard_Item_Status.Cancelada,
                                 'surface-800 surface-800': item.status == Dashboard_Item_Status.Feriado,
-                                'bg-red-500 border-red-500': item.status == Dashboard_Item_Status.FaltaNaAula,
-                                'bg-red-500 border-red-500 1': item.status == Dashboard_Item_Status.FaltaAgendada,
-                                'bg-blue-500 border-blue-500': item.status == Dashboard_Item_Status.ReposicaoFalta,
+                                'bg-red-500 border-red-500': item.status == Dashboard_Item_Status.FaltaAula,
+                                'bg-red-300 border-red-300 text-red-600': item.status == Dashboard_Item_Status.FaltaAgendada,
+                                'bg-blue-500 border-blue-500': item.status == Dashboard_Item_Status.FaltaReposicao,
                                 'bg-green-500 border-green-500': item.status == Dashboard_Item_Status.PresenteNaAula,
-                                'bg-green-300 border-green-300': item.status == Dashboard_Item_Status.ReposicaoPresente,
+                                'bg-green-200 border-green-200 text-green-700': item.status == Dashboard_Item_Status.PresenteReposicao,
                                 'bg-purple-500 border-purple-500': item.status == Dashboard_Item_Status.ReposicaoAgendada,
                                 'bg-yellow-500 border-yellow-500': item.status == Dashboard_Item_Status.FaltaAlunoContatado,
+                                'bg-purple-800 border-purple-800': item.status == Dashboard_Item_Status.ReposicaoDesmarcada,
                                 'surface-300 surface-300': item.status == Dashboard_Item_Status.Aula,
                             }">
-                            <span *ngIf="item.aula.reposicaoPara">{{item.aula.reposicaoPara}}</span>
+                                <!-- <pre *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada">{{item.reposicaoPara | json}}</pre> -->
                                 <span>{{item.status}}</span>
                             </div>
-                            <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.aula.data }"></ng-container>
+                                <ng-container *ngIf="item.reposicaoPara">
+                                    <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
+                                </ng-container>
+                                <ng-container *ngIf="!item.reposicaoPara">
+                                    <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.aula.data }"></ng-container>
+                                </ng-container>
                         </div>
                     </div>
                 </td>

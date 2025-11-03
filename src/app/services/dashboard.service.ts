@@ -70,13 +70,13 @@ export class DashboardService extends Service {
                 && reposicaoPara.participacao.presente === false
                 && reposicaoPara.participacao.active === true
             )
-                return Dashboard_Item_Status.ReposicaoFalta;
+                return Dashboard_Item_Status.FaltaReposicao;
 
             else if (reposicaoPara.aula.finalizado === true
                 && reposicaoPara.participacao.presente === true
                 && reposicaoPara.participacao.active === true
             )
-                return Dashboard_Item_Status.ReposicaoPresente;
+                return Dashboard_Item_Status.PresenteReposicao;
         }
         else if (!reposicaoPara) {
 
@@ -92,7 +92,7 @@ export class DashboardService extends Service {
                 && participacao.active === true
                 && !participacao.alunoContactado
             )
-                return Dashboard_Item_Status.FaltaNaAula;
+                return Dashboard_Item_Status.FaltaAula;
 
             else if (participacao.presente === false
                 && participacao.active === false
