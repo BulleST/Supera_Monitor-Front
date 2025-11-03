@@ -262,7 +262,8 @@
             <ng-container *ngFor="let item of aluno.items">
                 <td class="p-1 text-center"
                 [ngClass]="{
-                    'bg-grey-300': !item.show && !item.aula.aula.recesso,
+                    'opacity-30 pointer-events-none': !item.show,
+                    'bg-grey-300': !item.aula.aula.recesso,
                     'bg-red-50 border-red-500': item.aula.aula.recesso,
                 }" >
                     <ng-template #dataTemplate let-data="data">
