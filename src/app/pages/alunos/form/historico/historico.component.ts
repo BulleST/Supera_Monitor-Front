@@ -16,6 +16,7 @@ import { FilterMatchMode } from 'primeng/api';
 export class HistoricoComponent implements OnChanges {
 
     @Input() object: Aluno = new Aluno;
+    @Input() aluno_Id!: number;
     @Output() atualizar = new EventEmitter<boolean>();
     loading = false;
     FilterMathMode= FilterMatchMode
@@ -29,16 +30,19 @@ export class HistoricoComponent implements OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes['aluno_Id']) {
+            this.aluno_Id = changes['aluno_Id'].currentValue;
+            this.update();
+        }
         if (changes['object']) {
             this.object = changes['object'].currentValue;
-            this.update();
         }
     }
 
     update() {
         if (this.object.id) {
             this.loading = true;
-            lastValueFrom(this.service.getHistorico(this.object.id))
+            lastValueFrom(this.service.getHistorico(this.aluno_Id))
             .then(res => {
                 this.loading = false;
                 this.list = res;

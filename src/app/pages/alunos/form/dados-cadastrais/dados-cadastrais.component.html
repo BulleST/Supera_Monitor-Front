@@ -2,7 +2,7 @@
 <app-aluno-checklist-on-confirm-dialog #alunoChecklistOnConfirmDialog></app-aluno-checklist-on-confirm-dialog>
 <div class="formgrid grid">
     <!-- Foto -->
-    <div class="lg:col-3 md:col-3 col-12 px-0 ">
+    <div class="xl:col-2 lg:col-2 md:col-3 col-12 px-0 ">
         <p-fileupload #fileUpload
                       styleclass="gap-0 bg-transparent"
                       name="myfile[]"
@@ -75,7 +75,7 @@
             </ng-template>
         </p-fileupload>
     </div>
-    <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
+    <div class="xl:col-10 lg:col-10 md:col-9 col-12 px-0 flex align-items-start">
         <div class="hidden md:block surface-300" style="height: 95%; width: 2px;"></div>
         <div class="formgrid grid pl-2 sm:px-3">
             <!-- Nome -->
@@ -184,7 +184,7 @@
                 </div>
             </div>
             <!-- E-mail -->
-            <div class="field sm:col-6 xs:col-6 col-12">
+            <div class="field lg:col-6 md:col-6 sm:col-6 xs:col-12 col-12">
                 <label for="email">E-mail: <span class="text-red-500">*</span></label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-envelope" />
@@ -204,7 +204,7 @@
                 </div>
             </div>
             <!-- Endereço -->
-            <div class="field sm:col-6 xs:col-6 col-12">
+            <div class="field lg:col-6 md:col-6 sm:col-6 xs:col-12 col-12">
                 <label for="endereco">Endereço: </label>
                 <p-iconfield>
                     <p-inputicon styleClass="pi pi-map-marker" />
@@ -221,33 +221,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="endereco.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <!-- Início Vigência -->
-            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
-                <label for="dataInicioVigencia">Início Vigência: </label>
-                <input pInputText
-                       type="text"
-                       [value]="object.dataInicioVigencia | date : 'dd/MM/yyyy'"
-                       readonly
-                       fluid />
-            </div>
-            <!-- Fim Vigência -->
-            <div class="field lg:col-3 md:col-2 xs:col-6 col-12">
-                <label for="dataFimVigencia">Fim Vigência: </label>
-                <p-datepicker
-                              #dataFimVigencia="ngModel"
-                              [(ngModel)]="object.dataFimVigencia"
-                              [showIcon]="true"
-                              [iconDisplay]="'input'"
-                              [selectOtherMonths]="true"
-                              [minDate]="minDate"
-                              inputId="dataFimVigencia"
-                              name="dataFimVigencia"
-                              [required]="false"
-                              appendTo="body"
-                              fluid />
-            </div>
             <!-- Restrições -->
-            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-6 xs:col-6 col-12">
                 <div class="flex align-items-center gap-2 justify-content-between mb-1 relative" #divRestricoes>
                     <label for="restricoes">Restrições: </label>
                     <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1"
@@ -334,7 +309,7 @@
                 </div>
             </div>
             <!-- Etapa da jornada -->
-            <div class="field lg:col-6 md:col-4 xs:col-6 col-12">
+            <div class="field lg:col-3 md:col-6 xs:col-6 col-12">
                 <label for="etapaChecklist">Etapa da jornada: </label>
                 <div tabindex="0"
                      id="etapaChecklist"

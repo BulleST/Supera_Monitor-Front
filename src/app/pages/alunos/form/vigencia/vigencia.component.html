@@ -1,0 +1,130 @@
+<p-table #dt
+         [value]="list"
+         stripedRows
+         [loading]="loading"
+         [showLoader]="false"
+         dataKey="id"
+         sortField="id"
+         [sortOrder]="-1">
+    <ng-template #header>
+        <tr>
+            <th>
+                <p-button icon="pi pi-refresh text-white"
+                    pTooltip="Atualizar"
+                    tooltipPosition="bottom"
+                    [text]="true"
+                    severity="contrast"
+                    (onClick)="update()"
+                />
+            </th>
+            <th pSortableColumn="dataInicioVigencia">
+                <div class="flex align-items-center gap-2">
+                    <span>Início Vigencia</span>
+                    <p-sortIcon field="dataInicioVigencia" />
+                </div>
+            </th>
+            <th pSortableColumn="dataFimVigencia">
+                <div class="flex align-items-center gap-2">
+                    <span>Fim Vigencia</span>
+                    <p-sortIcon field="dataFimVigencia" />
+                </div>
+            </th>
+            <th pSortableColumn="turma">
+                <div class="flex align-items-center gap-2">
+                    <span>Turma</span>
+                    <p-sortIcon field="turma" />
+                </div>
+            </th>
+            <th pSortableColumn="professor">
+                <div class="flex align-items-center gap-2">
+                    <span>Professor</span>
+                    <p-sortIcon field="professor" />
+                </div>
+            </th>
+            <th pSortableColumn="account">
+                <div class="flex align-items-center gap-2">
+                    <span>Usuário</span>
+                    <p-sortIcon field="account" />
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th></th>
+            <th>
+                <p-columnFilter
+                                field="dataInicioVigencia"
+                                type="date"
+                                matchMode="dateIs"
+                                class="p-column-filter-inline" />
+            </th>
+            <th>
+                <p-columnFilter
+                                field="dataFimVigencia"
+                                type="date"
+                                matchMode="dateIs"
+                                class="p-column-filter-inline" />
+            </th>
+            <th>
+                <p-columnFilter
+                                field="turma"
+                                type="text"
+                                matchMode="contains"
+                                class="p-column-filter-inline" />
+            </th>
+            <th>
+                <p-columnFilter
+                                field="professor"
+                                type="text"
+                                matchMode="contains"
+                                class="p-column-filter-inline" />
+            </th>
+            <th>
+                <p-columnFilter
+                                field="account"
+                                type="text"
+                                matchMode="contains"
+                                class="p-column-filter-inline" />
+            </th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-item let-rowIndex="rowIndex">
+        <tr>
+            <td>{{item.id}}</td>
+            <td class="w-min">
+                <div class="flex align-items-center gap-1 white-space-nowrap">
+                    <i class="pi pi-calendar"></i>
+                    <span>{{item.dataInicioVigencia | date : 'dd/MM/yyyy HH:mm'}}</span>
+                </div>
+            </td>
+            <td class="w-min">
+                <div *ngIf="item.dataFimVigencia" class="flex align-items-center gap-1 white-space-nowrap">
+                    <i class="pi pi-calendar"></i>
+                    <span>{{item.dataFimVigencia | date : 'dd/MM/yyyy HH:mm'}}</span>
+                </div>
+                <span *ngIf="!item.dataFimVigencia">
+                    <p-badge severity="success" value="Vigente"/>
+                </span>
+            </td>
+            <td class="w-max white-space-nowrap">
+                {{item.turma}}
+            </td>
+            <td class="w-max white-space-nowrap">
+                <div class="flex align-items-center gap-2 white-space-nowrap w-min">
+                    <span>{{item.professor}}</span>
+                    <app-legend-color  class="line-height-1" [corLegenda]="item.corLegenda"></app-legend-color>
+                </div>
+            </td>
+            <td class="w-min">
+                <div class="flex align-items-center gap-2 white-space-nowrap w-min">
+                    <i class="pi pi-user"></i>
+                    <span>{{item.account}}</span>
+                </div>
+            </td>
+        </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+        <tr>
+            <td colspan="6">Não há histórico de transferência de turma.</td>
+        </tr>
+    </ng-template>
+</p-table>

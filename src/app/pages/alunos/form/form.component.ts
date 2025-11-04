@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Crypto, showError } from '../../../utils';
@@ -10,6 +10,8 @@ import { Popover } from 'primeng/popover';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChecklistService } from '../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
+import { HistoricoComponent } from './historico/historico.component';
+import { VigenciaComponent } from './vigencia/vigencia.component';
 
 
 @Component({
@@ -19,7 +21,7 @@ import { ToastrService } from 'ngx-toastr';
     providers: [ConfirmationService],
     standalone: false
 })
-export class FormComponent implements OnDestroy {
+export class FormComponent implements OnDestroy, AfterViewInit {
     visible: boolean = false;
     aluno_Id: number = 0;
     object!: Aluno
@@ -27,6 +29,10 @@ export class FormComponent implements OnDestroy {
     error: string = '';
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
+    
+    tabIndex = 0;
+    @ViewChild('historico') historico!: HistoricoComponent;
+    @ViewChild('vigencia') vigencia!: VigenciaComponent;
 
     constructor(
         private router: Router,
@@ -37,15 +43,24 @@ export class FormComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
     ) {
+    }
+    
+    ngAfterViewInit(): void {
         this.loadPage();
-                // this.visible = true;
-                // this.loading = true;
     }
 
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
+    tabChanged() {
+        if (this.tabIndex == 1) {
+            this.vigencia.atualizar.emit(true)
+        } 
+        else if (this.tabIndex == 2) {
+            this.historico.atualizar.emit(true)
+        }
+    }
 
     loadPage() {
         let params = this.activatedRoute.params.subscribe(async res => {
@@ -57,6 +72,7 @@ export class FormComponent implements OnDestroy {
                 if (!this.checklistService.list.value.length) {
                     await lastValueFrom(this.checklistService.getList())
                 }
+
 
                 lastValueFrom(this.service.get(this.aluno_Id))
                     .then(res => {

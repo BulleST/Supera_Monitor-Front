@@ -201,16 +201,12 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
                     const participacao = evento.alunos.find(x => x.aluno_Id == this.aluno.id);
                     const participacaoAtiva = participacao?.active;
                     const salaValida = !this.aluno.restricaoMobilidade || (this.aluno.restricaoMobilidade && evento.andar == SalaAndar.Terreo);
-                    const vigenciaInicio = moment(this.aluno.dataInicioVigencia).isSameOrBefore(evento.data, 'date'); 
-                    const vigenciaFim = this.aluno.dataFimVigencia && moment(this.aluno.dataFimVigencia).isSameOrAfter(evento.data, 'date') || !this.aluno.dataFimVigencia;
-                    const vigencia = vigenciaInicio && vigenciaFim; 
 
                     let final = eventoAtivo
                         && ehAula
                         && ehPerfilCompativel
                         && ((eventoTemVaga && !participacaoAtiva) || participacaoAtiva)
-                        && salaValida
-                        && vigencia;
+                        && salaValida;
 
                     return final;
                 })

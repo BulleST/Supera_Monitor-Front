@@ -91,13 +91,7 @@
     </div>
     <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
         <li> Apenas aulas <strong>com vagas disponíveis</strong> serão exibidas. </li>
-        <li> Apenas aulas dentro do <strong>período de vigência</strong> do aluno serão exibidas. 
-            <ng-container *ngIf="selectedAluno">
-                <span>( De {{selectedAluno.dataInicioVigencia|date:'dd/MM/yy'}}</span>
-                <span *ngIf="selectedAluno.dataFimVigencia"> Até {{selectedAluno.dataFimVigencia |date:'dd/MM/yy'}})</span>
-                <span *ngIf="!selectedAluno.dataFimVigencia">)</span>
-            </ng-container>
-        </li>
+        <li> Apenas aulas dentro do <strong>período de vigência</strong> do aluno serão exibidas.</li>
         <li> Apenas aulas dentro do <strong>perfil cognitivo</strong> do aluno serão exibidas.
             <i class="fa fa-brain text-sm mx-2"></i>
             <ng-container *ngIf="selectedAluno">

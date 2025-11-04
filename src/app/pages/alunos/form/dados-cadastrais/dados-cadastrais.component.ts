@@ -142,7 +142,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         if (changes['aluno_Id']) {
             this.aluno_Id = changes['aluno_Id'].currentValue;
             this.loadFoto();
-
         }
         if (changes['object']) {
             this.object = changes['object'].currentValue;

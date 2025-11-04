@@ -20,9 +20,6 @@ export class AlunoRequest {
     aluno_Foto?: string;
     restricaoMobilidade: boolean = false;
 
-    dataInicioVigencia: Date = new Date;
-    dataFimVigencia?: Date;
-
     perfilCognitivo_Id?: number;
     turma_Id?: number;
     pessoa_Sexo_Id?: number;
@@ -48,9 +45,6 @@ export class Aluno {
     observacao: string = '';
     endereco: string = '';
     aluno_Foto: string = '';
-
-    dataInicioVigencia: Date = new Date;
-    dataFimVigencia?: Date;
 
     created: Date = new Date;
     lastUpdated?: Date;

@@ -9,6 +9,7 @@ import { FormComponent } from './form/form.component';
 import { DadosCadastraisComponent } from './form/dados-cadastrais/dados-cadastrais.component';
 import { HistoricoComponent } from './form/historico/historico.component';
 import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
+import { VigenciaComponent } from './form/vigencia/vigencia.component';
 
 @NgModule({
     declarations: [
@@ -17,6 +18,7 @@ import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
         FormLoadingComponent,
         DadosCadastraisComponent,
         HistoricoComponent,
+        VigenciaComponent,
         AgendarFaltaComponent,
     ],
     imports: [

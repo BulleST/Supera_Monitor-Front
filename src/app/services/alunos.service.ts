@@ -17,6 +17,7 @@ import { Aluno_Historico } from '../models/aluno-historico.model';
 import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../models/aluno-checklist-item-list.model';
 import { environment } from '../../environments/environment';
 import { UrlService } from '../utils/url.service';
+import { Aluno_Vigencia } from '../models/aluno-vigencia.model';
 
 @Injectable({
     providedIn: 'root',
@@ -80,7 +81,6 @@ export class AlunoService extends Service {
         aluno.activeString = aluno.active ? 'Ativo' : 'Inativo';
 
         aluno.created = moment(aluno.created).toDate();
-        aluno.dataInicioVigencia = moment(aluno.dataInicioVigencia).toDate();
         aluno.dataNascimento = aluno.dataNascimento ? moment(aluno.dataNascimento).toDate() : undefined;
         aluno.idade = aluno.dataNascimento ? this.calculaIdade(aluno.dataNascimento) : undefined;
         aluno.ehAniversario = aluno.dataNascimento ? this.ehAniversario(aluno.dataNascimento) : undefined;
@@ -93,7 +93,6 @@ export class AlunoService extends Service {
         // Nuláveis
         aluno.lastUpdated = aluno.lastUpdated ? moment(aluno.lastUpdated).toDate() : undefined;
         aluno.deactivated = aluno.deactivated ? moment(aluno.deactivated).toDate() : undefined;
-        aluno.dataFimVigencia = aluno.dataFimVigencia ? moment(aluno.dataFimVigencia).toDate() : undefined;
 
         if (aluno.diaSemana && aluno.horario) {
             aluno.turmaDesc = semana[aluno.diaSemana] + ' às ' + aluno.horario.toString().replace(':', 'h').substring(0, 5)
@@ -209,6 +208,20 @@ export class AlunoService extends Service {
             }))
     }
 
+    getVigencia(id: number) {
+        return this.http.get<Aluno_Vigencia[]>(`${this.url}/alunos/vigencia/${id}`)
+            .pipe(tap(res => {
+                res = res.map(x => {
+                    x.dataInicioVigencia = moment(x.dataInicioVigencia).toDate();
+                    x.dataFimVigencia = x.dataFimVigencia ? moment(x.dataFimVigencia).toDate() : undefined;
+                    return x
+                });
+                res = res.sort((x, y) => y.id - x.id);
+                console.log(res)
+                return of(res)
+            }))
+    }
+
     getResumo(id: number) {
         return this.http.get<any[]>(`${this.url}/alunos/resumo/${id}`)
     }
@@ -249,15 +262,16 @@ export class AlunoService extends Service {
 
     edit(model: Aluno) {
         let request = MyMap(model, new AlunoRequest) as AlunoRequest;
+
         request.dataNascimento = model.dataNascimento;
         request.pessoa_Sexo_Id = model.pessoa_Sexo_Id;
         request.apostila_Kit_Id = model.apostila_Kit_Id;
-        request.dataFimVigencia = model.dataFimVigencia;
         request.turma_Id = model.turma_Id;
         request.perfilCognitivo_Id = model.perfilCognitivo_Id;
         request.aluno_Foto = model.aluno_Foto;
         request.aulaZero_Id = model.aulaZero_Id;
         request.primeiraAula_Id = model.primeiraAula_Id;
+
         return this.http.put<RequestResponse>(`${this.url}/alunos`, request)
             .pipe(tap({
                 next: res => {
