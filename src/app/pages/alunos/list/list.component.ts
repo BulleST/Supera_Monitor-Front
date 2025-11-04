@@ -389,6 +389,10 @@ export class ListComponent implements OnDestroy {
 
                 let novoAluno = await lastValueFrom(this.service.get(item.id));
                 novoAluno.turma_Id = novaTurma.id;
+                if (!novoAluno.perfilCognitivo_Id) {
+                    novoAluno.perfilCognitivo_Id = novaTurma.perfilCognitivo[0].id;
+                    novoAluno.perfilCognitivo = novaTurma.perfilCognitivo[0].nome;
+                }
 
                 lastValueFrom(this.service.edit(novoAluno))
                     .then(async res => {

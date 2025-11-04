@@ -307,7 +307,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 message = `O aluno(a) tem restrição de mobilidade e não poderá participar dessa turma no ${this.selectedTurma.andar}º andar.`;
             }
                 
-            else if (this.object.perfilCognitivo_Id && !perfisTurma.includes(this.object.perfilCognitivo_Id)) {
+                else if (this.object.perfilCognitivo_Id && !perfisTurma.includes(this.object.perfilCognitivo_Id)) {
                 valid = false;
                 header = 'Perfil Cognitivo incompatível';
                 message = `O aluno(a) tem um perfil cognitivo incompatível com a turma.`;
@@ -401,15 +401,14 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         let mensagem = 'Continuar com transferência de turma?';
         let perfilCognitivo = this.selectedTurma!.perfilCognitivo.map(x => x.id);
 
-        if (perfilCognitivo.includes(this.object.perfilCognitivo_Id) == false) {
+        if (this.object.perfilCognitivo_Id && !perfilCognitivo.includes(this.object.perfilCognitivo_Id)) {
             mensagem = 'O perfil dessa turma é diferente desse aluno.<br>' + mensagem
-        }
+        } 
 
         this.confirmationService.confirm({
             target: e.target,
             message: mensagem,
             header: 'Transferência de turma',
-            icon: 'pi pi-exclamation-triangle',
             acceptIcon: 'pi pi-check',
             acceptLabel: 'Sim',
             acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
@@ -441,6 +440,10 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.object.turma_Id = turma.id;
         this.object.professor_Id = turma.professor_Id;
         this.object.professor = turma.professor;
+
+        if (!this.object.perfilCognitivo_Id) {
+            this.object.perfilCognitivo_Id = turma.perfilCognitivo[0].id;
+        }
     }
 
     showError(header: string, message: string, e: any) {
