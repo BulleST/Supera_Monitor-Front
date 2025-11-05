@@ -60,6 +60,8 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     @Output() width = new EventEmitter<string>();
     onSave = new EventEmitter<Evento>();
 
+    turmaSelected?: Turma;
+
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
@@ -216,6 +218,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
     turmaChanged(aluno: Evento_Participacao_Aluno, model: NgModel, e: SelectChangeEvent) {
         let turma = this.turmasFiltered.find(x => x.id == aluno.turma_Id);
+        this.turmaSelected = turma;
 
         if (aluno.turma_Id && !turma) {
             model.control.setValue(null)

@@ -331,8 +331,8 @@
                                 [(ngModel)]="object.restricaoMobilidade"
                                 [binary]="true"
                                 [ngClass]="{ 'pointer-events-none': !object.active }"
-                                [disabled]="object.active"
-                                (onChange)="mobilidadeReduzidaChange($event)" />
+                                [readonly]="!object.active"
+                                (onChange)="object.active ? mobilidadeReduzidaChange($event) : undefined" />
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
             </div>

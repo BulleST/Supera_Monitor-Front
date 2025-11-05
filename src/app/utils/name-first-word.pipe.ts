@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'firstWord'
 })
 export class NameFirstWordPipe implements PipeTransform {
-    transform(value: string): string | boolean {
+    transform(value: string): string {
         if (!value) { return ''; }
         var nameArray = value.split(' ').filter(x => !!x);
         return nameArray[0];

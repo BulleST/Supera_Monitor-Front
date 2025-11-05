@@ -42,7 +42,7 @@
     </div>
     <!-- Educador -->
     <div class="field lg:col-3 sm:col-6 col-12">
-        <label for="professor_Id">Educador: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="professor_Id">Educador: <span *ngIf="!evento.finalizado" class="text-red-500">*</span></label>
         <p-select [options]="professores"
                   [(ngModel)]="evento.professor_Id"
                   [loading]="loadingProfessores"
@@ -59,7 +59,7 @@
                   appendTo="body"
                   optionDisabled="deactivated"
                   [readonly]="evento.finalizado"
-                  [dropdownIcon]="evento.finalizado ? ' ' : 'pi pi-angle-down'"
+                  [dropdownIcon]="evento.finalizado ? 'pi' : 'pi pi-angle-down'"
                   fluid>
             <ng-template let-item #item>
                 <div class="flex align-items-center justify-content-between w-full gap-2">
@@ -96,7 +96,7 @@
     </div>
     <!-- Sala -->
     <div class="field lg:col-3 sm:col-6 col-12">
-        <label for="sala_Id">Sala: <span *ngIf="evento.finalizado" class="text-red-500">*</span></label>
+        <label for="sala_Id">Sala: <span *ngIf="!evento.finalizado" class="text-red-500">*</span></label>
         <p-select [options]="salaAulas"
                   [(ngModel)]="evento.sala_Id"
                   [loading]="loadingSalaAulas"
@@ -185,7 +185,7 @@
                         <label for="perfilCognitivo[{{ i }}]">Perfil Cognitivo: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-brain" />
-                            <ng-container *ngIf="evento.finalizado">
+                            <ng-container *ngIf="!evento.finalizado">
                                 <input pInputText
                                        id="perfilCognitivo[{{ i }}]"
                                        name="perfilCognitivo[{{ i }}]"
@@ -220,8 +220,8 @@
                     <div class="field col">
                         <label for="turma[{{ i }}]">Turma: <span class="text-red-500">*</span></label>
                         <p-iconfield>
-                            <p-inputicon styleClass="fa-solid fa-users-between-lines" />
-                            <ng-container *ngIf="evento.finalizado">
+                            <p-inputicon styleClass="fa fa-users-between-lines" />
+                            <ng-container *ngIf="!evento.finalizado">
                                 <input pInputText
                                        id="turma[{{ i }}]"
                                        name="turma[{{ i }}]"
@@ -242,7 +242,7 @@
                         <label for="apostilaKit[{{ i }}]">Apostila Kit: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-book-open" />
-                            <ng-container *ngIf="evento.finalizado">
+                            <ng-container *ngIf="!evento.finalizado">
                                 <input pInputText
                                        id="apostilaKit[{{ i }}]"
                                        name="apostilaKit[{{ i }}]"
@@ -279,7 +279,7 @@
         </ng-container>
     </div>
 </div>
-<ng-template #turmaSelect let-participacao="participacao" let-i="i">
+<ng-template #turmaSelect let-participacao="participacao"  let-i="i">
     <p-select [options]="turmasFiltered"
               #turma_Id="ngModel"
               [(ngModel)]="participacao.turma_Id"
@@ -299,6 +299,17 @@
               [showClear]="true"
               appendTo="body"
               fluid>
+              <ng-template #selectedItem let-selectedOption>
+                <div class="flex align-items-center gap-2">
+                    <span>{{selectedOption.nome}}</span>
+                    
+                                <app-legend-color class="line-height-1"
+                                [corLegenda]="selectedOption.corLegenda"
+                                [turma]="selectedOption.nome"
+                                [turma_Id]="selectedOption.id"
+                                [professor]="selectedOption.professor"></app-legend-color>
+                </div>
+              </ng-template>
         <ng-template let-option #item>
             <div class="w-full">
                 <div class="flex align-items-center gap-2">
@@ -312,10 +323,10 @@
                     <ng-container *ngFor="let perfil of option.perfilCognitivo">
                         <p-tag [value]="perfil.nome" icon="fa-solid fa-brain" />
                     </ng-container>
-                    <p-tag *ngIf="option.vagas" [value]="option.vagas + ' vaga(s)'"
+                    <p-tag *ngIf="option.vagasDisponiveis" [value]="option.vagasDisponiveis + ' vaga(s)'"
                            class="ml-auto"
                            severity="secondary" />
-                    <p-tag *ngIf="!option.vagas" value="Nenhuma vaga"
+                    <p-tag *ngIf="!option.vagasDisponiveis" value="Nenhuma vaga"
                            class="ml-auto"
                            icon="pi pi-ban text-red-500"
                            severity="secondary" />

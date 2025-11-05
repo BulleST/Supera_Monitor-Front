@@ -223,6 +223,13 @@ export class CadastrarAula0Component implements OnDestroy {
             .catch(res => this.loadingFeriados = false);
     }
 
+    removeAluno(aluno: Aluno) {
+        var index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
+        if (index != -1) {
+            this.selectedAlunos.splice(index,1)
+        }
+    }
+
     setInvalidDates() {
         if (this.roteiros.length && this.feriados.length) {
             let recessos = this.roteiros.filter(x => x.recesso === true);
@@ -367,10 +374,8 @@ export class CadastrarAula0Component implements OnDestroy {
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         let item = this.salaAulas.find(x => x.id == e.value) as SalaAula;
-        let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
 
         this.validaSalaAulas()
-
 
         if (item.disponivel == false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
@@ -384,6 +389,8 @@ export class CadastrarAula0Component implements OnDestroy {
             return;
         }
 
+        let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
+        console.log('alunosRestricao', alunosRestricao)
         if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
             model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')

@@ -8,6 +8,8 @@ export function validaAlunoSalaAula(sala_Id: number, aluno_Id: number, salas: Sa
     const aluno = alunos.find(x => x.id == aluno_Id);
     const sala = salas.find(x => x.id == sala_Id);
 
+    console.log('aluno', aluno)
+    console.log('sala', sala)
     if (!aluno || !sala){
         return true;
     }

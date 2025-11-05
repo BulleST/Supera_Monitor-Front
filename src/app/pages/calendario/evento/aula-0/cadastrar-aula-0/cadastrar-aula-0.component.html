@@ -48,7 +48,7 @@
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
-             <!-- Data -->
+            <!-- Data -->
             <div class="field col-6">
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker
@@ -74,7 +74,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-             <!-- Horário -->
+            <!-- Horário -->
             <div class="field col-6">
                 <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker inputId="horario"
@@ -99,7 +99,83 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_horario.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-             <!-- Educador -->
+            <!-- Aluno -->
+            <div class="field col-12">
+                <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
+                <p-multiselect [options]="alunos"
+                               [loading]="loadingAlunos || loadingEventos"
+                               [(ngModel)]="selectedAlunos"
+                               [readonly]="blockAlunoField"
+                               [disabled]="blockAlunoField || loadingEventos || !data || !horario"
+                               (onChange)="alunoChanged($event, aluno_Id)"
+                               #aluno_Id="ngModel"
+                               optionLabel="nome"
+                               name="aluno_Id"
+                               inputId="aluno_Id"
+                               [required]="true"
+                               [filter]="true"
+                               filterBy="nome"
+                               [showToggleAll]="false"
+                               [virtualScroll]="true"
+                               [virtualScrollItemSize]="54"
+                               optionDisabled="deactivated, disponivel"
+                               placeholder="Selecione"
+                               appendTo="body"
+                               panelStyleClass="p-select-stripped"
+                               display="chip"
+                               fluid>
+                    <ng-template #selecteditems let-selectedOptions>
+                        <ng-container *ngFor="let aluno of selectedOptions">
+                            <p-chip [label]="aluno.nome | nameAbv"
+                                    class="capitalize"
+                                    [removable]="true"
+                                    (onRemove)="removeAluno(aluno)" />
+                        </ng-container>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <div class="flex align-items-center">
+                                    <p-button type="button"
+                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                              (onClick)="enviarMensagem(item)"
+                                              (auxclick)="enviarMensagem(item)"
+                                              (contextmenu)="enviarMensagem(item)"
+                                              severity="success"
+                                              [text]="true"
+                                              [disabled]="!item.celular"
+                                              pTooltip="Enviar mensagem"
+                                              size="small">
+                                    </p-button>
+                                    <p class="font-bold">
+                                        <span class="mr-2">{{item.nome}}</span>
+                                        <p-badge *ngIf="item.disponivel == false"
+                                                 value="Indisponível"
+                                                 severity="danger"
+                                                 [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                                        <ng-template #indisponivelTemplate>
+                                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                        </ng-template>
+                                    </p>
+                                </div>
+                                <p class="flex align-items-center gap-2 pl-2">
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [professor]="item.professor"
+                                                      [turma_Id]="item.turma_Id"></app-legend-color>
+                                    <span class="font-normal">Turma {{item.turma}}</span>
+                                </p>
+                            </div>
+                            <p-badge [value]="item.perfilCognitivo" />
+                        </div>
+                    </ng-template>
+                </p-multiselect>
+                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                </div>
+            </div>
+            <!-- Educador -->
             <div class="field col-6">
                 <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
                 <p-select
@@ -132,10 +208,9 @@
                                              value="Indisponível"
                                              severity="danger"
                                              [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                             
-                                             <ng-template #indisponivelTemplate>
-                                                 <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                             </ng-template>
+                                    <ng-template #indisponivelTemplate>
+                                        <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                    </ng-template>
                                 </p>
                                 <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
                                     <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
@@ -154,7 +229,7 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
                 </div>
             </div>
-             <!-- Sala -->
+            <!-- Sala -->
             <div class="field col-6">
                 <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
                 <p-select
@@ -175,95 +250,26 @@
                           optionDisabled="deactivated"
                           placeholder="Selecione"
                           fluid>
-                          <ng-template let-item #item>
-                              <div class="w-full flex align-items-center justify-content-between">
-                                  <app-sala-aula [sala_Id]="item.id"
-                                                 [andar]="item.andar"
-                                                 [numeroSala]="item.numeroSala"
-                                                 [descricao]="item.descricao"></app-sala-aula>
-                                  <p-badge *ngIf="item.disponivel == false"
-                                           value="Indisponível"
-                                           severity="danger"
-                                           [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                              </div>
-                              <ng-template #indisponivelTemplate>
-                                  <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                              </ng-template>
-                          </ng-template>
+                    <ng-template let-item #item>
+                        <div class="w-full flex align-items-center justify-content-between">
+                            <app-sala-aula [sala_Id]="item.id"
+                                           [andar]="item.andar"
+                                           [numeroSala]="item.numeroSala"
+                                           [descricao]="item.descricao"></app-sala-aula>
+                            <p-badge *ngIf="item.disponivel == false"
+                                     value="Indisponível"
+                                     severity="danger"
+                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                        </div>
+                        <ng-template #indisponivelTemplate>
+                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                        </ng-template>
+                    </ng-template>
                 </p-select>
                 <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['restricaoMobilidade']">{{sala_Id.errors['restricaoMobilidade']}}</p>
-                </div>
-            </div>
-             <!-- Aluno -->
-            <div class="field col-12">
-                <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
-                <p-multiselect [options]="alunos"
-                               [loading]="loadingAlunos || loadingEventos"
-                               [(ngModel)]="selectedAlunos"
-                               [readonly]="blockAlunoField"
-                               [disabled]="blockAlunoField || loadingEventos || !data || !horario"
-                               (onChange)="alunoChanged($event, aluno_Id)"
-                               #aluno_Id="ngModel"
-                               optionLabel="nome"
-                               name="aluno_Id"
-                               inputId="aluno_Id"
-                               [required]="true"
-                               [filter]="true"
-                               filterBy="nome"
-                               [showToggleAll]="false"
-                               [virtualScroll]="true"
-                               [virtualScrollItemSize]="54"
-                               optionDisabled="deactivated, disponivel"
-                               placeholder="Selecione"
-                               appendTo="body"
-                               panelStyleClass="p-select-stripped"
-                               display="chip"
-                               fluid>
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div>
-                                <div class="flex align-items-center">
-                                    <p-button type="button"
-                                              icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
-                                              (onClick)="enviarMensagem(item)"
-                                              (auxclick)="enviarMensagem(item)"
-                                              (contextmenu)="enviarMensagem(item)"
-                                              severity="success"
-                                              [text]="true"
-                                              [disabled]="!item.celular"
-                                              pTooltip="Enviar mensagem"
-                                              size="small">
-                                    </p-button>
-                                    <p class="font-bold">
-                                        <span class="mr-2">{{item.nome}}</span>
-                                        <p-badge *ngIf="item.disponivel == false"
-                                                 value="Indisponível"
-                                                 severity="danger"
-                                                 [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                                 
-                                                 <ng-template #indisponivelTemplate>
-                                                     <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                                 </ng-template>
-                                    </p>
-                                </div>
-                                <p class="flex align-items-center gap-2 pl-2">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
-                                                      [professor_Id]="item.professor_Id"
-                                                      [professor]="item.professor"
-                                                      [turma_Id]="item.turma_Id"></app-legend-color>
-                                    <span class="font-normal">Turma {{item.turma}}</span>
-                                </p>
-                            </div>
-                            <p-badge [value]="item.perfilCognitivo" />
-                        </div>
-                    </ng-template>
-                </p-multiselect>
-                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
                 </div>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">
