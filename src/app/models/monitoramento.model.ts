@@ -2,12 +2,12 @@ import { StatusContato } from "./evento-status-contato.enum";
 import { EventoTipo } from "./evento.model";
 import { Feriado } from "./feriado.model";
 
-export interface Dashboard {
-    alunos: Dashboard_Aluno[];
-    mesesRoteiro: Dashboard_Mes[];
+export interface Monitoramento_Response {
+    alunos: Monitoramento_Aluno[];
+    mesesRoteiro: Monitoramento_Mes[];
 }
 
-export interface Dashboard_Roteiro {
+export interface Monitoramento_Roteiro {
     id: number;
     tema: string;
     semana: number;
@@ -17,13 +17,13 @@ export interface Dashboard_Roteiro {
     recesso: boolean;
 }
 
-export class Dashboard_Mes {
+export class Monitoramento_Mes {
     mes: number = 0;
     mesString: string = '';
-    roteiros: Dashboard_Roteiro[] = [];
+    roteiros: Monitoramento_Roteiro[] = [];
 ;}
 
-export interface Dashboard_Aluno {
+export interface Monitoramento_Aluno {
     id: number;
     nome: string;
     celular: string;
@@ -35,22 +35,22 @@ export interface Dashboard_Aluno {
     corLegenda: string;
     turma: string;
     turma_Id: number;
-    items: Dashboard_Aluno_Aula_Reposicao[];
+    items: Monitoramento_Aluno_Item[];
 }
 
-export interface Dashboard_Aluno_Aula_Reposicao {
+export interface Monitoramento_Aluno_Item {
     show: boolean;
-    aula: Dashboard_Aula_Participacao;
-    reposicaoPara?: Dashboard_Aula_Participacao;
-    status: Dashboard_Item_Status;
+    aula: Monitoramento_Aula_Participacao_Rel;
+    reposicaoPara?: Monitoramento_Aula_Participacao_Rel;
+    status: Monitoramento_Item_Status;
 }
 
-export interface Dashboard_Aula_Participacao {
-    aula: Dashboard_Aula;
-    participacao: Dashboard_Participacao;
+export interface Monitoramento_Aula_Participacao_Rel {
+    aula: Monitoramento_Aula;
+    participacao: Monitoramento_Participacao;
 }
 
-export interface Dashboard_Aula {
+export interface Monitoramento_Aula {
     id: number;
     evento_Tipo_Id: EventoTipo.Aula; // EventoTipo.Aula ou EventoTipo.TurmaExtra 
     data: Date;
@@ -75,7 +75,7 @@ export interface Dashboard_Aula {
     feriado?: Feriado;
 }
 
-export interface Dashboard_Participacao {
+export interface Monitoramento_Participacao {
     id: number;
     presente?: boolean;
     observacao?: string;
@@ -93,7 +93,7 @@ export interface Dashboard_Participacao {
 }
 
 
-export class Dashboard_Request {
+export class Monitoramento_Request {
     ano: number = new Date().getFullYear();
     turma_Id?: number;
     professor_Id?: number;
@@ -102,7 +102,7 @@ export class Dashboard_Request {
 
 
 
-export enum Dashboard_Item_Status {
+export enum Monitoramento_Item_Status {
     Recesso = 'Recesso',
     Cancelada = 'Cancelada',
     Feriado = 'Feriado',

@@ -6,10 +6,10 @@ import { ConfirmationService, FilterMatchMode, SortEvent } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Popover } from 'primeng/popover';
 import { Table } from 'primeng/table';
-import { Dashboard_Aluno, Dashboard_Aluno_Aula_Reposicao, Dashboard_Item_Status, Dashboard_Mes, Dashboard_Request, Dashboard_Roteiro } from '../../models/dashboard.model';
+import { Monitoramento_Aluno, Monitoramento_Aluno_Item, Monitoramento_Item_Status, Monitoramento_Mes, Monitoramento_Request, Monitoramento_Roteiro } from '../../models/monitoramento.model';
 import { PseudoEvento } from '../../models/reposicao.model';
 import { CalendarioUtils, Crypto, MensagemWhatsapp } from '../../utils';
-import { MonitoramentoService } from '../../services/dashboard.service';
+import { MonitoramentoService } from '../../services/monitoramento.service';
 import { Aluno } from '../../models/alunos.model';
 import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao.component';
 
@@ -22,9 +22,9 @@ import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao
 
 })
 export class MonitoramentoComponent implements OnDestroy {
-	alunos: Dashboard_Aluno[] = [];
+	alunos: Monitoramento_Aluno[] = [];
 	loading = false;
-	mesesAno: Dashboard_Mes[] = [];
+	mesesAno: Monitoramento_Mes[] = [];
 	meses: string[] = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
 
@@ -34,10 +34,10 @@ export class MonitoramentoComponent implements OnDestroy {
 	@ViewChild('toolbar') toolbar!: ElementRef;
 	@ViewChild('dt') dt!: Table;
 
-	request: Dashboard_Request = new Dashboard_Request;
+	request: Monitoramento_Request = new Monitoramento_Request;
 
 	PseudoEvento = PseudoEvento;
-	Dashboard_Item_Status = Dashboard_Item_Status;
+	Dashboard_Item_Status = Monitoramento_Item_Status;
 	FilterMatchMode = FilterMatchMode;
 
 	loadingRequests = new EventEmitter<number>();
@@ -49,15 +49,15 @@ export class MonitoramentoComponent implements OnDestroy {
 
 	filterStatus = [
 		{ label: 'Todos', value: null, styleClass: 'pi pi-bars' },
-		{ label: Dashboard_Item_Status.Cancelada, value: Dashboard_Item_Status.Cancelada, styleClass: 'surface-800' },
-		{ label: Dashboard_Item_Status.Feriado, value: Dashboard_Item_Status.Feriado, styleClass: 'bg-red-600' },
-		{ label: Dashboard_Item_Status.ReposicaoAgendada, value: Dashboard_Item_Status.ReposicaoAgendada, styleClass: 'bg-purple-500' },
-		{ label: Dashboard_Item_Status.FaltaReposicao, value: Dashboard_Item_Status.FaltaReposicao, styleClass: 'bg-blue-600' },
-		{ label: Dashboard_Item_Status.FaltaAula, value: Dashboard_Item_Status.FaltaAula, styleClass: 'bg-red-500' },
-		{ label: Dashboard_Item_Status.FaltaAgendada, value: Dashboard_Item_Status.FaltaAgendada, styleClass: 'bg-red-500' },
-		{ label: Dashboard_Item_Status.PresenteReposicao, value: Dashboard_Item_Status.PresenteReposicao, styleClass: 'bg-green-300' },
-		{ label: Dashboard_Item_Status.PresenteNaAula, value: Dashboard_Item_Status.PresenteNaAula, styleClass: 'bg-green-500' },
-		{ label: Dashboard_Item_Status.Aula, value: Dashboard_Item_Status.Aula, styleClass: 'surface-200' },
+		{ label: Monitoramento_Item_Status.Cancelada, value: Monitoramento_Item_Status.Cancelada, styleClass: 'surface-800' },
+		{ label: Monitoramento_Item_Status.Feriado, value: Monitoramento_Item_Status.Feriado, styleClass: 'bg-red-600' },
+		{ label: Monitoramento_Item_Status.ReposicaoAgendada, value: Monitoramento_Item_Status.ReposicaoAgendada, styleClass: 'bg-purple-500' },
+		{ label: Monitoramento_Item_Status.FaltaReposicao, value: Monitoramento_Item_Status.FaltaReposicao, styleClass: 'bg-blue-600' },
+		{ label: Monitoramento_Item_Status.FaltaAula, value: Monitoramento_Item_Status.FaltaAula, styleClass: 'bg-red-500' },
+		{ label: Monitoramento_Item_Status.FaltaAgendada, value: Monitoramento_Item_Status.FaltaAgendada, styleClass: 'bg-red-500' },
+		{ label: Monitoramento_Item_Status.PresenteReposicao, value: Monitoramento_Item_Status.PresenteReposicao, styleClass: 'bg-green-300' },
+		{ label: Monitoramento_Item_Status.PresenteNaAula, value: Monitoramento_Item_Status.PresenteNaAula, styleClass: 'bg-green-500' },
+		{ label: Monitoramento_Item_Status.Aula, value: Monitoramento_Item_Status.Aula, styleClass: 'surface-200' },
 	]
 
 
@@ -123,9 +123,9 @@ export class MonitoramentoComponent implements OnDestroy {
 						tema: 'Carregando...',
 						dataInicio: inicio.toDate(),
 						dataFim: fim.toDate(),
-					} as Dashboard_Roteiro;
+					} as Monitoramento_Roteiro;
 				})
-			} as Dashboard_Mes;
+			} as Monitoramento_Mes;
 		})
 		this.alunos = [];
 	}
@@ -172,13 +172,13 @@ export class MonitoramentoComponent implements OnDestroy {
 		});
 	}
 
-	enviarMensagem(aluno: Dashboard_Aluno) {
+	enviarMensagem(aluno: Monitoramento_Aluno) {
 		let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
 		window.open(object.link, '_blank');
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 	}
 
-	showAula(item: Dashboard_Aluno_Aula_Reposicao, aluno: Dashboard_Aluno) {
+	showAula(item: Monitoramento_Aluno_Item, aluno: Monitoramento_Aluno) {
 		this.ref = this.dialogService.open(AulaParticipacaoComponent, {
 			header: 'Aula',
 			showHeader: false,
@@ -223,12 +223,12 @@ export class MonitoramentoComponent implements OnDestroy {
 		return moment(data).diff(dataNascimento, 'years');
 	}
 
-	applyFilter(request: Dashboard_Request) {
+	applyFilter(request: Monitoramento_Request) {
 		this.request = request;
 		this.update();
 	}
 
-	filtrarStatus(value: Dashboard_Item_Status | null, roteiro: Dashboard_Roteiro, table: Table) {
+	filtrarStatus(value: Monitoramento_Item_Status | null, roteiro: Monitoramento_Roteiro, table: Table) {
 		// let alunosFiltered = this.alunos.filter(aluno => {
 		//     let item = aluno.aulas.find(x => x.roteiro.id == roteiro.id
 		//         && moment(x.roteiro.dataInicio).isSame(roteiro.dataInicio, 'date')

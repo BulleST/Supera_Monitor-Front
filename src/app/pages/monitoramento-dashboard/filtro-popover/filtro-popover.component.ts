@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter,OnDestroy, Output, ViewChild } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Popover } from 'primeng/popover';
-import { Dashboard_Request } from '../../../models/dashboard.model';
+import { Monitoramento_Request } from '../../../models/monitoramento.model';
 import { Professor } from '../../../models/professor.model';
 import { Turma } from '../../../models/turma.model';
 import { Aluno } from '../../../models/alunos.model';
@@ -19,10 +19,10 @@ import { MensagemWhatsapp } from '../../../utils';
 })
 export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
     
-    @Output() applyFilter = new EventEmitter<Dashboard_Request>();
+    @Output() applyFilter = new EventEmitter<Monitoramento_Request>();
     
     subscription: Subscription[] = [];
-    request = new Dashboard_Request;
+    request = new Monitoramento_Request;
     anos: number[] = []
 
     professores: Professor[] = [];
@@ -43,7 +43,7 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
         private alunoService: AlunoService,
         private mensagemWhatsapp: MensagemWhatsapp,
     ) {
-        this.applyFilter = new EventEmitter<Dashboard_Request>();
+        this.applyFilter = new EventEmitter<Monitoramento_Request>();
 
         let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);

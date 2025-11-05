@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Dashboard_Aluno, Dashboard_Aluno_Aula_Reposicao, Dashboard_Aula, Dashboard_Aula_Participacao, Dashboard_Item_Status, Dashboard_Participacao } from '../../../models/dashboard.model';
+import { Monitoramento_Aluno, Monitoramento_Aluno_Item, Monitoramento_Aula, Monitoramento_Aula_Participacao_Rel, Monitoramento_Item_Status, Monitoramento_Participacao } from '../../../models/monitoramento.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { SalaAndar } from '../../../models/sala-aula.model';
 import { AlunoContatoFaltaComponent } from '../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
@@ -19,11 +19,11 @@ import { AlunoService } from '../../../services/alunos.service';
 	styleUrl: './aula-participacao.component.css'
 })
 export class AulaParticipacaoComponent implements OnInit {
-	item!: Dashboard_Aluno_Aula_Reposicao;
-	aluno!: Dashboard_Aluno;
-	aula!: Dashboard_Aula;
-	participacao!: Dashboard_Participacao;
-	reposicaoPara?: Dashboard_Aula_Participacao;
+	item!: Monitoramento_Aluno_Item;
+	aluno!: Monitoramento_Aluno;
+	aula!: Monitoramento_Aula;
+	participacao!: Monitoramento_Participacao;
+	reposicaoPara?: Monitoramento_Aula_Participacao_Rel;
 
 	loading = true;
 	instance: DynamicDialogComponent | undefined;
@@ -31,7 +31,7 @@ export class AulaParticipacaoComponent implements OnInit {
 
 	hoje = new Date;
 	SalaAndar = SalaAndar;
-	Dashboard_Item_Status = Dashboard_Item_Status;
+	Dashboard_Item_Status = Monitoramento_Item_Status;
 
 	constructor(
 		private alunoService: AlunoService,
