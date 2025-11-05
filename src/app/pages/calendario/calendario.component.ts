@@ -179,12 +179,12 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
                 this.loadedAnos.push(anoDe);
                 await this.requestLoadFeriados(anoDe);
-                await this.requestCancelarEventos(anoDe);
+                // await this.requestCancelarEventos(anoDe);
             }
             if (!this.loadedAnos.includes(anoAte)) {
                 this.loadedAnos.push(anoAte);
                 await this.requestLoadFeriados(anoAte);
-                await this.requestCancelarEventos(anoAte);
+                // await this.requestCancelarEventos(anoAte);
             }
         }
         await this.requestLoadCalendario()
@@ -539,9 +539,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         return lastValueFrom(this.service.getFeriados(ano))
     }
 
-    requestCancelarEventos(ano: number = 2025) {
-        return lastValueFrom(this.service.cancelarEventos(ano))
-    }
+    // requestCancelarEventos(ano: number = 2025) {
+    //     return lastValueFrom(this.service.cancelarEventos(ano))
+    // }
 
     requestLoadCalendario() {
         this.loading = true;

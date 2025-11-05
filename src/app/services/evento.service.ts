@@ -318,9 +318,9 @@ export class EventoService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/eventos/aula-zero/finalizar`, request);
     }
 
-    cancelarEventos(ano: number) {
-        return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
-    }
+    // cancelarEventos(ano: number) {
+    //     return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
+    // }
 
     cancelarParticipacao(request: EventoAgendarFaltaRequest) {
         return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
