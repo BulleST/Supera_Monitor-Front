@@ -125,7 +125,9 @@
                            class="bi bi-cake-fill text-pink-500 fadein"></i>
                     </div>
                 </td>
-                <td [pEditableColumn]="aluno" pEditableColumnField="turma_Id">
+                <td [pEditableColumn]="aluno" 
+                    pEditableColumnField="turma_Id"
+                    [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
                         <ng-template #input>
                             <p-iconfield>
@@ -217,7 +219,9 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td [pEditableColumn]="aluno" pEditableColumnField="perfilCognitivo_Id">
+                <td [pEditableColumn]="aluno" 
+                pEditableColumnField="perfilCognitivo_Id"
+                [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
                         <ng-template #input>
                             <p-iconfield>
@@ -250,7 +254,9 @@
                         <span pTooltip="{{aluno.nome | firstWord }} nasceu em {{aluno.dataNascimento | date : 'dd \'de\' MMMM \'de\' yyyy'}}">{{aluno.idade}} anos</span>
                     </ng-container>
                 </td>
-                <td [pEditableColumn]="aluno" pEditableColumnField="apostila_Kit_Id">
+                <td [pEditableColumn]="aluno" 
+                pEditableColumnField="apostila_Kit_Id"
+                [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
                         <ng-template #input>
                             <p-iconfield>

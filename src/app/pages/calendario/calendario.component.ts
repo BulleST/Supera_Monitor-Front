@@ -19,7 +19,7 @@ import { RequestResponse } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
 import { Feriado } from '../../models/feriado.model';
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import moment from 'moment';
@@ -171,25 +171,32 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     async update() {
         this.unselectAula();
 
-        let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
-        let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
+        await this.loadFeriados();
 
-        if (!(this.loadedAnos.includes(anoDe) && this.loadedAnos.includes(anoAte))) {
-            if (!this.loadedAnos.includes(anoDe)) {
-
-                this.loadedAnos.push(anoDe);
-                await this.requestLoadFeriados(anoDe);
-                // await this.requestCancelarEventos(anoDe);
-            }
-            if (!this.loadedAnos.includes(anoAte)) {
-                this.loadedAnos.push(anoAte);
-                await this.requestLoadFeriados(anoAte);
-                // await this.requestCancelarEventos(anoAte);
-            }
-        }
         await this.requestLoadCalendario()
         this.setCalendario();
         this.scrollToTime();
+
+    }
+
+    async loadFeriados() {
+
+        var requestsFeriado = [];
+
+        let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
+        let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
+
+        if (!this.loadedAnos.includes(anoDe)) {
+            var anoDeReq = lastValueFrom(this.service.getFeriados(anoDe))
+            requestsFeriado.push(anoDeReq)
+            this.loadedAnos.push(anoDe);
+        }
+        if (!this.loadedAnos.includes(anoAte)) {
+            var anoAteReq = lastValueFrom(this.service.getFeriados(anoAte))
+            requestsFeriado.push(anoAteReq)
+            this.loadedAnos.push(anoAte);
+        }
+        await Promise.all(requestsFeriado)
 
     }
 
@@ -207,27 +214,17 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.loading = true;
         this.cdkEventItensId = [];
 
-        // Apenas eventos que não caem em um feriado
-        // let eventos = this.eventos.filter(evento => {
-        //     let temFeriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'))
-        //     evento.feriado = temFeriado;
-        //     return !temFeriado;
-        // });
-
         let calendar = this.fullCalendar.getApi();
-        let de = this.calendarioRequest.intervaloDe;
-        let ate = this.calendarioRequest.intervaloAte;
-        let feriados = this.feriados.filter(x => moment(x.date).isBetween(de, ate, 'days', '[]'));
-
-        let events = this.eventos.map(item => {
+        // var eventos = this.eventos.filter(x => !x.feriado);
+        var eventos = this.eventos;
+        
+        let events = eventos.map(item => {
             const id = 'event-' + this.calendarioUtils.eventRandomId();
             const eventStyles = this.calendarioUtils.getEventStyles(item)
 
             if ([EventoTipo.Aula, EventoTipo.TurmaExtra].includes(item.evento_Tipo_Id)) {
                 this.cdkEventItensId.push(id);
             }
-
-            item.feriado = this.feriados.find(x => moment(x.date).isSame(item.data, 'date'))
 
             let event: any = {
                 id: id,
@@ -243,7 +240,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             return event;
         });
 
-        feriados.forEach(item => {
+        this.feriados.forEach(item => {
             let event = {
                 id: this.calendarioUtils.eventRandomId(),
                 textColor: 'white',
@@ -274,8 +271,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.scrollToTime();
 
         // Exibe ou esconde allDaySlot
-        let temFeriadoNaSemana = feriados.length > 0;
-        this.calendarioOptions.allDaySlot = temFeriadoNaSemana;
+        let feriadosSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'date', '[]'));
+        this.calendarioOptions.allDaySlot = feriadosSemana.length > 0;;
 
     }
 
@@ -533,15 +530,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             this.fullCalendar.getApi().changeView('timeGridWeek')
         }
     }
-
-
-    requestLoadFeriados(ano: number = 2025) {
-        return lastValueFrom(this.service.getFeriados(ano))
-    }
-
-    // requestCancelarEventos(ano: number = 2025) {
-    //     return lastValueFrom(this.service.cancelarEventos(ano))
-    // }
 
     requestLoadCalendario() {
         this.loading = true;

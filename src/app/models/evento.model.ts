@@ -3,7 +3,6 @@ import { Evento_Participacao_Professor } from "./evento-participacao-professor.m
 import { Feriado } from "./feriado.model";
 import { PerfilCognitivo } from "./perfil-cognitivo.model";
 import { PseudoEvento } from "./reposicao.model";
-import { SalaAulaId } from "./sala-aula.model";
 
 export class Evento {
     id: number = PseudoEvento.EventoId;
@@ -30,8 +29,7 @@ export class Evento {
     turma_Id?: number;
     turma?: string;
     perfilCognitivo: PerfilCognitivo[] = [];
-    
-    
+
     capacidadeMaximaEvento: number = 12;
     alunosAtivosEvento: number = 0;
     vagasDisponiveisEvento: number = 0;
@@ -39,11 +37,10 @@ export class Evento {
     alunosAtivosTurma: number = 0;
     vagasDisponiveisTurma: number = 0;
 
-    // capacidadeMaximaAlunos: number = 12;
-    // vagas: number = 0;
     roteiro_Id?: number;
     semana?: number;
     tema?: string;
+    roteiroCorLegenda?: string;
     
     created: Date = new Date;
     deactivated?: Date;

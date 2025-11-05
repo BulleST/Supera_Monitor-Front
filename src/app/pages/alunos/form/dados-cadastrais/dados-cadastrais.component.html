@@ -5,6 +5,9 @@
     <div class="xl:col-2 lg:col-2 md:col-3 col-12 px-0 ">
         <p-fileupload #fileUpload
                       styleclass="gap-0 bg-transparent"
+                      [ngClass]="{
+                        'pointer-events-none': !object.active
+                      }"
                       name="myfile[]"
                       accept="image/*"
                       (onSelect)="onSelectedFiles($event)"
@@ -12,6 +15,7 @@
                       [showUploadButton]="false"
                       [showCancelButton]="false"
                       [chooseStyleClass]="'hidden'"
+                      [disabled]="!object.active"
                       headerTemplate=""
                       fluid>
             <ng-template #content
@@ -88,6 +92,7 @@
                        id="nome"
                        name="nome"
                        [required]="true"
+                       [readonly]="!object.active"
                        fluid>
                 <div *ngIf="nome.touched && nome.invalid && nome.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="nome.errors['required']">Esse campo é obrigatório.</p>
@@ -111,7 +116,7 @@
                 <p-datepicker
                               #dataNascimento="ngModel"
                               [(ngModel)]="object.dataNascimento"
-                              [showIcon]="true"
+                              [showIcon]="object.active"
                               [iconDisplay]="'input'"
                               [selectOtherMonths]="true"
                               [minDate]="minDate"
@@ -119,6 +124,7 @@
                               inputId="dataNascimento"
                               name="dataNascimento"
                               [required]="true"
+                              [readonlyInput]="!object.active"
                               appendTo="body"
                               fluid />
                 <div *ngIf="dataNascimento.touched && dataNascimento.invalid && dataNascimento.errors">
@@ -137,8 +143,11 @@
                           inputId="pessoa_Sexo_Id"
                           optionLabel="nome"
                           optionValue="id"
-                          [showClear]="true"
                           appendTo="body"
+                          [ngClass]="{ 'pointer-events-none': !object.active }"
+                          [readonly]="!object.active"
+                          [showClear]="object.active"
+                          [dropdownIcon]=" !object.active ? 'pi' : undefined "
                           [required]="true"
                           fluid />
                 <div *ngIf="pessoa_Sexo_Id.touched && pessoa_Sexo_Id.invalid && pessoa_Sexo_Id.errors">
@@ -158,6 +167,7 @@
                            [(ngModel)]="object.telefone"
                            mask="+99 (99) 9999-9999"
                            placeholder="+55 (99) 9999-9999"
+                           [readonly]="!object.active"
                            [validation]="true"
                            fluid />
                 </p-iconfield>
@@ -177,6 +187,7 @@
                            placeholder="+55 (99) 9.9999-9999"
                            [validation]="true"
                            [required]="true"
+                           [readonly]="!object.active"
                            fluid />
                 </p-iconfield>
                 <div *ngIf="celular.touched && celular.invalid && celular.errors">
@@ -191,12 +202,13 @@
                     <input type="text"
                            pInputText
                            [email]="true"
+                           placeholder="example@gmail.com"
                            id="email"
                            name="email"
                            #email="ngModel"
                            [(ngModel)]="object.email"
                            [required]="true"
-                           placeholder="example@gmail.com"
+                           [readonly]="!object.active"
                            fluid>
                 </p-iconfield>
                 <div *ngIf="email.touched && email.invalid && email.errors">
@@ -215,6 +227,7 @@
                            id="endereco"
                            name="endereco"
                            placeholder="Rua das Pedras 123 - Vila das Amoras SP"
+                           [readonly]="!object.active"
                            fluid>
                 </p-iconfield>
                 <div *ngIf="endereco.touched && endereco.invalid && endereco.errors">
@@ -223,7 +236,7 @@
             </div>
             <!-- Restrições -->
             <div class="field lg:col-3 md:col-6 xs:col-6 col-12">
-                <div class="flex align-items-center gap-2 justify-content-between mb-1 relative" #divRestricoes>
+                <div class="flex align-items-center gap-2 justify-content-between mb-1 relative">
                     <label for="restricoes">Restrições: </label>
                     <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1"
                          (click)="popoverExplicacaoRestricoes.show($event)">
@@ -231,37 +244,43 @@
                         <span class="pi pi-question-circle"></span>
                     </div>
                     <p-popover #popoverExplicacaoRestricoes
-                               [appendTo]="divRestricoes"
+                               appendTo="body"
                                styleClass="w-30rem max-w-screen -mt-1">
-                        <div class="max-h-20rem overflow-auto text-lg ">
-                            <p class="text-red-500 font-bold mb-4">ATENÇÃO:</p>
-                            <p>As restrições indicam dificuldades do aluno, como problemas auditivos, visuais, motores etc.</p>
-                            <p>Elas <b>NÃO</b> impedem o agendamento de reposição ou transferência de turma, mas devem sempre ser consideradas.</p>
+                        <div class="max-h-20rem overflow-auto text-justify">
+                            <p class="text-red-500 font-bold text-lg mb-4">ATENÇÃO:</p>
+                            <p>As restrições <b>NÃO</b> impedem agendamentos ou transferências de turma, mas devem sempre ser consideradas para tal.</p>
                             <p>Um alerta será exibido ao identificar essas restrições.</p>
-                            <p class="mt-4">A restrição <b>Mobilidade Reduzida</b> deve ser marcada no campo checkbox abaixo.</p>
-                            <p>Ela <b>IMPÕE</b> limitações para inserir reposições ou transferências de turma.</p>
+                            <p class="mt-4">A restrição <b class="text-red-500">Mobilidade Reduzida </b> <b>IMPÕE</b> limitações para agendamentos ou transferências de turma.</p>
+                            <p>Ela deve ser marcada no campo checkbox abaixo.</p>
                         </div>
                     </p-popover>
                 </div>
                 <p-iconfield>
                     <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pi-spinner" />
                     <p-inputicon *ngIf="!loadingRestricoes" styleClass="pi pi-ban" />
-                    <input type="text"
+                    <div class="p-inputtext p-inputtext-disabled"
+                        (focusin)="restricoes.show($event); checklistPopover.hide()"
+                        (click)="restricoes.show($event); checklistPopover.hide()"    
+                        (keydown.tab)="restricoes.hide()"
+                        tabindex="0"
+                        fluid >
+                        {{restricoesText}}
+                    </div>
+                    <!-- <input type="text"
                            pInputText
                            [value]="restricoesText"
                            id="restricoes"
                            name="restricoes"
-                           [required]="true"
                            placeholder="Selecione"
-                           [readonly]="true"
                            (focusin)="restricoes.show($event)"
                            (click)="restricoes.show($event)"
                            (keydown.tab)="restricoes.hide()"
-                           fluid>
+                           fluid> -->
+                           <!-- [disabled]="!object.active" -->
                 </p-iconfield>
-                <p-popover #restricoes appendTo="body">
+                <p-popover #restricoes appendTo="body" styleClass="-mt-1">
                     <div class="p-2 border-bottom-1 border-200 ">
-                        <p-iconfield>
+                        <p-iconfield *ngIf="object.active" >
                             <input type="text"
                                    pInputText
                                    #restricao
@@ -282,12 +301,19 @@
                                     <div class="flex align-items-center gap-2 p-2" [ngClass]="{
                                         'surface-50': i % 2 == 0
                                     }">
-                                        <p-checkbox [name]="'active-' + i"
-                                                    [inputId]="'active-' + i"
-                                                    #checkbox="ngModel"
-                                                    [(ngModel)]="item.active"
-                                                    [binary]="true"
-                                                    (onChange)="toggleRestricao($event, item, checkbox, restricoes)" />
+                                        <p-checkbox *ngIf="object.active"
+                                         [name]="'active-' + i"
+                                         [inputId]="'active-' + i"
+                                         #checkbox="ngModel"
+                                         [(ngModel)]="item.active"
+                                         [binary]="true"
+                                         (onChange)="toggleRestricao($event, item, checkbox, restricoes)" />
+                                         <p-checkbox  *ngIf="!object.active"
+                                         [inputId]="'active-' + i"
+                                         [value]="item.active"
+                                         [binary]="true"
+                                         class="pointer-events-none"
+                                                    />
                                         <p>{{item.descricao}}</p>
                                     </div>
                                 </ng-container>
@@ -304,6 +330,8 @@
                                 #restricaoMobilidade="ngModel"
                                 [(ngModel)]="object.restricaoMobilidade"
                                 [binary]="true"
+                                [ngClass]="{ 'pointer-events-none': !object.active }"
+                                [disabled]="object.active"
                                 (onChange)="mobilidadeReduzidaChange($event)" />
                     <label for="restricaoMobilidade">Mobilidade reduzida</label>
                 </div>
@@ -402,33 +430,16 @@
                           #turma_Id="ngModel"
                           optionLabel="nome"
                           optionValue="id"
-                          placeholder="Selecione"
+                          placeholder="Indefinido"
                           [checkmark]="true"
                           (onChange)="turmaChanged($event)"
                           [filter]="true"
                           filterBy="nome"
+                          [ngClass]="{ 'pointer-events-none': !object.active }"
+                          [readonly]="!object.active"
+                          [dropdownIcon]=" !object.active ? 'pi' : undefined "
                           appendTo="body"
                           fluid>
-                        <ng-template #footer>
-                            <div class="p-3 border-top-1 border-200">
-                                <ng-container *ngIf="object.restricaoMobilidade">
-                                    <p>Esse aluno tem restrição de mobilidade:</p>
-                                    <p>
-                                        <i class="pi pi-check text-green-500 mr-1"></i>
-                                        Somente turmas do térreo serão exibidas.
-                                    </p>
-                                </ng-container>
-                                <p>
-                                    <i class="pi pi-check text-green-500 mr-1"></i>
-                                    Somente turmas do mesmo perfil cognitivo serão exibidas.
-                                </p>
-                                <p>
-                                    <i class="pi pi-check text-green-500 mr-1"></i>
-                                    Somente turmas com vagas serão exibidas.
-                                </p>
-                            </div>
-                        </ng-template>
-                      
                     <ng-template #selectedItem let-selectedOption>
                         <div class="flex align-items-center gap-2">
                             <app-legend-color [corLegenda]="selectedOption.corLegenda"
@@ -466,13 +477,29 @@
                             </span>
                         </div>
                     </ng-template>
+                    <ng-template #footer>
+                        <div class="p-3 border-top-1 border-200">
+                            <ng-container *ngIf="object.restricaoMobilidade">
+                                <p>Esse aluno tem restrição de mobilidade:</p>
+                                <p>
+                                    <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas do térreo serão exibidas.
+                                </p>
+                            </ng-container>
+                            <p>
+                                <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas do mesmo perfil cognitivo serão exibidas.
+                            </p>
+                            <p>
+                                <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas com vagas serão exibidas.
+                            </p>
+                        </div>
+                    </ng-template>
                 </p-select>
             </div>
             <!-- Educador -->
             <div class="field md:col-3 sm:col-6 xs:col-6 col-12">
                 <label for="professor">Educador: </label>
-                <p-iconfield>
-                    <p-inputicon *ngIf="selectedTurma">
+                <p-iconfield *ngIf="object.active && selectedTurma">
+                    <p-inputicon>
                         <app-legend-color [corLegenda]="selectedTurma.corLegenda"
                                           [professor_Id]="selectedTurma.professor_Id"
                                           [professor]="selectedTurma.professor"
@@ -480,7 +507,19 @@
                     </p-inputicon>
                     <input type="text"
                            pInputText
-                           [value]="selectedTurma?.professor ?? 'Selecione a turma para definir o educador'"
+                           [value]="selectedTurma.professor"
+                           id="professor"
+                           name="professor"
+                           readonly
+                           fluid>
+                </p-iconfield>
+                <p-iconfield *ngIf="!object.active">
+                    <p-inputicon>
+                        <app-legend-color [corLegenda]="'#000'"></app-legend-color>
+                    </p-inputicon>
+                    <input type="text"
+                           pInputText
+                           [value]="'Indefinido'"
                            id="professor"
                            name="professor"
                            readonly
@@ -502,7 +541,11 @@
                               inputId="perfilCognitivo_Id"
                               optionLabel="nome"
                               optionValue="id"
-                              [showClear]="true"
+                              placeholder="Indefinido"
+                              [ngClass]="{ 'pointer-events-none': !object.active }"
+                              [showClear]="object.active"
+                              [readonly]="!object.active"
+                              [dropdownIcon]=" !object.active ? 'pi' : undefined "
                               appendTo="body"
                               fluid />
                 </p-iconfield>
@@ -515,7 +558,6 @@
                           [(ngModel)]="selectedKit"
                           (onChange)="kitChanged(apostila_Kit_Id, $event)"
                           [loading]="loadingKits"
-                          [showClear]="true"
                           #apostila_Kit_Id="ngModel"
                           name="apostila_Kit_Id"
                           inputId="apostila_Kit_Id"
@@ -524,6 +566,11 @@
                           filterBy="nome"
                           appendTo="body"
                           optionDisabled="deactivated"
+                          placeholder="Indefinido"
+                          [ngClass]="{ 'pointer-events-none': !object.active }"
+                          [showClear]="object.active"
+                          [readonly]="!object.active"
+                          [dropdownIcon]=" !object.active ? 'pi' : undefined "
                           fluid>
                     <ng-template let-item #item>
                         <div class="flex flex-column">

@@ -43,6 +43,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
     ) {
+        lastValueFrom(this.checklistService.getList());
     }
 
     ngAfterViewInit(): void {
@@ -54,12 +55,12 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     tabChanged() {
-        if (this.tabIndex == 1) {
-            this.vigenciaComponent.atualizar.emit(true)
-        }
-        else if (this.tabIndex == 2) {
-            this.historicoComponent.atualizar.emit(true)
-        }
+        // if (this.tabIndex == 1) {
+        //     this.vigenciaComponent.atualizar.emit(true)
+        // }
+        // else if (this.tabIndex == 2) {
+        //     this.historicoComponent.atualizar.emit(true)
+        // }
     }
 
     loadPage() {
@@ -69,10 +70,8 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 this.loading = true;
                 this.aluno_Id = this.crypto.decrypt(res['aluno_id'])
 
-                if (!this.checklistService.list.value.length) {
-                    await lastValueFrom(this.checklistService.getList())
-                }
-
+                lastValueFrom(this.service.getVigencia(this.aluno_Id))
+                lastValueFrom(this.service.getHistorico(this.aluno_Id))
 
                 lastValueFrom(this.service.get(this.aluno_Id))
                     .then(res => {
@@ -101,6 +100,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
+
     async sendConfirmation(form: NgForm, e: any) {
         if (form.invalid) {
             return this.showError('Campos inválidos', 'Preencha os campos corretamente para salvar.', e);

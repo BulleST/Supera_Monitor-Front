@@ -27,6 +27,7 @@ export class HistoricoComponent implements OnChanges {
         private service: AlunoService
     ) {
         this.atualizar.subscribe(res => this.update())
+		this.service.historico.subscribe(res => this.list = res);
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -46,11 +47,9 @@ export class HistoricoComponent implements OnChanges {
             lastValueFrom(this.service.getHistorico(this.aluno_Id))
                 .then(res => {
                     this.loading = false;
-                    this.list = res;
                 })
                 .catch(res => {
                     this.loading = false;
-                    this.list = []
                 })
         }
     }

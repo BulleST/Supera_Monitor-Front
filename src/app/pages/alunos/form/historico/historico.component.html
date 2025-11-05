@@ -63,10 +63,10 @@
     </ng-template>
     <ng-template #body let-item let-rowIndex="rowIndex">
         <tr>
-            <td></td>
+            <td class="text-300">{{rowIndex+1}}</td>
             <td class="w-min">
-                <div class="flex align-items-center gap-1 white-space-nowrap">
-                    <i class="pi pi-clock"></i>
+                <div class="flex align-items-center gap-2 white-space-nowrap">
+                    <i class="pi pi-calendar"></i>
                     <span>{{item.data | date : 'dd/MM/yyyy HH:mm'}}</span>
                 </div>
             </td>

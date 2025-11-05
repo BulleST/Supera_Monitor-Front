@@ -205,7 +205,7 @@ export class ListComponent implements OnDestroy {
     }
 
     @HostListener('keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
+    onKeydownHandler(event: any) {
         this.unselectItems();
     }
 
@@ -250,8 +250,13 @@ export class ListComponent implements OnDestroy {
                     .then(async res => {
                         if (res.success) {
                             this.loadTurmas()
+                            
                             item.active = res.object.active;
                             item.deactivated = res.object.deactivated;
+                            item.turma = 'Indefinido';
+                            item.turma_Id = undefined;
+
+
                             insertOrReplace(this.service, item);
                             item = res.object;
                         } else {

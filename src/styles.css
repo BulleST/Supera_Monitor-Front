@@ -160,12 +160,23 @@ a {
 .p-datatable-gridlines .p-datatable-thead>tr>th {
     border-width: 0;
 }
-
-.p-inputtext:disabled {
-    background-color: var(--surface-100);
-    cursor: default;
+div.p-inputtext-disabled {
+   border-color: var(--p-inputtext-border-color)!important;
+    background: var(--p-inputtext-background)!important;
+    color: var(--p-inputtext-color)!important;
 }
 
+div.p-inputtext-disabled:hover {
+   border-color: var(--p-inputtext-hover-border-color)!important;
+    background: var(--p-inputtext-hover-background)!important;
+}
+div.p-inputtext-disabled:focus-visible,
+div.p-inputtext-disabled:focus-within,
+div.p-inputtext-disabled:focus {
+    outline: none;
+   border-color: var(--p-inputtext-focus-border-color)!important;
+    background: var(--p-inputtext-focus-background)!important;
+}
 .p-inputtext {
     height: 30px
 }

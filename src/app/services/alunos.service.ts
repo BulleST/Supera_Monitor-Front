@@ -15,7 +15,6 @@ import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
 import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../models/aluno-checklist-item-list.model';
-import { environment } from '../../environments/environment';
 import { UrlService } from '../utils/url.service';
 import { Aluno_Vigencia } from '../models/aluno-vigencia.model';
 
@@ -29,6 +28,9 @@ export class AlunoService extends Service {
     aluno = new BehaviorSubject<Aluno | undefined>(undefined);
     checklists: Checklist[] = [];
     restricaoCreated = new EventEmitter<Aluno_Restricao>();
+    
+    historico = new BehaviorSubject<Aluno_Historico[]>([]);
+    vigencia = new BehaviorSubject<Aluno_Vigencia[]>([]);
 
     constructor(
         private checklistService: ChecklistService,
@@ -203,7 +205,9 @@ export class AlunoService extends Service {
                     x.data = moment(x.data).toDate();
                     return x
                 });
-                res.sort((x, y) => x.data.getTime() - y.data.getTime());
+                res.sort((x, y) => y.id - x.id);
+
+                this.historico.next(res);
                 return of(res)
             }))
     }
@@ -217,7 +221,7 @@ export class AlunoService extends Service {
                     return x
                 });
                 res = res.sort((x, y) => y.id - x.id);
-                console.log(res)
+                this.vigencia.next(res);
                 return of(res)
             }))
     }

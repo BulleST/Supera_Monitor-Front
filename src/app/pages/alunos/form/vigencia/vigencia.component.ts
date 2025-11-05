@@ -4,7 +4,6 @@ import { FilterMatchMode } from 'primeng/api';
 import { Aluno_Vigencia } from '../../../../models/aluno-vigencia.model';
 import { AlunoService } from '../../../../services/alunos.service';
 import { lastValueFrom } from 'rxjs';
-import moment from 'moment';
 
 @Component({
 	selector: 'app-vigencia',
@@ -27,6 +26,7 @@ export class VigenciaComponent implements OnChanges {
 		private service: AlunoService
 	) {
 		this.atualizar.subscribe(res => this.update())
+		this.service.vigencia.subscribe(res => this.list = res);
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -46,12 +46,9 @@ export class VigenciaComponent implements OnChanges {
 			lastValueFrom(this.service.getVigencia(this.aluno_Id))
 				.then(res => {
 					this.loading = false;
-					this.list = res;
-					console.log(this.list)
 				})
 				.catch(res => {
 					this.loading = false;
-					this.list = []
 				})
 		}
 	}

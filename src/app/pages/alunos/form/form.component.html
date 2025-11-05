@@ -65,7 +65,8 @@
                     </p-tabpanels>
                 </p-tabs>
             </div>
-            <div class="formgrid grid pr-3 py-2 gap-4 align-items-center flex-wrap justify-content-between">
+            <div *ngIf="object.active" 
+                class="formgrid grid pr-3 py-2 gap-4 align-items-center flex-wrap justify-content-between">
                 <div class="sm:col-9 col-12">
                     <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                     <p class="text-red-500" *ngIf="error">{{error}}</p>

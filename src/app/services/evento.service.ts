@@ -122,11 +122,6 @@ export class EventoService extends Service {
             x.created = moment(x.created).toDate();
             return x
         })
-
-        if (!evento.roteiro_Id || evento.roteiro_Id == PseudoEvento.EventoId) {
-            let roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'));
-            evento.roteiro_Id = roteiro?.id ?? -PseudoEvento.EventoId;
-        }
         return evento;
     }
 
@@ -134,9 +129,6 @@ export class EventoService extends Service {
         return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
             .pipe(tap({
                 next: async (eventos) => {
-                    if (this.roteiroService.list.value.length == 0)
-                        await lastValueFrom(this.roteiroService.getList(request.intervaloDe?.getFullYear()));
-
                     let list = this.eventos.value as Evento[];
                     eventos = eventos.map(evento => {
                         evento = this.mapEvento(evento);
