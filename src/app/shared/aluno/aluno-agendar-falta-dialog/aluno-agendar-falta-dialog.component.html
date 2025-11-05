@@ -15,7 +15,7 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title flex gap-2 align-items-center">
-                <i class="pi pi-calendar text-xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <i class="pi pi-calendar text-sm w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <span>Agendar Falta</span>
                 <i class="fa fa-thumbs-down text-red-500"></i>
             </span>
@@ -32,7 +32,7 @@
                 <ng-container *ngIf="!blockAlunoField; else alunoSelecionadoTemplate">
                     <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                     <p-iconfield>
-                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user" />
+                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user text-200" />
                         <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
                         <p-select [options]="alunos"
                                     [loading]="loadingAlunos"
@@ -89,7 +89,7 @@
                 <ng-template #alunoSelecionadoTemplate>
                     <label for="nome">Nome:</label>
                     <p-iconfield>
-                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user text-700" />
+                        <p-inputicon *ngIf="!loadingAlunos" styleClass="fa-solid fa-user" />
                         <p-inputicon *ngIf="loadingAlunos" styleClass="pi pi-spinner pi-spin" />
                         <input type="text"
                                 pInputText
@@ -158,7 +158,9 @@
                                                     <div class="w-2rem text-center flex-none">
                                                         <i class="bi bi-door-closed text-base"></i>
                                                     </div>
-                                                    <p class="overflow-hidden text-overflow-ellipsis">Sala: {{getSalaAula(evento)}}</p>
+                                                    <p class="overflow-hidden text-overflow-ellipsis whi">
+                                                        Sala: {{ evento.sala }} -  
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -166,9 +168,7 @@
                                             <div class="col-12 py-1">
                                                 <div class="flex align-items-center gap-2 w-full">
                                                     <div class="w-2rem text-center flex-none">
-                                                        <i class="fa-solid fa-star text-base" [ngStyle]="{
-                                                            color: getCorRoteiro(evento.roteiro_Id) ?? 'var(--p-surface-900)'
-                                                        }"></i>
+                                                        <i class="fa-solid fa-star text-base" ></i>
                                                     </div>
                                                     <div class="flex align-items-center gap-2 w-full">
                                                         <p class="overflow-hidden text-overflow-ellipsis">Roteiro: {{evento.tema + ' - Semana ' + evento.semana}}</p>

@@ -13,7 +13,7 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { statusContato } from '../../../models/evento-participacao-aluno.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { DashboardService } from '../../../services/dashboard.service';
+import { MonitoramentoService } from '../../../services/monitoramento.service';
 
 @Component({
 	selector: 'app-aluno-contato-falta',
@@ -50,7 +50,7 @@ export class AlunoContatoFaltaComponent {
 		private confirmationService: ConfirmationService,
 		private toastr: ToastrService,
 		private ref: DynamicDialogRef,
-		private dashboardService: DashboardService,
+		private monitoramentoService: MonitoramentoService,
 		private eventoService: EventoService,
 		
 	) {
@@ -152,7 +152,7 @@ export class AlunoContatoFaltaComponent {
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.dashboardService.onReload.emit(true);
+					this.monitoramentoService.onReload.emit(true);
 					this.eventoService.calendarioReload.emit(res.object.id);
 					this.toastr.success(`Status atualizado com sucesso`);
 					this.close();

@@ -19,10 +19,8 @@ import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/al
 import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
 import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
 import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
-import { AlunoReposicaoTooltipComponent } from '../shared/aluno/aluno-reposicao-tooltip/aluno-reposicao-tooltip.component';
 import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
 import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
-import { AlunoParticipacaoStatusComponent } from './aluno/aluno-participacao-status/aluno-participacao-status.component';
 import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
 import { ReposicaoParaSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
 import { AlunoSelectComponent } from './aluno/aluno-reposicao-dialog/aluno-select/aluno-select.component';
@@ -54,10 +52,8 @@ import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-co
         AlunoChecklistDialogComponent,
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
-        AlunoReposicaoTooltipComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
-        AlunoParticipacaoStatusComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,
@@ -93,10 +89,8 @@ import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-co
         AlunoChecklistDialogComponent,
         AlunoChecklistOnConfirmDialogComponent,
         AlunoReposicaoDialogComponent,
-        AlunoReposicaoTooltipComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
-        AlunoParticipacaoStatusComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
         EventoItemComponent,

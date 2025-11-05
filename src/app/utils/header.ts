@@ -36,7 +36,7 @@ export class Header {
                     tooltip: 'Monitoramento',
                     // iconFontawesome: faCalendar,
                     icon: 'bi bi-table',
-                    routerLink: ['dashboard'],
+                    routerLink: ['monitoramento'],
                     routerLinkActiveOptions: { exact: false },
                     routerLinkActive: 'active-link',
                     command: e => {

@@ -29,10 +29,10 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     error: string = '';
     subscription: Subscription[] = [];
     @ViewChild('op') op!: Popover;
-    
+
     tabIndex = 0;
-    @ViewChild('historico') historico!: HistoricoComponent;
-    @ViewChild('vigencia') vigencia!: VigenciaComponent;
+    @ViewChild('historico') historicoComponent!: HistoricoComponent;
+    @ViewChild('vigencia') vigenciaComponent!: VigenciaComponent;
 
     constructor(
         private router: Router,
@@ -44,7 +44,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         private toastrService: ToastrService,
     ) {
     }
-    
+
     ngAfterViewInit(): void {
         this.loadPage();
     }
@@ -55,10 +55,10 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
     tabChanged() {
         if (this.tabIndex == 1) {
-            this.vigencia.atualizar.emit(true)
-        } 
+            this.vigenciaComponent.atualizar.emit(true)
+        }
         else if (this.tabIndex == 2) {
-            this.historico.atualizar.emit(true)
+            this.historicoComponent.atualizar.emit(true)
         }
     }
 
@@ -132,9 +132,23 @@ export class FormComponent implements OnDestroy, AfterViewInit {
                 this.loading = false;
                 if (res.success) {
                     this.toastrService.success(`Registro atualizado com sucesso.`);
-                    this.visible = false;
-                    this.visibleChange();
-                    // playSuccess();
+
+                    lastValueFrom(this.service.getList())
+
+                    this.confirmationService.confirm({
+                        target: e.target,
+                        message: 'Os dados do aluno foram atualizados com sucesso. <br> Deseja sair e voltar para página de alunos?',
+                        header: 'Sucesso',
+                        acceptLabel: 'Sair',
+                        acceptIcon: 'pi pi-arrow-left',
+                        acceptButtonStyleClass: 'p-button-rounded',
+                        rejectLabel: 'Não sair',
+                        rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                        accept: () => {
+                            this.visible = false;
+                            this.visibleChange();
+                        }
+                    })
 
                 }
                 else {

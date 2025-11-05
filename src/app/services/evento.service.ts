@@ -8,7 +8,6 @@ import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
 import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { Dashboard_Item, DashboardItemStatus, Dashboard_Response, DashboardRequest } from '../models/dashboard.model';
 import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -35,7 +34,6 @@ export class EventoService extends Service {
     eventoReposicaoPara = new BehaviorSubject<Evento | undefined>(undefined);
     eventos = new BehaviorSubject<Evento[]>([]);
     feriados = new BehaviorSubject<Feriado[]>([]);
-    dashboard = new BehaviorSubject<Dashboard_Response>(new Dashboard_Response());
     statusContato = new BehaviorSubject<{ value: any, label: string }[]>(statusContato);
 
     calendarioReload = new EventEmitter<number>();
@@ -225,93 +223,6 @@ export class EventoService extends Service {
             }));
     }
 
-    getDashboard(request: DashboardRequest) {
-        return this.http
-            .post<Dashboard_Response>(`${this.url}/eventos/dashboard`, request)
-            .pipe(
-                map((dashboard) => {
-                    dashboard.roteiros = dashboard.roteiros.map(roteiro => {
-                        roteiro.dataInicio = moment(roteiro.dataInicio).toDate();
-                        roteiro.dataFim = moment(roteiro.dataFim).toDate();
-                        return roteiro
-                    })
-                    dashboard.roteiros.sort((x, y) => x.dataInicio.getTime() - y.dataInicio.getTime());
-
-                    dashboard.alunos = dashboard.alunos.map(aluno => {
-
-                        if (aluno.aulas.length == 0) {
-                            aluno.aulas = dashboard.roteiros.map(roteiro => {
-                                let item = new Dashboard_Item;
-                                item.roteiro = roteiro;
-                                item.show = false;
-                                item.status = DashboardItemStatus.Aula;
-                                return item;
-                            })
-                        } else {
-                            aluno.aulas = aluno.aulas.map(item => {
-                                item.participacao.active = !item.participacao.deactivated;
-                                item.aula.active = !item.aula.deactivated;
-                                item.aula.data = moment(item.aula.data).toDate();
-
-                                // Procura se a aula foi reagendada
-                                if (item.aula.reagendamentoPara_Evento_Id) {
-                                    item.aula.reagendamentoPara_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoPara_Evento_Id)?.aula;
-                                }
-
-                                // Procura se a aula é reagendamento de outra
-                                if (item.aula.reagendamentoDe_Evento_Id) {
-                                    item.aula.reagendamentoDe_Evento = aluno.aulas.find(x => x.aula.id == item.aula.reagendamentoDe_Evento_Id)?.aula;
-                                }
-
-                                // Procura se a aula foi reposta
-                                if (item.participacao.reposicaoPara_Evento_Id) {
-                                    item.participacao.reposicaoPara_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoPara_Evento_Id)?.aula;
-                                }
-
-                                // Procura se a aula foi reposicao de outra
-                                if (item.participacao.reposicaoDe_Evento_Id) {
-                                    item.participacao.reposicaoDe_Evento = aluno.aulas.find(x => x.aula.id == item.participacao.reposicaoDe_Evento_Id)?.aula;
-                                }
-
-
-                                // Status
-                                if (!item.aula.active && !item.feriado && !item.participacao.reposicaoPara_Evento_Id)
-                                    item.status = DashboardItemStatus.Cancelada;
-                                else if (!item.aula.active && item.feriado && !item.participacao.reposicaoPara_Evento_Id)
-                                    item.status = DashboardItemStatus.Feriado;
-                                else if (item.participacao.reposicaoPara_Evento_Id)
-                                    item.status = DashboardItemStatus.ReposicaoAgendada;
-                                else if (item.aula.finalizado === true && item.participacao.presente === false && item.participacao.reposicaoDe_Evento_Id)
-                                    item.status = DashboardItemStatus.FaltaNaReposicao;
-                                else if (item.aula.finalizado === true 
-                                        && item.participacao.presente === false 
-                                        && !item.participacao.reposicaoDe_Evento_Id
-                                        && !item.participacao.alunoContactado
-                                ) item.status = DashboardItemStatus.FaltaNaAula;
-                                else if (item.aula.finalizado === true 
-                                        && item.participacao.presente === false 
-                                        && !item.participacao.reposicaoDe_Evento_Id
-                                        && !!item.participacao.alunoContactado
-                                ) item.status = DashboardItemStatus.FaltaAlunoContatado;
-                                else if (item.participacao.presente === false && item.participacao.active === false && !item.participacao.reposicaoDe_Evento_Id)
-                                    item.status = DashboardItemStatus.FaltaAgendada;
-                                else if (item.aula.finalizado === true && item.participacao.presente === true && item.participacao.reposicaoDe_Evento_Id)
-                                    item.status = DashboardItemStatus.PresenteNaReposicao;
-                                else if (item.aula.finalizado === true && item.participacao.presente === true && !item.participacao.reposicaoDe_Evento_Id)
-                                    item.status = DashboardItemStatus.PresenteNaAula;
-                                else
-                                    item.status = DashboardItemStatus.Aula;
-
-                                return item;
-                            });
-                        }
-                        return aluno;
-                    });
-
-                    return dashboard;
-                })
-            );
-    }
     createAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;

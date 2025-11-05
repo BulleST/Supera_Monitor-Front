@@ -1,0 +1,256 @@
+<div class="flex flex-column">
+    <header class="flex align-items-baseline justify-content-between gap-2 pt-3 pl-3">
+        <div>
+            <h3 class="text-2xl capitalize">{{aluno.nome | nameAbv }}</h3>
+            <p class="flex align-items-center gap-2 text-base font-normal">
+                <span>{{aluno.turma}}</span>
+                <app-legend-color class="line-height-1"
+                                  [corLegenda]="aluno.corLegenda"
+                                  [turma_Id]="aluno.turma_Id"></app-legend-color>
+            </p>
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.PresenteNaAula"
+                     severity="success"
+                     value="Presente" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.PresenteReposicao"
+                     severity="success"
+                     class="bg-green-200 border-green-200 text-green-700"
+                     value="Presente" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada"
+                     severity="success"
+                     class="bg-purple-500 border-purple-500"
+                     value="Reposição Agendada" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaReposicao"
+                     severity="info"
+                     class="bg-blue-500 border-blue-500"
+                     value="Faltou na Reposição" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaAlunoContatado"
+                     severity="warn"
+                     class="bg-yellow-500 border-yellow-500"
+                     value="Faltou - Aluno Contatato" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaAula"
+                     severity="danger"
+                     class="bg-red-500 border-red-500"
+                     value="Faltou - Aluno Não Contatato" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.Cancelada"
+                     severity="contrast"
+                     class="surface-900 border-900"
+                     value="Aula Cancelada" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.Feriado"
+                     severity="contrast"
+                     class="surface-900 border-900"
+                     [value]="'Aula Cancelada - ' + item.aula.aula.feriado?.name" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.Recesso"
+                     severity="danger"
+                     class="bg-red-200 border-red-200"
+                     value="Recesso" />
+            <p-badge *ngIf="item.status == Dashboard_Item_Status.Aula"
+                     severity="danger"
+                     class="surface-200 border-200 text-900"
+                     value="À realizar" />
+        </div>
+        <p-button icon="pi pi-times"
+                  (onClick)="close()"
+                  severity="secondary"
+                  size="large"
+                  [text]="true"
+                  styleClass="px-1" />
+    </header>
+    <p-divider />
+    <section class="px-3 flex-1 h-full">
+        <!-- <pre>{{ item.reposicaoPara| json  }}</pre> -->
+        <table class="mx-auto">
+            <!-- Data -->
+            <tr>
+                <td class="text-right">
+                    <label>Data:</label>
+                </td>
+                <td class="w-min" colspan="4">
+                    <p-iconfield>
+                        <p-inputicon class="pi pi-calendar text-primary-500" />
+                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                            <span *ngIf="item.reposicaoPara">
+                                {{item.reposicaoPara.aula.data | date : 'dd/MM/yyyy HH:mm' }}
+                            </span>
+                            <span [ngClass]="{
+                                'text-purple-500 line-through': item.reposicaoPara
+                            }">
+                                {{item.aula.aula.data | date : 'dd/MM/yyyy HH:mm' }}
+                            </span>
+                        </div>
+                    </p-iconfield>
+                </td>
+            </tr>
+            <!-- Turma -->
+            <tr>
+                <td class="text-right">
+                    <label>Turma:</label>
+                </td>
+                <td class="w-min" colspan="4">
+                    <p-iconfield>
+                        <p-inputicon class="fa fa-users-between-lines text-primary-500" />
+                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                            <span *ngIf="item.reposicaoPara">
+                                {{item.reposicaoPara.aula.turma }}
+                            </span>
+                            <span [ngClass]="{
+                                'text-purple-500 line-through': item.reposicaoPara
+                            }">
+                                {{item.aula.aula.turma }}
+                            </span>
+                        </div>
+                    </p-iconfield>
+                </td>
+            </tr>
+            <!-- Educador -->
+            <tr>
+                <td class="text-right">
+                    <label>Educador:</label>
+                </td>
+                <td class="w-min" colspan="4">
+                    <p-iconfield>
+                        <p-inputicon class="fa fa-user-graduate text-primary-500" />
+                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                            <ng-container *ngIf="item.reposicaoPara">
+                                <span>{{item.reposicaoPara.aula.professor }}</span>
+                                <app-legend-color class="line-height-1"
+                                                  [corLegenda]="item.reposicaoPara.aula.corLegenda"
+                                                  [professor]="item.reposicaoPara.aula.professor"></app-legend-color>
+                            </ng-container>
+                            <span [ngClass]="{
+                                'text-purple-500 line-through': item.reposicaoPara
+                            }">
+                                {{item.aula.aula.professor }}
+                            </span>
+                            <app-legend-color class="line-height-1"
+                                              [corLegenda]="item.aula.aula.corLegenda"
+                                              [professor]="item.aula.aula.professor"></app-legend-color>
+                        </div>
+                    </p-iconfield>
+                </td>
+            </tr>
+            <!-- Sala -->
+            <tr>
+                <td class="text-right">
+                    <label>Sala:</label>
+                </td>
+                <td class="w-min" colspan="4">
+                    <p-iconfield>
+                        <p-inputicon class="bi bi-door-open text-primary-500" />
+                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                            <span *ngIf="item.reposicaoPara">
+                                {{item.reposicaoPara.aula.sala }}
+                            </span>
+                            <span [ngClass]="{
+                                'text-purple-500 line-through': item.reposicaoPara
+                            }">
+                                {{item.aula.aula.sala }}
+                            </span>
+                        </div>
+                    </p-iconfield>
+                </td>
+            </tr>
+            <!-- Ábaco -->
+            <tr>
+                <td class="text-right">
+                    <label>Ábaco:</label>
+                </td>
+                <td class="w-min">
+                    <p-iconfield class="w-min">
+                        <p-inputicon class="bi bi-book text-primary-500" />
+                        <input type="text"
+                               pInputText
+                               [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco) ?? ''"
+                               readonly>
+                        <!-- style="field-sizing: content" -->
+                    </p-iconfield>
+                </td>
+                <td class="text-right">
+                    <label>Página:</label>
+                </td>
+                <td>
+                    <input type="text"
+                           pInputText
+                           [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco : item.aula.participacao.numeroPaginaAbaco) ?? ''"
+                           readonly
+                           class="w-5rem">
+                </td>
+            </tr>
+            <!-- AH -->
+            <tr>
+                <td class="text-right">
+                    <label>AH:</label>
+                </td>
+                <td class="w-min">
+                    <p-iconfield class="w-min">
+                        <p-inputicon class="bi bi-book text-primary-500" />
+                        <input type="text"
+                               pInputText
+                               [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.apostila_AH : item.aula.participacao.apostila_AH) ?? ''"
+                               readonly>
+                        <!-- style="field-sizing: content" -->
+                    </p-iconfield>
+                </td>
+                <td class="text-right">
+                    <label>Página:</label>
+                </td>
+                <td>
+                    <input type="text"
+                           pInputText
+                           [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAH : item.aula.participacao.numeroPaginaAH) ?? ''"
+                           readonly
+                           class="w-5rem">
+                </td>
+            </tr>
+            <tr>
+                <td class="text-right vertical-align-top">
+                    <label>Observações: </label>
+                </td>
+                <td colspan="3">
+                    <textarea pTextarea
+                              readonly
+                              [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.observacao : item.aula.participacao.observacao) ?? ''"
+                              fluid></textarea>
+                </td>
+            </tr>
+        </table>
+    </section>
+    <div class="mt-auto sticky bottom-0">
+        <p-divider layout="horizontal" />
+        <div class="px-3 flex align-items-center gap-2">
+            <!-- Contatar -->
+            <ng-container *ngIf="aula.finalizado && !participacao.presente">
+                <p-button icon="pi pi-whatsapp"
+                        severity="success"
+                        label="Contatar"
+                        [rounded]="true"
+                        (onClick)="showContatoFalta()">
+                </p-button>
+            </ng-container>
+            <!-- Agendar Reposição -->
+            <ng-container *ngIf="!reposicaoPara && participacao.presente">
+                <p-button icon="pi pi-calendar"
+                          severity="secondary"
+                          label="Agendar Reposição"
+                          [rounded]="true"
+                          (onClick)="goToReposicao()">
+                </p-button>
+            </ng-container>
+            <ng-container *ngIf="!aula.finalizado">
+                <p-button icon="pi pi-thumbs-down"
+                      severity="danger"
+                      label="Agendar falta"
+                      [rounded]="true"
+                      (onClick)="goToAgendarFalta()">
+                </p-button>
+            </ng-container>
+            <div class="ml-auto">
+                <p-button label="Ver Aula"
+                          icon="pi pi-arrow-right"
+                          iconPos="right"
+                          [rounded]="true"
+                          (onClick)="goToAula()">
+                </p-button>
+            </div>
+        </div>
+    </div>
+</div>

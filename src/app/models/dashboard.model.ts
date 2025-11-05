@@ -1,131 +1,118 @@
+import { StatusContato } from "./evento-status-contato.enum";
+import { EventoTipo } from "./evento.model";
 import { Feriado } from "./feriado.model";
-import { Roteiro } from "./roteiro.model";
 
-export class DashboardRequest {
-    ano: number = new Date().getFullYear();
-    mes: number = 0;
-    turma_Id?: number;
-    professor_Id?: number;
-    aluno_Id?: number;
+export interface Dashboard {
+    alunos: Dashboard_Aluno[];
+    mesesRoteiro: Dashboard_Mes[];
 }
 
-export class Dashboard_Response {
-    alunos: Dashboard_Aluno[] = [];
-    roteiros: Dashboard_Roteiro[] = [];
-}
-
-export class Dashboard_Item {
-    show: boolean = true;
-    aula: Dashboard_Aula = new Dashboard_Aula;
-    participacao: Dashboard_Participacao = new Dashboard_Participacao;
-    roteiro: Dashboard_Roteiro = new Dashboard_Roteiro;
-    feriado?: Feriado;
-    status: DashboardItemStatus = DashboardItemStatus.Aula;
-}
-
-export class Dashboard_Aula {
-    id: number = 0;
-    evento_Tipo_Id: number = 0;
-    Evento_Tipo: string = '';
-    data: Date = new Date;
-    descricao: string = '';
-    observacao: string = '';
-    duracaoMinutos: number = 0;
-    finalizado: boolean = false;
-    active: boolean = false;
-
-    account_Created_Id?: number;
-    account_Created: string = '';
-    created: Date = new Date;
-    lastUpdated?: Date;
-    deactivated?: Date;
-    reagendamentoDe_Evento_Id?: number;
-    reagendamentoDe_Evento?: Dashboard_Aula;
-    reagendamentoPara_Evento_Id?: number;
-    reagendamentoPara_Evento?: Dashboard_Aula;
-
-    sala: string = '';
-    sala_Id: number = 0;
-    andar: number = 0;
-    numeroSala: number = 0;
-
-    roteiro_Id?: number;
-    tema: string = '';
-    semana?: number;
-
-    turma_Id?: number;
-    turma: string = '';
-    capacidadeMaximaAlunos: number = 0;
-
-    professor_Id?: number;
-    professor: string = '';
-    corLegenda: string = '';
-}
-
-export class Dashboard_Participacao {
-    id: number = 0;
-    aluno_Id: number = 0;
-    evento_Id: number = 0;
-    reposicaoDe_Evento_Id?: number;
-    reposicaoDe_Evento?: Dashboard_Aula;
-    reposicaoPara_Evento_Id?: number;
-    reposicaoPara_Evento?: Dashboard_Aula;
-    presente?: boolean;
-    apostila_Abaco?: string;
-    apostila_AH?: string;
-    apostila_Abaco_Id?: number;
-    apostila_AH_Id?: number;
-    numeroPaginaAbaco?: number;
-    numeroPaginaAH?: number;
-    observacao?: string;
-    deactivated?: Date;
-    active: boolean = true;
-
-    alunoContactado?: Date; 
-    statusContato_Id?: number;
-    contatoObservacao?: string;
-}
-
-export class Dashboard_Roteiro {
-    id: number = 0;
-    tema: string = '';
-    semana: number = 0;
-    dataInicio: Date = new Date;
-    dataFim: Date = new Date;
-    corLegenda: string = '';
-    recesso: boolean = false; 
-}
-
-export class Dashboard_Aluno {
-    id: number = 0;
-    nome: string = '';
-    celular: string = '';
-    checklist_Id?: number;
-    primeiraAula_Id?: number;
-    aulaZero_Id?: number;
-    dataNascimento?: Date;
-    perfilCognitivo_Id: number = 0;
-    corLegenda: string = '';
-    turma: string = '';
-    turma_Id: number = 0;
-    aulas: Dashboard_Item[] = [];
+export interface Dashboard_Roteiro {
+    id: number;
+    tema: string;
+    semana: number;
+    dataInicio: Date;
+    dataFim: Date;
+    corLegenda: string;
+    recesso: boolean;
 }
 
 export class Dashboard_Mes {
     mes: number = 0;
     mesString: string = '';
-    roteiros: Roteiro[] = [];
+    roteiros: Dashboard_Roteiro[] = [];
+;}
+
+export interface Dashboard_Aluno {
+    id: number;
+    nome: string;
+    celular: string;
+    checklist_Id?: number;
+    primeiraAula_Id?: number;
+    aulaZero_Id?: number;
+    dataNascimento?: Date;
+    perfilCognitivo_Id: number;
+    corLegenda: string;
+    turma: string;
+    turma_Id: number;
+    items: Dashboard_Aluno_Aula_Reposicao[];
 }
 
-export enum DashboardItemStatus {
+export interface Dashboard_Aluno_Aula_Reposicao {
+    show: boolean;
+    aula: Dashboard_Aula_Participacao;
+    reposicaoPara?: Dashboard_Aula_Participacao;
+    status: Dashboard_Item_Status;
+}
+
+export interface Dashboard_Aula_Participacao {
+    aula: Dashboard_Aula;
+    participacao: Dashboard_Participacao;
+}
+
+export interface Dashboard_Aula {
+    id: number;
+    evento_Tipo_Id: EventoTipo.Aula; // EventoTipo.Aula ou EventoTipo.TurmaExtra 
+    data: Date;
+    descricao: string;
+    observacao: string;
+    finalizado: boolean;
+    active: boolean;
+
+    sala: string;
+    andar: number;
+    numeroSala: number;
+
+    tema: string;
+    semana: number;
+    recesso: boolean;
+    roteiroCorLegenda: string;
+    
+    turma: string;
+    professor: string;
+    corLegenda: string;
+
+    feriado?: Feriado;
+}
+
+export interface Dashboard_Participacao {
+    id: number;
+    presente?: boolean;
+    observacao?: string;
+    deactivated?: Date;
+    active: boolean;
+    
+    apostila_Abaco?: string;
+    apostila_AH?: string;
+    numeroPaginaAbaco?: number;
+    numeroPaginaAH?: number;
+
+    alunoContactado?: Date; 
+    statusContato_Id?: StatusContato;
+    contatoObservacao?: string;
+}
+
+
+export class Dashboard_Request {
+    ano: number = new Date().getFullYear();
+    turma_Id?: number;
+    professor_Id?: number;
+    aluno_Id?: number;
+}
+
+
+
+export enum Dashboard_Item_Status {
+    Recesso = 'Recesso',
     Cancelada = 'Cancelada',
     Feriado = 'Feriado',
     ReposicaoAgendada = 'Reposição Agendada',
-    FaltaNaReposicao = 'Faltou na Reposição',
-    FaltaNaAula = 'Faltou na Aula',
+    ReposicaoDesmarcada = 'Reposição Desmarcada',
+    FaltaReposicao = 'Faltou na Reposição',
     FaltaAgendada = 'Falta Agendada',
+    FaltaAula = 'Falta - Aluno Não Contatado',
     FaltaAlunoContatado = 'Falta - Aluno Contatado',
-    PresenteNaReposicao = 'Presente na Reposição',
+    PresenteReposicao = 'Presente na Reposição',
     PresenteNaAula = 'Presente',
     Aula = 'Aula',       
 }

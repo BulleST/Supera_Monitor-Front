@@ -8,11 +8,12 @@
         <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
             <p-tabpanel [value]="0">
                 <div class="formgrid grid">
-                    <div class="lg:col-3 md:col-3 col-12 flex align-items-center justify-content-center">
-                        <p-skeleton size="180px" shape="circle"/>
+                    <div class="xl:col-2 lg:col-3 md:col-3 col-12 flex align-items-center justify-content-center">
+                        <p-skeleton size="150px" shape="circle"/>
                     </div>
-                   <div class="lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
-                        <div class="hidden md:block surface-300" style="height: 95%; width: 2px;"></div>
+                   <div class="xl:col-10 lg:col-9 md:col-9 col-12 px-0 flex align-items-start">
+                        <p-divider layout="vertical" class="hidden md:block"/>
+                        <!-- <div class="hidden md:block surface-300" style="height: 95%; width: 1px;"></div> -->
                         <div class="formgrid grid pl-2 sm:px-3">
                             <div class="field lg:col-4 md:col-6 sm:col-6 xs:col-8 col-12">
                                 <label>Nome: <span class="text-red-500">*</span></label>
@@ -56,7 +57,7 @@
                             </div> 
                         </div>
                     </div>
-                     <div class="col-12 px-3 mt-2 flex overflow-hidden -mx-4">
+                     <div class="col-12 px-3 mt-2 flex overflow-hidden" style="width: calc(100% + 10px);">
 
                         <div class="formgrid grid w-full">
                             <div class="field lg:col-3 md:col-3 sm:col-6 xs:col-6 col-12">

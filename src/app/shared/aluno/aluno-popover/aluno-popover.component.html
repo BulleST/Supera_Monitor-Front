@@ -73,12 +73,12 @@
                         [pTooltip]="participacao?.aluno ?? aluno.nome">
                         {{ (participacao?.aluno ?? aluno.nome) | nameAbv }}
                     </p>
-                    <ng-container *ngIf="participacao && evento">
+                    <!-- <ng-container *ngIf="participacao && evento">
                         <app-aluno-participacao-status
                             [evento]="evento"
                             [participacao]="participacao"
                         ></app-aluno-participacao-status>
-                    </ng-container>
+                    </ng-container> -->
                 </div>
             </ng-template>
             <ng-template #subtitle>

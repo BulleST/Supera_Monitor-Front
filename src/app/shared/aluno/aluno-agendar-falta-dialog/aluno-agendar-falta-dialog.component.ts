@@ -14,8 +14,6 @@ import { ConfirmationService } from 'primeng/api';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { SelectChangeEvent } from 'primeng/select';
-import { Roteiro } from '../../../models/roteiro.model';
-import { RoteiroService } from '../../../services/roteiro.service';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { EventoAgendarFaltaRequest } from '../../../models/evento-agendar-falta-request.model';
@@ -45,9 +43,6 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
     eventos: Evento[] = [];
     loadingEventos = false;
 
-    roteiros: Roteiro[] = [];
-    loadingRoteiros = false;
-
     onHide = new EventEmitter<boolean>();
 
     alunoContactado = false;
@@ -74,20 +69,8 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         private crypto: Crypto,
         private salaAulaPipe: SalaAulaPipe,
         private confirmationService: ConfirmationService,
-        private roteiroService: RoteiroService,
         private calendarioUtils: CalendarioUtils,
     ) {
-
-        let roteiros = roteiroService.list.subscribe(res => this.roteiros = res);
-        this.subscription.push(roteiros)
-
-        if (!this.roteiros.length) {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
-        }
-
 
         let aluno = this.alunoService.getAluno().subscribe(async res => {
             if (!res) {
@@ -143,9 +126,13 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         if (!this.visible) {
             let params = this.activatedRoute.snapshot.params;
             let routeBack = params['aluno_id'] ? ['../../'] : ['..'];
-            this.eventoService.setEvento(undefined)
-            this.alunoService.setAluno(undefined)
-            this.router.navigate(routeBack, { relativeTo: this.activatedRoute });
+            this.ngOnDestroy();
+            this.router.navigate(routeBack, { relativeTo: this.activatedRoute })
+            .then(res => {
+                this.eventoService.setEvento(undefined)
+                this.alunoService.setAluno(undefined)
+            })
+
         }
     }
 
@@ -247,21 +234,8 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
     }
 
-    getSalaAula(evento: Evento) {
-        return this.salaAulaPipe.transform({
-            sala_Id: evento.sala_Id,
-            numeroSala: evento.numeroSala,
-            andar: evento.andar
-        })
-    }
-
     getPerfilCognitivo(evento: Evento) {
         return evento.perfilCognitivo.map(x => x.nome).join(', ');
-    }
-
-    getCorRoteiro(roteiro_Id?: number) {
-        let roteiro = this.roteiros.find(x => x.id == roteiro_Id)
-        return roteiro?.corLegenda;
     }
 
     showError(header: string, message: string, e: any) {

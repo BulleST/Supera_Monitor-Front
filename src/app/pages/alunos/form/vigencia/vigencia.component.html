@@ -10,12 +10,11 @@
         <tr>
             <th>
                 <p-button icon="pi pi-refresh text-white"
-                    pTooltip="Atualizar"
-                    tooltipPosition="bottom"
-                    [text]="true"
-                    severity="contrast"
-                    (onClick)="update()"
-                />
+                          pTooltip="Atualizar"
+                          tooltipPosition="bottom"
+                          [text]="true"
+                          severity="contrast"
+                          (onClick)="update()" />
             </th>
             <th pSortableColumn="dataInicioVigencia">
                 <div class="flex align-items-center gap-2">
@@ -89,7 +88,7 @@
     </ng-template>
     <ng-template #body let-item let-rowIndex="rowIndex">
         <tr>
-            <td>{{item.id}}</td>
+            <td class="text-300">{{rowIndex}}</td>
             <td class="w-min">
                 <div class="flex align-items-center gap-1 white-space-nowrap">
                     <i class="pi pi-calendar"></i>
@@ -102,7 +101,7 @@
                     <span>{{item.dataFimVigencia | date : 'dd/MM/yyyy HH:mm'}}</span>
                 </div>
                 <span *ngIf="!item.dataFimVigencia">
-                    <p-badge severity="success" value="Vigente"/>
+                    <p-badge severity="success" value="Vigente" />
                 </span>
             </td>
             <td class="w-max white-space-nowrap">
@@ -111,7 +110,7 @@
             <td class="w-max white-space-nowrap">
                 <div class="flex align-items-center gap-2 white-space-nowrap w-min">
                     <span>{{item.professor}}</span>
-                    <app-legend-color  class="line-height-1" [corLegenda]="item.corLegenda"></app-legend-color>
+                    <app-legend-color class="line-height-1" [corLegenda]="item.corLegenda"></app-legend-color>
                 </div>
             </td>
             <td class="w-min">
@@ -125,6 +124,16 @@
     <ng-template #emptymessage>
         <tr>
             <td colspan="6">Não há histórico de transferência de turma.</td>
+        </tr>
+    </ng-template>
+    <ng-template #loadingbody>
+        <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]">
+            <td><p-skeleton /></td>
+            <td><p-skeleton /></td>
+            <td><p-skeleton /></td>
+            <td><p-skeleton /></td>
+            <td><p-skeleton /></td>
+            <td><p-skeleton /></td>
         </tr>
     </ng-template>
 </p-table>

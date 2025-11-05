@@ -15,7 +15,7 @@ import { ApostilaService } from "../../../services/apostila.service";
 import { NameFirstWordPipe } from "../../../utils/name-first-word.pipe";
 import { SelectChangeEvent } from "primeng/select";
 import { Evento_Participacao_Aluno } from "../../../models/evento-participacao-aluno.model";
-import { AlunoParticipacaoStatusComponent } from "../../aluno/aluno-participacao-status/aluno-participacao-status.component";
+// import { AlunoParticipacaoStatusComponent } from "../../aluno/aluno-participacao-status/aluno-participacao-status.component";
 import moment from "moment"
 
 @Component({
@@ -192,9 +192,9 @@ export class AulaComponent implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    presente(item: Evento_Participacao_Aluno, status: AlunoParticipacaoStatusComponent) {
+    presente(item: Evento_Participacao_Aluno, status: any /*AlunoParticipacaoStatusComponent*/) {
         item.presente = !item.presente;
-        status.update(this.evento, item)
+        // status.update(this.evento, item)
     }
 
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {

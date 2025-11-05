@@ -19,13 +19,13 @@ export class HistoricoComponent implements OnChanges {
     @Input() aluno_Id!: number;
     @Output() atualizar = new EventEmitter<boolean>();
     loading = false;
-    FilterMathMode= FilterMatchMode
+    FilterMathMode = FilterMatchMode
     list: Aluno_Historico[] = [];
 
 
     constructor(
         private service: AlunoService
-    ) { 
+    ) {
         this.atualizar.subscribe(res => this.update())
     }
 
@@ -40,16 +40,18 @@ export class HistoricoComponent implements OnChanges {
     }
 
     update() {
-        if (this.object.id) {
+        if (this.aluno_Id) {
+            this.list = []
             this.loading = true;
             lastValueFrom(this.service.getHistorico(this.aluno_Id))
-            .then(res => {
-                this.loading = false;
-                this.list = res;
-            })
-            .catch(res => {
-                this.loading = false;
-            })
+                .then(res => {
+                    this.loading = false;
+                    this.list = res;
+                })
+                .catch(res => {
+                    this.loading = false;
+                    this.list = []
+                })
         }
     }
 
