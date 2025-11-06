@@ -8,7 +8,6 @@ import { NgForm } from '@angular/forms';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Professor } from '../../../models/professor.model';
 import { SalaAula } from '../../../models/sala-aula.model';
-import { Roteiro } from '../../../models/roteiro.model';
 import { Turma } from '../../../models/turma.model';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { AulaComponent } from '../../../shared/evento/aula/aula.component';
@@ -18,9 +17,7 @@ import { ProfessorService } from '../../../services/professor.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { EventoService } from '../../../services/evento.service';
 import { TurmaService } from '../../../services/turma.service';
-import { RoteiroService } from '../../../services/roteiro.service';
 import { CalendarioUtils, getError, showError, validaAlunos, validaProfessores, validaSalaAulas } from '../../../utils';
-import { PseudoEvento } from '../../../models/reposicao.model';
 import { CalendarioRequest } from '../../../models/calendario.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
@@ -51,9 +48,6 @@ export class VerAulaComponent implements OnDestroy {
 	salaAulas: SalaAula[] = [];
 	loadingSalaAulas = false;
 
-	roteiros: Roteiro[] = [];
-	loadingRoteiros = false;
-
 	turmas: Turma[] = [];
 	loadingTurmas = false;
 
@@ -79,7 +73,6 @@ export class VerAulaComponent implements OnDestroy {
 		private alunoService: AlunoService,
 		private service: EventoService,
 		private turmaService: TurmaService,
-		private roteiroService: RoteiroService,
 		private calendarioUtils: CalendarioUtils,
 	) {
 		let params = this.activatedRoute.snapshot.params
@@ -90,16 +83,6 @@ export class VerAulaComponent implements OnDestroy {
 		}
 
 		this.encryptedId = params['evento_id'];
-
-		let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res)
-		this.subscription.push(roteiros)
-
-		if (this.roteiros.length == 0) {
-			this.loadingRoteiros = true;
-			lastValueFrom(this.roteiroService.getList(moment().year()))
-				.then(res => this.loadingRoteiros = false)
-				.catch(res => this.loadingRoteiros = false);
-		}
 
 		let professores = this.professorService.list.subscribe(res => this.professores = res)
 		this.subscription.push(professores)
@@ -153,11 +136,6 @@ export class VerAulaComponent implements OnDestroy {
 				let alunosEvento = this.evento.alunos.map(x => x.aluno_Id);
 				this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id));
 
-				if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-					let roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
-					this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
-				}
-
 				let minutos = this.evento.duracaoMinutos % 60
 				let horas = this.evento.duracaoMinutos / 60
 				let horaRedonda = horas - Math.floor(horas) == 0
@@ -186,12 +164,6 @@ export class VerAulaComponent implements OnDestroy {
 
 	showError(header: string, message: string, e: any, innerMessage?: string) {
 		showError(this.confirmationService, header, message, e, innerMessage)
-	}
-
-	get roteiroEvento(): Roteiro | undefined {
-		if (!this.evento?.roteiro_Id)
-			return this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
-		return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
 	}
 
 	async verificaDisponibilidade() {

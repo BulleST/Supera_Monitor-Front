@@ -4,7 +4,7 @@ export class EventoAulaRequest {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
     turma_Id: number = undefined as unknown as number;
-    roteiro_Id: number = undefined as unknown as number;
+    roteiro_Id?: number;
     professor_Id: number = undefined as unknown as number;
     sala_Id: number = undefined as unknown as number;
     duracaoMinutos: number = 120;

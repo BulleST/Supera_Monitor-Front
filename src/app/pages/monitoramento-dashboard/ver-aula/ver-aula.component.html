@@ -15,8 +15,8 @@
                 <span class="p-dialog-title capitalize">{{ tipoString }}</span>
                 <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
                     <span class="flex align-items-center gap-2">
-                        <i class="pi pi-star-fill fadein" [style]="{ color: roteiroEvento?.corLegenda ?? '#000' }"></i>
-                        <span>{{roteiroEvento?.tema}} - Semana: {{roteiroEvento?.semana}}</span>
+                        <i class="pi pi-star-fill fadein" [style]="{ color: evento.roteiroCorLegenda }"></i>
+                        <span>{{evento.tema}} - Semana: {{evento.semana}}</span>
                     </span>
                 </ng-container>
                 <p *ngIf="!evento.active" class="block text-red-500 p-dialog-subtitle font-semibold">Esta {{ getTipo(evento) }} foi desativada no dia {{ evento.deactivated | date : 'dd/MM/yyyy HH:mm' }}</p>
@@ -24,6 +24,8 @@
         </div>
     </ng-template>
     <ng-container *ngIf="evento">
+        <!-- [roteiros]="roteiros"
+        [loadingRoteiros]="loadingRoteiros" -->
         <form #aulaForm #form="ngForm">
             <app-aula #componentForm
                       [evento]="evento"
@@ -31,8 +33,6 @@
                       [loadingProfessores]="loadingProfessores"
                       [salaAulas]="salaAulas"
                       [loadingSalaAulas]="loadingSalaAulas"
-                      [roteiros]="roteiros"
-                      [loadingRoteiros]="loadingRoteiros"
                       [duracaoEvento]="duracaoEvento"
                       (onProfessorChanged)="professorChanged($event)"
                       (onSalaChanged)="salaAulaChanged($event)"

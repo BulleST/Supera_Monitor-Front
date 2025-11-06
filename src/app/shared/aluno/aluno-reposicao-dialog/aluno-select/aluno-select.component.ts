@@ -3,7 +3,7 @@ import { Aluno } from '../../../../models/alunos.model';
 import { AlunoService } from '../../../../services/alunos.service';
 import { SelectChangeEvent } from 'primeng/select';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Crypto, MensagemWhatsapp } from '../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Evento } from '../../../../models/evento.model';
@@ -127,7 +127,9 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 
 			}
 
+			console.log('oi')
 			if (params.get('evento_reposicao_para') && this.eventoReposicaoPara) {
+				console.log('eventoReposicaoPara', this.eventoReposicaoPara)
 
 				// Se um evento estiver selecionado, 
 				// os unicos alunos a estarem disponiveis são os alunos que 
@@ -147,9 +149,7 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 					let perfilCompativel = perfilAula.includes(aluno.perfilCognitivo_Id) || !aluno.perfilCognitivo_Id
 					let salaValida = !aluno.restricaoMobilidade || this.eventoReposicaoPara?.andar == SalaAndar.Terreo;
 
-					return !alunoEstaNaAula
-						&& perfilCompativel
-						&& salaValida;
+					return !alunoEstaNaAula && perfilCompativel && salaValida;
 				});
 
 				

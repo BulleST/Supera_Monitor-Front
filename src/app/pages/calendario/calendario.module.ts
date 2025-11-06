@@ -31,6 +31,7 @@ import { AlunoContatoFaltaComponent } from './aluno-contato-falta/aluno-contato-
 import { AgendarAula1Component } from './agendar-aula-1/agendar-aula-1.component';
 import { AgendarAlunoComponent } from './agendar-aluno/agendar-aluno.component';
 import { SalaAulaPipe } from '../../utils/sala-aula.pipe';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @NgModule({
     declarations: [
@@ -68,6 +69,10 @@ import { SalaAulaPipe } from '../../utils/sala-aula.pipe';
         CalendarioRoutingModule,
         SharedModule,
         DragDropModule,
+        SalaAulaPipe
+    ],
+    providers: [
+        DialogService
     ],
     bootstrap: [CalendarioComponent]
 })

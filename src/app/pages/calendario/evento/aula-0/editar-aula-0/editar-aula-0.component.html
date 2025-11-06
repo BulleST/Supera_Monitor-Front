@@ -182,7 +182,7 @@
                 <div class="formgrid grid px-3 pt-3" *ngIf="item.presente">
                     <!-- Perfil Cognitivo -->
                     <div class="field col">
-                        <label for="perfilCognitivo[{{ i }}]">Perfil Cognitivo: <span class="text-red-500">*</span></label>
+                        <label for="perfilCognitivo[{{ i }}]">Perfil Cognitivo: <span *ngIf="!evento.finalizado && item.presente == true" class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-brain" />
                             <ng-container *ngIf="evento.finalizado">
@@ -218,7 +218,7 @@
                     </div>
                     <!-- Turma -->
                     <div class="field col">
-                        <label for="turma[{{ i }}]">Turma: <span class="text-red-500">*</span></label>
+                        <label for="turma[{{ i }}]">Turma: <span *ngIf="!evento.finalizado && item.presente == true" class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa fa-users-between-lines" />
                             <ng-container *ngIf="evento.finalizado">
@@ -239,7 +239,7 @@
                     </div>
                     <!-- Apostila Kit -->
                     <div class="field col">
-                        <label for="apostilaKit[{{ i }}]">Apostila Kit: <span class="text-red-500">*</span></label>
+                        <label for="apostilaKit[{{ i }}]">Apostila Kit: <span *ngIf="!evento.finalizado && item.presente == true" class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="fa-solid fa-book-open" />
                             <ng-container *ngIf="evento.finalizado">

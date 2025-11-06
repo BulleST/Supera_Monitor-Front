@@ -12,7 +12,7 @@
     <ng-template #header>
         <div class="w-full flex align-items-center">
             <span class="p-dialog-title">
-                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <i class="pi pi-calendar mr-2 text-sm w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <span>Agendar primeira aula</span>
             </span>
         </div>
@@ -57,6 +57,40 @@
                        fluid />
             </p-iconfield>
         </div>
+        <!-- Educador -->
+        <div class="field col-6">
+            <label for="educador">Educador:</label>
+            <p-iconfield>
+                <p-inputicon>
+                    <app-legend-color
+                    class="line-height-1"
+                    [corLegenda]="evento.corLegenda"
+                        [professor]="evento.professor"
+                    ></app-legend-color>
+                </p-inputicon>
+                <input type="text"
+                       pInputText
+                       id="educador"
+                       [value]="evento.professor"
+                       readonly
+                       fluid />
+            </p-iconfield>
+        </div>
+        <!-- Sala -->
+        <div class="field col-6">
+            <label for="sala">Sala:</label>
+            <p-iconfield>
+                <p-inputicon styleClass="bi bi-door-open" />
+                <input type="text"
+                       pInputText
+                       id="sala"
+                       [value]="getSala()"
+                       readonly
+                       fluid />
+            </p-iconfield>
+        </div>
+        
+        
         <!-- Aluno -->
         <div class="field col-12 col-span-4 mb-0">
             <label for="aluno">Aluno: <span class="text-red-500">*</span></label>
@@ -117,8 +151,11 @@
             <ul class="text-sm text-color-secondary mt-2 list-disc pl-5">
                 <li> Apenas alunos com o <b>perfil cognitivo correspondente a essa aula</b> são exibidos. </li>
                 <li> Apenas alunos que <b>ainda não realizaram primeira aula</b> são exibidos. </li>
+                <li> Apenas alunos <b>compatíveis</b> com a sala são exibidos. </li>
             </ul>
         </div>
+
+
         <p-fieldset legend="Dados do agendamento" class="field col-12 col-span-4">
             <div>
                 <div class="inline-flex gap-2 align-items-center">
@@ -132,11 +169,10 @@
             <div>
                 <div class="inline-flex gap-2">
                     <label>Sala:</label>
-                    <app-sala-aula class="text-primary font-bold"
-                                   [andar]="evento.andar"
-                                   [numeroSala]="evento.numeroSala"
-                                   [sala_Id]="evento.sala_Id"
-                                   [descricao]="evento.sala" />
+                    <span>{{evento.sala}}</span>
+                    <span>-</span>
+                    <span *ngIf="evento.andar > SalaAndar.Terreo" >{{evento.andar}}º andar</span>
+                    <span *ngIf="evento.andar == SalaAndar.Terreo" >Térreo</span>
                 </div>
             </div>
             <ng-container *ngIf="selectedAluno">

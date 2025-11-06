@@ -14,7 +14,7 @@ import { Evento, EventoTipo } from '../../../../../models/evento.model'
 import { EventoAulaRequest } from '../../../../../models/evento-aula.model'
 import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model'
 
-import { showError } from '../../../../../utils'
+import { showError, validaAlunoSalaAula } from '../../../../../utils'
 import { MyMap } from '../../../../../utils/map'
 import { CalendarioUtils } from '../../../../../utils/calendario-utils'
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp'
@@ -25,6 +25,8 @@ import { EventoService } from '../../../../../services/evento.service'
 import { ChecklistService } from '../../../../../services/checklist.service'
 import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
 import { AccountService } from '../../../../../services/account.service'
+import { SalaAndar } from '../../../../../models/sala-aula.model'
+import { SalaAulaService } from '../../../../../services/sala-aula.service'
 @Component({
     selector: 'app-agendar-primeira-aula-aluno',
     standalone: false,
@@ -41,7 +43,6 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
     selectedAula?: any
     selectedEvento?: Evento
-    EventoTipo = EventoTipo
     restricaoCheck: boolean = false
 
     evento: Evento = new Evento()
@@ -59,7 +60,10 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     alunos: Aluno[] = []
     loadingAlunos = false
     selectedAluno?: Aluno = undefined
-
+    
+    SalaAndar = SalaAndar;
+    EventoTipo = EventoTipo
+    
     constructor(
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -72,6 +76,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         private checklistService: ChecklistService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private accountService: AccountService,
+        private salaAulaService: SalaAulaService,
     ) {
         let alunos = this.alunoService.list.subscribe(res => {
             this.alunos = res;
@@ -125,7 +130,24 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id));
             }
+
+
+            this.alunos = this.alunos.filter(aluno => {
+                let salaCompativel = !aluno.restricaoMobilidade || this.evento.andar > SalaAndar.Terreo;
+                let primeiraAulaJaAgendadaNoEvento = aluno.primeiraAula_Id == this.evento.id;
+                let primeiraAulaAgendada = aluno.primeiraAula_Id;
+
+                return salaCompativel
+                && !primeiraAulaJaAgendadaNoEvento
+                && !primeiraAulaAgendada
+            });
+
         }
+    }
+
+    getSala() {
+        var andar = this.evento.andar > SalaAndar.Terreo ? this.evento.andar + 'º andar' : 'Térreo'
+        return this.evento.sala + ' - ' + andar
     }
 
     getTipo(e: Evento) {

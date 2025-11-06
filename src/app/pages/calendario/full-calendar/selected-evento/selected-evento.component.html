@@ -178,6 +178,47 @@
                                         <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                     </span>
 
+                                    <div class="ml-auto flex align-items-center gap-1">
+                                        <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
+                                            value="1ª aula"
+                                            class="bg-pink-500 border-pink-500"
+                                        />
+                                        <p-badge *ngIf="participacao.presente === false && !participacao.reposicaoPara_Evento_Id && !participacao.alunoContactado"
+                                            value="Faltou"
+                                            class="bg-red-500 border-red-500"
+                                            pTooltip="Aluno não contatado"
+                                            tooltipPosition="bottom"
+                                            (click)="showContatoFalta(participacao)"
+                                            />
+                                            
+                                        <p-badge *ngIf="participacao.presente === false && !participacao.reposicaoPara_Evento_Id && participacao.alunoContactado"
+                                            value="Faltou"
+                                            class="bg-yellow-500 border-yellow-500"
+                                            pTooltip="Clique para ver retorno do contato"
+                                            tooltipPosition="bottom"
+                                            (click)="showContatoFalta(participacao)"
+                                        />
+                                        
+                                        <p-badge *ngIf="participacao.presente === false && participacao.reposicaoPara_Evento_Id && participacao.alunoContactado"
+                                            value="Reposição Agendada"
+                                            class="bg-purple-500 border-purple-500"
+                                            pTooltip="Clique para ver retorno do contato"
+                                            tooltipPosition="bottom"
+                                            (click)="showContatoFalta(participacao)"
+                                        />  
+                                        
+                                        <p-badge *ngIf="participacao.presente === false && participacao.reposicaoPara_Evento_Id && participacao.alunoContactado"
+                                            value="Reposição Agendada"
+                                            class="bg-purple-500 border-purple-500"
+                                            pTooltip="Reposição agendada"
+                                        />
+
+                                        <p-badge *ngIf="participacao.presente === true && !participacao.reposicaoPara_Evento_Id"
+                                            value="Presente"
+                                            class="bg-green-500 border-green-500"
+                                        />
+                                    </div>
+
                                     <!-- <div class="ml-auto">
                                         <app-aluno-participacao-status 
                                             [evento]="evento" 

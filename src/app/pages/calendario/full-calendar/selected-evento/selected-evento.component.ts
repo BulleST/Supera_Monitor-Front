@@ -1,12 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
-import { AlunoService } from '../../../../services/alunos.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import { lastValueFrom } from 'rxjs';
-import { Crypto, playAlert } from '../../../../utils';
+import { Crypto } from '../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../services/evento.service';
@@ -18,20 +17,22 @@ import { SalaAndar, SalaAulaId } from '../../../../models/sala-aula.model';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
+import { AlunoContatoFaltaComponent } from '../../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
+import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 @Component({
     selector: 'app-selected-evento',
     standalone: false,
     templateUrl: './selected-evento.component.html',
     styleUrl: './selected-evento.component.css',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class SelectedEventoComponent implements OnChanges {
     @Input() evento!: Evento;
     @Input() cdkEventItensId: string[] = [];
     @Input() cdkDragCancel: boolean = false;
 
-    @Output() aluno = new EventEmitter<Evento_Participacao_Aluno>();
+    @Output() alunoOnChanged = new EventEmitter<Evento_Participacao_Aluno>();
     @Output() cdkDragCancelChange = new EventEmitter<boolean>();
 
 
@@ -47,9 +48,11 @@ export class SelectedEventoComponent implements OnChanges {
     tipoEventoString = '';
     mouse: any = { x: 0, y: 0 };
 
+        instance: DynamicDialogComponent | undefined;
+        refChild: DynamicDialogRef | undefined;
+    
 
     constructor(
-        private alunoService: AlunoService,
         private service: EventoService,
         private router: Router,
         private activatedRoute: ActivatedRoute,
@@ -59,7 +62,7 @@ export class SelectedEventoComponent implements OnChanges {
         private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
         private salaAulaPipe: SalaAulaPipe,
-        private changeDetector: ChangeDetectorRef,
+        private dialogService: DialogService,
 
     ) {
 
@@ -128,7 +131,7 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
     onHide() {
-        this.aluno.emit(undefined);
+        this.alunoOnChanged.emit(undefined);
     }
 
 
@@ -274,14 +277,48 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
-    goToContatoFalta(participacao: Evento_Participacao_Aluno) {
-        if (this.evento) {
-            this.service.setEvento(this.evento);
-            let eventoIdEncrypted = this.crypto.encrypt(this.evento.id);
-            let alunoIdEncrypted = this.crypto.encrypt(participacao.aluno_Id);
-            this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
+    // goToContatoFalta(participacao: Evento_Participacao_Aluno) {
+    //     if (this.evento) {
+    //         this.service.setEvento(this.evento);
+    //         let eventoIdEncrypted = this.crypto.encrypt(this.evento.id);
+    //         let alunoIdEncrypted = this.crypto.encrypt(participacao.aluno_Id);
+    //         this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
+    //     }
+    // }
+        showContatoFalta(participacao: Evento_Participacao_Aluno) {
+            this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
+                header: 'Aula',
+                showHeader: false,
+                closable: true,
+                maximizable: false,
+                closeOnEscape: true,
+                draggable: true,
+                dismissableMask: true,
+                duplicate: true,
+                modal: true,
+                width: '95vw',
+                style: { maxWidth: '550px' },
+                data: {
+                    celular: participacao.celular,
+                    aluno: participacao.aluno,
+    
+                    evento_Id: this.evento.id,
+                    evento: this.evento.descricao,
+                    data: this.evento.data,
+                    roteiroCorLegenda: this.evento.roteiroCorLegenda,
+                    semana: this.evento.semana,
+                    tema: this.evento.tema,
+    
+                    observacao: participacao.observacao,
+                    contatado: participacao.alunoContactado,
+                    alunoContactado: participacao.alunoContactado ? moment(participacao.alunoContactado).toDate() : undefined,
+                    statusContato_Id: participacao.statusContato_Id,
+                    contatoObservacao: participacao.contatoObservacao,
+                    participacao_Id: participacao.id,
+                }
+            });
         }
-    }
+    
 
 
     

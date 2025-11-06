@@ -15,8 +15,9 @@ import { ApostilaService } from "../../../services/apostila.service";
 import { NameFirstWordPipe } from "../../../utils/name-first-word.pipe";
 import { SelectChangeEvent } from "primeng/select";
 import { Evento_Participacao_Aluno } from "../../../models/evento-participacao-aluno.model";
-// import { AlunoParticipacaoStatusComponent } from "../../aluno/aluno-participacao-status/aluno-participacao-status.component";
 import moment from "moment"
+import { Button } from "primeng/button";
+import $ from 'jquery';
 
 @Component({
     selector: 'app-aula',
@@ -42,15 +43,15 @@ export class AulaComponent implements OnChanges, OnDestroy {
     loadingApostila = false;
 
     roteiro?: Roteiro;
-    @Input() roteiros: Roteiro[] = [];
-    @Input() loadingRoteiros = false;
+    // @Input() roteiros: Roteiro[] = [];
+    // @Input() loadingRoteiros = false;
 
     @Output() onProfessorChanged = new EventEmitter<Professor>();
     @Output() onSalaChanged = new EventEmitter<SalaAula>();
     @Output() onWidthChanged = new EventEmitter<string>();
-    
+
     onSave = new EventEmitter<Evento>();
-    
+
     ScreenWidth = ScreenWidth;
     screen = ScreenWidth.lg;
     EventoTipo = EventoTipo;
@@ -58,6 +59,7 @@ export class AulaComponent implements OnChanges, OnDestroy {
 
     @ViewChildren('alunoPopover') alunoPopover!: QueryList<AlunoPopoverComponent>;
 
+    @ViewChildren('presencaButton') presencaButton!: QueryList<Button>;
     @ViewChildren('apostilaAbacoInput') apostilaAbacoInput!: QueryList<InputNumber>;
     @ViewChildren('apostilaAHInput') apostilaAHInput!: QueryList<InputNumber>;
 
@@ -77,9 +79,8 @@ export class AulaComponent implements OnChanges, OnDestroy {
         let apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
 
-        
+
         this.onSave.subscribe(res => {
-            console.log('onSave')
         })
     }
 
@@ -88,7 +89,6 @@ export class AulaComponent implements OnChanges, OnDestroy {
             this.evento = changes['evento'].currentValue
 
             this.setApostilasAlunos()
-            this.setRoteiro();
         }
 
         if (changes['duracaoEvento'])
@@ -106,12 +106,12 @@ export class AulaComponent implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas'])
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue
 
-        if (changes['roteiros']) {
-            this.roteiros = changes['roteiros'].currentValue
-            this.setRoteiro()
-        }
-        if (changes['loadingRoteiros'])
-            this.loadingRoteiros = changes['loadingRoteiros'].currentValue
+        // if (changes['roteiros']) {
+        //     this.roteiros = changes['roteiros'].currentValue
+        // }
+
+        // if (changes['loadingRoteiros'])
+        //     this.loadingRoteiros = changes['loadingRoteiros'].currentValue
 
         this.onWidthChanged.emit('1200px')
     }
@@ -316,7 +316,7 @@ export class AulaComponent implements OnChanges, OnDestroy {
         if (current.numeroPaginaAbaco == null) {
             model.control.setErrors({ required: true });
             return this.showError('Inserir página', "Insira um valor para a página!", e);
-        } 
+        }
         else if (current.numeroPaginaAbaco < prev.numeroPaginaAbaco && prev.apostila_Abaco_Id == current.apostila_Abaco_Id) {
             this.confirmationService.confirm({
                 target: e.target,
@@ -386,7 +386,7 @@ export class AulaComponent implements OnChanges, OnDestroy {
         if (current.numeroPaginaAH == null) {
             model.control.setErrors({ required: true });
             return this.showError('Inserir página', "Insira um valor para a página!", e);
-        } 
+        }
         if (current.numeroPaginaAH < prev.numeroPaginaAH && prev.apostila_AH_Id == current.apostila_AH_Id) {
             this.confirmationService.confirm({
                 target: e.target,
@@ -405,62 +405,52 @@ export class AulaComponent implements OnChanges, OnDestroy {
         }
     }
 
-    setRoteiro() {
-        if (this.roteiros.length && this.evento) {
-            let roteiro: Roteiro | undefined
-            if (this.evento.roteiro_Id) {
-                roteiro = this.roteiros.find((x) => x.id == this.evento.roteiro_Id)
-                this.evento.roteiro_Id = roteiro?.id
-            } else {
-                roteiro = this.roteiros.find((x) => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
-            }
-            this.roteiro = roteiro
+    presencaPrev(index: number, e: any) {
+        let prev = index - 1;
+
+        if (index <= 0) {
+            prev = this.presencaButton.length - 1;
         }
+
+        let element = this.presencaButton.get(prev);
+        let button = $(`p-button[${element?.attrSelector}]`).find('button')
+
+        button.trigger('focus');
     }
 
-    showDivVaziaEnviarMensagemFalta(item: Evento_Participacao_Aluno) {
-        return this.evento.alunos.filter(x => x.presente === false).length > 0 && item.presente !== false
-    }
+    presencaNext(index: number, e: any) {
+        let next = index + 1;
+        if (index >= this.presencaButton.length - 1) {
+            next = 0;
+        }
+        let element = this.presencaButton.get(next);
+        let button = $(`p-button[${element?.attrSelector}]`).find('button')
 
-    get roteiroEvento(): Roteiro | undefined {
-        if (!this.evento?.roteiro_Id) return undefined;
-
-        return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
-    }
-
-    get roteiroTextColor(): string {
-        const bg = this.roteiroEvento?.corLegenda || '#ffffff';
-        // Luminance-based check
-        const r = parseInt(bg.slice(1, 3), 16);
-        const g = parseInt(bg.slice(3, 5), 16);
-        const b = parseInt(bg.slice(5, 7), 16);
-        const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        return luminance > 150 ? '#000' : '#fff';
+        button.trigger('focus');
     }
 
 
     apostilaAbacoInputNumberNext(index: number, inputNumber: InputNumber) {
-        const next = index + 1;
+        let next = index + 1;
         let element = this.apostilaAbacoInput.get(next)
         element?.input.nativeElement.focus();
     }
 
     apostilaAHInputNumberNext(index: number, inputNumber: InputNumber) {
-        const next = index + 1;
+        let next = index + 1;
         let element = this.apostilaAHInput.get(next)
         element?.input.nativeElement.focus();
     }
 
     apostilaAbacoInputNumberPrev(index: number, inputNumber: InputNumber) {
-        const next = index - 1;
-        let element = this.apostilaAbacoInput.get(next)
+        let prev = index - 1;
+        let element = this.apostilaAbacoInput.get(prev)
         element?.input.nativeElement.focus();
     }
 
     apostilaAHInputNumberPrev(index: number, inputNumber: InputNumber) {
-        const next = index - 1;
-        let element = this.apostilaAbacoInput.get(next)
+        let prev = index - 1;
+        let element = this.apostilaAbacoInput.get(prev)
         element?.input.nativeElement.focus();
     }
 

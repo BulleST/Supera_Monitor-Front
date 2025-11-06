@@ -381,24 +381,31 @@
                                         <div class="flex align-items-stretch gap-2" style="height: 32px">
                                             <p-button *ngIf="item.presente === false"
                                                       [disabled]="!item.celular"
-                                                      icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
+                                                      [severity]="item.celular ? 'success' : 'secondary'"
+                                                      icon="pi pi-whatsapp"
                                                       iconPos="right"
+                                                      [text]="true"
+                                                      label="Enviar mensagem"
                                                       pTooltip="Enviar mensagem de falta"
-                                                      severity="success"
                                                       (onClick)="enviarMensagemFalta(item, $event)"
                                                       (contextmenu)="enviarMensagemFalta(item, $event)"
                                                       (auxclick)="enviarMensagemFalta(item, $event)"
-                                                      styleClass="h-full"
-                                                      class="h-full" />
-                                            <p-button [disabled]=" evento.finalizado || !evento.active"
+                                                      fluid />
+                                            <p-button
+                                                      #presencaButton
+                                                      [disabled]=" evento.finalizado || !evento.active"
                                                       [severity]="item.presente == true ? 'success' : item.presente == false ? 'danger' : 'secondary'"
                                                       [label]="item.presente === true ? 'Presente' : item.presente === false ? 'Faltou' : 'Marcar presença'"
-                                                      [icon]="item.presente === true ? 'pi pi-thumbs-up-fill' : item.presente === false ? 'pi pi-thumbs-down-fill' : 'pi pi-check'"
                                                       [outlined]="item.presente == undefined || item.presente === null"
-                                                      iconPos="right"
+                                                      [rounded]="true"
                                                       (onClick)="presente(item, null)"
+                                                      (keydown.arrowDown)="presencaNext(rowIndex, $event)"
+                                                      (keydown.arrowUp)="presencaPrev(rowIndex, $event)"
+                                                      [icon]="item.presente === true ? 'pi pi-check text-sm' : item.presente === false ? 'pi pi-times text-sm -ml-1' : 'pi pi-check text-sm'"
                                                       styleClass="h-full w-7rem"
                                                       class="h-full w-7rem" />
+                                            <!-- h-full 
+                                                        h-full  -->
                                         </div>
                                     </div>
                                     <!-- Ábaco -->

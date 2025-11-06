@@ -42,6 +42,7 @@ import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { AulaComponent } from './evento/aula/aula.component';
 import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-contato-falta.component';
+import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
 
 @NgModule({
     declarations: [
@@ -68,7 +69,8 @@ import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-co
         ReposicaoParaSelectComponent,
         AlunoSelectComponent,
         AulaComponent,
-        AlunoContatoFaltaComponent
+        AlunoContatoFaltaComponent,
+        EventoParticipacaoStatusComponent
     ],
     exports: [
         FormsModule,
