@@ -119,10 +119,17 @@ export class ReposicaoDeSelectComponent implements OnChanges, OnDestroy {
             return;
         }
         else {
+            
             let request: CalendarioRequest = {
                 aluno_Id: this.aluno.id,
                 intervaloDe: moment().subtract(1, 'month').toDate(),
                 intervaloAte: moment().endOf('year').toDate(),
+            }
+            
+            
+            if (this.eventoReposicaoPara) {
+                request.intervaloDe = moment(this.eventoReposicaoPara.data).subtract(1, 'month').toDate();
+                request.intervaloAte = moment(this.eventoReposicaoPara.data).subtract(1, 'day').toDate();
             }
 
             this.loading = true;
@@ -131,13 +138,13 @@ export class ReposicaoDeSelectComponent implements OnChanges, OnDestroy {
                     this.list = res.filter(aula => {
                         const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                        const naoMarcouReposicaoAinda = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
+                        const naoMarcouReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
                         const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
-                        const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente != true;
+                        const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente !== true;
 
                         return alunoEstaNaAula
                             && ehAula
-                            && naoMarcouReposicaoAinda
+                            && naoMarcouReposicao
                             && naoEhReposicao
                             && naoGanhouPresenca
                     });

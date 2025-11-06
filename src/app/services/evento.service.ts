@@ -126,6 +126,9 @@ export class EventoService extends Service {
     }
 
     getList(request: CalendarioRequest) {
+        request.intervaloDe = moment(request.intervaloDe).format('YYYY-MM-DD') as any;
+        request.intervaloAte = moment(request.intervaloAte).format('YYYY-MM-DD') as any;
+        
         return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
             .pipe(tap({
                 next: async (eventos) => {

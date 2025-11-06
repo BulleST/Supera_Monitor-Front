@@ -158,6 +158,7 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 	}
 
 	loadAluno(aluno_Id: number) {
+		console.log('loadAluno', aluno_Id)
 		this.loading = true;
 		return lastValueFrom(this.service.get(aluno_Id))
 			.then(res => {
@@ -176,6 +177,8 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 
 
 	alunoChanged(e: SelectChangeEvent) {
+		console.log('alunoChanged', e)
+		console.log('aluno', this.aluno)
 		if (this.aluno) {
 			this.onAlunoChanged.emit(this.aluno);
 			this.loadAluno(this.aluno?.id).then(res => this.service.setAluno(res))
