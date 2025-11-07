@@ -63,7 +63,7 @@ export class ChecklistService extends Service {
         }));
     }
 
-    markAsDone(id: number, observacoes: string = '', aa: string = '') {
+    markAsDone(id: number, observacoes: string = '') {
         var request = {
             aluno_Checklist_Item_Id: id,
             observacoes: observacoes

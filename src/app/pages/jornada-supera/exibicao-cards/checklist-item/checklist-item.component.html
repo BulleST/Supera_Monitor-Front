@@ -1,0 +1,64 @@
+<p-accordion-panel [value]="index" #panel
+                   [ngClass]="{ 
+    'shadow-1 border-1 border-primary-500 border-bottom-1': activeIndex == index,
+    'border-round-xl': activeIndex != index
+    
+}">
+    <p-accordion-header class="bg-white"
+                        [ngClass]="{ 'shadow-1 border-round-md ': activeIndex != index }">
+        <div class="flex justify-content-between w-full -mt-1 bg-white">
+            <p>{{item.nome}}</p>
+            <p class="font-normal px-2 white-space-nowrap" *ngIf="item.alunos">{{item.alunos.length}} alunos</p>
+        </div>
+    </p-accordion-header>
+    <p-accordion-content style="background-color: white;">
+        <ng-container *ngIf="activeIndex == index">
+            <p-table [value]="item.alunos"
+                     [scrollable]="true"
+                     [scrollHeight]="'200px'"
+                     [virtualScroll]="true"
+                     [virtualScrollDelay]="100"
+                     [virtualScrollItemSize]="55"
+                     [virtualScrollOptions]="{  }"
+                     stripedRows
+                     tableStyleClass="checklist-item-alunos">
+                <ng-template #body let-aluno let-index="rowIndex">
+                    <tr style="height: 55px;">
+                        <td class="p-2">
+                            <app-checklist-item-aluno
+                                                      [checklist]="checklist"
+                                                      [item]="item"
+                                                      [alunoChecklistItem]="aluno"></app-checklist-item-aluno>
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template #emptymessage>
+                    <ng-container *ngIf="loading">
+                        <tr *ngFor="let item of [1,2,3,4]"
+                            style="height: 55px;">
+                            <td [ngClass]="{
+                                            'surface-100': item % 2 == 0,
+                                            'surface-50': item % 2 != 0,
+                                        }">
+                                <div class="flex align-items-center mb-2 gap-2">
+                                    <p-skeleton size="1rem" shape="circle" styleClass="fadein" />
+                                    <p-skeleton width="10rem" height="1rem" borderRadius="2rem" styleClass="fadein" />
+                                </div>
+                                <div class="flex align-items-center gap-2">
+                                    <p-skeleton width="5rem" height="1rem" borderRadius="2rem" styleClass="fadein" />
+                                    <p-skeleton width="5rem" height="1rem" borderRadius="2rem" styleClass="fadein" class="ml-auto" />
+                                    <p-skeleton size="1rem" shape="circle" styleClass="fadein" />
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <ng-container *ngIf="!loading">
+                        <tr style="height: 35px;">
+                            <td class="text-500 py-0 fadein">Nenhum aluno nessa etapa</td>
+                        </tr>
+                    </ng-container>
+                </ng-template>
+            </p-table>
+        </ng-container>
+    </p-accordion-content>
+</p-accordion-panel>

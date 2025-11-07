@@ -14,11 +14,10 @@
                       [text]="true"
                       size="small"
                       styleClass="-ml-2 fadein" />
-            <p class="hover:text-primary hover:underline cursor-pointer capitalize fadein"
-               (click)="alunoPopover.show($event)">
+            <p class="hover:text-primary hover:underline cursor-pointer capitalize fadein">
                 {{ alunoChecklistItem.aluno | nameAbv }}
             </p>
-            <p (click)="showAlunoChecklistOnConfirm()"
+            <p (click)="finalizarChecklist()"
                class="cursor-pointer text-primary-500 flex align-items-center gap-2 hover:underline hover:font-bold ml-auto fadein">
                 <span>Clique para finalizar</span>
                 <i class="pi pi-check no-underline hoveer:no-underline"></i>
@@ -36,13 +35,5 @@
                 </span>
             </p>
         </div>
-        <app-aluno-popover #alunoPopover
-                           [aluno_Id]="alunoChecklistItem.aluno_Id"
-                           [alunoChecklistItem]="alunoChecklistItem"
-                           [showChecklist]="true"></app-aluno-popover>
-        <app-aluno-checklist-on-confirm-dialog
-                                               #alunoChecklistOnConfirmDialog
-                                               [alunoChecklistItem]="alunoChecklistItem"
-                                               [item]="item"></app-aluno-checklist-on-confirm-dialog>
     </ng-container>
 </div>

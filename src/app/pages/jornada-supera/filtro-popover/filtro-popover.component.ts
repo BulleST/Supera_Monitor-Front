@@ -11,18 +11,16 @@ import { Popover } from 'primeng/popover';
 import { AlunoService } from '../../../services/alunos.service';
 import { JornadaSuperaRequest } from '../../../models/aluno-checklist-item-list.model';
 import { ToastrService } from 'ngx-toastr';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { JornadaSupera_Request } from '../../../models/jornada-supera-cards.model';
     
 @Component({
-    selector: 'app-filtro-popover-jornada-supera',
+    selector: 'app-filtro-popover',
     standalone: false,
     templateUrl: './filtro-popover.component.html',
     styleUrl: './filtro-popover.component.css'
 })
 export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
-
-    @Output() applyFilter = new EventEmitter<JornadaSuperaRequest>();
-    @Output() applyPendentesSemana = new EventEmitter<boolean>();
-
     subscription: Subscription[] = [];
     request = new JornadaSuperaRequest;
 
@@ -42,12 +40,12 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
         private professorService: ProfessorService,
         private turmaService: TurmaService,
         private alunoService: AlunoService,
+        private service: JornadaSuperaService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private toastr: ToastrService,
     ) {
-        this.applyFilter = new EventEmitter<JornadaSuperaRequest>();
 
-        var professores = this.professorService.list.subscribe(res => this.professores = res);
+        let professores = this.professorService.list.subscribe(res => this.professores = res);
         this.subscription.push(professores);
 
         if (this.professores.length == 0) {
@@ -57,7 +55,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingProfessores = false);
         }
 
-        var turmas = this.turmaService.list.subscribe(res => this.turmas = res);
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res);
         this.subscription.push(turmas);
 
         if (this.turmas.length == 0) {
@@ -67,7 +65,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        var alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res);
         this.subscription.push(alunos);
 
         if (this.alunos.length == 0) {
@@ -123,7 +121,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
     }
 
     filter() {
-        this.applyFilter.emit(this.request);
+        this.service.onReload.emit(this.request)
         this.hide();
     }
 
@@ -141,7 +139,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
             this.request.aluno_Id = undefined;
         }
 
-        this.setLocalStorage();
+        this.service.setRequest(this.request);
     }
 
     professorChanged() {
@@ -159,7 +157,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
             this.request.turma_Id = undefined;
         }
 
-        this.setLocalStorage();
+        this.service.setRequest(this.request);
 
     }
 
@@ -170,7 +168,7 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
             this.request.professor_Id = aluno.professor_Id;
         }
 
-        this.setLocalStorage();
+        this.service.setRequest(this.request);
     }
 
     setTurmaDisabled() {
@@ -194,26 +192,6 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
         });
     }
 
-    setLocalStorage() {
-        if (this.request.turma_Id) {
-            localStorage.setItem('turma_Id', (this.request.turma_Id ?? null).toString());
-        } else {
-            localStorage.removeItem('turma_Id');
-        }
-        if (this.request.professor_Id) {
-            localStorage.setItem('professor_Id', (this.request.professor_Id ?? null).toString());
-        } else {
-            localStorage.removeItem('professor_Id');
-        }
-        if (this.request.aluno_Id) {
-            localStorage.setItem('aluno_Id', (this.request.aluno_Id ?? null).toString());
-        } else {
-            localStorage.removeItem('aluno_Id');
-        }
-        localStorage.setItem('pendentesSemana', this.request.pendentesSemana.toString());
-
-    }
-
     enviarMensagem(aluno: Aluno) {
         if (!aluno.celular) {
             this.toastr.error('Nenhum celular cadastrado');
@@ -224,10 +202,6 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    filtrarPendentesSemana() {
-        this.applyPendentesSemana.emit(this.request.pendentesSemana)
-
-    }
 
 }
 

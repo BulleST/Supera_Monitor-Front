@@ -45,6 +45,8 @@ import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-co
 import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
 import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
 import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/reposicao-para-tooltip.component';
+import { FinalizarChecklistComponent } from './checklist/finalizar-checklist/finalizar-checklist.component';
+import { ChecklistStatusComponent } from './checklist/checklist-status/checklist-status.component';
 
 @NgModule({
     declarations: [
@@ -74,7 +76,9 @@ import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/r
         AlunoContatoFaltaComponent,
         EventoParticipacaoStatusComponent,
         AlunoParticipacaoComponent,
-        ReposicaoParaTooltipComponent
+        ReposicaoParaTooltipComponent,
+        FinalizarChecklistComponent,
+        ChecklistStatusComponent
     ],
     exports: [
         FormsModule,

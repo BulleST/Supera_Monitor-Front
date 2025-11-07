@@ -2,11 +2,15 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewC
 import { Checklist } from '../../../models/checklist.model';
 import { Aluno } from '../../../models/alunos.model';
 import { AlunoChecklistCompleto } from '../../../models/calendario.model';
-import { ChecklistPopoverComponent } from './checklist-popover/checklist-popover.component';
-import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
-import { MensagemWhatsapp } from '../../../utils';
+import { CalendarioUtils, MensagemWhatsapp } from '../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Table } from 'primeng/table';
+import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist } from '../../../models/jornada-supera-list.model';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { ChecklistService } from '../../../services/checklist.service';
+import { lastValueFrom, Subscription } from 'rxjs';
+import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
+import { SortEvent } from 'primeng/api';
 
 @Component({
     selector: 'app-exibicao-lista',
@@ -15,56 +19,59 @@ import { Table } from 'primeng/table';
     styleUrl: './exibicao-lista.component.css'
 })
 export class ExibicaoListaComponent implements OnChanges {
-    @Input() checklists!: Checklist[];
-    @Input() loading: boolean = true;
-    @Input() loadingChecklists: boolean = true;
-    @Input() alunos!: Aluno[];
+    checklists!: Checklist[];
+    loadingChecklists = false;
+
+    loading = false;
+    list: JornadaSupera_List_Aluno[] = [];
+
+    subscription: Subscription[] = [];
+    exibicao: boolean = true;
 
 
-    @ViewChild('popoverChecklist') popoverChecklist!: ChecklistPopoverComponent;
-    @ViewChild('alunoPopover') alunoPopover!: AlunoPopoverComponent;
+    JornadaSuperaStatus = JornadaSuperaStatus
 
-    // true - cards
-    // false - lista
-    @Input() modoExibicao: boolean = false;
-    @Output() modoExibicaoOnChange = new EventEmitter<boolean>();
-    @Output() toggleFilterPopover = new EventEmitter<any>();
-
-    statusFilter = [
+    status = [
         { label: 'Todos', value: null },
-        { label: 'Atrasado', value: 'Atrasado' },
-        { label: 'Finalizado', value: 'Finalizado' },
-        { label: 'Futuro', value: 'Futuro' },
-        { label: 'Em Andamento', value: 'Em Andamento' },
-        { label: 'Indefinido', value: 'Indefinido' },
+        { label: 'FinalizadoComAtraso', value: JornadaSuperaStatus.FinalizadoComAtraso },
+        { label: 'Finalizado', value: JornadaSuperaStatus.Finalizado },
+        { label: 'Atrasado', value: JornadaSuperaStatus.Atrasado },
+        { label: 'EmAndamento', value: JornadaSuperaStatus.EmAndamento },
+        { label: 'ARealizar', value: JornadaSuperaStatus.ARealizar },
     ]
 
     constructor(
-        private mensagemWhatsapp: MensagemWhatsapp,
+        private service: JornadaSuperaService,
+        private checklistService: ChecklistService,
         private toastr: ToastrService,
+        private calendarioUtils: CalendarioUtils,
+        private mensagemWhatsapp: MensagemWhatsapp,
     ) {
+        let loading = this.service.loadingList.subscribe(res => this.loading = res);
+        this.subscription.push(loading);
+
+        let list = this.service.list.subscribe(res => this.list = res);
+        this.subscription.push(list);
+
+        let checklists = this.checklistService.list.subscribe(res => this.checklists = res);
+        this.subscription.push(checklists);
+
+        let exibicao = this.service.getExibicao().subscribe(res => this.exibicao = res);
+        this.subscription.push(exibicao);
+
+        if (!this.checklists.length) {
+            this.getChecklists();
+        }
     }
+
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['checklists']) {
             this.checklists = changes['checklists'].currentValue;
         }
-        if (changes['loadingAlunos']) {
-            this.loading = changes['loadingAlunos'].currentValue;
-        }
         if (changes['loadingChecklists']) {
             this.loadingChecklists = changes['loadingChecklists'].currentValue;
         }
-        if (changes['alunos']) {
-            this.alunos = changes['alunos'].currentValue;
-        }
-        if (changes['modoExibicao']) {
-            this.modoExibicao = changes['modoExibicao'].currentValue;
-        }
-    }
-
-    modoExibicaoChanged() {
-        this.modoExibicaoOnChange.emit(this.modoExibicao);
     }
 
     enviarMensagem(aluno: Aluno) {
@@ -77,36 +84,42 @@ export class ExibicaoListaComponent implements OnChanges {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    showAlunoPopover(e: any, aluno: Aluno) {
-        this.alunoPopover.aluno_Id = aluno.id;
-        this.alunoPopover.aluno = aluno;
-        this.alunoPopover.showChecklist = false;
-        this.alunoPopover.show(e);
+    getChecklists() {
+        this.loadingChecklists = true;
+        lastValueFrom(this.checklistService.getList())
+            .then(res => this.loadingChecklists = false)
+            .catch(res => this.loadingChecklists = false);
     }
 
-    showChecklistPopover(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
-        this.popoverChecklist.aluno = aluno;
-        this.popoverChecklist.checklist = checklist;
-        this.popoverChecklist.show(e, aluno, checklist);
-    }
+    // showAlunoPopover(e: any, aluno: Aluno) {
+    //     this.alunoPopover.aluno_Id = aluno.id;
+    //     this.alunoPopover.aluno = aluno;
+    //     this.alunoPopover.showChecklist = false;
+    //     this.alunoPopover.show(e);
+    // }
 
-    hideChecklistPopover() {
-        this.popoverChecklist.hide();
-    }
+    // showChecklistPopover(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
+    //     this.popoverChecklist.aluno = aluno;
+    //     this.popoverChecklist.checklist = checklist;
+    //     this.popoverChecklist.show(e, aluno, checklist);
+    // }
 
-    trackByChecklistId(index: number, item: Checklist) {
+    // hideChecklistPopover() {
+    //     this.popoverChecklist.hide();
+    // }
+
+    trackByChecklistId(index: number, item: JornadaSupera_List_Checklist) {
         return item.id;
     }
 
 
-    filtrarChecklistStatus(value: string | null, checklist_Id: number, table: Table, filterCallback: any) {
-        let alunosFiltered = this.alunos.filter(aluno => {
-            let checklist = aluno.checklistCompleto.find(x => x.id == checklist_Id) as AlunoChecklistCompleto;
-
-            if (!value) {
+    filtrarChecklistStatus(status: JornadaSuperaStatus | null, checklist_Id: number, table: Table, filterCallback: any) {
+        let alunosFiltered = this.list.filter(aluno => {
+            let checklist = aluno.checklists.find(x => x.id == checklist_Id) as JornadaSupera_List_Checklist;
+            if (!status) {
                 return true
             }
-            if (checklist.status === value) {
+            if (checklist.status === status) {
                 return true;
             }
             return false;
@@ -115,4 +128,33 @@ export class ExibicaoListaComponent implements OnChanges {
         table.filteredValue = alunosFiltered;
     }
 
+    getTextColor(color: string) {
+        return this.calendarioUtils.getTextColor(color)
+    }
+
+    calculaAlunosMesmaTurma(turma_Id: number) {
+        let alunos = this.list.filter(x => x.turma_Id == turma_Id);
+        let soma = alunos.length;
+
+        if (soma == 0) {
+            return 'Nenhum aluno'
+        }
+        else if (soma == 1) {
+            return '1 aluno'
+        } else {
+
+            return soma + ' alunos';
+        }
+    }
+
+    customSort(event: SortEvent) {
+        event.data?.sort((x, y) => {
+            let a = x.turma == y.turma ? 0 :
+                x.turma == 'Indefinido' ? 1 :
+                    y.turma == 'Indefinido' ? -1 :
+                        x.turma < y.turma ? -1 :
+                            x.turma > y.turma ? 1 : 0;
+            return a;
+        });
+    }
 }

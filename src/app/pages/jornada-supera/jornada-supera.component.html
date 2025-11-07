@@ -1,28 +1,14 @@
 <app-confirm-dialog></app-confirm-dialog>
-<app-filtro-popover-jornada-supera
-                                   #filtroPopover
-                                   (applyFilter)="applyFilter($event)"
-                                   (applyPendentesSemana)="applyPendentesSemana($event)"></app-filtro-popover-jornada-supera>
 <div class="bg">
-    <div style="background-image: url(assets/images/account-bg-1.png);"
-         class="inner-bg absolute bg-contain bg-no-repeat top-0   right-0 z-0 -mb-5 rotate-90"></div>
-    <div style="background-image: url(assets/images/account-bg-2.png);"
-         class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
+     <div style="background-image: url(assets/images/account-bg-1.png);"
+          class="inner-bg absolute bg-contain bg-no-repeat top-0   right-0 z-0 -mb-5 rotate-90"></div>
+     <div style="background-image: url(assets/images/account-bg-2.png);"
+          class="inner-bg absolute bg-contain bg-no-repeat bottom-0 left-0 z-0 -mb-5 opacity-60"></div>
 </div>
-    <div class="relative w-full overflow-hidden h-full">
-        
-        <app-exibicao-cards *ngIf="modoExibicao"
-                            [loading]="loadingChecklistAlunos"
-                            [loadingChecklists]="loadingChecklists"
-                            [modoExibicao]="modoExibicao"
-                            [checklists]="checklists"></app-exibicao-cards>
+<div class="relative w-full overflow-hidden h-full">
+     <app-header-toolbar></app-header-toolbar>
 
-        <app-exibicao-lista *ngIf="!modoExibicao"
-                            [loading]="loadingAlunos"
-                            [loadingChecklists]="loadingChecklists"
-                            [modoExibicao]="modoExibicao"
-                            [checklists]="checklists"
-                            [alunos]="alunos"
-                            (modoExibicaoOnChange)="modoExibicao = $event"
-                            (toggleFilterPopover)="filtroPopover.toggle($event)"></app-exibicao-lista>
-    </div>
+     <app-exibicao-cards *ngIf="exibicao"></app-exibicao-cards>
+     
+     <app-exibicao-lista *ngIf="!exibicao"></app-exibicao-lista>
+</div>

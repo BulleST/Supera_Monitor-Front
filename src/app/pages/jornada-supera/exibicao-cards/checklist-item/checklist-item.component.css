@@ -1,7 +1,7 @@
 ::ng-deep .p-accordionpanel,
 ::ng-deep .p-accordionpanel.p-accordionheader {
     margin-bottom: 1rem;
-    border-bottom: none!important;
+    /* border-bottom: none!important; */
 }
 
 ::ng-deep .p-accordionpanel:not(.p-disabled).p-accordionpanel-active > .p-accordionheader {

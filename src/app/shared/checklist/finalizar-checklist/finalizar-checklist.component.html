@@ -1,0 +1,60 @@
+<app-confirm-dialog></app-confirm-dialog>
+<div class="flex align-items-center gap-3 py-4 px-2">
+    <i class="pi pi-check-square text-5xl text-primary"></i>
+    <div class="flex flex-column">
+        <p class="p-dialog-title">
+            {{view.checklistItem}}
+        </p>
+        <p class="flex align-items-center gap-2">
+            <span class="text-primary-500 capitalize">{{view.aluno | nameAbv }}</span>
+            <span>-</span>
+            <span>{{view.turma}}</span>
+            <app-legend-color class="line-heigth-1"
+                              [corLegenda]="view.corLegenda"></app-legend-color>
+        </p>
+    </div>
+    <p-button
+              class="ml-auto"
+              icon="pi pi-times"
+              [text]="true"
+              severity="secondary"
+              (onClick)="close(false)"
+              size="large" />
+</div>
+<form #form="ngForm" (ngSubmit)="sendConfirmation(form, $event)">
+    <div class="formgrid grid px-2">
+        <div class="field col-12">
+            <label for="observacoes">Observações: </label>
+            <textarea
+                      pInputTextarea
+                      name="observacoes"
+                      id="observacoes"
+                      #_observacoes="ngModel"
+                      [(ngModel)]="observacoes"
+                      fluid
+                      rows="5"></textarea>
+        </div>
+        <div class="w-full flex justify-content-between px-1">
+            <ng-container *ngIf="[8, 9, 12, 13, 32, 37, 22, 29, 23].includes(view.checklistItemId)">
+                <p-button type="button"
+                          icon="pi pi-whatsapp"
+                          [severity]="view.celular ? 'success' : 'secondary'"
+                          [disabled]="!view.celular"
+                          [text]="!view.celular"
+                          [rounded]="true"
+                          label="Enviar mensagem"
+                          pTooltip="Enviar mensagem"
+                          (onClick)="enviarMensagemCondicao()"
+                          (auxclick)="enviarMensagemCondicao()"
+                          (contextmenu)="enviarMensagemCondicao()" />
+            </ng-container>
+            <p-button class="ml-auto"
+                      type="submit"
+                      icon="pi pi-check"
+                      label="Finalizar"
+                      [loading]="loading"
+                      [disabled]="loading"
+                      [rounded]="true" />
+        </div>
+    </div>
+</form>

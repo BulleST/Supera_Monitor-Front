@@ -42,10 +42,10 @@ export class AlunoContatoFaltaComponent {
 
 	constructor(
 		private dialogService: DialogService,
+		private ref: DynamicDialogRef,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private confirmationService: ConfirmationService,
 		private toastr: ToastrService,
-		private ref: DynamicDialogRef,
 		private monitoramentoService: MonitoramentoService,
 		private eventoService: EventoService,
 		

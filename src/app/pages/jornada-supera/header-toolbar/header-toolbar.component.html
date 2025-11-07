@@ -1,0 +1,42 @@
+<app-filtro-popover #filtroPopover></app-filtro-popover>
+<div class="bg-white px-4 py-2 mb-4 relative z-3 shadow-1">
+    <div class="flex align-items-center justify-content-between">
+        <h2 class="col flex align-items-center gap-3">
+            <i class="pi pi-check-square text-primary-500 text-2xl"></i>
+            <span class="text-2xl font-normal my-0 white-space-nowrap">Jornada Supera</span>
+        </h2>
+        <div class="col flex align-items-center justify-content-center gap-2">
+            <!-- <label>Modo de exibição: </label> -->
+            <p-selectbutton [options]="[
+                                    { label: 'Cards', value: true, icon: 'bi bi-view-list' },
+                                    { label: 'Lista', value: false, icon: 'pi pi-list' },
+                                ]"
+                            [(ngModel)]="exibicao"
+                            name="exibicao"
+                            id="exibicao"
+                            optionLabel="label"
+                            optionValue="value"
+                            (onChange)="exibicaoChanged()">
+                <ng-template #item let-item>
+                    <i [class]="item.icon"></i>
+                    <span>{{item.label}}</span>
+                </ng-template>
+            </p-selectbutton>
+        </div>
+        <div class="col flex justify-content-end gap-2">
+
+            <p-button label="Atualizar"
+                      icon="pi pi-refresh"
+                      severity="secondary"
+                      styleClass="surface-800 hover:surface-700 border-800 hover:border-700 text-white"
+                      (onClick)="atualizar()"
+                      [rounded]="true" />
+
+            <p-button label="Ver filtros"
+                      icon="pi pi-filter"
+                      severity="primary"
+                      (onClick)="filtroPopover.toggle($event)"
+                      [rounded]="true" />
+        </div>
+    </div>
+</div>

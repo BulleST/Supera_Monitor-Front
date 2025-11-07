@@ -2,33 +2,32 @@ import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from
 import { Popover } from 'primeng/popover';
 import { Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../utils';
-import { Aluno } from '../../../../models/alunos.model';
-import { AlunoChecklistCompleto } from '../../../../models/calendario.model';
-import { Aluno_CheckList_Item, Checklist_Item } from '../../../../models/checklist.model';
-import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
-import { NgModel } from '@angular/forms';
-import { ChecklistService } from '../../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
+import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist, JornadaSupera_List_Checklist_Item_Aluno } from '../../../../models/jornada-supera-list.model';
+import { DialogService } from 'primeng/dynamicdialog';
+import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
     standalone: false,
     templateUrl: './checklist-popover.component.html',
-    styleUrl: './checklist-popover.component.css'
+    styleUrl: './checklist-popover.component.css',
+    providers: [DialogService]
 })
 export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
 
-    @Input() checklist!: AlunoChecklistCompleto;
-    @Input() aluno!: Aluno;
+    @Input() checklist!: JornadaSupera_List_Checklist;
+    @Input() aluno!: JornadaSupera_List_Aluno;
 
     subscription: Subscription[] = [];
 
     @ViewChild('popover') popover!: Popover;
-    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
+
+    prazo!: Date;
 
     constructor(
+        private dialogService: DialogService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private checklistService: ChecklistService,
         private toastr: ToastrService,
     ) {
     }
@@ -40,20 +39,19 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['checklist']) {
             this.checklist = changes['checklist'].currentValue;
+            console.log(this.checklist.items)
+            this.prazo = this.checklist.items[0].prazo;
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
         }
     }
 
-    show(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
-        this.popover.show(e);
+    toggle(e: any, aluno: JornadaSupera_List_Aluno, checklist: JornadaSupera_List_Checklist) {
+        this.popover.toggle(e);
         this.aluno = aluno;
         this.checklist = checklist
-        try {
-            this.popover.align();
-        }
-        catch (e) { }
+        this.prazo = this.checklist.items[0].prazo;
     }
 
 
@@ -62,7 +60,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             this.popover.hide();
     }
 
-    enviarMensagem(aluno: Aluno) {
+    enviarMensagem(aluno: JornadaSupera_List_Aluno) {
         if (!aluno.celular) {
             this.toastr.error('Nenhum celular cadastrado');
             return;
@@ -72,37 +70,45 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemCondicao(item: Aluno_CheckList_Item, aluno: Aluno) {
+    enviarMensagemCondicao(item: JornadaSupera_List_Checklist_Item_Aluno, aluno: JornadaSupera_List_Aluno) {
         this.mensagemWhatsapp.enviarMensagemCondicao(aluno, item.checklist_Item_Id);
     }
 
-    checkboxMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
-        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
+    finalizarChecklist(item: JornadaSupera_List_Checklist_Item_Aluno) {
 
-        let checklists = this.checklistService.list.value;
-        let item = checklists.flatMap(x => x.items).find(x => x.id == alunoChecklistItem.checklist_Item_Id) as Checklist_Item;
-        this.alunoChecklistOnConfirmDialog.item = item;
+        var view: FinalizarChecklistComponentModel = {
+                alunoChecklistItemId: item.id,
+                checklistItemId: item.checklist_Item_Id,
+                checklistId: this.checklist.id,
 
-        this.alunoChecklistOnConfirmDialog.show();
+                checklistItem: item.checklist_Item,
+                aluno: this.aluno.nome,
+                turma: this.aluno.turma,
+                corLegenda: this.aluno.corLegenda,
+                celular: this.aluno.celular,
+                prazo: item.prazo,
+                status: item.status,
+        }
+        var ref = this.dialogService.open(FinalizarChecklistComponent, {
+            header: 'Finalizar Checklist',
+            showHeader: false,
+            closable: true,
+            maximizable: false,
+            closeOnEscape: true,
+            draggable: true,
+            dismissableMask: true,
+            duplicate: true,
+            modal: true,
+            width: '95vw',
+            style: {
+                maxWidth: '500px',
+            },
+            data: {
+                view: view
+            }
+        })
 
-        let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
-            model.control.setValue(false);
-            model.control.updateValueAndValidity();
-            this.alunoChecklistOnConfirmDialog.hide();
-            onCancel.unsubscribe();
-            onFinish.unsubscribe();
-        });
-
-        let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-
-            alunoChecklistItem.observacoes = res.observacoes;
-            alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
-            alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
-            alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
-
-            onCancel.unsubscribe();
-            onFinish.unsubscribe();
-        });
+        ref.onClose.subscribe(res => item.finalizado = res)
 
     }
 

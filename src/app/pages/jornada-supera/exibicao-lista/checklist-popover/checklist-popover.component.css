@@ -1,0 +1,4 @@
+::ng-deep .p-checkbox-green .p-checkbox-checked .p-checkbox-box {
+    border-color: var(--p-green-600);
+    background: var(--p-green-600);
+}

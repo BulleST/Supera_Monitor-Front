@@ -1,5 +1,9 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { Checklist } from '../../../models/checklist.model';
+import { JornadaSupera_Card_Checklist } from '../../../models/jornada-supera-cards.model';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { ChecklistService } from '../../../services/checklist.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-exibicao-cards',
@@ -7,39 +11,33 @@ import { Checklist } from '../../../models/checklist.model';
     templateUrl: './exibicao-cards.component.html',
     styleUrl: './exibicao-cards.component.css',
 })
-export class ExibicaoCardsComponent implements OnChanges {
-    @Input() checklists!: Checklist[];
-    @Input() loading: boolean = true;
-    @Input() loadingChecklists: boolean = true;
+export class ExibicaoCardsComponent implements OnDestroy {
+    
+    cards: JornadaSupera_Card_Checklist[] = []
+    loading: boolean = false;
+    
+    subscription: Subscription[] = [];
+    exibicao: boolean = true;
 
-    // true - cards
-    // false - lista
-    @Input() modoExibicao: boolean = true;
-    @Output() modoExibicaoOnChange = new EventEmitter<boolean>();
-    @Output() toggleFilterPopover = new EventEmitter<any>();
+    constructor(
+        private service: JornadaSuperaService,
+    ) {
+        let loading = this.service.loadingCards.subscribe(res => this.loading = res);
+        this.subscription.push(loading);
 
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['checklists']) {
-            this.checklists = changes['checklists'].currentValue;
-        }
-        if (changes['loadingAlunos']) {
-            this.loading = changes['loadingAlunos'].currentValue;
-        }
-        if (changes['loadingChecklists']) {
-            this.loadingChecklists = changes['loadingChecklists'].currentValue;
-        }
-                if (changes['modoExibicao']) {
-                    this.modoExibicao = changes['modoExibicao'].currentValue;
-                }
+        let cards = this.service.cards.subscribe(res => this.cards = res);
+        this.subscription.push(cards);
+
+        let exibicao = this.service.getExibicao().subscribe(res => this.exibicao = res);
+        this.subscription.push(exibicao);
+
     }
 
-    modoExibicaoChanged() {
-        this.modoExibicaoOnChange.emit(this.modoExibicao);
+    ngOnDestroy(): void {
+        this.subscription.forEach(e => e.unsubscribe());
     }
 
-    trackByChecklistId(index: number, item: Checklist) {
+    trackByChecklistId(index: number, item: JornadaSupera_Card_Checklist) {
         return item.id;
     }
-
-
 }

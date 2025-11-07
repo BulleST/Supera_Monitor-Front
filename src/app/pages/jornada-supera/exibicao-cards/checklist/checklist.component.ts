@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { Checklist, Checklist_Item } from '../../../models/checklist.model';
+import { JornadaSupera_Card_Checklist, JornadaSupera_Card_Checklist_Item } from '../../../../models/jornada-supera-cards.model';
 
 @Component({
     selector: 'app-checklist-component',
@@ -9,7 +9,7 @@ import { Checklist, Checklist_Item } from '../../../models/checklist.model';
 })
 export class ChecklistComponent implements OnChanges {
 
-    @Input() checklist!: Checklist;
+    @Input() checklist!: JornadaSupera_Card_Checklist;
     @Input() loading: boolean = true;
     @Input() loadingChecklists: boolean = true;
     activeIndex = 0;
@@ -27,7 +27,7 @@ export class ChecklistComponent implements OnChanges {
         }
     }
 
-    trackByChecklistItemId(index: number, item: Checklist_Item) {
+    trackByChecklistItemId(index: number, item: JornadaSupera_Card_Checklist_Item) {
         return item.id;
     }
 }
