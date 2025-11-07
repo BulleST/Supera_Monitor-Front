@@ -13,10 +13,11 @@ import { SalaAndar } from '../../../../models/sala-aula.model';
 	selector: 'app-aluno-select',
 	standalone: false,
 	templateUrl: './aluno-select.component.html',
-    styleUrl: '../aluno-reposicao-dialog.component.css',
+	styleUrl: '../aluno-reposicao-dialog.component.css',
 })
 export class AlunoSelectComponent implements OnChanges, OnDestroy {
 
+	aluno_Id?: number;
 	aluno?: Aluno;
 	alunos: Aluno[] = [];
 	loadingAlunos = false;
@@ -44,21 +45,21 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 			}
 		})
 
-		let aluno = this.service.getAluno().subscribe(async res => {
-			let params = this.activatedRoute.snapshot.paramMap;
-			let aluno_id = params.get('aluno_id');
-			this.readonly = !!aluno_id;
+		let aluno = this.service.getAluno().subscribe(alunoRes => {
 
-			if (!res) {
-				if (aluno_id) {
-					const id = this.crypto.decrypt(aluno_id);
-					res = await this.loadAluno(id);
-					this.service.setAluno(res)
-				} 
+			let params = this.activatedRoute.snapshot.paramMap;
+			let alunoIdParam = params.get('aluno_id');
+			this.readonly = !!alunoIdParam;
+
+
+			if (!alunoRes && alunoIdParam) {
+				this.aluno_Id = this.crypto.decrypt(alunoIdParam);;
+				this.loadAluno();
+				return;
 			}
-			
-			this.aluno = res;
-			this.onAlunoChanged.emit(res);
+
+			this.aluno = alunoRes;
+			this.aluno_Id = alunoRes?.id;
 
 			if (!this.readonly) {
 				if (!this.service.list.value.length) {
@@ -68,14 +69,15 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 						.catch(res => this.loadingAlunos = false);
 				}
 
-				let alunos = this.service.list.subscribe(res => {
-					this.alunos = res;
-					
+				let alunos = this.service.list.subscribe(list => {
+					this.alunos = list;
+
 					this.setAlunos();
-					
-					if (this.aluno) {
-						let index = this.alunos.findIndex(x => x.id == this.aluno?.id);
-						if (index != -1) this.alunos.splice(index, 1, this.aluno);
+
+					if (alunoRes) {
+						let index = this.alunos.findIndex(x => x.id == alunoRes.id);
+						if (index != -1) this.alunos.splice(index, 1, alunoRes);
+						this.aluno = this.alunos[index];
 					}
 				});
 				this.subscription.push(alunos)
@@ -100,11 +102,11 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 		window.open(object.link, '_blank');
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 	}
-	
-    getRestricoes(aluno: Aluno) {
-        let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
-        return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
-    }
+
+	getRestricoes(aluno: Aluno) {
+		let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
+		return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
+	}
 
 	setAlunos() {
 		if (this.alunos.length) {
@@ -118,55 +120,61 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 				// Se um evento estiver selecionado, 
 				// os unicos alunos a estarem disponiveis são os alunos daquela aula que
 				// estão ativos e que não tem reposição agendada
-					
+
 				let alunosAula = this.eventoReposicaoDe.alunos
-									.filter(x => x.active && !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
-									.map(x => x.aluno_Id)
+					.filter(x => x.active && !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
+					.map(x => x.aluno_Id)
 
 				this.alunos = this.alunos.filter(x => alunosAula.includes(x.id))
 
 			}
 
-			console.log('oi')
 			if (params.get('evento_reposicao_para') && this.eventoReposicaoPara) {
-				console.log('eventoReposicaoPara', this.eventoReposicaoPara)
 
 				// Se um evento estiver selecionado, 
 				// os unicos alunos a estarem disponiveis são os alunos que 
 				// não estão naquela aula
 				// e que tem perfil compativel
 				// e que não tenha restrição de mobilidade caso a aula não seja no térreo
-					
+
 				let alunosAula = this.eventoReposicaoPara.alunos
-									.filter(x => x.active)
-									.map(x => x.aluno_Id)
+					.filter(x => x.active)
+					.map(x => x.aluno_Id)
 
 				let perfilAula = this.eventoReposicaoPara.perfilCognitivo.map(x => x.id)
 
 				this.alunos = this.alunos.filter(aluno => {
 
-					let alunoEstaNaAula = alunosAula.includes(aluno.id) 
+					let alunoEstaNaAula = alunosAula.includes(aluno.id)
 					let perfilCompativel = perfilAula.includes(aluno.perfilCognitivo_Id) || !aluno.perfilCognitivo_Id
 					let salaValida = !aluno.restricaoMobilidade || this.eventoReposicaoPara?.andar == SalaAndar.Terreo;
 
 					return !alunoEstaNaAula && perfilCompativel && salaValida;
 				});
 
-				
+
 			}
 		}
 	}
 
-	loadAluno(aluno_Id: number) {
-		console.log('loadAluno', aluno_Id)
+	loadAluno() {
+		if (!this.aluno_Id) return;
+
 		this.loading = true;
-		return lastValueFrom(this.service.get(aluno_Id))
+
+		let aluno = this.alunos.find(x => x.id == this.aluno_Id);
+		this.onAlunoChanged.emit(aluno);
+
+		return lastValueFrom(this.service.get(this.aluno_Id))
 			.then(res => {
 				this.aluno = res;
 				let index = this.alunos.findIndex(x => x.id == res.id);
 				if (index != -1) this.alunos.splice(index, 1, res);
 				this.loading = false;
-				return this.aluno;
+				this.service.setAluno(this.aluno)
+				this.onAlunoChanged.emit(aluno);
+
+				return res;
 			})
 			.catch(res => {
 				this.loading = false;
@@ -177,11 +185,8 @@ export class AlunoSelectComponent implements OnChanges, OnDestroy {
 
 
 	alunoChanged(e: SelectChangeEvent) {
-		console.log('alunoChanged', e)
-		console.log('aluno', this.aluno)
-		if (this.aluno) {
-			this.onAlunoChanged.emit(this.aluno);
-			this.loadAluno(this.aluno?.id).then(res => this.service.setAluno(res))
+		if (e.value) {
+			this.loadAluno()
 		}
 	}
 

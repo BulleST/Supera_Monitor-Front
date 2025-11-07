@@ -5,7 +5,7 @@ import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
 import { Professor } from '../../../../../models/professor.model';
 import { Aluno } from '../../../../../models/alunos.model';
 import { Turma } from '../../../../../models/turma.model';
-import { SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
+import { SalaAndar, SalaAula, SalaAulaId } from '../../../../../models/sala-aula.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TurmaService } from '../../../../../services/turma.service';
 import { ProfessorService } from '../../../../../services/professor.service';
@@ -50,8 +50,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     object: EventoTurmaExtraRequest = new EventoTurmaExtraRequest;
 
-    data: Date = new Date()
-    horario: Date = new Date(2025, 5, 21, 12, 0, 0);
+    data: Date = undefined as any;
+    horario: Date = undefined as any;
     minData = new Date();
 
     @ViewChild('perfilCognitivo') perfilCognitivo!: NgModel
@@ -94,6 +94,8 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     loadingFeriados = false;
     invalidDates: Date[] = [];
     ano: number = new Date().getFullYear();
+
+    SalaAndar = SalaAndar;
 
     constructor(
         private router: Router,
@@ -420,14 +422,47 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
 
-        let item = this.salaAulas.find(x => x.id == e.value);
+        let item = this.salaAulas.find(x => x.id == e.value) as SalaAula;
         if (item && item.disponivel === false && item.disponivelEvent) {
             model.control.setErrors({ indisponivel: 'Sala indisponível' });
-            this.showError('Sala Indisponível', `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, e.originalEvent);
+            this.showError(
+                'Sala Indisponível', 
+                `Essa sala está atribuída a outra ${this.getTipo(item.disponivelEvent)} no mesmo dia às <b>${moment(item.disponivelEvent.data).format('HH[h]mm')}</b>.`, 
+                e.originalEvent
+            );
             return;
         }
+
+        if (item.andar > SalaAndar.Terreo) {
+            var targetAlunos = this.target.filter(x => x.restricaoMobilidade);
+            if (targetAlunos.length > 0) {
+                model.control.setErrors({ incompativel: 'Sala incompatível' });
+                let alunos = targetAlunos
+                                .map(x => x.nome)
+                                .join('<br>')
+                                
+                this.showError(
+                    'Sala Incompatível', 
+                    `Os seguintes alunos possuem mobilidade reduzida e não poderão realizar essa aula na sala ${item.descricao} - ${item.andar}º andar: <br> ${alunos}`, 
+                    e.originalEvent
+                );
+                return;
+            }
+        }
+
         model.control.setErrors({ indisponivel: null });
         model.control.updateValueAndValidity();
+
+        let alunosTarget = this.target.map(x => x.id);
+        let alunosList = this.alunoService.list.value.filter(x => x.active && x.turma_Id);
+        this.source = alunosList.filter(x => {
+            const terreo = item.andar == SalaAndar.Terreo;
+            const restricao = x.restricaoMobilidade;
+            const target = alunosTarget.includes(x.id);
+            return (terreo || !restricao) && !target;
+        });
+
+
     }
 
     getTipo(e: Evento) {

@@ -134,10 +134,10 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     }
 
     alunoChanged(aluno: Aluno) {
-        if (!this.eventoService.eventoReposicaoDe.value) {
+        if (!this.eventoService.getEventoReposicaoDe().value) {
             this.eventoReposicaoDe = undefined;
         }
-        if (!this.eventoService.eventoReposicaoPara.value) {
+        if (!this.eventoService.getEventoReposicaoPara().value) {
             this.eventoReposicaoPara = undefined;
         }
         this.aluno = aluno;
@@ -146,7 +146,7 @@ export class AlunoReposicaoDialogComponent implements OnDestroy {
     eventoReposicaoDeChanged(evento: Evento) {
         this.eventoReposicaoDe = evento;
 
-        if (!this.eventoService.eventoReposicaoPara.value) {
+        if (!this.eventoService.getEventoReposicaoPara().value) {
             this.eventoReposicaoPara = undefined;
         }
     }

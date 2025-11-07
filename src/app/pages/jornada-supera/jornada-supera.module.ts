@@ -6,15 +6,17 @@ import { FiltroPopoverComponent } from './filtro-popover/filtro-popover.componen
 import { ChecklistComponent } from './checklist/checklist.component';
 import { ChecklistItemComponent } from './checklist-item/checklist-item.component';
 import { ChecklistItemAlunoComponent } from './checklist-item-aluno/checklist-item-aluno.component';
-import { ExibicaoCardsComponent } from './exibicao-cards/exibicao-cards.component';
-import { ExibicaoListaComponent } from './exibicao-lista/exibicao-lista.component';
 import { SharedModule } from '../../shared/shared.module';
 import { ChecklistPopoverComponent } from './exibicao-lista/checklist-popover/checklist-popover.component';
 import { ChecklistStatusComponent } from './exibicao-lista/checklist-status/checklist-status.component';
+import { ExibicaoCardsComponent } from './exibicao-cards/exibicao-cards.component';
+import { ExibicaoListaComponent } from './exibicao-lista/exibicao-lista.component';
+import { JornadaSuperaComponent } from './jornada-supera.component';
 
 
 @NgModule({
 	declarations: [
+		JornadaSuperaComponent,
 		FiltroPopoverComponent,
 		ChecklistComponent,
 		ChecklistItemComponent,

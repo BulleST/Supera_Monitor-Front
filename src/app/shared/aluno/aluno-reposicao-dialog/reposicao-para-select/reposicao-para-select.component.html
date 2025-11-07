@@ -1,4 +1,3 @@
-<app-confirm-dialog></app-confirm-dialog>
 <div class="field col-12">
     <p-fieldset legend="Agendar reposição para">
         <div class="formgrid grid">
@@ -164,16 +163,12 @@
                             <!-- Roteiro -->
                             <div class="sm:col-6 col-12">
                                 <div class="event-property">
-                                    <ng-container *ngTemplateOutlet="roteiroTemplate; context: { roteiro: getRoteiro(evento) } "></ng-container>
-                                    <ng-template #roteiroTemplate let-roteiro="roteiro">
-                                        <ng-container *ngIf="roteiro">
-                                            <div class="event-property-icon">
-                                                <i class="fa-solid fa-star" [ngStyle]="{ color: roteiro.corLegenda }"></i>
-                                            </div>
-                                            <p class="event-property-description"> Roteiro: {{roteiro.tema + ' - Semana ' + roteiro.semana}}
-                                            </p>
-                                        </ng-container>
-                                    </ng-template>
+                                    <div class="event-property-icon">
+                                        <i class="fa-solid fa-star" [ngStyle]="{ color: evento.roteiroCorLegenda }"></i>
+                                    </div>
+                                    <p class="event-property-description"> 
+                                        Roteiro: {{evento.tema + ' - Semana ' + evento.semana}}
+                                    </p>
                                 </div>
                             </div>
                             <!-- Perfil -->

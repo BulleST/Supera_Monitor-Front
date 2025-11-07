@@ -37,7 +37,8 @@
             <div class="w-full">
                 <div [innerHTML]="message.message"></div>
                 <div class="formgrid grid">
-                    <div class="field col-12"> <!-- Eventos  -->
+                    <div class="field col-12"> 
+                        <!-- Eventos  -->
                         <label for="evento_Id">Selecione uma aula: <span class="text-red-500">*</span></label>
                         <p-iconfield>
                             <p-inputicon styleClass="pi pi-calendar text-pink-500 text-base" />
@@ -66,7 +67,8 @@
                                             </div>
                                             <p class="flex align-items-center gap-1 ml-2">
                                                 <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
-                                                <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                <app-legend-color class="line-height-1" 
+                                                                [corLegenda]="selectedOption.corLegenda"
                                                                   [professor_Id]="selectedOption.professor_Id"
                                                                   [professor]="selectedOption.professor"
                                                                   [turma_Id]="selectedOption.turma_Id"></app-legend-color>
@@ -89,19 +91,20 @@
                                         <div class="flex flex-column w-full">
                                             <p class="flex align-items-center gap-2 py-1">
                                                 <span>{{item.turma ?? item.descricao}}</span>
-                                                <app-legend-color [corLegenda]="item.corLegenda"
+                                                <app-legend-color class="line-height-1" 
+                                                                [corLegenda]="item.corLegenda"
                                                                   [professor_Id]="item.professor_Id"
                                                                   [professor]="item.professor"
                                                                   [turma_Id]="item.turma_Id"></app-legend-color>
                                             </p>
                                             <p class="flex align-items-center gap-2 py-1">
-                                                <span class="">Sala: </span>
-                                                <app-sala-aula [andar]="item.andar"
-                                                               [numeroSala]="item.numeroSala"
-                                                               [sala_Id]="item.sala_Id"
-                                                               [descricao]="item.sala"></app-sala-aula>
+                                                <span>Sala: </span>
+                                                <span>{{item.sala}}</span>
+                                                <span>-</span>
+                                                <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
+                                                <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
                                                 <span class="ml-auto text-base">
-                                                    {{item.capacidadeMaximaAlunos - item.alunos.length}} vaga(s) </span>
+                                                    {{item.vagasDisponiveisEvento}} vaga(s) </span>
                                             </p>
                                         </div>
                                     </div>
@@ -245,8 +248,9 @@
                     <ng-template let-item #item>
                         <div class="flex align-items-center justify-content-between w-full gap-2">
                             <div>
-                                <p class="font-bold mb-1 flex align-items-center ">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                <p class="font-bold mb-1 flex align-items-center gap-2 ">
+                                    <app-legend-color class="line-height-1"
+                                     [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.id"
                                                       [professor]="item.nome"></app-legend-color>
                                     <span class="mr-2">{{ item.nome }}</span>
@@ -392,7 +396,7 @@
                                         <th *ngIf="!data && !horario">Selecione uma data e horário para selecionar alunos</th>
                                     </tr>
                                     <tr>
-                                        <th pSortableColumn="nome">
+                                        <th >
                                             <div class="flex align-items-center gap-2">
                                                 <span>Nome </span>
                                                 <p-iconfield iconPosition="left" class="ml-auto">
@@ -403,7 +407,7 @@
                                                            (input)="dtSource.filterGlobal(inputSource.value, 'contains')"
                                                            placeholder="Filtrar nome, turma ou perfil cognitifo" />
                                                 </p-iconfield>
-                                                <p-sortIcon field="nome" />
+                                                <p-sortIcon pSortableColumn="nome" field="nome" />
                                             </div>
                                         </th>
                                     </tr>

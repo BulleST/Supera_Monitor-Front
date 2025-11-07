@@ -33,6 +33,7 @@ export class Evento {
     capacidadeMaximaEvento: number = 12;
     alunosAtivosEvento: number = 0;
     vagasDisponiveisEvento: number = 0;
+    
     capacidadeMaximaTurma: number = 12;
     alunosAtivosTurma: number = 0;
     vagasDisponiveisTurma: number = 0;

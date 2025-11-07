@@ -11,6 +11,9 @@ import { Role } from '../../models/account-perfil.model';
 import { Router } from '@angular/router';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
 import { MegaMenu } from 'primeng/megamenu';
+import { Account } from '../../models/account.model';
+import { SelectChangeEvent } from 'primeng/select';
+import { UrlService } from '../../utils/url.service';
 
 @Component({
     selector: 'app-header',
@@ -27,6 +30,18 @@ export class HeaderComponent implements OnDestroy {
     subscription: Subscription[] = [];
 
     accountData: { name: string, abreviacao: string, email: string } | undefined;
+    account?: Account;
+    urlSelected: string = '';
+    options = [
+        {
+            label: 'Local',
+            value: 'https://localhost:7281/back'
+        },
+        {
+            label: 'PRD',
+            value: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back'
+        }
+    ]
 
     Role: typeof Role = Role;
     @ViewChild('menuBig') menuBig?: Menubar;
@@ -37,8 +52,6 @@ export class HeaderComponent implements OnDestroy {
     screen: ScreenWidth = ScreenWidth.lg;
     ScreenWidth: typeof ScreenWidth = ScreenWidth;
     items: MenuItem[] | undefined;
-
-
     menuMobileOpen = false;
 
     constructor(
@@ -48,6 +61,8 @@ export class HeaderComponent implements OnDestroy {
         private mobileService: MobileService,
         private header: Header,
         private confirmationService: ConfirmationService,
+        private urlService: UrlService,
+        
     ) {
 
         var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => this.menuMobileOpen = res)
@@ -58,10 +73,14 @@ export class HeaderComponent implements OnDestroy {
         var accountData = this.header.accountData.subscribe(res => this.accountData = res)
         this.subscription.push(accountData);
 
-        var navigationItems = this.header.navigationItems.subscribe(res => {
-            this.items = res;//.filter(x => x.items && x.items.length > 0).flatMap(x => x.items) as MenuItem[];
-        });
+        var navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
         this.subscription.push(navigationItems);
+
+        let account = this.accountService.accountSubject.subscribe(res => this.account = res);
+        this.subscription.push(account);
+
+        let urlSelected = this.urlService.getUrl().subscribe(res => this.urlSelected = res);
+        this.subscription.push(urlSelected);
 
         this.setModal();
     }
@@ -71,6 +90,9 @@ export class HeaderComponent implements OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
+    urlChange(e: SelectChangeEvent) {
+        this.urlService.setUrl(e.value)
+    }
 
     setModal() {
 

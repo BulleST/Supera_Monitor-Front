@@ -43,6 +43,8 @@ import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { AulaComponent } from './evento/aula/aula.component';
 import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-contato-falta.component';
 import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
+import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
+import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/reposicao-para-tooltip.component';
 
 @NgModule({
     declarations: [
@@ -70,7 +72,9 @@ import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-
         AlunoSelectComponent,
         AulaComponent,
         AlunoContatoFaltaComponent,
-        EventoParticipacaoStatusComponent
+        EventoParticipacaoStatusComponent,
+        AlunoParticipacaoComponent,
+        ReposicaoParaTooltipComponent
     ],
     exports: [
         FormsModule,

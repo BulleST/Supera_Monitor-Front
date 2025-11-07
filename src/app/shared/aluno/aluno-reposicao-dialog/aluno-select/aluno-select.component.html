@@ -1,4 +1,3 @@
-<app-confirm-dialog></app-confirm-dialog>
 <div class="field col-12">
     <p-fieldset legend="Aluno">
         <div class="formgrid grid">
@@ -12,13 +11,14 @@
                                 [loading]="loadingAlunos"
                                 name="aluno_Id"
                                 inputId="aluno_Id"
-                                #aluno_Id="ngModel"
-                                [(ngModel)]="aluno"
+                                #_aluno_Id="ngModel"
+                                [(ngModel)]="aluno_Id"
                                 [required]="true"
                                 [filter]="true"
                                 filterBy="nome,turma,professor"
                                 [virtualScroll]="true"
                                 [virtualScrollItemSize]="43"
+                                optionValue="id"
                                 optionLabel="nome"
                                 (onChange)="alunoChanged($event)"
                                 [readonly]="readonly"
@@ -57,9 +57,9 @@
                             </ng-template>
                         </p-select>
                     </p-iconfield>
-                    <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                    <div *ngIf="_aluno_Id.touched && _aluno_Id.invalid && _aluno_Id.errors">
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
                     </div>
                 </ng-container>
                 <ng-template #alunoSelecionadoTemplate>

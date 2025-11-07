@@ -28,6 +28,7 @@ import $ from 'jquery';
 import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
+import { SalaAndar } from '../../models/sala-aula.model';
 
 @Component({
     selector: 'app-calendario',
@@ -183,8 +184,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         var requestsFeriado = [];
 
-        let anoDe = this.calendarioRequest.intervaloDe!.getFullYear();
-        let anoAte = this.calendarioRequest.intervaloAte!.getFullYear();
+        let anoDe = moment(this.calendarioRequest.intervaloDe ?? new Date).year();
+        let anoAte = moment(this.calendarioRequest.intervaloAte ?? new Date).year();
 
         if (!this.loadedAnos.includes(anoDe)) {
             var anoDeReq = lastValueFrom(this.service.getFeriados(anoDe))
@@ -318,7 +319,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.cdkDragCancel = true;
         this.cdkEventItensId.forEach(id => {
             $('#' + id).parents('.fc-event').removeClass('scalein animation-duration-200 animation-iteration-1')
-            $('#' + id).parents('.fc-event').removeClass('sshadow-2 border-3 border-red-500')
+            $('#' + id).parents('.fc-event').removeClass('shadow-2 border-3 border-red-500')
         })
     }
 
@@ -357,6 +358,10 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             if (aluno.reposicaoDe_Evento_Id) {
                 erroMessage = 'O aluno não pode repor uma aula duas vezes.';
             }
+            
+            if (aluno.restricaoMobilidade && target.andar > SalaAndar.Terreo) {
+                erroMessage = `O aluno tem mobilidade reduzida e não pode repor aula na sala ${target.sala} - ${target.andar}º andar`;
+            }
 
             if (erroMessage) {
                 this.cdkCancelDrag('keyup')
@@ -367,21 +372,19 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
             if (target.data != source.data) {
 
+
                 let restricoes = await lastValueFrom(this.alunoRestricaoService.getList(aluno.aluno_Id));
                 aluno.restricoes = restricoes;
 
                 let message = ``;
 
-                if (restricoes.filter(x => !x.active).length > 0 || aluno.restricaoMobilidade) {
+                if (restricoes.filter(x => !x.active).length > 0) {
 
-                    message = 'Este aluno possui algumas restrições. <br> <ul>'
-                    if (aluno.restricaoMobilidade) {
-                        message += `<li>Restrição de mobilidade</li>`
-                    }
+                    message = 'Este aluno possui algumas restrições. <ul>'
                     if (restricoes.filter(x => !x.active).length > 0) {
                         message += restricoes.map(x => `<li>${x.descricao}</li>`);
                     }
-                    message += '</ul><br>Deseja continuar?'
+                    message += '</ul>Deseja continuar?'
 
                     this.confirmationService.confirm({
                         target: event.event.target as EventTarget,

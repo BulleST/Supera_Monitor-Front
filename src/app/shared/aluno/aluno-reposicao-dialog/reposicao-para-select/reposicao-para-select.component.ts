@@ -11,15 +11,12 @@ import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAndar } from '../../../../models/sala-aula.model';
 import { NgModel } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
-import { Roteiro } from '../../../../models/roteiro.model';
-import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
 
 @Component({
 	selector: 'app-reposicao-para-select',
 	standalone: false,
 	templateUrl: './reposicao-para-select.component.html',
 	styleUrl: '../aluno-reposicao-dialog.component.css',
-    providers: [ConfirmationService]
 })
 export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 	evento?: Evento;
@@ -28,7 +25,6 @@ export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 	readonly = false;
 	subscription: Subscription[] = [];
 	
-	@Input() roteiros: Roteiro[] = [];
 	@Input() aluno?: Aluno;
 	@Input() eventoReposicaoDe?: Evento;
 	@Output() onEventoChanged = new EventEmitter<Evento>();
@@ -41,7 +37,6 @@ export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 		private activatedRoute: ActivatedRoute,
 		private toastr: ToastrService,
 		private confirmationService: ConfirmationService,
-        private salaAulaPipe: SalaAulaPipe,
         
 	) {
 		this.onVisibleChange.subscribe(res => {
@@ -66,7 +61,6 @@ export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['aluno']) this.aluno = changes['aluno'].currentValue;
-		if (changes['roteiros']) this.roteiros = changes['roteiros'].currentValue;
 		if (changes['eventoReposicaoDe']) this.eventoReposicaoDe = changes['eventoReposicaoDe'].currentValue;
 
         this.loadEventosReposicaoPara();
@@ -74,29 +68,10 @@ export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 
 	}
 	
-        getRoteiro(evento: Evento) {
-            let roteiro: Roteiro; 
-            if (evento.roteiro_Id) {
-                roteiro = this.roteiros.find(x => x.id == evento.roteiro_Id) as Roteiro;
-            }
-            else {
-                roteiro = this.roteiros.find(x => moment(evento.data).isBetween(x.dataInicio, x.dataFim, 'date', '[]')) as Roteiro;
-            }
-            return roteiro;
-        }
-        
-    
     getPerfilCognitivo(evento: Evento) {
         return evento.perfilCognitivo.map(x => x.nome).join(', ');
     }
 
-    getSalaAula(evento: Evento) {
-        return this.salaAulaPipe.transform({
-            sala_Id: evento.sala_Id,
-            numeroSala: evento.numeroSala,
-            andar: evento.andar
-        })
-    }
     loadEventosReposicaoPara() {
         if (!this.aluno) {
             return undefined;
@@ -201,13 +176,6 @@ export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 
     selectEventoReposicaoPara() {
         if (this.evento) {
-            if (!this.evento.roteiro_Id || this.evento.roteiro_Id == PseudoEvento.EventoId) {
-                let roteiro = this.getRoteiro(this.evento)
-                this.evento.roteiro_Id = roteiro?.id;
-                this.evento.semana = roteiro?.semana;
-                this.evento.tema = roteiro?.tema;
-            }
-    
             this.evento = this.evento;
             this.service.setEventoReposicaoPara(this.evento)
             this.onEventoChanged.emit(this.evento);

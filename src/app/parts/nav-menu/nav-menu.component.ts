@@ -31,6 +31,7 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     @ViewChild('sidebar') sidebar!: Sidebar;
     @ViewChild('cm') cm!: ContextMenu;
 
+    urlSelected: string = '';
     options = [
         {
             label: 'Local',
@@ -62,6 +63,9 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
 
         let account = this.accountService.accountSubject.subscribe(res => this.account = res);
         this.subscription.push(account);
+
+        let urlSelected = this.urlService.getUrl().subscribe(res => this.urlSelected = res);
+        this.subscription.push(urlSelected);
 
 
     }

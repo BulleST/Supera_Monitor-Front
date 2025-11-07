@@ -48,6 +48,20 @@
                         </a>
                     </ng-template>
                     <ng-template #end>
+                        <ng-container *ngIf="account?.id == 1">
+                            <div class="px-2">
+                                <p-select
+                                    [options]="options"
+                                    [ngModel]="options[1]"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    (onChange)="urlChange($event)"
+                                    [(ngModel)]="urlSelected"
+                                    appendTo="body"
+                                    fluid
+                                />
+                            </div>
+                        </ng-container>
                         <ng-container *ngIf="accountData">
                             <div class="flex justify-content-center align-items-center pr-3 pb-3">
                                 <p-button

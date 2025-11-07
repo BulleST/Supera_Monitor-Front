@@ -22,15 +22,15 @@
         <a pRipple [routerLink]="item.routerLink" [routerLinkActive]="item.routerLinkActive"
            class="p-menu-item-link flex align-items-center justify-content-center" [pTooltip]="item.pTooltip">
             <span class="p-menu-item-icon">
-                <ng-template [ngIf]="item.iconImage">
+                <ng-container *ngIf="item.iconImage">
                     <img src="./../../.assets/images/{{item.iconImage}}" alt="{{item.iconImage}}">
-                </ng-template>
-                <ng-template [ngIf]="item.icon">
+                </ng-container>
+                <ng-container *ngIf="item.icon">
                     <i *ngIf="item.icon" [class]="item.icon"></i>
-                </ng-template>
-                <ng-template [ngIf]="item.iconFontawesome">
+                </ng-container>
+                <ng-container *ngIf="item.iconFontawesome">
                     <fa-icon [icon]="item.iconFontawesome"></fa-icon>
-                </ng-template>
+                </ng-container>
             </span>
             <span class="ml-2 mr-auto" *ngIf="menuOpen">{{ item.label }}</span>
             <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" />
@@ -40,13 +40,13 @@
     <ng-template #end>
         <ng-container *ngIf="account?.id == 1">
             <div class="px-2">
-
                 <p-select
                     [options]="options"
                     [ngModel]="options[1]"
                     optionLabel="label"
                     optionValue="value"
                     (onChange)="urlChange($event)"
+                    [(ngModel)]="urlSelected"
                     appendTo="body"
                     fluid
                 />

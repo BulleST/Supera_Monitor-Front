@@ -64,9 +64,6 @@ export class EventoComponent implements OnDestroy {
     eventos: Evento[] = [];
     loadingEventos = false;
 
-    roteiros: Roteiro[] = [];
-    loadingRoteiros = false;
-
     @ViewChildren('componentForm') componentForm!: QueryList<any>;
 
     constructor(
@@ -79,7 +76,6 @@ export class EventoComponent implements OnDestroy {
         private alunoService: AlunoService,
         private service: EventoService,
         private turmaService: TurmaService,
-        private roteiroService: RoteiroService,
         private calendarioUtils: CalendarioUtils,
     ) {
         let params = this.activatedRoute.snapshot.params
@@ -91,16 +87,7 @@ export class EventoComponent implements OnDestroy {
 
         this.encryptedId = params['evento_id']
 
-        let roteiros = this.roteiroService.list.subscribe(res => this.roteiros = res)
-        this.subscription.push(roteiros)
-
-        if (this.roteiros.length == 0) {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
-        }
-
+    
         let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
 
@@ -153,11 +140,6 @@ export class EventoComponent implements OnDestroy {
                 let alunosEvento = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id));
 
-                if (this.evento.roteiro_Id == PseudoEvento.EventoId) {
-                    let roteiro = this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'days', '[]'))
-                    this.evento.roteiro_Id = roteiro?.id ?? PseudoEvento.EventoId
-                }
-
                 let minutos = this.evento.duracaoMinutos % 60
                 let horas = this.evento.duracaoMinutos / 60
                 let horaRedonda = horas - Math.floor(horas) == 0
@@ -168,12 +150,6 @@ export class EventoComponent implements OnDestroy {
             }
         })
         this.subscription.push(evento)
-    }
-
-    get roteiroEvento(): Roteiro | undefined {
-        if (!this.evento?.roteiro_Id)
-            return this.roteiros.find(x => moment(this.evento.data).isBetween(x.dataInicio, x.dataFim, 'dates', '[]'));
-        return this.roteiros.find(r => r.id === this.evento.roteiro_Id);
     }
 
     ngOnDestroy(): void {

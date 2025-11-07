@@ -6,14 +6,14 @@
             <div>
                 <div [innerHTML]="message.message"></div>
                 <div class=" min-w-15rem mt-1"> <!-- Observações -->
-                    <label for="_observacaoReposicao" class="font-bold mt-1 text-base">Observações: <span class="text-red-500">*</span> </label>
+                    <label for="_observacaoReposicao" class="font-bold mt-1 text-base">Motivo da falta: <span class="text-red-500">*</span> </label>
                     <textarea pTextarea
                               class="w-full mt-1"
                               name="_observacaoReposicao"
                               id="_observacaoReposicao"
                               #_observacaoReposicao="ngModel"
                               [(ngModel)]="observacaoReposicao"
-                              placeholder="Aproveite para contar o motivo do agendamento dessa reposição"
+                              placeholder="Aproveite para contar o motivo dessa reposição"
                               [rows]="3"
                               [required]="true"></textarea>
                     <div *ngIf="_observacaoReposicao.touched && _observacaoReposicao.errors">

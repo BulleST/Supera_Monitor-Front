@@ -9,13 +9,12 @@ import { ToastrService } from 'ngx-toastr';
 import { NgForm, NgModel } from '@angular/forms';
 import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 import { ConfirmationService } from 'primeng/api';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../models/calendario.model';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Evento_Participacao_Aluno, statusContato } from '../../../models/evento-participacao-aluno.model';
 import { EventoAgendarFaltaRequest } from '../../../models/evento-agendar-falta-request.model';
 
 @Component({
@@ -47,17 +46,7 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
 
     alunoContactado = false;
 
-    status = [
-        { value: 1, label: 'Não compareceu' },
-        { value: 2, label: 'Aguardando Retorno' },
-        { value: 3, label: 'Optou por não repor' },
-        { value: 4, label: 'Aula Cancelada' },
-        { value: 5, label: 'Reposição Agendada' },
-        { value: 6, label: 'Reposição Realizada' },
-        { value: 7, label: 'Não Compareceu na reposição' },
-        { value: 8, label: 'Reposição Desmarcada' },
-        { value: 9, label: 'Outro' },
-    ]
+    status = statusContato;
 
     constructor(
         private eventoService: EventoService,
@@ -67,24 +56,24 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
-        private salaAulaPipe: SalaAulaPipe,
         private confirmationService: ConfirmationService,
         private calendarioUtils: CalendarioUtils,
     ) {
 
+        let params = this.activatedRoute.snapshot.paramMap;
+        this.blockAlunoField = params.get('aluno_id') != null;
+        this.blockEventoField = params.get('evento_id') != null;
+
         let aluno = this.alunoService.getAluno().subscribe(async res => {
             if (!res) {
-                let params = this.activatedRoute.snapshot.paramMap;
                  if (params.get('aluno_id')) {
                     const aluno_Id = this.crypto.decrypt(params.get('aluno_id'));
-                    this.blockAlunoField = true;
                     let aluno = await this.loadAluno(aluno_Id);
                     this.alunoService.setAluno(aluno)
                 }
             }
             if (res) {
                 this.aluno = res;
-                this.blockAlunoField = true;
             }
             else {
                 
@@ -108,7 +97,6 @@ export class AlunoAgendarFaltaDialogComponent implements OnDestroy {
         let evento = this.eventoService.getEvento().subscribe(res => {
             if (res) {
                 this.evento = res;
-                this.blockEventoField = true;
                 this.loadSugestoesReposicao();
             }
         });

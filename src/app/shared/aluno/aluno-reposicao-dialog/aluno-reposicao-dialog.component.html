@@ -19,7 +19,8 @@
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
             <!-- Aluno -->
-            <app-aluno-select #alunoSelectComponent class="w-full flex"
+            <app-aluno-select #alunoSelectComponent
+                              class="w-full flex"
                               [eventoReposicaoDe]="eventoReposicaoDe"
                               [eventoReposicaoPara]="eventoReposicaoPara"
                               (onAlunoChanged)="alunoChanged($event)"></app-aluno-select>
@@ -28,17 +29,15 @@
                                      #reposicaoDeComponent
                                      class="w-full flex"
                                      [aluno]="aluno"
-                                     [roteiros]="roteiros"
-                                     [eventoReposicaoPara]="eventoReposicaoPara"
                                      (onEventoChanged)="eventoReposicaoDeChanged($event)"></app-reposicao-de-select>
+                                     <!-- [eventoReposicaoPara]="eventoReposicaoPara" -->
             <!-- Eventos Para -->
             <app-reposicao-para-select
                                        #reposicaoParaComponent
                                        class="w-full flex"
                                        [aluno]="aluno"
-                                       [roteiros]="roteiros"
-                                       [eventoReposicaoDe]="eventoReposicaoDe"
                                        (onEventoChanged)="eventoReposicaoParaChanged($event)"></app-reposicao-para-select>
+                                       <!-- [eventoReposicaoDe]="eventoReposicaoDe" -->
             <p-fieldset class="col-12 mb-4">
                 <ng-template #header>
                     <label for="observacao" class="font-bold">Motivo da reposição: <small class="text-red-500">*</small></label>
