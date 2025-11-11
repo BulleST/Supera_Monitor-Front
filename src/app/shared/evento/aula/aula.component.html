@@ -222,10 +222,6 @@
             <ng-container *ngIf="[ScreenWidth.xs].includes(screen)">
                 <div class="flex align-items-stretch flex-wrap py-2">
                     <ng-container *ngFor="let item of evento.alunos; let rowIndex = index">
-                        <app-aluno-popover #popoverAluno
-                                           [aluno_Id]="item.aluno_Id"
-                                           [evento]="evento"
-                                           [showChecklist]="true"></app-aluno-popover>
                         <!-- Card -->
                         <div class="h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 ">
                             <header class="flex align-items-start justify-content-between mb-2 p-3 surface-50">
@@ -242,9 +238,9 @@
                                                   styleClass="p-1 w-auto h-auto"
                                                   [text]="true" />
                                         <p class="p-button-link cursor-pointer hover:underline white-space-nowrap"
-                                           (click)="popoverAluno.show($event)"
-                                           [pTooltip]="item.aluno">
-                                            <span class="text-lg font-bold capitalize">
+                                        [pTooltip]="item.aluno">
+                                        <!-- (click)="popoverAluno.show($event)" -->
+                                        <span class="text-lg font-bold capitalize">
                                                 {{ item.aluno | nameAbv }}
                                             </span>
                                         </p>
@@ -339,10 +335,10 @@
                         <tr class="static z-0">
                             <!-- Nome -->
                             <td pFrozenColumn class="pb-1 z-2 ">
-                                <app-aluno-popover #popoverAluno
+                                <!-- <app-aluno-popover #popoverAluno
                                                    [aluno_Id]="item.aluno_Id"
                                                    [evento]="evento"
-                                                   [showChecklist]="true"></app-aluno-popover>
+                                                   [showChecklist]="true"></app-aluno-popover> -->
                                 <div class="flex align-items-center gap-2">
                                     <div>
                                         <div class="flex align-items-center gap-1 ">
@@ -355,7 +351,9 @@
                                                       severity="success"
                                                       [text]="true"
                                                       class="-mt-1" />
-                                            <p class="p-button-link cursor-pointer hover:underline" (click)="popoverAluno.show($event)" pTooltip="Ver detalhes">
+                                            <p class="p-button-link cursor-pointer hover:underline" 
+                                            pTooltip="Ver detalhes">
+                                            <!-- (click)="popoverAluno.show($event)" -->
                                                 <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 capitalize">
                                                     {{ item.aluno | nameAbv }}
                                                 </span>
@@ -363,9 +361,9 @@
                                         </div>
                                         <p class="text-sm w-min ml-2 flex align-items-center gap-2 line-height-1">
                                             <b>Jornada: </b>
-                                            <app-aluno-checklist
+                                            <!-- <app-aluno-checklist
                                                                  [showChecklist]="true"
-                                                                 [aluno_Id]="item.aluno_Id"></app-aluno-checklist>
+                                                                 [aluno_Id]="item.aluno_Id"></app-aluno-checklist> -->
                                         </p>
                                     </div>
                                     <!-- <app-aluno-participacao-status

@@ -310,33 +310,33 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
 
     markChecklistAsDone() {
         // Comparecimento na aula 0
-        this.evento.alunos
-            .filter((aluno) => aluno.presente === true && aluno.active === true)
-            .forEach(async (aluno) => {
-                const checklistItemId = 33; // ID for "Comparecimento na aula 0"
-                try {
-                    const checklist = await lastValueFrom(this.checklistService.getChecklistAluno(aluno.aluno_Id));
-                    const alunoChecklistItem = checklist.find(item => item.checklist_Item_Id === checklistItemId) as Aluno_CheckList_Item;
-                    aluno.alunoChecklist = checklist;
+        // this.evento.alunos
+        //     .filter((aluno) => aluno.presente === true && aluno.active === true)
+        //     .forEach(async (aluno) => {
+        //         const checklistItemId = 33; // ID for "Comparecimento na aula 0"
+        //         try {
+        //             const checklist = await lastValueFrom(this.checklistService.getChecklistAluno(aluno.aluno_Id));
+        //             const alunoChecklistItem = checklist.find(item => item.checklist_Item_Id === checklistItemId) as Aluno_CheckList_Item;
+        //             aluno.alunoChecklist = checklist;
 
-                    if (alunoChecklistItem && !alunoChecklistItem.finalizado) {
-                        const professor = this.professores.find(prof => prof.id === this.evento.professor_Id)?.nome;
-                        const accountName = this.accountService.accountValue?.name;
-                        const eventDate = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-                        const completionDate = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        //             if (alunoChecklistItem && !alunoChecklistItem.finalizado) {
+        //                 const professor = this.professores.find(prof => prof.id === this.evento.professor_Id)?.nome;
+        //                 const accountName = this.accountService.accountValue?.name;
+        //                 const eventDate = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        //                 const completionDate = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
 
-                        const mensagem = `Aluno compareceu na aula 0 do dia ${eventDate} com o educador ${professor}.<br> Aula 0 finalizada por ${accountName} no dia ${completionDate}.`;
+        //                 const mensagem = `Aluno compareceu na aula 0 do dia ${eventDate} com o educador ${professor}.<br> Aula 0 finalizada por ${accountName} no dia ${completionDate}.`;
 
-                        await lastValueFrom(this.checklistService.markAsDone(alunoChecklistItem.id, mensagem));
-                    }
-                } catch (error) {
-                    this.showError(
-                        'Erro ao buscar ou atualizar checklist do aluno',
-                        'Não foi possível buscar ou atualizar o checklist do aluno.',
-                        error
-                    );
-                }
-            });
+        //                 await lastValueFrom(this.checklistService.markAsDone(alunoChecklistItem.id, mensagem));
+        //             }
+        //         } catch (error) {
+        //             this.showError(
+        //                 'Erro ao buscar ou atualizar checklist do aluno',
+        //                 'Não foi possível buscar ou atualizar o checklist do aluno.',
+        //                 error
+        //             );
+        //         }
+        //     });
     }
 
 }

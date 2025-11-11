@@ -1,6 +1,5 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { MensagemWhatsapp } from '../../../../utils';
-import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { JornadaSupera_Card_Checklist_Item_Aluno, JornadaSupera_Card_Checklist_Item, JornadaSupera_Card_Checklist } from './../../../../models/jornada-supera-cards.model';
 import { JornadaSuperaStatus } from '../../../../models/jornada-supera-status.model';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -20,7 +19,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     @Input() item!: JornadaSupera_Card_Checklist_Item;
     @Input() checklist!: JornadaSupera_Card_Checklist;
 
-    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent
     icon: string = '';
     text: string = '';
     textColor: string = '';

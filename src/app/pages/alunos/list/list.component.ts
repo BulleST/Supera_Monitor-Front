@@ -8,10 +8,8 @@ import { Role } from '../../../models/account-perfil.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { AlunoService } from '../../../services/alunos.service';
 import { Aluno, alunosColumns } from '../../../models/alunos.model';
-import { Checklist } from '../../../models/checklist.model';
 import { MensagemWhatsapp } from '../../../utils/mensagem-whatsapp';
 import { showError } from '../../../utils';
-import { AlunoPopoverComponent } from '../../../shared/aluno/aluno-popover/aluno-popover.component';
 import { ContextMenu } from 'primeng/contextmenu';
 import { Turma } from '../../../models/turma.model';
 import { PerfilCognitivo } from '../../../models/perfil-cognitivo.model';
@@ -47,7 +45,6 @@ export class ListComponent implements OnDestroy {
 
     SalaAndar = SalaAndar;
 
-    @ViewChild('popoverAluno') popoverAluno!: AlunoPopoverComponent;
     @ViewChild('cm') cm!: ContextMenu;
 
     turmas: Turma[] = [];
@@ -280,24 +277,10 @@ export class ListComponent implements OnDestroy {
         return item;
     }
 
-
-    getCheckList(aluno: Aluno, checklist: Checklist) {
-        if (!aluno.checklistCompleto)
-            return undefined;
-        return aluno.checklistCompleto.find(x => x.id == checklist.id);
-    }
-
     enviarMensagem(aluno: Aluno) {
         let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-    }
-
-    showPopoverAluno(aluno: Aluno, e: any) {
-        this.popoverAluno.aluno_Id = aluno.id;
-        this.popoverAluno.aluno = aluno;
-        this.popoverAluno.showChecklist = true;
-        this.popoverAluno.show(e);
     }
 
     turmaFocus(item: Aluno) {

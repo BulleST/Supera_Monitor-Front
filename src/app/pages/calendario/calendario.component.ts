@@ -14,7 +14,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
-import { PseudoEvento, ReposicaoAlunoRequest } from '../../models/reposicao.model';
+import { PseudoEvento, ReposicaoRequest } from '../../models/reposicao.model';
 import { RequestResponse } from '../../helpers/request-response.interface';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
@@ -455,7 +455,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     async agendaReposicao(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
         this.loading = true;
 
-        let request = new ReposicaoAlunoRequest;
+        let request = new ReposicaoRequest;
         request.aluno_Id = aluno.aluno_Id;
         request.source_Aula_Id = source.id;
         request.dest_Aula_Id = target.id;
@@ -480,7 +480,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             }
         }
 
-        await lastValueFrom(this.alunoService.reposicao(request))
+        await lastValueFrom(this.service.reposicao(request))
             .then(res => {
                 this.loading = false;
                 // this.selectedAluno = undefined;

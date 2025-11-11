@@ -14,16 +14,26 @@ import { RouterModule } from '@angular/router';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 
 // Alunos
-import { AlunoPopoverComponent } from './aluno/aluno-popover/aluno-popover.component';
-import { AlunoChecklistDialogComponent } from './aluno/aluno-checklist-dialog/aluno-checklist-dialog.component';
-import { AlunoChecklistComponent } from './aluno/aluno-checklist/aluno-checklist.component';
-import { AlunoReposicaoDialogComponent } from './aluno/aluno-reposicao-dialog/aluno-reposicao-dialog.component';
-import { AlunoChecklistOnConfirmDialogComponent } from './aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
 import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
-import { ReposicaoDeSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
-import { ReposicaoParaSelectComponent } from './aluno/aluno-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
-import { AlunoSelectComponent } from './aluno/aluno-reposicao-dialog/aluno-select/aluno-select.component';
+import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
+import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-contato-falta.component';
+import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
+
+
+// Evento
+import { AulaComponent } from './evento/aula/aula.component';
+import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
+import { AgendarReposicaoDialogComponent } from './evento/agendar-reposicao-dialog/agendar-reposicao-dialog.component';
+import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
+import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/reposicao-para-tooltip.component';
+import { ReposicaoDeSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
+import { ReposicaoParaSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
+
+// Checklist
+import { FinalizarChecklistComponent } from './checklist/finalizar-checklist/finalizar-checklist.component';
+import { ChecklistStatusComponent } from './checklist/checklist-status/checklist-status.component';
+import { AlunoChecklistStatusComponent } from './checklist/aluno-checklist-status/aluno-checklist-status.component';
 
 // Outros componentes
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
@@ -33,30 +43,17 @@ import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/even
 import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
 import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
 import { LegendColorComponent } from './professor/legend-color/legend-color.component';
-import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
-import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
 
 // Pipes
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
-import { AulaComponent } from './evento/aula/aula.component';
-import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-contato-falta.component';
-import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
-import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
-import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/reposicao-para-tooltip.component';
-import { FinalizarChecklistComponent } from './checklist/finalizar-checklist/finalizar-checklist.component';
-import { ChecklistStatusComponent } from './checklist/checklist-status/checklist-status.component';
+import { ReposicaoAlunoSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-aluno-select/reposicao-aluno-select.component';
 
 @NgModule({
     declarations: [
         ProfileComponent,
         ChangePasswordComponent,
-        AlunoPopoverComponent,
-        AlunoChecklistComponent,
-        AlunoChecklistDialogComponent,
-        AlunoChecklistOnConfirmDialogComponent,
-        AlunoReposicaoDialogComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
         ConfirmDialogComponent,
@@ -71,14 +68,16 @@ import { ChecklistStatusComponent } from './checklist/checklist-status/checklist
         CalendarioComponent,
         ReposicaoDeSelectComponent,
         ReposicaoParaSelectComponent,
-        AlunoSelectComponent,
         AulaComponent,
         AlunoContatoFaltaComponent,
         EventoParticipacaoStatusComponent,
         AlunoParticipacaoComponent,
         ReposicaoParaTooltipComponent,
         FinalizarChecklistComponent,
-        ChecklistStatusComponent
+        ChecklistStatusComponent,
+        AlunoChecklistStatusComponent,
+        AgendarReposicaoDialogComponent,
+        ReposicaoAlunoSelectComponent
     ],
     exports: [
         FormsModule,
@@ -94,11 +93,6 @@ import { ChecklistStatusComponent } from './checklist/checklist-status/checklist
         NameAbvPipe,
         ProfileComponent,
         ChangePasswordComponent,
-        AlunoPopoverComponent,
-        AlunoChecklistComponent,
-        AlunoChecklistDialogComponent,
-        AlunoChecklistOnConfirmDialogComponent,
-        AlunoReposicaoDialogComponent,
         AlunoAgendarFaltaDialogComponent,
         AlunoParticipacaoFaltaContatoDialogComponent,
         ConfirmDialogComponent,
@@ -109,10 +103,8 @@ import { ChecklistStatusComponent } from './checklist/checklist-status/checklist
         TableHeaderFilterComponent,
         LegendColorComponent,
         IndisponivelTooltipComponent,
-        
         ReposicaoDeSelectComponent,
         ReposicaoParaSelectComponent,
-        AlunoSelectComponent,
         AulaComponent,
         AlunoContatoFaltaComponent,
     ],

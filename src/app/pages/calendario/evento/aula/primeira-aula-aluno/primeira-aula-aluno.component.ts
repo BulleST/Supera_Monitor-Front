@@ -229,7 +229,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
             }
         }
 
-        lastValueFrom(this.alunoService.primeiraAula(request))
+        lastValueFrom(this.service.primeiraAula(request))
             .then(response => {
                 if (response.success) {
                     this.service.calendarioReload.emit(request.evento_Id);
@@ -287,23 +287,23 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
     }
 
    async markChecklistAsDone() {
-        let aluno = this.selectedAluno as Aluno
-        aluno = await lastValueFrom(this.alunoService.get(aluno.id));   
-        // Agendamento na 1ª aula 
-        if (aluno) {
-            const id = 38;
-            const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-            const professor = this.evento.professor;
-            const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-            const dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
-            const account = this.accountService.accountValue?.name;
+        // let aluno = this.selectedAluno as Aluno
+        // aluno = await lastValueFrom(this.alunoService.get(aluno.id));   
+        // // Agendamento na 1ª aula 
+        // if (aluno) {
+        //     const id = 38;
+        //     const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        //     const professor = this.evento.professor;
+        //     const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        //     const dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        //     const account = this.accountService.accountValue?.name;
 
-            if (alunoChecklist && !alunoChecklist.finalizado) {
-                const mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account} no dia ${dataAgendamento}`;
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-                }
-            }
-        }
+        //     if (alunoChecklist && !alunoChecklist.finalizado) {
+        //         const mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account} no dia ${dataAgendamento}`;
+        //         if (alunoChecklist && !alunoChecklist.finalizado) {
+        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
+        //         }
+        //     }
+        // }
     }
 }

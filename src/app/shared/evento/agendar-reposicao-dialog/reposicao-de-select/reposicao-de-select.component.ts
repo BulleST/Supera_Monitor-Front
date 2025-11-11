@@ -13,7 +13,7 @@ import { SalaAndar } from '../../../../models/sala-aula.model';
     selector: 'app-reposicao-de-select',
     standalone: false,
     templateUrl: './reposicao-de-select.component.html',
-    styleUrl: '../aluno-reposicao-dialog.component.css',
+	styleUrl: '../agendar-reposicao-dialog.component.css',
 })
 export class ReposicaoDeSelectComponent implements OnChanges, OnDestroy {
     evento?: Evento;

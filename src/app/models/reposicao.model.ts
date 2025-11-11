@@ -14,7 +14,7 @@ export class ReposicaoAluno {
     source_Professor: string = '';
 }
 
-export class ReposicaoAlunoRequest {
+export class ReposicaoRequest {
     aluno_Id: number = 0;
     source_Aula_Id: number = 0;
     dest_Aula_Id: number = 0;

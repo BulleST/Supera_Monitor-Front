@@ -4,7 +4,6 @@
                appendTo="body"
                triggerEvent="onclick" />
 <app-confirm-dialog></app-confirm-dialog>
-<app-aluno-popover #popoverAluno></app-aluno-popover>
 <div class="px-3 pb-4 bg-white">
     <p-table
              #dt
@@ -118,8 +117,7 @@
                                   (contextmenu)="enviarMensagem(aluno)" />
                         <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
                               pTooltip="{{aluno.nome}}"
-                              tooltipPosition="top"
-                              (click)="showPopoverAluno(aluno, $event)">{{ aluno.nome | nameAbv }}</span>
+                              tooltipPosition="top">{{ aluno.nome | nameAbv }}</span>
                         <i *ngIf="aluno.ehAniversario"
                            pTooltip="{{aluno.nome | firstWord}} faz aniversário dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM'}}"
                            class="bi bi-cake-fill text-pink-500 fadein"></i>

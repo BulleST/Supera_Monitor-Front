@@ -124,25 +124,25 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     markChecklistAsDone() {
         // Comparecimento na 1ª ou 2ª Oficina
         // Id 34 ou 36
-        this.evento.alunos
-        .filter(x => x.presente === true && x.active === true)
-        .forEach(async aluno => {
-            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36)) as Aluno_CheckList_Item;
+        // this.evento.alunos
+        // .filter(x => x.presente === true && x.active === true)
+        // .forEach(async aluno => {
+        //     const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+        //     const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36)) as Aluno_CheckList_Item;
             
-            if (alunoChecklist && !alunoChecklist.finalizado) {
+        //     if (alunoChecklist && !alunoChecklist.finalizado) {
 
-                const data = moment(this.evento.data).format('DD/MM/YY [às] hh[h]mm')
-                const account = this.accountService.accountValue?.name;
-                const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] hh[h]mm');
+        //         const data = moment(this.evento.data).format('DD/MM/YY [às] hh[h]mm')
+        //         const account = this.accountService.accountValue?.name;
+        //         const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] hh[h]mm');
                 
-                const mensagem = `Aluno compareceu na oficina do dia ${data}. <br>
-                                Oficina finalizada por ${account} no dia ${dataCadastro}.`
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-                }
-            }
-        });
+        //         const mensagem = `Aluno compareceu na oficina do dia ${data}. <br>
+        //                         Oficina finalizada por ${account} no dia ${dataCadastro}.`
+        //         if (alunoChecklist && !alunoChecklist.finalizado) {
+        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        //         }
+        //     }
+        // });
     }
 
     presenteClick(item: Evento_Participacao_Aluno) {

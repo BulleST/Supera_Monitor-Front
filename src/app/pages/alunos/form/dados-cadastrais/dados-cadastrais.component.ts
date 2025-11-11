@@ -21,7 +21,6 @@ import { SelectChangeEvent } from 'primeng/select';
 import { getError, MensagemWhatsapp, showError } from '../../../../utils';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Popover } from 'primeng/popover';
-import { AlunoChecklistOnConfirmDialogComponent } from '../../../../shared/aluno/aluno-checklist-on-confirm-dialog/aluno-checklist-on-confirm-dialog.component';
 import { CheckboxChangeEvent } from 'primeng/checkbox';
 import { SalaAndar } from '../../../../models/sala-aula.model';
 
@@ -73,7 +72,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
 
     SalaAndar = SalaAndar;
     
-    @ViewChild('alunoChecklistOnConfirmDialog') alunoChecklistOnConfirmDialog!: AlunoChecklistOnConfirmDialogComponent;
     @ViewChild('turma_Id') turma_Id!: NgModel;
     @ViewChild('perfilCognitivo_Id') perfilCognitivo_Id!: NgModel;
 
@@ -246,27 +244,27 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
     }
 
 
-    checklistMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
-        this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
-        this.alunoChecklistOnConfirmDialog.show();
+    // checklistMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
+    //     this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
+    //     this.alunoChecklistOnConfirmDialog.show();
 
-        let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
-            model.control.setValue(false);
-            model.control.updateValueAndValidity();
-            this.alunoChecklistOnConfirmDialog.hide();
-            onCancel.unsubscribe();
-            onFinish.unsubscribe();
-        });
+    //     let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
+    //         model.control.setValue(false);
+    //         model.control.updateValueAndValidity();
+    //         this.alunoChecklistOnConfirmDialog.hide();
+    //         onCancel.unsubscribe();
+    //         onFinish.unsubscribe();
+    //     });
 
-        let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-            alunoChecklistItem.observacoes = res.observacoes;
-            alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
-            alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
-            alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
-            onCancel.unsubscribe();
-            onFinish.unsubscribe();
-        });
-    }
+    //     let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
+    //         alunoChecklistItem.observacoes = res.observacoes;
+    //         alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
+    //         alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
+    //         alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
+    //         onCancel.unsubscribe();
+    //         onFinish.unsubscribe();
+    //     });
+    // }
 
     kitChanged(model: NgModel, e: SelectChangeEvent) {
         if (this.selectedKit) {

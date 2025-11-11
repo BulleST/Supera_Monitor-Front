@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Checklist } from '../../../models/checklist.model';
 import { Aluno } from '../../../models/alunos.model';
-import { AlunoChecklistCompleto } from '../../../models/calendario.model';
 import { CalendarioUtils, MensagemWhatsapp } from '../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Table } from 'primeng/table';
@@ -90,23 +89,6 @@ export class ExibicaoListaComponent implements OnChanges {
             .then(res => this.loadingChecklists = false)
             .catch(res => this.loadingChecklists = false);
     }
-
-    // showAlunoPopover(e: any, aluno: Aluno) {
-    //     this.alunoPopover.aluno_Id = aluno.id;
-    //     this.alunoPopover.aluno = aluno;
-    //     this.alunoPopover.showChecklist = false;
-    //     this.alunoPopover.show(e);
-    // }
-
-    // showChecklistPopover(e: any, aluno: Aluno, checklist: AlunoChecklistCompleto) {
-    //     this.popoverChecklist.aluno = aluno;
-    //     this.popoverChecklist.checklist = checklist;
-    //     this.popoverChecklist.show(e, aluno, checklist);
-    // }
-
-    // hideChecklistPopover() {
-    //     this.popoverChecklist.hide();
-    // }
 
     trackByChecklistId(index: number, item: JornadaSupera_List_Checklist) {
         return item.id;

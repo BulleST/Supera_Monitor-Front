@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
-import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest, EventoTipo } from '../models/evento.model';
+import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest } from '../models/evento.model';
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
 import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
@@ -16,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { RoteiroService } from './roteiro.service';
 import { Roteiro } from '../models/roteiro.model';
-import { PseudoEvento } from '../models/reposicao.model';
+import { PrimeiraAulaRequest, PseudoEvento, ReposicaoRequest } from '../models/reposicao.model';
 import { MyMap } from '../utils/map';
 import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
@@ -324,4 +324,22 @@ export class EventoService extends Service {
     atualizarParticipacao(request: any) {
         return this.http.put<RequestResponse>(`${this.url}/eventos/participacao/atualizar`, request);
     }
+        primeiraAula(request: PrimeiraAulaRequest) {
+            return this.http.post<RequestResponse>(`${this.url}/alunos/primeira-aula`, request)
+                .pipe(tap({
+                    error: err => {
+                        this.toastrService.error(`Não foi possível marcar primeira aula. \n ${getError(err)}`)
+                    }
+                }));
+        }
+    
+        reposicao(request: ReposicaoRequest) {
+            return this.http.post<RequestResponse>(`${this.url}/alunos/reposicao/`, request)
+                .pipe(tap({
+                    error: err => {
+                        this.toastrService.error(`Não foi possível marcar reposição. \n ${getError(err)}`)
+                    }
+                }));
+        }
+    
 }

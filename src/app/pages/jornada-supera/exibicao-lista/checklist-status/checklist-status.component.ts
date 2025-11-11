@@ -32,7 +32,7 @@ export class ChecklistStatusComponent implements OnChanges {
         else if (this.checklist.status == JornadaSuperaStatus.FinalizadoComAtraso) {
             this.icon = 'pi pi-check-circle';
             this.textColor = 'text-yellow-500';
-            this.text = `Finalizado`;
+            this.text = `Finalizado atrasado`;
         }
         else if (this.checklist.status == JornadaSuperaStatus.Atrasado) {
             this.icon = 'pi pi-times-circle';

@@ -388,23 +388,23 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         // Agendar 1ª Oficina ou 2ª 
         // checklist_Item_Id 12 ou 23
 
-        this.selectedAlunos.forEach(async aluno => {
+        // this.selectedAlunos.forEach(async aluno => {
 
-            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
+        //     const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+        //     const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
 
-            if (alunoChecklist) {
-                const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-                const account = this.accountService.accountValue?.name;
-                const dataInscricao = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        //     if (alunoChecklist) {
+        //         const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        //         const account = this.accountService.accountValue?.name;
+        //         const dataInscricao = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
 
-                const mensagem = `Inscrição na oficina do dia ${data}. <br> Inscrição realizada por ${account} no dia ${dataInscricao}`
+        //         const mensagem = `Inscrição na oficina do dia ${data}. <br> Inscrição realizada por ${account} no dia ${dataInscricao}`
 
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-                }
-            }
-        })
+        //         if (alunoChecklist && !alunoChecklist.finalizado) {
+        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        //         }
+        //     }
+        // })
     }
 
 

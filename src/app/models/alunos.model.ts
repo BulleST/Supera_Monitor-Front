@@ -1,8 +1,6 @@
 import { FilterMatchMode } from "primeng/api";
 import { ColumnTable, DisplayType, FilterType } from "../utils";
 import { Aluno_Restricao } from "./aluno-restricao.model";
-import { AlunoChecklistCompleto } from "./calendario.model";
-import { Aluno_CheckList_Item } from "./checklist.model";
 import { Evento } from "./evento.model";
 
 export class AlunoRequest {
@@ -85,8 +83,6 @@ export class Aluno {
     kit?: string = '' as any;
     apostila_Kit_Id?: number = undefined as any;
 
-    checklistCompleto: AlunoChecklistCompleto[] = [];
-    alunoChecklist: Aluno_CheckList_Item[] = [];
     restricoes: Aluno_Restricao[] = [];
 
     checklist_Id?: number = '' as any;
@@ -102,7 +98,6 @@ export class Aluno {
     aulaZero_Id?: number;
     aulaZero?: Evento;
 
-
     // Tela Cadastrar Turma Extra
     eventoReposicaoEmAndamento?: Evento;
 }
@@ -115,7 +110,6 @@ export interface Pessoa_DropDown {
 export interface Pessoa_Sexo extends Pessoa_DropDown { }
 export interface Pessoa_FaixaEtaria extends Pessoa_DropDown { }
 export interface Pessoa_Geracao extends Pessoa_DropDown { }
-
 export interface Pessoa_Origem extends Pessoa_DropDown { }
 export interface Pessoa_Origem_Canal extends Pessoa_DropDown { }
 export interface Pessoa_Origem_Categoria extends Pessoa_DropDown { }

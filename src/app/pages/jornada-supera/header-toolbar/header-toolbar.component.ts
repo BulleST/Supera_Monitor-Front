@@ -24,7 +24,6 @@ export class HeaderToolbarComponent implements OnDestroy {
 	}
 
 	exibicaoChanged() {
-		console.log('exibicaoChanged', this.exibicao)
 		this.service.setExibicao(this.exibicao);
 	}
 

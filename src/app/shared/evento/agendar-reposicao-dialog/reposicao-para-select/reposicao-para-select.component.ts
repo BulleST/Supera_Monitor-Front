@@ -16,7 +16,7 @@ import { ConfirmationService } from 'primeng/api';
 	selector: 'app-reposicao-para-select',
 	standalone: false,
 	templateUrl: './reposicao-para-select.component.html',
-	styleUrl: '../aluno-reposicao-dialog.component.css',
+	styleUrl: '../agendar-reposicao-dialog.component.css',
 })
 export class ReposicaoParaSelectComponent implements OnChanges, OnDestroy {
 	evento?: Evento;

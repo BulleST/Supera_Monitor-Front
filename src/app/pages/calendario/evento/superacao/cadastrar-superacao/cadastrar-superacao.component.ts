@@ -632,24 +632,24 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
     }
 
     markChecklistAsDone() {
-        // Agendar superação
-        // Id 22 ou 29
-        const professor = this.professores.find(x => x.id == this.object.professor_Id);
-        this.selectedAlunos.forEach(async aluno => {
-            const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-            const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+        // // Agendar superação
+        // // Id 22 ou 29
+        // const professor = this.professores.find(x => x.id == this.object.professor_Id);
+        // this.selectedAlunos.forEach(async aluno => {
+        //     const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+        //     const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
 
-            const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm');
-            const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-            const account = this.accountService.accountValue?.name;
+        //     const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm');
+        //     const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        //     const account = this.accountService.accountValue?.name;
 
-            if (alunoChecklist) {
-                const mensagem = `Superação agendada para o dia ${data} com o educador ${professor?.nome}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
+        //     if (alunoChecklist) {
+        //         const mensagem = `Superação agendada para o dia ${data} com o educador ${professor?.nome}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
 
-                if (alunoChecklist && !alunoChecklist.finalizado) {
-                    lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-                }
-            }
-        })
+        //         if (alunoChecklist && !alunoChecklist.finalizado) {
+        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        //         }
+        //     }
+        // })
     }
 }

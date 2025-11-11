@@ -7,7 +7,6 @@ import { SalaAula, SalaAulaId } from "../../../models/sala-aula.model";
 import { Roteiro } from "../../../models/roteiro.model";
 import { MobileService, ScreenWidth } from "../../../utils/mobile";
 import { Apostila, ApostilaTipo } from "../../../models/apostila.model";
-import { AlunoPopoverComponent } from "../../aluno/aluno-popover/aluno-popover.component";
 import { InputNumber } from "primeng/inputnumber";
 import { ConfirmationService } from "primeng/api";
 import { CalendarioUtils, MensagemWhatsapp, showError } from "../../../utils";
@@ -56,8 +55,6 @@ export class AulaComponent implements OnChanges, OnDestroy {
     screen = ScreenWidth.lg;
     EventoTipo = EventoTipo;
     SalaAulaId = SalaAulaId;
-
-    @ViewChildren('alunoPopover') alunoPopover!: QueryList<AlunoPopoverComponent>;
 
     @ViewChildren('presencaButton') presencaButton!: QueryList<Button>;
     @ViewChildren('apostilaAbacoInput') apostilaAbacoInput!: QueryList<InputNumber>;
@@ -154,23 +151,26 @@ export class AulaComponent implements OnChanges, OnDestroy {
         }
 
         let restricoesMessage = '';
-        this.alunoPopover.forEach(async component => {
-            let aluno = await component.loadAluno();
-            if (aluno) {
-                let restricaoMobilidade = aluno.restricaoMobilidade;
-                let restricoes = aluno.restricoes.filter(x => x.active);
+        this.evento.alunos.forEach(aluno => {
 
-                if (restricaoMobilidade || restricoes.length > 0) {
-                    restricoesMessage += `<br> - ${this.nameFirstWordPipe.transform(aluno.nome)}`
-                    if (restricaoMobilidade) {
-                        restricoesMessage += `<pre>Restrição de mobilidade: Sim</pre>`
-                    }
-                    if (restricoes.length > 0) {
-                        restricoesMessage += `<pre>Outras Restrições: ${restricoes.map(x => x.descricao).join(', ')}</pre>`
-                    }
-                }
-            }
-        });
+        })
+        // this.alunoPopover.forEach(async component => {
+        //     let aluno = await component.loadAluno();
+        //     if (aluno) {
+        //         let restricaoMobilidade = aluno.restricaoMobilidade;
+        //         let restricoes = aluno.restricoes.filter(x => x.active);
+
+        //         if (restricaoMobilidade || restricoes.length > 0) {
+        //             restricoesMessage += `<br> - ${this.nameFirstWordPipe.transform(aluno.nome)}`
+        //             if (restricaoMobilidade) {
+        //                 restricoesMessage += `<pre>Restrição de mobilidade: Sim</pre>`
+        //             }
+        //             if (restricoes.length > 0) {
+        //                 restricoesMessage += `<pre>Outras Restrições: ${restricoes.map(x => x.descricao).join(', ')}</pre>`
+        //             }
+        //         }
+        //     }
+        // });
 
         if (restricoesMessage) {
             this.showError('Atenção', `Alguns alunos possuem restrições. <br>${restricoesMessage} <br> Tem certeza que deseja continuar?`, e);

@@ -111,53 +111,59 @@
         </tr>
     </ng-template>
     <ng-template #body let-aluno let-rowIndex="rowIndex">
-        <ng-container *ngIf="rowIndex == 0">
+        @if(rowIndex == 0) {
             <ng-container *ngTemplateOutlet="groupHeader; context: { aluno }"></ng-container>
-        </ng-container>
-        <ng-container *ngIf="rowIndex > 0 && list[rowIndex - 1].turma_Id != aluno.turma_Id">
+            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+        }
+        @else if ((dt.filteredValue ?? list)[rowIndex - 1].turma_Id != aluno.turma_Id) {
             <ng-container *ngTemplateOutlet="groupHeader; context: { aluno: aluno }"></ng-container>
-        </ng-container>
-        <tr class="cursor-pointer">
-            <!-- Nome -->
-            <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 fadein">
-                <div class="flex align-items-center white-space-nowrap gap-2">
-                    <p-button type="button"
-                              (onClick)="enviarMensagem(aluno)"
-                              (auxclick)="enviarMensagem(aluno)"
-                              (contextmenu)="enviarMensagem(aluno)"
-                              [disabled]="!aluno.celular"
-                              icon="pi pi-whatsapp  {{!aluno.celular ? 'text-300' : ''}}"
-                              severity="success"
-                              [rounded]="true"
-                              [text]="true"
-                              size="small" />
-                    <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
-                          [pTooltip]="aluno.nome"
-                          tooltipPosition="top">{{ aluno.nome | nameAbv }}</span>
-                </div>
-            </td>
-            <td class="white-space-nowrap fadein">
-                <div class="flex align-items-center gap-2">
-                    <app-legend-color class="line-height-1"
-                                      [corLegenda]="aluno.corLegenda"
-                                      [professor_Id]="aluno.professor_Id"
-                                      [professor]="aluno.professor"
-                                      [turma_Id]="aluno.turma_Id"></app-legend-color>
-                    <span>{{aluno.turma}}</span>
-                </div>
-            </td>
-            <ng-container *ngFor="let checklist of aluno.checklists; trackBy: trackByChecklistId">
-                <td class="white-space-nowrap text-center px-3 fadein"
-                    (click)="popoverChecklist.toggle($event, aluno, checklist)">
-                    <app-checklist-status [checklist]="checklist"></app-checklist-status>
+            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+        }
+        @else {
+            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+        }
+        <ng-template #elseTemplate>
+            <tr class="cursor-pointer">
+                <!-- Nome -->
+                <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 fadein">
+                    <div class="flex align-items-center white-space-nowrap gap-2">
+                        <p-button type="button"
+                                  (onClick)="enviarMensagem(aluno)"
+                                  (auxclick)="enviarMensagem(aluno)"
+                                  (contextmenu)="enviarMensagem(aluno)"
+                                  [disabled]="!aluno.celular"
+                                  icon="pi pi-whatsapp  {{!aluno.celular ? 'text-300' : ''}}"
+                                  severity="success"
+                                  [rounded]="true"
+                                  [text]="true"
+                                  size="small" />
+                        <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
+                              [pTooltip]="aluno.nome"
+                              tooltipPosition="top">{{ aluno.nome | nameAbv }}</span>
+                    </div>
                 </td>
-            </ng-container>
-        </tr>
+                <td class="white-space-nowrap fadein">
+                    <div class="flex align-items-center gap-2">
+                        <app-legend-color class="line-height-1"
+                                          [corLegenda]="aluno.corLegenda"
+                                          [professor_Id]="aluno.professor_Id"
+                                          [professor]="aluno.professor"
+                                          [turma_Id]="aluno.turma_Id"></app-legend-color>
+                        <span>{{aluno.turma}}</span>
+                    </div>
+                </td>
+                <ng-container *ngFor="let checklist of aluno.checklists; trackBy: trackByChecklistId">
+                    <td class="white-space-nowrap text-center px-3 fadein"
+                        (click)="popoverChecklist.toggle($event, aluno, checklist)">
+                        <app-checklist-status [checklist]="checklist"></app-checklist-status>
+                    </td>
+                </ng-container>
+            </tr>
+        </ng-template>
     </ng-template>
     <ng-template #emptymessage>
         <tr class="p-datatable-empty-text">
-            <td pFrozenColumn>Nenhum item encontrado.</td>
-            <td [attr.colspan]="1 + checklists.length"></td>
+            <td [attr.colspan]="2 + checklists.length">Nenhum item encontrado.</td>
         </tr>
     </ng-template>
     <ng-template #loadingbody let-columns="columns">
@@ -171,7 +177,7 @@
     </ng-template>
 </p-table>
 <app-checklist-popover-jornada #popoverChecklist></app-checklist-popover-jornada>
-<app-aluno-popover #alunoPopover></app-aluno-popover>
+<!-- <app-aluno-popover #alunoPopover></app-aluno-popover> -->
 <ng-template #groupHeader let-aluno="aluno">
     <tr>
         <td pFrozenColumn

@@ -75,27 +75,6 @@ export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingAlunos = false);
         }
 
-        this.accountService.account.subscribe(res => {
-            if (!localStorage.getItem('professor_Id')) {
-                this.request.professor_Id = res?.professor_Id;
-            }
-        });
-
-        if (!!localStorage.getItem('professor_Id')) {
-            this.request.professor_Id = parseInt(localStorage.getItem('professor_Id')!)
-        }
-
-        if (!!localStorage.getItem('turma_Id')) {
-            this.request.turma_Id = parseInt(localStorage.getItem('turma_Id')!)
-        }
-
-        if (!!localStorage.getItem('aluno_Id')) {
-            this.request.aluno_Id = parseInt(localStorage.getItem('aluno_Id')!)
-        }
-
-        if (localStorage.getItem('pendentesSemana')) {
-            this.request.pendentesSemana = localStorage.getItem('pendentesSemana') == 'true' ? true : false;
-        }
     }
 
     ngAfterViewInit(): void {

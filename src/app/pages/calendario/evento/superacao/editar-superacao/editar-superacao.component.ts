@@ -157,25 +157,25 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
 
         // Comparecimento na superação
         // Id 35
-        this.evento.alunos.filter(x => x.active === true && x.presente === true)
-            .map(async aluno => {
-                const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
+        // this.evento.alunos.filter(x => x.active === true && x.presente === true)
+        //     .map(async aluno => {
+        //         const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
 
-                const id = 35;
-                const alunoChecklist = alunoObj.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-                const professor = this.professores.find(x => x.id == this.evento.professor_Id)?.nome;
-                const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-                const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-                const account = this.accountService.accountValue?.name;
+        //         const id = 35;
+        //         const alunoChecklist = alunoObj.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        //         const professor = this.professores.find(x => x.id == this.evento.professor_Id)?.nome;
+        //         const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        //         const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        //         const account = this.accountService.accountValue?.name;
 
-                if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
-                    const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br>
-                                    Agendamento realizado por ${account} no dia ${dataCadastro}`
-                    if (alunoChecklist && !alunoChecklist.finalizado) {
-                        lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-                    }
-                }
-            })
+        //         if (alunoChecklist && !alunoChecklist.finalizado && aluno.presente) {
+        //             const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br>
+        //                             Agendamento realizado por ${account} no dia ${dataCadastro}`
+        //             if (alunoChecklist && !alunoChecklist.finalizado) {
+        //                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        //             }
+        //         }
+        //     })
     }
 
 

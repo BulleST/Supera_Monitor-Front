@@ -42,20 +42,14 @@ export class JornadaSuperaComponent implements OnDestroy {
         let cards = this.service.cards.subscribe(res => this.cards = res);
         this.subscription.push(cards);
 
-        // this.service.getExibicao();
-        let exibicao = this.service.exibicao.subscribe(res => {
-            console.log('exibicao', res);
-            this.exibicao = res;
-        });
+        let exibicao = this.service.exibicao.subscribe(res => this.exibicao = res);
         this.subscription.push(exibicao);
 
-        this.service.onReload.subscribe(res => {
-            console.log('onReload', res);
+        var onReload = this.service.onReload.subscribe(res => {
             this.request = res ?? this.service.getRequest().value;
             this.update();
         });
-
-        // this.update();
+        this.subscription.push(onReload);
     }
 
     ngOnDestroy(): void {
@@ -63,7 +57,6 @@ export class JornadaSuperaComponent implements OnDestroy {
     }
 
     update() {
-        // this.getChecklis ts();
         this.getCard();
         this.getList();
     }

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { Aluno } from '../../../models/alunos.model';
-import { CalendarioUtils, Crypto, getError, MensagemWhatsapp, showError, validaAlunos } from '../../../utils';
+import { CalendarioUtils, getError, MensagemWhatsapp, showError, validaAlunos } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { AlunoService } from '../../../services/alunos.service';
@@ -380,32 +380,32 @@ export class AgendarAlunoComponent {
     }
 
     checklistSuperacao(aluno: Aluno) {
-        const alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
-        const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        const professor = this.evento.professor;
-        const account = this.accountService.accountValue?.name;
-        const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        // const alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
+        // const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        // const professor = this.evento.professor;
+        // const account = this.accountService.accountValue?.name;
+        // const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
 
-        if (alunoChecklist && !alunoChecklist.finalizado) {
-            const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro};`
-            lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-        }
+        // if (alunoChecklist && !alunoChecklist.finalizado) {
+        //     const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro};`
+        //     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
+        // }
     }
 
     checklistAula0(aluno: Aluno) {
-        // Agendamento na aula 0
-        const id = 31;
-        const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
+        // // Agendamento na aula 0
+        // const id = 31;
+        // const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
 
-        if (alunoChecklist && !alunoChecklist.finalizado) {
-            const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-            const professor = this.evento.professor;
-            const account = this.accountService.accountValue?.name;
-            const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
+        // if (alunoChecklist && !alunoChecklist.finalizado) {
+        //     const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
+        //     const professor = this.evento.professor;
+        //     const account = this.accountService.accountValue?.name;
+        //     const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
 
-            const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`;
-            lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-        }
+        //     const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`;
+        //     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
+        // }
     }
 
 

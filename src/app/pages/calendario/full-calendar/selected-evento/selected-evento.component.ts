@@ -223,16 +223,16 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             let evento: Evento = this.evento;
 
-            // if (evento.id != PseudoEvento.EventoId) {
-            //     await lastValueFrom(this.service.get(evento.id))
-            //             .then(res => evento = res)
-            //             .catch(res => this.toastr.error(res.message, 'Erro'))
-            // }
-            // else if (evento.evento_Tipo_Id == EventoTipo.Aula) {
-            //     await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
-            //         .then(res => evento = res)
-            //         .catch(res => this.toastr.error(res.message, 'Erro'))
-            // }
+            if (evento.id != PseudoEvento.EventoId) {
+                await lastValueFrom(this.service.get(evento.id))
+                        .then(res => evento = res)
+                        .catch(res => this.toastr.error(res.message, 'Erro'))
+            }
+            else if (evento.evento_Tipo_Id == EventoTipo.Aula) {
+                await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
+                    .then(res => evento = res)
+                    .catch(res => this.toastr.error(res.message, 'Erro'))
+            }
 
             if (evento.alunos && evento.alunos.length) {
                 evento.alunos = evento.alunos.map(x => {

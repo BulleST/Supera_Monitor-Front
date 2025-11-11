@@ -178,10 +178,10 @@
     <!-- Alunos -->
     <div class="col-12 flex h-fit align-items-stretch flex-wrap py-2">
         <ng-container *ngFor="let item of evento.alunos; let i = index">
-            <app-aluno-popover #popoverAluno
+            <!-- <app-aluno-popover #popoverAluno
                                [aluno_Id]="item.aluno_Id"
                                [evento]="evento"
-                               [showChecklist]="true"></app-aluno-popover>
+                               [showChecklist]="true"></app-aluno-popover> -->
             <!-- Card -->
             <div class="col h-full bg-white border-round-lg shadow-2 overflow-hidden p-0 mr-3 mb-3" style="min-width: 20rem">
                 <header class="flex align-items-center mb-2 p-3 surface-50">
@@ -195,7 +195,9 @@
                               [text]="true" />
                     <div class="w-full overflow-hidden white-space-nowrap text-overflow-ellipsis">
                         <div class="flex align-items-center">
-                            <p class="p-button-link capitalize text-lg font-bold" (click)="popoverAluno.show($event)" [pTooltip]="item.aluno">
+                            <p class="p-button-link capitalize text-lg font-bold" 
+                            [pTooltip]="item.aluno">
+                            <!-- (click)="popoverAluno.show($event)"  -->
                                 <span>{{ item.aluno | nameAbv }}</span>
                             </p>
                             <p-badge *ngIf="item.reposicaoDe_Evento_Id"
