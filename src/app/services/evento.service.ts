@@ -128,7 +128,7 @@ export class EventoService extends Service {
     getList(request: CalendarioRequest) {
         request.intervaloDe = moment(request.intervaloDe).format('YYYY-MM-DD') as any;
         request.intervaloAte = moment(request.intervaloAte).format('YYYY-MM-DD') as any;
-        
+
         return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
             .pipe(tap({
                 next: async (eventos) => {
@@ -314,22 +314,23 @@ export class EventoService extends Service {
     atualizarParticipacao(request: any) {
         return this.http.put<RequestResponse>(`${this.url}/eventos/participacao/atualizar`, request);
     }
-        primeiraAula(request: PrimeiraAulaRequest) {
-            return this.http.post<RequestResponse>(`${this.url}/alunos/primeira-aula`, request)
-                .pipe(tap({
-                    error: err => {
-                        this.toastrService.error(`Não foi possível marcar primeira aula. \n ${getError(err)}`)
-                    }
-                }));
-        }
     
-        reposicao(request: ReposicaoRequest) {
-            return this.http.post<RequestResponse>(`${this.url}/alunos/reposicao/`, request)
-                .pipe(tap({
-                    error: err => {
-                        this.toastrService.error(`Não foi possível marcar reposição. \n ${getError(err)}`)
-                    }
-                }));
-        }
-    
+    primeiraAula(request: PrimeiraAulaRequest) {
+        return this.http.post<RequestResponse>(`${this.url}/eventos/primeira-aula`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível marcar primeira aula. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    reposicao(request: ReposicaoRequest) {
+        return this.http.post<RequestResponse>(`${this.url}/eventos/reposicao/`, request)
+            .pipe(tap({
+                error: err => {
+                    this.toastrService.error(`Não foi possível marcar reposição. \n ${getError(err)}`)
+                }
+            }));
+    }
+
 }
