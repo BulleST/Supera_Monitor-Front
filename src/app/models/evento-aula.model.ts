@@ -10,8 +10,9 @@ export class EventoAulaRequest {
     duracaoMinutos: number = 120;
     observacao: string = '';
     descricao: string = '';
-    perfilCognitivo: number[] = [];
     capacidadeMaximaAlunos = 12;
+    professores: number[] = [];
+    perfilCognitivo: number[] = [];
 }
 
 export class EventoTurmaExtraRequest {

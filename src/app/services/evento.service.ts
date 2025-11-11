@@ -192,32 +192,7 @@ export class EventoService extends Service {
             }));
     }
 
-    getOficinas() {
-        return this.http.get<Evento[]>(`${this.url}/eventos/oficinas/`)
-            .pipe(tap({
-                next: async eventos => {
-                    if (this.roteiroService.list.value.length == 0)
-                        await lastValueFrom(this.roteiroService.getList(moment().year()));
-
-                    let eventosExistentes = this.eventos.value as Evento[];
-                    eventos = eventos.map(evento => {
-                        evento = this.mapEvento(evento);
-
-                        let index = eventosExistentes.findIndex(x => x.turma_Id == evento.turma_Id && moment(x.data).isSame(evento.data));
-                        if (index == -1) eventosExistentes.push(evento);
-                        else eventosExistentes.splice(index, 1, evento);
-                        return evento;
-                    });
-
-                    this.eventos.next(eventosExistentes);
-                    return of(eventos);
-                },
-                error: (err) => {
-                    this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
-                },
-            }));
-    }
-
+   
     createAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;

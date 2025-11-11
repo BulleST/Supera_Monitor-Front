@@ -158,7 +158,8 @@ export class CalendarioUtils {
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id)
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento ?? evento.capacidadeMaximaTurma;
         request.roteiro_Id = request.roteiro_Id == PseudoEvento.EventoId ? undefined : request.roteiro_Id;
-
+        request.professores = [request.professor_Id];
+        
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createAulaTurma(request))
         return lastValueFrom(this.service.editAulaTurma(request))
