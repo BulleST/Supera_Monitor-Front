@@ -323,17 +323,20 @@ export class AgendarAlunoComponent {
         lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
             .then(res => {
                 this.loading = false;
-                this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
-                this.service.calendarioReload.emit(0);
-                if (aluno.celular) {
-                    this.sendMensagemAlunos(e);
-                } else {
-                    this.visible = false
-                    this.visibleChange();
+                if (res.success) {
+                    this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
+                    this.service.calendarioReload.emit(0);
+                    if (aluno.celular) {
+                        this.sendMensagemAlunos(e);
+                    } else {
+                        this.visible = false
+                        this.visibleChange();
+                    }
                 }
                 // playSuccess();
             })
             .catch(res => {
+                this.loading = false;
                 this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
             })
     }
