@@ -199,13 +199,12 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
                     const ehPerfilCompativel = !this.aluno.perfilCognitivo_Id || evento.perfilCognitivo.map(x => x.id).includes(this.aluno.perfilCognitivo_Id)
                     const eventoTemVaga = evento.vagasDisponiveisEvento > 0;
                     const participacao = evento.alunos.find(x => x.aluno_Id == this.aluno.id);
-                    const participacaoAtiva = participacao?.active;
-                    const salaValida = !this.aluno.restricaoMobilidade || (this.aluno.restricaoMobilidade && evento.andar == SalaAndar.Terreo);
+                    const salaValida = !this.aluno.restricaoMobilidade || evento.andar == SalaAndar.Terreo;
 
                     let final = eventoAtivo
                         && ehAula
                         && ehPerfilCompativel
-                        && ((eventoTemVaga && !participacaoAtiva) || participacaoAtiva)
+                        && ((eventoTemVaga && !participacao) || participacao)
                         && salaValida;
 
                     return final;

@@ -125,24 +125,19 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
     setAlunos() {
         if (this.alunos.length && this.evento) {
+            this.alunos = this.alunoService.list.value;
             this.alunos = this.alunos.filter(x => x.active || moment(x.deactivated).isSameOrAfter(this.evento.data, 'date'))
-
             if (this.evento.vagasDisponiveisEvento === 0) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);
                 this.alunos = this.alunos.filter(x => !eventoAlunos.includes(x.id));
             }
-
-
             this.alunos = this.alunos.filter(aluno => {
-                let salaCompativel = !aluno.restricaoMobilidade || this.evento.andar > SalaAndar.Terreo;
+                let salaCompativel = !aluno.restricaoMobilidade || this.evento.andar == SalaAndar.Terreo;
                 let primeiraAulaJaAgendadaNoEvento = aluno.primeiraAula_Id == this.evento.id;
-                let primeiraAulaAgendada = aluno.primeiraAula_Id;
 
                 return salaCompativel
-                && !primeiraAulaJaAgendadaNoEvento
-                && !primeiraAulaAgendada
+                && !primeiraAulaJaAgendadaNoEvento;
             });
-
         }
     }
 
@@ -220,8 +215,13 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         // Se a aula target não existir, cria a aula
         if (request.evento_Id == PseudoEvento.EventoId) {
             response = await this.requestAulaTurma(this.evento)
+            .catch(res => {
+                this.loading = false;
+                return res;
+            })
             request.evento_Id = response.object.id
             if (!response.success) {
+                    this.loading = false;
                 return this.showError(
                     'Primeira aula não agendada',
                     `Ocorreu um erro ao agendar primeira aula. <br> ${response.message}`,
@@ -233,6 +233,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         lastValueFrom(this.service.primeiraAula(request))
             .then(response => {
                 if (response.success) {
+                    this.loading = false;
                     this.service.calendarioReload.emit(request.evento_Id);
                     this.toastrService.success(response.message);
                     this.markChecklistAsDone();
@@ -245,6 +246,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
                     }
 
                 } else {
+                    this.loading = false;
                     this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, response.message)
                 }
 
