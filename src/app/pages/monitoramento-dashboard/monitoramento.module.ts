@@ -13,19 +13,19 @@ import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao
 
 
 @NgModule({
-  declarations: [
-    MonitoramentoComponent,
-    AgendarFaltaComponent,
-    AgendarReposicaoComponent,
-    VerAulaComponent,
-    FiltroPopoverComponent,
-    LegendaPopoverComponent,
-    AulaParticipacaoComponent
-  ],
-  imports: [
-    CommonModule,
-    MonitoramentoRoutingModule,
-    SharedModule
-  ]
+	declarations: [
+		MonitoramentoComponent,
+		AgendarFaltaComponent,
+		AgendarReposicaoComponent,
+		VerAulaComponent,
+		FiltroPopoverComponent,
+		LegendaPopoverComponent,
+		AulaParticipacaoComponent
+	],
+	imports: [
+		CommonModule,
+		MonitoramentoRoutingModule,
+		SharedModule
+	]
 })
 export class MonitoramentoModule { }

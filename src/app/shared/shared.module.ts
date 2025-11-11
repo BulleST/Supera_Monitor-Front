@@ -107,6 +107,7 @@ import { ReposicaoAlunoSelectComponent } from './evento/agendar-reposicao-dialog
         ReposicaoParaSelectComponent,
         AulaComponent,
         AlunoContatoFaltaComponent,
+        AgendarReposicaoDialogComponent,
     ],
     imports: [
         CommonModule,
