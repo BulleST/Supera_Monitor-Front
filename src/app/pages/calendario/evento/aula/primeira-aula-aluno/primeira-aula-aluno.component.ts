@@ -3,30 +3,31 @@ import { Component, OnDestroy, AfterViewInit } from '@angular/core'
 
 import { ConfirmationService } from 'primeng/api'
 
-import moment from 'moment'
-import { ToastrService } from 'ngx-toastr'
-import { lastValueFrom, Subscription } from 'rxjs'
-import { PseudoEvento, PrimeiraAulaRequest } from '../../../../../models/reposicao.model'
-import { Aluno } from '../../../../../models/alunos.model'
-import { Roteiro } from '../../../../../models/roteiro.model'
-import { Feriado } from '../../../../../models/feriado.model'
-import { Evento, EventoTipo } from '../../../../../models/evento.model'
-import { EventoAulaRequest } from '../../../../../models/evento-aula.model'
-import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model'
+import moment from 'moment';
+import { ToastrService } from 'ngx-toastr';
+import { lastValueFrom, Subscription } from 'rxjs';
+import { PseudoEvento, PrimeiraAulaRequest } from '../../../../../models/reposicao.model';
+import { Aluno } from '../../../../../models/alunos.model';
+import { Roteiro } from '../../../../../models/roteiro.model';
+import { Feriado } from '../../../../../models/feriado.model';
+import { Evento, EventoTipo } from '../../../../../models/evento.model';
+import { EventoAulaRequest } from '../../../../../models/evento-aula.model';
+import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
 
-import { showError, validaAlunoSalaAula } from '../../../../../utils'
-import { MyMap } from '../../../../../utils/map'
-import { CalendarioUtils } from '../../../../../utils/calendario-utils'
-import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp'
-import { RequestResponse } from '../../../../../helpers/request-response.interface'
+import { showError, validaAlunoSalaAula } from '../../../../../utils';
+import { MyMap } from '../../../../../utils/map';
+import { CalendarioUtils } from '../../../../../utils/calendario-utils';
+import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
+import { RequestResponse } from '../../../../../helpers/request-response.interface';
 
-import { AlunoService } from '../../../../../services/alunos.service'
-import { EventoService } from '../../../../../services/evento.service'
-import { ChecklistService } from '../../../../../services/checklist.service'
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
-import { AccountService } from '../../../../../services/account.service'
-import { SalaAndar } from '../../../../../models/sala-aula.model'
-import { SalaAulaService } from '../../../../../services/sala-aula.service'
+import { AlunoService } from '../../../../../services/alunos.service';
+import { EventoService } from '../../../../../services/evento.service';
+import { ChecklistService } from '../../../../../services/checklist.service';
+import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
+import { AccountService } from '../../../../../services/account.service';
+import { SalaAndar } from '../../../../../models/sala-aula.model';
+import { SalaAulaService } from '../../../../../services/sala-aula.service';
+
 @Component({
     selector: 'app-agendar-primeira-aula-aluno',
     standalone: false,
@@ -124,7 +125,7 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
 
     setAlunos() {
         if (this.alunos.length && this.evento) {
-            this.alunos = this.alunos.filter(x => moment(x.deactivated).isSameOrAfter(this.evento.data, 'date'))
+            this.alunos = this.alunos.filter(x => x.active || moment(x.deactivated).isSameOrAfter(this.evento.data, 'date'))
 
             if (this.evento.vagasDisponiveisEvento === 0) {
                 let eventoAlunos = this.evento.alunos.map(x => x.aluno_Id);

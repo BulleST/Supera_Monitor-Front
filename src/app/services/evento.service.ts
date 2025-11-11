@@ -294,17 +294,6 @@ export class EventoService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar`, request);
     }
 
-    inscrever(aluno_Id: number, evento_Id: number) {
-        let request = { aluno_Id, evento_Id };
-        return this.http.post<RequestResponse>(`${this.url}/eventos/participacao/inscrever`, request);
-    }
-
-    reagendar(model: EventoReagendamentoRequest) {
-        let request = MyMap(model, new EventoReagendamentoRequest()) as EventoReagendamentoRequest;
-        request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;
-        return this.http.post<RequestResponse>(`${this.url}/eventos/reagendar`, request);
-    }
-
     finalizar(request: EventoChamadaRequest) {
         return this.http.post<RequestResponse>(`${this.url}/eventos/finalizar`, request);
     }
@@ -313,9 +302,10 @@ export class EventoService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/eventos/aula-zero/finalizar`, request);
     }
 
-    // cancelarEventos(ano: number) {
-    //     return this.http.post<RequestResponse>(`${this.url}/eventos/cancelar-eventos-feriado/${ano}`, {});
-    // }
+    inscrever(aluno_Id: number, evento_Id: number) {
+        let request = { aluno_Id, evento_Id };
+        return this.http.post<RequestResponse>(`${this.url}/eventos/participacao/inscrever`, request);
+    }
 
     cancelarParticipacao(request: EventoAgendarFaltaRequest) {
         return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
