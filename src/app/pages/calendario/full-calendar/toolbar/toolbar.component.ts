@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { CalendarioDayView, CalendarioRequest, CalendarioView } from '../../../../models/calendario.model';
 import { EventoService } from '../../../../services/evento.service';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import {  Router } from '@angular/router';
 import { MobileService } from '../../../../utils';
 import { ScreenWidth } from '../../../../utils/mobile';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -51,7 +51,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     agendarMenuItem: MenuItem[] = [
         {
             label: 'Aula 0',
-            routerLink: 'calendario/aula-zero/agendar',
+            routerLink: 'calendario/agendar/aula-zero',
             command: () => {
                 let evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.AulaZero;
@@ -59,21 +59,21 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
             }
         }, {
             label: 'Aula 1',
-            routerLink: 'calendario/primeira-aula/agendar',
+            routerLink: 'calendario/agendar/primeira-aula',
             command: () => {
                 this.service.setEvento(undefined);
             }
         },
         {
             label: 'Falta',
-            routerLink: 'calendario/agendar-falta',
+            routerLink: 'calendario/agendar/falta',
             command: () => {
                 this.service.setEvento(undefined);
             }
         },
         {
             label: 'Oficina',
-            routerLink: 'calendario/oficina/agendar',
+            routerLink: 'calendario/agendar/oficina',
             command: () => {
                 let evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.Oficina;
@@ -82,7 +82,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         },
         {
             label: 'Reunião',
-            routerLink: 'calendario/reuniao/agendar',
+            routerLink: 'calendario/agendar/reuniao',
             command: () => {
                 let evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.Reuniao;
@@ -91,14 +91,14 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         },
         {
             label: 'Reposição',
-            routerLink: 'calendario/reposicao/agendar',
+            routerLink: 'calendario/agendar/reposicao',
             command: () => {
                 this.service.setEvento(undefined);
             }
         },
         {
             label: 'Superação',
-            routerLink: 'calendario/superacao/agendar',
+            routerLink: 'calendario/agendar/superacao',
             command: () => {
                 let evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.Superacao;
@@ -107,7 +107,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         },
         {
             label: 'Turma Extra',
-            routerLink: 'calendario/turma-extra/agendar',
+            routerLink: 'calendario/agendar/turma-extra',
             command: () => {
                 let evento = new Evento;
                 evento.evento_Tipo_Id = EventoTipo.TurmaExtra;
@@ -132,7 +132,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
         private service: EventoService,
         private mobileService: MobileService,
         private router: Router,
-        private activatedRoute: ActivatedRoute,
         private cdr: ChangeDetectorRef,
         private roteiroService: RoteiroService,
 
@@ -171,7 +170,6 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     }
 
     updateCalendar() {
-        // this.getData();
         this.requestLoadRoteiros();
         this.update.emit(this.calendarioRequest)
         this.getTemaSemana();

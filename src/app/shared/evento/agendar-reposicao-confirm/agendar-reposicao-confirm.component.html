@@ -1,1 +1,104 @@
-<p>agendar-reposicao-confirm works!</p>
+<app-confirm-dialog></app-confirm-dialog>
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full">
+        <div class="flex align-items-center gap-2">
+            <i class="pi pi-calendar text-lg w-3rem h-3rem bg-primary-500 text-white border-circle flex align-items-center justify-content-center p-1"></i>
+            <div class="flex flex-column">
+                <p>Agendar Reposição</p>
+                <p class="flex align-items-center gap-2 text-base font-normal">
+                    <span class="text-primary-500 capitalize">{{view.participacao.aluno | nameAbv }}</span>
+                    <span>-</span>
+                    <span>{{ view.reposicaoDe.turma }}</span>
+                    <app-legend-color class="line-heigth-1"
+                    [corLegenda]="view.reposicaoDe.corLegenda"
+                    [professor]="view.reposicaoDe.professor"></app-legend-color>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button icon="pi pi-times"
+                  (onClick)="close(false)"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+
+<form #form="ngForm" (ngSubmit)="send($event)">
+    <div class="formgrid grid">
+        <div class="field col-12">
+            <label for="reposicaoDe">Reposição do dia:</label>
+            <p-iconField iconPosition="left">
+                <p-inputIcon styleClass="pi pi-calendar" />
+                <div pInputText 
+                    class="p-input-text w-full flex align-items-center gap-2">
+                    <span class="text-primary-500">
+                        {{view.reposicaoDe.data | date : 'dd/MM/yyyy HH:mm'}}
+                    </span>
+                    <span> - </span>
+                        <span>
+                        {{view.reposicaoDe.turma }}
+                    </span>
+                    
+                    <app-legend-color 
+                        class="line-height-1"
+                        [corLegenda]="view.reposicaoDe.corLegenda"
+                        [professor]="view.reposicaoDe.professor"/>
+                </div>
+            </p-iconField>
+        </div>
+        <div class="field col-12">
+            <label for="reposicaoPara">Reposição para o dia:</label>
+            <p-iconField iconPosition="left">
+                <p-inputIcon styleClass="pi pi-calendar" />
+                <div pInputText 
+                    class="p-input-text w-full flex align-items-center gap-2">
+                    <span class="text-primary-500">
+                        {{view.reposicaoPara.data | date : 'dd/MM/yyyy HH:mm'}}
+                    </span>
+                    <span> - </span>
+                        <span>
+                        {{view.reposicaoPara.turma }}
+                    </span>
+                    
+                    <app-legend-color 
+                        class="line-height-1"
+                        [corLegenda]="view.reposicaoPara.corLegenda"
+                        [professor]="view.reposicaoPara.professor"/>
+                </div>
+            </p-iconField>
+        </div>
+        <div class="field col-12">
+            <label for="observacaoReposicao">Motivo da reposição: <span class="text-red-500">*</span></label>
+            <textarea pTextarea
+                      class="w-full mt-1"
+                      name="observacaoReposicao"
+                      id="observacaoReposicao"
+                      #observacaoReposicao="ngModel"
+                      [(ngModel)]="view.observacaoReposicao"
+                      placeholder="Aproveite para contar o motivo dessa reposição"
+                      [rows]="3"
+                      [required]="true"></textarea>
+            <div *ngIf="observacaoReposicao.touched && observacaoReposicao.errors">
+                <p class="text-red-500 mt-2 mb-0" *ngIf="observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>
+            </div>
+        </div>
+        <div class="w-full flex justify-content-between px-1">
+            <p class="font-bold">
+                <!-- <i class="pi pi-exclamation-triangle text-xl text-primary-500"></i> -->
+                Tem certeza que deseja continuar com o agendamento dessa reposição?
+            </p>
+        
+            <p-button class="ml-auto"
+                      type="submit"
+                      icon="pi pi-check"
+                      label="Agendar reposição"
+                      [loading]="loading"
+                      [disabled]="loading"
+                      [rounded]="true" />
+        </div>
+    </div>
+</form>

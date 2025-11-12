@@ -227,7 +227,7 @@
                 </p-button>
             </ng-container>
             <!-- Agendar Reposição -->
-            <ng-container *ngIf="!reposicaoPara && participacao.presente">
+            <ng-container *ngIf="!reposicaoPara && participacao.presente != false">
                 <p-button icon="pi pi-calendar"
                           severity="secondary"
                           label="Agendar Reposição"

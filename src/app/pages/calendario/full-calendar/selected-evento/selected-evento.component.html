@@ -282,7 +282,7 @@
                             <!-- Só pode inserir na oficina se tiver vagas e se a oficina não for mais pseudo -->
                             <ng-container *ngIf="[EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
                                 <!-- Inserir inscricao -->
-                                <p-button (onClick)="goToInscricaoOficina()"
+                                <p-button (onClick)="goToInserirAluno()"
                                           label="Inscrever Aluno"
                                           icon="pi pi-user-plus text-primary-500"
                                           [text]="true"
@@ -293,7 +293,7 @@
                             </ng-container>
                             <ng-container *ngIf="[EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
                                 <!-- Inserir aluno -->
-                                <p-button (onClick)="goToInserirAlunoConfirm($event)"
+                                <p-button (onClick)="goToInserirAluno()"
                                           label="Inserir Aluno"
                                           icon="pi pi-user-plus text-primary-500"
                                           [text]="true"

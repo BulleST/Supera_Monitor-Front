@@ -25,6 +25,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { FluidModule } from 'primeng/fluid';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ImageModule } from 'primeng/image';
+import { InplaceModule } from 'primeng/inplace';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputMaskModule } from 'primeng/inputmask';
 import { InputNumberModule } from 'primeng/inputnumber';
@@ -93,6 +94,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         FluidModule,
         IconFieldModule,
         ImageModule,
+        InplaceModule,
         InputIconModule,
         InputMaskModule,
         InputNumberModule,
@@ -157,6 +159,7 @@ import { ConfirmationService, FilterMatchMode, MessageService} from 'primeng/api
         FluidModule,
         IconFieldModule,
         ImageModule,
+        InplaceModule,
         InputIconModule,
         InputMaskModule,
         InputNumberModule,

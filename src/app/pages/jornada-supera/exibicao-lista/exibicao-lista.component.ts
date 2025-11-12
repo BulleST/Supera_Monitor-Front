@@ -11,7 +11,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
 import { FilterMatchMode, SortEvent } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../utils/showAluno';
+import { showAluno } from '../../../utils/show-aluno-dialog-service';
 
 @Component({
     selector: 'app-exibicao-lista',

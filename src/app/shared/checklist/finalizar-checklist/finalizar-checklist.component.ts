@@ -8,7 +8,6 @@ import { lastValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { NgForm } from '@angular/forms';
-import { AccountService } from '../../../services/account.service';
 
 @Component({
 	selector: 'app-finalizar-checklist',

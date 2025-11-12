@@ -29,13 +29,16 @@ import { CalendarioUtils } from '../../utils/calendario-utils';
 import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
 import { SalaAndar } from '../../models/sala-aula.model';
+import { DialogService } from 'primeng/dynamicdialog';
+import { AgendarReposicaoConfirmView } from '../../shared/evento/agendar-reposicao-confirm/agendar-reposicao-confirm.component';
+import { showAgendarReposicaoConfirm } from '../../utils/show-reposicao-confirm-dialog-service';
 
 @Component({
     selector: 'app-calendario',
     standalone: false,
     templateUrl: './calendario.component.html',
     styleUrl: './calendario.component.css',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class CalendarioComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
@@ -98,18 +101,17 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     constructor(
-        private changeDetector: ChangeDetectorRef,
-        private confirmationService: ConfirmationService,
-        private header: Header,
         private service: EventoService,
-        private alunoService: AlunoService,
         private alunoRestricaoService: AlunoRestricaoService,
         private accountService: AccountService,
+        private perfilCognitivoService: PerfilCognitivoService,
+        private confirmationService: ConfirmationService,
         private mobileService: MobileService,
+        private header: Header,
         private toastrService: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
-        private perfilCognitivoService: PerfilCognitivoService,
+        private dialogService: DialogService,
     ) {
 
         let screen = this.mobileService.get().subscribe(res => {
@@ -342,6 +344,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
             let source = this.selectedEvento;
             let aluno = event.item.data as Evento_Participacao_Aluno;
+            console.log('aluno', aluno)
+            console.log('source', source)
+            console.log('target', target)
 
             let erroMessage = '';
 
@@ -350,6 +355,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             }
 
             let perfil = target.perfilCognitivo.map(x => x.id);
+            console.log('perfil target', perfil)
+            console.log('perfil aluno', aluno.perfilCognitivo_Id)
             if (aluno.perfilCognitivo_Id && perfil.includes(aluno.perfilCognitivo_Id) == false) {
                 erroMessage = 'Somente reposições entre alunos de turmas com mesmo perfil cognitivo são permitidas.';
             }
@@ -383,7 +390,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
             if (target.data != source.data) {
 
-
                 let restricoes = await lastValueFrom(this.alunoRestricaoService.getList(aluno.aluno_Id));
                 aluno.restricoes = restricoes;
 
@@ -409,7 +415,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                         rejectLabel: 'Cancelar',
                         rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
                         accept: async () => {
-                            this.agendaReposicaoConfirm(event.event, aluno, source, target);
+                            this.showAgendarReposicaoConfirm(event.event, aluno, source, target);
                             this.cdkCancelDrag('keyup')
                         },
                         reject: () => {
@@ -418,9 +424,8 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                     });
 
                 } else {
-                    this.agendaReposicaoConfirm(event.event, aluno, source, target);
+                    this.showAgendarReposicaoConfirm(event.event, aluno, source, target);
                 }
-
             }
         }
     }
@@ -441,95 +446,17 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         showError(this.confirmationService, header, message, e);
     }
 
-    agendaReposicaoConfirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
-        this.confirmationService.confirm({
-            key: 'agendarReposicao',
-            message: `Agendar reposição do aluno(a) <b>${aluno.aluno}</b> para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}?`,
-            header: 'Agendar reposição',
-            acceptIcon: 'pi pi-check',
-            acceptLabel: 'Agendar',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: true,
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: async () => {
-                this.agendaReposicao(e, aluno, source, target);
-                this.cdkCancelDrag('keyup')
-            },
-            reject: () => {
-                this.cdkCancelDrag('keyup')
+    showAgendarReposicaoConfirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
+        var ref = showAgendarReposicaoConfirm(aluno, source, target, this.dialogService);
+        var onClose = ref.onClose.subscribe(confirmacaoCancelada => {
+            if (confirmacaoCancelada) {
+                this.cdkCancelDrag('keyup');
+            }
+            else {
+                this.service.calendarioReload.emit(1);
             }
         });
-    }
-
-    async agendaReposicao(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
-        this.loading = true;
-
-        let request = new ReposicaoRequest;
-        request.aluno_Id = aluno.aluno_Id;
-        request.source_Aula_Id = source.id;
-        request.dest_Aula_Id = target.id;
-        request.observacao = this.observacaoReposicao;
-        let response: RequestResponse = { success: true, message: '', object: undefined };
-
-        // Se a aula source não existir, cria a aula
-        if (request.source_Aula_Id == PseudoEvento.EventoId) {
-            response = await this.requestAulaTurma(source)
-            request.source_Aula_Id = response.object.id;
-            if (!response.success) {
-                return this.showError('Reposição não agendada', `Ocorreu um erro ao agendar reposição. <br> ${response.message}`, e);
-            }
-        }
-
-        // Se a aula target não existir, cria a aula
-        if (request.dest_Aula_Id == PseudoEvento.EventoId) {
-            response = await this.requestAulaTurma(target)
-            request.dest_Aula_Id = response.object.id;
-            if (!response.success) {
-                return this.showError('Reposição não agendada', `Ocorreu um erro ao agendar reposição. <br> ${response.message}`, e);
-            }
-        }
-
-        await lastValueFrom(this.service.reposicao(request))
-            .then(res => {
-                this.loading = false;
-                // this.selectedAluno = undefined;
-                this.service.calendarioReload.emit(source.id);
-                this.unselectAula();
-                this.toastrService.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
-
-                this.sendMensagemAluno(e, aluno, source, target);
-
-                this.observacaoReposicao = '';
-
-            })
-            .catch(res => {
-                this.loading = false;
-                this.showError('Ocorreu um erro', `Não foi possível agendar reposição. <br> ${getError(res)}`, e)
-            })
-    }
-
-    sendMensagemAluno(e: any, aluno: Evento_Participacao_Aluno, source: any, target: any) {
-        if (aluno.celular) {
-
-            this.confirmationService.confirm({
-                target: e.target,
-                message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação. <br> Celular: ${aluno.celular}`,
-                header: 'Enviar whatsapp',
-                icon: 'pi pi-whatsapp text-green-500 text-4xl',
-                acceptIcon: 'pi pi-whatsapp',
-                acceptLabel: `Enviar mensagem`,
-                rejectLabel: 'Não enviar',
-                acceptButtonStyleClass: 'p-button-rounded p-button-success',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: () => {
-                    let object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.aluno, aluno.celular!, source, target);
-                    window.open(object.link, '_target');
-                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-                },
-            });
-        }
+        this.subscription.push(onClose);
     }
 
     getEventoTipo(e: Evento) {
@@ -561,8 +488,6 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     requestAulaTurma(evento: Evento) {
         return this.calendarioUtils.requestAulaTurma(evento);
     }
-
-
 
 }
 

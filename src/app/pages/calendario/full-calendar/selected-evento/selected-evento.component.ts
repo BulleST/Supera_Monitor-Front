@@ -2,7 +2,7 @@ import { Component, EventEmitter, HostListener, Input, OnChanges, Output, Simple
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { ConfirmationService } from 'primeng/api';
 import { Popover } from 'primeng/popover';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CdkDragEnter, CdkDragExit, CdkDragStart } from '@angular/cdk/drag-drop';
 import { lastValueFrom } from 'rxjs';
 import { Crypto } from '../../../../utils';
@@ -16,10 +16,9 @@ import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAndar, SalaAulaId } from '../../../../models/sala-aula.model';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
-import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
 import { AlunoContatoFaltaComponent } from '../../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../../utils/showAluno';
+import { showAluno } from '../../../../utils/show-aluno-dialog-service';
 
 @Component({
     selector: 'app-selected-evento',
@@ -56,17 +55,12 @@ export class SelectedEventoComponent implements OnChanges {
     constructor(
         private service: EventoService,
         private router: Router,
-        private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
-        private confirmationService: ConfirmationService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
-        private salaAulaPipe: SalaAulaPipe,
         private dialogService: DialogService,
-
     ) {
-
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -151,51 +145,26 @@ export class SelectedEventoComponent implements OnChanges {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
-    goToInscricaoOficina() {
-        if (this.evento && this.evento.vagasDisponiveisEvento > 0) {
-            this.service.setEvento(this.evento);
-            this.router.navigate(['calendario', 'oficina', 'inscrever', this.crypto.encrypt(this.evento.id)])
-        }
-    }
-
-    goToInserirAlunoConfirm(e: any) {
-        if (this.evento) {
-            this.confirmationService.confirm({
-                target: e.target,
-                message: `Tem certeza que deseja inserir mais um aluno nessa ${this.tipoEventoString}?`,
-                header: `Inserir aluno`,
-                acceptIcon: 'pi pi-check',
-                acceptLabel: `Sim`,
-                acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
-                rejectIcon: 'pi pi-times',
-                rejectLabel: 'Não',
-                rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-                accept: async () => {
-                    this.goToInserirAluno();
-                }
-            });
-        }
-    }
-
 
     goToInserirAluno() {
         if (this.evento) {
             this.service.setEvento(this.evento);
 
-            let route: 'aula-zero' | 'superacao' = 'aula-zero'
+            let route: 'aula-zero' | 'superacao' | 'oficina' = 'aula-zero'
             switch (this.evento.evento_Tipo_Id) {
                 case EventoTipo.AulaZero: route = 'aula-zero'; break;
                 case EventoTipo.Superacao: route = 'superacao'; break;
+                case EventoTipo.Oficina: route = 'oficina'; break;
                 default: route = 'aula-zero'; break;
             }
-            this.router.navigate(['calendario', route, 'inserir-aluno', this.crypto.encrypt(this.evento.id)])
+            this.router.navigate(['calendario', 'inscrever', route, this.crypto.encrypt(this.evento.id)])
         }
     }
 
     goToPrimeiraAula() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-            this.router.navigate(['calendario', 'aula', 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', 'agendar', 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
     }
@@ -214,7 +183,7 @@ export class SelectedEventoComponent implements OnChanges {
                 case EventoTipo.Oficina: route = 'oficina'; break;
                 default: route = 'aula'; break;
             }
-            this.router.navigate([route, 'cancelar', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
+            this.router.navigate(['calendario', 'cancelar', route, this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
 
         }
@@ -265,7 +234,7 @@ export class SelectedEventoComponent implements OnChanges {
                 default: route = 'aula'; break;
             }
 
-            this.router.navigate(['calendario', route, this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', 'finalizar', route, this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
         }
     }
@@ -274,18 +243,9 @@ export class SelectedEventoComponent implements OnChanges {
         if (this.evento) {
             this.service.setEventoReposicaoDe(undefined)
             this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate(['reposicao', 'agendar', '', this.crypto.encrypt(this.evento.id)], { relativeTo: this.activatedRoute });
+            this.router.navigate(['calendario', 'agendar','reposicao', '', this.crypto.encrypt(this.evento.id)]);
         }
     }
-
-    // goToContatoFalta(participacao: Evento_Participacao_Aluno) {
-    //     if (this.evento) {
-    //         this.service.setEvento(this.evento);
-    //         let eventoIdEncrypted = this.crypto.encrypt(this.evento.id);
-    //         let alunoIdEncrypted = this.crypto.encrypt(participacao.aluno_Id);
-    //         this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
-    //     }
-    // }
     showContatoFalta(participacao: Evento_Participacao_Aluno) {
         this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
             header: 'Aula',
@@ -319,9 +279,6 @@ export class SelectedEventoComponent implements OnChanges {
             }
         });
     }
-
-
-
 
     @HostListener('mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {

@@ -56,6 +56,13 @@ import { TabVigenciaComponent } from './aluno/aluno-detalhes/tab-vigencia/tab-vi
 import { TabHistoricoComponent } from './aluno/aluno-detalhes/tab-historico/tab-historico.component';
 import { TabDadosCadastraisComponent } from './aluno/aluno-detalhes/tab-dados-cadastrais/tab-dados-cadastrais.component';
 import { AlunoDetalhesLoadingComponent } from './aluno/aluno-detalhes/aluno-detalhes-loading/aluno-detalhes-loading.component';
+import { AgendarFaltaComponent } from './evento/agendar-falta/agendar-falta.component';
+import { EditarAulaComponent } from './evento/editar-aula/editar-aula.component';
+import { EditarEventoComponent } from './evento/editar-evento/editar-evento.component';
+import { EditarAula0Component } from './evento/editar-evento/editar-aula-0/editar-aula-0.component';
+import { EditarOficinaComponent } from './evento/editar-evento/editar-oficina/editar-oficina.component';
+import { EditarReuniaoComponent } from './evento/editar-evento/editar-reuniao/editar-reuniao.component';
+import { EditarSuperacaoComponent } from './evento/editar-evento/editar-superacao/editar-superacao.component';
 
 @NgModule({
     declarations: [
@@ -91,7 +98,15 @@ import { AlunoDetalhesLoadingComponent } from './aluno/aluno-detalhes/aluno-deta
         TabVigenciaComponent,
         TabHistoricoComponent,
         TabDadosCadastraisComponent,
-        AlunoDetalhesLoadingComponent
+        AlunoDetalhesLoadingComponent,
+        AgendarFaltaComponent,
+        
+        EditarAulaComponent,
+        EditarEventoComponent,
+        EditarAula0Component,
+        EditarOficinaComponent,
+        EditarReuniaoComponent,
+        EditarSuperacaoComponent
     ],
     exports: [
         FormsModule,

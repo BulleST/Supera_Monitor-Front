@@ -12,7 +12,7 @@ import { CalendarioUtils, Crypto, MensagemWhatsapp } from '../../utils';
 import { MonitoramentoService } from '../../services/monitoramento.service';
 import { Aluno } from '../../models/alunos.model';
 import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao.component';
-import { showAluno } from '../../utils/showAluno';
+import { showAluno } from '../../utils/show-aluno-dialog-service';
 
 @Component({
 	selector: 'app-monitoramento',

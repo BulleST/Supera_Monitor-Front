@@ -11,7 +11,7 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">
-                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <i class="pi pi-calendar mr-2 text-base w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <span>Agendar reposição</span>
             </span>
         </div>
@@ -30,7 +30,6 @@
                                      class="w-full flex"
                                      [aluno]="aluno"
                                      (onEventoChanged)="eventoReposicaoDeChanged($event)"></app-reposicao-de-select>
-                                     <!-- [eventoReposicaoPara]="eventoReposicaoPara" -->
             <!-- Eventos Para -->
             <app-reposicao-para-select
                                        #reposicaoParaComponent
@@ -38,22 +37,7 @@
                                        [aluno]="aluno"
                                        (onEventoChanged)="eventoReposicaoParaChanged($event)"></app-reposicao-para-select>
                                        <!-- [eventoReposicaoDe]="eventoReposicaoDe" -->
-            <p-fieldset class="col-12 mb-4">
-                <ng-template #header>
-                    <label for="observacao" class="font-bold">Motivo da reposição: <small class="text-red-500">*</small></label>
-                </ng-template>
-                <div class="formgrid grid">
-                    <div class="field col-12">
-                        <textarea pTextarea
-                                  id="observacao"
-                                  name="observacao"
-                                  [(ngModel)]="observacao"
-                                  placeholder="Insira aqui..."
-                                  required
-                                  fluid></textarea>
-                    </div>
-                </div>
-            </p-fieldset>
+         
             <div class="col-12 px-1 flex align-items-center justify-content-end">
                 <p-button type="submit"
                           fluid

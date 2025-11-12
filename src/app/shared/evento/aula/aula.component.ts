@@ -11,13 +11,12 @@ import { InputNumber } from "primeng/inputnumber";
 import { ConfirmationService } from "primeng/api";
 import { CalendarioUtils, MensagemWhatsapp, showError } from "../../../utils";
 import { ApostilaService } from "../../../services/apostila.service";
-import { NameFirstWordPipe } from "../../../utils/name-first-word.pipe";
 import { SelectChangeEvent } from "primeng/select";
 import { Evento_Participacao_Aluno } from "../../../models/evento-participacao-aluno.model";
 import moment from "moment"
 import { Button } from "primeng/button";
 import $ from 'jquery';
-import { showAluno } from "../../../utils/showAluno";
+import { showAluno } from "../../../utils/show-aluno-dialog-service";
 import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
@@ -76,15 +75,11 @@ export class AulaComponent implements OnChanges, OnDestroy {
         let apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
 
-
-        this.onSave.subscribe(res => {
-        })
     }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue
-
             this.setApostilasAlunos()
         }
 
@@ -102,13 +97,6 @@ export class AulaComponent implements OnChanges, OnDestroy {
 
         if (changes['loadingSalaAulas'])
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue
-
-        // if (changes['roteiros']) {
-        //     this.roteiros = changes['roteiros'].currentValue
-        // }
-
-        // if (changes['loadingRoteiros'])
-        //     this.loadingRoteiros = changes['loadingRoteiros'].currentValue
 
         this.onWidthChanged.emit('1200px')
     }
@@ -192,13 +180,13 @@ export class AulaComponent implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
+    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+    }
+
     presente(item: Evento_Participacao_Aluno, status: any /*AlunoParticipacaoStatusComponent*/) {
         item.presente = !item.presente;
         // status.update(this.evento, item)
-    }
-
-    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
     async setApostilasAlunos() {
@@ -254,7 +242,6 @@ export class AulaComponent implements OnChanges, OnDestroy {
             }
         })
     }
-
 
     clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
 

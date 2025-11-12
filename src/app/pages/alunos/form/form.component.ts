@@ -4,7 +4,7 @@ import { Crypto } from '../../../utils';
 import { Subscription } from 'rxjs';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { AlunoDetalhesComponent } from '../../../shared/aluno/aluno-detalhes/aluno-detalhes.component';
-import { showAluno } from '../../../utils/showAluno';
+import { showAluno } from '../../../utils/show-aluno-dialog-service';
 
 
 @Component({

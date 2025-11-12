@@ -7,24 +7,25 @@ import { AlunoService } from '../../../services/alunos.service';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { NgForm } from '@angular/forms';
-import { CalendarioUtils, getError, MensagemWhatsapp, showError } from '../../../utils';
+import { CalendarioUtils, MensagemWhatsapp, showError } from '../../../utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
-import { PseudoEvento, ReposicaoRequest } from '../../../models/reposicao.model';
-import { RequestResponse } from '../../../helpers/request-response.interface';
 import { Roteiro } from '../../../models/roteiro.model';
 import { RoteiroService } from '../../../services/roteiro.service';
 import { SalaAndar } from '../../../models/sala-aula.model';
 import { ReposicaoDeSelectComponent } from './reposicao-de-select/reposicao-de-select.component';
 import { ReposicaoParaSelectComponent } from './reposicao-para-select/reposicao-para-select.component';
 import { ReposicaoAlunoSelectComponent } from './reposicao-aluno-select/reposicao-aluno-select.component';
+import { showAgendarReposicaoConfirm } from '../../../utils/show-reposicao-confirm-dialog-service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 
 @Component({
 	selector: 'app-agendar-reposicao-dialog',
 	standalone: false,
 	templateUrl: './agendar-reposicao-dialog.component.html',
 	styleUrl: './agendar-reposicao-dialog.component.css',
-	providers: [ConfirmationService]
+	providers: [ConfirmationService, DialogService]
 
 })
 export class AgendarReposicaoDialogComponent implements OnDestroy {
@@ -58,6 +59,7 @@ export class AgendarReposicaoDialogComponent implements OnDestroy {
 		private activatedRoute: ActivatedRoute,
 		private confirmationService: ConfirmationService,
 		private calendarioUtils: CalendarioUtils,
+		private dialogService: DialogService,
 	) {
 
 		let roteiros = roteiroService.list.subscribe(res => this.roteiros = res);
@@ -98,15 +100,7 @@ export class AgendarReposicaoDialogComponent implements OnDestroy {
 
 			this.ngOnDestroy();
 
-			let routeBack = '';
-
-			let pathname = window.location.pathname;
-			if (pathname.includes('calendario/reposicao/agendar')) {
-				routeBack += '../../';
-			}
-			else if (pathname.includes('dashboard/reposicao/agendar')) {
-				routeBack += '../../';
-			}
+			let routeBack = '../../';
 
 			let params = this.activatedRoute.snapshot.params;
 			for (const [key, value] of Object.entries(params)) {
@@ -135,6 +129,7 @@ export class AgendarReposicaoDialogComponent implements OnDestroy {
 	}
 
 	alunoChanged(aluno: Aluno) {
+		console.log('alunoChanged', aluno)
 		if (!this.eventoService.getEventoReposicaoDe().value) {
 			this.eventoReposicaoDe = undefined;
 		}
@@ -169,121 +164,21 @@ export class AgendarReposicaoDialogComponent implements OnDestroy {
 	}
 
 	sendConfirmation(form: NgForm, e: any) {
-
-		if (!form.valid) {
-			this.showError('Erro', 'Por favor, preencha todos os campos obrigatórios.', e);
-			this.toastr.error('Por favor, preencha todos os campos obrigatórios.', 'Erro')
-			return;
-		}
-
 		let aluno = this.aluno as Aluno;
 		let source = this.eventoReposicaoDe as Evento;
 		let target = this.eventoReposicaoPara as Evento;
-		let mensagem = `
-            <p class="white-space-nowrap">Aluno(a): <b>${aluno.nome} </b></p>
-            <p class="white-space-nowrap">Do dia: <b class="pl-5 -ml-1">${moment(source.data).format('DD/MM HH[h]mm')}</b> - ${source.turma}.</p>
-            <p class="white-space-nowrap">Para o dia: <b>${moment(target.data).format('DD/MM HH[h]mm')}</b> - ${target.turma}.</p>
-            <p>Continuar agendamento?</p>
-        `;
+		let participacao = source.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
-		this.confirmationService.confirm({
-			target: e.target,
-			message: mensagem,
-			header: 'Agendar reposição',
-			acceptIcon: 'pi pi-check',
-			rejectIcon: 'pi pi-times',
-			acceptLabel: 'Agendar',
-			rejectLabel: 'Cancelar',
-			acceptButtonStyleClass: 'p-button-rounded',
-			rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-			accept: () => {
-				this.send(e, aluno, source, target);
-			},
-			reject: () => {
+		var ref = showAgendarReposicaoConfirm(participacao, source, target, this.dialogService);
+		var onClose = ref.onClose.subscribe(agendamentoCancelado => {
+			if (!agendamentoCancelado) {
+				this.eventoService.calendarioReload.emit(1);
 			}
-		});
+			this.visible = false;
+			this.visibleChange();
+		})
+		this.subscription.push(onClose);
+
 	}
 
-
-	async send(e: any, aluno: Aluno, source: Evento, target: Evento) {
-
-		this.loading = true;
-
-		let request = new ReposicaoRequest;
-		request.aluno_Id = aluno.id;
-		request.source_Aula_Id = source.id;
-		request.dest_Aula_Id = target.id;
-		request.observacao = this.observacao;
-
-		let response: RequestResponse = { success: true, message: '', object: undefined };
-
-
-		// Se a aula source não existir, cria a aula
-		if (request.source_Aula_Id == PseudoEvento.EventoId) {
-			response = await this.requestAulaTurma(source)
-			request.source_Aula_Id = response.object.id;
-			if (!response.success) {
-				return this.showError('Reposição não agendada', `Ocorreu um erro ao agendar reposição. <br> ${response.message}`, e);
-			}
-		}
-
-		// Se a aula target não existir, cria a aula
-		if (request.dest_Aula_Id == PseudoEvento.EventoId) {
-			response = await this.requestAulaTurma(target)
-			request.dest_Aula_Id = response.object.id;
-			if (!response.success) {
-				return this.showError('Reposição não agendada', `Ocorreu um erro ao agendar reposição. <br> ${response.message}`, e);
-			}
-		}
-
-		await lastValueFrom(this.eventoService.reposicao(request))
-			.then(res => {
-				// playSuccess();
-				this.loading = false;
-				if (res.success) {
-					this.eventoService.calendarioReload.emit(res.object.id);
-					this.toastr.success(`Reposição agendada para o dia ${moment(target.data).format('DD/MM/YYYY [às] HH[h]mm')}`)
-					if (aluno.celular) {
-						this.sendMensagemAluno(e, aluno, source, target);
-					} else {
-						this.visible = false;
-						this.visibleChange();
-					}
-				}
-			})
-			.catch(res => {
-				this.loading = false;
-				this.showError('Erro', `Não foi possível agendar reposição. <br> ${getError(res)}`, e)
-			})
-	}
-
-	requestAulaTurma(evento: Evento) {
-		return this.calendarioUtils.requestAulaTurma(evento);
-	}
-
-	sendMensagemAluno(e: any, aluno: Aluno, source: Evento, target: Evento) {
-		this.confirmationService.confirm({
-			target: e.target,
-			message: `Reposição agendada com sucesso. <br> Clique para enviar mensagem de confirmação. <br> Celular: ${aluno.celular}`,
-			header: 'Enviar whatsapp',
-			icon: 'pi pi-whatsapp text-green-500 text-4xl',
-			acceptLabel: `Enviar mensagem`,
-			rejectLabel: 'Não enviar',
-			acceptIcon: 'pi pi-whatsapp',
-			rejectIcon: 'pi pi-times',
-			acceptButtonStyleClass: 'p-button-rounded p-button-success',
-			rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-			accept: () => {
-				this.visible = false
-				this.visibleChange();
-				let url = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, source, target);
-				window.open(url.link, '_blank');
-				this.mensagemWhatsapp.copiarMensagem(url.mensagem);
-			},
-			reject: () => {
-				this.visible = false
-				this.visibleChange();
-			}
-		});
-	}
 }

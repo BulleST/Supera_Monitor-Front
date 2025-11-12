@@ -1,28 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-<!-- <p-confirmdialog key="agendarReposicao">
-    <ng-template #message let-message>
-        <div class="flex align-items-start gap-2 ">
-            <div>
-                <div [innerHTML]="message.message"></div>
-                <div class=" min-w-15rem mt-1"> 
-                    <label for="_observacaoReposicao" class="font-bold mt-1 text-base">Motivo da falta: <span class="text-red-500">*</span> </label>
-                    <textarea pTextarea
-                              class="w-full mt-1"
-                              name="_observacaoReposicao"
-                              id="_observacaoReposicao"
-                              #_observacaoReposicao="ngModel"
-                              [(ngModel)]="observacaoReposicao"
-                              placeholder="Aproveite para contar o motivo dessa reposição"
-                              [rows]="3"
-                              [required]="true"></textarea>
-                    <div *ngIf="_observacaoReposicao.touched && _observacaoReposicao.errors">
-                        <p class="text-red-500 mt-2 mb-0" *ngIf="_observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog> -->
 <section id="home" class="overflow-hidden" #home>
     <div id="alunos"
          cdkDropList
