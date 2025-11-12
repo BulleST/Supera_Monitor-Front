@@ -17,6 +17,8 @@ import { Evento_Participacao_Aluno } from "../../../models/evento-participacao-a
 import moment from "moment"
 import { Button } from "primeng/button";
 import $ from 'jquery';
+import { showAluno } from "../../../utils/showAluno";
+import { DialogService } from "primeng/dynamicdialog";
 
 @Component({
     selector: 'app-aula',
@@ -24,6 +26,7 @@ import $ from 'jquery';
     templateUrl: './aula.component.html',
     styleUrl: './aula.component.css',
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+    providers: [DialogService],
 })
 export class AulaComponent implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
@@ -42,8 +45,6 @@ export class AulaComponent implements OnChanges, OnDestroy {
     loadingApostila = false;
 
     roteiro?: Roteiro;
-    // @Input() roteiros: Roteiro[] = [];
-    // @Input() loadingRoteiros = false;
 
     @Output() onProfessorChanged = new EventEmitter<Professor>();
     @Output() onSalaChanged = new EventEmitter<SalaAula>();
@@ -65,10 +66,9 @@ export class AulaComponent implements OnChanges, OnDestroy {
         public mensagemWhatsapp: MensagemWhatsapp,
         private apostilaService: ApostilaService,
         private mobileService: MobileService,
-        // private alunoService: AlunoService,
-        // private service: EventoService,
         private calendarioUtils: CalendarioUtils,
-        private nameFirstWordPipe: NameFirstWordPipe,
+        private dialogService: DialogService
+        
     ) {
         let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
@@ -452,6 +452,10 @@ export class AulaComponent implements OnChanges, OnDestroy {
         let prev = index - 1;
         let element = this.apostilaAbacoInput.get(prev)
         element?.input.nativeElement.focus();
+    }
+
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
     }
 
 }

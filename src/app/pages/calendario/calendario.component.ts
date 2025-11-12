@@ -181,6 +181,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     async loadFeriados() {
+        this.loading = true;
 
         var requestsFeriado = [];
 
@@ -189,15 +190,25 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         if (!this.loadedAnos.includes(anoDe)) {
             var anoDeReq = lastValueFrom(this.service.getFeriados(anoDe))
+                .catch(res => {
+                    this.loading = false;
+                    return res;
+                })
             requestsFeriado.push(anoDeReq)
             this.loadedAnos.push(anoDe);
         }
         if (!this.loadedAnos.includes(anoAte)) {
             var anoAteReq = lastValueFrom(this.service.getFeriados(anoAte))
+                .catch(res => {
+                    this.loading = false;
+                    return res;
+                })
             requestsFeriado.push(anoAteReq)
             this.loadedAnos.push(anoAte);
         }
-        await Promise.all(requestsFeriado)
+        await Promise.all(requestsFeriado).catch(res => {
+            this.loading = false;
+        })
 
     }
 

@@ -49,9 +49,9 @@ export class SelectedEventoComponent implements OnChanges {
     tipoEventoString = '';
     mouse: any = { x: 0, y: 0 };
 
-        instance: DynamicDialogComponent | undefined;
-        refChild: DynamicDialogRef | undefined;
-    
+    instance: DynamicDialogComponent | undefined;
+    refChild: DynamicDialogRef | undefined;
+
 
     constructor(
         private service: EventoService,
@@ -226,8 +226,8 @@ export class SelectedEventoComponent implements OnChanges {
 
             if (evento.id != PseudoEvento.EventoId) {
                 await lastValueFrom(this.service.get(evento.id))
-                        .then(res => evento = res)
-                        .catch(res => this.toastr.error(res.message, 'Erro'))
+                    .then(res => evento = res)
+                    .catch(res => this.toastr.error(res.message, 'Erro'))
             }
             else if (evento.evento_Tipo_Id == EventoTipo.Aula) {
                 await lastValueFrom(this.service.getPseudoAula(evento.turma_Id!, evento.data))
@@ -286,43 +286,43 @@ export class SelectedEventoComponent implements OnChanges {
     //         this.router.navigate(['contato', eventoIdEncrypted, alunoIdEncrypted], { relativeTo: this.activatedRoute });
     //     }
     // }
-        showContatoFalta(participacao: Evento_Participacao_Aluno) {
-            this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
-                header: 'Aula',
-                showHeader: false,
-                closable: true,
-                maximizable: false,
-                closeOnEscape: true,
-                draggable: true,
-                dismissableMask: true,
-                duplicate: true,
-                modal: true,
-                width: '95vw',
-                style: { maxWidth: '550px' },
-                data: {
-                    celular: participacao.celular,
-                    aluno: participacao.aluno,
-    
-                    evento_Id: this.evento.id,
-                    evento: this.evento.descricao,
-                    data: this.evento.data,
-                    roteiroCorLegenda: this.evento.roteiroCorLegenda,
-                    semana: this.evento.semana,
-                    tema: this.evento.tema,
-    
-                    observacao: participacao.observacao,
-                    contatado: participacao.alunoContactado,
-                    alunoContactado: participacao.alunoContactado ? moment(participacao.alunoContactado).toDate() : undefined,
-                    statusContato_Id: participacao.statusContato_Id,
-                    contatoObservacao: participacao.contatoObservacao,
-                    participacao_Id: participacao.id,
-                }
-            });
-        }
-    
+    showContatoFalta(participacao: Evento_Participacao_Aluno) {
+        this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
+            header: 'Aula',
+            showHeader: false,
+            closable: true,
+            maximizable: false,
+            closeOnEscape: true,
+            draggable: true,
+            dismissableMask: true,
+            duplicate: true,
+            modal: true,
+            width: '95vw',
+            style: { maxWidth: '550px' },
+            data: {
+                celular: participacao.celular,
+                aluno: participacao.aluno,
+
+                evento_Id: this.evento.id,
+                evento: this.evento.descricao,
+                data: this.evento.data,
+                roteiroCorLegenda: this.evento.roteiroCorLegenda,
+                semana: this.evento.semana,
+                tema: this.evento.tema,
+
+                observacao: participacao.observacao,
+                contatado: participacao.alunoContactado,
+                alunoContactado: participacao.alunoContactado ? moment(participacao.alunoContactado).toDate() : undefined,
+                statusContato_Id: participacao.statusContato_Id,
+                contatoObservacao: participacao.contatoObservacao,
+                participacao_Id: participacao.id,
+            }
+        });
+    }
 
 
-    
+
+
     @HostListener('mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {
         const x = event.clientX;
@@ -347,10 +347,7 @@ export class SelectedEventoComponent implements OnChanges {
             || participacao.reposicaoPara_Evento_Id
     }
 
-    showAlunoParticipacao() {
-
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
     }
-        showAluno(participacao: Evento_Participacao_Aluno) {
-            showAluno(participacao.aluno_Id, this.dialogService);
-        }
 }

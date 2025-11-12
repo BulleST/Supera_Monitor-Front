@@ -4,6 +4,9 @@ import { Professor } from '../../../../../models/professor.model'
 import { SalaAula } from '../../../../../models/sala-aula.model'
 import { ControlContainer, NgForm } from '@angular/forms'
 import { AulaComponent } from '../../../../../shared/evento/aula/aula.component'
+import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
+import { showAluno } from '../../../../../utils/showAluno'
+import { DialogService } from 'primeng/dynamicdialog'
 
 @Component({
     selector: 'app-editar-aula',
@@ -11,6 +14,7 @@ import { AulaComponent } from '../../../../../shared/evento/aula/aula.component'
     templateUrl: './editar-aula.component.html',
     styleUrl: './editar-aula.component.css',
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+    providers: [DialogService],
 })
 export class EditarAulaComponent implements OnChanges {
 
@@ -31,7 +35,9 @@ export class EditarAulaComponent implements OnChanges {
 
     @ViewChild('componentForm') componentForm!: AulaComponent;
 
-    constructor() { 
+    constructor(
+        private dialogService: DialogService
+    ) {
 
         this.onSave.subscribe(res => {
             this.componentForm.onSave.emit(res);
@@ -59,6 +65,10 @@ export class EditarAulaComponent implements OnChanges {
             this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue
 
 
+    }
+
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
     }
 
 }

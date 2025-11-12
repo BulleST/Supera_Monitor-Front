@@ -16,13 +16,16 @@ import { ChecklistService } from '../../../../../services/checklist.service';
 import { showError, CalendarioUtils } from '../../../../../utils';
 import { EventoService } from '../../../../../services/evento.service';
 import { AlunoService } from '../../../../../services/alunos.service';
+import { DialogService } from 'primeng/dynamicdialog';
+import { showAluno } from '../../../../../utils/showAluno';
 
 @Component({
     selector: 'app-editar-superacao',
     standalone: false,
     templateUrl: './editar-superacao.component.html',
     styleUrl: './editar-superacao.component.css',
-    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
+    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+    providers: [DialogService],
 })
 export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
@@ -56,6 +59,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         private calendarioUtils: CalendarioUtils,
         private service: EventoService,
         private alunoService: AlunoService,
+        private dialogService: DialogService,
     ) {
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
@@ -148,5 +152,9 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
 
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+    }
+
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
     }
 }

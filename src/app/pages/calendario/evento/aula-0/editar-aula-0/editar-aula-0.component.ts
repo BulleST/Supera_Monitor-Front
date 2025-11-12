@@ -17,6 +17,8 @@ import { Apostila_Kit } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { PerfilCognitivoService } from '../../../../../services/perfil-cognitivo.services';
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
+import { DialogService } from 'primeng/dynamicdialog';
+import { showAluno } from '../../../../../utils/showAluno';
 
 @Component({
     selector: 'app-editar-aula-0',
@@ -24,6 +26,7 @@ import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
     templateUrl: './editar-aula-0.component.html',
     styleUrl: './editar-aula-0.component.css',
     viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+        providers: [DialogService],
 })
 export class EditarAula0Component implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
@@ -63,6 +66,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         private apostilaService: ApostilaService,
         private perfilCognitivoService: PerfilCognitivoService,
         private nameFirstWordPipe: NameFirstWordPipe,
+        private dialogService: DialogService,
         
     ) {
         // Fetch kits data
@@ -298,5 +302,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
-
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
+    }
 }

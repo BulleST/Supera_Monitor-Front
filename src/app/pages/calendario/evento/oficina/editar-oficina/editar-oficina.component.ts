@@ -12,13 +12,16 @@ import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
+import { DialogService } from 'primeng/dynamicdialog';
+import { showAluno } from '../../../../../utils/showAluno';
 
 @Component({
     selector: 'app-editar-oficina',
     standalone: false,
     templateUrl: './editar-oficina.component.html',
     styleUrl: './editar-oficina.component.css',
-    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }]
+    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
+    providers: [DialogService],
 })
 export class EditarOficinaComponent implements OnChanges, OnDestroy {
     subscription: Subscription[] = [];
@@ -43,6 +46,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
+        private dialogService: DialogService,
     ) {
     }
 
@@ -114,9 +118,13 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     presenteClick(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
-    
+
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+    }
+
+    showAluno(participacao: Evento_Participacao_Aluno) {
+        showAluno(participacao.aluno_Id, this.dialogService);
     }
 
 }
