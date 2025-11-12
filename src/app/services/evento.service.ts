@@ -68,7 +68,7 @@ export class EventoService extends Service {
             value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
             localStorage.setItem('evento', JSON.stringify(value));
         }
-        else localStorage.removeItem('evento-reposicao-de');
+        else localStorage.removeItem('evento');
     }
 
     getEventoReposicaoDe() {
@@ -178,7 +178,8 @@ export class EventoService extends Service {
     getFeriados(ano: number = new Date().getFullYear()) {
         let token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
         token = '20487|fbPtn71wk6mjsGDWRdU8mGECDlNZhyM7';
-        return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
+        // return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
+        return this.http.get<Feriado[]>(`${this.url}/eventos/feriado/${ano}`)
             .pipe(tap({
                 next: res => {
                     let list = this.feriados.value;
@@ -190,6 +191,10 @@ export class EventoService extends Service {
                     this.feriados.next(list);
                     return of(list);
                 },
+                error: res => {
+                    this.feriados.next([]);
+                    return of([]);
+                }
             }));
     }
 
