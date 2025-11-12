@@ -143,12 +143,6 @@
                                 <ng-container *ngTemplateOutlet="participacaoItem; context: { participacao: participacaoAluno }"></ng-container>
                             </a>
                             <ng-template #participacaoItem let-participacao="participacao">
-                                <!-- <app-aluno-popover #popoverAluno
-                                                [aluno_Id]="participacao.aluno_Id"
-                                                [showChecklist]="true"
-                                                [evento]="evento"
-                                                [eventoReposicao]="participacao.reposicaoDe_Evento ? undefined : evento"
-                                                [participacao]="participacao.reposicaoDe_Evento ? undefined : participacao"></app-aluno-popover> -->
                                 <div class="w-full p-2 px-3"
                                     [ngClass]="{
                                             'surface-50': i % 2 == 0,
@@ -168,7 +162,8 @@
                                             styleClass="p-0 w-auto h-auto" />
                                         <!-- Nome -->
                                         <span class="hover:underline hover:text-primary-500 hover:font-bold"
-                                            [pTooltip]="participacao.nome">
+                                            [pTooltip]="participacao.nome"
+                                            (click)="showAluno(participacao)">
                                             <!-- 
                                                 (click)="popoverAluno.show($event)" -->
                                             <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>

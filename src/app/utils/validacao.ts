@@ -24,10 +24,9 @@ export function validaAlunoSalaAula(sala_Id: number, aluno_Id: number, salas: Sa
 export function validaAlunos(data: Date, duracaoMinutos: number, alunos: Aluno[], eventos: Evento[], turma_Id?: number, evento_Id?: number) {
     let intervaloDe = moment(data);
     let intervaloAte = moment(data).add(duracaoMinutos - 1, 'minutes');
-
     return alunos.map(aluno => {
         let evento = eventos.find(e => {
-
+            
             let eventoIntervaloDe = moment(e.data);
             let eventoIntervaloAte =  moment(e.data).add(e.duracaoMinutos - 1, 'minute');
             

@@ -66,6 +66,8 @@
                                fluid
                                name="aluno_Id"
                                inputId="aluno_Id"
+                               [virtualScroll]="true"
+                               [virtualScrollItemSize]="40"
                                [required]="true"
                                [filter]="true"
                                filterBy="nome"
@@ -98,11 +100,10 @@
                                     </p>
                                 </div>
                                 <p class="mb-1 flex align-items-center gap-2 ">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
-                                                      [professor]="item.professor"
-                                                      [professor_Id]="item.professor_Id"
-                                                      [turma_Id]="item.turma_Id"></app-legend-color>
-                                    <span class="font-normal">Educador(a) {{item.professor}}</span>
+                                    <app-legend-color class="line-height-1"
+                                                    [corLegenda]="item.corLegenda"
+                                                      [professor]="item.professor"></app-legend-color>
+                                    <span class="font-normal">Turma {{item.turma}}</span>
                                 </p>
                             </div>
                         </div>

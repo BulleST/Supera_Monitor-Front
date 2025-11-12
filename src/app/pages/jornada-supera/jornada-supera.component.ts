@@ -1,14 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
-import { Aluno_Checklist_Item_View, JornadaSuperaRequest } from '../../models/aluno-checklist-item-list.model';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { Aluno } from '../../models/alunos.model';
-import { Checklist } from '../../models/checklist.model';
-import { ChecklistService } from '../../services/checklist.service';
-import { AlunoService } from '../../services/alunos.service';
-import { AccountService } from '../../services/account.service';
-import moment from 'moment';
-import { showError } from '../../utils';
 import { JornadaSupera_Card_Checklist, JornadaSupera_Request } from '../../models/jornada-supera-cards.model';
 import { JornadaSuperaService } from '../../services/jornada-supera.service';
 import { JornadaSupera_List_Aluno } from '../../models/jornada-supera-list.model';

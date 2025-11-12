@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { NgForm } from '@angular/forms';
 import { AccountService } from '../../../services/account.service';
-import moment from 'moment';
+
 @Component({
 	selector: 'app-finalizar-checklist',
 	standalone: false,
@@ -31,14 +31,11 @@ export class FinalizarChecklistComponent implements OnInit {
 		private toastr: ToastrService,
 		private service: ChecklistService,
 		private jornadaSuperaService: JornadaSuperaService,
-		private accountService: AccountService,
 		private mensagemWhatsapp: MensagemWhatsapp,
 	) {
 
 		this.instance = this.dialogService.getInstance(this.ref);
 	}
-
-
 
 	ngOnInit(): void {
 		if (this.instance && this.instance.data) {

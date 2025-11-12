@@ -6,6 +6,8 @@ import { ToastrService } from 'ngx-toastr';
 import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist, JornadaSupera_List_Checklist_Item_Aluno } from '../../../../models/jornada-supera-list.model';
 import { DialogService } from 'primeng/dynamicdialog';
 import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
+import { AlunoChecklistDetalhesComponent, AlunoChecklistDetalhesView } from '../../../../shared/checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
+import { AlunoDetalhesComponent } from '../../../../shared/aluno/aluno-detalhes/aluno-detalhes.component';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
@@ -39,7 +41,6 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['checklist']) {
             this.checklist = changes['checklist'].currentValue;
-            console.log(this.checklist.items)
             this.prazo = this.checklist.items[0].prazo;
         }
         if (changes['aluno']) {
@@ -109,9 +110,52 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
         })
 
         ref.onClose.subscribe(res => item.finalizado = res)
-
     }
 
+    showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno) {
+
+        var view: AlunoChecklistDetalhesView = {
+            alunoChecklistItemId: item.id,
+            
+            checklist: this.checklist.nome,
+            checklistId: this.checklist.id,
+            
+            checklistItem: item.checklist_Item,
+            checklistItemId: item.checklist_Item_Id,
+
+            prazo: item.prazo,
+            dataFinalizacao: item.dataFinalizacao,
+            account: item.account,
+            observacoes: item.observacoes,
+            evento_Id: item.evento_Id,
+
+            aluno_Id: this.aluno.id,
+            aluno: this.aluno.nome,
+            celular: this.aluno.celular,
+            turma: this.aluno.turma,
+            corLegenda: this.aluno.corLegenda,
+            
+        }
+
+        var ref = this.dialogService.open(AlunoChecklistDetalhesComponent, {
+            showHeader: false,
+            closable: true,
+            maximizable: true,
+            closeOnEscape: true,
+            draggable: true,
+            dismissableMask: true,
+            duplicate: true,
+            modal: true,
+            width: '95vw',
+            style: {
+                maxWidth: '500px',
+            },
+            data: {
+                view: view
+            }
+
+        });
+    }
 
 }
 

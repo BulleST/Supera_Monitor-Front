@@ -115,9 +115,10 @@
                                   (onClick)="enviarMensagem(aluno)"
                                   (auxclick)="enviarMensagem(aluno)"
                                   (contextmenu)="enviarMensagem(aluno)" />
-                        <span class="capitalize hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
-                              pTooltip="{{aluno.nome}}"
-                              tooltipPosition="top">{{ aluno.nome | nameAbv }}</span>
+                        <a class="capitalize text-500 hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
+                              pTooltip="Clique para ver: {{aluno.nome}}"
+                              [routerLink]="editar(aluno)"
+                              tooltipPosition="top">{{ aluno.nome | nameAbv }}</a>
                         <i *ngIf="aluno.ehAniversario"
                            pTooltip="{{aluno.nome | firstWord}} faz aniversário dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM'}}"
                            class="bi bi-cake-fill text-pink-500 fadein"></i>

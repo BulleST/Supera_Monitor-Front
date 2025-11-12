@@ -1,5 +1,4 @@
 <app-filtro-popover #filtroPopover (applyFilter)="applyFilter($event)"></app-filtro-popover>
-<!-- <app-aluno-popover #alunoPopover [showChecklist]="true"> </app-aluno-popover> -->
 <p-table #dt
          [value]="alunos"
          stripedRows
@@ -231,7 +230,8 @@
                                   (contextmenu)="enviarMensagem(aluno)"
                                   [disabled]="!aluno.celular" />
                     </span>
-                    <p class="text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize">
+                    <p class="text-primary-500 hover:underline hover:font-bold cursor-pointer capitalize"
+                       (click)="showAluno(aluno)">
                         <span>{{aluno.nome | nameAbv }}</span>
                     </p>
                 </div>
@@ -299,8 +299,7 @@
                                 item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
                                 item.status == Dashboard_Item_Status.Aula ? 'Aula' :
                                 'Aula' 
-                                "
-                                ></span>
+                                "></span>
                             </div>
                             <ng-container *ngIf="item.reposicaoPara">
                                 <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, OnDestroy, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AccountService } from '../../../services/account.service';
 import { ProfessorService } from '../../../services/professor.service';
 import { TurmaService } from '../../../services/turma.service';
@@ -9,7 +9,6 @@ import { Aluno } from '../../../models/alunos.model';
 import { MensagemWhatsapp } from '../../../utils';
 import { Popover } from 'primeng/popover';
 import { AlunoService } from '../../../services/alunos.service';
-import { JornadaSuperaRequest } from '../../../models/aluno-checklist-item-list.model';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { JornadaSupera_Request } from '../../../models/jornada-supera-cards.model';
@@ -22,7 +21,7 @@ import { JornadaSupera_Request } from '../../../models/jornada-supera-cards.mode
 })
 export class FiltroPopoverComponent implements OnDestroy, AfterViewInit {
     subscription: Subscription[] = [];
-    request = new JornadaSuperaRequest;
+    request = new JornadaSupera_Request;
 
     professores: Professor[] = [];
     loadingProfessores = false;

@@ -5,6 +5,7 @@ import { JornadaSuperaStatus } from '../../../../models/jornada-supera-status.mo
 import { DialogService } from 'primeng/dynamicdialog';
 import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { showAluno } from '../../../../utils/showAluno';
 
 @Component({
     selector: 'app-checklist-item-aluno',
@@ -154,5 +155,9 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         //     onFinish.unsubscribe();
         // });
 
+    }
+    
+    showAluno(aluno: JornadaSupera_Card_Checklist_Item_Aluno) {
+        showAluno(aluno.aluno_Id, this.dialogService);
     }
 }

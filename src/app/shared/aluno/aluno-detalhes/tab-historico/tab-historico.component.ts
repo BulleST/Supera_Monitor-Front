@@ -1,19 +1,18 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { Aluno_Historico } from '../../../../models/aluno-historico.model';
 import moment from 'moment';
-import 'moment/locale/pt-br'
-import { Aluno } from '../../../../models/alunos.model';
 import { lastValueFrom } from 'rxjs';
-import { AlunoService } from '../../../../services/alunos.service';
+import { Aluno_Historico } from '../../../../models/aluno-historico.model';
 import { FilterMatchMode } from 'primeng/api';
+import { Aluno } from '../../../../models/alunos.model';
+import { AlunoService } from '../../../../services/alunos.service';
 
 @Component({
-    selector: 'app-historico',
-    standalone: false,
-    templateUrl: './historico.component.html',
-    styleUrl: './historico.component.css'
+  selector: 'app-tab-historico',
+  standalone: false,
+  templateUrl: './tab-historico.component.html',
+  styleUrl: './tab-historico.component.css'
 })
-export class HistoricoComponent implements OnChanges {
+export class TabHistoricoComponent implements OnChanges {
 
     @Input() object: Aluno = new Aluno;
     @Input() aluno_Id!: number;
@@ -81,3 +80,4 @@ export class HistoricoComponent implements OnChanges {
     }
 
 }
+

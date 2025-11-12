@@ -2,9 +2,10 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, of, Subject, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
-import { Aluno_CheckList_Item, Checklist } from '../models/checklist.model';
+import { Checklist } from '../models/checklist.model';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Aluno } from '../models/alunos.model';
+import { Aluno_CheckList_Item } from '../models/aluno-checklist-item.model';
 
 @Injectable({
     providedIn: 'root',
@@ -30,38 +31,20 @@ export class ChecklistService extends Service {
         }));
     }
 
-    getChecklistAula(aula_Id: number) {
-        return this.http.get<{ aluno_Id: number, checklist: Aluno_CheckList_Item[] }[]>(`${this.url}/checklist/all/aula/${aula_Id}`).pipe(tap({
-            next: res => {
-                res.map(aluno => {
-                    aluno.checklist.map(checklist => {
-                        checklist.finalizado = !!checklist.dataFinalizacao;
-                        return checklist;
-                    })
-                    return aluno;
-                })
-                return of(res);
-            },
-            error: err => {
-                this.toastrService.error(`Não foi possível carregar checklist dos alunos. \n ${getError(err)}`);
-            }
-        }));
-    }
-
-    getChecklistAluno(aluno_Id: number) {
-        return this.http.get<Aluno_CheckList_Item[]>(`${this.url}/checklist/all/aluno/${aluno_Id}`).pipe(tap({
-            next: res => {
-                res.map(x => {
-                    x.finalizado = !!x.dataFinalizacao;
-                    return x;
-                });
-                return res;
-            },
-            error: err => {
-                this.toastrService.error(`Não foi possível carregar checklist do aluno. \n ${getError(err)}`);
-            }
-        }));
-    }
+    // getChecklistAluno(aluno_Id: number) {
+    //     return this.http.get<Aluno_CheckList_Item[]>(`${this.url}/checklist/all/aluno/${aluno_Id}`).pipe(tap({
+    //         next: res => {
+    //             res.map(x => {
+    //                 x.dataFinalizacao = x.dataFinalizacao ? moment(x.dataFinalizacao).toDate() : undefined;
+    //                 return x;
+    //             });
+    //             return res;
+    //         },
+    //         error: err => {
+    //             this.toastrService.error(`Não foi possível carregar checklist do aluno. \n ${getError(err)}`);
+    //         }
+    //     }));
+    // }
 
     markAsDone(id: number, observacoes: string = '') {
         var request = {

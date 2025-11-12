@@ -7,7 +7,7 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Crypto, getError, showError } from '../../../../../utils';
+import { getError, showError } from '../../../../../utils';
 import { AlunoService } from '../../../../../services/alunos.service';
 import { EventoService } from '../../../../../services/evento.service';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
@@ -17,10 +17,9 @@ import moment from 'moment';
 import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { RequestResponse } from '../../../../../helpers/request-response.interface';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { ChecklistService } from '../../../../../services/checklist.service';
 import { AccountService } from '../../../../../services/account.service';
-import { validaAlunos, validaAlunoSalaAula } from '../../../../../utils/validacao';
+import { validaAlunos } from '../../../../../utils/validacao';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
@@ -337,7 +336,6 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.loading = false;
         this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
         this.service.calendarioReload.emit(0);
-        this.markChecklistAsDone();
         this.sendMensagemAlunos();
         // playSuccess();
 
@@ -383,29 +381,5 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
-
-    markChecklistAsDone() {
-        // Agendar 1ª Oficina ou 2ª 
-        // checklist_Item_Id 12 ou 23
-
-        // this.selectedAlunos.forEach(async aluno => {
-
-        //     const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-        //     const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 12 || x.checklist_Item_Id == 23) && !x.finalizado) as Aluno_CheckList_Item;
-
-        //     if (alunoChecklist) {
-        //         const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        //         const account = this.accountService.accountValue?.name;
-        //         const dataInscricao = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-
-        //         const mensagem = `Inscrição na oficina do dia ${data}. <br> Inscrição realizada por ${account} no dia ${dataInscricao}`
-
-        //         if (alunoChecklist && !alunoChecklist.finalizado) {
-        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-        //         }
-        //     }
-        // })
-    }
-
 
 }

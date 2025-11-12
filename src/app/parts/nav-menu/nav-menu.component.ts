@@ -8,6 +8,7 @@ import { AccountService } from '../../services/account.service';
 import { Account } from '../../models/account.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { UrlService } from '../../utils/url.service';
+import { ToggleButtonChangeEvent } from 'primeng/togglebutton';
 
 @Component({
     selector: 'app-nav-menu',
@@ -31,6 +32,7 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     @ViewChild('sidebar') sidebar!: Sidebar;
     @ViewChild('cm') cm!: ContextMenu;
 
+    local = false;
     urlSelected: string = '';
     options = [
         {
@@ -80,6 +82,11 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
 
     setMenu() {
         this.header.menuAsideOpen.next(!this.menuOpen);
+    }
+
+    localChange(e: ToggleButtonChangeEvent){
+        var url = this.local ? this.options [0] : this.options[1];
+        this.urlService.setUrl(url.value)
     }
 
     urlChange(e: SelectChangeEvent) {

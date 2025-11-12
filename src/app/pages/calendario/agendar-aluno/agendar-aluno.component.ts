@@ -13,7 +13,6 @@ import moment from 'moment';
 import { SelectChangeEvent } from 'primeng/select';
 import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../models/reposicao.model';
-import { Aluno_CheckList_Item } from '../../../models/checklist.model';
 import { AccountService } from '../../../services/account.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { Turma } from '../../../models/turma.model';
@@ -60,13 +59,9 @@ export class AgendarAlunoComponent {
         private calendarioUtils: CalendarioUtils,
         private mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
-        private accountService: AccountService,
-        private checklistService: ChecklistService,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
         private salaPipe: SalaAulaPipe,
-
-
     ) {
 
         let params = this.activatedRoute.snapshot.params;
@@ -371,46 +366,5 @@ export class AgendarAlunoComponent {
             });
         }
     }
-
-    async markChecklistAsDone() {
-        const aluno = await lastValueFrom(this.alunoService.get(this.selectedAluno!.id));
-
-        if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
-            this.checklistAula0(aluno);
-        } else if (this.evento.evento_Tipo_Id == EventoTipo.Superacao) {
-            this.checklistSuperacao(aluno);
-        }
-    }
-
-    checklistSuperacao(aluno: Aluno) {
-        // const alunoChecklist = aluno.alunoChecklist.find(x => (x.checklist_Item_Id == 22 || x.checklist_Item_Id == 29) && !x.finalizado) as Aluno_CheckList_Item;
-        // const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        // const professor = this.evento.professor;
-        // const account = this.accountService.accountValue?.name;
-        // const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-
-        // if (alunoChecklist && !alunoChecklist.finalizado) {
-        //     const mensagem = `Superação agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro};`
-        //     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-        // }
-    }
-
-    checklistAula0(aluno: Aluno) {
-        // // Agendamento na aula 0
-        // const id = 31;
-        // const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-
-        // if (alunoChecklist && !alunoChecklist.finalizado) {
-        //     const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        //     const professor = this.evento.professor;
-        //     const account = this.accountService.accountValue?.name;
-        //     const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-
-        //     const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`;
-        //     lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-        // }
-    }
-
-
 
 }

@@ -121,13 +121,13 @@ export class Header {
 
             ]
         },
-        {
-            separator: true,
-        },
-        {
-            label: 'Minha conta',
-            expanded: true,
-        },
+        // {
+        //     separator: true,
+        // },
+        // {
+        //     label: 'Minha conta',
+        //     expanded: true,
+        // },
     ]);
 
 

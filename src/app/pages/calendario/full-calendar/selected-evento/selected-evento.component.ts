@@ -19,6 +19,7 @@ import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { SalaAulaPipe } from '../../../../utils/sala-aula.pipe';
 import { AlunoContatoFaltaComponent } from '../../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { showAluno } from '../../../../utils/showAluno';
 
 @Component({
     selector: 'app-selected-evento',
@@ -349,4 +350,7 @@ export class SelectedEventoComponent implements OnChanges {
     showAlunoParticipacao() {
 
     }
+        showAluno(participacao: Evento_Participacao_Aluno) {
+            showAluno(participacao.aluno_Id, this.dialogService);
+        }
 }

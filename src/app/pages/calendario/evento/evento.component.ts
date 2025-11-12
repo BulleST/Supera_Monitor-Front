@@ -364,8 +364,16 @@ export class EventoComponent implements OnDestroy {
 
         return {
             evento_Id: this.evento.id,
+            descricao: this.evento.descricao,
             observacao: this.evento.observacao,
+            duracaoMinutos: this.evento.duracaoMinutos,
+            sala_Id: this.evento.sala_Id,
+            turma_Id: this.evento.turma_Id,
+            roteiro_Id: this.evento.roteiro_Id,
+            capacidadeMaximaAlunos: this.evento.capacidadeMaximaEvento,
             alunos: alunos,
+            perfilCognitivo: this.evento.perfilCognitivo.map(x => x.id),
+            professores: this.evento.professores.map(x => x.professor_Id),
         };
     }
 

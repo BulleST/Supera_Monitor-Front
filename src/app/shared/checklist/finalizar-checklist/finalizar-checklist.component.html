@@ -1,5 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
-<div class="flex align-items-center gap-3 py-4 px-2">
+<header class="flex align-items-center gap-3 py-4 px-2">
     <i class="pi pi-check-square text-5xl text-primary"></i>
     <div class="flex flex-column">
         <p class="p-dialog-title">
@@ -20,7 +20,7 @@
               severity="secondary"
               (onClick)="close(false)"
               size="large" />
-</div>
+</header>
 <form #form="ngForm" (ngSubmit)="sendConfirmation(form, $event)">
     <div class="formgrid grid px-2">
         <div class="field col-12">

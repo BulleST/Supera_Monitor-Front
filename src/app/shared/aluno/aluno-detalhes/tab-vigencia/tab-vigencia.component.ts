@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Aluno } from '../../../../models/alunos.model';
 import { FilterMatchMode } from 'primeng/api';
-import { Aluno_Vigencia } from '../../../../models/aluno-vigencia.model';
 import { AlunoService } from '../../../../services/alunos.service';
+import { Aluno_Vigencia } from '../../../../models/aluno-vigencia.model';
 import { lastValueFrom } from 'rxjs';
 
 @Component({
-	selector: 'app-vigencia',
+	selector: 'app-tab-vigencia',
 	standalone: false,
-	templateUrl: './vigencia.component.html',
-	styleUrl: './vigencia.component.css'
+	templateUrl: './tab-vigencia.component.html',
+	styleUrl: './tab-vigencia.component.css'
 })
-export class VigenciaComponent implements OnChanges {
+export class TabVigenciaComponent implements OnChanges {
 
 	@Input() object: Aluno = new Aluno;
 	@Input() aluno_Id!: number;
@@ -53,3 +53,4 @@ export class VigenciaComponent implements OnChanges {
 		}
 	}
 }
+

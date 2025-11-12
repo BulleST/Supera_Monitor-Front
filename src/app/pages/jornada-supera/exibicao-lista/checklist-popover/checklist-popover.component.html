@@ -30,6 +30,16 @@
 
                     <div class="pl-2 ml-auto">
 
+                        <ng-container *ngIf="item.finalizado">
+                            <p-button 
+                                icon="pi pi-exclamation-circle"
+                                severity="info"
+                                [text]="true"
+                                [rounded]="true"
+                                pTooltip="Clique para ver detalhes"
+                                tooltipPosition="bottom"
+                                (onClick)="showChecklistDetalhes(item)"/>
+                        </ng-container>
                         <ng-container *ngIf="item.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(item.checklist_Item_Id)">
                             <p-button type="button"
                                 icon="pi pi-whatsapp"

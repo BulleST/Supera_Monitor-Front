@@ -49,12 +49,14 @@
             <th pFrozenColumn>
                 <p-columnFilter [type]="'text'"
                                 [field]="'nome'"
+                                [matchMode]="FilterMatchMode.CONTAINS"
                                 placeholder="Filtrar aluno"
                                 class="p-column-filter-inline" />
             </th>
             <th>
                 <p-columnFilter [type]="'text'"
                                 [field]="'turma'"
+                                [matchMode]="FilterMatchMode.CONTAINS"
                                 placeholder="Filtrar turma"
                                 class="p-column-filter-inline" />
             </th>
@@ -72,8 +74,7 @@
                               optionLabel="label"
                               optionValue="value"
                               appendTo="body"
-                              #checklistFilter
-                              (onChange)="filtrarChecklistStatus(checklistFilter.value, checklist.id, dt, 'filterCallback')" />
+                              (onChange)="filtrarChecklistStatus($event.value , checklist.id, dt, 'filterCallback')" />
                 </th>
             </ng-container>
         </tr>
@@ -138,7 +139,8 @@
                                   [text]="true"
                                   size="small" />
                         <span class="capitalize hover:text-primary-500 hover:underline hover:font-medium"
-                              [pTooltip]="aluno.nome"
+                              [pTooltip]="'Clique para ver: ' + aluno.nome"
+                              (click)="showAluno(aluno)"
                               tooltipPosition="top">{{ aluno.nome | nameAbv }}</span>
                     </div>
                 </td>

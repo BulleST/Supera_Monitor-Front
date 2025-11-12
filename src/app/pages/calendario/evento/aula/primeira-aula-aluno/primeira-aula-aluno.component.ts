@@ -11,11 +11,9 @@ import { Aluno } from '../../../../../models/alunos.model';
 import { Roteiro } from '../../../../../models/roteiro.model';
 import { Feriado } from '../../../../../models/feriado.model';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
-import { EventoAulaRequest } from '../../../../../models/evento-aula.model';
 import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
 
-import { showError, validaAlunoSalaAula } from '../../../../../utils';
-import { MyMap } from '../../../../../utils/map';
+import { showError } from '../../../../../utils';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { RequestResponse } from '../../../../../helpers/request-response.interface';
@@ -23,7 +21,6 @@ import { RequestResponse } from '../../../../../helpers/request-response.interfa
 import { AlunoService } from '../../../../../services/alunos.service';
 import { EventoService } from '../../../../../services/evento.service';
 import { ChecklistService } from '../../../../../services/checklist.service';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
 import { AccountService } from '../../../../../services/account.service';
 import { SalaAndar } from '../../../../../models/sala-aula.model';
 import { SalaAulaService } from '../../../../../services/sala-aula.service';
@@ -236,8 +233,6 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
                     this.loading = false;
                     this.service.calendarioReload.emit(request.evento_Id);
                     this.toastrService.success(response.message);
-                    this.markChecklistAsDone();
-
                     if (this.selectedAluno?.celular) {
                         this.sendMensagemAluno(e, this.evento);
                     } else {
@@ -289,24 +284,4 @@ export class PrimeiraAulaAlunoComponent implements OnDestroy, AfterViewInit {
         })
     }
 
-   async markChecklistAsDone() {
-        // let aluno = this.selectedAluno as Aluno
-        // aluno = await lastValueFrom(this.alunoService.get(aluno.id));   
-        // // Agendamento na 1ª aula 
-        // if (aluno) {
-        //     const id = 38;
-        //     const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-        //     const professor = this.evento.professor;
-        //     const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        //     const dataAgendamento = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
-        //     const account = this.accountService.accountValue?.name;
-
-        //     if (alunoChecklist && !alunoChecklist.finalizado) {
-        //         const mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account} no dia ${dataAgendamento}`;
-        //         if (alunoChecklist && !alunoChecklist.finalizado) {
-        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-        //         }
-        //     }
-        // }
-    }
 }

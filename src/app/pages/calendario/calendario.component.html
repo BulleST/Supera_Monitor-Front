@@ -1,11 +1,10 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="agendarReposicao">
+<!-- <p-confirmdialog key="agendarReposicao">
     <ng-template #message let-message>
         <div class="flex align-items-start gap-2 ">
-            <!-- <span class="mt-1"> @if (message.icon) { <i [ngClass]="message.icon" class="text-4xl "></i> } @else { <i class="pi pi-exclamation-triangle text-5xl text-primary-500"></i> } </span> -->
             <div>
                 <div [innerHTML]="message.message"></div>
-                <div class=" min-w-15rem mt-1"> <!-- Observações -->
+                <div class=" min-w-15rem mt-1"> 
                     <label for="_observacaoReposicao" class="font-bold mt-1 text-base">Motivo da falta: <span class="text-red-500">*</span> </label>
                     <textarea pTextarea
                               class="w-full mt-1"
@@ -23,8 +22,8 @@
             </div>
         </div>
     </ng-template>
-</p-confirmdialog>
-<section id="home" #home>
+</p-confirmdialog> -->
+<section id="home" class="overflow-hidden" #home>
     <div id="alunos"
          cdkDropList
          [cdkDropListData]="selectedEvento ? selectedEvento.alunos : undefined"

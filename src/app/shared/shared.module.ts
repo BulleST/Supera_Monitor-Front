@@ -49,6 +49,13 @@ import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
 import { ReposicaoAlunoSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-aluno-select/reposicao-aluno-select.component';
+import { AlunoChecklistDetalhesComponent } from './checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
+import { AlunoDetalhesComponent } from './aluno/aluno-detalhes/aluno-detalhes.component';
+import { AgendarReposicaoConfirmComponent } from './evento/agendar-reposicao-confirm/agendar-reposicao-confirm.component';
+import { TabVigenciaComponent } from './aluno/aluno-detalhes/tab-vigencia/tab-vigencia.component';
+import { TabHistoricoComponent } from './aluno/aluno-detalhes/tab-historico/tab-historico.component';
+import { TabDadosCadastraisComponent } from './aluno/aluno-detalhes/tab-dados-cadastrais/tab-dados-cadastrais.component';
+import { AlunoDetalhesLoadingComponent } from './aluno/aluno-detalhes/aluno-detalhes-loading/aluno-detalhes-loading.component';
 
 @NgModule({
     declarations: [
@@ -77,7 +84,14 @@ import { ReposicaoAlunoSelectComponent } from './evento/agendar-reposicao-dialog
         ChecklistStatusComponent,
         AlunoChecklistStatusComponent,
         AgendarReposicaoDialogComponent,
-        ReposicaoAlunoSelectComponent
+        ReposicaoAlunoSelectComponent,
+        AlunoChecklistDetalhesComponent,
+        AlunoDetalhesComponent,
+        AgendarReposicaoConfirmComponent,
+        TabVigenciaComponent,
+        TabHistoricoComponent,
+        TabDadosCadastraisComponent,
+        AlunoDetalhesLoadingComponent
     ],
     exports: [
         FormsModule,

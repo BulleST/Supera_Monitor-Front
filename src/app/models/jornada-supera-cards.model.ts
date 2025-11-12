@@ -32,10 +32,13 @@ export interface JornadaSupera_Card_Checklist_Item_Aluno {
     celular?: string;
     status: JornadaSuperaStatus;
     finalizado: boolean;
+    evento_Id?: number;
+    
 }
 
 export class JornadaSupera_Request {
     aluno_Id?: number;
     turma_Id?: number;
     professor_Id?: number;
+    pendenteSemana: boolean = false;
 }

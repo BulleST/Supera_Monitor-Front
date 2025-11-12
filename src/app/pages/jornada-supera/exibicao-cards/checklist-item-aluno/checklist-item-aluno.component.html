@@ -14,7 +14,8 @@
                       [text]="true"
                       size="small"
                       styleClass="-ml-2 fadein" />
-            <p class="hover:text-primary hover:underline cursor-pointer capitalize fadein">
+            <p class="hover:text-primary hover:underline cursor-pointer capitalize fadein"
+            (click)="showAluno(alunoChecklistItem)">
                 {{ alunoChecklistItem.aluno | nameAbv }}
             </p>
             <p (click)="finalizarChecklist()"

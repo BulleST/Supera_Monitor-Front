@@ -12,6 +12,7 @@ import { CalendarioUtils, Crypto, MensagemWhatsapp } from '../../utils';
 import { MonitoramentoService } from '../../services/monitoramento.service';
 import { Aluno } from '../../models/alunos.model';
 import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao.component';
+import { showAluno } from '../../utils/showAluno';
 
 @Component({
 	selector: 'app-monitoramento',
@@ -252,6 +253,10 @@ export class MonitoramentoComponent implements OnDestroy {
 
 		// table.filteredValue = alunosFiltered;
 	}
+		
+		showAluno(aluno: Monitoramento_Aluno) {
+			showAluno(aluno.id, this.dialogService);
+		}
 
 
 }

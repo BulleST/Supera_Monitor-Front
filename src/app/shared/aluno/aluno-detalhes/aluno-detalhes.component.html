@@ -1,0 +1,98 @@
+<app-confirm-dialog></app-confirm-dialog>
+<header class="p-dialog-header">
+    <span class="p-dialog-title w-full">
+        <i class="fa fa-user-graduate mr-2 text-sm w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <span>Dados do Aluno</span>
+    </span>
+    <div class="p-dialog-header-actions">
+        <p-button
+                  type="button"
+                  icon="pi pi-exclamation-circle text-blue-500"
+                  text
+                  rounded
+                  severity="secondary"
+                  (onClick)="op.toggle($event); " />
+                  
+        <p-button
+                  [icon]="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+                  (onClick)="maximize()"
+                  styleClass="p-dialog-maximize-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+
+        <p-button icon="pi pi-times"
+                  (onClick)="close()"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+    <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white  min-w-w-20rem">
+        <div class="px-2" *ngIf="object">
+            <h3 class="text-xl mb-2">Informações Adicionais</h3>
+            <table class="w-full">
+                <tr>
+                    <td class="p-1"><b>Cadastrado por</b></td>
+                    <td class="p-1 pl-3 text-right">{{ object.aspNetUsers_Created }}</td>
+                </tr>
+                <tr *ngIf="object.lastUpdated">
+                    <td class="p-1"><b>Última atualização</b></td>
+                    <td class="p-1 pl-3 text-right">{{object.lastUpdated | date : 'dd/MM/YYYY'}}</td>
+                </tr>
+                <tr *ngIf="object.deactivated">
+                    <td class="p-1"><b>Inativo em</b></td>
+                    <td class="p-1 pl-3 text-right">{{object.deactivated | date : 'dd/MM/YYYY'}}</td>
+                </tr>
+            </table>
+        </div>
+    </p-popover>
+</header>
+<form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm" class="px-2">
+    <ng-container *ngIf="loading">
+        <app-aluno-detalhes-loading></app-aluno-detalhes-loading>
+    </ng-container>
+    <ng-container *ngIf="!loading && object">
+        <div class="card">
+            <p-tabs [(value)]="tabIndex">
+                <p-tablist>
+                    <p-tab [value]="0">Dados Cadastrais</p-tab>
+                    <p-tab [value]="1">Transferência de Turma</p-tab>
+                    <p-tab [value]="2">Histórico</p-tab>
+                </p-tablist>
+                <p-tabpanels class="border-1 border-100 border-round-2 surface-50">
+                    <p-tabpanel [value]="0">
+                        <app-tab-dados-cadastrais [object]="object" [aluno_Id]="aluno_Id"></app-tab-dados-cadastrais>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="1">
+                        <app-tab-vigencia #vigencia [object]="object" [aluno_Id]="aluno_Id"></app-tab-vigencia>
+                    </p-tabpanel>
+                    <p-tabpanel [value]="2">
+                        <app-tab-historico #historico [object]="object" [aluno_Id]="aluno_Id"></app-tab-historico>
+                    </p-tabpanel>
+                </p-tabpanels>
+            </p-tabs>
+        </div>
+        <div *ngIf="object.active"
+             class="formgrid grid pr-3 py-2 gap-4 align-items-center flex-wrap justify-content-between">
+            <div class="sm:col-9 col-12">
+                <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
+                <p class="text-red-500" *ngIf="error">{{error}}</p>
+            </div>
+            <div class="ml-auto">
+                <p-button
+                          type="submit"
+                          [disabled]="form.invalid || loading"
+                          class="w-full"
+                          styleClass="w-full px-3"
+                          label="Salvar"
+                          icon="pi pi-check"
+                          iconPos="right"
+                          [loading]="loading"
+                          [rounded]="true" />
+            </div>
+        </div>
+    </ng-container>
+</form>

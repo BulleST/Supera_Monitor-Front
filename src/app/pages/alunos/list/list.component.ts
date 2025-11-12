@@ -26,8 +26,9 @@ import { SalaAndar } from '../../../models/sala-aula.model';
     selector: 'app-list',
     templateUrl: './list.component.html',
     styleUrl: './list.component.css',
-    providers: [ConfirmationService],
-    standalone: false
+    standalone: false,
+        providers: [ConfirmationService]
+    
 })
 export class ListComponent implements OnDestroy {
     list: Aluno[] = [];
@@ -199,6 +200,13 @@ export class ListComponent implements OnDestroy {
     clear(dt: Table) {
         this.tableSearch = '';
         dt.clear();
+    }
+
+    editar(aluno: Aluno) {
+        var idEncrypted = this.crypto.encrypt(aluno.id)
+        return  ['./', 'editar', idEncrypted]
+
+
     }
 
     @HostListener('keydown.escape', ['$event'])

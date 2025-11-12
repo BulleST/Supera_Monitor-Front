@@ -1,40 +1,41 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
-import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
-import { Turma } from '../../../../models/turma.model';
-import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
-import { lastValueFrom, Subscription } from 'rxjs';
-import { TurmaService } from '../../../../services/turma.service';
-import { AlunoService } from '../../../../services/alunos.service';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
-import { Aluno_Restricao, Aluno_Restricao_Request } from '../../../../models/aluno-restricao.model';
-import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
-import { Aluno_CheckList_Item, Checklist } from '../../../../models/checklist.model';
-import { ChecklistService } from '../../../../services/checklist.service';
 import { ConfirmationService } from 'primeng/api';
+import { Aluno, Pessoa_Sexo } from '../../../../models/alunos.model';
+import { lastValueFrom, Subscription } from 'rxjs';
+import { Turma } from '../../../../models/turma.model';
+import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
+import { Checklist } from '../../../../models/checklist.model';
+import { Apostila_Kit } from '../../../../models/apostila.model';
+import { SalaAndar } from '../../../../models/sala-aula.model';
+import { AlunoService } from '../../../../services/alunos.service';
+import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
+import { TurmaService } from '../../../../services/turma.service';
+import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
+import { ChecklistService } from '../../../../services/checklist.service';
 import { ToastrService } from 'ngx-toastr';
 import { UserService } from '../../../../services/user.service';
-import { PerfilCognitivo } from '../../../../models/perfil-cognitivo.model';
-import { AlunoRestricaoService } from '../../../../services/aluno-restricao.service';
 import { ApostilaService } from '../../../../services/apostila.service';
-import { Apostila_Kit } from '../../../../models/apostila.model';
-import { SelectChangeEvent } from 'primeng/select';
 import { getError, MensagemWhatsapp, showError } from '../../../../utils';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Popover } from 'primeng/popover';
+import { FileSelectEvent, FileUpload } from 'primeng/fileupload';
+import { SelectChangeEvent } from 'primeng/select';
 import { CheckboxChangeEvent } from 'primeng/checkbox';
-import { SalaAndar } from '../../../../models/sala-aula.model';
+import { Aluno_Restricao, Aluno_Restricao_Request } from '../../../../models/aluno-restricao.model';
+import { Popover } from 'primeng/popover';
+import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
 
 @Component({
-    selector: 'app-dados-cadastrais',
-    standalone: false,
-    templateUrl: './dados-cadastrais.component.html',
-    styleUrl: './dados-cadastrais.component.css',
-    providers: [ConfirmationService],
-    viewProviders: [{ provide: ControlContainer, useExisting: NgForm }] // Permite validação de form pai em input de componente filho
+  selector: 'app-tab-dados-cadastrais',
+  standalone: false,
+  templateUrl: './tab-dados-cadastrais.component.html',
+  styleUrl: './tab-dados-cadastrais.component.css',
+      providers: [ConfirmationService],
+      viewProviders: [{ provide: ControlContainer, useExisting: NgForm }] // Permite validação de form pai em input de componente filho
 })
-export class DadosCadastraisComponent implements OnChanges, OnDestroy {
+export class TabDadosCadastraisComponent implements OnChanges, OnDestroy {
     @Input() object!: Aluno;
     @Input() aluno_Id!: number;
+
     subscription: Subscription[] = [];
 
     file?: File;
@@ -147,10 +148,7 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             if (this.object.id) {
                 this.loadTurmasDisponiveis();
                 this.formataRestricoes();
-                this.generateRM();
-
                 this.selectedKit = this.kits.find(x => x.id == this.object.apostila_Kit_Id);
-
             }
 
         }
@@ -243,29 +241,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         this.loadingFile = false;
     }
 
-
-    // checklistMark(alunoChecklistItem: Aluno_CheckList_Item, model: NgModel) {
-    //     this.alunoChecklistOnConfirmDialog.alunoChecklistItem = alunoChecklistItem;
-    //     this.alunoChecklistOnConfirmDialog.show();
-
-    //     let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
-    //         model.control.setValue(false);
-    //         model.control.updateValueAndValidity();
-    //         this.alunoChecklistOnConfirmDialog.hide();
-    //         onCancel.unsubscribe();
-    //         onFinish.unsubscribe();
-    //     });
-
-    //     let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-    //         alunoChecklistItem.observacoes = res.observacoes;
-    //         alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
-    //         alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
-    //         alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
-    //         onCancel.unsubscribe();
-    //         onFinish.unsubscribe();
-    //     });
-    // }
-
     kitChanged(model: NgModel, e: SelectChangeEvent) {
         if (this.selectedKit) {
             this.object.apostila_Kit_Id = this.selectedKit.id;
@@ -279,14 +254,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
             this.object.apostila_Abaco_Id = abaco?.id;
             this.object.apostila_Abaco = abaco?.nome;
             this.object.numeroPaginaAbaco = 0;
-        } else {
-            // delete this.object.apostila_Kit_Id;
-            // delete this.object.apostila_AH_Id;
-            // delete this.object.apostila_AH;
-            // delete this.object.numeroPaginaAH;
-            // delete this.object.apostila_Abaco_Id;
-            // delete this.object.apostila_Abaco;
-            // delete this.object.numeroPaginaAbaco;
         }
     }
 
@@ -447,15 +414,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
         showError(this.confirmationService, header, message, e);
     }
 
-    generateRM() {
-        if (!this.object.rm) {
-            const min = 100000;
-            const max = 999999;
-            const rm = Math.floor(Math.random() * (max - min + 1)) + min
-            this.object.rm = rm.toString();
-        }
-    }
-
     formataRestricoes() {
         if (!this.object || !this.object.restricoes || this.object.restricoes.length == 0) {
             this.restricoesText = ''
@@ -571,10 +529,6 @@ export class DadosCadastraisComponent implements OnChanges, OnDestroy {
                 model.control.setValue(item.active);
             }
         });
-    }
-
-    enviarMensagemCondicao(checklistItem: Aluno_CheckList_Item) {
-        this.mensagemWhatsapp.enviarMensagemCondicao(this.object, checklistItem.checklist_Item_Id)
     }
 
 }

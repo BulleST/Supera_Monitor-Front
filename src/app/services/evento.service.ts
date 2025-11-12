@@ -132,23 +132,24 @@ export class EventoService extends Service {
         return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
             .pipe(tap({
                 next: async (eventos) => {
-                    let list = this.eventos.value as Evento[];
+                    // let list = this.eventos.value as Evento[];
+
                     eventos = eventos.map(evento => {
                         evento = this.mapEvento(evento);
 
-                        let index = list.findIndex(x => x.id == evento.id
-                            && x.turma_Id == evento.turma_Id
-                            && moment(x.data).isSame(evento.data));
+                        // let index = list.findIndex(x => x.id == evento.id
+                        //     && x.turma_Id == evento.turma_Id
+                        //     && moment(x.data).isSame(evento.data));
 
-                        if (index == -1) list.push(evento);
-                        else list.splice(index, 1, evento);
+                        // if (index == -1) list.push(evento);
+                        // else list.splice(index, 1, evento);
 
                         return evento;
                     });
 
-                    this.eventos.next(list);
+                    this.eventos.next(eventos);
 
-                    return of(list);
+                    return of(eventos);
                 },
                 error: (err) => {
                     this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);

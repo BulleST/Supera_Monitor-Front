@@ -22,7 +22,6 @@ import { ProfessorService } from '../../../../services/professor.service'
 import { RequestResponse } from '../../../../helpers/request-response.interface'
 import { ToastrService } from 'ngx-toastr'
 import { AlunoService } from '../../../../services/alunos.service'
-import { Aluno_CheckList_Item } from '../../../../models/checklist.model'
 import { ChecklistService } from '../../../../services/checklist.service'
 import { AccountService } from '../../../../services/account.service'
 import { SalaAndar } from '../../../../models/sala-aula.model'
@@ -357,8 +356,6 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
                 if (response.success) {
                     this.service.calendarioReload.emit(request.evento_Id);
                     this.toastrService.success(response.message);
-                    this.markChecklistAsDone();
-
                     if (this.aluno?.celular) {
                         this.sendMensagemAluno(e, this.selectedEvento as Evento);
                     } else {
@@ -405,26 +402,5 @@ export class CalendarioAlunoOptionsComponent implements OnChanges, OnDestroy {
         })
     }
 
-    async markChecklistAsDone() {
-        // const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id));
-
-
-        // // Agendamento na 1ª aula 
-        // if (aluno) {
-        //     const id = 38;
-        //     const alunoChecklist = aluno.alunoChecklist.find((x) => x.checklist_Item_Id == id) as Aluno_CheckList_Item;
-        //     const data = moment(this.selectedEvento!.data).format('DD/MM/YY [às] HH[h]mm');
-        //     const professor = this.selectedEvento!.professor;
-        //     const account = this.accountService.accountValue?.name;
-        //     const dataFinalizado = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm');
-
-        //     if (alunoChecklist && !alunoChecklist.finalizado) {
-        //         let mensagem = `Aula 0 agendada para o dia ${data} com o educador(a) ${professor}.<br> Agendamento realizado por ${account} no dia ${dataFinalizado}`;
-        //         if (alunoChecklist && !alunoChecklist.finalizado) {
-        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem));
-        //         }
-        //     }
-        // }
-    }
 
 }

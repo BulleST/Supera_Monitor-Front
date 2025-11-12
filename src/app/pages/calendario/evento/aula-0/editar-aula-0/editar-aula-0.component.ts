@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Evento } from '../../../../../models/evento.model';
-import { lastValueFrom, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Professor } from '../../../../../models/professor.model';
 import { SalaAndar, SalaAula } from '../../../../../models/sala-aula.model';
 import { ConfirmationService } from 'primeng/api';
@@ -9,9 +9,6 @@ import { SelectChangeEvent } from 'primeng/select';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
-import { AccountService } from '../../../../../services/account.service';
-import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
 import { Turma } from '../../../../../models/turma.model';
@@ -19,9 +16,6 @@ import { PerfilCognitivo } from '../../../../../models/perfil-cognitivo.model';
 import { Apostila_Kit } from '../../../../../models/apostila.model';
 import { ApostilaService } from '../../../../../services/apostila.service';
 import { PerfilCognitivoService } from '../../../../../services/perfil-cognitivo.services';
-import { EventoService } from '../../../../../services/evento.service';
-import { ParticipacaoAulaZeroModel } from '../../../../../models/evento-aula-0.model';
-import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe';
 
 @Component({
@@ -65,8 +59,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
-        private accountService: AccountService,
-        private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
         private apostilaService: ApostilaService,
         private perfilCognitivoService: PerfilCognitivoService,
@@ -86,8 +78,6 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         });
         this.subscription.push(perfis);
 
-        let onSave = this.onSave.subscribe((res) => this.markChecklistAsDone());
-        this.subscription.push(onSave)
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -308,35 +298,5 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
-    markChecklistAsDone() {
-        // Comparecimento na aula 0
-        // this.evento.alunos
-        //     .filter((aluno) => aluno.presente === true && aluno.active === true)
-        //     .forEach(async (aluno) => {
-        //         const checklistItemId = 33; // ID for "Comparecimento na aula 0"
-        //         try {
-        //             const checklist = await lastValueFrom(this.checklistService.getChecklistAluno(aluno.aluno_Id));
-        //             const alunoChecklistItem = checklist.find(item => item.checklist_Item_Id === checklistItemId) as Aluno_CheckList_Item;
-        //             aluno.alunoChecklist = checklist;
-
-        //             if (alunoChecklistItem && !alunoChecklistItem.finalizado) {
-        //                 const professor = this.professores.find(prof => prof.id === this.evento.professor_Id)?.nome;
-        //                 const accountName = this.accountService.accountValue?.name;
-        //                 const eventDate = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-        //                 const completionDate = moment().format('DD/MM/YY [aproximadamente às] HH[h]mm');
-
-        //                 const mensagem = `Aluno compareceu na aula 0 do dia ${eventDate} com o educador ${professor}.<br> Aula 0 finalizada por ${accountName} no dia ${completionDate}.`;
-
-        //                 await lastValueFrom(this.checklistService.markAsDone(alunoChecklistItem.id, mensagem));
-        //             }
-        //         } catch (error) {
-        //             this.showError(
-        //                 'Erro ao buscar ou atualizar checklist do aluno',
-        //                 'Não foi possível buscar ou atualizar o checklist do aluno.',
-        //                 error
-        //             );
-        //         }
-        //     });
-    }
 
 }

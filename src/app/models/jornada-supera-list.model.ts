@@ -33,4 +33,5 @@ export interface JornadaSupera_List_Checklist_Item_Aluno {
     
     observacoes?: string;
     status: JornadaSuperaStatus;
+    evento_Id?: number;
 }

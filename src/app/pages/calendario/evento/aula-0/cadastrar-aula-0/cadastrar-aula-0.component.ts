@@ -28,13 +28,11 @@ import { DatePickerYearChangeEvent } from 'primeng/datepicker'
 import { MultiSelectChangeEvent } from 'primeng/multiselect'
 import $ from 'jquery'
 import { CalendarioUtils } from '../../../../../utils/calendario-utils'
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model'
 import { MyMap } from '../../../../../utils/map'
 import { NameFirstWordPipe } from '../../../../../utils/name-first-word.pipe'
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model'
 import { RoteiroService } from '../../../../../services/roteiro.service'
 import { Roteiro } from '../../../../../models/roteiro.model'
-import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe'
 
 @Component({
     selector: 'app-cadastrar-aula-0',
@@ -649,7 +647,6 @@ export class CadastrarAula0Component implements OnDestroy {
                 this.loading = false
                 this.object = res.object
                 this.service.calendarioReload.emit(res.object.id)
-                this.markChecklistAsDone()
                 this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado')
 
                 if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
@@ -727,29 +724,6 @@ export class CadastrarAula0Component implements OnDestroy {
         if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1)
     }
 
-    markChecklistAsDone() {
-        // Agendamento na aula 0
-        // if (this.selectedAlunos) {
-        //     const id = 31
-        //     this.selectedAlunos.forEach(async alunoItem => {
-
-        //         const aluno = await lastValueFrom(this.alunoService.get(alunoItem.id));
-
-        //         const alunoChecklist = aluno.alunoChecklist.find(x => x.checklist_Item_Id == id) as Aluno_CheckList_Item
-        //         const professor = this.professores.find(x => x.id == this.object.professor_Id)?.nome;
-        //         const data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')
-        //         const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] HH[h]mm')
-        //         const account = this.accountService.accountValue?.name
-
-        //         if (alunoChecklist && !alunoChecklist.finalizado) {
-        //             const mensagem = `Aula 0 agendada para o dia ${data} com o educador ${professor}.<br> Agendamento realizado por ${account} no dia ${dataCadastro}`
-        //             if (alunoChecklist && !alunoChecklist.finalizado) {
-        //                 lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-        //             }
-        //         }
-        //     })
-        // }
-    }
 
 
 }

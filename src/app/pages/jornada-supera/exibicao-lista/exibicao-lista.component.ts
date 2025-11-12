@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, OnChanges, SimpleChanges } from '@angular/core';
 import { Checklist } from '../../../models/checklist.model';
 import { Aluno } from '../../../models/alunos.model';
 import { CalendarioUtils, MensagemWhatsapp } from '../../../utils';
@@ -9,13 +9,16 @@ import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { ChecklistService } from '../../../services/checklist.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
-import { SortEvent } from 'primeng/api';
+import { FilterMatchMode, SortEvent } from 'primeng/api';
+import { DialogService } from 'primeng/dynamicdialog';
+import { showAluno } from '../../../utils/showAluno';
 
 @Component({
     selector: 'app-exibicao-lista',
     standalone: false,
     templateUrl: './exibicao-lista.component.html',
-    styleUrl: './exibicao-lista.component.css'
+    styleUrl: './exibicao-lista.component.css',
+    providers: [DialogService]
 })
 export class ExibicaoListaComponent implements OnChanges {
     checklists!: Checklist[];
@@ -27,16 +30,39 @@ export class ExibicaoListaComponent implements OnChanges {
     subscription: Subscription[] = [];
     exibicao: boolean = true;
 
-
     JornadaSuperaStatus = JornadaSuperaStatus
-
+    FilterMatchMode = FilterMatchMode;
     status = [
-        { label: 'Todos', value: null },
-        { label: 'FinalizadoComAtraso', value: JornadaSuperaStatus.FinalizadoComAtraso },
-        { label: 'Finalizado', value: JornadaSuperaStatus.Finalizado },
-        { label: 'Atrasado', value: JornadaSuperaStatus.Atrasado },
-        { label: 'EmAndamento', value: JornadaSuperaStatus.EmAndamento },
-        { label: 'ARealizar', value: JornadaSuperaStatus.ARealizar },
+        {
+            label: 'Todos',
+            value: null,
+            styleClass: 'text-600'
+        },
+        {
+            label: 'Finalizados Com Atraso',
+            value: JornadaSuperaStatus.FinalizadoComAtraso,
+            styleClass: 'text-yellow-500'
+        },
+        {
+            label: 'Finalizados',
+            value: JornadaSuperaStatus.Finalizado,
+            styleClass: 'text-green-500'
+        },
+        {
+            label: 'Atrasados',
+            value: JornadaSuperaStatus.Atrasado,
+            styleClass: 'text-red-500'
+        },
+        {
+            label: 'Em Andamento',
+            value: JornadaSuperaStatus.EmAndamento,
+            styleClass: 'text-orange-500'
+        },
+        {
+            label: 'À Realizar',
+            value: JornadaSuperaStatus.ARealizar,
+            styleClass: 'text-blue-500'
+        },
     ]
 
     constructor(
@@ -45,6 +71,8 @@ export class ExibicaoListaComponent implements OnChanges {
         private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private dialogService: DialogService,
+
     ) {
         let loading = this.service.loadingList.subscribe(res => this.loading = res);
         this.subscription.push(loading);
@@ -98,12 +126,14 @@ export class ExibicaoListaComponent implements OnChanges {
     filtrarChecklistStatus(status: JornadaSuperaStatus | null, checklist_Id: number, table: Table, filterCallback: any) {
         let alunosFiltered = this.list.filter(aluno => {
             let checklist = aluno.checklists.find(x => x.id == checklist_Id) as JornadaSupera_List_Checklist;
+
             if (!status) {
                 return true
             }
             if (checklist.status === status) {
                 return true;
             }
+
             return false;
         });
 
@@ -139,4 +169,9 @@ export class ExibicaoListaComponent implements OnChanges {
             return a;
         });
     }
+
+    showAluno(aluno: JornadaSupera_List_Aluno) {
+        showAluno(aluno.id, this.dialogService);
+    }
+
 }

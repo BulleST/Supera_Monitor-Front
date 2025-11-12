@@ -1,6 +1,5 @@
 import { Aluno_Restricao } from "./aluno-restricao.model";
 import { Apostila } from "./apostila.model";
-import { Aluno_CheckList_Item } from "./checklist.model";
 import { Evento } from "./evento.model";
 import { PseudoEvento } from "./reposicao.model";
 

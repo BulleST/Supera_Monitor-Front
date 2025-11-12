@@ -31,7 +31,6 @@ import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import $ from 'jquery';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { AlunoRestricaoService } from '../../../../../services/aluno-restricao.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 

@@ -2,20 +2,16 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleCha
 import { ConfirmationService } from 'primeng/api';
 import { SalaAula } from '../../../../../models/sala-aula.model';
 import { Professor } from '../../../../../models/professor.model';
-import { lastValueFrom, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../../utils/mensagem-whatsapp';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
 import { Evento } from '../../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
-import { Aluno_CheckList_Item } from '../../../../../models/checklist.model';
-import { AccountService } from '../../../../../services/account.service';
-import { ChecklistService } from '../../../../../services/checklist.service';
 import { CalendarioUtils } from '../../../../../utils/calendario-utils';
 import { showError } from '../../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
-import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({
     selector: 'app-editar-oficina',
@@ -46,14 +42,8 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     constructor(
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
-        private accountService: AccountService,
-        private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
-        private alunoService: AlunoService,
     ) {
-        this.onSave.subscribe(res => {
-            this.markChecklistAsDone();
-        })
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -119,30 +109,6 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         let object = this.mensagemWhatsapp.enviarMensagem(aluno.aluno, aluno.celular);
         window.open(object.link, '_blank');
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-    }
-
-    markChecklistAsDone() {
-        // Comparecimento na 1ª ou 2ª Oficina
-        // Id 34 ou 36
-        // this.evento.alunos
-        // .filter(x => x.presente === true && x.active === true)
-        // .forEach(async aluno => {
-        //     const alunoObj = await lastValueFrom(this.alunoService.get(aluno.id));
-        //     const alunoChecklist = alunoObj.alunoChecklist.find(x => (x.checklist_Item_Id == 34 || x.checklist_Item_Id == 36)) as Aluno_CheckList_Item;
-            
-        //     if (alunoChecklist && !alunoChecklist.finalizado) {
-
-        //         const data = moment(this.evento.data).format('DD/MM/YY [às] hh[h]mm')
-        //         const account = this.accountService.accountValue?.name;
-        //         const dataCadastro = moment(new Date()).format('DD/MM/YY [aproximadamente às] hh[h]mm');
-                
-        //         const mensagem = `Aluno compareceu na oficina do dia ${data}. <br>
-        //                         Oficina finalizada por ${account} no dia ${dataCadastro}.`
-        //         if (alunoChecklist && !alunoChecklist.finalizado) {
-        //             lastValueFrom(this.checklistService.markAsDone(alunoChecklist.id, mensagem))
-        //         }
-        //     }
-        // });
     }
 
     presenteClick(item: Evento_Participacao_Aluno) {

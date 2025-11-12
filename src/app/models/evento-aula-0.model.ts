@@ -22,7 +22,15 @@ export interface ParticipacaoAulaZeroModel {
 }
 
 export interface FinalizarAulaZeroRequest {
+  duracaoMinutos: number;
   evento_Id: number;
+  sala_Id: number;
+  turma_Id?: number;
+  roteiro_Id?: number;
+  capacidadeMaximaAlunos: number;
+  descricao: string;
   observacao?: string;
   alunos: ParticipacaoAulaZeroModel[];
+  perfilCognitivo: number[];
+  professores: number[];
 }
