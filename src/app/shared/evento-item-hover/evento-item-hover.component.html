@@ -1,0 +1,142 @@
+<p-popover #popover appendTo="body" styleClass="bg-transparent border-none popover-event-hover py-0">
+    <ng-container *ngIf="evento && evento.id">
+        <!-- FERIADO -->
+        <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
+            <div class="event event-hover event-feriado"
+                 [style]="{ backgroundColor: 'red', borderColor: 'red', color: 'white' }">
+                <div class="event-header">
+                    <span>Feriado</span>
+                </div>
+                <div class="event-body">
+                    <span class="event-descricao">{{evento.descricao}}</span>
+                </div>
+            </div>
+        </ng-container>
+        <!-- AULA E AULA EXTRA -->
+        <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
+            <div class="event event-hover"
+                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.borderColor, color: arg.textColor }">
+                <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+            </div>
+        </ng-container>
+        <!-- OFICINA, REUNIÃO, SUPERAÇÃO, AULA ZERO -->
+        <ng-container *ngIf="[EventoTipo.Oficina, EventoTipo.Reuniao, EventoTipo.Superacao, EventoTipo.AulaZero].includes(evento.evento_Tipo_Id)">
+            <div class="event event-hover"
+                 [class.event-disabled]="!evento.active"
+                 [style]="{ backgroundColor: arg.backgroundColor, borderColor: arg.borderColor, color: arg.textColor }"
+                 [ngClass]="{
+                    'event-superacao': EventoTipo.Superacao == evento.evento_Tipo_Id,
+                    'event-aula-zero': EventoTipo.AulaZero == evento.evento_Tipo_Id,
+                    'event-oficina': EventoTipo.Oficina == evento.evento_Tipo_Id,
+                    'event-reuniao': EventoTipo.Reuniao == evento.evento_Tipo_Id,
+                }">
+                <ng-container *ngTemplateOutlet="eventHeader"></ng-container>
+                <ng-container *ngTemplateOutlet="eventBody"></ng-container>
+                <ng-container *ngTemplateOutlet="eventFooter"></ng-container>
+            </div>
+        </ng-container>
+        <ng-template #eventHeader>
+            <div class="event-header">
+                <div class="event-time">
+                    <i class="pi pi-clock"></i>
+                    <span>{{setHorario(evento.data)}}</span>
+                </div>
+                <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Reuniao">
+                    <div class="event-educador">
+                        <ng-container *ngIf="evento.professor">
+                            <span>{{evento.professor}}</span>
+                        </ng-container>
+                        <ng-container *ngIf="!evento.professor && evento.professores.length > 0">
+                            <span>{{evento.professores[0].nome}}</span>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
+        </ng-template>
+        <ng-template #eventBody>
+            <div class="event-body">
+                <p class="event-descricao">{{evento.descricao}}</p>
+                <ng-container *ngIf="evento.sala">
+                    <p class="event-sala">{{evento.sala}}</p>
+                </ng-container>
+            </div>
+        </ng-template>
+        <ng-template #eventFooter>
+            <div class="event-footer">
+                <ng-container *ngIf="[EventoTipo.AulaZero, EventoTipo.Superacao].includes(evento.evento_Tipo_Id)">
+                    <span class="event-alunos">
+                        <ng-container *ngIf="evento.alunos.length < 3">
+                            <span *ngFor="let aluno of evento.alunos" class="capitalize">{{ aluno.aluno | nameAbv }}</span>
+                        </ng-container>
+                        <ng-container *ngIf="evento.alunos.length > 2">
+                            <span *ngFor="let aluno of evento.alunos" class="capitalize">{{ aluno.aluno | firstWord }}</span>
+                        </ng-container>
+                    </span>
+                </ng-container>
+                <!-- Se Cancelado -->
+                <ng-container *ngIf="!evento.active; else checkFinalizado">
+                    <span class="event-cancelado">
+                        <i class="fa fa-times text-red-500 text-lg"></i>
+                        <span>Cancelado</span>
+                    </span>
+                </ng-container>
+                <!-- Se Finalizado -->
+                <ng-template #checkFinalizado>
+                    <ng-container *ngIf="evento.finalizado; else notFinalizado">
+                        <span class="event-finalizado">
+                            <i class="fa fa-check-circle"></i>
+                            <span>Finalizado</span>
+                        </span>
+                    </ng-container>
+                </ng-template>
+                <!-- Caso não finalizado, renderiza o conteúdo padrão -->
+                <ng-template #notFinalizado>
+                    <ng-container *ngIf="evento.perfilCognitivo.length > 0">
+                        <span class="event-perfil">
+                            <!-- <span class="fa fa-brain"></span> -->
+                            {{ getPerfilCognitivo(evento.perfilCognitivo) }}
+                        </span>
+                    </ng-container>
+                    <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra, EventoTipo.Oficina].includes(evento.evento_Tipo_Id)">
+                        <span class="event-vagas" [pTooltip]="tooltipVagas">
+                            <p class="flex flex-row align-items-center gap-1">
+                                <i class="pi pi-calendar text-xs"></i>
+                                <span>
+                                    {{evento.vagasDisponiveisEvento}}/{{evento.alunosAtivosEvento}} </span>
+                            </p>
+                            <p class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                <i class="fa fa-users-between-lines text-xs"></i>
+                                <span>
+                                    {{evento.vagasDisponiveisTurma}}/{{evento.alunosAtivosTurma}} </span>
+                            </p>
+                            <ng-template #tooltipVagas>
+                                <p class="flex flex-row align-items-center gap-1 white-space-nowrap">
+                                    <i class="pi pi-calendar text-xs"></i>
+                                    <span> No dia: <span *ngIf="evento.vagasDisponiveisEvento == 0">Nenhuma vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisEvento == 1">1 vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisEvento > 1">{{ evento.vagasDisponiveisEvento }} vagas / </span>
+                                        <span *ngIf="evento.alunosAtivosEvento == 0">Nenhum aluno</span>
+                                        <span *ngIf="evento.alunosAtivosEvento == 1">1 aluno</span>
+                                        <span *ngIf="evento.alunosAtivosEvento > 1">{{ evento.alunosAtivosEvento }} alunos</span>
+                                    </span>
+                                </p>
+                                <p class="flex flex-row align-items-center gap-1 white-space-nowrap" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
+                                    <i class="fa fa-users-between-lines text-xs"></i>
+                                    <span> Na turma: <span *ngIf="evento.vagasDisponiveisTurma == 0">Nenhuma vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisTurma == 1">1 vaga / </span>
+                                        <span *ngIf="evento.vagasDisponiveisTurma > 1">{{ evento.vagasDisponiveisTurma }} vagas / </span>
+                                        <span *ngIf="evento.alunosAtivosTurma == 0">Nenhum aluno</span>
+                                        <span *ngIf="evento.alunosAtivosTurma == 1">1 aluno</span>
+                                        <span *ngIf="evento.alunosAtivosTurma > 1">{{ evento.alunosAtivosTurma }} alunos</span>
+                                    </span>
+                                </p>
+                            </ng-template>
+                        </span>
+                    </ng-container>
+                </ng-template>
+            </div>
+        </ng-template>
+    </ng-container>
+</p-popover>

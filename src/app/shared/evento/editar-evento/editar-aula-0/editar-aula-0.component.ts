@@ -18,7 +18,7 @@ import { ApostilaService } from '../../../../services/apostila.service';
 import { PerfilCognitivoService } from '../../../../services/perfil-cognitivo.services';
 import { NameFirstWordPipe } from '../../../../utils/name-first-word.pipe';
 import { DialogService } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../../utils/show-aluno';
 
 @Component({
     selector: 'app-editar-aula-0',

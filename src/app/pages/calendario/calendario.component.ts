@@ -1,21 +1,19 @@
-import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import { Evento, EventoTipo } from '../../models/evento.model';
 import { CalendarOptions, DatesSetArg } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import { ConfirmationService } from 'primeng/api';
 import { CalendarioDayView, CalendarioRequest, CalendarioView } from '../../models/calendario.model';
 import { MobileService, ScreenWidth } from '../../utils/mobile';
-import { lastValueFrom, Observable, Subscription } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
 import { getError, Header, showError } from '../../utils';
-import { AlunoService } from '../../services/alunos.service';
 import { AccountService } from '../../services/account.service';
 import { ToastrService } from 'ngx-toastr';
 import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { EventoService } from '../../services/evento.service';
-import { PseudoEvento, ReposicaoRequest } from '../../models/reposicao.model';
-import { RequestResponse } from '../../helpers/request-response.interface';
+import { PseudoEvento } from '../../models/reposicao.model';
 import { MensagemWhatsapp } from '../../utils/mensagem-whatsapp';
 import { AlunoRestricaoService } from '../../services/aluno-restricao.service';
 import { Feriado } from '../../models/feriado.model';
@@ -30,8 +28,7 @@ import { PerfilCognitivo } from '../../models/perfil-cognitivo.model';
 import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services';
 import { SalaAndar } from '../../models/sala-aula.model';
 import { DialogService } from 'primeng/dynamicdialog';
-import { AgendarReposicaoConfirmView } from '../../shared/evento/agendar-reposicao-confirm/agendar-reposicao-confirm.component';
-import { showAgendarReposicaoConfirm } from '../../utils/show-reposicao-confirm-dialog-service';
+import { showAgendarReposicaoConfirm } from '../../utils/show-reposicao-confirm';
 
 @Component({
     selector: 'app-calendario',
@@ -174,43 +171,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     async update() {
         this.unselectAula();
 
-        await this.loadFeriados();
-
         await this.requestLoadCalendario()
         this.setCalendario();
         this.scrollToTime();
-
-    }
-
-    async loadFeriados() {
-        this.loading = true;
-
-        var requestsFeriado = [];
-
-        let anoDe = moment(this.calendarioRequest.intervaloDe ?? new Date).year();
-        let anoAte = moment(this.calendarioRequest.intervaloAte ?? new Date).year();
-
-        if (!this.loadedAnos.includes(anoDe)) {
-            var anoDeReq = lastValueFrom(this.service.getFeriados(anoDe))
-                .catch(res => {
-                    this.loading = false;
-                    return res;
-                })
-            requestsFeriado.push(anoDeReq)
-            this.loadedAnos.push(anoDe);
-        }
-        if (!this.loadedAnos.includes(anoAte)) {
-            var anoAteReq = lastValueFrom(this.service.getFeriados(anoAte))
-                .catch(res => {
-                    this.loading = false;
-                    return res;
-                })
-            requestsFeriado.push(anoAteReq)
-            this.loadedAnos.push(anoAte);
-        }
-        await Promise.all(requestsFeriado).catch(res => {
-            this.loading = false;
-        })
 
     }
 
@@ -231,7 +194,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         let calendar = this.fullCalendar.getApi();
         // var eventos = this.eventos.filter(x => !x.feriado);
         var eventos = this.eventos;
-        
+
         let events = eventos.map(item => {
             const id = 'event-' + this.calendarioUtils.eventRandomId();
             const eventStyles = this.calendarioUtils.getEventStyles(item)
@@ -292,7 +255,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
     datesSet(arg: DatesSetArg) {
         this.loading = true;
-        
+
         this.calendarioRequest.intervaloDe = arg.start;
         this.calendarioRequest.intervaloAte = moment(arg.end).subtract(1, 'day').toDate(); // Full calendar está terminando no domingo da semana seguinte
         this.unselectAula();
@@ -310,15 +273,15 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     loadReposicoes(evento: Evento) {
-         evento.alunos.map(async aluno => {
-                if (aluno.reposicaoDe_Evento_Id) {
-                    aluno.reposicaoDe_Evento = await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
-                }
-                if (aluno.reposicaoPara_Evento_Id) {
-                    aluno.reposicaoPara_Evento = await lastValueFrom(this.service.get(aluno.reposicaoPara_Evento_Id))
-                }
-                return aluno;
-            })
+        evento.alunos.map(async aluno => {
+            if (aluno.reposicaoDe_Evento_Id) {
+                aluno.reposicaoDe_Evento = await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
+            }
+            if (aluno.reposicaoPara_Evento_Id) {
+                aluno.reposicaoPara_Evento = await lastValueFrom(this.service.get(aluno.reposicaoPara_Evento_Id))
+            }
+            return aluno;
+        })
         return evento;
     }
 
@@ -376,7 +339,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             if (aluno.reposicaoDe_Evento_Id) {
                 erroMessage = 'O aluno não pode repor uma aula duas vezes.';
             }
-            
+
             if (aluno.restricaoMobilidade && target.andar > SalaAndar.Terreo) {
                 erroMessage = `O aluno tem mobilidade reduzida e não pode repor aula na sala ${target.sala} - ${target.andar}º andar`;
             }
@@ -475,8 +438,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     requestLoadCalendario() {
         this.loading = true;
         return lastValueFrom(this.service.getList(this.calendarioRequest))
-            .then(list => {
-                this.eventos = list;
+            .then(res => {
+                this.feriados = res.feriados;
+                this.eventos = res.eventos;
                 this.loading = false;
             })
             .catch(res => {

@@ -93,7 +93,7 @@ export class CancelarEventoComponent implements OnDestroy {
                 this.tipoEventoString = this.getTipo(this.evento)
                 this.setAlunosProfessores()
                 this.visible = true
-            } 
+            }
             else {
                 this.visible = false
                 this.visibleChange()
@@ -145,6 +145,15 @@ export class CancelarEventoComponent implements OnDestroy {
         e.evento_Tipo_Id = this.evento.evento_Tipo_Id
         return this.calendarioUtils.getEventoTipo(e)
     }
+    
+	getPerfilCognitivo(evento: Evento) {
+		return evento.perfilCognitivo.map(x => x.nome).join(', ');
+	}
+
+	getSala(evento: Evento) {
+		var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
+		return evento.sala + ' - ' + andar
+	}
 
     goToReagendamento() {
         if (this.evento) {

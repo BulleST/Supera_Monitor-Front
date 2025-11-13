@@ -144,7 +144,7 @@ export class ListComponent implements OnDestroy {
     }
 
     @HostListener('keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
+    onKeydownHandler(event: any) {
         this.unselectItems();
     }
 

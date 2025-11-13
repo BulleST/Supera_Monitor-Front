@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Monitoramento_Aluno, Monitoramento_Aluno_Item, Monitoramento_Aula, Monitoramento_Aula_Participacao_Rel, Monitoramento_Item_Status, Monitoramento_Participacao } from '../../../models/monitoramento.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { SalaAndar } from '../../../models/sala-aula.model';
-import { AlunoContatoFaltaComponent } from '../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
 import moment from 'moment';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { lastValueFrom } from 'rxjs';
@@ -60,39 +59,7 @@ export class AulaParticipacaoComponent implements OnInit {
 		this.ref.close();
 	}
 
-	showContatoFalta() {
-		this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
-			header: 'Aula',
-			showHeader: false,
-			closable: true,
-			maximizable: false,
-			closeOnEscape: true,
-			draggable: true,
-			dismissableMask: true,
-			duplicate: true,
-			modal: true,
-			width: '95vw',
-			style: { maxWidth: '550px' },
-			data: {
-				celular: this.aluno.celular,
-				aluno: this.aluno.nome,
-
-				evento_Id: this.item.aula.aula.id,
-				evento: this.item.aula.aula.descricao,
-				data: this.item.aula.aula.data,
-				roteiroCorLegenda: this.item.aula.aula.roteiroCorLegenda,
-				semana: this.item.aula.aula.semana,
-				tema: this.item.aula.aula.tema,
-
-				observacao: this.item.aula.participacao.observacao,
-				contatado: this.item.aula.participacao.alunoContactado,
-				alunoContactado: this.item.aula.participacao.alunoContactado ? moment(this.item.aula.participacao.alunoContactado).toDate() : undefined,
-				statusContato_Id: this.item.aula.participacao.statusContato_Id,
-				contatoObservacao: this.item.aula.participacao.contatoObservacao,
-				participacao_Id: this.item.aula.participacao.id,
-			}
-		});
-	}
+	
 
 
 	async goToAula() {

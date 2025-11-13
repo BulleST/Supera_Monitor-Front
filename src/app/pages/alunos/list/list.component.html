@@ -116,15 +116,15 @@
                                   (auxclick)="enviarMensagem(aluno)"
                                   (contextmenu)="enviarMensagem(aluno)" />
                         <a class="capitalize text-500 hover:underline hover:text-primary-500 hover:font-bold cursor-pointer"
-                              pTooltip="Clique para ver: {{aluno.nome}}"
-                              [routerLink]="editar(aluno)"
-                              tooltipPosition="top">{{ aluno.nome | nameAbv }}</a>
+                           pTooltip="Clique para ver: {{aluno.nome}}"
+                           [routerLink]="editar(aluno)"
+                           tooltipPosition="top">{{ aluno.nome | nameAbv }}</a>
                         <i *ngIf="aluno.ehAniversario"
                            pTooltip="{{aluno.nome | firstWord}} faz aniversário dia {{aluno.dataNascimento | date : 'dd \'de\' MMMM'}}"
                            class="bi bi-cake-fill text-pink-500 fadein"></i>
                     </div>
                 </td>
-                <td [pEditableColumn]="aluno" 
+                <td [pEditableColumn]="aluno"
                     pEditableColumnField="turma_Id"
                     [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
@@ -132,79 +132,76 @@
                             <p-iconfield>
                                 <p-inputicon class="fa fa-users-between-lines" />
                                 <p-select
-                          [options]="turmasDisponiveis"
-                          [loading]="loadingTurmas"
-                          [showClear]="false"
-                          [(ngModel)]="aluno.turma_Id"
-                          inputId="turma"
-                          name="turma"
-                          #turma_Id="ngModel"
-                          optionLabel="nome"
-                          optionValue="id"
-                          placeholder="Selecione"
-                          [checkmark]="true"
-                          (onChange)="turmaChanged(aluno, turma_Id, $event)"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
-                          fluid>
-                    <ng-template #footer>
-                        <div class="p-3 border-top-1 border-200">
-                            <ng-container *ngIf="aluno.restricaoMobilidade">
-                                <p>Esse aluno tem restrição de mobilidade:</p>
-                                <p>
-                                    <i class="pi pi-check text-green-500 mr-1"></i>
-                                    Somente turmas do térreo serão exibidas.
-                                </p>
-                            </ng-container>
-                            <p>
-                                <i class="pi pi-check text-green-500 mr-1"></i>
-                                Somente turmas do mesmo perfil cognitivo serão exibidas.
-                            </p>
-                            <p>
-                                <i class="pi pi-check text-green-500 mr-1"></i>
-                                Somente turmas com vagas serão exibidas.
-                            </p>
-                        </div>
-                    </ng-template>
-                    <ng-template #selectedItem let-selectedOption>
-                        <div class="flex align-items-center gap-2">
-                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
-                                              [professor]="selectedOption.professor"
-                                              [professor_Id]="selectedOption.professor_Id"
-                                              [turma_Id]="selectedOption.id"></app-legend-color>
-                            <span>{{selectedOption.nome}}</span>
-                        </div>
-                    </ng-template>
-                    <ng-template #item let-turma>
-                        <div class="flex align-items-start gap-2 w-full">
-                            <div class="w-full">
-                                <div class="flex align-items-center gap-2">
-                                    <app-legend-color [corLegenda]="turma.corLegenda"
-                                                      [professor]="turma.professor"
-                                                      [professor_Id]="turma.professor_Id"
-                                                      [turma_Id]="turma.id"></app-legend-color>
-                                    <span>{{turma.nome}}</span>
-                                    <p class="ml-auto " *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
-                                    <p class="ml-auto text-500" *ngIf="turma.vagasDisponiveis == 0">Não há vagas</p>
-                                </div>
-                                <div class="flex align-items-center justify-content-between gap-2 w-full">
-                                    <p class="flex align-items-center gap-2">
-                                        <span>{{turma.sala}}</span>
-                                        <span>-</span>
-                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
-                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <span class="pl-2 flex align-items-center gap-2 ml-auto">
-                                <ng-container *ngFor="let perfil of turma.perfilCognitivo">
-                                    <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
-                                </ng-container>
-                            </span>
-                        </div>
-                    </ng-template>
-                </p-select>
+                                          [options]="turmasDisponiveis"
+                                          [loading]="loadingTurmas"
+                                          [showClear]="false"
+                                          [(ngModel)]="aluno.turma_Id"
+                                          inputId="turma"
+                                          name="turma"
+                                          #turma_Id="ngModel"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          placeholder="Selecione"
+                                          [checkmark]="true"
+                                          (onChange)="turmaChanged(aluno, turma_Id, $event)"
+                                          [filter]="true"
+                                          filterBy="nome"
+                                          appendTo="body"
+                                          fluid>
+                                    <ng-template #footer>
+                                        <div class="p-3 border-top-1 border-200">
+                                            <ng-container *ngIf="aluno.restricaoMobilidade">
+                                                <p>Esse aluno tem restrição de mobilidade:</p>
+                                                <p>
+                                                    <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas do térreo serão exibidas.
+                                                </p>
+                                            </ng-container>
+                                            <p>
+                                                <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas do mesmo perfil cognitivo serão exibidas.
+                                            </p>
+                                            <p>
+                                                <i class="pi pi-check text-green-500 mr-1"></i> Somente turmas com vagas serão exibidas.
+                                            </p>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #selectedItem let-selectedOption>
+                                        <div class="flex align-items-center gap-2">
+                                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                                              [professor]="selectedOption.professor"
+                                                              [professor_Id]="selectedOption.professor_Id"
+                                                              [turma_Id]="selectedOption.id"></app-legend-color>
+                                            <span>{{selectedOption.nome}}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #item let-turma>
+                                        <div class="flex align-items-start gap-2 w-full">
+                                            <div class="w-full">
+                                                <div class="flex align-items-center gap-2">
+                                                    <app-legend-color [corLegenda]="turma.corLegenda"
+                                                                      [professor]="turma.professor"
+                                                                      [professor_Id]="turma.professor_Id"
+                                                                      [turma_Id]="turma.id"></app-legend-color>
+                                                    <span>{{turma.nome}}</span>
+                                                    <p class="ml-auto " *ngIf="turma.vagasDisponiveis > 0">{{turma.vagasDisponiveis}} vagas</p>
+                                                    <p class="ml-auto text-500" *ngIf="turma.vagasDisponiveis == 0">Não há vagas</p>
+                                                </div>
+                                                <div class="flex align-items-center justify-content-between gap-2 w-full">
+                                                    <p class="flex align-items-center gap-2">
+                                                        <span>{{turma.sala}}</span>
+                                                        <span>-</span>
+                                                        <span *ngIf="turma.andar > SalaAndar.Terreo">{{turma.andar}}º andar</span>
+                                                        <span *ngIf="turma.andar == SalaAndar.Terreo">Térreo</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <span class="pl-2 flex align-items-center gap-2 ml-auto">
+                                                <ng-container *ngFor="let perfil of turma.perfilCognitivo">
+                                                    <p-tag icon="fa-solid fa-brain" [value]="perfil.nome" />
+                                                </ng-container>
+                                            </span>
+                                        </div>
+                                    </ng-template>
+                                </p-select>
                             </p-iconfield>
                         </ng-template>
                         <ng-template #output>
@@ -218,29 +215,29 @@
                         </ng-template>
                     </p-cellEditor>
                 </td>
-                <td [pEditableColumn]="aluno" 
-                pEditableColumnField="perfilCognitivo_Id"
-                [pEditableColumnDisabled]="!aluno.active">
+                <td [pEditableColumn]="aluno"
+                    pEditableColumnField="perfilCognitivo_Id"
+                    [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
                         <ng-template #input>
                             <p-iconfield>
-                                    <p-inputicon class="fa fa-brain" />
-                                    <p-select
-                                            [options]="perfisFiltered"
-                                            [loading]="loadingPerfilCognitivo"
-                                            [showClear]="false"
-                                            [(ngModel)]="aluno.perfilCognitivo_Id"
-                                            inputId="perfilCognitivo[{{rowIndex}}]"
-                                            name="perfilCognitivo[{{rowIndex}}]"
-                                            #perfilCognitivo_Id="ngModel"
-                                            optionLabel="nome"
-                                            optionValue="id"
-                                            [filter]="true"
-                                            filterBy="nome"
-                                            (onChange)="perfilChangedConfirm(aluno, perfilCognitivo_Id, $event)"
-                                            (onFocus)="perfilFocus(aluno)"
-                                            appendTo="body"
-                                            fluid />
+                                <p-inputicon class="fa fa-brain" />
+                                <p-select
+                                          [options]="perfisFiltered"
+                                          [loading]="loadingPerfilCognitivo"
+                                          [showClear]="false"
+                                          [(ngModel)]="aluno.perfilCognitivo_Id"
+                                          inputId="perfilCognitivo[{{rowIndex}}]"
+                                          name="perfilCognitivo[{{rowIndex}}]"
+                                          #perfilCognitivo_Id="ngModel"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          [filter]="true"
+                                          filterBy="nome"
+                                          (onChange)="perfilChangedConfirm(aluno, perfilCognitivo_Id, $event)"
+                                          (onFocus)="perfilFocus(aluno)"
+                                          appendTo="body"
+                                          fluid />
                             </p-iconfield>
                         </ng-template>
                         <ng-template #output>
@@ -253,30 +250,30 @@
                         <span pTooltip="{{aluno.nome | firstWord }} nasceu em {{aluno.dataNascimento | date : 'dd \'de\' MMMM \'de\' yyyy'}}">{{aluno.idade}} anos</span>
                     </ng-container>
                 </td>
-                <td [pEditableColumn]="aluno" 
-                pEditableColumnField="apostila_Kit_Id"
-                [pEditableColumnDisabled]="!aluno.active">
+                <td [pEditableColumn]="aluno"
+                    pEditableColumnField="apostila_Kit_Id"
+                    [pEditableColumnDisabled]="!aluno.active">
                     <p-cellEditor>
                         <ng-template #input>
                             <p-iconfield>
-                                    <p-inputicon class="bi bi-book-fill" />
-                                    <p-select
-                                              [options]="listKits"
-                                              [loading]="loadingKit"
-                                              [showClear]="false"
-                                              [(ngModel)]="aluno.apostila_Kit_Id"
-                                              inputId="kit[{{rowIndex}}]"
-                                              name="kit[{{rowIndex}}]"
-                                              #kit_Id="ngModel"
-                                              optionLabel="nome"
-                                              optionValue="id"
-                                              [filter]="true"
-                                              filterBy="nome"
-                                              placeholder="Selecione"
-                                              (onChange)="kitChangedConfirm(aluno, kit_Id, $event)"
-                                              (onFocus)="kitFocus(aluno)"
-                                              appendTo="body"
-                                              fluid />
+                                <p-inputicon class="bi bi-book-fill" />
+                                <p-select
+                                          [options]="listKits"
+                                          [loading]="loadingKit"
+                                          [showClear]="false"
+                                          [(ngModel)]="aluno.apostila_Kit_Id"
+                                          inputId="kit[{{rowIndex}}]"
+                                          name="kit[{{rowIndex}}]"
+                                          #kit_Id="ngModel"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          [filter]="true"
+                                          filterBy="nome"
+                                          placeholder="Selecione"
+                                          (onChange)="kitChangedConfirm(aluno, kit_Id, $event)"
+                                          (onFocus)="kitFocus(aluno)"
+                                          appendTo="body"
+                                          fluid />
                             </p-iconfield>
                         </ng-template>
                         <ng-template #output>
@@ -300,15 +297,14 @@
                     {{aluno.numeroPaginaAH}}
                 </td>
                 <td class="w-5rem">
-                    <p-checkbox 
-                        [ngModel]="aluno.restricaoMobilidade" 
-                        [binary]="true"
-                        [readonly]="true" />
-                        <span class="ml-2">
-
-                            <span *ngIf="aluno.restricaoMobilidade">Sim</span>
-                            <span *ngIf="!aluno.restricaoMobilidade">Não</span>
-                        </span>
+                    <p-checkbox
+                                [ngModel]="aluno.restricaoMobilidade"
+                                [binary]="true"
+                                [readonly]="true" />
+                    <span class="ml-2">
+                        <span *ngIf="aluno.restricaoMobilidade">Sim</span>
+                        <span *ngIf="!aluno.restricaoMobilidade">Não</span>
+                    </span>
                 </td>
                 <td class="w-5rem">
                     <ng-container *ngIf="aluno.active">

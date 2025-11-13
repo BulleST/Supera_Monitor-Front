@@ -1,114 +1,126 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
-import { ProfileComponent } from './profile/profile.component';
-import { ChangePasswordComponent } from './change-password/change-password.component';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { FormsModule } from '@angular/forms';
-import { PrimengModule } from './primeng.module';
 import { ToastrModule } from 'ngx-toastr';
+import { PrimengModule } from './primeng.module';
+import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-
-// Alunos
-import { AlunoAgendarFaltaDialogComponent } from './aluno/aluno-agendar-falta-dialog/aluno-agendar-falta-dialog.component';
-import { AlunoParticipacaoFaltaContatoDialogComponent } from './aluno/aluno-participacao-falta-contato-dialog/aluno-participacao-falta-contato-dialog.component';
-import { CalendarioComponent } from './aluno/aluno-agendar-falta-dialog/calendario/calendario.component';
-import { AlunoContatoFaltaComponent } from './aluno/aluno-contato-falta/aluno-contato-falta.component';
-import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
-
-
-// Evento
-import { AulaComponent } from './evento/aula/aula.component';
-import { IndisponivelTooltipComponent } from './evento/indisponivel-tooltip/indisponivel-tooltip.component';
-import { AgendarReposicaoDialogComponent } from './evento/agendar-reposicao-dialog/agendar-reposicao-dialog.component';
-import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
-import { ReposicaoParaTooltipComponent } from './evento/reposicao-para-tooltip/reposicao-para-tooltip.component';
-import { ReposicaoDeSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-de-select/reposicao-de-select.component';
-import { ReposicaoParaSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-para-select/reposicao-para-select.component';
-
-// Checklist
-import { FinalizarChecklistComponent } from './checklist/finalizar-checklist/finalizar-checklist.component';
-import { ChecklistStatusComponent } from './checklist/checklist-status/checklist-status.component';
-import { AlunoChecklistStatusComponent } from './checklist/aluno-checklist-status/aluno-checklist-status.component';
-
-// Outros componentes
-import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
-import { SalaAulaComponent } from './sala-aula/sala-aula.component';
-import { EventoItemComponent } from '../pages/calendario/full-calendar/evento-item/evento-item.component';
-import { EventoItemHoverComponent } from '../pages/calendario/full-calendar/evento-item-hover/evento-item-hover.component';
-import { LoadingBrainComponent } from '../parts/loading-brain/loading-brain.component';
-import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
-import { LegendColorComponent } from './professor/legend-color/legend-color.component';
-
-// Pipes
+import { FullCalendarModule } from '@fullcalendar/angular';
 import { NameAbvPipe } from '../utils/name.pipe';
 import { NameFirstWordPipe } from '../utils/name-first-word.pipe';
 import { SalaAulaPipe } from '../utils/sala-aula.pipe';
-import { ReposicaoAlunoSelectComponent } from './evento/agendar-reposicao-dialog/reposicao-aluno-select/reposicao-aluno-select.component';
-import { AlunoChecklistDetalhesComponent } from './checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
 import { AlunoDetalhesComponent } from './aluno/aluno-detalhes/aluno-detalhes.component';
-import { AgendarReposicaoConfirmComponent } from './evento/agendar-reposicao-confirm/agendar-reposicao-confirm.component';
+import { TabDadosCadastraisComponent } from './aluno/aluno-detalhes/tab-dados-cadastrais/tab-dados-cadastrais.component';
 import { TabVigenciaComponent } from './aluno/aluno-detalhes/tab-vigencia/tab-vigencia.component';
 import { TabHistoricoComponent } from './aluno/aluno-detalhes/tab-historico/tab-historico.component';
-import { TabDadosCadastraisComponent } from './aluno/aluno-detalhes/tab-dados-cadastrais/tab-dados-cadastrais.component';
 import { AlunoDetalhesLoadingComponent } from './aluno/aluno-detalhes/aluno-detalhes-loading/aluno-detalhes-loading.component';
-import { AgendarFaltaComponent } from './evento/agendar-falta/agendar-falta.component';
+import { AlunoParticipacaoComponent } from './aluno/aluno-participacao/aluno-participacao.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { AlunoChecklistDetalhesComponent } from './checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
+import { AlunoChecklistStatusComponent } from './checklist/aluno-checklist-status/aluno-checklist-status.component';
+import { ChecklistStatusComponent } from './checklist/checklist-status/checklist-status.component';
+import { FinalizarChecklistComponent } from './checklist/finalizar-checklist/finalizar-checklist.component';
+import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { AgendarFaltaComponent } from './evento/agendar/agendar-falta/agendar-falta.component';
+import { FaltaAlunoSelectComponent } from './evento/agendar/agendar-falta/falta-aluno-select/falta-aluno-select.component';
+import { FaltaCalendarioSelectComponent } from './evento/agendar/agendar-falta/falta-calendario-select/falta-calendario-select.component';
+import { FaltaEventoSelectedComponent } from './evento/agendar/agendar-falta/falta-evento-selected/falta-evento-selected.component';
+import { AgendarPrimeiraAulaComponent } from './evento/agendar/agendar-primeira-aula/agendar-primeira-aula.component';
+import { Aula1AlunoSelectComponent } from './evento/agendar/agendar-primeira-aula/aula1-aluno-select/aula1-aluno-select.component';
+import { Aula1CalendarioSelectComponent } from './evento/agendar/agendar-primeira-aula/aula1-calendario-select/aula1-calendario-select.component';
+import { Aula1EventoSelectedComponent } from './evento/agendar/agendar-primeira-aula/aula1-evento-selected/aula1-evento-selected.component';
+import { AgendarReposicaoComponent } from './evento/agendar/agendar-reposicao/agendar-reposicao.component';
+import { ReposicaoConfirmComponent } from './evento/agendar/agendar-reposicao/_reposicao-confirm/reposicao-confirm.component';
+import { ReposicaoAlunoSelectComponent } from './evento/agendar/agendar-reposicao/reposicao-aluno-select/reposicao-aluno-select.component';
+import { ReposicaoDeSelectComponent } from './evento/agendar/agendar-reposicao/reposicao-de-select/reposicao-de-select.component';
+import { ReposicaoParaSelectComponent } from './evento/agendar/agendar-reposicao/reposicao-para-select/reposicao-para-select.component';
 import { EditarAulaComponent } from './evento/editar-aula/editar-aula.component';
 import { EditarEventoComponent } from './evento/editar-evento/editar-evento.component';
 import { EditarAula0Component } from './evento/editar-evento/editar-aula-0/editar-aula-0.component';
 import { EditarOficinaComponent } from './evento/editar-evento/editar-oficina/editar-oficina.component';
 import { EditarReuniaoComponent } from './evento/editar-evento/editar-reuniao/editar-reuniao.component';
 import { EditarSuperacaoComponent } from './evento/editar-evento/editar-superacao/editar-superacao.component';
+import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
+import { IndisponivelTooltipComponent } from './indisponivel-tooltip/indisponivel-tooltip.component';
+import { ReposicaoParaTooltipComponent } from './reposicao-para-tooltip/reposicao-para-tooltip.component';
+import { LegendColorComponent } from './legend-color/legend-color.component';
+import { ProfileComponent } from './profile/profile.component';
+import { SalaAulaComponent } from './sala-aula/sala-aula.component';
+import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
+import { EventoItemHoverComponent } from './evento-item-hover/evento-item-hover.component';
+import { EditarParticipacaoContatoComponent } from './evento/editar-participacao-contato/editar-participacao-contato.component';
 
 @NgModule({
     declarations: [
-        ProfileComponent,
-        ChangePasswordComponent,
-        AlunoAgendarFaltaDialogComponent,
-        AlunoParticipacaoFaltaContatoDialogComponent,
-        ConfirmDialogComponent,
-        SalaAulaComponent,
-        EventoItemComponent,
-        EventoItemHoverComponent,
-        LoadingBrainComponent,
-        TableHeaderFilterComponent,
-        TableHeaderFilterComponent,
-        LegendColorComponent,
-        IndisponivelTooltipComponent,
-        CalendarioComponent,
-        ReposicaoDeSelectComponent,
-        ReposicaoParaSelectComponent,
-        AulaComponent,
-        AlunoContatoFaltaComponent,
-        EventoParticipacaoStatusComponent,
-        AlunoParticipacaoComponent,
-        ReposicaoParaTooltipComponent,
-        FinalizarChecklistComponent,
-        ChecklistStatusComponent,
-        AlunoChecklistStatusComponent,
-        AgendarReposicaoDialogComponent,
-        ReposicaoAlunoSelectComponent,
-        AlunoChecklistDetalhesComponent,
+        // > aluno
         AlunoDetalhesComponent,
-        AgendarReposicaoConfirmComponent,
+        TabDadosCadastraisComponent,
         TabVigenciaComponent,
         TabHistoricoComponent,
-        TabDadosCadastraisComponent,
         AlunoDetalhesLoadingComponent,
+        AlunoParticipacaoComponent,
+
+        ChangePasswordComponent,
+
+        // > checklist
+        AlunoChecklistDetalhesComponent,
+        AlunoChecklistStatusComponent,
+        ChecklistStatusComponent,
+        FinalizarChecklistComponent,
+
+        ConfirmDialogComponent,
+
+        // > evento 
+        // > evento > agendar > falta
         AgendarFaltaComponent,
+        FaltaAlunoSelectComponent,
+        FaltaCalendarioSelectComponent,
+        FaltaEventoSelectedComponent,
         
+        // > evento > agendar > primeira aula
+        AgendarPrimeiraAulaComponent,
+        Aula1AlunoSelectComponent,
+        Aula1CalendarioSelectComponent,
+        Aula1EventoSelectedComponent,
+        
+        // > evento > agendar > reposicao
+        AgendarReposicaoComponent,
+        ReposicaoConfirmComponent,
+        ReposicaoAlunoSelectComponent,
+        ReposicaoDeSelectComponent,
+        ReposicaoParaSelectComponent,
+        
+        // > evento > editar aula
         EditarAulaComponent,
+        
+        // > evento > editar evento
         EditarEventoComponent,
         EditarAula0Component,
         EditarOficinaComponent,
         EditarReuniaoComponent,
-        EditarSuperacaoComponent
+        EditarReuniaoComponent,
+        EditarSuperacaoComponent,
+
+        EventoParticipacaoStatusComponent,
+        IndisponivelTooltipComponent,
+        ReposicaoParaTooltipComponent,
+
+        LegendColorComponent,
+        ProfileComponent,
+        SalaAulaComponent,
+        TableHeaderFilterComponent,
+        EventoItemHoverComponent,
+        EditarParticipacaoContatoComponent
+
+
+        
     ],
     exports: [
+        CommonModule,
         FormsModule,
         PrimengModule,
         ToastrModule,
@@ -120,23 +132,18 @@ import { EditarSuperacaoComponent } from './evento/editar-evento/editar-superaca
         NgxMaskPipe,
         NameFirstWordPipe,
         NameAbvPipe,
-        ProfileComponent,
-        ChangePasswordComponent,
-        AlunoAgendarFaltaDialogComponent,
-        AlunoParticipacaoFaltaContatoDialogComponent,
-        ConfirmDialogComponent,
-        SalaAulaComponent,
-        EventoItemComponent,
-        EventoItemHoverComponent,
-        LoadingBrainComponent,
-        TableHeaderFilterComponent,
+        RouterModule,
+        SalaAulaPipe,
+
+        // Components
         LegendColorComponent,
         IndisponivelTooltipComponent,
-        ReposicaoDeSelectComponent,
-        ReposicaoParaSelectComponent,
-        AulaComponent,
-        AlunoContatoFaltaComponent,
-        AgendarReposicaoDialogComponent,
+        EventoItemHoverComponent,
+        ReposicaoParaTooltipComponent,
+        TableHeaderFilterComponent,
+        ConfirmDialogComponent,
+        SalaAulaComponent,
+
     ],
     imports: [
         CommonModule,
@@ -153,6 +160,7 @@ import { EditarSuperacaoComponent } from './evento/editar-evento/editar-superaca
         NameAbvPipe,
         NameFirstWordPipe,
         SalaAulaPipe,
+        
     ],
     providers: [
         provideHttpClient(withFetch()),

@@ -158,7 +158,7 @@ export class CalendarioUtils {
         request.perfilCognitivo = evento.perfilCognitivo.map(x => x.id)
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento ?? evento.capacidadeMaximaTurma;
         request.roteiro_Id = request.roteiro_Id == PseudoEvento.EventoId ? undefined : request.roteiro_Id;
-        request.professores = [request.professor_Id];
+        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
         
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createAulaTurma(request))
@@ -179,10 +179,10 @@ export class CalendarioUtils {
     requestOficina(evento: Evento) {
         let request = MyMap(evento, new EventoOficinaRequest())
         request.alunos = evento.alunos.map(x => x.aluno_Id);
-        request.professores = [evento.professor_Id];
+        request.professores = evento.professor_Id ? [evento.professor_Id] : [];
         request.capacidadeMaximaAlunos = evento.capacidadeMaximaEvento;
         request.roteiro_Id = request.roteiro_Id == PseudoEvento.EventoId ? undefined : request.roteiro_Id;
-
+        
         if (evento.id == PseudoEvento.EventoId)
             return lastValueFrom(this.service.createOficina(request))
         return lastValueFrom(this.service.editOficina(request))

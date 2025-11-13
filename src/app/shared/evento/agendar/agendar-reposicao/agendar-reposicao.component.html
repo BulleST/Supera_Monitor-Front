@@ -1,0 +1,139 @@
+<app-confirm-dialog></app-confirm-dialog>
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full flex align-items-center gap-2">
+        <i class="pi pi-calendar mr-2 text-base w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <p>Agendar Reposição</p>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button
+                  [icon]="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+                  (onClick)="maximize()"
+                  styleClass="p-dialog-maximize-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+        <p-button icon="pi pi-times"
+                  (onClick)="close()"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+<form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
+    <p-accordion value="0">
+        <!-- Aluno -->
+        <p-accordion-panel value="0">
+            <p-accordion-header>
+                <div class="flex align-items-center gap-2">
+                    <span>
+                        <p-badge
+                                 value="Passo 1"
+                                 [severity]="aluno ? 'success' : 'danger'" />
+                    </span>
+                    <span>Aluno: </span>
+                    <span class="text-primary-500">/</span>
+                    <span class="font-normal">
+                        {{aluno?.nome ?? 'Selecionar'}}
+                    </span>
+                    <ng-container *ngIf="aluno">
+                        <app-legend-color
+                                          class="line-height-1"
+                                          [corLegenda]="aluno.corLegenda"
+                                          [professor]="aluno.professor" />
+                    </ng-container>
+                </div>
+            </p-accordion-header>
+            <p-accordion-content>
+                <div class="surface-50 w-full p-3 -mx-3">
+                    <app-reposicao-aluno-select #reposicaoAlunoComponent
+                                                class="w-full flex surface-50"
+                                                [eventoReposicaoDe]="eventoReposicaoDe"
+                                                [eventoReposicaoPara]="eventoReposicaoPara"
+                                                (onAlunoChanged)="alunoChanged($event)"></app-reposicao-aluno-select>
+                </div>
+            </p-accordion-content>
+        </p-accordion-panel>
+        <!-- Reposição de Evento -->
+        <p-accordion-panel value="1">
+            <p-accordion-header>
+                <div class="flex align-items-center gap-2">
+                    <span>
+                        <p-badge
+                                 value="Passo 2"
+                                 [severity]="eventoReposicaoDe ? 'success' : 'danger'" />
+                    </span>
+                    <span>Reposição de: </span>
+                    <span class="text-primary-500">
+                        {{eventoReposicaoDe?.data | date : 'dd/MMM yyyy \'às\' HH:mm'}}
+                    </span>
+                    <span class="text-primary-500">/</span>
+                    <span class="font-normal">
+                        {{eventoReposicaoDe?.descricao ?? 'Selecionar'}}
+                    </span>
+                    <ng-container *ngIf="eventoReposicaoDe">
+                        <app-legend-color
+                                          class="line-height-1"
+                                          [corLegenda]="eventoReposicaoDe.corLegenda"
+                                          [professor]="eventoReposicaoDe.professor" />
+                    </ng-container>
+                </div>
+            </p-accordion-header>
+            <p-accordion-content>
+                <div class="surface-50 w-full p-3 -mx-3">
+                    <app-reposicao-de-select
+                                             #reposicaoDeComponent
+                                             class="w-full flex"
+                                                (onEventoChanged)="eventoReposicaoDeChanged($event)"></app-reposicao-de-select>
+                </div>
+            </p-accordion-content>
+        </p-accordion-panel>
+        <!-- Reposição para Evento -->
+        <p-accordion-panel value="3">
+            <p-accordion-header>
+                <div class="flex align-items-center gap-2">
+                    <span>
+                        <p-badge
+                                 value="Passo 3"
+                                 [severity]="eventoReposicaoPara ? 'success' : 'danger'" />
+                    </span>
+                    <span>Reposição para: </span>
+                    <span class="text-primary-500">
+                        {{eventoReposicaoPara?.data | date : 'dd/MMM yyyy \'às\' HH:mm' }}
+                    </span>
+                    <span class="text-primary-500">/</span>
+                    <span class="font-normal">
+                        {{eventoReposicaoPara?.descricao ?? 'Selecionar'}}
+                    </span>
+                    <ng-container *ngIf="eventoReposicaoPara">
+                        <app-legend-color
+                                          class="line-height-1"
+                                          [corLegenda]="eventoReposicaoPara.corLegenda"
+                                          [professor]="eventoReposicaoPara.professor" />
+                    </ng-container>
+                </div>
+            </p-accordion-header>
+            <p-accordion-content>
+                <div class="surface-50 w-full p-3 -mx-3">
+                    <app-reposicao-para-select
+                                               #reposicaoParaComponent
+                                               class="w-full flex"
+                                               (onEventoChanged)="eventoReposicaoParaChanged($event)"></app-reposicao-para-select>
+                </div>
+            </p-accordion-content>
+        </p-accordion-panel>
+    </p-accordion>
+    <div class="formgrid grid mt-4">
+        <div class="col-12 px-1 flex align-items-center justify-content-end">
+            <p-button type="submit"
+                      fluid
+                      label="Finalizar agendamento"
+                      icon="pi pi-check"
+                      [loading]="loading"
+                      [rounded]="true"
+                      [disabled]="saveDisabled(form)" />
+        </div>
+    </div>
+</form>

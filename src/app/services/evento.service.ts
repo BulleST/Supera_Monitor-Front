@@ -1,14 +1,13 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
-import { RequestResponse } from '../helpers/request-response.interface';
+import { BehaviorSubject, map, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
-import { Evento, EventoCancelamentoRequest, EventoReagendamentoRequest } from '../models/evento.model';
+import { Evento, EventoCancelamentoRequest } from '../models/evento.model';
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
 import { EventoSuperacaoRequest } from '../models/evento-superacao.model';
 import { EventoOficinaRequest } from '../models/evento-oficina.model';
 import { EventoReuniaoRequest } from '../models/evento-reuniao.model';
-import { EventoAula0Request } from '../models/evento-aula-0.model';
-import { CalendarioRequest, CalendarioView } from '../models/calendario.model';
+import { EventoAula0Request, FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
+import { CalendarioRequest, CalendarioResponse, CalendarioView } from '../models/calendario.model';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import { getError } from '../utils';
@@ -20,10 +19,10 @@ import { PrimeiraAulaRequest, PseudoEvento, ReposicaoRequest } from '../models/r
 import { MyMap } from '../utils/map';
 import { EventoChamadaRequest } from '../models/evento-chamada.model';
 import { Feriado } from '../models/feriado.model';
-import { FinalizarAulaZeroRequest } from '../models/evento-aula-0.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
 import { UrlService } from '../utils/url.service';
 import { statusContato } from '../models/evento-participacao-aluno.model';
+import { RequestResponse } from '../helpers/request-response.interface';
 
 @Injectable({
     providedIn: 'root',
@@ -62,11 +61,12 @@ export class EventoService extends Service {
     }
 
     setEvento(value: Evento | undefined) {
-
         this.evento.next(value);
+
         if (value) {
-            value.data = moment(value.data).format('YYYY-MM-DD[T]HH:mm') as any;
-            localStorage.setItem('evento', JSON.stringify(value));
+            var newValue = {...value}
+            newValue.data = moment(newValue.data).format('YYYY-MM-DD[T]HH:mm') as any;
+            localStorage.setItem('evento', JSON.stringify(newValue));
         }
         else localStorage.removeItem('evento');
     }
@@ -110,7 +110,8 @@ export class EventoService extends Service {
         evento.data = moment(evento.data, 'YYYY-MM-DDTHH:mm').locale('pt-BR').toDate();
         evento.active = !evento.deactivated;
 
-        evento.professores = evento.professores.filter(x => x.active) ?? [];
+        evento.professores = evento.professores ?? [];
+        evento.professores = evento.professores.filter(x => x.active);
         evento.professores = evento.professores.sort((x, y) => (x.nome < y.nome ? -1 : 1));
 
         evento.alunos = evento.alunos ?? [];
@@ -129,33 +130,31 @@ export class EventoService extends Service {
         request.intervaloDe = moment(request.intervaloDe).format('YYYY-MM-DD') as any;
         request.intervaloAte = moment(request.intervaloAte).format('YYYY-MM-DD') as any;
 
-        return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
-            .pipe(tap({
-                next: async (eventos) => {
-                    // let list = this.eventos.value as Evento[];
-
+        return this.http.post<CalendarioResponse>(`${this.url}/eventos/calendario/`, request)
+        // return this.http.post<Evento[]>(`${this.url}/eventos/calendario/`, request)
+            .pipe(tap({ 
+                next: res => {
+                    let eventos = res.eventos;
                     eventos = eventos.map(evento => {
                         evento = this.mapEvento(evento);
-
-                        // let index = list.findIndex(x => x.id == evento.id
-                        //     && x.turma_Id == evento.turma_Id
-                        //     && moment(x.data).isSame(evento.data));
-
-                        // if (index == -1) list.push(evento);
-                        // else list.splice(index, 1, evento);
-
                         return evento;
                     });
-
                     this.eventos.next(eventos);
 
-                    return of(eventos);
+                    let feriados = res.feriados;
+                    feriados = feriados.map(feriado => {
+                        feriado.date = moment(feriado.date).toDate();
+                        return feriado;
+                    });
+
+                    this.feriados.next(feriados)
+
+                    return of(res);
                 },
                 error: (err) => {
                     this.toastrService.error(`Não foi possível carregar calendário. \n ${getError(err)}`);
                 },
-            })
-            );
+            }));
     }
 
     get(id: number) {

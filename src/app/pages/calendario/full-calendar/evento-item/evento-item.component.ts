@@ -34,7 +34,7 @@ export class EventoItemComponent implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['evento']) {
             this.evento = changes['evento'].currentValue;
-            if (this.evento.alunos)  {
+            if (this.evento.alunos) {
                 this.alunosStr = this.evento.alunos.map(x => this.nameFirstWordPipe.transform(x.aluno)).join(', ');
             }
         }

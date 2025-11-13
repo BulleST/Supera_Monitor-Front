@@ -13,7 +13,7 @@ import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { showError } from '../../../../utils';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { DialogService } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../../utils/show-aluno';
 
 @Component({
     selector: 'app-editar-oficina',

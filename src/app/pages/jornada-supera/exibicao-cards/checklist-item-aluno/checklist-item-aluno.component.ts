@@ -5,7 +5,7 @@ import { JornadaSuperaStatus } from '../../../../models/jornada-supera-status.mo
 import { DialogService } from 'primeng/dynamicdialog';
 import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
-import { showAluno } from '../../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../../utils/show-aluno';
 
 @Component({
     selector: 'app-checklist-item-aluno',

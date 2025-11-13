@@ -1,34 +1,5 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div class="flex align-items-start gap-2 ">
-            <span class="mt-1">
-                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
-                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
-            </span>
-            <div>
-                <div [innerHTML]="message.message"></div>
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
-                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
-                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
-                    <div *ngFor="let aluno of mensagensEnviadasAlunos">
-                        <p-button type="button"
-                                  (onClick)="enviarMensagemInscricao(aluno)"
-                                  (auxclick)="enviarMensagemInscricao(aluno)"
-                                  (contextmenu)="enviarMensagemInscricao(aluno)"
-                                  [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp"
-                                  [severity]="aluno.celular ? 'success' : 'secondary'"
-                                  label="{{aluno.nome | nameAbv }}"
-                                  styleClass="capitalize"
-                                  [pTooltip]="aluno.nome"
-                                  [text]="true" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
+
 <p-dialog [maximizable]="true"
           [draggable]="true"
           [modal]="true"
@@ -39,7 +10,7 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title flex align-items-center">
-                <i class="pi pi-user-plus mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <i class="pi pi-user-plus mr-2 text-sm w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <div class="flex flex-column">
                     <span>Inscrever aluno</span>
                 </div>
@@ -47,20 +18,14 @@
         </div>
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
-        <p-divider layout="horizontal" *ngIf="evento.id == PseudoEvento.EventoId">
-            <p class="text-primary-500 font-medium">Defina o tema e outros dados da oficina para salvar inscrição</p>
-        </p-divider>
         <div class="formgrid grid">
             <!-- Aluno -->
             <div class="field col-12">
                 <label for="aluno_Id">Selecionar alunos: <span class="text-red-500">*</span></label>
-                <p-multiSelect [options]="alunos"
+                <p-select [options]="alunos"
                                [loading]="loadingAlunos"
-                               [(ngModel)]="selectedAlunos"
+                               [(ngModel)]="aluno"
                                (onChange)="alunoChanged($event, aluno_Id)"
-                               [maxSelectedLabels]="evento.vagasDisponiveisEvento"
-                               [selectionLimit]="evento.vagasDisponiveisEvento"
-                               display="chip"
                                optionLabel="nome"
                                #aluno_Id="ngModel"
                                fluid
@@ -101,14 +66,14 @@
                                 </div>
                                 <p class="mb-1 flex align-items-center gap-2 ">
                                     <app-legend-color class="line-height-1"
-                                                    [corLegenda]="item.corLegenda"
+                                                      [corLegenda]="item.corLegenda"
                                                       [professor]="item.professor"></app-legend-color>
                                     <span class="font-normal">Turma {{item.turma}}</span>
                                 </p>
                             </div>
                         </div>
                     </ng-template>
-                </p-multiSelect>
+                </p-select>
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
@@ -116,7 +81,7 @@
             </div>
         </div>
         <p-divider layout="horizontal" [align]="'left'">
-            <span class="text-primary-500 font-bold">Dados da Oficina</span>
+            <span class="text-primary-500 font-bold">Dados da {{getTipo(evento)}}</span>
         </p-divider>
         <div class="formgrid grid">
             <!-- Descrição -->
@@ -193,7 +158,7 @@
                 <label for="sala">Sala: </label>
                 <input type="text"
                        pInputText
-                       [value]="sala"
+                       [value]="sala ?? 'Indefinido'"
                        fluid
                        id="sala"
                        readonly />

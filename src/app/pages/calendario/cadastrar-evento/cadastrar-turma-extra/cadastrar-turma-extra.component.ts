@@ -643,8 +643,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         lastValueFrom(this.service.getList(request))
             .then(res => {
 
-                let feriadosDates = this.invalidDates.map(x => moment(x).format('YYYY-MM-DD'));
-                aluno.aulasParaRepor = res.filter(evento => {
+                aluno.aulasParaRepor = res.eventos.filter(evento => {
                     let ehAula = evento.evento_Tipo_Id == EventoTipo.Aula;
                     let ehAulaFinalizada = evento.finalizado;
                     let alunoEstaNaAula = evento.alunos.find(x => x.active === true)
@@ -656,12 +655,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                         && !alunoMarcouReposicao
                     return condicao;
                 });
-
-                aluno.aulasParaRepor = aluno.aulasParaRepor
-                    .map(evento => {
-                        evento.feriado = this.feriados.find(x => moment(x.date).isSame(evento.data, 'date'));
-                        return evento;
-                    });
 
                 this.loadingEventosReposicaoAluno = false;
 

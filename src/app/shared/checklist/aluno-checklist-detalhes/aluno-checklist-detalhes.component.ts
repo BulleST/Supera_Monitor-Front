@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ChecklistItemId } from '../../../models/checklist-item-id.enum';
-import { showAluno } from '../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../utils/show-aluno';
 
 @Component({
 	selector: 'app-aluno-checklist-detalhes',

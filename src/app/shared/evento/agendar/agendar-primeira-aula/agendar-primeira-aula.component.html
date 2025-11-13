@@ -1,0 +1,69 @@
+<app-confirm-dialog></app-confirm-dialog>
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full flex align-items-center gap-2">
+        <i class="pi pi-calendar mr-2 text-base w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <p>Agendar Primeira Aula</p>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button
+                  [icon]="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+                  (onClick)="maximize()"
+                  styleClass="p-dialog-maximize-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+        <p-button icon="pi pi-times"
+                  (onClick)="close()"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+<form #form="ngForm" (ngSubmit)="sendConfirmation($event)">
+    <!-- Aluno -->
+    <app-aula1-aluno-select
+                            class="w-full flex"
+                            [evento]="evento"
+                            (onAlunoChanged)="alunoChanged($event)"></app-aula1-aluno-select>
+    <!-- Evento -->
+    <app-aula1-evento-selected *ngIf="evento"
+                                class="w-full flex"
+                                [aluno]="aluno"
+                                (onEventoChanged)="eventoChanged($event)"></app-aula1-evento-selected>
+    <!-- Calendario -->
+    <app-aula1-calendario-select *ngIf="!evento && aluno"
+                                 class="w-full flex"
+                                 [aluno]="aluno"
+                                 (onEventoChanged)="eventoChanged($event)"></app-aula1-calendario-select>
+    <!-- Footer -->
+    <ng-container *ngIf="aluno && evento">
+        <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
+            <div *ngIf="aluno.restricaoMobilidade || restricoes.length > 0"
+                 class="flex align-items-center">
+                <p-checkbox
+                            inputId="restricaoCheck"
+                            name="restricaoCheck"
+                            [(ngModel)]="restricaoCheck"
+                            [disabled]="!aluno"
+                            [binary]="true"
+                            [required]="true" />
+                <label for="restricaoCheck"
+                       class="ml-2 mt-1 leading-none"> Estou ciente das restrições do aluno e quero continuar. </label>
+            </div>
+            <div class="ml-auto">
+                <p-button (onClick)="sendConfirmation($event)"
+                          styleClass="w-full px-3"
+                          label="Agendar"
+                          [icon]="'pi pi-check'"
+                          [loading]="loading"
+                          [pTooltip]="!restricaoCheck ? 'Verifique os dados e marque a caixa' : ''"
+                          tooltipPosition="top"
+                          [disabled]="!restricaoCheck && (aluno.restricaoMobilidade || restricoes.length > 0)"
+                          [rounded]="true" />
+            </div>
+        </div>
+    </ng-container>
+</form>

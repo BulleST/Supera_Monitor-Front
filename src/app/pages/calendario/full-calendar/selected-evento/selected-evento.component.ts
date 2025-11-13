@@ -16,9 +16,8 @@ import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAndar, SalaAulaId } from '../../../../models/sala-aula.model';
 import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
-import { AlunoContatoFaltaComponent } from '../../../../shared/aluno/aluno-contato-falta/aluno-contato-falta.component';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../../utils/show-aluno';
 
 @Component({
     selector: 'app-selected-evento',
@@ -168,6 +167,13 @@ export class SelectedEventoComponent implements OnChanges {
             this.hidePopover();
         }
     }
+    goToAgendarFalta() {
+        if (this.evento) {
+            this.service.setEvento(this.evento);
+            this.router.navigate(['calendario', 'agendar', 'falta', '', this.crypto.encrypt(this.evento.id)]);
+            this.hidePopover();
+        }
+    }
 
     goToCancelamento() {
         if (this.evento) {
@@ -186,6 +192,14 @@ export class SelectedEventoComponent implements OnChanges {
             this.router.navigate(['calendario', 'cancelar', route, this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
 
+        }
+    }
+    
+    goToReposicao() {
+        if (this.evento) {
+            this.service.setEventoReposicaoDe(undefined)
+            this.service.setEventoReposicaoPara(this.evento);
+            this.router.navigate(['calendario', 'agendar','reposicao', '', this.crypto.encrypt(this.evento.id)]);
         }
     }
 
@@ -239,47 +253,7 @@ export class SelectedEventoComponent implements OnChanges {
         }
     }
 
-    goToReposicao() {
-        if (this.evento) {
-            this.service.setEventoReposicaoDe(undefined)
-            this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate(['calendario', 'agendar','reposicao', '', this.crypto.encrypt(this.evento.id)]);
-        }
-    }
-    showContatoFalta(participacao: Evento_Participacao_Aluno) {
-        this.refChild = this.dialogService.open(AlunoContatoFaltaComponent, {
-            header: 'Aula',
-            showHeader: false,
-            closable: true,
-            maximizable: false,
-            closeOnEscape: true,
-            draggable: true,
-            dismissableMask: true,
-            duplicate: true,
-            modal: true,
-            width: '95vw',
-            style: { maxWidth: '550px' },
-            data: {
-                celular: participacao.celular,
-                aluno: participacao.aluno,
-
-                evento_Id: this.evento.id,
-                evento: this.evento.descricao,
-                data: this.evento.data,
-                roteiroCorLegenda: this.evento.roteiroCorLegenda,
-                semana: this.evento.semana,
-                tema: this.evento.tema,
-
-                observacao: participacao.observacao,
-                contatado: participacao.alunoContactado,
-                alunoContactado: participacao.alunoContactado ? moment(participacao.alunoContactado).toDate() : undefined,
-                statusContato_Id: participacao.statusContato_Id,
-                contatoObservacao: participacao.contatoObservacao,
-                participacao_Id: participacao.id,
-            }
-        });
-    }
-
+    
     @HostListener('mousemove', ['$event'])
     onMouseMove(event: MouseEvent): void {
         const x = event.clientX;

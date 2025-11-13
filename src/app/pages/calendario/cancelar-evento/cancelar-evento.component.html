@@ -41,64 +41,131 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">
-                <i class="pi pi-calendar mr-2 text-2xl w-3rem h-3rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+                <i class="pi pi-calendar mr-2 text-sm w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
                 <span>Cancelar {{tipoEventoString}}</span>
             </span>
         </div>
     </ng-template>
     <form #form="ngForm" (submit)="sendConfirmation( $event, form)">
-        <p class="text-lg mb-1">Tem certeza que deseja cancelar essa {{tipoEventoString}}? </p>
-            <p class="text-xl text-primary-500 white-space-nowrap flex align-items-center gap-2">
-                <i class="fa-solid fa-users-between-lines"></i>
-                <span class="capitalize font-bold">{{evento.descricao }} </span>
-            </p>
-        <p class="flex flex-column my-2">
         
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
-                <i class="pi pi-calendar"></i>
-                <!-- <span class="font-bold">Data:</span> -->
-                <span class="capitalize">{{evento.data | date : 'EEEE\',\''}} </span>
-                <span>{{evento.data | date : 'dd \'de\' MMMM \'de\' yyyy '}} </span>
-            </span>
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
-                <i class="pi pi-clock"></i>
-                <!-- <span class="font-bold">Horário:</span> -->
-                <span>{{evento.data | date : 'HH:mm'}}</span>
-            </span>
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2" *ngIf="evento.professor">
-                <i class="fa-solid fa-person-chalkboard"></i>
-                <span>Educador: </span>
-                <span>{{evento.professor}}</span>
-                <app-legend-color [corLegenda]="evento.corLegenda"
-                                [professor_Id]="evento.professor_Id"
-                                [turma_Id]="evento.turma_Id"></app-legend-color>
-            </span>
-            <span class="col p-0 white-space-nowrap flex align-items-center gap-2">
-                <i class="bi bi-door-closed"></i>
-                <span>Sala: </span>
-                <span>{{evento.sala}}</span>
-                <span>-</span>
-                <span *ngIf="evento.andar == SalaAndar.Terreo">Terreo</span>
-                <span *ngIf="evento.andar != SalaAndar.Terreo">{{evento.andar}}ºandar</span>
-            </span>
-        </p>
-        <div class="formgrid grid mt-2">
-            <div class="field col-12"> <!-- Observações -->
-                <label for="observacao">Observações:<span class="text-red-500">*</span> <span class="text-400 text-sm font-normal ml-2">(motivo do cancelamento)</span></label>
-                <textarea pTextarea
-                          class="w-full"
-                          name="observacao"
-                          id="observacao"
-                          #observacao="ngModel"
-                          [(ngModel)]="evento.observacao"
-                          placeholder="Aproveite para contar o motivo do cancelamento"
-                          [required]="true"
-                          [rows]="3"></textarea>
-                <div *ngIf="observacao.touched && observacao.invalid && observacao.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="observacao.errors['required']">Esse campo é obrigatório.</p>
-                </div>
-            </div>
-        </div>
+        <table class="w-full">
+            <tr>
+                <td class="vertical-align-middle">
+                    <label for="data">Data:</label>
+                </td>
+                <td class="vertical-align-middle">
+                    <p-iconfield>
+                        <p-inputicon styleClass="pi pi-calendar" />
+                        <input type="text"
+                               pInputText
+                               [value]="evento.data |date : 'dd \'de\' MMMM \'de\' yyyy \'às\' HH:mm'"
+                               id="data"
+                               name="data"
+                               fluid
+                               readonly>
+                    </p-iconfield>
+                </td>
+            </tr>
+                <!-- Turma -->
+                <tr>
+                    <td class="vertical-align-middle">
+                        <label for="turma">Turma:</label>
+                    </td>
+                    <td class="vertical-align-middle">
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa fa-users-between-lines" />
+                            <input type="text"
+                                   pInputText
+                                   [value]="evento.turma ?? 'Indefinido'"
+                                   id="turma"
+                                   name="turma"
+                                   fluid
+                                   readonly>
+                            <p-inputicon>
+                                <app-legend-color class="line-height-1"
+                                                  [corLegenda]="evento.corLegenda"
+                                                  [professor]="evento.professor" />
+                            </p-inputicon>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Perfil Cognitivo -->
+                <tr>
+                    <td class="vertical-align-middle">
+                        <label for="perfilCognitivo ">Perfil Cognitivo:</label>
+                    </td>
+                    <td class="vertical-align-middle">
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa fa-brain" />
+                            <input type="text"
+                                   pInputText
+                                   [value]="getPerfilCognitivo(evento) ?? 'Infedinido' "
+                                   id="perfilCognitivo "
+                                   name="perfilCognitivo "
+                                   fluid
+                                   readonly>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Sala -->
+                <tr>
+                    <td class="vertical-align-middle">
+                        <label for="sala ">Sala:</label>
+                    </td>
+                    <td class="vertical-align-middle">
+                        <p-iconfield>
+                            <p-inputicon styleClass="bi bi-door-open" />
+                            <input type="text"
+                                   pInputText
+                                   [value]="evento.sala + ' - ' + ( evento.andar == 0 ? 'Térreo' : (evento.andar ?? 0+ 'º andar') )"
+                                   id="sala "
+                                   name="sala "
+                                   fluid
+                                   readonly>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Roteiro -->
+                <tr>
+                    <td class="vertical-align-middle">
+                        <label for="roteiro ">Roteiro:</label>
+                    </td>
+                    <td class="vertical-align-middle">
+                        <p-iconfield>
+                            <p-inputicon styleClass="fa fa-star" [style]="{color: evento.roteiroCorLegenda}" />
+                            <input type="text"
+                                   pInputText
+                                   [value]="'Tema: ' + evento.tema + ' - Semana:' + evento.semana"
+                                   id="roteiro "
+                                   name="roteiro "
+                                   fluid
+                                   readonly>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Observações -->
+                <tr>
+                    <td class="vertical-align-top">
+                        <label for="observacao" class="mt-1 block">Observações:</label>
+                    </td>
+                    <td>
+                        <textarea pTextarea
+                                  class="w-full"
+                                  name="observacao"
+                                  id="observacao"
+                                  #observacao="ngModel"
+                                  [(ngModel)]="evento.observacao"
+                                  placeholder="Aproveite para contar o motivo do cancelamento"
+                                  [required]="true"
+                                  [rows]="3"></textarea>
+                                  <div *ngIf="observacao.touched && observacao.invalid && observacao.errors">
+                                      <p class="text-red-500 mb-0" *ngIf="observacao.errors['required']">Esse campo é obrigatório.</p>
+                                  </div>
+                    </td>
+                </tr>
+        </table>
+
+
         <div class="formgrid grid">
             <div class="field col" *ngIf="evento.alunos && evento.alunos.length > 0">
                 <p class="font-bold text-primary-500">
@@ -107,7 +174,7 @@
                 </p>
                 <hr class="mb-2 border-orange-500 border-1">
                 <div *ngFor="let item of evento.alunos; let i = index">
-                    <div class="flex align-items-center w-full p-2 gap-2" [ngClass]="{
+                    <div class="flex align-items-center w-full px-2 py-1 gap-2" [ngClass]="{
                         'bg-white': i % 2 == 0,
                         'surface-50': i % 2 != 0 
                     }">
@@ -119,7 +186,8 @@
                                   icon="pi pi-whatsapp {{!item.celular ? 'text-300' : ''}}"
                                   severity="success"
                                   [text]="true"
-                                  [rounded]="true" />
+                                  [rounded]="true" 
+                                    size="small"/>
                         <p class="capitalize" [pTooltip]="item.aluno">{{ item.aluno | nameAbv}}</p>
                         <ng-container *ngIf="item.reposicaoDe_Evento_Id">
                             <p-badge
@@ -135,16 +203,17 @@
                 <div class="flex flex-wrap gap-2 pl-1">
                     <div *ngFor="let item of professores; let i = index"
                          class="flex align-items-center justify-content-between gap-2 ">
-                        <div class="font-bold flex align-items-center ">
+                        <div class="font-bold flex align-items-center gap-2">
                             <app-legend-color [corLegenda]="item.corLegenda"
                                               [professor_Id]="item.id"
                                               [professor]="item.nome"></app-legend-color>
-                            <span class="mr-2">{{ item.nome }}</span>
+                            <span>{{ item.nome }}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 flex">
+            <div class="col-12 flex align-items-center justify-content-between">
+                <p >Tem certeza que deseja cancelar essa {{tipoEventoString}}? </p>
                 <p-button type="submit"
                           styleClass="px-3"
                           class=" ml-auto"

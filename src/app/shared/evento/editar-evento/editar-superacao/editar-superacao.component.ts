@@ -17,7 +17,7 @@ import { showError, CalendarioUtils } from '../../../../utils';
 import { EventoService } from '../../../../services/evento.service';
 import { AlunoService } from '../../../../services/alunos.service';
 import { DialogService } from 'primeng/dynamicdialog';
-import { showAluno } from '../../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../../utils/show-aluno';
 
 @Component({
     selector: 'app-editar-superacao',

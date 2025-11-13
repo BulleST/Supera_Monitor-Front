@@ -11,7 +11,6 @@ import { TurmaService } from '../../../services/turma.service'
 import { HttpErrorResponse } from '@angular/common/http'
 import { ToastrService } from 'ngx-toastr'
 import { ContextMenu } from 'primeng/contextmenu'
-import { SalaAndar } from '../../../models/sala-aula.model'
 
 @Component({
     selector: 'app-list',
@@ -76,7 +75,7 @@ export class ListComponent implements OnDestroy {
     }
 
     @HostListener('keydown.escape', ['$event'])
-    onKeydownHandler(event: KeyboardEvent) {
+    onKeydownHandler(event: any) {
         this.unselectItems()
     }
 

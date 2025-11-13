@@ -1,0 +1,164 @@
+<app-confirm-dialog></app-confirm-dialog>
+<div class="field col-12">
+    <p-fieldset legend="Aluno">
+        <div class="formgrid grid">
+            <!-- Aluno -->
+            <div class="field sm:col col-12">
+                <ng-container *ngIf="!readonly; else alunoSelecionadoTemplate">
+                    <label for="aluno_Id">Selecione o aluno: <span class="text-red-500">*</span></label>
+                    <p-iconfield>
+                        <p-inputicon styleClass="fa-solid fa-user" />
+                        <p-select [options]="alunos"
+                                [loading]="loadingAlunos"
+                                name="aluno_Id"
+                                inputId="aluno_Id"
+                                #aluno_Id="ngModel"
+                                [(ngModel)]="aluno"
+                                (onChange)="alunoChanged($event)"
+                                [required]="true"
+                                [filter]="true"
+                                filterBy="nome,turma,professor"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="43"
+                                optionLabel="nome"
+                                [readonly]="readonly"
+                                [disabled]="readonly"
+                                placeholder="Selecione um aluno"
+                                panelStyleClass="p-select-stripped"
+                                appendTo="body"
+                                fluid>
+                            <ng-template let-item #item>
+                                <div class="flex flex-column">
+                                    <div class="flex align-items-center">
+                                        <p-button 
+                                            icon="pi pi-whatsapp  {{!item.celular ? 'text-300' : ''}}"
+                                            severity="success"
+                                            [rounded]="true"
+                                            (onClick)="enviarMensagem(item)"
+                                            (auxclick)="enviarMensagem(item)"
+                                            (contextmenu)="enviarMensagem(item)"
+                                            pTooltip="Enviar mensagem"
+                                            [disabled]="!item.celular"
+                                            [text]="true"
+                                            size="small"
+                                        />
+                                        <p class="capitalize">{{item.nome | nameAbv }}</p>
+                                    </div>
+                                    <div class="flex align-items-center gap-2">
+                                        <div class="w-2rem pl-1 flex justify-content-center">
+                                            <app-legend-color [corLegenda]="item.corLegenda"
+                                                              [professor_Id]="item.professor_Id"
+                                                              [professor]="item.professor"
+                                                              [turma_Id]="item.turma_Id"></app-legend-color>
+                                        </div>
+                                        <span>{{item.turma}}</span>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </p-select>
+                    </p-iconfield>
+                    <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                        <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                    </div>
+                </ng-container>
+                <ng-template #alunoSelecionadoTemplate>
+                    <label for="nome">Nome:</label>
+                    <p-iconfield>
+                        <p-inputicon *ngIf="!loading" styleClass="fa-solid fa-user text-700" />
+                        <p-inputicon *ngIf="loading" styleClass="pi pi-spinner pi-spin" />
+                        <input type="text"
+                            pInputText
+                            [value]="aluno?.nome"
+                            id="nome"
+                            name="nome"
+                            fluid
+                            readonly>
+                    </p-iconfield>
+                </ng-template>
+            </div>
+            <div class="field sm:col-8 col-12 flex align-items-center gap-2 p-0">
+                <p-divider layout="vertical" class="hidden sm:block" />
+                <div class="event-container" >
+                    <ng-container *ngIf="aluno && !loading">
+                        <div class="event-row">
+                            <div class="sm:col-6 col-12">
+                                <div class="event-property">
+                                    <div class="event-property-icon">
+                                        <i class="fa-solid fa-users-between-lines"></i>
+                                    </div>
+                                    <p class="event-property-description">
+                                        <span>Turma: {{aluno.turma}}</span>
+                                        <app-legend-color [corLegenda]="aluno.corLegenda"
+                                                          [professor_Id]="aluno.professor_Id"
+                                                          [professor]="aluno.professor"
+                                                          [turma_Id]="aluno.turma_Id"></app-legend-color>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="sm:col-6 col-12">
+                                <div class="event-property"> 
+                                    <div class="event-property-icon">
+                                        <i class="fa-solid fa-brain"></i>
+                                    </div>
+                                    <p class="event-property-description">Perfil Cognitivo: {{aluno.perfilCognitivo}}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="event-row">
+                            <div class="sm:col-6 col-12">
+                                <div class="event-property"> 
+                                    <div class="event-property-icon">
+                                        <i class="fa-solid fa-wheelchair"></i>
+                                    </div>
+                                    <p class="event-property-description">
+                                        <span>Restrição de mobilidade: </span>
+                                        <span *ngIf="aluno.restricaoMobilidade" class="text-red-500 zoomin animation-iteration-infinite animation-duration-500 font-bold">Sim</span> 
+                                        <span *ngIf="!aluno.restricaoMobilidade">Não</span> 
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="sm:col-6 col-12">
+                                <div class="event-property white-space-normal"> 
+                                    <div class="event-property-icon">
+                                        <i class="pi pi-ban"></i>
+                                    </div>
+                                    <p class="event-property-description">
+                                        Outras restrições: {{ getRestricoes(aluno) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!aluno && loading">
+                        <div class="flex align-items-center gap-2">
+                            <i class="fa-solid fa-users-between-lines"></i>
+                            <p class="flex gap-2 align-items-center">
+                                <span>Turma: </span>
+                                <p-skeleton width="100px" height="10px"></p-skeleton>
+                                <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                            </p>
+                        </div>
+                        <div class="flex align-items-center gap-2">
+                            <i class="fa-solid fa-person-chalkboard"></i>
+                            <p class="flex gap-2 align-items-center">Educador(a): <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                            <p-skeleton width="1rem" height="1rem" shape="circle"></p-skeleton>
+                        </div>
+                        <div class="flex align-items-center gap-2"> 
+                            <i class="fa-solid fa-brain"></i>
+                            <p class="flex gap-2 align-items-center">Perfil Cognitivo: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                        </div>
+                        <div class="flex align-items-center gap-2"> 
+                            <i class="fa-solid fa-wheelchair"></i>
+                            <p class="flex gap-2 align-items-center">Restrição de mobilidade: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                        </div>
+                        <div class="flex align-items-center gap-2"> 
+                            <i class="pi pi-ban"></i>
+                            <p class="flex gap-2 align-items-center">Outras restrições: <p-skeleton width="100px" height="10px"></p-skeleton></p>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </p-fieldset>
+</div>

@@ -12,7 +12,7 @@ import { ConfirmationService } from 'primeng/api';
 import { CalendarioUtils, getError, MensagemWhatsapp, showError, validaAlunos, validaAlunoSalaAula, validaProfessores, validaSalaAulas } from '../../../utils';
 import { ApostilaService } from '../../../services/apostila.service';
 import { lastValueFrom, Subscription } from 'rxjs';
-import { showAluno } from '../../../utils/show-aluno-dialog-service';
+import { showAluno } from '../../../utils/show-aluno';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { NgForm, NgModel } from '@angular/forms';
 import { SelectChangeEvent } from 'primeng/select';

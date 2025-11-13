@@ -117,7 +117,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
         lastValueFrom(this.eventoService.getList(request))
             .then(res => {
                 this.loadingEventos = false;
-                this.eventos = res;
+                this.eventos = res.eventos;
 
                 this.verificaDisponibilidade();
             })
@@ -266,7 +266,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
     }
 
     @HostListener('keydown.enter', ['$event'])
-    onEnterKeydown(event: KeyboardEvent) {
+    onEnterKeydown(event: any) {
 
         // Add your desired logic here
         this.sendConfirmation(this.form, event)

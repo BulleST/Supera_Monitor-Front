@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Aluno } from '../../../models/alunos.model';
-import { SalaAndar, SalaAulaId } from '../../../models/sala-aula.model';
+import { SalaAndar } from '../../../models/sala-aula.model';
 import { Turma } from '../../../models/turma.model';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -43,8 +43,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     duracaoEvento = '';
     EventoTipo = EventoTipo;
 
-    selectedAlunos: Aluno[] = [];
-    mensagensEnviadasAlunos: Aluno[] = [];
+    aluno?: Aluno;
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -205,7 +204,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
     }
 
 
-    async alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
+    alunoChanged(e: MultiSelectChangeEvent, model: NgModel) {
 
         this.validaAlunos()
 
@@ -227,7 +226,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                     e.originalEvent
                 );
 
-                this.selectAlunoReject(aluno, model);
+                this.selectAlunoReject(model);
                 return
             }
 
@@ -238,22 +237,19 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                     e.originalEvent
                 );
 
-                this.selectAlunoReject(aluno, model);
+                this.selectAlunoReject(model);
                 return;
             }
-            
+
             model.control.setErrors({ indisponivel: null });
             model.control.updateValueAndValidity()
 
         }
     }
 
-    selectAlunoReject(aluno: Aluno, model: NgModel) {
-        let index = this.selectedAlunos.findIndex(x => x.id == aluno.id);
-        if (index != -1)
-            this.selectedAlunos.splice(index, 1);
-
-        model.control.setValue(this.selectedAlunos);
+    selectAlunoReject(model: NgModel) {
+        this.aluno = undefined;
+        model.control.setValue(this.aluno);
         model.control.updateValueAndValidity();
     }
 
@@ -279,7 +275,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             return this.showError('Não foi possível salvar', 'Preencha todos os dados corretamente para salvar', e)
         }
 
-        if (!this.selectedAlunos.length) {
+        if (!this.aluno) {
             return this.showError('Não foi possível salvar', 'Selecione um aluno para continuar com inscrição', e)
         }
 
@@ -288,7 +284,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         this.confirmationService.confirm({
             target: e.target,
             header: 'Inscrever alunos',
-            message: `Tem certeza que deseja inscrever os alunos selecionados? <br> Alunos selecionados: ${this.selectedAlunos.map(x => x.nome.split(' ')[0]).join(', ')}?`,
+            message: `Tem certeza que deseja inscrever o aluno aluno selecionado?`,
             acceptLabel: `Salvar e inscrever`,
             rejectLabel: 'Cancelar',
             acceptIcon: 'pi pi-check',
@@ -308,78 +304,73 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         let response: RequestResponse = { success: false, message: '', object: undefined };
 
         if (this.evento.id == PseudoEvento.EventoId) {
-            response = await this.requestOficina();
+            response = await this.request();
             this.evento.id = response.object.id;
         }
+        var aluno = this.aluno as Aluno;
 
-        let count = 0
-        await new Promise<boolean>((resolve, reject) => {
-            this.selectedAlunos.forEach(aluno => {
-                lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
-                    .then(res => {
-                        count++;
-                        if (count == this.selectedAlunos.length) {
-                            resolve(true);
-                        }
-                    })
-                    .catch(res => {
-                        count++;
-                        this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`, e);
-                        if (count == this.selectedAlunos.length) {
-                            resolve(true);
-                        }
-                    })
+        lastValueFrom(this.service.inscrever(aluno.id, this.evento.id))
+            .then(res => {
+                this.loading = false;
+                if (res.success) {
+
+                    this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
+                    this.service.calendarioReload.emit(0);
+                    this.enviarMensagemAluno(e);
+                } else {
+
+                    this.showError('Agendamento falhou',
+                        `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${res.message}`,
+                        e);
+                }
             })
-        });
+            .catch(res => {
+                this.showError('Agendamento falhou',
+                    `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`,
+                    e);
+            })
 
 
-        this.loading = false;
-        this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
-        this.service.calendarioReload.emit(0);
-        this.sendMensagemAlunos();
         // playSuccess();
 
     }
 
-    requestOficina() {
-        return this.calendarioUtils.requestOficina(this.evento);
+    request() {
+        return this.calendarioUtils.request(this.evento);
     }
 
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
-        this.confirmationService.confirm({
-            key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: false,
-            accept: () => {
-                this.visible = false
-                this.visibleChange();
-            },
-        });
-    }
+    enviarMensagemAluno(e: any) {
+        if (this.aluno) {
+            var aluno = this.aluno as Aluno;
+            this.confirmationService.confirm({
+                target: e.target,
+                message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
+                header: 'Enviar whatsapp',
+                icon: 'pi pi-whatsapp text-green-500',
+                acceptLabel: `Concluir`,
+                acceptIcon: 'pi pi-check',
+                acceptButtonStyleClass: 'p-button-rounded',
+                rejectVisible: false,
+                accept: () => {
+                    let object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
+                    window.open(object.link, '_blank');
+                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 
-
-    removerAlunoLista(aluno: Aluno, e: any) {
-        if (e.which == 2) {
-            let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-            if (index != -1)
-                this.mensagensEnviadasAlunos.splice(index, 1);
+                    this.visible = false
+                    this.visibleChange();
+                },
+                reject: () => {
+                    this.visible = false
+                    this.visibleChange();
+                }
+            });
+        }
+        else {
+            this.visible = false
+            this.visibleChange();
         }
     }
 
-    enviarMensagemInscricao(aluno: Aluno) {
-        if (!aluno.celular) {
-            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
-            return;
-        }
-        let object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
-        window.open(object.link, '_blank');
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-    }
 
 }
+

@@ -1,0 +1,170 @@
+import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { Evento, EventoTipo } from '../../../../../models/evento.model';
+import { EventoService } from '../../../../../services/evento.service';
+import { lastValueFrom, Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { Aluno } from '../../../../../models/alunos.model';
+import { CalendarioRequest } from '../../../../../models/calendario.model';
+import moment from 'moment';
+import { PseudoEvento } from '../../../../../models/reposicao.model';
+import { SalaAndar } from '../../../../../models/sala-aula.model';
+import { NgModel } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
+import { AlunoService } from '../../../../../services/alunos.service';
+
+@Component({
+	selector: 'app-reposicao-para-select',
+	standalone: false,
+	templateUrl: './reposicao-para-select.component.html',
+	styleUrl: '../agendar-reposicao.component.css',
+})
+export class ReposicaoParaSelectComponent implements OnDestroy {
+	evento?: Evento;
+	list: Evento[] = [];
+	loading = false;
+	readonly = false;
+	subscription: Subscription[] = [];
+    data = new Date;
+	
+	aluno?: Aluno;
+	eventoReposicaoDe?: Evento;
+	@Output() onEventoChanged = new EventEmitter<Evento>();
+	@Output() onVisibleChange = new EventEmitter<boolean>();
+
+    SalaAndar = SalaAndar;
+
+    constructor(
+		private activatedRoute: ActivatedRoute,
+		private toastr: ToastrService,
+		private confirmationService: ConfirmationService,
+		private service: EventoService,
+		private alunoService: AlunoService,
+        
+	) {
+		this.onVisibleChange.subscribe(res => {
+			if (!res) {
+				this.ngOnDestroy();
+			}
+		})
+
+		let aluno = this.alunoService.getAluno().subscribe(res => {
+            this.aluno = res;
+            this.loadEventosReposicaoPara();
+            this.setEvento();
+		});
+		this.subscription.push(aluno);
+
+		let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
+            this.eventoReposicaoDe = res;
+            this.loadEventosReposicaoPara();
+            this.setEvento();
+            console.log('eventoReposicaoDe')
+		});
+		this.subscription.push(eventoReposicaoDe);
+
+		let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => {
+			let params = this.activatedRoute.snapshot.paramMap;
+            this.readonly = !!params.get('evento_reposicao_para');
+            this.evento = res;
+            this.data = moment(this.evento?.data ?? new Date).toDate();
+            
+            this.setEvento();
+		});
+		this.subscription.push(eventoReposicaoPara);
+	}
+
+	
+    ngOnDestroy(): void {
+        this.subscription.forEach(item => item.unsubscribe());
+    }
+
+    getPerfilCognitivo(evento: Evento) {
+        return evento.perfilCognitivo.map(x => x.nome).join(', ');
+    }
+
+    loadEventosReposicaoPara() {
+        if (!this.aluno) {
+            return undefined;
+        }
+        else if (!this.eventoReposicaoDe) {
+            return undefined;
+        }
+        else  {
+            let request: CalendarioRequest = {
+                perfil_Cognitivo_Id: this.aluno.perfilCognitivo_Id,
+                intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
+                intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
+            }
+
+
+            this.loading = true;
+            return lastValueFrom(this.service.getList(request))
+                .then(res => {
+
+                    this.list = res.eventos.filter(aula => {
+                        const aulaAtiva = aula.active;
+                        const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+                        const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaEvento;
+                        const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
+                        const aulaNaoFinalizada = !aula.finalizado;
+                        const aulaEstaAtiva = aula.active;
+                        const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
+                        const naoEhFeriado = !aula.feriado;
+                        const salaValida = !this.aluno?.restricaoMobilidade || (this.aluno.restricaoMobilidade && aula.andar == SalaAndar.Terreo)
+                        const mesmaAula = this.eventoReposicaoDe!.id == aula.id && ![aula.id].includes(PseudoEvento.EventoId);
+                        const mesmaDataHora = moment(this.eventoReposicaoDe!.data).isSame(aula.data);
+
+                        return aulaAtiva
+                            && alunoNaoEstaNaAula
+                            && ehAula
+                            && temVagas
+                            && perfilCognitivo
+                            && aulaNaoFinalizada
+                            && aulaEstaAtiva
+                            && ehPerfilCognitivoCompativel
+                            && naoEhFeriado
+                            && salaValida
+                            && !mesmaAula
+                            && !mesmaDataHora;
+
+                    });
+
+                    this.setEvento();
+                    this.loading = false;
+                })
+                .catch(res => {
+                    this.loading = true;
+                    this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
+                    console.error(res)
+                });
+        }
+    }
+
+    setEvento() {
+        if (this.evento && this.list) {
+            let index = this.list.findIndex(x => x.id == this.evento!.id 
+                && moment(this.evento!.data).isSame(x.data)
+                && this.evento!.turma_Id == x.turma_Id
+            );
+            if (index != -1) {
+                this.evento = this.list[index];
+            }
+        }
+    }
+
+    eventoChanged() {
+        if (this.evento && this.aluno) {
+            this.selectEventoReposicaoPara()
+        }
+    }
+
+    selectEventoReposicaoPara() {
+        if (this.evento) {
+            this.evento = this.evento;
+            this.service.setEventoReposicaoPara(this.evento)
+            this.onEventoChanged.emit(this.evento);
+        }
+    }
+}

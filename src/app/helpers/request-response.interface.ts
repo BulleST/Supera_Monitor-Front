@@ -1,5 +1,5 @@
-export interface RequestResponse {
-    success: boolean;
-    message: string;
+export class RequestResponse {
+    success: boolean = false;
+    message: string = '';
     object: any;
 }

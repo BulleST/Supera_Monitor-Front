@@ -1,0 +1,99 @@
+<app-confirm-dialog></app-confirm-dialog>
+<div class="flex-1 p-2">
+    <p-toolbar styleClass="border-none bg-transparent p-0 px-2 mb-3">
+        <div class="p-toolbar-group-start flex-1">
+            <h2 class="flex align-items-center overflow-hidden text-overflow-ellipsis">
+                <i class="bi bi-calendar mr-3 text-primary text-2xl"></i>
+                <span
+                      class="text-xl font-normal white-space-nowrap text-overflow-ellipsis">
+                    <span class="font-bold text-xl">{{ currentTitle }}</span>
+                </span>
+            </h2>
+        </div>
+        <div class="p-toolbar-group-end flex align-items-stretch gap-2 flex-wrap">
+            <p-datepicker [(ngModel)]="data"
+                          dateFormat="dd/mm/yy"
+                          (ngModelChange)="fullCalendar.getApi().gotoDate(data)"
+                          [showIcon]="true"
+                          [readonlyInput]="true"
+                          [appendTo]="'body'"
+                          [disabledDays]="[0]"
+                          iconDisplay="input"></p-datepicker>
+            <!-- Prev -->
+            <p-button
+                      icon="pi pi-angle-left"
+                      (onClick)="prev()"
+                      [disabled]="!aluno"
+                      severity="secondary"
+                      iconPos="right"
+                      pTooltip="Anterior"
+                      tooltipPosition="top"
+                      styleClass="h-full" />
+            <!-- Hoje -->
+            <p-button
+                      label="hoje"
+                      (onClick)="today()"
+                      [disabled]="!aluno"
+                      severity="contrast"
+                      pTooltip="Hoje"
+                      tooltipPosition="top"
+                      styleClass="h-full" />
+            <!-- Next -->
+            <p-button
+                      icon="pi pi-angle-right"
+                      (onClick)="next()"
+                      [disabled]="!aluno"
+                      severity="secondary"
+                      pTooltip="Próximo"
+                      tooltipPosition="top"
+                      styleClass="h-full" />
+            <!-- Atualizar -->
+            <p-button
+                      icon="pi pi-sync"
+                      (onClick)="update()"
+                      [disabled]="!aluno"
+                      severity="contrast"
+                      label="atualizar"
+                      pTooltip="Atualizar calendário"
+                      tooltipPosition="top"
+                      styleClass="h-full" />
+        </div>
+    </p-toolbar>
+    <full-calendar [options]="calendarioOptions" #fullCalendar>
+        <ng-template #eventContent let-arg>
+            <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
+            <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
+                <ng-container *ngIf="!loading && evento">
+                    <app-evento-item-hover #eventoPopover [evento]="evento" [arg]="arg"></app-evento-item-hover>
+                    <div class="w-full flex flex-column p-1 overflow-hidden border-2 border-round-sm"
+                         (click)="selectEvento($event, evento)"
+                         (mouseenter)="eventoPopover.show($event)"
+                         (mouseleave)="eventoPopover.hide()"
+                         [ngStyle]="{
+                                backgroundColor: arg.backgroundColor,
+                                borderColor: evento && evento.id == arg.event.id ? 'red' :  arg.backgroundColor,
+                                color: arg.textColor,
+                        }">
+                        <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado; else feriadoTemplate">
+                            <div class="flex align-items-center cursor-pointer">
+                                <span class="text-sm mr-2">
+                                    {{ evento.data | date : 'HH:mm' }}
+                                </span>
+                                <span
+                                      class="text-sm overflow-hidden text-overflow-ellipsis w-12rem white-space-nowrap">
+                                    {{ evento.descricao }}
+                                </span>
+                            </div>
+                        </ng-container>
+                        <ng-template #feriadoTemplate>
+                            <p class="text-sm">Feriado</p>
+                            <p class="text-sm">
+                                {{ evento.descricao }}
+                            </p>
+                        </ng-template>
+                    </div>
+                </ng-container>
+            </ng-template>
+        </ng-template>
+    </full-calendar>
+</div>

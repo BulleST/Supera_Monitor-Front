@@ -45,12 +45,20 @@
                     </div>
                 </ng-template>
                 <ng-template #eventContent let-arg>
-                    <app-evento-item class="w-full"
+                    <!-- <pre>{{arg.event.extendedProps |json}}</pre> -->
+                    <app-evento-item
                                      [calendarioDayView]="calendarioDayView"
                                      [evento]="arg.event.extendedProps"
                                      [arg]="arg"
                                      (selectEvent)="selectEvento($event, arg.event.extendedProps)"
-                                     (cdkDrop)="cdkDrop($event, arg.event.extendedProps)"></app-evento-item>
+                                     (cdkDrop)="cdkDrop($event, arg.event.extendedProps)">
+                    </app-evento-item>
+                    <!-- <app-evento-item 
+                                     [calendarioDayView]="calendarioDayView"
+                                     [evento]="arg.event.extendedProps"
+                                     [arg]="arg"
+                                     (selectEvent)="selectEvento($event, arg.event.extendedProps)"
+                                     (cdkDrop)="cdkDrop($event, arg.event.extendedProps)"></app-evento-item> -->
                 </ng-template>
             </full-calendar>
         </div>

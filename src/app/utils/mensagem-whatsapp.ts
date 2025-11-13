@@ -69,7 +69,7 @@ export class MensagemWhatsapp {
             }
             await lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
-                    sugestoes = res.filter(aula => {
+                    sugestoes = res.eventos.filter(aula => {
                         const alunosAtivos = aula.alunos.filter(x => x.active);
                         const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
