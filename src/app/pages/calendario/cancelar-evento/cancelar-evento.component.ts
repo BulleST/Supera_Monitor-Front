@@ -147,10 +147,14 @@ export class CancelarEventoComponent implements OnDestroy {
     }
     
 	getPerfilCognitivo(evento: Evento) {
+        if (!evento.perfilCognitivo.length)
+            return 'Indefinido'
 		return evento.perfilCognitivo.map(x => x.nome).join(', ');
 	}
 
 	getSala(evento: Evento) {
+        if (!evento.sala_Id)
+            return 'Indefinido'
 		var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
 		return evento.sala + ' - ' + andar
 	}
@@ -271,7 +275,12 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.evento.id = res.object.id
                     response = res
                 })
-                .catch(res => this.showError('Erro', getError(res), e))
+                .catch(res =>  {
+                    this.loading = false;
+                    this.showError('Erro', getError(res), e)
+                    return res;
+
+                })
         }
 
         if (response.success) {
@@ -293,6 +302,7 @@ export class CancelarEventoComponent implements OnDestroy {
                     }
                 })
                 .catch(res => {
+                    this.loading = false;
                     this.showError('Erro', `Não foi possível cancelar a ${this.tipoEventoString}. <br> ${getError(res)}`, e)
                 })
         }

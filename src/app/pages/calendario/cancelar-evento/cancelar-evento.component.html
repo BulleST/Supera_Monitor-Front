@@ -99,7 +99,7 @@
                             <p-inputicon styleClass="fa fa-brain" />
                             <input type="text"
                                    pInputText
-                                   [value]="getPerfilCognitivo(evento) ?? 'Infedinido' "
+                                   [value]="getPerfilCognitivo(evento)"
                                    id="perfilCognitivo "
                                    name="perfilCognitivo "
                                    fluid
@@ -117,7 +117,7 @@
                             <p-inputicon styleClass="bi bi-door-open" />
                             <input type="text"
                                    pInputText
-                                   [value]="evento.sala + ' - ' + ( evento.andar == 0 ? 'Térreo' : (evento.andar ?? 0+ 'º andar') )"
+                                   [value]="getSala(evento)"
                                    id="sala "
                                    name="sala "
                                    fluid
@@ -157,7 +157,8 @@
                                   [(ngModel)]="evento.observacao"
                                   placeholder="Aproveite para contar o motivo do cancelamento"
                                   [required]="true"
-                                  [rows]="3"></textarea>
+                                  [rows]="3"
+                                  [pAutoFocus]="true"></textarea>
                                   <div *ngIf="observacao.touched && observacao.invalid && observacao.errors">
                                       <p class="text-red-500 mb-0" *ngIf="observacao.errors['required']">Esse campo é obrigatório.</p>
                                   </div>

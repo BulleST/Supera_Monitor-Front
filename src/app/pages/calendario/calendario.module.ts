@@ -25,6 +25,7 @@ import { SelectedEventoComponent } from './full-calendar/selected-evento/selecte
 import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { EditarContatoFaltaComponent } from './editar-contato-falta/editar-contato-falta.component';
 import { DialogService } from 'primeng/dynamicdialog';
+import { AutoFocus } from "primeng/autofocus";
 
 
 @NgModule({
@@ -51,11 +52,12 @@ import { DialogService } from 'primeng/dynamicdialog';
         EditarContatoFaltaComponent,
     ],
     imports: [
-        CommonModule,
-        CalendarioRoutingModule,
-        SharedModule,
-        SalaAulaPipe
-    ],
+    CommonModule,
+    CalendarioRoutingModule,
+    SharedModule,
+    SalaAulaPipe,
+    AutoFocus
+],
     providers: [DialogService],
     bootstrap: [CalendarioComponent]
 })
