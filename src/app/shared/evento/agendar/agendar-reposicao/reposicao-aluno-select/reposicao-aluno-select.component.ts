@@ -64,7 +64,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
             console.log('getAluno', alunoRes)
 
-            let params = this.activatedRoute.snapshot.paramMap;
+            let params = this.activatedRoute.snapshot.queryParamMap;
 
             let idParam = params.get('aluno_id');
 
@@ -134,7 +134,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
             this.alunos = this.alunos.filter(x => x.active == true && !!x.turma_Id);
 
 
-            let params = this.activatedRoute.snapshot.paramMap;
+            let params = this.activatedRoute.snapshot.queryParamMap;
 
             if (params.get('evento_reposicao_de') && this.eventoReposicaoDe) {
 
@@ -143,7 +143,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 // estão ativos e que não tem reposição agendada
 
                 let alunosAula = this.eventoReposicaoDe.alunos
-                    .filter(x => x.active && !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
+                    .filter(x =>  !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
                     .map(x => x.aluno_Id)
 
                 this.alunos = this.alunos.filter(x => alunosAula.includes(x.id))
@@ -159,7 +159,6 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 // e que não tenha restrição de mobilidade caso a aula não seja no térreo
 
                 let alunosAula = this.eventoReposicaoPara.alunos
-                    .filter(x => x.active)
                     .map(x => x.aluno_Id)
 
                 let perfilAula = this.eventoReposicaoPara.perfilCognitivo.map(x => x.id)
@@ -210,7 +209,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
     alunoChanged(e: SelectChangeEvent) {
         console.log('alunoChanged', e)
         if (e.value) {
-            this.aluno_Id = e.value.id;
+            this.aluno_Id = e.value;
             this.loadAluno()
         }
     }

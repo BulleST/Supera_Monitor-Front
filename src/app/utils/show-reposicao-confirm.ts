@@ -27,7 +27,7 @@ export function showAgendarReposicaoConfirm(
         dismissableMask: true,
         duplicate: true,
         modal: true,
-        width: '500px',
+        width: '450px',
         style: {
             maxWidth: '95vw',
             maxHeight: '95vh',

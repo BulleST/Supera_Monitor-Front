@@ -2,20 +2,23 @@ import { DialogService } from "primeng/dynamicdialog";
 import { EnviarMensagemAlunosComponent, EnviarMensagemAlunosView, MensagemTipo } from "../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component";
 import { Aluno } from "../models/alunos.model";
 import { Evento } from "../models/evento.model";
+import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
 
 export function showEnviarMensagemAlunos(dialogService: DialogService, 
     alunos: Aluno[], 
     evento: Evento, 
     tipo: MensagemTipo,
     reposicaoDe?: Evento,
-    reposicaoPara?: Evento
+    reposicaoPara?: Evento,
+    participacao?: Evento_Participacao_Aluno
 ) {
     var view: EnviarMensagemAlunosView = {
         alunos,
         evento,
         tipo,
         reposicaoDe,
-        reposicaoPara
+        reposicaoPara,
+        participacao
     }
     return dialogService.open(EnviarMensagemAlunosComponent, {
         showHeader: false,

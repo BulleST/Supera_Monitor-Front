@@ -51,23 +51,13 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
         })
         this.subscription.push(onVisibleChange);
 
-		let aluno = this.alunoService.getAluno().subscribe(res => {
-            this.aluno = res;
-            this.loadEventosReposicaoDe();
-            this.setEvento();
-		});
-		this.subscription.push(aluno);
 
-		let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => {
-            this.eventoReposicaoPara = res;
-            this.loadEventosReposicaoDe();
-            this.setEvento();
-		});
+		let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => this.eventoReposicaoPara = res);
 		this.subscription.push(eventoReposicaoPara);
 
         let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
             
-            let params = this.activatedRoute.snapshot.paramMap;
+            let params = this.activatedRoute.snapshot.queryParamMap;
 
             var idParam = params.get('evento_reposicao_de');
 
@@ -85,6 +75,14 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
         });
         this.subscription.push(eventoReposicaoDe);
 
+		let aluno = this.alunoService.getAluno().subscribe(res => {
+            this.aluno = res;
+            if (!this.readonly) {
+                this.loadEventosReposicaoDe();
+                this.setEvento();
+            }
+		});
+        this.subscription.push(aluno);
         let feriados = this.service.feriados.subscribe(res => this.feriados = res);
         this.subscription.push(feriados);
     }

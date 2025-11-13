@@ -6,7 +6,7 @@ import moment from 'moment';
 import { lastValueFrom } from 'rxjs';
 
 import { Evento } from '../../../../../models/evento.model';
-import { CalendarioUtils, getError, MensagemWhatsapp, showError } from '../../../../../utils';
+import { CalendarioUtils, getError, showError } from '../../../../../utils';
 import { EventoService } from '../../../../../services/evento.service';
 import { Evento_Participacao_Aluno } from '../../../../../models/evento-participacao-aluno.model';
 import { PseudoEvento, ReposicaoRequest } from '../../../../../models/reposicao.model';
@@ -32,7 +32,6 @@ export class ReposicaoConfirmComponent implements OnInit {
 		private ref: DynamicDialogRef,
 		private confirmationService: ConfirmationService,
 		private toastr: ToastrService,
-		private mensagemWhatsapp: MensagemWhatsapp,
 		private service: EventoService,
 		private calendarioUtils: CalendarioUtils,
 
@@ -103,7 +102,7 @@ export class ReposicaoConfirmComponent implements OnInit {
 				this.loading = false;
 				if (res.success) {
 					this.service.calendarioReload.emit(reposicaoDe.id);
-					this.sendMensagemAluno(e);
+					this.sendMensagemAluno(res.object);
 					var data = moment(reposicaoPara.data).format('DD/MM/YYYY [às] HH[h]mm');
 					this.toastr.success(`Reposição agendada para o dia ${data}`);
 					this.close(false);
@@ -128,20 +127,21 @@ export class ReposicaoConfirmComponent implements OnInit {
 			})
 	}
 
-	sendMensagemAluno(e: any) {
-		var participacao = this.view.participacao;
-		var reposicaoPara = this.view.reposicaoPara;
-		var reposicaoDe = this.view.reposicaoDe;
+	sendMensagemAluno(evento: Evento) {
 
-		if (participacao.celular) {
+		if (this.view.participacao.celular) {
 			
 			var ref = showEnviarMensagemAlunos(this.dialogService, 
 				[this.view.aluno], 
-				null as any, 
+				evento, 
 				MensagemTipo.ConfirmacaoReposicao,
-				reposicaoDe,
-				reposicaoPara
+				this.view.reposicaoDe,
+				this.view.reposicaoPara,
+				this.view.participacao
 			);
+			ref.onClose.subscribe(res => {
+				this.close(false)
+			})
 
 		
 		}

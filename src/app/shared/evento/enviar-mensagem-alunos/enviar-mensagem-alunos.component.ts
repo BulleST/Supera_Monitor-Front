@@ -92,7 +92,8 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 	}
 
 	enviarMensagem(aluno: Aluno) {
-		var participacao = this.evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+		var participacao = this.view.participacao;
+
 		if (!aluno.celular) {
 			this.showError('Erro', 'Nenhum celular cadastrado', aluno);
 			return;
@@ -113,7 +114,7 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 			object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
 		}
 		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
-			var podeRemarcar = !participacao.reposicaoDe_Evento_Id && !participacao.reposicaoPara_Evento_Id;
+			var podeRemarcar = !participacao?.reposicaoDe_Evento_Id && !participacao?.reposicaoPara_Evento_Id;
 			if (podeRemarcar) {
 				this.loadSugestoes(aluno)
 					.then(sugestoes => {
@@ -129,10 +130,10 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 
 		if (this.mensagemTipo == MensagemTipo.Cancelamento) {
-			this.showContatoFalta(aluno, participacao, EditarContatoTipo.Cancelamento);
+			this.showContatoFalta(aluno, participacao!, EditarContatoTipo.Cancelamento);
 		}
 		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
-			this.showContatoFalta(aluno, participacao, EditarContatoTipo.FaltaAgendada);
+			this.showContatoFalta(aluno, participacao!, EditarContatoTipo.FaltaAgendada);
 		}
 		else {
 			this.removeItemLista(aluno);
@@ -165,6 +166,7 @@ export class EnviarMensagemAlunosView {
 	tipo: MensagemTipo = MensagemTipo.Agendamento;
 	reposicaoDe?: Evento;
 	reposicaoPara?: Evento;
+    participacao?: Evento_Participacao_Aluno
 }
 
 export enum MensagemTipo {

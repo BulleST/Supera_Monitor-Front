@@ -58,7 +58,7 @@ export class AgendarReposicaoComponent implements OnInit, OnDestroy {
 	){
 		this.instance = this.dialogService.getInstance(this.ref);
 
-		let params = this.activatedRoute.snapshot.paramMap;
+		let params = this.activatedRoute.snapshot.queryParamMap;
 		this.blockReposicaoDe = !!params.get('evento_reposicao_de');
 		this.blockReposicaoPara = !!params.get('evento_reposicao_para');
 		
@@ -150,7 +150,7 @@ export class AgendarReposicaoComponent implements OnInit, OnDestroy {
 			|| form.invalid
 			|| !this.aluno
 			|| !this.eventoReposicaoDe
-			|| !this.eventoReposicaoPara;
+			|| !this.eventoReposicaoPara
 	}
 
 	sendConfirmation(form: NgForm, e: any) {

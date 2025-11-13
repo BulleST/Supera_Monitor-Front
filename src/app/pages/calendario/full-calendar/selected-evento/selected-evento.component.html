@@ -53,17 +53,16 @@
                                 <i class="fa-solid fa-brain"></i>
                             </span>
                             <span>Perfil Cognitivo:</span>
-                            <p class="font-bold white-space-nowrap overflow-hidden text-overflow-ellipsis" 
-                                [pTooltip]="perfilCognitivoTemplate"
-                                style="width: 15rem;">
+                            <p class="font-bold white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                               [pTooltip]="perfilCognitivoTemplate"
+                               style="width: 15rem;">
                                 {{ getPerfilCognitivo(evento) }}
                             </p>
                             <ng-template #perfilCognitivoTemplate>
                                 <ul class="px-0">
                                     <li *ngFor="let item of evento.perfilCognitivo"
                                         style="list-style-position: inside;"
-                                        class="white-space-nowrap"
-                                    >{{item.nome}}</li>
+                                        class="white-space-nowrap">{{item.nome}}</li>
                                 </ul>
                             </ng-template>
                         </div>
@@ -172,27 +171,41 @@
                                             <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                         </span>
                                         <div class="ml-auto flex align-items-center gap-1">
+
                                             <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
                                                      value="1ª aula"
                                                      class="bg-pink-500 border-pink-500" />
-                                            <p-badge *ngIf="participacao.presente === false && !participacao.active && !evento.finalizado"
-                                                     value="Falta"
-                                                     class="bg-red-500 border-red-500" />
+
+                                            <p-badge *ngIf="!participacao.active && !participacao.reposicaoPara_Evento_Id"
+                                                     value="Falta agendada"
+                                                     class="bg-red-500 border-red-500" 
+                                                     pTooltip="{{participacao.deactivated | date : 'dd/MM/yyyy HH:mm' }}"/>
+
                                             <p-badge *ngIf="participacao.reposicaoPara_Evento_Id"
                                                      value="Reposição Agendada"
-                                                     class="bg-purple-500 border-purple-500" />
+                                                     class="bg-purple-500 border-purple-500"
+                                                     [pTooltip]="reposicaoParaTemplate" />
+
+                                            <ng-template #reposicaoParaTemplate>
+                                                <app-reposicao-para-tooltip 
+                                                    [evento]="participacao.reposicaoPara_Evento"></app-reposicao-para-tooltip>
+                                            </ng-template>
+     
                                             <p-badge *ngIf="participacao.reposicaoDe_Evento_Id"
                                                      value="Reposição"
-                                                     class="bg-purple-500 border-purple-500" />
-                                            <p-badge *ngIf="participacao.presente === false && participacao.reposicaoPara_Evento_Id && participacao.alunoContactado"
-                                                     value="Reposição Agendada"
                                                      class="bg-purple-500 border-purple-500"
-                                                     pTooltip="Reposição agendada" />
+                                                     [pTooltip]="reposicaoDeTemplate"  />
+                                                     
+                                            <ng-template #reposicaoDeTemplate>
+                                                <app-reposicao-para-tooltip 
+                                                    [evento]="participacao.reposicaoDe_Evento"></app-reposicao-para-tooltip>
+                                            </ng-template>
                                             <p-badge *ngIf="evento.finalizado && participacao.presente === false && !participacao.alunoContactado && !participacao.reposicaoDe_Evento_Id"
                                                      value="Faltou"
                                                      class="bg-red-500 border-red-500"
                                                      pTooltip="Aluno não contatado"
                                                      tooltipPosition="bottom" />
+
                                             <p-badge *ngIf="evento.finalizado && participacao.presente === false && !participacao.alunoContactado && participacao.reposicaoDe_Evento_Id"
                                                      value="Faltou"
                                                      class="bg-blue-500 border-blue-500"
@@ -277,7 +290,7 @@
                                               label="Agendar Reposição"
                                               icon="pi pi-calendar text-primary-500"
                                               [text]="true"
-                                              [disabled]="evento.vagasDisponiveisEvento < 1"
+                                              [disabled]="evento.alunosAtivosEvento == 0"
                                               severity="secondary"
                                               styleClass="justify-content-start surface-50"
                                               fluid />

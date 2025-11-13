@@ -126,19 +126,26 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 			if (this.evento) {
 				var evento = this.evento as Evento;
 				this.alunos = this.alunos.filter(aluno => {
+					
 					const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
-					const alunoAtivo = aluno.active || moment(aluno.deactivated).isSameOrAfter(evento.data, 'date');
-					const temVagas = evento.vagasDisponiveisEvento > 0;
-					const alunosDoEvento = temVagas || alunoEstaNaAula;
+					const falta = alunoEstaNaAula && alunoEstaNaAula.presente === false;
+					const faltaAgendada = alunoEstaNaAula && alunoEstaNaAula.active === false;
+					const reposicaoDe = alunoEstaNaAula && alunoEstaNaAula.reposicaoDe_Evento_Id;
+					const reposicaoPara = alunoEstaNaAula && alunoEstaNaAula.reposicaoPara_Evento_Id;
+					const primeiraAula = aluno.primeiraAula_Id == evento.id;
 					const salaCompativel = !aluno.restricaoMobilidade || evento.andar == SalaAndar.Terreo;
-					const primeiraAulaAgendada = aluno.primeiraAula_Id == evento.id;
-					const alunoNaoMarcouFalta = !alunoEstaNaAula || (alunoEstaNaAula.active && alunoEstaNaAula.presente !== false)
+					const temVagas = evento.vagasDisponiveisEvento > 0;
+					const alunoAtivo = aluno.active || moment(aluno.deactivated).isSameOrAfter(evento.data, 'date');
+					const alunosDoEvento = temVagas || alunoEstaNaAula;
 
 					return alunosDoEvento
 						&& salaCompativel
 						&& alunoAtivo
-						&& !primeiraAulaAgendada
-						&& alunoNaoMarcouFalta
+						&& !primeiraAula
+						&& !falta
+						&& !faltaAgendada
+						&& !reposicaoDe
+						&& !reposicaoPara
 
 				})
 

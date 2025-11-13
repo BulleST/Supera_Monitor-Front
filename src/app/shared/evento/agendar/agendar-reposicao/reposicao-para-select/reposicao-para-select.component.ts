@@ -62,7 +62,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
 
         let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => {
             
-            let params = this.activatedRoute.snapshot.paramMap;
+            let params = this.activatedRoute.snapshot.queryParamMap;
 
             var idParam = params.get('evento_reposicao_para');
 

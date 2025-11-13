@@ -1,1 +1,34 @@
-<p>reposicao-para-tooltip works!</p>
+<ng-container *ngIf="evento">
+    <div class="w-25rem">
+        <!-- Tipo / Data -->
+        <p>
+            <span class="text-orange-400 font-bold capitalize">{{ tipo }}</span>
+            <span> - {{ evento.data | date : 'dd/MM/yyyy HH:mm' }}</span>
+        </p>
+        <p>{{ evento.descricao }}</p>
+        <!-- Professor -->
+        <ng-container *ngIf="evento.professor">
+            <p class="flex align-items-center gap-2">
+                <app-legend-color class="line-height-1"
+                                  [corLegenda]="evento.corLegenda"
+                                  [professor]="evento.professor"
+                                  [professor_Id]="evento.professor_Id"></app-legend-color>
+                <span>{{ evento.professor }}</span>
+            </p>
+        </ng-container>
+        <!-- Turma -->
+        <ng-container *ngIf="evento.turma && evento.turma != evento.descricao">
+            <p>{{ evento.turma }}</p>
+        </ng-container>
+        <!-- Sala -->
+        <ng-container *ngIf="evento.sala_Id">
+            <p>
+                <app-sala-aula
+                               [numeroSala]="evento.numeroSala"
+                               [andar]="evento.andar"
+                               [sala_Id]="evento.sala_Id"
+                               [descricao]="evento.sala"></app-sala-aula>
+            </p>
+        </ng-container>
+    </div>
+</ng-container>

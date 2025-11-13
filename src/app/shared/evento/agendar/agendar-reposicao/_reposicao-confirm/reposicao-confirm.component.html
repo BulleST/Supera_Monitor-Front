@@ -5,20 +5,20 @@
             <i class="pi pi-calendar text-lg w-2rem h-2rem bg-primary-500 text-white border-circle flex align-items-center justify-content-center p-1"></i>
             <div class="flex flex-column">
                 <p>Agendar Reposição</p>
-                <p class="flex align-items-center gap-2 text-base font-normal">
+                <!-- <p class="flex align-items-center gap-2 text-base font-normal">
                     <span class="text-primary-500 capitalize">{{view.participacao.aluno | nameAbv }}</span>
                     <span>-</span>
                     <span>{{ view.reposicaoDe.turma }}</span>
                     <app-legend-color class="line-heigth-1"
                     [corLegenda]="view.reposicaoDe.corLegenda"
                     [professor]="view.reposicaoDe.professor"></app-legend-color>
-                </p>
+                </p> -->
             </div>
         </div>
     </div>
     <div class="p-dialog-header-actions">
         <p-button icon="pi pi-times"
-                  (onClick)="close(false)"
+                  (onClick)="close(true)"
                   styleClass="p-dialog-close-button"
                   severity="secondary"
                   rounded
@@ -27,7 +27,7 @@
     </div>
 </header>
 
-<form #form="ngForm" (ngSubmit)="send($event)">
+<form #form="ngForm" (ngSubmit)="send($event)" class="px-3">
     <div class="formgrid grid">
         <!-- Aluno -->
         <div class="field col-12">
@@ -111,18 +111,17 @@
                 <p class="text-red-500 mt-2 mb-0" *ngIf="observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>
             </div>
         </div>
-        <div class="w-full flex justify-content-between px-1">
-            <p class="font-bold">
-                <!-- <i class="pi pi-exclamation-triangle text-xl text-primary-500"></i> -->
+        <div class="w-full flex justify-content-between gap-2 px-2">
+            <p>
                 Tem certeza que deseja continuar com o agendamento dessa reposição?
             </p>
         
             <p-button class="ml-auto"
                       type="submit"
                       icon="pi pi-check"
-                      label="Agendar reposição"
+                      label="Finalizar agendamento"
                       [loading]="loading"
-                      [disabled]="loading"
+                      [disabled]="form.invalid || loading"
                       [rounded]="true" />
         </div>
     </div>

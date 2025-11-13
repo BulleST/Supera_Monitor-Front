@@ -197,9 +197,15 @@ export class SelectedEventoComponent implements OnChanges {
     
     goToAgendarReposicao() {
         if (this.evento) {
-            this.service.setEventoReposicaoDe(undefined)
-            this.service.setEventoReposicaoPara(this.evento);
-            this.router.navigate(['calendario', 'agendar','reposicao', 'null', this.crypto.encrypt(this.evento.id)]);
+            this.service.setEventoReposicaoDe(this.evento)
+            this.service.setEventoReposicaoPara(undefined);
+            this.router.navigate(['calendario', 'agendar','reposicao'], {
+                queryParams: {
+                    evento_reposicao_de: this.crypto.encrypt(this.evento.id),
+                    evento_reposicao_para: null,
+                    aluno_id: null
+                }
+            });
         }
     }
 
