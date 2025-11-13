@@ -26,6 +26,7 @@ import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { EditarContatoFaltaComponent } from './editar-contato-falta/editar-contato-falta.component';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AutoFocus } from "primeng/autofocus";
+import { ReposicaoDeSelectComponent } from './cadastrar-evento/cadastrar-turma-extra/reposicao-de-select/reposicao-de-select.component';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { AutoFocus } from "primeng/autofocus";
         SelectedEventoComponent,
         ToolbarComponent,
         EditarContatoFaltaComponent,
+        ReposicaoDeSelectComponent,
     ],
     imports: [
     CommonModule,

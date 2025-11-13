@@ -1,0 +1,117 @@
+<app-confirm-dialog></app-confirm-dialog>
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full flex align-items-center gap-2">
+        <i class="pi pi-calendar mr-2 text-base w-2rem h-2rem p-2 border-circle bg-primary-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <p>Reposição de</p>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button icon="pi pi-times"
+                  (onClick)="close(undefined)"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+<form #form="ngForm" (ngSubmit)="selectEvento($event, form)">
+    <div class="formgrid grid">
+        <div class="field col-12">
+            <!-- Eventos  -->
+            <label for="evento_Id">Selecione uma aula: <span class="text-red-500">*</span></label>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-calendar text-pink-500 text-base" />
+                <p-select [options]="eventos"
+                          [(ngModel)]="reposicaoDe"
+                          [loading]="loading"
+                          #evento_Id="ngModel"
+                          name="evento_Id"
+                          inputId="evento_Id"
+                          optionLabel="data"
+                          [required]="true"
+                          [filter]="true"
+                          [filterBy]="'data,turma,professor'"
+                          emptyMessage="Nenhuma aula para repor"
+                          panelStyleClass="p-select-stripped"
+                          appendTo="body"
+                          fluid>
+                    <ng-template #selectedItem let-selectedOption>
+                        <ng-container *ngIf="selectedOption">
+                            <div class="flex align-items-center">
+                                <div class="flex align-items-center gap-2 px-1 text-sm bg-primary-500 border-1 border-primary-500 text-white ">
+                                    <span>{{selectedOption.data | date : 'dd/MMM'}}</span>
+                                </div>
+                                <div class="flex align-items-center gap-2 px-1 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                    <span>{{selectedOption.data | date : 'HH:mm'}}</span>
+                                </div>
+                                <p class="flex align-items-center gap-1 ml-2">
+                                    <span>{{selectedOption.turma ?? selectedOption.descricao}}</span>
+                                    <app-legend-color class="line-height-1"
+                                                      [corLegenda]="selectedOption.corLegenda"
+                                                      [professor_Id]="selectedOption.professor_Id"
+                                                      [professor]="selectedOption.professor"
+                                                      [turma_Id]="selectedOption.turma_Id"></app-legend-color>
+                                </p>
+                            </div>
+                        </ng-container>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="flex gap-2 w-full">
+                            <div class="flex flex-column">
+                                <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
+                                    <i class="pi pi-calendar text-sm"></i>
+                                    <span>{{item.data | date : 'dd/MMM'}}</span>
+                                </div>
+                                <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                    <i class="pi pi-clock text-sm"></i>
+                                    <span>{{item.data | date : 'HH:mm'}}</span>
+                                </div>
+                            </div>
+                            <div class="flex flex-column w-full">
+                                <p class="flex align-items-center gap-2 py-1">
+                                    <span>{{item.turma ?? item.descricao}}</span>
+                                    <app-legend-color class="line-height-1"
+                                                      [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.professor_Id"
+                                                      [professor]="item.professor"
+                                                      [turma_Id]="item.turma_Id"></app-legend-color>
+                                </p>
+                                <p class="flex align-items-center gap-2 py-1">
+                                    <span>Sala: </span>
+                                    <span>{{item.sala}}</span>
+                                    <span>-</span>
+                                    <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
+                                    <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
+                                    <span class="ml-auto text-base">
+                                        {{item.vagasDisponiveisEvento}} vaga(s) </span>
+                                </p>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </p-iconfield>
+            <div *ngIf="evento_Id.touched && evento_Id.invalid && evento_Id.errors">
+                <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['required']">Esse campo é obrigatório.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="evento_Id.errors['indisponivel']">Educador indisponível.</p>
+            </div>
+        </div>
+        <div class="col-12">
+            <ul class="px-2 m-0" style="list-style-position: inside;">
+                <li>Apenas aulas que o aluno participa serão exibidas</li>
+                <li>Apenas aulas que o aluno não ganhou presença serão exibidas</li>
+                <li>Apenas aulas que o aluno não marcou outra reposição serão exibidas</li>
+            </ul>
+        </div>
+        <div class="col-12 gap-2 flex align-items-center justify-content-end mt-2">
+            <p-button type="submit"
+                      styleClass="px-3"
+                      label="Continuar"
+                      icon="pi pi-arrow-right"
+                      iconPos="right"
+                      severity="primary"
+                      [loading]="loading"
+                      [rounded]="true"
+                      [disabled]="form.invalid || loading" />
+        </div>
+    </div>
+</form>

@@ -19,12 +19,9 @@ import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
 import { Evento, EventoTipo } from '../../../../models/evento.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { CalendarioRequest } from '../../../../models/calendario.model';
-import { AccountService } from '../../../../services/account.service';
-import { ChecklistService } from '../../../../services/checklist.service';
 import { Feriado } from '../../../../models/feriado.model';
 import { DatePickerYearChangeEvent } from 'primeng/datepicker';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
-import { MyMap } from '../../../../utils/map';
 import { validaAlunos, validaProfessores, validaSalaAulas, CalendarioUtils, showError } from '../../../../utils';
 import 'moment/locale/pt-br';
 import moment from 'moment';
@@ -32,13 +29,16 @@ import $ from 'jquery';
 import { NameFirstWordPipe } from '../../../../utils/name-first-word.pipe';
 import { RoteiroService } from '../../../../services/roteiro.service';
 import { Roteiro } from '../../../../models/roteiro.model';
+import { MensagemTipo } from '../../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
+import { DialogService } from 'primeng/dynamicdialog';
+import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
 
 @Component({
     selector: 'app-cadastrar-superacao',
     standalone: false,
     templateUrl: './cadastrar-superacao.component.html',
     styleUrl: './cadastrar-superacao.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService, DialogService],
 })
 export class CadastrarSuperacaoComponent implements OnDestroy {
     visible: boolean = false;
@@ -50,11 +50,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     data: Date = undefined as unknown as Date;
     horario: Date = undefined as unknown as Date;
-    minData = new Date();
 
     blockAlunoField = false;
     selectedAlunos: Aluno[] = [];
-    mensagensEnviadasAlunos: Aluno[] = [];
     alunos: Aluno[] = [];
     loadingAlunos = false;
 
@@ -96,8 +94,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         private roteiroService: RoteiroService,
         private service: EventoService,
         public mensagemWhatsapp: MensagemWhatsapp,
-        private accountService: AccountService,
-        private checklistService: ChecklistService,
+        private dialogService: DialogService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
     ) {
@@ -563,11 +560,20 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         lastValueFrom(this.service.createSuperacao(this.object))
             .then(res => {
-                this.loading = false;
-                this.object = res.object;
-                this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
-                this.service.calendarioReload.emit(res.object.id);
-                this.sendMensagemAlunos();
+
+                if (res.success) {
+                    if (this.object.alunos.length > 0) {
+                        this.sendMensagemAlunos(res.object);
+                    } else {
+                        this.visible = false;
+                        this.visibleChange()
+                    }
+                    this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
+                    this.service.calendarioReload.emit(res.object.id);
+                }
+                else {
+                    this.showError('Agendamento falhou', `Não foi possível agendar superação. <br> ${res.message}`, e);
+                }
 
             })
             .catch(res => {
@@ -577,47 +583,22 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     }
 
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => x.nome < y.nome ? -1 : 1);
-        this.confirmationService.confirm({
-            key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: false,
-            accept: () => {
-                this.visible = false;
-                this.visibleChange();
-            },
+    sendMensagemAlunos(evento: Evento) {
+        var alunos = this.selectedAlunos
+            .sort((x, y) => x.nome < y.nome ? -1 : 1);
+
+        var ref = showEnviarMensagemAlunos(
+            this.dialogService, 
+            alunos, evento, 
+            MensagemTipo.Agendamento
+        );
+
+        var onClose = ref.onClose.subscribe(res => {
+            this.visible = false;
+            this.visibleChange();
         });
+        this.subscription.push(onClose);
     }
-
-    removerAlunoLista(aluno: Aluno, e: any) {
-        if (e.which == 2) {
-            let index = this.mensagensEnviadasAlunos.findIndex(
-                (x) => x.id == aluno.id
-            );
-            if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1);
-        }
-    }
-
-    enviarMensagemAgendamento(aluno: Aluno) {
-        if (!aluno.celular) {
-            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
-            return
-        }
-        let evento = MyMap(this.object, new Evento())
-        evento.evento_Tipo_Id = EventoTipo.TurmaExtra
-        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
-        window.open(object.link, '_target')
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
-        let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-        if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1)
-    }
-
 
     enviarMensagem(aluno: Aluno) {
         if (!aluno.celular) {

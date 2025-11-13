@@ -1,34 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="enviarMensagemCancelamento" styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div class="flex align-items-start gap-2 ">
-            <span class="mt-1">
-                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
-                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
-            </span>
-            <div>
-                <div [innerHTML]="message.message"></div>
-                <!-- Alunos -->
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length"> Alunos </p>
-                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
-                    <p class="font-medium text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
-                    <div *ngFor="let participacao of mensagensEnviadasAlunos">
-                        <p-button type="button"
-                                  (onClick)="enviarMensagemCancelamento(participacao)"
-                                  (auxclick)="enviarMensagemCancelamento(participacao)"
-                                  (contextmenu)="enviarMensagemCancelamento(participacao)"
-                                  [disabled]="!participacao.celular"
-                                  icon="pi pi-whatsapp"
-                                  styleClass="capitalize"
-                                  [severity]="participacao.celular ? 'success' : 'secondary'"
-                                  label="{{participacao.aluno | nameAbv}}"
-                                  [text]="true" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
 <p-dialog [header]="'Cancelar ' + tipoEventoString"
           [maximizable]="true"
           [draggable]="true"

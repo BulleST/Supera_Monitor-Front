@@ -1,33 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div class="flex align-items-start gap-2 ">
-            <span class="mt-1">
-                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
-                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
-            </span>
-            <div>
-                <div [innerHTML]="message.message"></div>
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
-                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
-                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
-                    <div *ngFor="let aluno of mensagensEnviadasAlunos">
-                        <p-button type="button"
-                                  (onClick)="enviarMensagemAgendamento(aluno)"
-                                  (auxclick)="enviarMensagemAgendamento(aluno)"
-                                  (contextmenu)="enviarMensagemAgendamento(aluno)"
-                                  [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-600'}}"
-                                  styleClass="text-600"
-                                  severity="success"
-                                  [label]="aluno.nome"
-                                  [text]="true" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
 <p-dialog [header]="'Agendar Superação'"
           [maximizable]="true"
           [draggable]="true"
@@ -48,7 +19,8 @@
     </ng-template>
     <form #form="ngForm" class="px-2" (submit)="sendConfirmation(form, $event)">
         <div class="formgrid grid">
-            <div class="field col-6"> <!-- Data -->
+            <!-- Data -->
+            <div class="field col-6"> 
                 <label for="data">Data: <span class="text-red-500">*</span></label>
                 <p-datepicker
                               #_data="ngModel"
@@ -60,7 +32,6 @@
                               placeholder="dd/mm/yyyy"
                               [showIcon]="true"
                               [iconDisplay]="'input'"
-                              [minDate]="minData"
                               inputId="data"
                               name="data"
                               [required]="true"
@@ -74,7 +45,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Horário -->
+            <!-- Horário -->
+            <div class="field col-6"> 
                 <label for="horario">Horário: <span class="text-red-500">*</span></label>
                 <p-datepicker inputId="horario"
                               name="horario"
@@ -98,102 +70,8 @@
                     <p class="text-red-500 mt-2 mb-0" *ngIf="_horario.errors['required']">Esse campo é obrigatório.</p>
                 </div>
             </div>
-            <div class="field col-6"> <!-- Educador -->
-                <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="professores"
-                          [(ngModel)]="object.professor_Id"
-                          [loading]="loadingProfessores || loadingEventos"
-                          [disabled]="loadingProfessores || loadingEventos || !data || !horario"
-                          (onChange)="professorChanged($event, professor_Id)"
-                          #professor_Id="ngModel"
-                          name="professor_Id"
-                          inputId="professor_Id"
-                          optionLabel="nome"
-                          optionValue="id"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="nome"
-                          appendTo="body"
-                          optionDisabled="deactivated"
-                          placeholder="Selecione"
-                          fluid>
-                    <ng-template let-item #item>
-                        <div class="flex align-items-center justify-content-between w-full gap-2">
-                            <div>
-                                <p class="font-bold mb-1 flex align-items-center gap-2">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
-                                                      [professor_Id]="item.id"
-                                                      [professor]="item.nome"></app-legend-color>
-                                    <span>{{ item.nome }}</span>
-                                    <p-badge *ngIf="item.disponivel == false"
-                                             value="Indisponível"
-                                             severity="danger"
-                                             [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                                    <ng-template #indisponivelTemplate>
-                                        <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                                    </ng-template>
-                                </p>
-                                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
-                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
-                                </ng-container>
-                            </div>
-                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
-                                   [value]="item.active ? 'Ativo': 'Inativo'"
-                                   [severity]="item.active ? 'success': 'danger'"
-                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
-                        </div>
-                    </ng-template>
-                </p-select>
-                <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
-                </div>
-            </div>
-            <div class="field col-6"> <!-- Sala -->
-                <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
-                <p-select
-                          [options]="salaAulas"
-                          [(ngModel)]="object.sala_Id"
-                          [loading]="loadingSalaAulas || loadingEventos"
-                          [disabled]="loadingSalaAulas || loadingEventos || !data || !horario"
-                          (onChange)="salaAulaChanged($event, sala_Id)"
-                          #sala_Id="ngModel"
-                          optionValue="id"
-                          optionLabel="descricao"
-                          name="sala_Id"
-                          inputId="sala_Id"
-                          [required]="true"
-                          [filter]="true"
-                          filterBy="descricao"
-                          appendTo="body"
-                          optionDisabled="deactivated"
-                          placeholder="Selecione"
-                          fluid>
-                    <ng-template let-item #item>
-                        <div class="w-full flex align-items-center justify-content-between">
-                            <app-sala-aula [sala_Id]="item.id"
-                                           [andar]="item.andar"
-                                           [numeroSala]="item.numeroSala"
-                                           [descricao]="item.descricao"></app-sala-aula>
-                            <p-badge *ngIf="item.disponivel == false"
-                                     value="Indisponível"
-                                     severity="danger"
-                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
-                        </div>
-                        <ng-template #indisponivelTemplate>
-                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
-                        </ng-template>
-                    </ng-template>
-                </p-select>
-                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['restricaoMobilidade']">{{sala_Id.errors['restricaoMobilidade']}}</p>
-                </div>
-            </div>
-            <div class="field col-12"> <!-- Aluno -->
+            <!-- Aluno -->
+            <div class="field col-12"> 
                 <label for="aluno_Id">Aluno: <span class="text-red-500">*</span></label>
                 <p-multiselect [options]="alunos"
                                [loading]="loadingAlunos || loadingEventos"
@@ -259,6 +137,103 @@
                 <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
                     <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                </div>
+            </div>
+            <!-- Educador -->
+            <div class="field col-6"> 
+                <label for="professor_Id">Educador: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="professores"
+                          [(ngModel)]="object.professor_Id"
+                          [loading]="loadingProfessores || loadingEventos"
+                          [disabled]="loadingProfessores || loadingEventos || !data || !horario"
+                          (onChange)="professorChanged($event, professor_Id)"
+                          #professor_Id="ngModel"
+                          name="professor_Id"
+                          inputId="professor_Id"
+                          optionLabel="nome"
+                          optionValue="id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="nome"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          placeholder="Selecione"
+                          fluid>
+                    <ng-template let-item #item>
+                        <div class="flex align-items-center justify-content-between w-full gap-2">
+                            <div>
+                                <p class="font-bold mb-1 flex align-items-center gap-2">
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                      [professor_Id]="item.id"
+                                                      [professor]="item.nome"></app-legend-color>
+                                    <span>{{ item.nome }}</span>
+                                    <p-badge *ngIf="item.disponivel == false"
+                                             value="Indisponível"
+                                             severity="danger"
+                                             [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                                    <ng-template #indisponivelTemplate>
+                                        <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                                    </ng-template>
+                                </p>
+                                <ng-container *ngIf="item.expedienteInicio && item.expedienteFim">
+                                    <p class="text-sm">Expediente {{item.expedienteInicio | date : 'HH:mm'}} às {{item.expedienteFim | date : 'HH:mm'}}</p>
+                                </ng-container>
+                            </div>
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   [icon]="(item.active ? 'pi pi-lock-open' : 'pi pi-lock') + ' mr-2 text-sm'"
+                                   [value]="item.active ? 'Ativo': 'Inativo'"
+                                   [severity]="item.active ? 'success': 'danger'"
+                                   [pTooltip]="!item.active ?  'Inativo desde ' + (item.deactivated | date : 'dd/MM/yyyy HH:mm')  : undefined" />
+                        </div>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="professor_Id.touched && professor_Id.invalid && professor_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="professor_Id.errors['indisponivel']">{{professor_Id.errors['indisponivel']}}</p>
+                </div>
+            </div>
+            <!-- Sala -->
+            <div class="field col-6"> 
+                <label for="sala_Id">Sala: <span class="text-red-500">*</span></label>
+                <p-select
+                          [options]="salaAulas"
+                          [(ngModel)]="object.sala_Id"
+                          [loading]="loadingSalaAulas || loadingEventos"
+                          [disabled]="loadingSalaAulas || loadingEventos || !data || !horario"
+                          (onChange)="salaAulaChanged($event, sala_Id)"
+                          #sala_Id="ngModel"
+                          optionValue="id"
+                          optionLabel="descricao"
+                          name="sala_Id"
+                          inputId="sala_Id"
+                          [required]="true"
+                          [filter]="true"
+                          filterBy="descricao"
+                          appendTo="body"
+                          optionDisabled="deactivated"
+                          placeholder="Selecione"
+                          fluid>
+                    <ng-template let-item #item>
+                        <div class="w-full flex align-items-center justify-content-between">
+                            <app-sala-aula [sala_Id]="item.id"
+                                           [andar]="item.andar"
+                                           [numeroSala]="item.numeroSala"
+                                           [descricao]="item.descricao"></app-sala-aula>
+                            <p-badge *ngIf="item.disponivel == false"
+                                     value="Indisponível"
+                                     severity="danger"
+                                     [pTooltip]="item.disponivelEvent ? indisponivelTemplate : undefined" />
+                        </div>
+                        <ng-template #indisponivelTemplate>
+                            <app-indisponivel-tooltip [evento]="item.disponivelEvent"></app-indisponivel-tooltip>
+                        </ng-template>
+                    </ng-template>
+                </p-select>
+                <div *ngIf="sala_Id.touched && sala_Id.invalid && sala_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['indisponivel']">Sala indisponível.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="sala_Id.errors['restricaoMobilidade']">{{sala_Id.errors['restricaoMobilidade']}}</p>
                 </div>
             </div>
             <div class="col-12 px-1 flex align-items-center justify-content-end">

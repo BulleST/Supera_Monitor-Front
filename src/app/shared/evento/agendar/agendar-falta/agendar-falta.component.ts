@@ -15,7 +15,9 @@ import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng
 import { EventoAgendarFaltaRequest } from '../../../../models/evento-agendar-falta-request.model';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
 import { showContatoFalta } from '../../../../utils/show-contato-falta';
-import { EditarParticipacaoContatoComponent, EditarParticipacaoContatoView } from '../../editar-participacao-contato/editar-participacao-contato.component';
+import { EditarParticipacaoContatoComponent, EditarContatoView, EditarContatoTipo } from '../../editar-participacao-contato/editar-participacao-contato.component';
+import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
+import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 
 @Component({
 	selector: 'app-agendar-falta',
@@ -189,12 +191,7 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 					this.loading = false;
 					this.eventoService.calendarioReload.emit(evento.id);
 					this.toastrService.success(response.message);
-					if (this.aluno?.celular) {
-						this.sendMensagemAluno(e, evento);
-					} else {
-						this.showContatoFalta();
-					}
-
+					this.sendMensagemAluno(response.object);
 				} else {
 					this.loading = false;
 					this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, response.message)
@@ -212,36 +209,35 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 		return this.calendarioUtils.requestAulaTurma(evento);
 	}
 
-	sendMensagemAluno(e: any, evento: Evento) {
-		let aluno = this.aluno as Aluno
-		this.confirmationService.confirm({
-			target: e.target,
-			message: `Primeira aula agendada com sucesso. <br> Clique para enviar mensagem de confirmação.`,
-			header: 'Enviar whatsapp',
-			icon: 'pi pi-whatsapp text-green-500 text-4xl',
-			acceptIcon: 'pi pi-whatsapp',
-			rejectIcon: 'pi pi-times',
-			acceptLabel: `Enviar mensagem`,
-			rejectLabel: 'Não enviar',
-			acceptButtonStyleClass: 'p-button-rounded p-button-success',
-			rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-			accept: () => {
+	sendMensagemAluno( evento: Evento) {
+		if (this.aluno) {
+			var aluno = this.aluno as Aluno;
+			var ref = showEnviarMensagemAlunos(
+				this.dialogService,
+				[aluno],
+				evento,
+				MensagemTipo.FaltaAgendada
+			)
+			var onClose = ref.onClose.subscribe(res => {
 				this.close();
-				let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
-				window.open(object.link, '_target')
-				this.mensagemWhatsapp.copiarMensagem(object.mensagem)
-				this.showContatoFalta();
-			},
-			reject: () => {				
-				this.showContatoFalta();
-			},
-		})
+			})
+			this.subscription.push(onClose)
+		}
+		else {				
+			this.close();
+		}
+		
 	}
 
 
 	showContatoFalta() {
 		if (this.evento && this.participacao) {
-			this.refChild = showContatoFalta(this.dialogService, this.evento, this.participacao);
+			this.refChild = showContatoFalta(
+				this.dialogService, 
+				this.evento, 
+				this.participacao,
+				EditarContatoTipo.FaltaAgendada
+			);
 			let onClose = this.refChild.onClose.subscribe(res => this.close())
 			this.subscription.push(onClose);
 		}

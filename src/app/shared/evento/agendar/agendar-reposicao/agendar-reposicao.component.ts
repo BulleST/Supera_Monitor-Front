@@ -159,12 +159,20 @@ export class AgendarReposicaoComponent implements OnInit, OnDestroy {
 		let target = this.eventoReposicaoPara as Evento;
 		let participacao = source.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
-		var ref = showAgendarReposicaoConfirm(participacao, source, target, this.dialogService);
-		var onClose = ref.onClose.subscribe(agendamentoCancelado => {
-			if (!agendamentoCancelado) {
-				this.eventoService.calendarioReload.emit(1);
+		var ref = showAgendarReposicaoConfirm(
+			this.dialogService,
+			aluno,
+			participacao, 
+			source, 
+			target
+		);
+		var onClose = ref.onClose.subscribe(cancelarReposicao => {
+			if (cancelarReposicao) {
 			}
-			this.close();
+			else {
+				this.eventoService.calendarioReload.emit(1);
+				this.close();
+			}
 		})
 		this.subscription.push(onClose);
 

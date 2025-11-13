@@ -29,6 +29,8 @@ import { PerfilCognitivoService } from '../../services/perfil-cognitivo.services
 import { SalaAndar } from '../../models/sala-aula.model';
 import { DialogService } from 'primeng/dynamicdialog';
 import { showAgendarReposicaoConfirm } from '../../utils/show-reposicao-confirm';
+import { AlunoService } from '../../services/alunos.service';
+import { Aluno } from '../../models/alunos.model';
 
 @Component({
     selector: 'app-calendario',
@@ -106,9 +108,9 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private mobileService: MobileService,
         private header: Header,
         private toastrService: ToastrService,
-        private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
         private dialogService: DialogService,
+        private alunoService: AlunoService,
     ) {
 
         let screen = this.mobileService.get().subscribe(res => {
@@ -409,8 +411,21 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         showError(this.confirmationService, header, message, e);
     }
 
-    showAgendarReposicaoConfirm(e: any, aluno: Evento_Participacao_Aluno, source: Evento, target: Evento) {
-        var ref = showAgendarReposicaoConfirm(aluno, source, target, this.dialogService);
+    async showAgendarReposicaoConfirm(e: any, participacao: Evento_Participacao_Aluno, source: Evento, target: Evento) {
+
+        var alunos = this.alunoService.list.value;
+        if (alunos.length) {
+            alunos = await lastValueFrom(this.alunoService.getList())
+        }
+        var aluno = alunos.find(x => x.id == participacao.aluno_Id) as Aluno;
+      
+        var ref = showAgendarReposicaoConfirm(
+            this.dialogService,
+            aluno,
+            participacao,
+            source,
+            target);
+
         var onClose = ref.onClose.subscribe(confirmacaoCancelada => {
             if (confirmacaoCancelada) {
                 this.cdkCancelDrag('keyup');

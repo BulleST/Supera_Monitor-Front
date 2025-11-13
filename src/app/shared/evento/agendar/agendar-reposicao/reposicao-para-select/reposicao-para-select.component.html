@@ -1,6 +1,10 @@
 <table>
-    <tr>
-        <td class="text-right vertical-align-middle">
+    <tr *ngIf="!readonly">
+        <td class="text-right"
+        [ngClass]="{
+            'vertical-align-center': !(_data.touched && _data.invalid),
+            'vertical-align-baseline mt-2 block': _data.touched && _data.invalid
+        }">
             <label for="data">Data:</label>
         </td>
         <td class="vertical-align-middle">
@@ -10,7 +14,8 @@
                           placeholder="dd/mm/yyyy"
                           dateFormat="dd/mm/yy"
                             (ngModelChange)="loadEventosReposicaoPara()"
-                          [showIcon]="true"
+                          [showIcon]="!readonly"
+                          [disabled]="readonly"
                           [iconDisplay]="'input'"
                           inputId="data"
                           name="data"
@@ -20,90 +25,77 @@
                           [disabledDays]="[0]"
                           appendTo="body"
                           fluid />
-        </td>
-        <td class="vertical-align-middle">
             <div *ngIf="_data.touched && _data.invalid && _data.errors">
                 <p class="text-red-500 ml-2" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>
             </div>
         </td>
-    </tr>
     <tr>
-        <td class="text-right vertical-align-middle">
+        <td class="text-right"
+        [ngClass]="{
+            'vertical-align-center': !(field.touched && field.invalid),
+            'vertical-align-baseline mt-2 block': field.touched && field.invalid
+        }">
             <label for="eventoReposicao_Id">Aula:</label>
         </td>
         <td class="vertical-align-middle">
-            <ng-container *ngIf="!readonly">
-                <p-iconfield>
-                    <p-inputicon styleClass="pi pi-calendar" />
-                    <p-select [options]="list"
-                              [loading]="loading"
-                              name="eventoReposicao_Id"
-                              inputId="eventoReposicao_Id"
-                              #eventoReposicao_Id="ngModel"
-                              [(ngModel)]="evento"
-                              [readonly]="readonly"
-                              [required]="true"
-                              [filter]="true"
-                              filterBy="descricao,turma,professor,data,sala"
-                              optionLabel="descricao"
-                              placeholder="Selecione uma aula para repor"
-                              (onChange)="eventoChanged()"
-                              panelStyleClass="p-select-stripped"
-                              appendTo="body"
-                              fluid>
-                        <ng-template #footer>
-                            <p class="py-2 px-4">Exibindo {{list.length}} aulas do mês de {{ data | date : 'MMMM' }}</p>
-                        </ng-template>
-                        <ng-template #selectedItem let-selectedOption>
-                            <ng-container *ngIf="selectedOption">
-                                <span>{{selectedOption.data | date : 'dd/MM/yyyy HH:mm'}}</span>
-                            </ng-container>
-                        </ng-template>
-                        <ng-template let-item #item>
-                            <div class="flex gap-2">
-                                <div class="flex flex-column">
-                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
-                                        <i class="pi pi-calendar text-sm"></i>
-                                        <span>{{item.data | date : 'dd/MMM'}}</span>
-                                    </div>
-                                    <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
-                                        <i class="pi pi-clock text-sm"></i>
-                                        <span>{{item.data | date : 'HH:mm'}}</span>
-                                    </div>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-calendar" />
+                <p-select [options]="list"
+                            [loading]="loading"
+                            name="eventoReposicao_Id"
+                            inputId="eventoReposicao_Id"
+                            #field="ngModel"
+                            [(ngModel)]="evento"
+                            [readonly]="readonly"
+                            [required]="true"
+                          [filter]="true"
+                            [dropdownIcon]="readonly ? 'pi' : 'pi pi-chevron-down'"
+                            filterBy="descricao,turma,professor,data,sala"
+                            optionLabel="descricao"
+                            placeholder="Selecione uma aula para repor"
+                            (onChange)="eventoChanged()"
+                            panelStyleClass="p-select-stripped"
+                            appendTo="body"
+                            fluid>
+                    <ng-template #footer>
+                        <p class="py-2 px-4">Exibindo {{list.length}} aulas do mês de {{ data | date : 'MMMM' }}</p>
+                    </ng-template>
+                    <ng-template #selectedItem let-selectedOption>
+                        <ng-container *ngIf="selectedOption">
+                            <span>{{selectedOption.data | date : 'dd/MM/yyyy HH:mm'}}</span>
+                        </ng-container>
+                    </ng-template>
+                    <ng-template let-item #item>
+                        <div class="flex gap-2">
+                            <div class="flex flex-column">
+                                <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-primary-500 text-white ">
+                                    <i class="pi pi-calendar text-sm"></i>
+                                    <span>{{item.data | date : 'dd/MMM'}}</span>
                                 </div>
-                                <div class="flex flex-column">
-                                    <p class="flex align-items-center gap-2 py-1">
-                                        <span>{{item.turma ?? item.descricao}}</span>
-                                        <app-legend-color [corLegenda]="item.corLegenda"
-                                                          [professor_Id]="item.professor_Id"
-                                                          [professor]="item.professor"
-                                                          [turma_Id]="item.turma_Id"></app-legend-color>
-                                    </p>
-                                    <p class="flex align-items-center gap-1 py-1">
-                                        <span>{{item.sala}}</span>
-                                        <span>-</span>
-                                        <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
-                                        <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
-                                    </p>
+                                <div class="flex align-items-center gap-2 py-1 px-2 text-sm bg-white border-1 border-200 text-primary-500 ">
+                                    <i class="pi pi-clock text-sm"></i>
+                                    <span>{{item.data | date : 'HH:mm'}}</span>
                                 </div>
                             </div>
-                        </ng-template>
-                    </p-select>
-                </p-iconfield>
-            </ng-container>
-            <ng-container *ngIf="readonly">
-                <p-iconfield>
-                    <p-inputicon *ngIf="!loading" styleClass="fa-solid fa-users-between-lines" />
-                    <p-inputicon *ngIf="loading" styleClass="pi pi-spinner pi-spin" />
-                    <input type="text"
-                           pInputText
-                           [value]="evento?.descricao"
-                           id="descricao"
-                           name="descricao"
-                           fluid
-                           readonly>
-                </p-iconfield>
-            </ng-container>
+                            <div class="flex flex-column">
+                                <p class="flex align-items-center gap-2 py-1">
+                                    <span>{{item.turma ?? item.descricao}}</span>
+                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                                        [professor_Id]="item.professor_Id"
+                                                        [professor]="item.professor"
+                                                        [turma_Id]="item.turma_Id"></app-legend-color>
+                                </p>
+                                <p class="flex align-items-center gap-1 py-1">
+                                    <span>{{item.sala}}</span>
+                                    <span>-</span>
+                                    <span *ngIf="item.andar == SalaAndar.Terreo">Térreo</span>
+                                    <span *ngIf="item.andar > SalaAndar.Terreo">{{item.andar}}º andar</span>
+                                </p>
+                            </div>
+                        </div>
+                    </ng-template>
+                </p-select>
+            </p-iconfield>
         </td>
         <td class="vertical-align-middle">
             <p class="text-red-500 ml-2" *ngIf="!evento">Esse campo é obrigatório.</p>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Evento, EventoTipo } from '../../../../../models/evento.model';
 import { EventoService } from '../../../../../services/evento.service';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -10,7 +10,6 @@ import moment from 'moment';
 import { SalaAndar } from '../../../../../models/sala-aula.model';
 import { Feriado } from '../../../../../models/feriado.model';
 import { ConfirmationService } from 'primeng/api';
-import { CalendarioUtils } from '../../../../../utils';
 import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({
@@ -45,6 +44,13 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
         private alunoService: AlunoService,
 
     ) {
+        let onVisibleChange = this.onVisibleChange.subscribe(res => {
+            if (!res) {
+                this.ngOnDestroy();
+            }
+        })
+        this.subscription.push(onVisibleChange);
+
 		let aluno = this.alunoService.getAluno().subscribe(res => {
             this.aluno = res;
             this.loadEventosReposicaoDe();
@@ -56,15 +62,25 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
             this.eventoReposicaoPara = res;
             this.loadEventosReposicaoDe();
             this.setEvento();
-            console.log('eventoReposicaoPara')
 		});
 		this.subscription.push(eventoReposicaoPara);
 
         let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
+            
             let params = this.activatedRoute.snapshot.paramMap;
-            this.readonly = !!params.get('evento_reposicao_de');
+
+            var idParam = params.get('evento_reposicao_de');
+
+            this.readonly = idParam != null && idParam != 'null';
+
             this.evento = res;
-            this.data = moment(this.evento?.data ?? new Date).toDate();
+
+            if (this.evento) {
+                this.data = moment(this.evento?.data ?? new Date).toDate();
+                if (this.readonly) {
+                    this.list = [this.evento];
+                }
+            }
             this.setEvento();
         });
         this.subscription.push(eventoReposicaoDe);
@@ -109,49 +125,50 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
     }
 
     loadEventosReposicaoDe() {
-
-        this.data = this.data ?? new Date;
-
-
-
-        let request: CalendarioRequest = {
-            aluno_Id: this.aluno?.id,
-            intervaloDe: moment(this.data).startOf('month').toDate(),
-            intervaloAte: moment(this.data).endOf('month').toDate(),
+        if (!this.aluno) {
+            return;
         }
-        if (this.eventoReposicaoPara) {
-            this.data = this.eventoReposicaoPara.data;
-            request.intervaloDe = moment(this.data).subtract(1, 'month').toDate();
-            request.intervaloAte = moment(this.data).add(1, 'month').toDate();
-        }
-
-
-        this.loading = true;
-        return lastValueFrom(this.service.getList(request))
-            .then(res => {
-                this.list = res.eventos.filter(aula => {
-                    const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
-                    const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                    const naoMarcouReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
-                    const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
-                    const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente !== true;
-
-                    return alunoEstaNaAula
-                        && ehAula
-                        && naoMarcouReposicao
-                        && naoEhReposicao
-                        && naoGanhouPresenca
+        else {
+            this.data = this.data ?? new Date;
+            let request: CalendarioRequest = {
+                aluno_Id: this.aluno?.id,
+                intervaloDe: moment(this.data).startOf('month').toDate(),
+                intervaloAte: moment(this.data).endOf('month').toDate(),
+            }
+            if (this.eventoReposicaoPara) {
+                this.data = this.eventoReposicaoPara.data;
+                request.intervaloDe = moment(this.data).subtract(1, 'month').toDate();
+                request.intervaloAte = moment(this.data).add(1, 'month').toDate();
+            }
+    
+    
+            this.loading = true;
+            return lastValueFrom(this.service.getList(request))
+                .then(res => {
+                    this.list = res.eventos.filter(aula => {
+                        const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
+                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
+                        const naoMarcouReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoPara_Evento_Id;
+                        const naoEhReposicao = alunoEstaNaAula && !alunoEstaNaAula.reposicaoDe_Evento_Id;
+                        const naoGanhouPresenca = alunoEstaNaAula && alunoEstaNaAula.presente !== true;
+    
+                        return alunoEstaNaAula
+                            && ehAula
+                            && naoMarcouReposicao
+                            && naoEhReposicao
+                            && naoGanhouPresenca
+                    });
+    
+                    this.list = this.list.sort((x, y) => y.data.getTime() - x.data.getTime())
+                    this.loading = false;
+                    this.setEvento();
+                })
+                .catch(res => {
+                    this.loading = true;
+                    this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
+                    console.error(res)
                 });
-
-                this.list = this.list.sort((x, y) => y.data.getTime() - x.data.getTime())
-                this.loading = false;
-                this.setEvento();
-            })
-            .catch(res => {
-                this.loading = true;
-                this.toastr.error('Não foi possível carregar aulas para repor.', 'Erro')
-                console.error(res)
-            });
+        }
     }
 
 }

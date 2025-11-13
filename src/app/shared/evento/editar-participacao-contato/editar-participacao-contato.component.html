@@ -98,11 +98,7 @@
         </div>
         <!-- OBS -->
         <div class="field col-12">
-            <label for="observacao" class="font-bold">
-                <span *ngIf="passado">Por que o aluno faltou? </span>
-                <span *ngIf="!passado">Por que o aluno irá faltar? </span>
-                <span *ngIf="alunoContactado" class="text-red-500">*</span>
-            </label>
+            <label for="observacao" class="font-bold">Motivo da falta: <span class="text-red-500">*</span></label>
             <textarea pTextarea
                       id="observacao"
                       name="observacao"
@@ -112,7 +108,8 @@
                       placeholder="Insira aqui o motivo..."
                       rows="2"
                       [required]="alunoContactado"
-                      fluid></textarea>
+                      fluid
+                      [pAutoFocus]="true"></textarea>
             <ng-container *ngIf="observacao.touched && observacao.errors">
                 <p class="text-red-500" *ngIf="observacao.errors['required']">Esse campo é obrigatório</p>
             </ng-container>
@@ -183,15 +180,15 @@
                       fluid />
         </div>
         <!-- Retorno do contato -->
-        <div class="field col">
+        <div class="field col-12">
             <label for="contatoObservacao" class="font-bold"> Retorno do contato: </label>
-            <input pInputText
+            <textarea pTextarea
                    id="contatoObservacao"
                    name="contatoObservacao"
                    [(ngModel)]="participacao.contatoObservacao"
                    #contatoObservacao="ngModel"
                    [disabled]="!alunoContactado"
-                   fluid />
+                   fluid> </textarea>
         </div>
     </div>
     <div class="col-12 px-1 flex align-items-center justify-content-end">

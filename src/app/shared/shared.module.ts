@@ -53,6 +53,8 @@ import { SalaAulaComponent } from './sala-aula/sala-aula.component';
 import { TableHeaderFilterComponent } from './table/table-header-filter/table-header-filter.component';
 import { EventoItemHoverComponent } from './evento-item-hover/evento-item-hover.component';
 import { EditarParticipacaoContatoComponent } from './evento/editar-participacao-contato/editar-participacao-contato.component';
+import { EnviarMensagemAlunosComponent } from './evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
+import { AutoFocus } from "primeng/autofocus";
 
 @NgModule({
     declarations: [
@@ -114,7 +116,8 @@ import { EditarParticipacaoContatoComponent } from './evento/editar-participacao
         SalaAulaComponent,
         TableHeaderFilterComponent,
         EventoItemHoverComponent,
-        EditarParticipacaoContatoComponent
+        EditarParticipacaoContatoComponent,
+        EnviarMensagemAlunosComponent
 
 
         
@@ -146,22 +149,22 @@ import { EditarParticipacaoContatoComponent } from './evento/editar-participacao
 
     ],
     imports: [
-        CommonModule,
-        RouterModule,
-        PrimengModule,
-        ToastrModule.forRoot({ enableHtml: true }),
-        FontAwesomeModule,
-        NgxMaskDirective,
-        FormsModule,
-        NgxMaskPipe,
-        DragDropModule,
-        ScrollingModule,
-        FullCalendarModule,
-        NameAbvPipe,
-        NameFirstWordPipe,
-        SalaAulaPipe,
-        
-    ],
+    CommonModule,
+    RouterModule,
+    PrimengModule,
+    ToastrModule.forRoot({ enableHtml: true }),
+    FontAwesomeModule,
+    NgxMaskDirective,
+    FormsModule,
+    NgxMaskPipe,
+    DragDropModule,
+    ScrollingModule,
+    FullCalendarModule,
+    NameAbvPipe,
+    NameFirstWordPipe,
+    SalaAulaPipe,
+    AutoFocus
+],
     providers: [
         provideHttpClient(withFetch()),
         provideHttpClient(withInterceptorsFromDi()),

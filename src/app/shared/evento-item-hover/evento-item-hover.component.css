@@ -11,6 +11,14 @@
     flex-direction: column;
 }
 
+.event-perfil {
+    width: 100%;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: .85rem;
+}
 
 .event-hover .event-header {
     display: flex;

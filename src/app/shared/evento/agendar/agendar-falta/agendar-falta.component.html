@@ -24,15 +24,15 @@
 </header>
 <form #form="ngForm" (ngSubmit)="sendConfirmation($event)">
     <!-- Aluno -->
-    <app-falta-aluno-select class="w-full flex"
+    <app-falta-aluno-select class="w-full formgrid grid"
                             (onAlunoChanged)="alunoChanged($event)"></app-falta-aluno-select>
     <!-- Evento -->
     <app-falta-evento-selected *ngIf="evento"
-                                class="w-full flex"
+                                class="w-full formgrid grid"
                                 (onEventoChanged)="eventoChanged($event)"></app-falta-evento-selected>
     <!-- Calendario -->
     <app-falta-calendario-select *ngIf="!evento && aluno"
-                                 class="w-full flex"
+                                 class="w-full formgrid grid"
                                  (onEventoChanged)="eventoChanged($event)"></app-falta-calendario-select>
     <!-- Footer -->
     <ng-container *ngIf="aluno && evento">

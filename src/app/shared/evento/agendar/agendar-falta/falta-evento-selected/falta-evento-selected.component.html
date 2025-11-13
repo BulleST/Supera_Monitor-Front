@@ -1,6 +1,6 @@
-<div class="formgrid grid" *ngIf="evento">
-    <div class="col-12 flex mb-2 pr-4">
-        <p-button *ngIf="!readonly"
+<ng-container *ngIf="evento">
+    <div class="col-12 flex mb-2 pr-4" *ngIf="!readonly">
+        <p-button
                   icon="pi pi-calendar"
                   (onClick)="selecionarOutraData()"
                   severity="primary"
@@ -78,4 +78,4 @@
                    fluid />
         </p-iconfield>
     </div>
-</div>
+</ng-container>

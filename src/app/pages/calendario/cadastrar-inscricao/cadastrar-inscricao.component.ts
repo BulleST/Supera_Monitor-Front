@@ -17,20 +17,21 @@ import moment from 'moment';
 import { NgForm, NgModel } from '@angular/forms';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { RequestResponse } from '../../../helpers/request-response.interface';
-import { ChecklistService } from '../../../services/checklist.service';
-import { AccountService } from '../../../services/account.service';
 import { validaAlunos } from '../../../utils/validacao';
 import { CalendarioUtils } from '../../../utils/calendario-utils';
 import { MultiSelectChangeEvent } from 'primeng/multiselect';
 import { SalaAulaPipe } from '../../../utils/sala-aula.pipe';
 import { NameFirstWordPipe } from '../../../utils/name-first-word.pipe';
+import { showEnviarMensagemAlunos } from '../../../utils/show-enviar-mensagem-alunos';
+import { MensagemTipo } from '../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @Component({
     selector: 'app-cadastrar-inscricao',
     standalone: false,
     templateUrl: './cadastrar-inscricao.component.html',
     styleUrl: './cadastrar-inscricao.component.css',
-    providers: [ConfirmationService]
+    providers: [ConfirmationService, DialogService]
 
 })
 export class CadastrarInscricaoComponent implements OnDestroy {
@@ -65,10 +66,9 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         private turmaService: TurmaService,
         private service: EventoService,
         private salaPipe: SalaAulaPipe,
-        private checklistService: ChecklistService,
-        private accountService: AccountService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
+        private dialogService: DialogService,
 
     ) {
 
@@ -313,15 +313,11 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             .then(res => {
                 this.loading = false;
                 if (res.success) {
-
                     this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
                     this.service.calendarioReload.emit(0);
-                    this.enviarMensagemAluno(e);
+                    this.enviarMensagemAluno(res.object);
                 } else {
-
-                    this.showError('Agendamento falhou',
-                        `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${res.message}`,
-                        e);
+                    this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome} na ${this.getTipo(this.evento)}. <br> ${res.message}`, e);
                 }
             })
             .catch(res => {
@@ -339,31 +335,20 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         return this.calendarioUtils.request(this.evento);
     }
 
-    enviarMensagemAluno(e: any) {
+    enviarMensagemAluno(evento: Evento) {
         if (this.aluno) {
             var aluno = this.aluno as Aluno;
-            this.confirmationService.confirm({
-                target: e.target,
-                message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-                header: 'Enviar whatsapp',
-                icon: 'pi pi-whatsapp text-green-500',
-                acceptLabel: `Concluir`,
-                acceptIcon: 'pi pi-check',
-                acceptButtonStyleClass: 'p-button-rounded',
-                rejectVisible: false,
-                accept: () => {
-                    let object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
-                    window.open(object.link, '_blank');
-                    this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-
-                    this.visible = false
-                    this.visibleChange();
-                },
-                reject: () => {
-                    this.visible = false
-                    this.visibleChange();
-                }
-            });
+            var ref = showEnviarMensagemAlunos(
+                this.dialogService,
+                [aluno],
+                evento,
+                MensagemTipo.Inscricao
+            )
+            var onClose = ref.onClose.subscribe(res => {
+                this.visible = false
+                this.visibleChange();
+            })
+            this.subscription.push(onClose)
         }
         else {
             this.visible = false

@@ -1,33 +1,4 @@
 <app-confirm-dialog></app-confirm-dialog>
-<p-confirmdialog key="enviarMensagem" styleClass="w-25rem">
-    <ng-template #message let-message>
-        <div class="flex align-items-start gap-2 ">
-            <span class="mt-1">
-                <i *ngIf="message.icon" [ngClass]="message.icon" class="text-4xl "></i>
-                <i *ngIf="!message.icon" class="pi pi-exclamation-triangle text-4xl  text-primary-500"></i>
-            </span>
-            <div>
-                <div [innerHTML]="message.message"></div>
-                <p class="mt-2 text-primary-500 font-bold" *ngIf="mensagensEnviadasAlunos.length">Alunos</p>
-                <div class="flex flex-column align-items-start justify-content-start max-h-15rem overflow-auto">
-                    <p class="font-mediu text-400" *ngIf="mensagensEnviadasAlunos.length == 0">Nenhum aluno foi inserido</p>
-                    <div *ngFor="let aluno of mensagensEnviadasAlunos">
-                        <p-button type="button"
-                                  (onClick)="enviarMensagemAgendamento(aluno)"
-                                  (auxclick)="enviarMensagemAgendamento(aluno)"
-                                  (contextmenu)="enviarMensagemAgendamento(aluno)"
-                                  [disabled]="!aluno.celular"
-                                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-600'}}"
-                                  styleClass="text-600"
-                                  severity="success"
-                                  [label]="aluno.nome"
-                                  [text]="true" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </ng-template>
-</p-confirmdialog>
 <p-dialog [header]="'Agendar Aula 0'"
           [maximizable]="true"
           [draggable]="true"

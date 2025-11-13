@@ -18,28 +18,28 @@ import { EventoService } from '../../../../services/evento.service'
 import { NgForm, NgModel } from '@angular/forms'
 import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp'
 import { SelectChangeEvent } from 'primeng/select'
-import { Evento, EventoTipo } from '../../../../models/evento.model'
+import { Evento } from '../../../../models/evento.model'
 import { CalendarioRequest } from '../../../../models/calendario.model'
-import { ChecklistService } from '../../../../services/checklist.service'
-import { AccountService } from '../../../../services/account.service'
 import { validaAlunos, validaProfessores, validaSalaAulas, validaAlunoSalaAula } from '../../../../utils/validacao'
 import { Feriado } from '../../../../models/feriado.model'
 import { DatePickerYearChangeEvent } from 'primeng/datepicker'
 import { MultiSelectChangeEvent } from 'primeng/multiselect'
 import $ from 'jquery'
 import { CalendarioUtils } from '../../../../utils/calendario-utils'
-import { MyMap } from '../../../../utils/map'
 import { NameFirstWordPipe } from '../../../../utils/name-first-word.pipe'
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model'
 import { RoteiroService } from '../../../../services/roteiro.service'
 import { Roteiro } from '../../../../models/roteiro.model'
+import { MensagemTipo } from '../../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component'
+import { DialogService } from 'primeng/dynamicdialog'
+import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos'
 
 @Component({
     selector: 'app-cadastrar-aula-0',
     standalone: false,
     templateUrl: './cadastrar-aula-0.component.html',
     styleUrl: './cadastrar-aula-0.component.css',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class CadastrarAula0Component implements OnDestroy {
     visible: boolean = false
@@ -53,7 +53,6 @@ export class CadastrarAula0Component implements OnDestroy {
 
     blockAlunoField = false
 
-    mensagensEnviadasAlunos: Aluno[] = []
     selectedAlunos: Aluno[] = []
     alunos: Aluno[] = []
     loadingAlunos = false
@@ -98,8 +97,7 @@ export class CadastrarAula0Component implements OnDestroy {
         private roteiroService: RoteiroService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private checklistService: ChecklistService,
-        private accountService: AccountService,
+        private dialogService: DialogService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
     ) {
@@ -644,86 +642,42 @@ export class CadastrarAula0Component implements OnDestroy {
 
         await lastValueFrom(this.service.createAula0(this.object))
             .then(async res => {
-                this.loading = false
-                this.object = res.object
-                this.service.calendarioReload.emit(res.object.id)
-                this.toastrService.success('Aula 0 cadastrada com sucesso.', 'Agendamento finalizado')
-
-                if (this.selectedAlunos.length == 1 && this.selectedAlunos[0].celular) {
-                    this.sendMensagemAluno(e, res.object)
-                } else if (this.selectedAlunos.filter(x => x.celular).length > 0) {
-                    this.sendMensagemAlunos()
-                } else {
-                    this.visible = false
-                    this.visibleChange()
+                this.loading = false;
+                if (res.success) {
+                    if (this.object.alunos.length > 0) {
+                        this.sendMensagemAlunos(res.object);
+                    } else {
+                        this.visible = false;
+                        this.visibleChange()
+                    }
+                    this.toastrService.success('Aula zero cadastrada com sucesso.', 'Agendamento finalizado');
+                    this.service.calendarioReload.emit(res.object.id);
+                }
+                else {
+                    this.showError('Agendamento falhou', `Não foi possível agendar aula zero. <br> ${res.message}`, e);
                 }
             })
             .catch(res => {
                 this.loading = false
-                this.showError('Agendamento falhou', `Não foi possível agendar aula 0. <br> ${getError(res)}`, e)
+                this.showError('Agendamento falhou', `Não foi possível agendar aula zero. <br> ${getError(res)}`, e)
             })
     }
 
-    sendMensagemAluno(e: any, evento: any) {
-        let aluno = this.selectedAlunos[0] as Aluno
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Agendamento concluído com sucesso. <br> Clique para enviar mensagem de confirmação.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500 text-4xl',
-            acceptLabel: `Enviar mensagem`,
-            acceptButtonStyleClass: ' p-button-rounded p-button-success  px-3 mr-0',
-            acceptIcon: 'pi pi-whatsapp',
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Não enviar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                this.visible = false
-                this.visibleChange();
+    sendMensagemAlunos(evento: Evento) {
+        var alunos = this.selectedAlunos
+            .sort((x, y) => x.nome < y.nome ? -1 : 1);
 
-                this.enviarMensagemAgendamento(aluno)
-            },
-            reject: () => {
-                this.visible = false
-                this.visibleChange()
-            },
-        })
+        var ref = showEnviarMensagemAlunos(
+            this.dialogService, 
+            alunos, evento, 
+            MensagemTipo.Agendamento
+        );
+
+        var onClose = ref.onClose.subscribe(res => {
+            this.visible = false;
+            this.visibleChange();
+        });
+        this.subscription.push(onClose);
     }
-
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.selectedAlunos.sort((x, y) => (x.nome < y.nome ? -1 : 1))
-        this.confirmationService.confirm({
-            key: 'enviarMensagem',
-            message: `Agendamento concluído com sucesso. <br> Envie uma mensagem de confirmação para os alunos que participarão da aula.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptButtonStyleClass: 'p-button-rounded',
-            acceptIcon: 'pi pi-check',
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Não',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: () => {
-                this.visible = false
-                this.visibleChange()
-            },
-        })
-    }
-
-    enviarMensagemAgendamento(aluno: Aluno) {
-        if (!aluno.celular) {
-            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
-            return
-        }
-        let evento = MyMap(this.object, new Evento())
-        evento.evento_Tipo_Id = EventoTipo.TurmaExtra
-        let object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, evento)
-        window.open(object.link, '_target')
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
-        let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-        if (index != -1) this.mensagensEnviadasAlunos.splice(index, 1)
-    }
-
-
 
 }

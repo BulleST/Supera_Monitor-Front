@@ -41,7 +41,6 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
     data: Date = new Date;
     horario: Date = undefined as unknown as Date;
-    minData = new Date();
 
     professorSelected?: Professor;
     professores: Professor[] = [];
@@ -321,11 +320,16 @@ export class CadastrarOficinaComponent implements OnDestroy {
         lastValueFrom(this.service.createOficina(this.object))
             .then(res => {
                 this.loading = false;
-                this.visible = false
-                this.visibleChange();
-                this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
-                this.service.calendarioReload.emit(res.object.id);
-                // playSuccess();
+
+                if (res.success) {
+                    this.visible = false;
+                    this.visibleChange()
+                    this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
+                    this.service.calendarioReload.emit(res.object.id);
+                }
+                else {
+                    this.showError('Agendamento falhou', `Não foi possível agendar oficina. <br> ${res.message}`, e);
+                }
             })
             .catch(res => {
                 this.loading = false;

@@ -2,12 +2,20 @@ import { DialogService } from "primeng/dynamicdialog";
 import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
 import { Evento } from "../models/evento.model";
 import { AgendarReposicaoConfirmView, ReposicaoConfirmComponent } from "../shared/evento/agendar/agendar-reposicao/_reposicao-confirm/reposicao-confirm.component";
+import { Aluno } from "../models/alunos.model";
 
-export function showAgendarReposicaoConfirm(aluno: Evento_Participacao_Aluno, source: Evento, target: Evento, dialogService: DialogService) {
+export function showAgendarReposicaoConfirm(
+    dialogService: DialogService,
+    aluno: Aluno, 
+    participacao: Evento_Participacao_Aluno, 
+    reposicaoDe: Evento, 
+    reposicaoPara: Evento
+) {
     var view: AgendarReposicaoConfirmView = {
-        reposicaoDe: source,
-        reposicaoPara: target,
-        participacao: aluno,
+        aluno,
+        participacao,
+        reposicaoDe,
+        reposicaoPara,
         observacaoReposicao: '',
     }
     return dialogService.open(ReposicaoConfirmComponent, {
@@ -19,7 +27,7 @@ export function showAgendarReposicaoConfirm(aluno: Evento_Participacao_Aluno, so
         dismissableMask: true,
         duplicate: true,
         modal: true,
-        width: '450px',
+        width: '500px',
         style: {
             maxWidth: '95vw',
             maxHeight: '95vh',

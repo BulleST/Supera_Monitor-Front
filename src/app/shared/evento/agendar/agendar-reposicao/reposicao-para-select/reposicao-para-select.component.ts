@@ -9,72 +9,80 @@ import { CalendarioRequest } from '../../../../../models/calendario.model';
 import moment from 'moment';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { SalaAndar } from '../../../../../models/sala-aula.model';
-import { NgModel } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
 import { AlunoService } from '../../../../../services/alunos.service';
 
 @Component({
-	selector: 'app-reposicao-para-select',
-	standalone: false,
-	templateUrl: './reposicao-para-select.component.html',
-	styleUrl: '../agendar-reposicao.component.css',
+    selector: 'app-reposicao-para-select',
+    standalone: false,
+    templateUrl: './reposicao-para-select.component.html',
+    styleUrl: '../agendar-reposicao.component.css',
 })
 export class ReposicaoParaSelectComponent implements OnDestroy {
-	evento?: Evento;
-	list: Evento[] = [];
-	loading = false;
-	readonly = false;
-	subscription: Subscription[] = [];
+    evento?: Evento;
+    list: Evento[] = [];
+    loading = false;
+    readonly = false;
+    subscription: Subscription[] = [];
     data = new Date;
-	
-	aluno?: Aluno;
-	eventoReposicaoDe?: Evento;
-	@Output() onEventoChanged = new EventEmitter<Evento>();
-	@Output() onVisibleChange = new EventEmitter<boolean>();
+
+    aluno?: Aluno;
+    eventoReposicaoDe?: Evento;
+    @Output() onEventoChanged = new EventEmitter<Evento>();
+    @Output() onVisibleChange = new EventEmitter<boolean>();
 
     SalaAndar = SalaAndar;
 
     constructor(
-		private activatedRoute: ActivatedRoute,
-		private toastr: ToastrService,
-		private confirmationService: ConfirmationService,
-		private service: EventoService,
-		private alunoService: AlunoService,
-        
-	) {
-		this.onVisibleChange.subscribe(res => {
-			if (!res) {
-				this.ngOnDestroy();
-			}
-		})
+        private activatedRoute: ActivatedRoute,
+        private toastr: ToastrService,
+        private service: EventoService,
+        private alunoService: AlunoService,
 
-		let aluno = this.alunoService.getAluno().subscribe(res => {
+    ) {
+        let onVisibleChange = this.onVisibleChange.subscribe(res => {
+            if (!res) {
+                this.ngOnDestroy();
+            }
+        })
+        this.subscription.push(onVisibleChange);
+
+        let aluno = this.alunoService.getAluno().subscribe(res => {
             this.aluno = res;
             this.loadEventosReposicaoPara();
             this.setEvento();
-		});
-		this.subscription.push(aluno);
+        });
+        this.subscription.push(aluno);
 
-		let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
+        let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
             this.eventoReposicaoDe = res;
             this.loadEventosReposicaoPara();
             this.setEvento();
-            console.log('eventoReposicaoDe')
-		});
-		this.subscription.push(eventoReposicaoDe);
+        });
+        this.subscription.push(eventoReposicaoDe);
 
-		let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => {
-			let params = this.activatedRoute.snapshot.paramMap;
-            this.readonly = !!params.get('evento_reposicao_para');
-            this.evento = res;
-            this.data = moment(this.evento?.data ?? new Date).toDate();
+        let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => {
             
-            this.setEvento();
-		});
-		this.subscription.push(eventoReposicaoPara);
-	}
+            let params = this.activatedRoute.snapshot.paramMap;
 
-	
+            var idParam = params.get('evento_reposicao_para');
+
+            this.readonly = idParam != null && idParam != 'null';
+
+            this.evento = res;
+
+            if (this.evento) {
+                this.data = moment(this.evento?.data ?? new Date).toDate();
+                if (this.readonly) {
+                    this.list = [this.evento];
+                }
+            }
+
+            this.setEvento();
+        });
+        this.subscription.push(eventoReposicaoPara);
+    }
+
+
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
     }
@@ -90,7 +98,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
         else if (!this.eventoReposicaoDe) {
             return undefined;
         }
-        else  {
+        else {
             let request: CalendarioRequest = {
                 perfil_Cognitivo_Id: this.aluno.perfilCognitivo_Id,
                 intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
@@ -144,7 +152,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
 
     setEvento() {
         if (this.evento && this.list) {
-            let index = this.list.findIndex(x => x.id == this.evento!.id 
+            let index = this.list.findIndex(x => x.id == this.evento!.id
                 && moment(this.evento!.data).isSame(x.data)
                 && this.evento!.turma_Id == x.turma_Id
             );

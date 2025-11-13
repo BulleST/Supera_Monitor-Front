@@ -24,13 +24,18 @@ import { RequestResponse } from '../../../helpers/request-response.interface'
 
 import { Turma } from '../../../models/turma.model'
 import { SalaAulaId, SalaAndar } from '../../../models/sala-aula.model'
+import { Aluno } from '../../../models/alunos.model'
+import { AlunoService } from '../../../services/alunos.service'
+import { MensagemTipo } from '../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component'
+import { DialogService } from 'primeng/dynamicdialog'
+import { showEnviarMensagemAlunos } from '../../../utils/show-enviar-mensagem-alunos'
 
 @Component({
     selector: 'app-cancelar-evento',
     standalone: false,
     templateUrl: './cancelar-evento.component.html',
     styleUrl: './cancelar-evento.component.css',
-    providers: [ConfirmationService],
+    providers: [ConfirmationService, DialogService],
 })
 export class CancelarEventoComponent implements OnDestroy {
     evento: Evento = new Evento();
@@ -41,8 +46,8 @@ export class CancelarEventoComponent implements OnDestroy {
     tipoEventoString = '';
     EventoTipo = EventoTipo;
 
-    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
-    alunos: Evento_Participacao_Aluno[] = [];
+    alunos: Aluno[] = [];
+    loadingAlunos = false;
 
     professores: Professor[] = [];
     loadingProfessores = false;
@@ -60,12 +65,14 @@ export class CancelarEventoComponent implements OnDestroy {
         private crypto: Crypto,
         private professorService: ProfessorService,
         private service: EventoService,
+        private dialogService: DialogService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
         private turmaService: TurmaService,
+        private alunoService: AlunoService,
     ) {
         let professores = this.professorService.list.subscribe(res => {
-            this.professores = res.filter(x => x.active == true)
+            this.professores = res;
             this.setAlunosProfessores()
         })
         this.subscription.push(professores)
@@ -77,7 +84,7 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => (this.loadingProfessores = false))
         }
 
-        let turmas = this.turmaService.list.subscribe(res => (this.turmas = res.filter(x => x.active == true)))
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res)
         this.subscription.push(turmas)
 
         if (this.turmas.length == 0) {
@@ -85,6 +92,16 @@ export class CancelarEventoComponent implements OnDestroy {
             lastValueFrom(this.turmaService.getList())
                 .then(res => (this.loadingTurmas = false))
                 .catch(res => (this.loadingTurmas = false))
+        }
+
+        let alunos = this.alunoService.list.subscribe(res => this.alunos = res);
+        this.subscription.push(alunos)
+
+        if (this.alunos.length == 0) {
+            this.loadingAlunos = true
+            lastValueFrom(this.alunoService.getList())
+                .then(res => (this.loadingAlunos = false))
+                .catch(res => (this.loadingAlunos = false))
         }
 
         let eventos = this.service.getEvento().subscribe(res => {
@@ -192,50 +209,6 @@ export class CancelarEventoComponent implements OnDestroy {
         }
     }
 
-    enviarMensagemCancelamento(aluno: Evento_Participacao_Aluno) {
-        if (!aluno.celular) {
-            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
-            return
-        }
-
-        if (this.evento?.observacao && this.evento.observacao.length < 3) {
-            this.showError('Erro', 'Insira um motivo para o cancelamento. Pelo menos 3 caracteres.', aluno)
-            return
-        }
-
-        let object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.aluno, aluno.celular, this.evento)
-
-        window.open(object.link, '_blank')
-
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
-
-        let index = this.mensagensEnviadasAlunos.findIndex(x => x.id == aluno.id)
-
-        if (index != -1) {
-            this.mensagensEnviadasAlunos.splice(index, 1)
-        }
-    }
-
-    enviarMensagem(aluno: Evento_Participacao_Aluno) {
-        if (!aluno.celular) {
-            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
-            return
-        }
-
-        if (!this.evento.observacao) {
-            this.showError('Erro', 'Insira um motivo para o cancelamento.', aluno)
-            return
-        }
-
-        if (this.evento?.observacao && this.evento.observacao.length < 3) {
-            this.showError('Erro', 'Insira um motivo para o cancelamento. Pelo menos 3 caracteres.', aluno)
-            return
-        }
-
-        let object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.aluno, aluno.celular, this.evento)
-        window.open(object.link, '_blank')
-        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
-    }
 
     sendConfirmation(e: any, form: NgForm) {
         if (form.invalid) {
@@ -290,15 +263,20 @@ export class CancelarEventoComponent implements OnDestroy {
             }
             lastValueFrom(this.service.cancelar(request))
                 .then(res => {
-                    this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado')
-                    this.service.calendarioReload.emit(res.object.id)
-                    this.loading = false
-
-                    if (this.evento.alunos.length > 0) {
-                        this.sendMensagemAlunos()
-                    } else {
-                        this.visible = false
-                        this.visibleChange()
+                    this.loading = false;
+                    if (res.success) {
+                        this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado')
+                        this.service.calendarioReload.emit(res.object.id)
+    
+                        if (this.evento.alunos.length > 0) {
+                            this.sendMensagemAlunos(res.object)
+                        } else {
+                            this.visible = false
+                            this.visibleChange()
+                        }
+                    }
+                    else {
+                        this.showError('Erro', `Não foi possível cancelar a ${this.tipoEventoString}. <br> ${res.message}`, e)
                     }
                 })
                 .catch(res => {
@@ -313,21 +291,35 @@ export class CancelarEventoComponent implements OnDestroy {
         return this.calendarioUtils.request(evento);
     }
 
-    sendMensagemAlunos() {
-        this.mensagensEnviadasAlunos = this.evento!.alunos.sort((x, y) => (x.aluno < y.aluno ? -1 : 1))
-        this.confirmationService.confirm({
-            key: 'enviarMensagemCancelamento',
-            message: `A ${this.tipoEventoString} foi cancelada <br> Clique no(s) aluno(s) para enviar mensagem de cancelamento.`,
-            header: 'Enviar whatsapp',
-            icon: 'pi pi-whatsapp text-green-500',
-            acceptLabel: `Concluir`,
-            acceptIcon: 'pi pi-check',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: false,
-            accept: () => {
-                this.visible = false
-                this.visibleChange()
-            },
-        })
+    sendMensagemAlunos(evento: Evento) {
+        var eventoAlunos = evento.alunos.map(x => x.aluno_Id);
+        var alunos = this.alunos
+            .filter(x => eventoAlunos.includes(x.id))
+            .sort((x, y) => x.nome < y.nome ? -1 : 1);
+
+        var ref = showEnviarMensagemAlunos(
+            this.dialogService, 
+            alunos, evento, 
+            MensagemTipo.Cancelamento
+        );
+
+        var onClose = ref.onClose.subscribe(res => {
+            this.visible = false;
+            this.visibleChange();
+        });
+        this.subscription.push(onClose);
     }
+
+    
+    enviarMensagem(aluno: Evento_Participacao_Aluno) {
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno)
+            return
+        }
+
+        let object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.aluno, aluno.celular, this.evento)
+        window.open(object.link, '_blank')
+        this.mensagemWhatsapp.copiarMensagem(object.mensagem)
+    }
+
 }

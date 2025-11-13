@@ -20,16 +20,23 @@ import { NgForm } from '@angular/forms';
 	providers: [ConfirmationService]
 })
 export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
+	
 	subscription: Subscription[] = [];
 	instance: DynamicDialogComponent | undefined;
 	loading = false;
 	maximized = false;
-	view = new EditarParticipacaoContatoView;
+
+	view = new EditarContatoView;
 	evento!: Evento;
 	participacao!: Evento_Participacao_Aluno;
+	tipo!: EditarContatoTipo;
+
 	alunoContactado: boolean = false;
 	passado: boolean = false;
 	status = statusContato;
+
+	EditarContatoTipo = EditarContatoTipo;
+
 
 	constructor(
 		private dialogService: DialogService,
@@ -52,6 +59,17 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			this.view = this.instance.data['view'];
 			this.evento = this.view.evento;
 			this.participacao = this.view.participacao;
+			this.tipo = this.view.tipo;
+
+			if (this.tipo == EditarContatoTipo.Cancelamento) {
+				this.participacao.observacao = 'Aula Cancelada';
+			}
+			else if (this.tipo == EditarContatoTipo.FaltaAgendada && !this.participacao.observacao) {
+				this.participacao.observacao = 'Falta agendada';
+			}
+			else if (this.tipo == EditarContatoTipo.Falta && !this.participacao.observacao) {
+				// this.participacao.observacao = 'Aluno faltou';
+			}
 			
 		}
 	}
@@ -154,7 +172,14 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 
 }
 
-export class EditarParticipacaoContatoView {
+export class EditarContatoView {
 	participacao = new Evento_Participacao_Aluno;
 	evento = new Evento;
+	tipo = EditarContatoTipo.Falta;
+}
+
+export enum EditarContatoTipo {
+	Cancelamento,
+	Falta,
+	FaltaAgendada
 }

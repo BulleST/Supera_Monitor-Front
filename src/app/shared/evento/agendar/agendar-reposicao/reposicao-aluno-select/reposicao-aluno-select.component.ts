@@ -8,6 +8,7 @@ import { Crypto, MensagemWhatsapp } from '../../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { Evento } from '../../../../../models/evento.model';
 import { SalaAndar } from '../../../../../models/sala-aula.model';
+import { EventoService } from '../../../../../services/evento.service';
 
 @Component({
     selector: 'app-reposicao-aluno-select',
@@ -15,7 +16,7 @@ import { SalaAndar } from '../../../../../models/sala-aula.model';
     templateUrl: './reposicao-aluno-select.component.html',
     styleUrl: '../agendar-reposicao.component.css',
 })
-export class ReposicaoAlunoSelectComponent implements OnChanges, OnDestroy {
+export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
     aluno_Id?: number;
     aluno?: Aluno;
@@ -25,8 +26,8 @@ export class ReposicaoAlunoSelectComponent implements OnChanges, OnDestroy {
     readonly = false;
     subscription: Subscription[] = [];
 
-    @Input() eventoReposicaoDe?: Evento;
-    @Input() eventoReposicaoPara?: Evento;
+    eventoReposicaoDe?: Evento;
+    eventoReposicaoPara?: Evento;
     @Output() onAlunoChanged = new EventEmitter<Aluno>();
     @Output() onVisibleChange = new EventEmitter<boolean>();
 
@@ -36,30 +37,57 @@ export class ReposicaoAlunoSelectComponent implements OnChanges, OnDestroy {
         private activatedRoute: ActivatedRoute,
         private toastr: ToastrService,
         private mensagemWhatsapp: MensagemWhatsapp,
+        private eventoService: EventoService,
 
     ) {
 
-        this.onVisibleChange.subscribe(res => {
+        let onVisibleChange = this.onVisibleChange.subscribe(res => {
             if (!res) {
                 this.ngOnDestroy();
             }
         })
+        this.subscription.push(onVisibleChange);
+        
+		const eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
+            this.eventoReposicaoDe = res;
+            this.setAlunos();
+        });
+		this.subscription.push(eventoReposicaoDe)
+
+		const eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => {
+            this.eventoReposicaoPara = res;
+            this.setAlunos();
+        });
+		this.subscription.push(eventoReposicaoPara)
 
         let aluno = this.service.getAluno().subscribe(alunoRes => {
 
+            console.log('getAluno', alunoRes)
+
             let params = this.activatedRoute.snapshot.paramMap;
-            let alunoIdParam = params.get('aluno_id');
-            this.readonly = !!alunoIdParam;
+
+            let idParam = params.get('aluno_id');
+
+            this.readonly = idParam != null && idParam != 'null';
+            
+            console.log('readonly', this.readonly)
 
 
-            if (!alunoRes && alunoIdParam) {
-                this.aluno_Id = this.crypto.decrypt(alunoIdParam);;
+            if (idParam) {
+                this.aluno_Id = this.crypto.decrypt(idParam);
+            }
+            console.log('aluno_Id', this.aluno_Id)
+
+            this.aluno_Id = alunoRes?.id;
+            this.aluno = alunoRes;
+            console.log('aluno', this.aluno)
+
+            if (!alunoRes && this.aluno_Id) {
+                console.log('if 1')
                 this.loadAluno();
                 return;
             }
 
-            this.aluno = alunoRes;
-            this.aluno_Id = alunoRes?.id;
 
             if (!this.readonly) {
                 if (!this.service.list.value.length) {
@@ -74,9 +102,8 @@ export class ReposicaoAlunoSelectComponent implements OnChanges, OnDestroy {
 
                     this.setAlunos();
 
-                    if (alunoRes) {
-                        let index = this.alunos.findIndex(x => x.id == alunoRes.id);
-                        if (index != -1) this.alunos.splice(index, 1, alunoRes);
+                    if (this.aluno_Id) {
+                        let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
                         this.aluno = this.alunos[index];
                     }
                 });
@@ -85,12 +112,6 @@ export class ReposicaoAlunoSelectComponent implements OnChanges, OnDestroy {
             }
         });
         this.subscription.push(aluno);
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes['eventoReposicaoDe']) this.eventoReposicaoDe = changes['eventoReposicaoDe'].currentValue;
-        if (changes['eventoReposicaoPara']) this.eventoReposicaoPara = changes['eventoReposicaoPara'].currentValue;
-        this.setAlunos();
     }
 
     ngOnDestroy(): void {

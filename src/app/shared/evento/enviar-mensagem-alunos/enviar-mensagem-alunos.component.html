@@ -1,0 +1,64 @@
+<app-confirm-dialog></app-confirm-dialog>
+
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full flex align-items-center gap-2">
+        <i class="pi pi-whatsapp mr-2 text-base w-2rem h-2rem p-2 border-circle bg-green-500 text-white inline-flex align-items-center justify-content-center"></i>
+        <p>Enviar mensagem</p>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button icon="pi pi-times"
+                  (onClick)="close()"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+<div>
+    
+    <ng-container *ngIf="mensagemTipo == MensagemTipo.Agendamento">
+        <p>Agendamento concluído com sucesso.</p>
+        <p>Envie uma mensagem de confirmação para os alunos que participarão da {{tipoString}}:</p>
+    </ng-container>
+    <ng-container *ngIf="mensagemTipo == MensagemTipo.Cancelamento">
+        <p class="flex gap-1">
+            <span class="capitalize">{{tipoString}}</span>
+            <span>cancelada com sucesso.</span>
+        </p>
+        <p>Envie uma mensagem informando os alunos que participariam da {{tipoString}}:</p>
+    </ng-container>
+    <ng-container *ngIf="mensagemTipo == MensagemTipo.ConfirmacaoReposicao">
+        <p>Reposição agendada com sucesso.</p>
+        <p>Envie uma mensagem de confirmação para o aluno que irá fazer a reposição:</p>
+    </ng-container>
+    <ng-container *ngIf="mensagemTipo == MensagemTipo.FaltaAgendada">
+        <p>A falta do aluno <span class="capitalize font-bold">{{ alunos[0].nome | nameAbv }}</span> para o dia <span class="font-bold">{{evento.data | date : 'dd/MM/yyyy HH:mm'}} </span> foi registrada.</p>
+        <p>Clique para enviar uma mensagem:</p>
+    </ng-container>
+</div>
+<div class="mt-3">
+    <div *ngFor="let aluno of alunos">
+        <p-button type="button"
+                  (onClick)="enviarMensagem(aluno)"
+                  (auxclick)="enviarMensagem(aluno)"
+                  (contextmenu)="enviarMensagem(aluno)"
+                  [disabled]="!aluno.celular"
+                  icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-500'}}"
+                  styleClass="text-700 w-full text-left justify-content-start"
+                  class="w-full"
+                  severity="secondary"
+                  [label]="aluno.nome"
+                  [text]="true" 
+                  pTooltip="Clique para enviar mensagem"
+                  tooltipPosition="bottom"/>
+    </div>
+</div>
+<div class="flex align-items-center">
+    <p-button class="ml-auto"
+            icon="pi pi-check"
+            label="Concluir"
+            (onClick)="close()"
+            rounded
+    />
+</div>

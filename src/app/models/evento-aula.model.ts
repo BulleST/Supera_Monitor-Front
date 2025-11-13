@@ -1,3 +1,4 @@
+import { Evento } from "./evento.model";
 import { PseudoEvento } from "./reposicao.model";
 
 export class EventoAulaRequest {
@@ -26,5 +27,10 @@ export class EventoTurmaExtraRequest {
     observacao: string = '';
     descricao: string = '';
     perfilCognitivo: number[] = [];
-    alunos: { aluno_Id: number, reposicaoDe_Evento_Id: number }[] = [];
+    alunos: EventoTurmaExtraRequest_Alunos[] = [];
+}
+
+export class EventoTurmaExtraRequest_Alunos {
+    aluno_Id: number = 0;
+    reposicaoDe_Evento_Id: number = 0;
 }

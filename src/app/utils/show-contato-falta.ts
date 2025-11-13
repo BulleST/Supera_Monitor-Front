@@ -1,12 +1,17 @@
 import { DialogService } from "primeng/dynamicdialog";
 import { Evento } from "../models/evento.model";
-import { EditarParticipacaoContatoComponent, EditarParticipacaoContatoView } from "../shared/evento/editar-participacao-contato/editar-participacao-contato.component";
+import { EditarParticipacaoContatoComponent, EditarContatoTipo, EditarContatoView } from "../shared/evento/editar-participacao-contato/editar-participacao-contato.component";
 import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
 
-export function showContatoFalta(dialogService: DialogService, evento: Evento, participacao: Evento_Participacao_Aluno) {
-    var view: EditarParticipacaoContatoView = {
-        evento: evento,
-        participacao: participacao,
+export function showContatoFalta(dialogService: DialogService,
+    evento: Evento,
+    participacao: Evento_Participacao_Aluno,
+    tipo: EditarContatoTipo
+) {
+    var view: EditarContatoView = {
+        evento,
+        participacao,
+        tipo
     }
     return dialogService.open(EditarParticipacaoContatoComponent, {
         showHeader: false,

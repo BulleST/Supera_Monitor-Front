@@ -18,7 +18,7 @@ export function showAgendarReposicao(dialogService: DialogService, aluno?: Aluno
         dismissableMask: true,
         duplicate: true,
         modal: true,
-        width: '1000px',
+        width: '500px',
         style: {
             maxWidth: '95vw',
             maxHeight: '95vh',

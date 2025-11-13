@@ -298,7 +298,7 @@ export class MensagemWhatsapp {
         };
     }
 
-    enviarMensagemAgendamentoFalta(nome: string, celular: string, evento: Evento, sugestoes: Evento[]) {
+    enviarMensagemAgendamentoFalta(nome: string, celular: string, evento: Evento, sugestoes: Evento[], podeRemarcar: boolean = true) {
         let array = nome.split(' ');
         nome = array[0];
         celular = celular.replace(/\D/g, '')
@@ -309,20 +309,29 @@ export class MensagemWhatsapp {
         let mensagem = `Olá ${nome},
             \r\nEspero que esteja bem!
             \r\nSua falta do dia ${data} foi registrada.
-            \r\n Você terá até o dia ${dataLimite} para participar de uma reposição, caso contrário, perderá por completo o conteúdo da semana ${semana}.
-        `;
-        if (sugestoes.length > 0) {
-            mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
-                    \r\n `;
+            `;
+        if (!podeRemarcar) {
+            mensagem += `\r\n Você não poderá marcar outra reposição.
+                        \r\n Evite faltas excessivas para não perder o conteúdo.
+                        \r\n 
+                        \r\n Se precisar de algo estaremos aqui para o que precisar.`
         }
-        sugestoes.forEach(sugestao => {
-            let data = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
-            mensagem += `\r\n • ${data} - Turma: ${sugestao.turma}`;
-        })
-        mensagem += `\r\n
-                    \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
-                    \r\n
-                    \r\nIremos aguardar sua resposta...`;
+        if (podeRemarcar) {
+            mensagem += `\r\n Você terá até o dia ${dataLimite} para participar de uma reposição, caso contrário, perderá por completo o conteúdo da semana ${semana}.`
+
+            if (sugestoes.length > 0) {
+                mensagem += `\r\n Temos vagas nas seguintes datas para você agendar sua reposição já:
+                        \r\n `;
+            }
+            sugestoes.forEach(sugestao => {
+                let data = moment(sugestao.data).format('DD/MM/YY [às] HH[h]mm');
+                mensagem += `\r\n • ${data} - Turma: ${sugestao.turma}`;
+            })
+            mensagem += `\r\n
+                        \r\nMe avise o quanto antes sobre sua disponibilidade e agendaremos um horário conveniente para você.
+                        \r\n
+                        \r\nIremos aguardar sua resposta...`;
+        }
 
         let link = this.createLink(celular, mensagem);
         return {

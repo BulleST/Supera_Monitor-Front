@@ -52,8 +52,20 @@
                             <span class="selected-evento-linha-icon">
                                 <i class="fa-solid fa-brain"></i>
                             </span>
-                            <span>Perfil Cognitivo: </span>
-                            <p class="font-bold">{{ getPerfilCognitivo(evento) }}</p>
+                            <span>Perfil Cognitivo:</span>
+                            <p class="font-bold white-space-nowrap overflow-hidden text-overflow-ellipsis" 
+                                [pTooltip]="perfilCognitivoTemplate"
+                                style="width: 15rem;">
+                                {{ getPerfilCognitivo(evento) }}
+                            </p>
+                            <ng-template #perfilCognitivoTemplate>
+                                <ul class="px-0">
+                                    <li *ngFor="let item of evento.perfilCognitivo"
+                                        style="list-style-position: inside;"
+                                        class="white-space-nowrap"
+                                    >{{item.nome}}</li>
+                                </ul>
+                            </ng-template>
                         </div>
                     </ng-container>
                 </div>
@@ -261,9 +273,9 @@
                                 </ng-container>
                                 <ng-container *ngIf="[EventoTipo.Aula, EventoTipo.TurmaExtra].includes(evento.evento_Tipo_Id)">
                                     <!-- Reposição -->
-                                    <p-button (onClick)="goToReposicao()"
+                                    <p-button (onClick)="goToAgendarReposicao()"
                                               label="Agendar Reposição"
-                                              icon="pi pi-user-plus text-primary-500"
+                                              icon="pi pi-calendar text-primary-500"
                                               [text]="true"
                                               [disabled]="evento.vagasDisponiveisEvento < 1"
                                               severity="secondary"
@@ -272,7 +284,7 @@
                                     <!-- Primeira aula -->
                                     <p-button (onClick)="goToPrimeiraAula()"
                                               label="Agendar 1ª Aula"
-                                              icon="pi pi-user-plus text-pink-500"
+                                              icon="bi bi-1-circle-fill text-pink-500"
                                               [text]="true"
                                               severity="secondary"
                                               styleClass="justify-content-start surface-50"
@@ -281,7 +293,7 @@
                                 <!-- Agendar Falta -->
                                 <p-button (onClick)="goToAgendarFalta()"
                                           label="Agendar Falta"
-                                          icon="pi pi-times-circle text-red-500"
+                                          icon="fa fa-user-xmark text-red-500"
                                           [text]="true"
                                           severity="secondary"
                                           styleClass="justify-content-start surface-50"
@@ -291,7 +303,7 @@
                             <!-- Cancelamento -->
                             <p-button (onClick)="goToCancelamento()"
                                       label="Cancelar {{tipoEventoString}}"
-                                      icon="pi pi-times-circle text-red-500"
+                                      icon="fa fa-calendar-xmark text-red-500"
                                       [text]="true"
                                       [disabled]="!evento.active"
                                       severity="secondary"
