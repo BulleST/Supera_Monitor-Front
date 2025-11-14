@@ -8,7 +8,8 @@
 }
 
 .event-status {
-    width: 100%;
+    width: 71px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -23,6 +24,25 @@
     height: 20px;
 }
 
+.event-abaco, 
+.event-data {
+    display: flex;
+    width: 100%;
+}
+
+.event-abaco-name,
+.event-abaco-page,
+.event-data-day,
+.event-data-hour {
+    padding: 0 3px;
+    flex: 1;
+    background: white;
+    text-align: center;
+    font-size: 9px;
+    border: 1px var(--p-surface-200) solid;
+    border-top: none;
+    border-right: none;
+}
 /* .event-status >span {
     margin-left: 5px;
 } */

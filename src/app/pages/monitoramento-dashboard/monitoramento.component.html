@@ -248,78 +248,144 @@
                 </div>
             </td>
             <ng-container *ngFor="let item of aluno.items; let itemIndex = index">
-                <td class="p-1 text-center"
+                <td class="p-1 text-center px-0"
                     [ngClass]="{
-                    'bg-grey-300': !item.aula.aula.recesso,
-                    'bg-red-200 border-red-500': item.aula.aula.recesso,
+                    'bg-grey-300': item.status != Monitoramento_Item_Status.Recesso,
+                    'bg-red-200 border-red-500': item.status == Monitoramento_Item_Status.Recesso
                 }">
-                    <ng-template #dataTemplate let-data="data">
-                        <div class="flex w-full">
-                            <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none border-right-none">
-                                {{data | date: 'dd/MM'}}
-                            </p>
-                            <p class="px-1 flex-1 bg-white text-center text-sm border-1 border-200 border-top-none">
-                                {{data | date: 'HH\'h\'mm'}}
-                            </p>
-                        </div>
-                    </ng-template>
                     <div [ngClass]="{
                         'event-cell': true,
-                        'hidden': !item.show || item.aula.aula.recesso,
+                        'hidden': !item.show || item.status == Monitoramento_Item_Status.Recesso
                     }">
                         <div class="event-cell-inner" (click)="showAula(item, aluno)">
-                            <div class="event-status"
-                                 [ngClass]="{
-                                'bg-red-200 border-1 border-red-200 text-red-700': item.status == Dashboard_Item_Status.Recesso,
-                                'surface-900 border-1 border-900': item.status == Dashboard_Item_Status.Cancelada,
-                                'surface-800 border-1 border-800': item.status == Dashboard_Item_Status.Feriado,
-                                'bg-red-500 border-1 border-red-500': item.status == Dashboard_Item_Status.FaltaAula,
-                                'bg-red-200 border-1 border-red-200 text-red-600': item.status == Dashboard_Item_Status.FaltaAgendada,
-                                'bg-blue-500 border-1 border-blue-500': item.status == Dashboard_Item_Status.FaltaReposicao,
-                                'bg-green-500 border-1 border-green-500': item.status == Dashboard_Item_Status.PresenteNaAula,
-                                'bg-green-200 border-1 border-green-200 text-green-700': item.status == Dashboard_Item_Status.PresenteReposicao,
-                                'bg-purple-500 border-1 border-purple-500': item.status == Dashboard_Item_Status.ReposicaoAgendada,
-                                'bg-yellow-500 border-1 border-yellow-500': item.status == Dashboard_Item_Status.FaltaAlunoContatado,
-                                'bg-purple-800 border-1 border-purple-800': item.status == Dashboard_Item_Status.ReposicaoDesmarcada,
-                                'surface-50 border-1 border-100 text-500': item.status == Dashboard_Item_Status.Aula,
-                            }">
-                                <!-- <pre *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada">{{item.reposicaoPara | json}}</pre> -->
-                                <span [innerText]="
-                                item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
-                                item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
-                                item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
-                                item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.FaltaAgendada ? 'Falta A.' :
-                                item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'R. cancelada' :
-                                item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
-                                item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
-                                item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
-                                item.status == Dashboard_Item_Status.Aula ? 'Aula' : 'Aula' 
-                            " [pTooltip]="
-                                    item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
-                                    item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
-                                    item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
-                                    item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
-                                    item.status == Dashboard_Item_Status.FaltaAgendada ? 'Falta Agendada' :
-                                    item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
-                                    item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
-                                    item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'Reposição cancelada' :
-                                    item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
-                                    item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
-                                    item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
-                                    item.status == Dashboard_Item_Status.Aula ? 'Aula' : 'Aula' 
-                                "></span>
-                                <span class="event-turma"
-                                      [pTooltip]="item.aula.aula.turma"
-                                      [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
-                            </div>
-                            <ng-container *ngIf="item.reposicaoPara">
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
+                            <!-- Recesso -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.Recesso">
+                                <div class="event-status bg-red-200 border-1 border-red-200 text-red-700">
+                                    <span pTooltip="Recesso">Recesso</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
-                            <ng-container *ngIf="!item.reposicaoPara">
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.aula.data }"></ng-container>
+                            <!-- Cancelada -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.Cancelada">
+                                <div class="event-status surface-900 border-1 border-900">
+                                    <span pTooltip="Cancelada">Cancelada</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- Feriado -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.Feriado">
+                                <div class="event-status surface-800 border-1 border-800">
+                                    <span pTooltip="Feriado">Feriado</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- FaltaAula -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAula">
+                                <div class="event-status bg-red-500 border-1 border-red-500">
+                                    <span pTooltip="Falta - Aluno não contatado">Falta</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- FaltaAgendada -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAgendada">
+                                <div class="event-status bg-red-200 border-1 border-red-200 text-red-600">
+                                    <span pTooltip="Falta Agendada">Falta</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- FaltaReposicao -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaReposicao">
+                                <div class="event-status bg-blue-500 border-1 border-blue-500">
+                                    <span pTooltip="Falta - Reposição">Falta</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- PresenteNaAula -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteNaAula">
+                                <div class="event-status bg-green-500 border-1 border-green-500">
+                                    <span pTooltip="Presente">Presente</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
+                                    abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
+                                    pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
+                                    reposicao: item.reposicaoPara ? true : false
+                                }"></ng-container>
+                            </ng-container>
+                            <!-- PresenteReposicao -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteReposicao">
+                                <div class="event-status bg-green-200 border-1 border-green-200 text-green-700">
+                                    <span pTooltip="Presente - Reposição">Presente</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
+                                    abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
+                                    pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
+                                    reposicao: item.reposicaoPara ? true : false
+                                }"></ng-container>
+                                <!-- <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container> -->
+                            </ng-container>
+                            <!-- ReposicaoAgendada -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.ReposicaoAgendada">
+                                <div class="event-status bg-purple-500 border-1 border-purple-500">
+                                    <span pTooltip="Reposição Agendada">Reposição</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- FaltaAlunoContatado -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAlunoContatado">
+                                <div class="event-status bg-yellow-500 border-1 border-yellow-500">
+                                    <span pTooltip="Falta - Aluno Contatado">Falta</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- ReposicaoDesmarcada -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.ReposicaoDesmarcada">
+                                <div class="event-status bg-purple-800 border-1 border-purple-800">
+                                    <span pTooltip="Reposição Desmarcada">Reposição</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                            </ng-container>
+                            <!-- Aula -->
+                            <ng-container *ngIf="item.status == Monitoramento_Item_Status.Aula">
+                                <div class="event-status surface-50 border-1 border-100 text-500">
+                                    <span pTooltip="Aula">Aula</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                         </div>
                         <span *ngIf="aluno.primeiraAula_Id == item.id" class="primeira-aula">1ª aula</span>
@@ -355,5 +421,37 @@
             </ng-container>
         </tr>
     </ng-container>
+</ng-template>
+<ng-template #abacoTemplate let-abaco="abaco" let-pagina="pagina" let-reposicao="reposicao">
+    <div class="event-abaco" [pTooltip]="reposicao">
+        <p class="event-abaco-name"
+        [ngClass]="{
+            'bg-green-200 border-green-200 text-green-600': reposicao,
+            'bg-green-500 border-green-500 text-white': !reposicao,
+        }">
+            <span [pTooltip]="abaco" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis lowercase">
+                {{abaco}}
+            </span>
+        </p>
+        <p class="event-abaco-page"
+            [ngClass]="{
+                'bg-green-200 border-green-200 text-green-600': reposicao,
+                'bg-green-500 border-green-500 text-white': !reposicao,
+            }">
+            <span [pTooltip]="'Página '+ pagina" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis">
+                pág. {{pagina}}
+            </span>
+        </p>
+    </div>
+</ng-template>
+<ng-template #dataTemplate let-data="data">
+    <div class="event-data">
+        <p class="event-data-day">
+            {{data | date: 'dd/MM'}}
+        </p>
+        <p class="event-data-hour">
+            {{data | date: 'HH\'h\'mm'}}
+        </p>
+    </div>
 </ng-template>
 <router-outlet></router-outlet>

@@ -40,7 +40,7 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	request: Monitoramento_Request = new Monitoramento_Request;
 
 	PseudoEvento = PseudoEvento;
-	Dashboard_Item_Status = Monitoramento_Item_Status;
+	Monitoramento_Item_Status = Monitoramento_Item_Status;
 	FilterMatchMode = FilterMatchMode;
 
 	loadingRequests = new EventEmitter<number>();
