@@ -34,7 +34,7 @@
                           pTooltip="Atualizar monitoramento"
                           tooltipPosition="top"
                           styleClass="border-4"
-                          [rounded]="true"  />
+                          [rounded]="true" />
                 <p-button label="Ver filtros"
                           icon="pi pi-filter"
                           severity="primary"
@@ -267,7 +267,6 @@
                         'event-cell': true,
                         'hidden': !item.show || item.aula.aula.recesso,
                     }">
-                    
                         <div class="event-cell-inner" (click)="showAula(item, aluno)">
                             <div class="event-status"
                                  [ngClass]="{
@@ -286,21 +285,22 @@
                             }">
                                 <!-- <pre *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada">{{item.reposicaoPara | json}}</pre> -->
                                 <span [innerText]="
-                                
-                                item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
-                                item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
-                                item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
-                                item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.FaltaAgendada ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'Faltou' :
-                                item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
-                                item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
-                                item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
-                                item.status == Dashboard_Item_Status.Aula ? 'Aula' :
-                                'Aula' 
+                                    item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
+                                    item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
+                                    item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
+                                    item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
+                                    item.status == Dashboard_Item_Status.FaltaAgendada ? 'Faltou' :
+                                    item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
+                                    item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
+                                    item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'R. cancelada' :
+                                    item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
+                                    item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
+                                    item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
+                                    item.status == Dashboard_Item_Status.Aula ? 'Aula' : 'Aula' 
                                 "></span>
+                                <span class="event-turma"
+                                      [pTooltip]="item.aula.aula.turma"
+                                      [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                             </div>
                             <ng-container *ngIf="item.reposicaoPara">
                                 <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
@@ -309,6 +309,7 @@
                                 <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.aula.aula.data }"></ng-container>
                             </ng-container>
                         </div>
+                        <span *ngIf="aluno.primeiraAula_Id == item.id" class="primeira-aula">1ª aula</span>
                     </div>
                 </td>
             </ng-container>

@@ -18,6 +18,8 @@ import { showContatoFalta } from '../../../../utils/show-contato-falta';
 import { EditarParticipacaoContatoComponent, EditarContatoView, EditarContatoTipo } from '../../editar-participacao-contato/editar-participacao-contato.component';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
 import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-alunos.component';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
 
 @Component({
 	selector: 'app-agendar-falta',
@@ -48,6 +50,8 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
 		private eventoService: EventoService,
+		private jornadaService: JornadaSuperaService,
+		private monitoramentoService: MonitoramentoService,
 		private alunoService: AlunoService,
 		private toastrService: ToastrService,
 		private confirmationService: ConfirmationService,
@@ -174,7 +178,7 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 			}
 		}
 
-		this.participacao = evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno; 
+		this.participacao = evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
 		let request: EventoAgendarFaltaRequest = {
 			participacao_Id: this.participacao.id,
@@ -186,15 +190,17 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 		};
 
 		lastValueFrom(this.eventoService.cancelarParticipacao(request))
-			.then(response => {
-				if (response.success) {
+			.then(res => {
+				if (res.success) {
 					this.loading = false;
-					this.eventoService.calendarioReload.emit(evento.id);
-					this.toastrService.success(response.message);
-					this.sendMensagemAluno(response.object);
+					this.jornadaService.onReload.emit(res.object.id);
+					this.monitoramentoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit(res.object.id);
+					this.toastrService.success(res.message);
+					this.sendMensagemAluno(res.object);
 				} else {
 					this.loading = false;
-					this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, response.message)
+					this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, res.message)
 				}
 
 			})
@@ -209,7 +215,7 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 		return this.calendarioUtils.requestAulaTurma(evento);
 	}
 
-	sendMensagemAluno( evento: Evento) {
+	sendMensagemAluno(evento: Evento) {
 		if (this.aluno) {
 			var aluno = this.aluno as Aluno;
 			var ref = showEnviarMensagemAlunos(
@@ -223,18 +229,18 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 			})
 			this.subscription.push(onClose)
 		}
-		else {				
+		else {
 			this.close();
 		}
-		
+
 	}
 
 
 	showContatoFalta() {
 		if (this.evento && this.participacao) {
 			this.refChild = showContatoFalta(
-				this.dialogService, 
-				this.evento, 
+				this.dialogService,
+				this.evento,
 				this.participacao,
 				EditarContatoTipo.FaltaAgendada
 			);

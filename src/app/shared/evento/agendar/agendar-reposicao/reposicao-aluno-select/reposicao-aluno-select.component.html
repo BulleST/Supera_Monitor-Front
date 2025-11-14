@@ -27,7 +27,7 @@
                             optionLabel="nome"
                             optionValue="id"
                             [readonly]="readonly"
-                            [disabled]="readonly"
+                            [class.pointer-events-none]="readonly"
                             [dropdownIcon]="readonly ? 'pi' : 'pi pi-chevron-down'"
                             placeholder="Selecione um aluno"
                             panelStyleClass="p-select-stripped"

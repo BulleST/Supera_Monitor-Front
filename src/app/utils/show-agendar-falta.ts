@@ -17,7 +17,7 @@ export function showAgendarFalta(dialogService: DialogService, aluno?: Aluno, ev
         dismissableMask: true,
         duplicate: true,
         modal: true,
-        width: '700px',
+        width: '500px',
         style: {
             maxWidth: '95vw',
             maxHeight: '95vh',

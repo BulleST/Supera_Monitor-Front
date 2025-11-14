@@ -4,9 +4,6 @@ import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restricao.model';
 import { getError, insertOrReplace } from '../utils';
-import { HttpClient } from '@angular/common/http';
-import { ToastrService } from 'ngx-toastr';
-import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root',

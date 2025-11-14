@@ -38,7 +38,7 @@ export class FaltaEventoSelectedComponent implements OnChanges, OnDestroy {
 			}
 		})
 
-		let params = this.activatedRoute.snapshot.paramMap;
+		let params = this.activatedRoute.snapshot.queryParamMap;
 		this.readonly = !!params.get('evento_id');
 		let evento = this.service.getEvento().subscribe(res => {
 			if (res) {

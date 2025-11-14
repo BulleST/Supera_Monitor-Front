@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, map, of, tap } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { Evento, EventoCancelamentoRequest } from '../models/evento.model';
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
@@ -35,7 +35,7 @@ export class EventoService extends Service {
     feriados = new BehaviorSubject<Feriado[]>([]);
     statusContato = new BehaviorSubject<{ value: any, label: string }[]>(statusContato);
 
-    calendarioReload = new EventEmitter<number>();
+    onReload = new EventEmitter<number>();
     calendarView = new EventEmitter<CalendarioView>();
     roteiros: Roteiro[] = [];
 
@@ -159,11 +159,33 @@ export class EventoService extends Service {
 
     get(id: number) {
         return this.http.get<Evento>(`${this.url}/eventos/${id}`)
-            .pipe(tap(evento => {
+            .pipe(tap(async evento => {
                 evento = this.mapEvento(evento);
+                evento = await this.loadReposicoes(evento)
+                
                 return evento;
             }));
     }
+        async loadReposicoes(evento: Evento) {
+            var reqs: Promise<Evento>[] = [];
+            evento.alunos.map(aluno => {
+                // if (aluno.reposicaoDe_Evento_Id && !aluno.reposicaoDe_Evento) {
+                //    var req = lastValueFrom(this.get(aluno.reposicaoDe_Evento_Id))
+                //     .then(res => aluno.reposicaoDe_Evento = res)
+                //     reqs.push(req)
+                // }
+                // if (aluno.reposicaoPara_Evento_Id && !aluno.reposicaoPara_Evento) {
+                //     var req = lastValueFrom(this.get(aluno.reposicaoPara_Evento_Id))
+                //     .then(res => aluno.reposicaoPara_Evento = res)
+                //     reqs.push(req)
+                // }
+                return aluno;
+            })
+
+            await Promise.all(reqs);
+
+            return evento;
+        }
 
     getPseudoAula(turma_Id: number, dataHora: Date) {
         dataHora = moment(dataHora).format('YYYY-MM-DD[T]HH:mm:ss') as any

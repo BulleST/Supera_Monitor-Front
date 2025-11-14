@@ -23,6 +23,8 @@ import $ from 'jquery';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { Roteiro } from '../../../../models/roteiro.model';
 import { RoteiroService } from '../../../../services/roteiro.service';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
 
 @Component({
     selector: 'app-cadastrar-oficina',
@@ -51,14 +53,14 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
     eventos: Evento[] = [];
     loadingEventos = false;
-    
+
     roteiros: Roteiro[] = [];
     loadingRoteiros = false;
-        
+
     feriados: Feriado[] = [];
     loadingFeriados = false;
     ano: number = new Date().getFullYear();
-    
+
     invalidDates: Date[] = [];
 
     @ViewChild('form') form!: NgForm;
@@ -72,14 +74,16 @@ export class CadastrarOficinaComponent implements OnDestroy {
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
         private roteiroService: RoteiroService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
         private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Oficina';
 
-        let feriados = this.service.feriados.subscribe(res => {
+        let feriados = this.eventoService.feriados.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -113,7 +117,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
             this.loadSalas();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
         this.subscription.push(eventos);
 
         this.visible = true;
@@ -126,41 +130,41 @@ export class CadastrarOficinaComponent implements OnDestroy {
         this.subscription.forEach(item => item.unsubscribe());
     }
 
-    
+
     visibleChange() {
         if (!this.visible) {
             this.router.navigate(['../../'], { relativeTo: this.activatedRoute });
         }
     }
-    
+
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
 
     loadProfessores() {
-            this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+        this.loadingProfessores = true;
+        lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
     }
 
     loadRoteiros() {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList(moment().year()))
+            .then(res => this.loadingRoteiros = false)
+            .catch(res => this.loadingRoteiros = false);
     }
 
     loadSalas() {
-            this.loadingSalaAulas = true;
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
+        this.loadingSalaAulas = true;
+        lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
     }
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.service.getFeriados(this.ano))
+        lastValueFrom(this.eventoService.getFeriados(this.ano))
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -176,8 +180,8 @@ export class CadastrarOficinaComponent implements OnDestroy {
                 range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
                 return range;
             });
-            
-              let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+
+            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }
@@ -188,7 +192,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
             this.loadFeriados()
         }
     }
-    
+
     async verificaDisponibilidade() {
         let valid = true;
 
@@ -210,7 +214,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
@@ -235,7 +239,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
             let e: SelectChangeEvent = {
                 value: this.professorSelected,
                 originalEvent: { target: $('#professor_Id').get(0) as any } as any
-            } 
+            }
             this.professorChanged(e, this.professor_Id);
         }
     }
@@ -250,16 +254,16 @@ export class CadastrarOficinaComponent implements OnDestroy {
         }
         else if (item && !item.disponivel && !item.disponivelEvent && item.expedienteInicio && item.expedienteFim) {
             mensagemErro = `O expediente do educador é das ${moment(item.expedienteInicio).format('HH:mm')} às ${moment(item.expedienteFim).format('HH:mm')}`;
-        } 
+        }
         else {
             mensagemErro = null;
         }
-        
+
         if (mensagemErro) {
             this.showError('Educador indisponível', mensagemErro, e.originalEvent)
             model.control.setValue(undefined)
         }
-        
+
         model.control.setErrors({ indisponivel: mensagemErro });
         model.control.updateValueAndValidity();
     }
@@ -317,7 +321,7 @@ export class CadastrarOficinaComponent implements OnDestroy {
 
         this.loading = true;
 
-        lastValueFrom(this.service.createOficina(this.object))
+        lastValueFrom(this.eventoService.createOficina(this.object))
             .then(res => {
                 this.loading = false;
 
@@ -325,7 +329,9 @@ export class CadastrarOficinaComponent implements OnDestroy {
                     this.visible = false;
                     this.visibleChange()
                     this.toastrService.success('Oficina cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.service.calendarioReload.emit(res.object.id);
+                    this.jornadaService.onReload.emit(res.object.id);
+                    this.monitoramentoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id);
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar oficina. <br> ${res.message}`, e);

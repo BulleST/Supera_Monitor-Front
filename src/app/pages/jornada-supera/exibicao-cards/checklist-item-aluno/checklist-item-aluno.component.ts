@@ -158,6 +158,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     }
     
     showAluno(aluno: JornadaSupera_Card_Checklist_Item_Aluno) {
-        showAluno(aluno.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, aluno.aluno_Id);
     }
 }

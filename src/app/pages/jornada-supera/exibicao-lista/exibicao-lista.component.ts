@@ -171,7 +171,7 @@ export class ExibicaoListaComponent implements OnChanges {
     }
 
     showAluno(aluno: JornadaSupera_List_Aluno) {
-        showAluno(aluno.id, this.dialogService);
+        showAluno(this.dialogService, aluno.id);
     }
 
 }

@@ -14,6 +14,8 @@ import { RequestResponse } from '../../../../../helpers/request-response.interfa
 import { showEnviarMensagemAlunos } from '../../../../../utils/show-enviar-mensagem-alunos';
 import { MensagemTipo } from '../../../enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { Aluno } from '../../../../../models/alunos.model';
+import { MonitoramentoService } from '../../../../../services/monitoramento.service';
+import { JornadaSuperaService } from '../../../../../services/jornada-supera.service';
 
 @Component({
 	selector: 'app-reposicao-confirm',
@@ -32,7 +34,9 @@ export class ReposicaoConfirmComponent implements OnInit {
 		private ref: DynamicDialogRef,
 		private confirmationService: ConfirmationService,
 		private toastr: ToastrService,
-		private service: EventoService,
+		private eventoService: EventoService,
+		private jornadaService: JornadaSuperaService,
+		private monitoramentoService: MonitoramentoService,
 		private calendarioUtils: CalendarioUtils,
 
 	) {
@@ -97,11 +101,13 @@ export class ReposicaoConfirmComponent implements OnInit {
 			}
 		}
 
-		await lastValueFrom(this.service.reposicao(request))
+		await lastValueFrom(this.eventoService.reposicao(request))
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.service.calendarioReload.emit(reposicaoDe.id);
+					this.jornadaService.onReload.emit(res.object.id);
+					this.monitoramentoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit(res.object.id);
 					this.sendMensagemAluno(res.object);
 					var data = moment(reposicaoPara.data).format('DD/MM/YYYY [às] HH[h]mm');
 					this.toastr.success(`Reposição agendada para o dia ${data}`);

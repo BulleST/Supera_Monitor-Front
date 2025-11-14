@@ -10,6 +10,7 @@ import { ProfessorService } from '../../../services/professor.service';
 import { TurmaService } from '../../../services/turma.service';
 import { AlunoService } from '../../../services/alunos.service';
 import { MensagemWhatsapp } from '../../../utils';
+import moment from 'moment';
 
 @Component({
   selector: 'app-filtro-popover',
@@ -94,7 +95,8 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
         }
 
         let anoMin = 2025;
-        let currentAno = new Date().getFullYear();
+        let currentAno = moment().add(1, 'year').year();
+        // let currentAno = 2030;
         for (let ano = anoMin; ano <= currentAno; ano++) {
             this.anos.push(ano)
         }

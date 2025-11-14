@@ -1,5 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, EventEmitter, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import moment from 'moment';
 import { ConfirmationService, FilterMatchMode, SortEvent } from 'primeng/api';
@@ -13,6 +12,9 @@ import { MonitoramentoService } from '../../services/monitoramento.service';
 import { Aluno } from '../../models/alunos.model';
 import { AulaParticipacaoComponent } from './aula-participacao/aula-participacao.component';
 import { showAluno } from '../../utils/show-aluno';
+import { ToastrService } from 'ngx-toastr';
+import $ from 'jquery';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-monitoramento',
@@ -22,7 +24,7 @@ import { showAluno } from '../../utils/show-aluno';
 	providers: [ConfirmationService, DialogService],
 
 })
-export class MonitoramentoComponent implements OnDestroy {
+export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	alunos: Monitoramento_Aluno[] = [];
 	loading = false;
 	mesesAno: Monitoramento_Mes[] = [];
@@ -63,11 +65,11 @@ export class MonitoramentoComponent implements OnDestroy {
 
 
 	constructor(
+		private router: Router,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private service: MonitoramentoService,
 		private crypto: Crypto,
-		private activatedRoute: ActivatedRoute,
-		private router: Router,
+		private toastr: ToastrService,
 		private dialogService: DialogService,
 		private calendarioUtils: CalendarioUtils,
 	) {
@@ -88,6 +90,10 @@ export class MonitoramentoComponent implements OnDestroy {
 
 	getTextColor(color: string) {
 		return this.calendarioUtils.getTextColor(color)
+	}
+
+	ngAfterViewInit(): void {
+		this.scrollView();
 	}
 
 	calculaAlunosMesmaTurma(turma_Id: number) {
@@ -154,12 +160,29 @@ export class MonitoramentoComponent implements OnDestroy {
 				});
 
 				this.loading = false;
-				setTimeout(() => {
-					let container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;
-					let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
-					container.scrollLeft = tr.offsetLeft - tr.offsetWidth;
-				}, 2000);
 			})
+			.catch(res => {
+				this.loading = false;
+				this.toastr.error('Não foi possível carregar monitoramento', 'Erro')
+			})
+	}
+
+	scrollView() {
+		setTimeout(() => {
+			let container = $('.p-datatable-table-container')
+			console.log(container)
+			// let tr = $(`th[data-mes="${(new Date().getMonth())}"]`)
+			let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
+			console.log(tr)
+	
+			let left = $(tr).offset()?.left ?? 0
+			console.log(left)
+			$(container).animate({
+				scrollLeft: left
+			}, 800);
+		}, 200);
+
+
 	}
 
 	customSort(event: SortEvent) {
@@ -180,6 +203,7 @@ export class MonitoramentoComponent implements OnDestroy {
 	}
 
 	showAula(item: Monitoramento_Aluno_Item, aluno: Monitoramento_Aluno) {
+		this.router.navigate(['monitoramento', 'aula'])
 		this.ref = this.dialogService.open(AulaParticipacaoComponent, {
 			header: 'Aula',
 			showHeader: false,
@@ -255,7 +279,7 @@ export class MonitoramentoComponent implements OnDestroy {
 	}
 		
 		showAluno(aluno: Monitoramento_Aluno) {
-			showAluno(aluno.id, this.dialogService);
+			showAluno(this.dialogService, aluno.id);
 		}
 
 

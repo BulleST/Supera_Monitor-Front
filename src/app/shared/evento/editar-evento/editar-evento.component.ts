@@ -1,4 +1,4 @@
-import { Component, OnDestroy, QueryList, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ConfirmationService } from 'primeng/api';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { lastValueFrom, Subscription } from 'rxjs';
@@ -21,6 +21,11 @@ import { NgForm } from '@angular/forms';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { FinalizarAulaZeroRequest, ParticipacaoAulaZeroModel } from '../../../models/evento-aula-0.model';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
+import { Roteiro } from '../../../models/roteiro.model';
+import { EditarAulaView } from '../editar-aula/editar-aula.component';
+import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../services/monitoramento.service';
 
 @Component({
   selector: 'app-editar-evento',
@@ -29,16 +34,17 @@ import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
   styleUrl: './editar-evento.component.css',
     providers: [ConfirmationService],
 })
-export class EditarEventoComponent implements OnDestroy {
-    evento: Evento = new Evento;
-    visible: boolean = false;
-    loading = false;
-    error: string = '';
+export class EditarEventoComponent implements OnInit, OnDestroy {
     subscription: Subscription[] = [];
-    tipoString = '';
+    instance: DynamicDialogComponent | undefined;
+    loading = false;
+    maximized = false;
+    activeIndexAluno = 0;
+    
+    view = new EditarAulaView;
+    evento: Evento = new Evento;
     duracaoEvento = '';
-    width = '1000px';
-    tipo = EventoTipo;
+    tipoString = '';
 
     EventoTipo = EventoTipo;
     selectedAluno?: Evento_Participacao_Aluno;
@@ -61,18 +67,24 @@ export class EditarEventoComponent implements OnDestroy {
 
     @ViewChildren('componentForm') componentForm!: QueryList<any>;
 
+    readonly = false;
+
     constructor(
-        private activatedRoute: ActivatedRoute,
+            private dialogService: DialogService,
+            private ref: DynamicDialogRef,
         private router: Router,
         private toastr: ToastrService,
         private calendarioUtils: CalendarioUtils,
         private confirmationService: ConfirmationService,
-        private service: EventoService,
+        private eventoService: EventoService,
+                private jornadaService: JornadaSuperaService,
+                private monitoramentoService: MonitoramentoService,
         private alunoService: AlunoService,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
     ) {
+		this.instance = this.dialogService.getInstance(this.ref);
       
         let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
@@ -114,41 +126,44 @@ export class EditarEventoComponent implements OnDestroy {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos)
 
-        let evento = this.service.getEvento().subscribe(async res => {
-            if (res) {
-                this.evento = res;
-                this.visible = true;
-                this.verificaDisponibilidade();
-                this.tipoString = this.getTipo(this.evento);
-                let alunosEvento = this.evento.alunos.map(x => x.aluno_Id);
-                this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id));
+    }
 
+
+	ngOnInit(): void {
+		if (this.instance && this.instance.data) {
+			this.view = this.instance.data['view'];
+            this.evento = this.view.evento;
+            this.getDuracaoEvento();
+            this.tipoString = this.getTipo(this.evento);
+            this.readonly = this.evento.finalizado || !this.evento.active
+		}
+	}
+
+    ngOnDestroy(): void {
+        this.subscription.forEach((item) => item.unsubscribe())
+    }
+
+    close() {
+        this.ref.close();
+    }
+
+	maximize() {
+		this.maximized = !this.maximized;
+		this.instance!.maximize();
+	}
+
+    getDuracaoEvento() {
                 let minutos = this.evento.duracaoMinutos % 60
                 let horas = this.evento.duracaoMinutos / 60
                 let horaRedonda = horas - Math.floor(horas) == 0
 
                 this.duracaoEvento = horaRedonda
                     ? horas.toString().padStart(2, '0') + 'h'
-                    : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
-            }
-        })
-        this.subscription.push(evento)
-    }
+                    : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';}
 
-    ngOnDestroy(): void {
-        this.subscription.forEach((e) => e.unsubscribe())
-    }
-
-    visibleChange() {
-        if (!this.visible) {
-            let route = '../../../';
-            this.router.navigate([route], { relativeTo: this.activatedRoute })
-            this.service.setEvento(undefined)
-        }
-    }
 
     showError(header: string, message: string, e: any, innerMessage?: string) {
         showError(this.confirmationService, header, message, e, innerMessage)
@@ -167,7 +182,7 @@ export class EditarEventoComponent implements OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate()
 
         this.loadingEventos = true
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => (this.loadingEventos = false))
             .catch(res => (this.loadingEventos = false))
 
@@ -251,12 +266,15 @@ export class EditarEventoComponent implements OnDestroy {
         this.loading = true;
         this.requestCreateEdit()
             .then(res => {
-                this.service.calendarioReload.emit(res.object.id)
-                this.evento.id = res.object.id
-                this.service.setEvento(this.evento)
-                this.toastr.success('Dados atualizados com sucesso.')
-                this.router.navigate(['calendario'])
                 this.loading = false
+                if (res.success) {
+					this.jornadaService.onReload.emit(res.object.id);
+                    this.monitoramentoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id)
+                    this.evento.id = res.object.id
+                    this.eventoService.setEvento(this.evento)
+                    this.toastr.success('Dados atualizados com sucesso.')
+                }
             })
             .catch(res => {
                 this.loading = false
@@ -303,10 +321,32 @@ export class EditarEventoComponent implements OnDestroy {
                 .then(res => {
                     this.loading = false;
                     if (res.success) {
-                        this.visible = false
-                        this.visibleChange()
-                        this.service.calendarioReload.emit(this.evento.id)
+                        this.evento = res.object;
+                        this.jornadaService.onReload.emit(res.object.id);
+                        this.monitoramentoService.onReload.emit(res.object.id);
+                        this.eventoService.onReload.emit(res.object.id)
                         this.toastr.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
+
+                        this.confirmationService.confirm({
+                            target: e.target,
+                            header: 'Sair?',
+                            message: 'Deseja voltar à página anterior ou manter a visualização da aula?',
+                            closeOnEscape: true,
+                            acceptIcon: 'pi pi-arrow-right p-button-icon-right',
+                            acceptLabel: `Sair`,
+                            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+                            accept: () => {
+                                this.close();
+                            },
+                            rejectLabel: 'Não sair',
+                            rejectIcon: '',
+                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                            reject: () => {
+
+                            }
+                        })
+
+
                     }
                     else {
                         this.toastr.error(`Não foi possível finalizar ${this.tipoString}.`, 'Erro');
@@ -314,7 +354,6 @@ export class EditarEventoComponent implements OnDestroy {
                     }
                 })
                 .catch(res => {
-                    this.error = res.message
                     this.showError('Erro', `Não foi possível finalizar ${this.tipoString}.`, e, getError(res))
                     this.loading = false
                     console.error(res);
@@ -323,7 +362,6 @@ export class EditarEventoComponent implements OnDestroy {
 
         }
     }
-
 
     buildFinalizarAulaZeroRequest(): FinalizarAulaZeroRequest {
         const alunos: ParticipacaoAulaZeroModel[] = this.evento.alunos.map(aluno => {
@@ -396,11 +434,11 @@ export class EditarEventoComponent implements OnDestroy {
     requestFinalizar(eventoResponse: Evento) {
         if (this.evento.evento_Tipo_Id == EventoTipo.AulaZero) {
             const request = this.buildFinalizarAulaZeroRequest();
-            return lastValueFrom(this.service.finalizarAulaZero(request));
+            return lastValueFrom(this.eventoService.finalizarAulaZero(request));
         }
         else {
             const request = this.buildFinalizar(eventoResponse);
-            return lastValueFrom(this.service.finalizar(request))
+            return lastValueFrom(this.eventoService.finalizar(request))
         }
     }
 

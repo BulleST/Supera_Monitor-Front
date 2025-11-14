@@ -62,34 +62,24 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
         let aluno = this.service.getAluno().subscribe(alunoRes => {
 
-            console.log('getAluno', alunoRes)
-
             let params = this.activatedRoute.snapshot.queryParamMap;
 
             let idParam = params.get('aluno_id');
 
             this.readonly = idParam != null && idParam != 'null';
             
-            console.log('readonly', this.readonly)
-
-
             if (idParam) {
                 this.aluno_Id = this.crypto.decrypt(idParam);
             }
-            console.log('aluno_Id', this.aluno_Id)
 
             this.aluno_Id = alunoRes?.id;
             this.aluno = alunoRes;
-            console.log('aluno', this.aluno)
 
             if (!alunoRes && this.aluno_Id) {
-                console.log('if 1')
                 this.loadAluno();
                 return;
             }
 
-
-            if (!this.readonly) {
                 if (!this.service.list.value.length) {
                     this.loadingAlunos = true;
                     lastValueFrom(this.service.getList())
@@ -109,7 +99,6 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 });
                 this.subscription.push(alunos)
 
-            }
         });
         this.subscription.push(aluno);
     }
@@ -178,8 +167,6 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
     }
 
     loadAluno() {
-        console.log('loadAluno')
-        console.log('aluno_Id', this.aluno_Id)
         if (!this.aluno_Id) return;
 
         this.loading = true;
@@ -207,7 +194,6 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
 
     alunoChanged(e: SelectChangeEvent) {
-        console.log('alunoChanged', e)
         if (e.value) {
             this.aluno_Id = e.value;
             this.loadAluno()

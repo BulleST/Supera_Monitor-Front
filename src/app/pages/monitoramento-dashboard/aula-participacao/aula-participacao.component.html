@@ -1,52 +1,69 @@
 <div class="flex flex-column">
     <header class="flex align-items-baseline justify-content-between gap-2 pt-3 pl-3">
         <div>
-            <h3 class="text-2xl capitalize">{{aluno.nome | nameAbv }}</h3>
+            <h3 class="text-2xl capitalize hover:text-primary-500 cursor-pointer hover:underline" (click)="showAluno()">
+                {{aluno.nome | nameAbv }}
+            </h3>
             <p class="flex align-items-center gap-2 text-base font-normal">
-                <span>{{item.aula.aula.turma}}</span>
+                <span>{{aula.turma}}</span>
                 <app-legend-color class="line-height-1"
-                                  [corLegenda]="item.aula.aula.corLegenda"
-                                  [professor]="item.aula.aula.professor"></app-legend-color>
+                                  [corLegenda]="aula.corLegenda"
+                                  [professor]="aula.professor"></app-legend-color>
             </p>
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.PresenteNaAula"
-                     severity="success"
-                     value="Presente" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.PresenteReposicao"
-                     severity="success"
-                     class="bg-green-200 border-green-200 text-green-700"
-                     value="Presente" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada"
-                     severity="success"
-                     class="bg-purple-500 border-purple-500"
-                     value="Reposição Agendada" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaReposicao"
-                     severity="info"
-                     class="bg-blue-500 border-blue-500"
-                     value="Faltou na Reposição" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaAlunoContatado"
-                     severity="warn"
-                     class="bg-yellow-500 border-yellow-500"
-                     value="Faltou - Aluno Contatato" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.FaltaAula"
-                     severity="danger"
-                     class="bg-red-500 border-red-500"
-                     value="Faltou - Aluno Não Contatato" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.Cancelada"
-                     severity="contrast"
-                     class="surface-900 border-900"
-                     value="Aula Cancelada" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.Feriado"
-                     severity="contrast"
-                     class="surface-900 border-900"
-                     [value]="'Aula Cancelada - ' + item.aula.aula.feriado?.name" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.Recesso"
-                     severity="danger"
-                     class="bg-red-200 border-red-200"
-                     value="Recesso" />
-            <p-badge *ngIf="item.status == Dashboard_Item_Status.Aula"
-                     severity="danger"
-                     class="surface-200 border-200 text-900"
-                     value="À realizar" />
+            <!-- <app-evento-participacao-status 
+            [evento]="item.aula.aula"
+            [participacao]="item.aula.participacao"
+            [primeiraAula_Id]="aluno.primeiraAula_Id"
+            [reposicaoPara]="item.reposicaoPara?.aula" /> -->
+            <div class="flex align-items-center gap-2 mt-2">
+                <p-badge *ngIf="aluno.primeiraAula_Id == item.id"
+                         severity="danger"
+                         class="bg-pink-500 border-pink-500"
+                         value="1ª Aula" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.PresenteNaAula"
+                         severity="success"
+                         value="Presente" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.PresenteReposicao"
+                         severity="success"
+                         class="bg-green-200 border-green-200 text-green-700"
+                         value="Presente" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.ReposicaoDesmarcada"
+                         severity="success"
+                         class="bg-purple-800 border-purple-800"
+                         value="Reposição cancelada" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.ReposicaoAgendada"
+                         severity="success"
+                         class="bg-purple-500 border-purple-500"
+                         value="Reposição Agendada" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaReposicao"
+                         severity="info"
+                         class="bg-blue-500 border-blue-500"
+                         value="Faltou na Reposição" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAlunoContatado"
+                         severity="warn"
+                         class="bg-yellow-500 border-yellow-500"
+                         value="Faltou - Aluno Contatato" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAula"
+                         severity="danger"
+                         class="bg-red-500 border-red-500"
+                         value="Faltou - Aluno Não Contatato" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.Cancelada"
+                         severity="contrast"
+                         class="surface-900 border-900"
+                         value="Aula Cancelada" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.Feriado"
+                         severity="contrast"
+                         class="surface-900 border-900"
+                         [value]="'Aula Cancelada - ' + aula.feriado?.name" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.Recesso"
+                         severity="danger"
+                         class="bg-red-200 border-red-200"
+                         value="Recesso" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.Aula"
+                         severity="danger"
+                         class="surface-200 border-200 text-900"
+                         value="À realizar" />
+            </div>
         </div>
         <p-button icon="pi pi-times"
                   (onClick)="close()"
@@ -72,9 +89,9 @@
                                 {{item.reposicaoPara.aula.data | date : 'dd/MM/yyyy HH:mm' }}
                             </span>
                             <span [ngClass]="{
-                                'text-purple-500 line-through': item.reposicaoPara
+                                'text-500 line-through ml-auto pl-3': item.reposicaoPara
                             }">
-                                {{item.aula.aula.data | date : 'dd/MM/yyyy HH:mm' }}
+                                {{aula.data | date : 'dd/MM/yyyy HH:mm' }}
                             </span>
                         </div>
                     </p-iconfield>
@@ -93,9 +110,9 @@
                                 {{item.reposicaoPara.aula.turma }}
                             </span>
                             <span [ngClass]="{
-                                'text-purple-500 line-through': item.reposicaoPara
+                                'text-500 line-through ml-auto pl-3': item.reposicaoPara
                             }">
-                                {{item.aula.aula.turma }}
+                                {{aula.turma }}
                             </span>
                         </div>
                     </p-iconfield>
@@ -117,13 +134,13 @@
                                                   [professor]="item.reposicaoPara.aula.professor"></app-legend-color>
                             </ng-container>
                             <span [ngClass]="{
-                                'text-purple-500 line-through': item.reposicaoPara
+                                'text-500 line-through ml-auto pl-3': item.reposicaoPara
                             }">
-                                {{item.aula.aula.professor }}
+                                {{aula.professor }}
                             </span>
                             <app-legend-color class="line-height-1"
-                                              [corLegenda]="item.aula.aula.corLegenda"
-                                              [professor]="item.aula.aula.professor"></app-legend-color>
+                                              [corLegenda]="aula.corLegenda"
+                                              [professor]="aula.professor"></app-legend-color>
                         </div>
                     </p-iconfield>
                 </td>
@@ -141,9 +158,9 @@
                                 {{item.reposicaoPara.aula.sala }}
                             </span>
                             <span [ngClass]="{
-                                'text-purple-500 line-through': item.reposicaoPara
+                                'text-500 line-through ml-auto pl-3': item.reposicaoPara
                             }">
-                                {{item.aula.aula.sala }}
+                                {{aula.sala }}
                             </span>
                         </div>
                     </p-iconfield>
@@ -172,7 +189,8 @@
                            pInputText
                            [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco : item.aula.participacao.numeroPaginaAbaco) ?? ''"
                            readonly
-                           class="w-5rem">
+                           class="w-full"
+                           style="max-width: 8rem;">
                 </td>
             </tr>
             <!-- AH -->
@@ -198,7 +216,8 @@
                            pInputText
                            [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAH : item.aula.participacao.numeroPaginaAH) ?? ''"
                            readonly
-                           class="w-5rem">
+                           class="w-full"
+                           style="max-width: 8rem;">
                 </td>
             </tr>
             <tr>
@@ -217,21 +236,11 @@
     <div class="mt-auto sticky bottom-0">
         <p-divider layout="horizontal" />
         <div class="px-3 flex align-items-center gap-2">
-            <!-- Contatar -->
-            <ng-container *ngIf="aula.finalizado && !participacao.presente">
+            <!-- <ng-container *ngIf="aula.finalizado && !participacao.presente">
                 <p-button icon="pi pi-whatsapp"
                         severity="success"
                         label="Contatar"
                         [rounded]="true">
-                </p-button>
-            </ng-container>
-            <!-- Agendar Reposição -->
-            <ng-container *ngIf="!reposicaoPara && participacao.presente != false">
-                <p-button icon="pi pi-calendar"
-                          severity="secondary"
-                          label="Agendar Reposição"
-                          [rounded]="true"
-                          (onClick)="goToReposicao()">
                 </p-button>
             </ng-container>
             <ng-container *ngIf="!aula.finalizado">
@@ -241,7 +250,64 @@
                       [rounded]="true"
                       (onClick)="goToAgendarFalta()">
                 </p-button>
-            </ng-container>
+            </ng-container> -->
+            <div>
+                <p-button icon="pi pi-cog"
+                          iconPos="right"
+                          severity="secondary"
+                          label="Opções"
+                          [rounded]="true"
+                          (onClick)="popoverMenu.toggle($event)" />
+                <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
+                    <div class="flex flex-column">
+                        <ng-container *ngIf="[EventoTipo.Reuniao].includes(aula.evento_Tipo_Id) == false">
+                            <!-- Reposição -->
+                            <p-button (onClick)="goToAgendarReposicao()"
+                                      label="Agendar Reposição"
+                                      icon="pi pi-calendar text-primary-500"
+                                      [text]="true"
+                                      severity="secondary"
+                                      styleClass="justify-content-start surface-50"
+                                      [disabled]="participacao.presente === true 
+                                            || item.reposicaoPara 
+                                            || participacao.reposicaoDe_Evento_Id 
+                                            || participacao.reposicaoPara_Evento_Id
+                                        "
+                                      fluid />
+                            <!-- Primeira aula -->
+                            <p-button (onClick)="goToPrimeiraAula()"
+                                      label="Marcar 1ª aula"
+                                      icon="bi bi-1-circle-fill text-pink-500"
+                                      [text]="true"
+                                      severity="secondary"
+                                      styleClass="justify-content-start surface-50"
+                                      fluid
+                                      [disabled]="!aula.active
+                                            || item.reposicaoPara 
+                                            || aluno.primeiraAula_Id
+                                            || participacao.reposicaoPara_Evento_Id
+                                            || participacao.presente === false" />
+                            <!-- Agendar Falta -->
+                            <p-button (onClick)="goToAgendarFalta()"
+                                      label="Agendar Falta"
+                                      icon="fa fa-user-xmark text-red-500"
+                                      [text]="true"
+                                      severity="secondary"
+                                      styleClass="justify-content-start surface-50"
+                                      fluid />
+                        </ng-container>
+                    </div>
+                </p-popover>
+            </div>
+            <p-button *ngIf="[Monitoramento_Item_Status.ReposicaoAgendada,
+            Monitoramento_Item_Status.ReposicaoDesmarcada,
+            Monitoramento_Item_Status.FaltaAgendada,
+            Monitoramento_Item_Status.FaltaReposicao,
+            Monitoramento_Item_Status.FaltaAula].includes(item.status )"
+                label="Ver contato"
+            icon="pi pi-phone"
+            [rounded]="true"
+            (onClick)="showContatoFalta()"/>
             <div class="ml-auto">
                 <p-button label="Ver Aula"
                           icon="pi pi-arrow-right"

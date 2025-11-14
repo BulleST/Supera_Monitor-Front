@@ -14,6 +14,8 @@ import { PrimeiraAulaRequest, PseudoEvento } from '../../../../models/reposicao.
 import { RequestResponse } from '../../../../helpers/request-response.interface';
 import { Aluno_Restricao } from '../../../../models/aluno-restricao.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
 
 @Component({
 	selector: 'app-agendar-primeira-aula',
@@ -46,6 +48,8 @@ export class AgendarPrimeiraAulaComponent implements OnInit, OnDestroy {
 		private router: Router,
 		private activatedRoute: ActivatedRoute,
 		private eventoService: EventoService,
+		private jornadaService: JornadaSuperaService,
+		private monitoramentoService: MonitoramentoService,
 		private alunoService: AlunoService,
 		private toastrService: ToastrService,
 		private confirmationService: ConfirmationService,
@@ -173,11 +177,13 @@ export class AgendarPrimeiraAulaComponent implements OnInit, OnDestroy {
 		}
 
 		lastValueFrom(this.eventoService.primeiraAula(request))
-			.then(response => {
-				if (response.success) {
+			.then(res => {
+				if (res.success) {
 					this.loading = false;
-					this.eventoService.calendarioReload.emit(request.evento_Id);
-					this.toastrService.success(response.message);
+					this.jornadaService.onReload.emit(res.object.id);
+					this.monitoramentoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit(res.object.id);
+					this.toastrService.success(res.message);
 					if (this.aluno?.celular) {
 						this.sendMensagemAluno(e, evento);
 					} else {
@@ -186,7 +192,7 @@ export class AgendarPrimeiraAulaComponent implements OnInit, OnDestroy {
 
 				} else {
 					this.loading = false;
-					this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, response.message)
+					this.showError('OPS', 'Não foi possível agendar a primeira aula.', e, res.message)
 				}
 
 			})

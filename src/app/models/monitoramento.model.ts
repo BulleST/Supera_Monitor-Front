@@ -39,6 +39,7 @@ export interface Monitoramento_Aluno {
 }
 
 export interface Monitoramento_Aluno_Item {
+    id: number;
     show: boolean;
     aula: Monitoramento_Aula_Participacao_Rel;
     reposicaoPara?: Monitoramento_Aula_Participacao_Rel;
@@ -90,6 +91,9 @@ export interface Monitoramento_Participacao {
     alunoContactado?: Date; 
     statusContato_Id?: StatusContato;
     contatoObservacao?: string;
+
+    reposicaoDe_Evento_Id?: number;
+    reposicaoPara_Evento_Id?: number;
 }
 
 

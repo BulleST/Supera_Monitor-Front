@@ -55,7 +55,7 @@ export class FormComponent implements OnInit, OnDestroy {
 
     showAluno() {
 
-        this.ref = showAluno(this.aluno_Id, this.dialogService);
+        this.ref = showAluno(this.dialogService, this.aluno_Id);
 
         var onClose = this.ref.onClose.subscribe(res => this.visibleChange());
         this.subscription.push(onClose)

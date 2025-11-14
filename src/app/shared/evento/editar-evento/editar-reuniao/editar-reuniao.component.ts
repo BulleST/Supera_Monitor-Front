@@ -30,7 +30,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
 
     @Output() validaProfessor = new EventEmitter<Professor>();
     @Output() validaSala = new EventEmitter<SalaAula>();
-    @Output() width = new EventEmitter<string>();
     onSave = new EventEmitter<Evento>();
 
     @ViewChild('picklist') picklist!: PickList;
@@ -59,7 +58,6 @@ export class EditarReuniaoComponent implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
 
-        this.width.emit('600px');
 
     }
 

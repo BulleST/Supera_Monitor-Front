@@ -1,4 +1,4 @@
-import { Component, OnDestroy} from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { EventoReuniaoRequest } from '../../../../models/evento-reuniao.model';
 import { Professor } from '../../../../models/professor.model';
@@ -20,6 +20,8 @@ import { MensagemWhatsapp, validaProfessores, validaSalaAulas, CalendarioUtils, 
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Roteiro } from '../../../../models/roteiro.model';
 import { RoteiroService } from '../../../../services/roteiro.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
 
 @Component({
     selector: 'app-cadastrar-reuniao',
@@ -39,15 +41,15 @@ export class CadastrarReuniaoComponent implements OnDestroy {
     data: Date = new Date;
     horario: Date = undefined as unknown as Date;
     minData = new Date();
-    
+
     salaAulas: SalaAula[] = [];
     loadingSalaAulas = false;
 
     eventos: Evento[] = [];
     loadingEventos = false;
-    
-        roteiros: Roteiro[] = [];
-        loadingRoteiros = false;
+
+    roteiros: Roteiro[] = [];
+    loadingRoteiros = false;
 
     feriados: Feriado[] = [];
     loadingFeriados = false;
@@ -68,14 +70,16 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         private confirmationService: ConfirmationService,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
-                private roteiroService: RoteiroService,
-        private service: EventoService,
+        private roteiroService: RoteiroService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private toastrService: ToastrService,
         private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Reunião';
-let feriados = this.service.feriados.subscribe(res => {
+        let feriados = this.eventoService.feriados.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -84,7 +88,7 @@ let feriados = this.service.feriados.subscribe(res => {
         if (this.feriados.length == 0) {
             this.loadFeriados();
         }
-        
+
         let roteiros = this.roteiroService.list.subscribe(res => {
             this.roteiros = res.filter(x => x.active);
             this.setInvalidDates();
@@ -110,9 +114,9 @@ let feriados = this.service.feriados.subscribe(res => {
             this.loadSalas();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
         this.subscription.push(eventos);
-        
+
         this.loadFeriados();
         this.verificaDisponibilidade();
         this.visible = true;
@@ -129,29 +133,29 @@ let feriados = this.service.feriados.subscribe(res => {
         }
     }
     loadProfessores() {
-            this.loadingProfessores = true;
-            lastValueFrom(this.professorService.getList())
-                .then(res => this.loadingProfessores = false)
-                .catch(res => this.loadingProfessores = false);
+        this.loadingProfessores = true;
+        lastValueFrom(this.professorService.getList())
+            .then(res => this.loadingProfessores = false)
+            .catch(res => this.loadingProfessores = false);
     }
 
     loadRoteiros() {
-            this.loadingRoteiros = true;
-            lastValueFrom(this.roteiroService.getList(moment().year()))
-                .then(res => this.loadingRoteiros = false)
-                .catch(res => this.loadingRoteiros = false);
+        this.loadingRoteiros = true;
+        lastValueFrom(this.roteiroService.getList(moment().year()))
+            .then(res => this.loadingRoteiros = false)
+            .catch(res => this.loadingRoteiros = false);
     }
 
     loadSalas() {
-            this.loadingSalaAulas = true;
-            lastValueFrom(this.salaAulaService.getList())
-                .then(res => this.loadingSalaAulas = false)
-                .catch(res => this.loadingSalaAulas = false);
+        this.loadingSalaAulas = true;
+        lastValueFrom(this.salaAulaService.getList())
+            .then(res => this.loadingSalaAulas = false)
+            .catch(res => this.loadingSalaAulas = false);
     }
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.service.getFeriados(this.ano))
+        lastValueFrom(this.eventoService.getFeriados(this.ano))
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -168,8 +172,8 @@ let feriados = this.service.feriados.subscribe(res => {
                 range.push(moment(x.dataFim, 'YYYY-MM-DD').toDate())
                 return range;
             });
-            
-              let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+
+            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }
@@ -196,7 +200,7 @@ let feriados = this.service.feriados.subscribe(res => {
             this.horario.setHours(12, 0, 0);
         }
 
-         this.verificaDisponibilidade();
+        this.verificaDisponibilidade();
     }
 
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
@@ -223,7 +227,7 @@ let feriados = this.service.feriados.subscribe(res => {
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
@@ -260,8 +264,8 @@ let feriados = this.service.feriados.subscribe(res => {
             let tipo = this.getTipo(item.disponivelEvent);
             let data = moment(item.disponivelEvent.data).format('HH[h]mm');
 
-            this.showError('Sala Indisponível', 
-                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`, 
+            this.showError('Sala Indisponível',
+                `Essa sala está atribuída a outra ${tipo} no mesmo dia às <b>${data}</b>.`,
                 e.originalEvent);
             return;
         }
@@ -366,7 +370,7 @@ let feriados = this.service.feriados.subscribe(res => {
         }
     }
 
-     targetDropped(e: CdkDragDrop<Professor[]>) {
+    targetDropped(e: CdkDragDrop<Professor[]>) {
         if (e.previousContainer != e.container) {
 
             let professor = e.item.data as Professor;
@@ -391,7 +395,7 @@ let feriados = this.service.feriados.subscribe(res => {
 
         }
     }
-    
+
     transferToTarget(e: CdkDragDrop<Professor[]>) {
         let item = this.selectedSource as Professor;
         let index = this.source.findIndex(x => x.id == item.id);
@@ -453,13 +457,15 @@ let feriados = this.service.feriados.subscribe(res => {
     send(e: any) {
         this.loading = true;
 
-        lastValueFrom(this.service.createReuniao(this.object))
+        lastValueFrom(this.eventoService.createReuniao(this.object))
             .then(res => {
                 this.loading = false;
                 this.visible = false
                 this.visibleChange();
                 this.toastrService.success('Reunião cadastrada com sucesso.', 'Agendamento finalizado');
-                this.service.calendarioReload.emit(res.object.id);
+                this.jornadaService.onReload.emit(res.object.id);
+                this.monitoramentoService.onReload.emit(res.object.id);
+                this.eventoService.onReload.emit(res.object.id);
             })
             .catch(res => {
                 this.loading = false;

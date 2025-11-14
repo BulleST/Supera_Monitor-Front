@@ -35,9 +35,9 @@
             <p-iconField iconPosition="left">
                 <p-inputIcon styleClass="pi pi-calendar" />
                 <div pInputText 
-                    class="p-input-text w-full flex align-items-center gap-2">
-                    <span class="text-primary-500">
-                        {{ view.aluno.nome }}
+                    class="p-input-text w-full flex align-items-center gap-2 white-space-nowrap overflow-hidden text-overflow-ellipsis">
+                    <span class="text-primary-500 capitalize" [pTooltip]="view.aluno.nome">
+                        {{ view.aluno.nome | nameAbv}}
                     </span>
                     <span> - </span>
                     <span>
@@ -105,7 +105,7 @@
                       [(ngModel)]="view.observacaoReposicao"
                       placeholder="Aproveite para contar o motivo dessa reposição"
                       [rows]="3"
-                      [pAutoFocus]="true"
+                      [autofocus]="true"
                       [required]="true"></textarea>
             <div *ngIf="observacaoReposicao.touched && observacaoReposicao.errors">
                 <p class="text-red-500 mt-2 mb-0" *ngIf="observacaoReposicao.errors['required']">Esse campo é obrigatório.</p>

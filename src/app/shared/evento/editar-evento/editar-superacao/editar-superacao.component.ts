@@ -42,7 +42,6 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
 
     @Output() validaProfessor = new EventEmitter<Professor>();
     @Output() validaSala = new EventEmitter<SalaAula>();
-    @Output() width = new EventEmitter<string>();
     onSave = new EventEmitter<Evento>();
 
     apostilaAbacoAluno: Apostila[] = [];
@@ -54,11 +53,7 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         private confirmationService: ConfirmationService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private apostilaService: ApostilaService,
-        private accountService: AccountService,
-        private checklistService: ChecklistService,
         private calendarioUtils: CalendarioUtils,
-        private service: EventoService,
-        private alunoService: AlunoService,
         private dialogService: DialogService,
     ) {
         var apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
@@ -82,7 +77,6 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
         if (changes['salaAulas']) this.salaAulas = changes['salaAulas'].currentValue;
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
-        this.width.emit('700px')
     }
 
     ngOnDestroy(): void {
@@ -155,6 +149,6 @@ export class EditarSuperacaoComponent implements OnChanges, OnDestroy {
     }
 
     showAluno(participacao: Evento_Participacao_Aluno) {
-        showAluno(participacao.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, participacao.aluno_Id);
     }
 }

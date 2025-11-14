@@ -25,10 +25,7 @@ const routes: Routes = [{
         
         { path: 'agendar/reposicao', component: AgendarReposicaoComponent },
         { path: 'agendar/primeira-aula', component: AgendarPrimeiraAulaComponent },
-        { path: 'agendar/primeira-aula/:evento_id', component: AgendarPrimeiraAulaComponent },
-        
         { path: 'agendar/falta', component: AgendarFaltaComponent },
-        { path: 'agendar/falta/:aluno_id/:evento_id', component: AgendarFaltaComponent },
         
         { path: 'inscrever/oficina/:evento_id', component: CadastrarInscricaoComponent },
         { path: 'inscrever/aula-zero/:evento_id', component: CadastrarInscricaoComponent },

@@ -2,15 +2,15 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Evento_Participacao_Aluno, statusContato } from '../../../models/evento-participacao-aluno.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { Roteiro } from '../../../models/roteiro.model';
 import { CalendarioUtils, getError, MensagemWhatsapp, showError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
-import { RoteiroService } from '../../../services/roteiro.service';
 import { EventoService } from '../../../services/evento.service';
 import moment from 'moment';
 import { Evento } from '../../../models/evento.model';
 import { NgForm } from '@angular/forms';
+import { MonitoramentoService } from '../../../services/monitoramento.service';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 
 @Component({
 	selector: 'app-editar-participacao-contato',
@@ -20,7 +20,7 @@ import { NgForm } from '@angular/forms';
 	providers: [ConfirmationService]
 })
 export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
-	
+
 	subscription: Subscription[] = [];
 	instance: DynamicDialogComponent | undefined;
 	loading = false;
@@ -42,7 +42,9 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
 
-		private service: EventoService,
+		private eventoService: EventoService,
+		private jornadaService: JornadaSuperaService,
+		private monitoramentoService: MonitoramentoService,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private confirmationService: ConfirmationService,
 		private calendarioUtils: CalendarioUtils,
@@ -60,6 +62,7 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			this.evento = this.view.evento;
 			this.participacao = this.view.participacao;
 			this.tipo = this.view.tipo;
+			this.alunoContactado = !!this.participacao.alunoContactado;
 
 			if (this.tipo == EditarContatoTipo.Cancelamento) {
 				this.participacao.observacao = 'Aula Cancelada';
@@ -70,7 +73,7 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			else if (this.tipo == EditarContatoTipo.Falta && !this.participacao.observacao) {
 				// this.participacao.observacao = 'Aluno faltou';
 			}
-			
+
 		}
 	}
 	ngOnDestroy(): void {
@@ -148,11 +151,13 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			alunoContactado: this.participacao.alunoContactado,
 			statusContato_Id: this.participacao.statusContato_Id,
 		}
-		await lastValueFrom(this.service.atualizarParticipacao(request))
+		await lastValueFrom(this.eventoService.atualizarParticipacao(request))
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.service.calendarioReload.emit(res.object.id);
+					this.jornadaService.onReload.emit(res.object.id);
+					this.monitoramentoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit(res.object.id);
 					this.toastr.success(`Status atualizado com sucesso`)
 					this.close();
 				}
@@ -181,5 +186,8 @@ export class EditarContatoView {
 export enum EditarContatoTipo {
 	Cancelamento,
 	Falta,
-	FaltaAgendada
+	FaltaAgendada,
+	FaltaReposicao,
+	ReposicaoAgendada,
+	ReposicaoDesmarcada,
 }

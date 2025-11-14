@@ -4,6 +4,7 @@ import { Service } from '../helpers/service.service';
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import { Monitoramento_Aluno_Item, Monitoramento_Item_Status, Monitoramento_Request, Monitoramento_Response } from '../models/monitoramento.model';
+import { MyMap } from '../utils/map';
 
 @Injectable({
     providedIn: 'root',
@@ -61,7 +62,6 @@ export class MonitoramentoService extends Service {
                 return Monitoramento_Item_Status.ReposicaoAgendada;
 
             else if (reposicaoPara.aula.finalizado == false
-                && reposicaoPara.participacao.presente == false
                 && reposicaoPara.participacao.active == false
             )
                 return Monitoramento_Item_Status.ReposicaoDesmarcada;
@@ -94,15 +94,7 @@ export class MonitoramentoService extends Service {
             )
                 return Monitoramento_Item_Status.FaltaAula;
 
-            else if (participacao.presente === false
-                && participacao.active === false
-            )
-                return Monitoramento_Item_Status.FaltaAgendada;
-
-            else if (aula.finalizado === false
-                && participacao.presente === false
-                && participacao.active === false
-            )
+            else if (participacao.active === false)
                 return Monitoramento_Item_Status.FaltaAgendada;
 
             else if (aula.finalizado === true

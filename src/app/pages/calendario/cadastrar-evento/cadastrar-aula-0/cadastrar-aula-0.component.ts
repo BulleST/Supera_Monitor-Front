@@ -651,7 +651,7 @@ export class CadastrarAula0Component implements OnDestroy {
                         this.visibleChange()
                     }
                     this.toastrService.success('Aula zero cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.service.calendarioReload.emit(res.object.id);
+                    this.service.onReload.emit(res.object.id);
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar aula zero. <br> ${res.message}`, e);

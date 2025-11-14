@@ -31,21 +31,6 @@ export class ChecklistService extends Service {
         }));
     }
 
-    // getChecklistAluno(aluno_Id: number) {
-    //     return this.http.get<Aluno_CheckList_Item[]>(`${this.url}/checklist/all/aluno/${aluno_Id}`).pipe(tap({
-    //         next: res => {
-    //             res.map(x => {
-    //                 x.dataFinalizacao = x.dataFinalizacao ? moment(x.dataFinalizacao).toDate() : undefined;
-    //                 return x;
-    //             });
-    //             return res;
-    //         },
-    //         error: err => {
-    //             this.toastrService.error(`Não foi possível carregar checklist do aluno. \n ${getError(err)}`);
-    //         }
-    //     }));
-    // }
-
     markAsDone(id: number, observacoes: string = '') {
         var request = {
             aluno_Checklist_Item_Id: id,

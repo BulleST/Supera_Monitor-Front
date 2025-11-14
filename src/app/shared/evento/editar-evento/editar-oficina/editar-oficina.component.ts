@@ -39,7 +39,6 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
 
     @Output() validaProfessor = new EventEmitter<Professor>();
     @Output() validaSala = new EventEmitter<SalaAula>();
-    @Output() width = new EventEmitter<string>();
     onSave = new EventEmitter<Evento>();
 
     constructor(
@@ -58,7 +57,6 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         if (changes['loadingSalaAulas']) this.loadingSalaAulas = changes['loadingSalaAulas'].currentValue;
         if (changes['duracaoEvento']) this.duracaoEvento = changes['duracaoEvento'].currentValue;
         if (changes['isChamadaPage']) this.isChamadaPage = changes['isChamadaPage'].currentValue;
-        this.width.emit('650px');
 
     }
 
@@ -124,7 +122,7 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
     }
 
     showAluno(participacao: Evento_Participacao_Aluno) {
-        showAluno(participacao.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, participacao.aluno_Id);
     }
 
 }

@@ -52,7 +52,7 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 		let aluno = this.service.getAluno().subscribe(alunoRes => {
 
-			let params = this.activatedRoute.snapshot.paramMap;
+            let params = this.activatedRoute.snapshot.queryParamMap;
 			let alunoIdParam = params.get('aluno_id');
 			this.readonly = !!alunoIdParam;
 

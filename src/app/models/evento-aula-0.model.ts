@@ -9,7 +9,7 @@ export class EventoAula0Request {
   sala_Id: number = undefined as unknown as number;
   data: Date = undefined as unknown as Date;
   duracaoMinutos: number = 60;
-  roteiro_Id: number = 60;
+  roteiro_Id?: number = 0;
 }
 
 export interface ParticipacaoAulaZeroModel {

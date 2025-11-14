@@ -142,7 +142,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingPerfilCognitivo = false);
         }
 
-        let calendarioReload = this.service.calendarioReload.subscribe(res => this.update());
+        let calendarioReload = this.service.onReload.subscribe(res => this.update());
         this.subscription.push(calendarioReload);
 
         let calendarView = this.service.calendarView.subscribe(view => {
@@ -155,7 +155,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
             }
 
 
-            this.service.calendarioReload.emit(1);
+            this.service.onReload.emit(1);
         })
         this.subscription.push(calendarView);
     }
@@ -275,12 +275,14 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
     }
 
     loadReposicoes(evento: Evento) {
-        evento.alunos.map(async aluno => {
-            if (aluno.reposicaoDe_Evento_Id) {
-                aluno.reposicaoDe_Evento = await lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
+        evento.alunos.map(aluno => {
+            if (aluno.reposicaoDe_Evento_Id && !aluno.reposicaoDe_Evento) {
+                lastValueFrom(this.service.get(aluno.reposicaoDe_Evento_Id))
+                .then(res => aluno.reposicaoDe_Evento = res)
             }
-            if (aluno.reposicaoPara_Evento_Id) {
-                aluno.reposicaoPara_Evento = await lastValueFrom(this.service.get(aluno.reposicaoPara_Evento_Id))
+            if (aluno.reposicaoPara_Evento_Id && !aluno.reposicaoPara_Evento) {
+                lastValueFrom(this.service.get(aluno.reposicaoPara_Evento_Id))
+                .then(res => aluno.reposicaoPara_Evento = res)
             }
             return aluno;
         })
@@ -431,7 +433,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 this.cdkCancelDrag('keyup');
             }
             else {
-                this.service.calendarioReload.emit(1);
+                this.service.onReload.emit(1);
             }
         });
         this.subscription.push(onClose);

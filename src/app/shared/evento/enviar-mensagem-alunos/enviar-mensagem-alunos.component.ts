@@ -113,6 +113,15 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 		else if (this.mensagemTipo == MensagemTipo.Inscricao) {
 			object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
 		}
+		else if (this.mensagemTipo == MensagemTipo.Falta) {
+				this.loadSugestoes(aluno)
+					.then(sugestoes => {
+						object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, sugestoes, true);
+					})
+		}
+		else if (this.mensagemTipo == MensagemTipo.FaltaReposicao) {
+			object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, [], false);
+		}
 		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
 			var podeRemarcar = !participacao?.reposicaoDe_Evento_Id && !participacao?.reposicaoPara_Evento_Id;
 			if (podeRemarcar) {
@@ -122,7 +131,6 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 					})
 			}
 			else {
-				object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, [], podeRemarcar);
 			}
 		}
 
@@ -174,5 +182,8 @@ export enum MensagemTipo {
 	Inscricao,
 	Cancelamento,
 	ConfirmacaoReposicao,
-	FaltaAgendada
+	FaltaAgendada,
+	Falta,
+	FaltaReposicao,
+	ReposicaoDesmarcada,
 }

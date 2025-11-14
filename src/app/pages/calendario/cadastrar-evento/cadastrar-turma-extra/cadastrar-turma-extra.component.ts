@@ -36,6 +36,8 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ReposicaoDeSelectComponent } from './reposicao-de-select/reposicao-de-select.component';
 import { MensagemTipo } from '../../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
 
 @Component({
     selector: 'app-cadastrar-turma-extra',
@@ -97,7 +99,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private turmaService: TurmaService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         private professorService: ProfessorService,
         private perfilCognitivoService: PerfilCognitivoService,
         private confirmationService: ConfirmationService,
@@ -109,7 +113,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         private dialogService: DialogService,
         private calendarioUtils: CalendarioUtils,
     ) {
-        let feriados = this.service.feriados.subscribe(res => {
+        let feriados = this.eventoService.feriados.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -165,7 +169,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
             this.loadAlunos();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res);
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res);
         this.subscription.push(eventos);
 
         this.verificaDisponibilidade();
@@ -236,7 +240,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.service.getFeriados(this.ano))
+        lastValueFrom(this.eventoService.getFeriados(this.ano))
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -344,7 +348,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
@@ -730,11 +734,14 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
 
         await Promise.all(request)
 
-        lastValueFrom(this.service.createAulaExtra(this.object))
+        lastValueFrom(this.eventoService.createAulaExtra(this.object))
             .then(res => {
                 this.loading = false;
 
                 if (res.success) {
+                    this.jornadaService.onReload.emit(res.object.id);
+                    this.monitoramentoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id);
                     if (this.object.alunos.length > 0) {
                         this.sendMensagemAlunos(res.object);
                     } else {
@@ -742,7 +749,6 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                         this.visibleChange()
                     }
                     this.toastrService.success('Turma extra cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.service.calendarioReload.emit(res.object.id);
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar turma extra. <br> ${res.message}`, e);
@@ -758,10 +764,10 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
     sendMensagemAlunos(evento: Evento) {
         var alunos = this.target
             .sort((x, y) => x.nome < y.nome ? -1 : 1);
-            
+
         var ref = showEnviarMensagemAlunos(
-            this.dialogService, 
-            alunos, evento, 
+            this.dialogService,
+            alunos, evento,
             MensagemTipo.Agendamento
         );
 

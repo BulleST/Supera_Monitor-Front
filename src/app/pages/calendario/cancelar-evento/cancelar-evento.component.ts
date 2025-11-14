@@ -29,6 +29,8 @@ import { AlunoService } from '../../../services/alunos.service'
 import { MensagemTipo } from '../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component'
 import { DialogService } from 'primeng/dynamicdialog'
 import { showEnviarMensagemAlunos } from '../../../utils/show-enviar-mensagem-alunos'
+import { JornadaSuperaService } from '../../../services/jornada-supera.service'
+import { MonitoramentoService } from '../../../services/monitoramento.service'
 
 @Component({
     selector: 'app-cancelar-evento',
@@ -64,7 +66,9 @@ export class CancelarEventoComponent implements OnDestroy {
         private toastrService: ToastrService,
         private crypto: Crypto,
         private professorService: ProfessorService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         private dialogService: DialogService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
@@ -104,7 +108,7 @@ export class CancelarEventoComponent implements OnDestroy {
                 .catch(res => (this.loadingAlunos = false))
         }
 
-        let eventos = this.service.getEvento().subscribe(res => {
+        let eventos = this.eventoService.getEvento().subscribe(res => {
             if (res) {
                 this.evento = res
                 this.tipoEventoString = this.getTipo(this.evento)
@@ -162,23 +166,23 @@ export class CancelarEventoComponent implements OnDestroy {
         e.evento_Tipo_Id = this.evento.evento_Tipo_Id
         return this.calendarioUtils.getEventoTipo(e)
     }
-    
-	getPerfilCognitivo(evento: Evento) {
+
+    getPerfilCognitivo(evento: Evento) {
         if (!evento.perfilCognitivo.length)
             return 'Indefinido'
-		return evento.perfilCognitivo.map(x => x.nome).join(', ');
-	}
+        return evento.perfilCognitivo.map(x => x.nome).join(', ');
+    }
 
-	getSala(evento: Evento) {
+    getSala(evento: Evento) {
         if (!evento.sala_Id)
             return 'Indefinido'
-		var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
-		return evento.sala + ' - ' + andar
-	}
+        var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
+        return evento.sala + ' - ' + andar
+    }
 
     goToReagendamento() {
         if (this.evento) {
-            this.service.setEvento(this.evento)
+            this.eventoService.setEvento(this.evento)
 
             let route: 'aula' | 'aula-zero' | 'aula' | 'superacao' | 'reuniao' | 'oficina' = 'aula'
             switch (this.evento.evento_Tipo_Id) {
@@ -248,7 +252,7 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.evento.id = res.object.id
                     response = res
                 })
-                .catch(res =>  {
+                .catch(res => {
                     this.loading = false;
                     this.showError('Erro', getError(res), e)
                     return res;
@@ -261,13 +265,15 @@ export class CancelarEventoComponent implements OnDestroy {
                 id: this.evento.id,
                 observacao: this.evento.observacao,
             }
-            lastValueFrom(this.service.cancelar(request))
+            lastValueFrom(this.eventoService.cancelar(request))
                 .then(res => {
                     this.loading = false;
                     if (res.success) {
                         this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado')
-                        this.service.calendarioReload.emit(res.object.id)
-    
+                        this.jornadaService.onReload.emit(res.object.id);
+                        this.monitoramentoService.onReload.emit(res.object.id);
+                        this.eventoService.onReload.emit(res.object.id)
+
                         if (this.evento.alunos.length > 0) {
                             this.sendMensagemAlunos(res.object)
                         } else {
@@ -298,8 +304,8 @@ export class CancelarEventoComponent implements OnDestroy {
             .sort((x, y) => x.nome < y.nome ? -1 : 1);
 
         var ref = showEnviarMensagemAlunos(
-            this.dialogService, 
-            alunos, evento, 
+            this.dialogService,
+            alunos, evento,
             MensagemTipo.Cancelamento
         );
 
@@ -310,7 +316,7 @@ export class CancelarEventoComponent implements OnDestroy {
         this.subscription.push(onClose);
     }
 
-    
+
     enviarMensagem(aluno: Evento_Participacao_Aluno) {
         if (!aluno.celular) {
             this.showError('Erro', 'Nenhum celular cadastrado', aluno)

@@ -32,6 +32,8 @@ import { Roteiro } from '../../../../models/roteiro.model';
 import { MensagemTipo } from '../../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { DialogService } from 'primeng/dynamicdialog';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../../services/monitoramento.service';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -92,7 +94,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         private alunoService: AlunoService,
         private turmaService: TurmaService,
         private roteiroService: RoteiroService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         public mensagemWhatsapp: MensagemWhatsapp,
         private dialogService: DialogService,
         private calendarioUtils: CalendarioUtils,
@@ -101,7 +105,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         this.object.descricao = 'Superação';
 
-        let feriados = this.service.feriados.subscribe(res => {
+        let feriados = this.eventoService.feriados.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -149,7 +153,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             this.loadAlunos();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active));
         this.subscription.push(eventos);
 
         this.loadFeriados();
@@ -213,7 +217,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.service.getFeriados(this.ano))
+        lastValueFrom(this.eventoService.getFeriados(this.ano))
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -263,7 +267,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate();
 
         this.loadingEventos = true;
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => this.loadingEventos = false)
             .catch(res => this.loadingEventos = false);
 
@@ -558,7 +562,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         this.object.alunos = this.selectedAlunos.map(x => x.id);
         this.object.professores = [this.object.professor_Id];
 
-        lastValueFrom(this.service.createSuperacao(this.object))
+        lastValueFrom(this.eventoService.createSuperacao(this.object))
             .then(res => {
 
                 if (res.success) {
@@ -569,7 +573,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                         this.visibleChange()
                     }
                     this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.service.calendarioReload.emit(res.object.id);
+                    this.jornadaService.onReload.emit(res.object.id);
+                    this.monitoramentoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id);
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar superação. <br> ${res.message}`, e);
@@ -588,8 +594,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             .sort((x, y) => x.nome < y.nome ? -1 : 1);
 
         var ref = showEnviarMensagemAlunos(
-            this.dialogService, 
-            alunos, evento, 
+            this.dialogService,
+            alunos, evento,
             MensagemTipo.Agendamento
         );
 

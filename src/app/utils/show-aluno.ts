@@ -1,7 +1,7 @@
 import { DialogService } from "primeng/dynamicdialog";
 import { AlunoDetalhesComponent } from "../shared/aluno/aluno-detalhes/aluno-detalhes.component";
 
-export function showAluno(aluno_Id: number, dialogService: DialogService) {
+export function showAluno(dialogService: DialogService, aluno_Id: number) {
     return dialogService.open(AlunoDetalhesComponent, {
         showHeader: false,
         closable: true,

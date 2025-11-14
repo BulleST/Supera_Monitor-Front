@@ -78,7 +78,7 @@ export class AlunoChecklistDetalhesComponent {
 	}
 
 	showAluno() {
-		showAluno(this.view.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, this.view.aluno_Id);
 	}
 
 

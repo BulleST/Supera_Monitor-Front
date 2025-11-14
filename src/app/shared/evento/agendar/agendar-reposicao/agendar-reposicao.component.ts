@@ -170,7 +170,7 @@ export class AgendarReposicaoComponent implements OnInit, OnDestroy {
 			if (cancelarReposicao) {
 			}
 			else {
-				this.eventoService.calendarioReload.emit(1);
+				this.eventoService.onReload.emit(1);
 				this.close();
 			}
 		})

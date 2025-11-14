@@ -1,12 +1,11 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, of, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
-import { AlunoRequest, Aluno, Pessoa_Sexo, Pessoa_Status } from '../models/alunos.model';
+import { AlunoRequest, Aluno, Pessoa_Sexo } from '../models/alunos.model';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError, replace } from '../utils';
-import { PrimeiraAulaRequest, ReposicaoRequest } from '../models/reposicao.model';
 import { Aluno_Restricao } from '../models/aluno-restricao.model';
 import { ChecklistService } from './checklist.service';
 import { Checklist } from '../models/checklist.model';

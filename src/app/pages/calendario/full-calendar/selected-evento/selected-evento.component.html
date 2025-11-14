@@ -170,7 +170,10 @@
                                         </span>
                                         <div class="ml-auto flex align-items-center gap-1">
                                             <app-evento-participacao-status [evento]="evento"
-                                                                            [participacao]="participacao"></app-evento-participacao-status>
+                                                                            [participacao]="participacao"
+                                                                            [reposicaoDe]="participacao.reposicaoDe_Evento" 
+                                                                            [reposicaoPara]="participacao.reposicaoPara_Evento"
+                                                                            [primeiraAula_Id]="participacao.primeiraAula_Id" />
 
                                             <!-- <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
                                                      value="1ª aula"
@@ -264,7 +267,7 @@
             </ng-container>
             <p-divider layout="horizontal" styleClass="mb-0" class="mb-0" />
             <div class="p-2 flex align-items-center gap-4">
-                <ng-container *ngIf="!evento.finalizado && evento.active">
+                <ng-container>
                     <p-button icon="pi pi-cog"
                               iconPos="right"
                               severity="secondary"
@@ -341,7 +344,7 @@
                 <ng-template #obsTemplate>
                     <p [innerHTML]="'Motivo: ' + evento.observacao" class="white-space-nowrap"></p>
                 </ng-template>
-                <p-button *ngIf="evento.active"
+                <p-button
                           label="Ver {{ tipoEventoString }}"
                           icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "
                           iconPos="right"

@@ -10,11 +10,9 @@ import { Evento_Participacao_Aluno } from '../../../../models/evento-participaca
 import { MensagemWhatsapp } from '../../../../utils/mensagem-whatsapp';
 import { EventoService } from '../../../../services/evento.service';
 import { ToastrService } from 'ngx-toastr';
-import { Evento_Participacao_Professor } from '../../../../models/evento-participacao-professor.model';
 import $ from 'jquery';
 import { PseudoEvento } from '../../../../models/reposicao.model';
 import { SalaAndar, SalaAulaId } from '../../../../models/sala-aula.model';
-import moment from 'moment';
 import { CalendarioUtils } from '../../../../utils/calendario-utils';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { showAluno } from '../../../../utils/show-aluno';
@@ -41,8 +39,6 @@ export class SelectedEventoComponent implements OnChanges {
     SalaAulaId = SalaAulaId;
     SalaAndar = SalaAndar;
 
-    mensagensEnviadasAlunos: Evento_Participacao_Aluno[] = [];
-    mensagensEnviadasProfessor: Evento_Participacao_Professor[] = [];
 
     tipoEventoString = '';
     mouse: any = { x: 0, y: 0 };
@@ -163,15 +159,37 @@ export class SelectedEventoComponent implements OnChanges {
     goToPrimeiraAula() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-            this.router.navigate(['calendario', 'agendar', 'primeira-aula', this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', 'agendar', 'primeira-aula'], {
+                queryParams: {
+                    evento_id: this.crypto.encrypt(this.evento.id),
+                }
+            });
             this.hidePopover();
         }
     }
     goToAgendarFalta() {
         if (this.evento) {
             this.service.setEvento(this.evento);
-            this.router.navigate(['calendario', 'agendar', 'falta', '', this.crypto.encrypt(this.evento.id)]);
+            this.router.navigate(['calendario', 'agendar', 'falta'], {
+                queryParams: {
+                    evento_id: this.crypto.encrypt(this.evento.id),
+                }
+            });
             this.hidePopover();
+        }
+    }
+    
+    goToAgendarReposicao() {
+        if (this.evento) {
+            this.service.setEventoReposicaoDe(this.evento)
+            this.service.setEventoReposicaoPara(undefined);
+            this.router.navigate(['calendario', 'agendar','reposicao'], {
+                queryParams: {
+                    evento_reposicao_de: this.crypto.encrypt(this.evento.id),
+                    evento_reposicao_para: null,
+                    aluno_id: null
+                }
+            });
         }
     }
 
@@ -192,20 +210,6 @@ export class SelectedEventoComponent implements OnChanges {
             this.router.navigate(['calendario', 'cancelar', route, this.crypto.encrypt(this.evento.id)]);
             this.hidePopover();
 
-        }
-    }
-    
-    goToAgendarReposicao() {
-        if (this.evento) {
-            this.service.setEventoReposicaoDe(this.evento)
-            this.service.setEventoReposicaoPara(undefined);
-            this.router.navigate(['calendario', 'agendar','reposicao'], {
-                queryParams: {
-                    evento_reposicao_de: this.crypto.encrypt(this.evento.id),
-                    evento_reposicao_para: null,
-                    aluno_id: null
-                }
-            });
         }
     }
 
@@ -285,6 +289,6 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
     showAluno(participacao: Evento_Participacao_Aluno) {
-        showAluno(participacao.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, participacao.aluno_Id);
     }
 }

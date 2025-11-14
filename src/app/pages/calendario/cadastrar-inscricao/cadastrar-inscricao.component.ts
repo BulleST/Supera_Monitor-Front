@@ -314,7 +314,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 this.loading = false;
                 if (res.success) {
                     this.toastrService.success('Inscrição realizada com sucesso', 'Inscrição realizada');
-                    this.service.calendarioReload.emit(0);
+                    this.service.onReload.emit(0);
                     this.enviarMensagemAluno(res.object);
                 } else {
                     this.showError('Agendamento falhou', `Não foi possível inscrever o aluno ${aluno.nome} na ${this.getTipo(this.evento)}. <br> ${res.message}`, e);

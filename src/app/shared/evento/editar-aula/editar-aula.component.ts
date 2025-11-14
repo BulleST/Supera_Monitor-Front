@@ -28,25 +28,26 @@ import { CalendarioRequest } from '../../../models/calendario.model';
 import { ToastrService } from 'ngx-toastr';
 import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { MonitoramentoService } from '../../../services/monitoramento.service';
 
 @Component({
-  selector: 'app-editar-aula',
-  standalone: false,
-  templateUrl: './editar-aula.component.html',
-  styleUrl: './editar-aula.component.css',
-  providers: [ConfirmationService]
+    selector: 'app-editar-aula',
+    standalone: false,
+    templateUrl: './editar-aula.component.html',
+    styleUrl: './editar-aula.component.css',
+    providers: [ConfirmationService]
 })
-export class EditarAulaComponent implements OnInit, OnDestroy  {
-	subscription: Subscription[] = [];
-	instance: DynamicDialogComponent | undefined;
-	loading = false;
-	maximized = false;
+export class EditarAulaComponent implements OnInit, OnDestroy {
+    subscription: Subscription[] = [];
+    instance: DynamicDialogComponent | undefined;
+    loading = false;
+    maximized = false;
     activeIndexAluno = 0;
-    
-	view = new EditarAulaView;
+
+    view = new EditarAulaView;
     evento: Evento = new Evento;
     duracaoEvento = '';
-    roteiro?: Roteiro;
     tipoString = '';
 
     alunos: Aluno[] = [];
@@ -80,23 +81,27 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
     statusContato = statusContato;
 
-	constructor(
-		private dialogService: DialogService,
-		private ref: DynamicDialogRef,
-		private confirmationService: ConfirmationService,
-		public mensagemWhatsapp: MensagemWhatsapp,
-		private mobileService: MobileService,
-		private calendarioUtils: CalendarioUtils,
+    readonly = false;
+
+    constructor(
+        private dialogService: DialogService,
+        private ref: DynamicDialogRef,
+        private confirmationService: ConfirmationService,
+        public mensagemWhatsapp: MensagemWhatsapp,
+        private mobileService: MobileService,
+        private calendarioUtils: CalendarioUtils,
         private toastr: ToastrService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         private alunoService: AlunoService,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
-		private apostilaService: ApostilaService,
-	) {
+        private apostilaService: ApostilaService,
+    ) {
 
-		this.instance = this.dialogService.getInstance(this.ref);
+        this.instance = this.dialogService.getInstance(this.ref);
 
         let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
@@ -111,7 +116,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
                 .catch(res => this.loadingApostila = false);
 
         }
-    
+
         let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
 
@@ -151,19 +156,20 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
                 .catch(res => this.loadingTurmas = false);
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos)
-	}
+    }
 
-	ngOnInit(): void {
-		if (this.instance && this.instance.data) {
-			this.view = this.instance.data['view'];
+    ngOnInit(): void {
+        if (this.instance && this.instance.data) {
+            this.view = this.instance.data['view'];
             this.evento = this.view.evento;
             this.getDuracaoEvento();
             this.tipoString = this.getTipo(this.evento);
             this.setApostilasAlunos();
-		}
-	}
+            this.readonly = this.evento.finalizado || !this.evento.active
+        }
+    }
 
     ngOnDestroy(): void {
         this.subscription.forEach((item) => item.unsubscribe())
@@ -173,23 +179,24 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         this.ref.close();
     }
 
-	maximize() {
-		this.maximized = !this.maximized;
-		this.instance!.maximize();
-	}
+    maximize() {
+        this.maximized = !this.maximized;
+        this.instance!.maximize();
+    }
 
     showError(header: string, message: string, e: any, innerMessage?: string) {
         showError(this.confirmationService, header, message, e, innerMessage)
     }
 
     getDuracaoEvento() {
-                let minutos = this.evento.duracaoMinutos % 60
-                let horas = this.evento.duracaoMinutos / 60
-                let horaRedonda = horas - Math.floor(horas) == 0
+        let minutos = this.evento.duracaoMinutos % 60
+        let horas = this.evento.duracaoMinutos / 60
+        let horaRedonda = horas - Math.floor(horas) == 0
 
-                this.duracaoEvento = horaRedonda
-                    ? horas.toString().padStart(2, '0') + 'h'
-                    : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';}
+        this.duracaoEvento = horaRedonda
+            ? horas.toString().padStart(2, '0') + 'h'
+            : horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
+    }
 
     async verificaDisponibilidade() {
 
@@ -204,7 +211,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         request.intervaloAte = moment(data).add(1, 'day').toDate()
 
         this.loadingEventos = true
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => (this.loadingEventos = false))
             .catch(res => (this.loadingEventos = false))
 
@@ -261,7 +268,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
                 let aluno = this.alunos.find(x => x.id == participacao.aluno_Id) as Aluno;
                 alunos.push(aluno)
             }
-            
+
         })
         if (valid) {
             this.sala_Id.control.setErrors(null);
@@ -269,7 +276,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         else {
             this.sala_Id.control.setErrors({ invalid: valid })
             this.showError(
-                'Sala Incompativel', 
+                'Sala Incompativel',
                 '',
                 { target: null });
         }
@@ -293,7 +300,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
     salaAulaChanged(e: SelectChangeEvent, model: NgModel) {
         this.validaSalaAulas();
-        
+
         let item = this.salaAulas.find((x) => x.id == e.value)
 
         if (item && item.disponivel == false && item.disponivelEvent) {
@@ -335,7 +342,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
     }
 
-    presente(item: Evento_Participacao_Aluno, status: any ) {
+    presente(item: Evento_Participacao_Aluno, status: any) {
         item.presente = !item.presente;
     }
 
@@ -548,7 +555,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         if (index <= 0) {
             newIndex = this.presencaButton.length - 1;
         }
-    
+
         let element = this.presencaButton.get(newIndex);
         let button = $(`p-button[${element?.attrSelector}]`).find('button')
 
@@ -571,7 +578,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
     apostilaAbacoInputNumberNext(index: number, inputNumber: InputNumber) {
         let newIndex = index + 1;
 
-        
+
         if (index >= this.presencaButton.length - 1) {
             newIndex = 0;
         }
@@ -579,7 +586,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         var row = this.evento.alunos[newIndex];
         if (row.presente === false) {
             this.apostilaAbacoInputNumberNext(newIndex, inputNumber)
-            return 
+            return
         }
 
         let element = this.apostilaAbacoInput.get(newIndex)
@@ -588,7 +595,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
     apostilaAHInputNumberNext(index: number, inputNumber: InputNumber) {
         let newIndex = index + 1;
-        
+
         if (index >= this.presencaButton.length - 1) {
             newIndex = 0;
         }
@@ -596,7 +603,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         var row = this.evento.alunos[newIndex];
         if (row.presente === false) {
             this.apostilaAHInputNumberNext(newIndex, inputNumber)
-            return 
+            return
         }
 
         let element = this.apostilaAHInput.get(newIndex)
@@ -613,7 +620,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         var row = this.evento.alunos[newIndex];
         if (row.presente === false) {
             this.apostilaAbacoInputNumberPrev(newIndex, inputNumber)
-            return 
+            return
         }
 
         let element = this.apostilaAbacoInput.get(newIndex)
@@ -630,7 +637,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         var row = this.evento.alunos[newIndex];
         if (row.presente === false) {
             this.apostilaAHInputNumberPrev(newIndex, inputNumber)
-            return 
+            return
         }
 
         let element = this.apostilaAbacoInput.get(newIndex)
@@ -638,7 +645,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
     }
 
     showAluno(participacao: Evento_Participacao_Aluno) {
-        showAluno(participacao.aluno_Id, this.dialogService);
+        showAluno(this.dialogService, participacao.aluno_Id);
     }
 
     sendConfirmation(e: any, form: NgForm) {
@@ -668,13 +675,15 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         this.loading = true;
         this.requestCreateEdit()
             .then(res => {
+                this.loading = false
                 if (res.success) {
-                    this.service.calendarioReload.emit(res.object.id)
+                    this.jornadaService.onReload.emit(res.object.id);
+                    this.monitoramentoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id)
                     this.evento.id = res.object.id
-                    this.service.setEvento(this.evento)
+                    this.eventoService.setEvento(this.evento)
                     this.toastr.success('Dados atualizados com sucesso.')
                 }
-                this.loading = false
             })
             .catch(res => {
                 this.loading = false
@@ -721,8 +730,32 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
                 .then(res => {
                     this.loading = false;
                     if (res.success) {
-                        this.service.calendarioReload.emit(this.evento.id)
+                        this.evento = res.object;
+                        this.jornadaService.onReload.emit(res.object.id);
+                        this.monitoramentoService.onReload.emit(res.object.id);
+                        this.eventoService.onReload.emit(res.object.id)
                         this.toastr.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
+
+                        this.confirmationService.confirm({
+                            target: e.target,
+                            header: 'Sair?',
+                            message: 'Deseja voltar à página anterior ou manter a visualização da aula?',
+                            closeOnEscape: true,
+                            acceptIcon: 'pi pi-arrow-right p-button-icon-right',
+                            acceptLabel: `Sair`,
+                            acceptButtonStyleClass: 'p-button-rounded p-button-icon-right',
+                            accept: () => {
+                                this.close();
+                            },
+                            rejectLabel: 'Não sair',
+                            rejectIcon: '',
+                            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+                            reject: () => {
+
+                            }
+                        })
+
+
                     }
                     else {
                         this.toastr.error(`Não foi possível finalizar ${this.tipoString}.`, 'Erro');
@@ -780,7 +813,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
     requestFinalizar(eventoResponse: Evento) {
         const request = this.buildFinalizar(eventoResponse);
-        return lastValueFrom(this.service.finalizar(request))
+        return lastValueFrom(this.eventoService.finalizar(request))
     }
 
 
@@ -790,7 +823,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
         }
         else {
             item.alunoContactado = new Date;
-        } 
+        }
     }
 
     getTurma(turma_Id?: number) {
@@ -802,5 +835,5 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
 
 export class EditarAulaView {
-	evento: Evento = new Evento;
+    evento: Evento = new Evento;
 }
