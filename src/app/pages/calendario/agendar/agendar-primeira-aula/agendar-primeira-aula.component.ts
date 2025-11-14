@@ -1,9 +1,9 @@
 import { Component, OnDestroy } from '@angular/core';
-import { EventoService } from '../../../services/evento.service';
-import { AlunoService } from '../../../services/alunos.service';
+import { EventoService } from '../../../../services/evento.service';
+import { AlunoService } from '../../../../services/alunos.service';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { showAgendarPrimeiraAula } from '../../../utils/show-agendar-primeira-aula';
+import { showAgendarPrimeiraAula } from '../../../../utils/show-agendar-primeira-aula';
 import { Subscription } from 'rxjs';
 
 @Component({

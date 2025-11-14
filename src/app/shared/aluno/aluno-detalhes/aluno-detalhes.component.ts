@@ -8,6 +8,8 @@ import { showError } from '../../../utils';
 import { NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/module.d-CnjH8Dlt';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { JornadaSupera_List_Aluno } from '../../../models/jornada-supera-list.model';
 
 @Component({
 	selector: 'app-aluno-detalhes',
@@ -26,8 +28,9 @@ export class AlunoDetalhesComponent implements OnInit, OnDestroy {
 	instance: DynamicDialogComponent | undefined;
 
 	maximized = false;
+
 	constructor(
-		private service: AlunoService,
+		private alunoService: AlunoService,
 		private confirmationService: ConfirmationService,
 		private toastrService: ToastrService,
 		private dialogService: DialogService,
@@ -59,9 +62,10 @@ export class AlunoDetalhesComponent implements OnInit, OnDestroy {
 
 	loadPage() {
 		this.loading = true;
-		lastValueFrom(this.service.getVigencia(this.aluno_Id));
-		lastValueFrom(this.service.getHistorico(this.aluno_Id));
-		lastValueFrom(this.service.get(this.aluno_Id))
+
+		lastValueFrom(this.alunoService.getVigencia(this.aluno_Id));
+		lastValueFrom(this.alunoService.getHistorico(this.aluno_Id));
+		lastValueFrom(this.alunoService.get(this.aluno_Id))
 			.then(res => {
 				this.object = res;
 				this.loading = false;
@@ -105,7 +109,7 @@ export class AlunoDetalhesComponent implements OnInit, OnDestroy {
 				if (res.success) {
 					this.toastrService.success(`Registro atualizado com sucesso.`);
 
-					lastValueFrom(this.service.getList())
+					lastValueFrom(this.alunoService.getList())
 
 					this.confirmationService.confirm({
 						target: e.target,
@@ -135,6 +139,6 @@ export class AlunoDetalhesComponent implements OnInit, OnDestroy {
 	}
 
 	request() {
-		return lastValueFrom(this.service.edit(this.object))
+		return lastValueFrom(this.alunoService.edit(this.object))
 	}
 }

@@ -1,21 +1,21 @@
 import { Component, OnDestroy } from '@angular/core';
+import { EventoService } from '../../../../services/evento.service';
+import { AlunoService } from '../../../../services/alunos.service';
 import { DialogService } from 'primeng/dynamicdialog';
-import { EventoService } from '../../../services/evento.service';
-import { AlunoService } from '../../../services/alunos.service';
+import { showAgendarReposicao } from '../../../../utils/show-agendar-reposicao';
 import { ActivatedRoute, Router } from '@angular/router';
-import { showAgendarFalta } from '../../../utils/show-agendar-falta';
 import { Subscription } from 'rxjs';
 
 @Component({
-	selector: 'app-agendar-falta',
+	selector: 'app-agendar-reposicao',
 	standalone: false,
-	templateUrl: './agendar-falta.component.html',
-	styleUrl: './agendar-falta.component.css',
+	templateUrl: './agendar-reposicao.component.html',
+	styleUrl: './agendar-reposicao.component.css',
 	providers: [DialogService]
 })
-export class AgendarFaltaComponent implements OnDestroy {
+export class AgendarReposicaoComponent implements OnDestroy {
 	subscription: Subscription[] = [];
-	
+
 	constructor(
 		private eventoService: EventoService,
 		private alunoService: AlunoService,
@@ -24,7 +24,6 @@ export class AgendarFaltaComponent implements OnDestroy {
 		private activatedRoute: ActivatedRoute
 	) {
 		this.show();
-
 	}
 	
     ngOnDestroy(): void {
@@ -42,10 +41,11 @@ export class AgendarFaltaComponent implements OnDestroy {
 	}
 
 	show() {
-		let evento = this.eventoService.getEvento().value;
+		let reposicaoDe = this.eventoService.getEventoReposicaoDe().value;
+		let reposicaoPara = this.eventoService.getEventoReposicaoPara().value;
 		let aluno = this.alunoService.getAluno().value;
 
-		var ref = showAgendarFalta(this.dialogService, aluno, evento); 
+		var ref = showAgendarReposicao(this.dialogService, aluno, reposicaoDe, reposicaoPara);
 		var onClose = ref.onClose.subscribe(res => {
 			this.close();
 		});

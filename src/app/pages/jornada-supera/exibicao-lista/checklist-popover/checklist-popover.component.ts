@@ -5,9 +5,11 @@ import { MensagemWhatsapp } from '../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist, JornadaSupera_List_Checklist_Item_Aluno } from '../../../../models/jornada-supera-list.model';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
-import { AlunoChecklistDetalhesComponent, AlunoChecklistDetalhesView } from '../../../../shared/checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
-import { AlunoDetalhesComponent } from '../../../../shared/aluno/aluno-detalhes/aluno-detalhes.component';
+import {  FinalizarChecklistComponentView } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
+import { AlunoChecklistDetalhesView } from '../../../../shared/checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
+import { showChecklistDetalhes } from '../../../../utils/show-aluno-checklist-detalhes';
+import { showFinalizarChecklist } from '../../../../utils/show-finalizar-checklist';
+import { checklistsMensagemWhatsapp } from '../../../../models/checklist-item-id.enum';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
@@ -22,10 +24,9 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     @Input() aluno!: JornadaSupera_List_Aluno;
 
     subscription: Subscription[] = [];
+    checklistsMensagemWhatsapp = checklistsMensagemWhatsapp;
 
     @ViewChild('popover') popover!: Popover;
-
-    prazo!: Date;
 
     constructor(
         private dialogService: DialogService,
@@ -41,7 +42,6 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['checklist']) {
             this.checklist = changes['checklist'].currentValue;
-            this.prazo = this.checklist.items[0].prazo;
         }
         if (changes['aluno']) {
             this.aluno = changes['aluno'].currentValue;
@@ -52,7 +52,6 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
         this.popover.toggle(e);
         this.aluno = aluno;
         this.checklist = checklist
-        this.prazo = this.checklist.items[0].prazo;
     }
 
 
@@ -77,7 +76,8 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
 
     finalizarChecklist(item: JornadaSupera_List_Checklist_Item_Aluno) {
 
-        var view: FinalizarChecklistComponentModel = {
+        var view: FinalizarChecklistComponentView = {
+                alunoId: this.aluno.id,
                 alunoChecklistItemId: item.id,
                 checklistItemId: item.checklist_Item_Id,
                 checklistId: this.checklist.id,
@@ -90,30 +90,13 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
                 prazo: item.prazo,
                 status: item.status,
         }
-        var ref = this.dialogService.open(FinalizarChecklistComponent, {
-            header: 'Finalizar Checklist',
-            showHeader: false,
-            closable: true,
-            maximizable: false,
-            closeOnEscape: true,
-            draggable: true,
-            dismissableMask: true,
-            duplicate: true,
-            modal: true,
-            width: '95vw',
-            style: {
-                maxWidth: '500px',
-            },
-            data: {
-                view: view
-            }
-        })
+
+        var ref = showFinalizarChecklist(this.dialogService, view);
 
         ref.onClose.subscribe(res => item.finalizado = res)
     }
 
     showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno) {
-
         var view: AlunoChecklistDetalhesView = {
             alunoChecklistItemId: item.id,
             
@@ -136,26 +119,10 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
             corLegenda: this.aluno.corLegenda,
             
         }
-
-        var ref = this.dialogService.open(AlunoChecklistDetalhesComponent, {
-            showHeader: false,
-            closable: true,
-            maximizable: true,
-            closeOnEscape: true,
-            draggable: true,
-            dismissableMask: true,
-            duplicate: true,
-            modal: true,
-            width: '95vw',
-            style: {
-                maxWidth: '500px',
-            },
-            data: {
-                view: view
-            }
-
-        });
+        var ref = showChecklistDetalhes(
+            this.dialogService,
+            view
+        );
     }
-
 }
 

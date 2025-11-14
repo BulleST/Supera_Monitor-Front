@@ -1,5 +1,3 @@
-import { Aluno } from "./alunos.model";
-
 export interface Checklist {
     id: number;
     nome: string;

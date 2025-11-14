@@ -51,3 +51,16 @@ export enum ChecklistItemId {
 
     VerificarTodosItensRealizados = 30,
 }
+
+
+export let checklistsMensagemWhatsapp: ChecklistItemId[] = [
+    ChecklistItemId.MensagemBoasVindas,
+    ChecklistItemId.ApresentacaoDiretorFranqueado,
+    ChecklistItemId.ConfirmacaoAdequacaoAoPerfilDaTurma,
+    ChecklistItemId.FeedbackPosVenda,
+    ChecklistItemId.ConfirmacaoPreenchimentoFeedbackPosVenda,
+    // ChecklistItemId.Agendamento1Oficina,
+    // ChecklistItemId.Agendamento1Superacao,
+    // ChecklistItemId.Agendamento2Oficina,
+    // ChecklistItemId.Agendamento2Superacao,
+]

@@ -1,13 +1,12 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { EventoAula0Request } from '../../../../models/evento-aula-0.model'
 import { lastValueFrom, Subscription } from 'rxjs'
 import { Aluno } from '../../../../models/alunos.model'
 import { Professor } from '../../../../models/professor.model'
 import { SalaAndar, SalaAula, SalaAulaId } from '../../../../models/sala-aula.model'
-import { ActivatedRoute, Router } from '@angular/router'
 import { ConfirmationService } from 'primeng/api'
 import { ToastrService } from 'ngx-toastr'
-import { Crypto, getError, showError } from '../../../../utils'
+import { getError, showError } from '../../../../utils'
 import moment from 'moment'
 import { Turma } from '../../../../models/turma.model'
 import { TurmaService } from '../../../../services/turma.service'
@@ -30,28 +29,30 @@ import { NameFirstWordPipe } from '../../../../utils/name-first-word.pipe'
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model'
 import { RoteiroService } from '../../../../services/roteiro.service'
 import { Roteiro } from '../../../../models/roteiro.model'
-import { MensagemTipo } from '../../../../shared/evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component'
-import { DialogService } from 'primeng/dynamicdialog'
+import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-alunos.component'
+import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos'
+import { showAluno } from '../../../../utils/show-aluno'
 
 @Component({
-    selector: 'app-cadastrar-aula-0',
+    selector: 'app-agendar-aula-0',
     standalone: false,
-    templateUrl: './cadastrar-aula-0.component.html',
-    styleUrl: './cadastrar-aula-0.component.css',
-    providers: [ConfirmationService, DialogService],
+    templateUrl: './agendar-aula-0.component.html',
+    styleUrl: './agendar-aula-0.component.css',
+    providers: [ConfirmationService],
 })
-export class CadastrarAula0Component implements OnDestroy {
-    visible: boolean = false
-    loading = false
-    error: string = ''
+export class AgendarAula0Component implements OnInit, OnDestroy {
+
+    instance: DynamicDialogComponent | undefined;
+    aluno_Id?: number;
+    aluno?: Aluno;
+
     subscription: Subscription[] = []
+    loading = false
     object: EventoAula0Request = new EventoAula0Request()
 
     data: Date = undefined as unknown as Date
     horario: Date = undefined as unknown as Date
-
-    blockAlunoField = false
 
     selectedAlunos: Aluno[] = []
     alunos: Aluno[] = []
@@ -80,16 +81,17 @@ export class CadastrarAula0Component implements OnDestroy {
 
     @ViewChild('form') form!: NgForm
     @ViewChild('formDiv') formDiv!: HTMLFormElement
-    @ViewChild('professor_Id') professor_Id!: NgModel
+    @ViewChild('professor_Id') professor_Id!: NgModel;
+    @ViewChild('_data') _data!: NgModel;
+    @ViewChild('_horario') _horario!: NgModel;
 
     SalaAulaId = SalaAulaId
 
     constructor(
-        private activatedRoute: ActivatedRoute,
-        private router: Router,
+        private dialogService: DialogService,
+        private ref: DynamicDialogRef,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
-        private crypto: Crypto,
         private turmaService: TurmaService,
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
@@ -97,10 +99,12 @@ export class CadastrarAula0Component implements OnDestroy {
         private roteiroService: RoteiroService,
         private service: EventoService,
         private mensagemWhatsapp: MensagemWhatsapp,
-        private dialogService: DialogService,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
     ) {
+
+		this.instance = this.dialogService.getInstance(this.ref);
+
         this.object.descricao = 'Aula 0';
 
         let feriados = this.service.feriados.subscribe(res => {
@@ -144,7 +148,10 @@ export class CadastrarAula0Component implements OnDestroy {
             this.loadTurmas();
         }
 
-        let alunos = this.alunoService.list.subscribe(res => this.alunos = res.filter(x => x.active))
+        let alunos = this.alunoService.list.subscribe(res => {
+            this.alunos = res.filter(x => x.active);
+            this.setAluno();
+        })
         this.subscription.push(alunos)
 
         if (this.alunos.length == 0) {
@@ -157,24 +164,51 @@ export class CadastrarAula0Component implements OnDestroy {
         this.loadFeriados()
         this.verificaDisponibilidade()
 
-        this.activatedRoute.params.subscribe(res => {
-            if (res['aluno_Id']) {
-                this.object.alunos = this.crypto.decrypt(res['aluno_Id'])
-                this.blockAlunoField = true
-            }
-        })
-
-        this.visible = true;
     }
+
+	ngOnInit(): void {
+		if (this.instance && this.instance.data) {
+			this.aluno_Id = this.instance.data['aluno_Id'];
+            this.setAluno();
+		}
+	}
 
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe())
     }
 
-    visibleChange() {
-        if (!this.visible) {
-            this.router.navigate(['../../'], { relativeTo: this.activatedRoute })
+    setAluno() {
+        if (this.alunos.length && this.aluno_Id) {
+            this.aluno = this.alunos.find(x => x.id == this.aluno_Id )
+            this.selectedAlunos = this.aluno ? [this.aluno] : [];
         }
+
+        if (this.aluno && !this.aluno.disponivel && this.aluno.disponivelEvent) {
+            
+            let tipo = this.getTipo(this.aluno.disponivelEvent);
+            let data = moment(this.aluno.disponivelEvent.data).format('HH[h]mm');
+
+            this.showError(
+                'Aluno Indisponível',
+                `${this.aluno.nome} tem ${tipo} no mesmo dia às <b>${data}</b>.`,
+                { target: this.form }
+            );
+            if (this._data)
+                this._data.control.setErrors({ required: true })
+            if (this._horario)
+                this._horario.control.setErrors({ required: true })
+
+        }
+        else {
+            if (this._data)
+                this._data.control.setErrors(null)
+            if (this._horario)
+                this._horario.control.setErrors(null)
+        }
+    }
+
+    close(agendamentoConcluido: boolean) {
+        this.ref.close(agendamentoConcluido);
     }
 
     loadProfessores() {
@@ -220,7 +254,7 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     removeAluno(aluno: Aluno) {
-        var index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
+        let index = this.selectedAlunos.findIndex(x => x.id == aluno.id)
         if (index != -1) {
             this.selectedAlunos.splice(index,1)
         }
@@ -247,7 +281,10 @@ export class CadastrarAula0Component implements OnDestroy {
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e)
     }
-
+    
+    showAluno(aluno_Id: number) {
+        showAluno(this.dialogService, aluno_Id)
+    }
     dateNavigatorChanged(e: DatePickerYearChangeEvent) {
         if (e.year != this.ano) {
             this.ano = e.year ?? new Date().getFullYear()
@@ -272,6 +309,9 @@ export class CadastrarAula0Component implements OnDestroy {
 
         if (!this.data || !this.horario) {
             return valid
+        }
+        if (this.loadingEventos) {
+            return valid;
         }
 
         this.loadingEventos = true
@@ -335,7 +375,8 @@ export class CadastrarAula0Component implements OnDestroy {
         }
         let data = this.data
         data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined)
+        this.alunos = validaAlunos(data, this.object.duracaoMinutos, this.alunos, this.eventos, undefined, undefined);
+        this.setAluno();
     }
 
     professorChanged(e: SelectChangeEvent, model: NgModel) {
@@ -601,28 +642,19 @@ export class CadastrarAula0Component implements OnDestroy {
 
         // playAlert();
 
-        this.object.alunos = this.selectedAlunos.map(x => x.id)
-
-        this.object.data = new Date(this.data)
-        this.object.data.setHours(this.horario.getHours(), this.horario.getMinutes(), 0)
-        this.object.data = moment(this.data).format('YYYY-MM-DD[T]HH:mm') as any
-
-        let mensagem = ``
-        let nome = this.selectedAlunos[0].nome
-        let data = moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')
-
-        if (this.selectedAlunos.length == 1) {
-            mensagem = `Tem certeza que deseja agendar a aula 0 do aluno ${nome} para o dia <span class="text-primary-500">${data}</span>?`
-        } else if (this.selectedAlunos.length > 1) {
-            mensagem = `Tem certeza que deseja agendar a aula 0 dos alunos ${this.selectedAlunos
-                .map(x => x.nome)
-                .join(', ')} para o dia <span class="text-primary-500">${data}</span>?`
-        }
+        this.object.data = moment().set({
+            date: moment(this.data).date(),
+            month: moment(this.data).month(),
+            year: moment(this.data).year(),
+            hour: moment(this.horario).hour(),
+            minutes: moment(this.horario).minutes(),
+            second: 0,
+        }).toDate();
 
         this.confirmationService.confirm({
             target: e.target,
             header: 'Agendar aula 0',
-            message: mensagem,
+            message: `Tem certeza que deseja agendar aula zero para o dia ${moment(this.object.data).format('DD/MM/YY [às] HH[h]mm')}?`,
             acceptLabel: `Agendar aula 0`,
             acceptIcon: 'pi pi-check',
             acceptButtonStyleClass: 'p-button-rounded',
@@ -638,7 +670,8 @@ export class CadastrarAula0Component implements OnDestroy {
     async send(e: any) {
         this.loading = true
 
-        this.object.data = this.data;
+        this.object.alunos = this.selectedAlunos.map(x => x.id);
+        // this.object.professores = [this.object.professor_Id];
 
         await lastValueFrom(this.service.createAula0(this.object))
             .then(async res => {
@@ -647,8 +680,7 @@ export class CadastrarAula0Component implements OnDestroy {
                     if (this.object.alunos.length > 0) {
                         this.sendMensagemAlunos(res.object);
                     } else {
-                        this.visible = false;
-                        this.visibleChange()
+                        this.close(true);
                     }
                     this.toastrService.success('Aula zero cadastrada com sucesso.', 'Agendamento finalizado');
                     this.service.onReload.emit(res.object.id);
@@ -664,18 +696,17 @@ export class CadastrarAula0Component implements OnDestroy {
     }
 
     sendMensagemAlunos(evento: Evento) {
-        var alunos = this.selectedAlunos
+        let alunos = this.selectedAlunos
             .sort((x, y) => x.nome < y.nome ? -1 : 1);
 
-        var ref = showEnviarMensagemAlunos(
+        let ref = showEnviarMensagemAlunos(
             this.dialogService, 
             alunos, evento, 
             MensagemTipo.Agendamento
         );
 
-        var onClose = ref.onClose.subscribe(res => {
-            this.visible = false;
-            this.visibleChange();
+        let onClose = ref.onClose.subscribe(res => {
+            this.close(true);
         });
         this.subscription.push(onClose);
     }

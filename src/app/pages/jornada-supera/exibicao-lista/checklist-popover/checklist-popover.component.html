@@ -6,117 +6,51 @@
         <p>
             <span>Prazo máximo: </span>
             <b>
-                <span *ngIf="prazo">{{prazo | date : 'dd/MM/yyyy'}}</span>
-                <span *ngIf="!prazo">Indefinido</span>
+                <span *ngIf="checklist.prazo">{{checklist.prazo | date : 'dd/MM/yyyy'}}</span>
+                <span *ngIf="!checklist.prazo">Indefinido</span>
             </b>
         </p>
         <ul class="flex flex-column list-none p-0">
             <li *ngFor="let item of checklist.items; let index = index">
                 <div class="flex align-items-center line-height-1 gap-2" style="height: 30px">
                     <p-checkbox
-                        [(ngModel)]="item.finalizado"
-                        [readonly]="item.finalizado"
-                        inputId="finalizado[{{index}}]"
-                        name="finalizado[{{index}}]"
-                        [ngClass]="{ 
+                                [(ngModel)]="item.finalizado"
+                                [readonly]="item.finalizado"
+                                inputId="finalizado[{{index}}]"
+                                name="finalizado[{{index}}]"
+                                [ngClass]="{ 
                             'pointer-events-none' : item.finalizado,
                         }"
-                        class="p-checkbox-green"
-                        [binary]="true"
-                        (onChange)="finalizarChecklist(item)"
-                    ></p-checkbox>
-                    
+                                class="p-checkbox-green"
+                                [binary]="true"
+                                (onChange)="finalizarChecklist(item)"></p-checkbox>
                     <span class="white-space-nowrap">{{item.checklist_Item}}</span>
-
                     <div class="pl-2 ml-auto">
-
                         <ng-container *ngIf="item.finalizado">
-                            <p-button 
-                                icon="pi pi-exclamation-circle"
-                                severity="info"
-                                [text]="true"
-                                [rounded]="true"
-                                pTooltip="Clique para ver detalhes"
-                                tooltipPosition="bottom"
-                                (onClick)="showChecklistDetalhes(item)"/>
+                            <p-button
+                                      icon="pi pi-exclamation-circle"
+                                      severity="info"
+                                      [text]="true"
+                                      [rounded]="true"
+                                      pTooltip="Clique para ver detalhes"
+                                      tooltipPosition="bottom"
+                                      (onClick)="showChecklistDetalhes(item)" />
                         </ng-container>
-                        <ng-container *ngIf="item.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(item.checklist_Item_Id)">
+                        <ng-container *ngIf="item.finalizado == false && checklistsMensagemWhatsapp.includes(item.checklist_Item_Id)">
                             <p-button type="button"
-                                icon="pi pi-whatsapp"
-                                [severity]="aluno.celular ? 'success' : 'secondary'"
-                                [disabled]="!aluno.celular"
-                                [text]="true"
-                                [rounded]="true"
-                                pTooltip="Enviar mensagem"
-                                (onClick)="enviarMensagemCondicao(item, aluno)"
-                                (auxclick)="enviarMensagemCondicao(item, aluno)"
-                                (contextmenu)="enviarMensagemCondicao(item, aluno)"/>
+                                      icon="pi pi-whatsapp"
+                                      [severity]="aluno.celular ? 'success' : 'secondary'"
+                                      [disabled]="!aluno.celular"
+                                      [text]="true"
+                                      [rounded]="true"
+                                      pTooltip="Enviar mensagem"
+                                      (onClick)="enviarMensagemCondicao(item, aluno)"
+                                      (auxclick)="enviarMensagemCondicao(item, aluno)"
+                                      (contextmenu)="enviarMensagemCondicao(item, aluno)" />
                         </ng-container>
                     </div>
-        
                 </div>
             </li>
         </ul>
-        <!-- <p-table [value]="checklist.items">
-            <ng-template pTemplate="body" let-checklistItem let-index="rowIndex">
-                <tr [ngClass]="{ 'surface-50': index % 2 != 0 }"
-                    (mouseenter)="checklistItem.dataFinalizacao ? checklistData.show($event) : undefined"
-                    (mouseleave)="checklistItem.dataFinalizacao ? checklistData.hide() : undefined">
-                    <td class="pr-1">
-                        <p-popover #checklistData appendTo="body" styleClass="w-30rem max-w-screen">
-                            <ng-container *ngIf="checklistItem.dataFinalizacao">
-                                <p>
-                                    <span *ngIf="checklistItem.dataFinalizacao">Finalizado em <b>{{checklistItem.dataFinalizacao | date : 'dd/MM/yyyy' }}</b></span>
-                                    <span *ngIf="!checklistItem.dataFinalizacao">Agora, há poucos minutos <i class="pi pi-clock text-400 ml-2"></i></span>
-
-                                    <span *ngIf="checklistItem.account_Finalizacao"> por <b>{{checklistItem.account_Finalizacao }}</b></span>
-                                    <span *ngIf="!checklistItem.account_Finalizacao"> por você.</span>
-                                </p>
-                                <p class="mt-2">
-                                    <span class="font-medium">Observações: </span>
-                                    <span *ngIf="checklistItem.observacoes"
-                                        [innerHTML]="checklistItem.observacoes"></span>
-                                    <span *ngIf="!checklistItem.observacoes" class="text-500">Nenhuma observação</span>
-                                </p>
-                            </ng-container>
-                            
-                        </p-popover>
-                        <p-checkbox *ngIf="!checklistItem.finalizado"
-                                    #checkbox
-                                    [inputId]="'checklistitem-' + checklistItem.id"
-                                    [name]="'checklistitem-' + checklistItem.id"
-                                    #finalizado="ngModel"
-                                    [ngModel]="checklistItem.finalizado"
-                                    [binary]="true"
-                                    [readonly]="checklistItem.finalizado"
-                                    (ngModelChange)="checkboxMark(checklistItem, finalizado)" />
-                        <div *ngIf="checklistItem.dataFinalizacao"
-                                class="p-checkbox p-checkbox-checked p-highlight pointer-events-none">
-                            <div class="p-checkbox-box">
-                                <i class="pi pi-check p-checkbox-icon "></i>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-1">
-                        <label class="font-medium"
-                                [for]="'checklistitem-' + checklistItem.id">{{ checklistItem.nome }}</label>
-                    </td>
-                    <td class="p-0 pr-2">
-                        <ng-container *ngIf="checklistItem.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(checklistItem.checklist_Item_Id)">
-                            <p-button type="button"
-                                icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : ''}}"
-                                severity="success"
-                                [disabled]="!aluno.celular"
-                                [text]="true"
-                                [rounded]="true"
-                                pTooltip="Enviar mensagem"
-                                (onClick)="enviarMensagemCondicao(checklistItem, aluno)"
-                                (auxclick)="enviarMensagemCondicao(checklistItem, aluno)"
-                                (contextmenu)="enviarMensagemCondicao(checklistItem, aluno)"/>
-                        </ng-container>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table> -->
     </div>
 </p-popover>

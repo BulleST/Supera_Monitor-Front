@@ -5,14 +5,14 @@ import { CalendarioRoutingModule } from './calendario.routing';
 import { SalaAulaPipe } from '../../utils/sala-aula.pipe';
 
 import { CalendarioComponent } from './calendario.component';
-import { AgendarFaltaComponent } from './agendar-falta/agendar-falta.component';
-import { AgendarPrimeiraAulaComponent } from './agendar-primeira-aula/agendar-primeira-aula.component';
-import { AgendarReposicaoComponent } from './agendar-reposicao/agendar-reposicao.component';
-import { CadastrarAula0Component } from './cadastrar-evento/cadastrar-aula-0/cadastrar-aula-0.component';
-import { CadastrarOficinaComponent } from './cadastrar-evento/cadastrar-oficina/cadastrar-oficina.component';
-import { CadastrarReuniaoComponent } from './cadastrar-evento/cadastrar-reuniao/cadastrar-reuniao.component';
-import { CadastrarSuperacaoComponent } from './cadastrar-evento/cadastrar-superacao/cadastrar-superacao.component';
-import { CadastrarTurmaExtraComponent } from './cadastrar-evento/cadastrar-turma-extra/cadastrar-turma-extra.component';
+import { AgendarFaltaComponent } from './agendar/agendar-falta/agendar-falta.component';
+import { AgendarPrimeiraAulaComponent } from './agendar/agendar-primeira-aula/agendar-primeira-aula.component';
+import { AgendarReposicaoComponent } from './agendar/agendar-reposicao/agendar-reposicao.component';
+import { CadastrarAula0Component } from './agendar/cadastrar-aula-0/cadastrar-aula-0.component';
+import { CadastrarOficinaComponent } from './agendar/cadastrar-oficina/cadastrar-oficina.component';
+import { CadastrarReuniaoComponent } from './agendar/cadastrar-reuniao/cadastrar-reuniao.component';
+import { CadastrarSuperacaoComponent } from './agendar/cadastrar-superacao/cadastrar-superacao.component';
+import { CadastrarTurmaExtraComponent } from './agendar/cadastrar-turma-extra/cadastrar-turma-extra.component';
 import { CadastrarInscricaoComponent } from './cadastrar-inscricao/cadastrar-inscricao.component';
 import { CancelarEventoComponent } from './cancelar-evento/cancelar-evento.component';
 import { EditarAulaComponent } from './editar-aula/editar-aula.component';
@@ -25,7 +25,7 @@ import { SelectedEventoComponent } from './full-calendar/selected-evento/selecte
 import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AutoFocus } from "primeng/autofocus";
-import { ReposicaoDeSelectComponent } from './cadastrar-evento/cadastrar-turma-extra/reposicao-de-select/reposicao-de-select.component';
+import { ReposicaoDeSelectComponent } from './agendar/cadastrar-turma-extra/reposicao-de-select/reposicao-de-select.component';
 
 
 @NgModule({

@@ -1,41 +1,50 @@
 <app-confirm-dialog></app-confirm-dialog>
-<header class="flex align-items-center gap-3 py-4 px-2">
-    <i class="pi pi-check-square text-5xl text-primary"></i>
-    <div class="flex flex-column">
-        <p class="p-dialog-title">
-            {{view.checklistItem}}
-        </p>
-        <p class="flex align-items-center gap-2">
-            <span class="text-primary-500 capitalize">{{view.aluno | nameAbv }}</span>
-            <span>-</span>
-            <span>{{view.turma}}</span>
-            <app-legend-color class="line-heigth-1"
-                              [corLegenda]="view.corLegenda"></app-legend-color>
-        </p>
+<header class="p-dialog-header -mx-2">
+    <div class="p-dialog-title w-full flex align-items-center gap-2">
+        <i class="pi pi-check-square text-3xl text-primary"></i>
+        <div class="flex flex-column">
+            <p class="font-lg">
+                {{view.checklistItem}}
+            </p>
+            <p class="flex align-items-center gap-2 text-base font-normal">
+                <span class="text-primary-500 capitalize">{{view.aluno | nameAbv }}</span>
+                <span>-</span>
+                <span>{{view.turma}}</span>
+                <app-legend-color class="line-heigth-1"
+                                  [corLegenda]="view.corLegenda"></app-legend-color>
+            </p>
+        </div>
     </div>
-    <p-button
-              class="ml-auto"
-              icon="pi pi-times"
-              [text]="true"
-              severity="secondary"
-              (onClick)="close(false)"
-              size="large" />
+    <div class="p-dialog-header-actions -mr-2">
+        <p-button icon="pi pi-times"
+                  (onClick)="close(false)"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
 </header>
 <form #form="ngForm" (ngSubmit)="sendConfirmation(form, $event)">
     <div class="formgrid grid px-2">
         <div class="field col-12">
-            <label for="observacoes">Observações: </label>
+            <label for="observacoes">Observações: <span class="text-red-500">*</span></label>
             <textarea
                       pInputTextarea
                       name="observacoes"
                       id="observacoes"
                       #_observacoes="ngModel"
                       [(ngModel)]="observacoes"
+                      rows="4"
                       fluid
-                      rows="5"></textarea>
-        </div>
-        <div class="w-full flex justify-content-between px-1">
-            <ng-container *ngIf="[8, 9, 12, 13, 32, 37, 22, 29, 23].includes(view.checklistItemId)">
+                      [required]="true"
+                      [autofocus]="true"></textarea>
+            <div *ngIf="_observacoes.touched && _observacoes.errors">
+                <p class="text-red-500" *ngIf="_observacoes.errors['required']">Esse campo é obrigatório.</p>
+            </div>
+            </div>
+        <div class="w-full flex justify-content-between align-items-center gap-2 px-2">
+            <ng-container *ngIf="checklistsMensagemWhatsapp.includes(view.checklistItemId)">
                 <p-button type="button"
                           icon="pi pi-whatsapp"
                           [severity]="view.celular ? 'success' : 'secondary'"
@@ -48,12 +57,41 @@
                           (auxclick)="enviarMensagemCondicao()"
                           (contextmenu)="enviarMensagemCondicao()" />
             </ng-container>
+
+            
+            <ng-container *ngIf="view.checklistItemId == ChecklistItemId.AgendamentoAulaZero">
+                <p-button 
+                    label="Agendar Aula 0"
+                    icon="pi pi-calendar"
+                    [rounded]="true"
+                    severity="secondary"
+                    (onClick)="showAgendarAulaZero()"
+                />
+            </ng-container>
+            <ng-container *ngIf="view.checklistItemId == ChecklistItemId.Agendamento1Superacao || view.checklistItemId == ChecklistItemId.Agendamento2Superacao">
+                
+                <p-button 
+                    label="Agendar Superação"
+                    icon="pi pi-calendar"
+                    [rounded]="true"
+                    severity="secondary"
+                    (onClick)="showAgendarSuperacao()"
+                />
+            </ng-container>
+            <ng-container *ngIf="view.checklistItemId == ChecklistItemId.Agendamento1Oficina || view.checklistItemId == ChecklistItemId.Agendamento2Oficina">
+                <p-button 
+                    label="Agendar Oficina"
+                    routerLink="calendario/agendar/oficina"
+                />
+            </ng-container>
+            
+
             <p-button class="ml-auto"
                       type="submit"
                       icon="pi pi-check"
                       label="Finalizar"
                       [loading]="loading"
-                      [disabled]="loading"
+                      [disabled]="form.invalid || loading"
                       [rounded]="true" />
         </div>
     </div>

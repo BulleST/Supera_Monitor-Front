@@ -4,7 +4,6 @@ import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Professor } from '../../../models/professor.model';
 import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
 import { Apostila, ApostilaTipo } from '../../../models/apostila.model';
-import { Roteiro } from '../../../models/roteiro.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
 import { Button } from 'primeng/button';
 import { InputNumber } from 'primeng/inputnumber';

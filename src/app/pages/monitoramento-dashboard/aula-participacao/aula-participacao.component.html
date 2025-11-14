@@ -43,10 +43,14 @@
                          severity="warn"
                          class="bg-yellow-500 border-yellow-500"
                          value="Faltou - Aluno Contatato" />
-                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAula"
-                         severity="danger"
-                         class="bg-red-500 border-red-500"
-                         value="Faltou - Aluno Não Contatato" />
+                         <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAula"
+                                  severity="danger"
+                                  class="bg-red-500 border-red-500"
+                                  value="Faltou - Aluno Não Contatato" />
+                                  <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAgendada"
+                                           severity="danger"
+                                           class="bg-red-100 border-red-100 text-red-600"
+                                           value="Falta Agendada" />
                 <p-badge *ngIf="item.status == Monitoramento_Item_Status.Cancelada"
                          severity="contrast"
                          class="surface-900 border-900"

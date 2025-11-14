@@ -1,0 +1,127 @@
+<header class="p-dialog-header px-0">
+    <div class="p-dialog-title w-full">
+        <div class="flex align-items-center gap-2">
+            <i class="pi pi-check-square text-sm w-2rem h-2rem bg-primary-500 text-white border-circle flex align-items-center justify-content-center "></i>
+            <div class="flex flex-column">
+                <p>Jornada Supera</p>
+                <p class="flex align-items-center gap-2 text-base font-normal">
+                    <span class="capitalize">{{aluno.nome | nameAbv}}</span>
+                    <span>{{aluno.turma}}</span>
+                    <app-legend-color class="line-heigth-1"
+                                      [corLegenda]="aluno.corLegenda"></app-legend-color>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="p-dialog-header-actions">
+        <p-button
+                  [icon]="maximized ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+                  (onClick)="maximize()"
+                  styleClass="p-dialog-maximize-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+        <p-button icon="pi pi-times"
+                  (onClick)="close(false)"
+                  styleClass="p-dialog-close-button"
+                  severity="secondary"
+                  rounded
+                  pRipple
+                  text />
+    </div>
+</header>
+<section>
+    <p-accordion [(value)]="activeIndex">
+        <ng-container *ngFor="let checklist of jornada.checklists; let i = index">
+            <p-accordion-panel [value]="checklist.id">
+                <p-accordion-header [ngClass]="{
+                    'surface-50': true ,
+                    'bg-primary-50 border-bottom-2 border-primary-500': activeIndex == checklist.id
+                }">
+                    <div class="w-full flex align-items-center gap-2 justify-content-between pr-3">
+                        <span>
+                            {{checklist.nome}}
+                        </span>
+                        <span class="flex align-items-center gap-2 ">
+                            <span class="font-normal">
+                                Prazo:
+                                {{checklist.prazo | date : 'dd/MM/yyyy'}}
+                            </span>
+
+                            <ng-container *ngIf="checklist.status == JornadaSuperaStatus.Finalizado" >
+                                <span class="text-green-500 font-normal">Finalizado</span>
+                                <i class="pi pi-check-circle text-green-500"></i>
+                            </ng-container>
+                            <ng-container *ngIf="checklist.status == JornadaSuperaStatus.FinalizadoComAtraso" >
+                                <span class="text-yellow-500 font-normal">Finalizado </span>
+                                <i class="pi pi-check-circle text-yellow-500"></i>
+                            </ng-container>
+                            <ng-container *ngIf="checklist.status == JornadaSuperaStatus.ARealizar" >
+                                <span class="text-blue-500 font-normal">À Realizar </span>
+                                <span class="text-blue-500">{{checklist.finalizados}}/{{checklist.items.length}}</span>
+                                <i class="pi pi-clock text-blue-500"></i>
+                            </ng-container>
+                            <ng-container *ngIf="checklist.status == JornadaSuperaStatus.EmAndamento" >
+                                <span class="text-orange-500 font-normal">Em andamento </span>
+                                <span class="text-orange-500">{{checklist.finalizados}}/{{checklist.items.length}}</span>
+                                <i class="pi pi-houglass text-orange-500"></i>
+                            </ng-container>
+                            <ng-container *ngIf="checklist.status == JornadaSuperaStatus.Atrasado" >
+                                <span class="text-red-500 font-normal">Atrasado </span>
+                                <span class="text-red-500">{{checklist.finalizados}}/{{checklist.items.length}}</span>
+                                <i class="pi pi-times-circle text-red-500"></i>
+                            </ng-container>
+                        </span>
+                    </div>
+                </p-accordion-header>
+                <p-accordion-content [ngClass]="{
+                        'pt-3': activeIndex == checklist.id
+                }">
+                    <ul class="flex flex-column list-none p-0 m-0">
+                        <li *ngFor="let item of checklist.items; let index = index">
+                            <div class="flex align-items-center line-height-1 gap-2" style="height: 30px">
+                                <p-checkbox
+                                            [(ngModel)]="item.finalizado"
+                                            [readonly]="item.finalizado"
+                                            inputId="finalizado[{{index}}]"
+                                            name="finalizado[{{index}}]"
+                                            [ngClass]="{ 
+                            'pointer-events-none' : item.finalizado,
+                        }"
+                                            class="p-checkbox-green"
+                                            [binary]="true"
+                                            (onChange)="finalizarChecklist(item, checklist)"></p-checkbox>
+                                <span class="white-space-nowrap">{{item.checklist_Item}}</span>
+                                <div class="pl-2 ml-auto">
+                                    <ng-container *ngIf="item.finalizado">
+                                        <p-button
+                                                  icon="pi pi-exclamation-circle"
+                                                  severity="info"
+                                                  [text]="true"
+                                                  [rounded]="true"
+                                                  pTooltip="Clique para ver detalhes"
+                                                  tooltipPosition="bottom"
+                                                  (onClick)="showChecklistDetalhes(item, checklist)" />
+                                    </ng-container>
+                                    <ng-container *ngIf="item.finalizado == false && [8, 9, 12, 13, 32, 37, 22, 29, 23].includes(item.checklist_Item_Id)">
+                                        <p-button type="button"
+                                                  icon="pi pi-whatsapp"
+                                                  [severity]="aluno.celular ? 'success' : 'secondary'"
+                                                  [disabled]="!aluno.celular"
+                                                  [text]="true"
+                                                  [rounded]="true"
+                                                  pTooltip="Enviar mensagem"
+                                                  (onClick)="enviarMensagemCondicao(item)"
+                                                  (auxclick)="enviarMensagemCondicao(item)"
+                                                  (contextmenu)="enviarMensagemCondicao(item)" />
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </p-accordion-content>
+            </p-accordion-panel>
+        </ng-container>
+    </p-accordion>
+</section>

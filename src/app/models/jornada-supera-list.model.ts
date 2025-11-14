@@ -15,6 +15,8 @@ export interface JornadaSupera_List_Checklist {
     nome: string;
     ordem: number;
     numeroSemana: number;
+    prazo: Date;
+    finalizados: number;
     status: JornadaSuperaStatus;
     items: JornadaSupera_List_Checklist_Item_Aluno[];
 }

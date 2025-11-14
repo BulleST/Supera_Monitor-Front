@@ -77,4 +77,9 @@ export class JornadaSuperaService extends Service {
             }));
     }
 
+    getJornadaAluno(aluno_Id: number) {
+        var request = { aluno_Id: aluno_Id, pendenteSemana: false };
+        return this.http.post<JornadaSupera_List_Aluno[]>(`${this.url}/jornada-supera/list`, request)
+    }
+
 }

@@ -3,9 +3,9 @@ import { MensagemWhatsapp } from '../../../../utils';
 import { JornadaSupera_Card_Checklist_Item_Aluno, JornadaSupera_Card_Checklist_Item, JornadaSupera_Card_Checklist } from './../../../../models/jornada-supera-cards.model';
 import { JornadaSuperaStatus } from '../../../../models/jornada-supera-status.model';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FinalizarChecklistComponent, FinalizarChecklistComponentModel } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
-import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { FinalizarChecklistComponentView } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
 import { showAluno } from '../../../../utils/show-aluno';
+import { showFinalizarChecklist } from '../../../../utils/show-finalizar-checklist';
 
 @Component({
     selector: 'app-checklist-item-aluno',
@@ -29,7 +29,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private dialogService: DialogService,
-        private jornadaSuperaService: JornadaSuperaService,
     ) {
 
     }
@@ -38,7 +37,6 @@ export class ChecklistItemAlunoComponent implements OnChanges {
         if (changes['alunoChecklistItem']) {
             this.alunoChecklistItem = changes['alunoChecklistItem'].currentValue;
             this.setComponent();
-
         }
         if (changes['item']) {
             this.item = changes['item'].currentValue;
@@ -81,7 +79,8 @@ export class ChecklistItemAlunoComponent implements OnChanges {
 
     finalizarChecklist() {
 
-        var view: FinalizarChecklistComponentModel = {
+        var view: FinalizarChecklistComponentView = {
+            alunoId: this.alunoChecklistItem.aluno_Id,
             alunoChecklistItemId: this.alunoChecklistItem.id,
             checklistItemId: this.item.id,
             checklistId: this.checklist.id,
@@ -94,67 +93,9 @@ export class ChecklistItemAlunoComponent implements OnChanges {
             status: this.alunoChecklistItem.status,
             celular: this.alunoChecklistItem.celular,
         }
-        var ref = this.dialogService.open(FinalizarChecklistComponent, {
-            header: 'Finalizar Checklist',
-            showHeader: false,
-            closable: true,
-            maximizable: false,
-            closeOnEscape: true,
-            draggable: true,
-            dismissableMask: true,
-            duplicate: true,
-            modal: true,
-            width: '95vw',
-            style: {
-                maxWidth: '500px',
-            },
-            data: {
-                view: view
-            }
-
-        });
-    }
-
-    showAlunoChecklistOnConfirm() {
-        // let aluno: Aluno = {
-        //     id: this.alunoChecklistItem.aluno_Id,
-        //     nome: this.alunoChecklistItem.aluno,
-        //     celular: this.alunoChecklistItem.celular,
-        //     diaSemana: this.alunoChecklistItem.diaSemana,
-        //     corLegenda: this.alunoChecklistItem.corLegenda,
-        //     turma: this.alunoChecklistItem.turma,
-        //     turma_Id: this.alunoChecklistItem.turma_Id,
-        //     professor: this.alunoChecklistItem.professor,
-        //     professor_Id: this.alunoChecklistItem.professor_Id,
-        //     email: this.alunoChecklistItem.email,
-        //     linkGrupo: this.alunoChecklistItem.linkGrupo,
-        //     horario: this.alunoChecklistItem.horario,
-        // } as Aluno
-
-        // this.alunoChecklistOnConfirmDialog.alunoChecklistItem = this.alunoChecklistItem;
-        // this.alunoChecklistOnConfirmDialog.aluno = aluno;
-        // this.alunoChecklistOnConfirmDialog.show(aluno);
-
-        // let onCancel = this.alunoChecklistOnConfirmDialog.onCancel.subscribe(res => {
-        //     this.alunoChecklistOnConfirmDialog.hide();
-        //     onCancel.unsubscribe();
-        //     onFinish.unsubscribe();
-        // });
-
-        // let onFinish = this.alunoChecklistOnConfirmDialog.onFinish.subscribe(res => {
-
-        //     this.alunoChecklistItem.observacoes = res.observacoes;
-        //     this.alunoChecklistItem.dataFinalizacao = res.dataFinalizacao;
-        //     this.alunoChecklistItem.account_Finalizacao_Id = res.account_Finalizacao_Id;
-        //     this.alunoChecklistItem.account_Finalizacao = res.account_Finalizacao;
-        //     this.hide = true;
-        //     setTimeout(() => {
-        //         this.alunoChecklistItem = undefined as any;
-        //     }, 1000);
-        //     onCancel.unsubscribe();
-        //     onFinish.unsubscribe();
-        // });
-
+        
+        var ref = showFinalizarChecklist(this.dialogService, view);
+       
     }
     
     showAluno(aluno: JornadaSupera_Card_Checklist_Item_Aluno) {

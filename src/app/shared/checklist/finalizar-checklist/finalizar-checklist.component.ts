@@ -8,6 +8,9 @@ import { lastValueFrom } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { NgForm } from '@angular/forms';
+import { ChecklistItemId, checklistsMensagemWhatsapp } from '../../../models/checklist-item-id.enum';
+import { showAgendarAulaZero } from '../../../utils/show-agendar-superacao';
+import { showAgendarSuperacao } from '../../../utils/show-agendar-aula-zero';
 
 @Component({
 	selector: 'app-finalizar-checklist',
@@ -21,7 +24,11 @@ export class FinalizarChecklistComponent implements OnInit {
 	instance: DynamicDialogComponent | undefined;
 	observacoes: string = '';
 	loading = false;
-	view = new FinalizarChecklistComponentModel;
+	view = new FinalizarChecklistComponentView;
+
+	checklistsMensagemWhatsapp = checklistsMensagemWhatsapp;
+
+	ChecklistItemId = ChecklistItemId;
 
 	constructor(
 		private dialogService: DialogService,
@@ -49,6 +56,26 @@ export class FinalizarChecklistComponent implements OnInit {
 
 	showError(header: string, message: string, e: any, error: any) {
 		showError(this.confirmationService, header, message, e, error.toString());
+	}
+
+	showAgendarAulaZero() {
+		var ref = showAgendarAulaZero(this.dialogService, this.view.alunoId);
+		let onClose = ref.onClose.subscribe(agendamentoConcluido => {
+			if (agendamentoConcluido) {
+				this.toastr.success(`Checklist ${this.view.checklistItem} finalizado com sucesso!`);
+				this.close(true);
+			}
+		});
+	}
+
+	showAgendarSuperacao() {
+		var ref = showAgendarSuperacao(this.dialogService, this.view.alunoId);
+		let onClose = ref.onClose.subscribe(agendamentoConcluido => {
+			if (agendamentoConcluido) {
+				this.toastr.success(`Checklist ${this.view.checklistItem} finalizado com sucesso!`);
+				this.close(true);
+			}
+		});
 	}
 
 	enviarMensagemCondicao() {
@@ -86,41 +113,6 @@ export class FinalizarChecklistComponent implements OnInit {
 	send(e: any) {
 		this.loading = true;
 
-		// var cards = this.jornadaSuperaService.cards.value;
-
-		// var checklistindex = cards.findIndex(x => x.id == this.view.checklistId);
-		// var checklist = cards[checklistindex];
-		// var itemIndex = checklist.items.findIndex(x => x.id == this.view.checklistItemId);
-		// var item = checklist.items[itemIndex];
-		// var alunoIndex = item.alunos.findIndex(x => x.id == this.view.alunoChecklistItemId);
-		// var aluno = item.alunos[alunoIndex];
-
-
-		// // remove item dos cards
-		// item.alunos.splice(alunoIndex, 1);
-		// checklist.items.splice(itemIndex, 1, item);
-		// cards.splice(checklistindex, 1, checklist)
-		// this.jornadaSuperaService.cards.next(cards);
-
-		// // atualiza item na lista
-
-		// var list = this.jornadaSuperaService.list.value;
-		// var alunoIndex = list.findIndex(x => x.id == aluno.aluno_Id)
-		// var alunoList = list[alunoIndex]
-		// var checklistIndex = alunoList.checklists.findIndex(x => x.id == this.view.checklistId);
-		// var checklistList = alunoList.checklists[checklistIndex];
-		// var alunoItemIndex = checklistList.items.findIndex(x => x.id == this.view.checklistItemId);
-		// var alunoItemList = checklistList.items[alunoItemIndex];
-
-		// alunoItemList.dataFinalizacao = new Date;
-		// alunoItemList.account = this.accountService.accountValue?.name;
-		// alunoItemList.account_Id = this.accountService.accountValue?.id;
-		// alunoItemList.status = moment(alunoItemList.dataFinalizacao).isAfter(this.view.prazo, 'date') ? JornadaSuperaStatus.FinalizadoComAtraso : JornadaSuperaStatus.Finalizado;
-
-		// checklistList.items.splice(alunoItemIndex, 1, alunoItemList);
-		// alunoList.checklists.splice(checklistIndex, 1, checklistList)
-		// list.splice(alunoIndex, 1, alunoList)
-
 		lastValueFrom(this.service.markAsDone(this.view.alunoChecklistItemId, this.observacoes))
 			.then(res => {
 				this.loading = false;
@@ -144,8 +136,9 @@ export class FinalizarChecklistComponent implements OnInit {
 }
 
 
-export class FinalizarChecklistComponentModel {
+export class FinalizarChecklistComponentView {
 
+	alunoId: number = 0
 	alunoChecklistItemId: number = 0
 	checklistItemId: number = 0
 	checklistId: number = 0

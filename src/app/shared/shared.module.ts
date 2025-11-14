@@ -55,6 +55,9 @@ import { EventoItemHoverComponent } from './evento-item-hover/evento-item-hover.
 import { EditarParticipacaoContatoComponent } from './evento/editar-participacao-contato/editar-participacao-contato.component';
 import { EnviarMensagemAlunosComponent } from './evento/enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { AutoFocus } from "primeng/autofocus";
+import { AlunoJornadaComponent } from './checklist/aluno-jornada/aluno-jornada.component';
+import { AgendarAula0Component } from './evento/agendar/agendar-aula-0/agendar-aula-0.component';
+import { AgendarSuperacaoComponent } from './evento/agendar/agendar-superacao/agendar-superacao.component';
 
 @NgModule({
     declarations: [
@@ -82,13 +85,13 @@ import { AutoFocus } from "primeng/autofocus";
         FaltaAlunoSelectComponent,
         FaltaCalendarioSelectComponent,
         FaltaEventoSelectedComponent,
-        
+
         // > evento > agendar > primeira aula
         AgendarPrimeiraAulaComponent,
         Aula1AlunoSelectComponent,
         Aula1CalendarioSelectComponent,
         Aula1EventoSelectedComponent,
-        
+
         // > evento > agendar > reposicao
         AgendarReposicaoComponent,
         ReposicaoConfirmComponent,
@@ -96,9 +99,15 @@ import { AutoFocus } from "primeng/autofocus";
         ReposicaoDeSelectComponent,
         ReposicaoParaSelectComponent,
         
+        // > evento > agendar > aula zero
+        AgendarAula0Component,
+
+        // > evento > agendar > superacao
+        AgendarSuperacaoComponent,
+
         // > evento > editar aula
         EditarAulaComponent,
-        
+
         // > evento > editar evento
         EditarEventoComponent,
         EditarAula0Component,
@@ -117,10 +126,11 @@ import { AutoFocus } from "primeng/autofocus";
         TableHeaderFilterComponent,
         EventoItemHoverComponent,
         EditarParticipacaoContatoComponent,
-        EnviarMensagemAlunosComponent
+        EnviarMensagemAlunosComponent,
+        AlunoJornadaComponent,
 
 
-        
+
     ],
     exports: [
         CommonModule,
@@ -150,22 +160,22 @@ import { AutoFocus } from "primeng/autofocus";
 
     ],
     imports: [
-    CommonModule,
-    RouterModule,
-    PrimengModule,
-    ToastrModule.forRoot({ enableHtml: true }),
-    FontAwesomeModule,
-    NgxMaskDirective,
-    FormsModule,
-    NgxMaskPipe,
-    DragDropModule,
-    ScrollingModule,
-    FullCalendarModule,
-    NameAbvPipe,
-    NameFirstWordPipe,
-    SalaAulaPipe,
-    AutoFocus
-],
+        CommonModule,
+        RouterModule,
+        PrimengModule,
+        ToastrModule.forRoot({ enableHtml: true }),
+        FontAwesomeModule,
+        NgxMaskDirective,
+        FormsModule,
+        NgxMaskPipe,
+        DragDropModule,
+        ScrollingModule,
+        FullCalendarModule,
+        NameAbvPipe,
+        NameFirstWordPipe,
+        SalaAulaPipe,
+        AutoFocus
+    ],
     providers: [
         provideHttpClient(withFetch()),
         provideHttpClient(withInterceptorsFromDi()),

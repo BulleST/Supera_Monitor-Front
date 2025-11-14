@@ -236,7 +236,7 @@
             <!-- Restrições -->
             <div class="field lg:col-3 md:col-6 xs:col-6 col-12">
                 <div class="flex align-items-center gap-2 justify-content-between mb-1 relative">
-                    <label for="restricoes">Restrições: </label>
+                    <label for="restricoesText">Restrições: </label>
                     <div class="flex align-items-center gap-1 ml-auto text-blue-300 hover:text-blue-500 cursor-pointer mb-1"
                          (click)="popoverExplicacaoRestricoes.show($event)">
                         <span>Info</span>
@@ -257,25 +257,17 @@
                 <p-iconfield>
                     <p-inputicon *ngIf="loadingRestricoes" styleClass="pi pi-spin pi-spinner" />
                     <p-inputicon *ngIf="!loadingRestricoes" styleClass="pi pi-ban" />
-                    <div class="p-inputtext p-inputtext-disabled"
-                        (focusin)="restricoes.show($event)"
-                        (click)="restricoes.show($event)"    
-                        (keydown.tab)="restricoes.hide()"
-                        tabindex="0"
-                        fluid >
-                        {{restricoesText}}
-                    </div>
-                    <!-- <input type="text"
-                           pInputText
-                           [value]="restricoesText"
-                           id="restricoes"
-                           name="restricoes"
-                           placeholder="Selecione"
-                           (focusin)="restricoes.show($event)"
-                           (click)="restricoes.show($event)"
-                           (keydown.tab)="restricoes.hide()"
-                           fluid> -->
-                           <!-- [disabled]="!object.active" -->
+                    <input type="text"
+                            pInputText
+                            [value]="restricoesText" 
+                            (keydown.tab)="restricoes.hide()"
+                            (focusin)="restricoes.show($event)"
+                            (click)="restricoes.show($event)"   
+                            id="restricoesText"
+                            tabindex="0"
+                            readonly
+                            fluid>
+                    
                 </p-iconfield>
                 <p-popover #restricoes appendTo="body" styleClass="-mt-1">
                     <div class="p-2 border-bottom-1 border-200 ">
@@ -337,7 +329,28 @@
             </div>
             <!-- Etapa da jornada -->
             <div class="field lg:col-3 md:col-6 xs:col-6 col-12">
-                <label for="etapaChecklist">Etapa da jornada: </label>
+                <label for="jornadaNome">Etapa da jornada: </label>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-check-square" *ngIf="!loadingJornada"/>
+                    <p-inputicon styleClass="pi pi-spin pi-spinner" *ngIf="loadingJornada"/>
+                    <input type="text"
+                           pInputText
+                           [value]="jornadaNome"
+                           id="jornadaNome"
+                           name="jornadaNome"
+                           class="cursor-pointer"
+                           (focus)="showAlunoJornada()"
+                           (click)="showAlunoJornada()"
+                           (keydown)="$event.preventDefault()"
+                           fluid>
+                    <p-inputicon *ngIf="!loadingJornada">
+                        <div class="flex align-items-center gap-2">
+                            <span class="text-600">{{jornadaFinalizados}}</span>
+                            <i class="{{jornadaIcon}}"></i>
+                        </div>
+                    </p-inputicon>
+                </p-iconfield>
+
             </div>
         </div>
     </div>
