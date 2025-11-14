@@ -13,7 +13,7 @@ import { CalendarioUtils, getError, MensagemWhatsapp, showError, validaAlunos, v
 import { ApostilaService } from '../../../services/apostila.service';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { showAluno } from '../../../utils/show-aluno';
-import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
+import { Evento_Participacao_Aluno, statusContato } from '../../../models/evento-participacao-aluno.model';
 import { NgForm, NgModel } from '@angular/forms';
 import { SelectChangeEvent } from 'primeng/select';
 import moment from 'moment';
@@ -33,13 +33,15 @@ import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
   selector: 'app-editar-aula',
   standalone: false,
   templateUrl: './editar-aula.component.html',
-  styleUrl: './editar-aula.component.css'
+  styleUrl: './editar-aula.component.css',
+  providers: [ConfirmationService]
 })
 export class EditarAulaComponent implements OnInit, OnDestroy  {
 	subscription: Subscription[] = [];
 	instance: DynamicDialogComponent | undefined;
 	loading = false;
 	maximized = false;
+    activeIndexAluno = 0;
     
 	view = new EditarAulaView;
     evento: Evento = new Evento;
@@ -75,6 +77,9 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
     @ViewChildren('apostilaAbacoInput') apostilaAbacoInput!: QueryList<InputNumber>;
     @ViewChildren('apostilaAHInput') apostilaAHInput!: QueryList<InputNumber>;
 
+
+    statusContato = statusContato;
+
 	constructor(
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
@@ -98,6 +103,14 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
 
         let apostilas = this.apostilaService.listApostila.subscribe(res => this.apostilas = res);
         this.subscription.push(apostilas);
+
+        if (this.apostilas.length == 0) {
+            this.loadingApostila = true;
+            lastValueFrom(this.apostilaService.getApostilas())
+                .then(res => this.loadingApostila = false)
+                .catch(res => this.loadingApostila = false);
+
+        }
     
         let professores = this.professorService.list.subscribe(res => this.professores = res)
         this.subscription.push(professores)
@@ -148,6 +161,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
             this.evento = this.view.evento;
             this.getDuracaoEvento();
             this.tipoString = this.getTipo(this.evento);
+            this.setApostilasAlunos();
 		}
 	}
 
@@ -529,50 +543,97 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
     }
 
     presencaPrev(index: number, e: any) {
-        let prev = index - 1;
+        let newIndex = index - 1;
 
         if (index <= 0) {
-            prev = this.presencaButton.length - 1;
+            newIndex = this.presencaButton.length - 1;
         }
-
-        let element = this.presencaButton.get(prev);
+    
+        let element = this.presencaButton.get(newIndex);
         let button = $(`p-button[${element?.attrSelector}]`).find('button')
 
         button.trigger('focus');
     }
 
     presencaNext(index: number, e: any) {
-        let next = index + 1;
+        let newIndex = index + 1;
+
         if (index >= this.presencaButton.length - 1) {
-            next = 0;
+            newIndex = 0;
         }
-        let element = this.presencaButton.get(next);
+
+        let element = this.presencaButton.get(newIndex);
         let button = $(`p-button[${element?.attrSelector}]`).find('button')
 
         button.trigger('focus');
     }
 
     apostilaAbacoInputNumberNext(index: number, inputNumber: InputNumber) {
-        let next = index + 1;
-        let element = this.apostilaAbacoInput.get(next)
+        let newIndex = index + 1;
+
+        
+        if (index >= this.presencaButton.length - 1) {
+            newIndex = 0;
+        }
+
+        var row = this.evento.alunos[newIndex];
+        if (row.presente === false) {
+            this.apostilaAbacoInputNumberNext(newIndex, inputNumber)
+            return 
+        }
+
+        let element = this.apostilaAbacoInput.get(newIndex)
         element?.input.nativeElement.focus();
     }
 
     apostilaAHInputNumberNext(index: number, inputNumber: InputNumber) {
-        let next = index + 1;
-        let element = this.apostilaAHInput.get(next)
+        let newIndex = index + 1;
+        
+        if (index >= this.presencaButton.length - 1) {
+            newIndex = 0;
+        }
+
+        var row = this.evento.alunos[newIndex];
+        if (row.presente === false) {
+            this.apostilaAHInputNumberNext(newIndex, inputNumber)
+            return 
+        }
+
+        let element = this.apostilaAHInput.get(newIndex)
         element?.input.nativeElement.focus();
     }
 
     apostilaAbacoInputNumberPrev(index: number, inputNumber: InputNumber) {
-        let prev = index - 1;
-        let element = this.apostilaAbacoInput.get(prev)
+        let newIndex = index - 1;
+
+        if (index <= 0) {
+            newIndex = this.presencaButton.length - 1;
+        }
+
+        var row = this.evento.alunos[newIndex];
+        if (row.presente === false) {
+            this.apostilaAbacoInputNumberPrev(newIndex, inputNumber)
+            return 
+        }
+
+        let element = this.apostilaAbacoInput.get(newIndex)
         element?.input.nativeElement.focus();
     }
 
     apostilaAHInputNumberPrev(index: number, inputNumber: InputNumber) {
-        let prev = index - 1;
-        let element = this.apostilaAbacoInput.get(prev)
+        let newIndex = index - 1;
+
+        if (index <= 0) {
+            newIndex = this.presencaButton.length - 1;
+        }
+
+        var row = this.evento.alunos[newIndex];
+        if (row.presente === false) {
+            this.apostilaAHInputNumberPrev(newIndex, inputNumber)
+            return 
+        }
+
+        let element = this.apostilaAbacoInput.get(newIndex)
         element?.input.nativeElement.focus();
     }
 
@@ -720,6 +781,21 @@ export class EditarAulaComponent implements OnInit, OnDestroy  {
     requestFinalizar(eventoResponse: Evento) {
         const request = this.buildFinalizar(eventoResponse);
         return lastValueFrom(this.service.finalizar(request))
+    }
+
+
+    contatoToggle(item: Evento_Participacao_Aluno) {
+        if (item.alunoContactado) {
+            item.alunoContactado = undefined
+        }
+        else {
+            item.alunoContactado = new Date;
+        } 
+    }
+
+    getTurma(turma_Id?: number) {
+        var turma = this.turmas.find(x => x.id == turma_Id)
+        return turma;
     }
 
 }

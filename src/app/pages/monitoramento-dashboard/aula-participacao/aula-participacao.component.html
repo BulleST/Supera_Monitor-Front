@@ -3,10 +3,10 @@
         <div>
             <h3 class="text-2xl capitalize">{{aluno.nome | nameAbv }}</h3>
             <p class="flex align-items-center gap-2 text-base font-normal">
-                <span>{{aluno.turma}}</span>
+                <span>{{item.aula.aula.turma}}</span>
                 <app-legend-color class="line-height-1"
-                                  [corLegenda]="aluno.corLegenda"
-                                  [turma_Id]="aluno.turma_Id"></app-legend-color>
+                                  [corLegenda]="item.aula.aula.corLegenda"
+                                  [professor]="item.aula.aula.professor"></app-legend-color>
             </p>
             <p-badge *ngIf="item.status == Dashboard_Item_Status.PresenteNaAula"
                      severity="success"

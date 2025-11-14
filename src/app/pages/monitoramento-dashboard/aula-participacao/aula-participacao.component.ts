@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Monitoramento_Aluno, Monitoramento_Aluno_Item, Monitoramento_Aula, Monitoramento_Aula_Participacao_Rel, Monitoramento_Item_Status, Monitoramento_Participacao } from '../../../models/monitoramento.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { SalaAndar } from '../../../models/sala-aula.model';
-import moment from 'moment';
 import { PseudoEvento } from '../../../models/reposicao.model';
 import { lastValueFrom } from 'rxjs';
 import { EventoService } from '../../../services/evento.service';

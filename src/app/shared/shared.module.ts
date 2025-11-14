@@ -146,6 +146,7 @@ import { AutoFocus } from "primeng/autofocus";
         TableHeaderFilterComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,
+        EventoParticipacaoStatusComponent,
 
     ],
     imports: [

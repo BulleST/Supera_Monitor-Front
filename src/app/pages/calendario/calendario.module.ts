@@ -23,7 +23,6 @@ import { HeaderComponent } from './full-calendar/header/header.component';
 import { LegendaComponent } from './full-calendar/legenda/legenda.component';
 import { SelectedEventoComponent } from './full-calendar/selected-evento/selected-evento.component';
 import { ToolbarComponent } from './full-calendar/toolbar/toolbar.component';
-import { EditarContatoFaltaComponent } from './editar-contato-falta/editar-contato-falta.component';
 import { DialogService } from 'primeng/dynamicdialog';
 import { AutoFocus } from "primeng/autofocus";
 import { ReposicaoDeSelectComponent } from './cadastrar-evento/cadastrar-turma-extra/reposicao-de-select/reposicao-de-select.component';
@@ -50,7 +49,6 @@ import { ReposicaoDeSelectComponent } from './cadastrar-evento/cadastrar-turma-e
         LegendaComponent,
         SelectedEventoComponent,
         ToolbarComponent,
-        EditarContatoFaltaComponent,
         ReposicaoDeSelectComponent,
     ],
     imports: [

@@ -581,3 +581,8 @@ p-scroller {
 .p-select-no-dropdown .p-select-dropdown {
     display: none;
 }
+
+
+p-inputNumber.ng-invalid.ng-dirty > .p-inputtext, p-input-number.ng-invalid.ng-dirty > .p-inputtext, p-inputnumber.ng-invalid.ng-dirty > .p-inputtext {
+    border: 1px #e93636 solid;
+}

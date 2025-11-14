@@ -166,13 +166,13 @@
                                         <span class="hover:underline hover:text-primary-500 hover:font-bold"
                                               [pTooltip]="'Clique para ver mais: ' + participacao.aluno"
                                               (click)="showAluno(participacao)">
-                                            <!-- 
-                                                (click)="popoverAluno.show($event)" -->
                                             <span class="capitalize">{{ participacao.aluno | nameAbv }}</span>
                                         </span>
                                         <div class="ml-auto flex align-items-center gap-1">
+                                            <app-evento-participacao-status [evento]="evento"
+                                                                            [participacao]="participacao"></app-evento-participacao-status>
 
-                                            <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
+                                            <!-- <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
                                                      value="1ª aula"
                                                      class="bg-pink-500 border-pink-500" />
 
@@ -200,6 +200,7 @@
                                                 <app-reposicao-para-tooltip 
                                                     [evento]="participacao.reposicaoDe_Evento"></app-reposicao-para-tooltip>
                                             </ng-template>
+
                                             <p-badge *ngIf="evento.finalizado && participacao.presente === false && !participacao.alunoContactado && !participacao.reposicaoDe_Evento_Id"
                                                      value="Faltou"
                                                      class="bg-red-500 border-red-500"
@@ -221,7 +222,7 @@
                                                      class="bg-green-500 border-green-500" />
                                             <p-badge *ngIf="participacao.presente === true && participacao.reposicaoDe_Evento_Id"
                                                      value="Presente"
-                                                     class="bg-green-200 border-green-200 text-green-600 font-light" />
+                                                     class="bg-green-200 border-green-200 text-green-600 font-light" /> -->
                                         </div>
                                         <!-- <div class="ml-auto">
                                             <app-aluno-participacao-status 

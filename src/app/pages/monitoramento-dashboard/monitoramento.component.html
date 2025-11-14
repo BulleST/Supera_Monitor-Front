@@ -33,7 +33,8 @@
                           label="Atualizar"
                           pTooltip="Atualizar monitoramento"
                           tooltipPosition="top"
-                          styleClass="border-4" />
+                          styleClass="border-4"
+                          [rounded]="true"  />
                 <p-button label="Ver filtros"
                           icon="pi pi-filter"
                           severity="primary"
@@ -264,9 +265,9 @@
                     </ng-template>
                     <div [ngClass]="{
                         'event-cell': true,
-                        'opacity-0 pointer-events-none': !item.show && !item.recesso,
-                        'pointer-events-none': !item.show && !item.recesso,
+                        'hidden': !item.show || item.aula.aula.recesso,
                     }">
+                    
                         <div class="event-cell-inner" (click)="showAula(item, aluno)">
                             <div class="event-status"
                                  [ngClass]="{

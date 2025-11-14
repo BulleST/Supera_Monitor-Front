@@ -1,1 +1,57 @@
-<p>evento-participacao-status works!</p>
+<div class="ml-auto flex align-items-center gap-1">
+    <p-badge *ngIf="participacao.primeiraAula_Id == evento.id"
+             value="1ª aula"
+             title="1ª aula"
+             class="bg-pink-500 border-pink-500" />
+    <p-badge *ngIf="!participacao.active && !participacao.reposicaoPara_Evento_Id"
+             value="Falta agendada"
+             title="Falta agendada"
+             class="bg-red-500 border-red-500"
+             pTooltip="{{participacao.deactivated | date : 'dd/MM/yyyy HH:mm' }}" />
+    <p-badge *ngIf="participacao.reposicaoPara_Evento_Id"
+             value="Reposição Agendada"
+             title="Reposição Agendada"
+             class="bg-purple-500 border-purple-500"
+             [pTooltip]="participacao.reposicaoPara_Evento ? reposicaoParaTemplate : undefined" />
+    <ng-template #reposicaoParaTemplate>
+        <app-reposicao-para-tooltip
+                                    *ngIf="participacao.reposicaoPara_Evento"
+                                    [evento]="participacao.reposicaoPara_Evento"></app-reposicao-para-tooltip>
+    </ng-template>
+    <p-badge *ngIf="participacao.reposicaoDe_Evento_Id"
+             value="Reposição"
+             title="Reposição"
+             class="bg-purple-500 border-purple-500"
+             [pTooltip]="participacao.reposicaoDe_Evento ? reposicaoDeTemplate : undefined" />
+    <ng-template #reposicaoDeTemplate>
+        <app-reposicao-para-tooltip
+                                    *ngIf="participacao.reposicaoDe_Evento"
+                                    [evento]="participacao.reposicaoDe_Evento"></app-reposicao-para-tooltip>
+    </ng-template>
+    <p-badge *ngIf="evento.finalizado && participacao.presente === false && !participacao.alunoContactado && !participacao.reposicaoDe_Evento_Id"
+             value="Faltou"
+             title="Faltou"
+             class="bg-red-500 border-red-500"
+             pTooltip="Aluno não contatado"
+             tooltipPosition="bottom" />
+    <p-badge *ngIf="evento.finalizado && participacao.presente === false && !participacao.alunoContactado && participacao.reposicaoDe_Evento_Id"
+             value="Faltou"
+             title="Faltou"
+             class="bg-blue-500 border-blue-500"
+             pTooltip="Aluno não contatado"
+             tooltipPosition="bottom" />
+    <p-badge *ngIf="evento.finalizado && participacao.presente === false && participacao.active && participacao.alunoContactado"
+             value="Faltou"
+             title="Faltou"
+             class="bg-yellow-500 border-yellow-500"
+             pTooltip="Clique para ver o contatos"
+             tooltipPosition="bottom" />
+    <p-badge *ngIf="evento.finalizado && participacao.presente === true && !participacao.reposicaoDe_Evento_Id"
+             value="Presente"
+             title="Presente"
+             class="bg-green-500 border-green-500" />
+    <p-badge *ngIf="evento.finalizado && participacao.presente === true && participacao.reposicaoDe_Evento_Id"
+             value="Presente"
+             title="Presente"
+             class="bg-green-200 border-green-200 text-green-600 font-light" />
+</div>
