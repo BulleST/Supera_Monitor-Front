@@ -294,16 +294,21 @@
                                       [text]="true"
                                       severity="secondary"
                                       styleClass="justify-content-start surface-50"
+                                      [disabled]="aula.finalizado
+                                            || !aula.active
+                                            || !participacao.active
+                                            || participacao.presente === false
+                                      "
                                       fluid />
                         </ng-container>
                     </div>
                 </p-popover>
             </div>
             <p-button *ngIf="[Monitoramento_Item_Status.ReposicaoAgendada,
-            Monitoramento_Item_Status.ReposicaoDesmarcada,
-            Monitoramento_Item_Status.FaltaAgendada,
-            Monitoramento_Item_Status.FaltaReposicao,
-            Monitoramento_Item_Status.FaltaAula].includes(item.status )"
+                        Monitoramento_Item_Status.ReposicaoDesmarcada,
+                        Monitoramento_Item_Status.FaltaAgendada,
+                        Monitoramento_Item_Status.FaltaReposicao,
+                        Monitoramento_Item_Status.FaltaAula].includes(item.status )"
                 label="Ver contato"
             icon="pi pi-phone"
             [rounded]="true"

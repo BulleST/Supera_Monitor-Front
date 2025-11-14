@@ -285,14 +285,27 @@
                             }">
                                 <!-- <pre *ngIf="item.status == Dashboard_Item_Status.ReposicaoAgendada">{{item.reposicaoPara | json}}</pre> -->
                                 <span [innerText]="
+                                item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
+                                item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
+                                item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
+                                item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
+                                item.status == Dashboard_Item_Status.FaltaAgendada ? 'Falta A.' :
+                                item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
+                                item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
+                                item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'R. cancelada' :
+                                item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
+                                item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
+                                item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
+                                item.status == Dashboard_Item_Status.Aula ? 'Aula' : 'Aula' 
+                            " [pTooltip]="
                                     item.status == Dashboard_Item_Status.Recesso ? 'Recesso' :
                                     item.status == Dashboard_Item_Status.Cancelada ? 'Cancelada' :
                                     item.status == Dashboard_Item_Status.Feriado ? 'Feriado' :
                                     item.status == Dashboard_Item_Status.FaltaAula ? 'Faltou' :
-                                    item.status == Dashboard_Item_Status.FaltaAgendada ? 'Faltou' :
+                                    item.status == Dashboard_Item_Status.FaltaAgendada ? 'Falta Agendada' :
                                     item.status == Dashboard_Item_Status.FaltaReposicao ? 'Faltou' :
                                     item.status == Dashboard_Item_Status.FaltaAlunoContatado ? 'Faltou' :
-                                    item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'R. cancelada' :
+                                    item.status == Dashboard_Item_Status.ReposicaoDesmarcada ? 'Reposição cancelada' :
                                     item.status == Dashboard_Item_Status.PresenteNaAula ? 'Presente' :
                                     item.status == Dashboard_Item_Status.PresenteReposicao ? 'Presente' :
                                     item.status == Dashboard_Item_Status.ReposicaoAgendada ? 'Reposição' :
