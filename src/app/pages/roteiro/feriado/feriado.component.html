@@ -10,34 +10,6 @@
     <ng-template #header>
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
-            <p-button *ngIf="isEditPage"
-                      class="ml-auto"
-                      type="button"
-                      icon="pi pi-exclamation-circle"
-                      size="large"
-                      [text]="true"
-                      [rounded]="true"
-                      severity="secondary"
-                      (onClick)="op.toggle($event)" />
-            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
-                <div class="px-2">
-                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
-                    <table class="w-full">
-                        <tr *ngIf="object.created">
-                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Cadastrado em</td>
-                            <td class="py-2 px-3 surface-800 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
-                        </tr>
-                        <tr *ngIf="object.account_Created">
-                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Cadastrado por</td>
-                            <td class="py-2 px-3 surface-700 text-right">{{ object.account_Created }}</td>
-                        </tr>
-                        <tr *ngIf="object.deactivated">
-                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Inativo em</td>
-                            <td class="py-2 px-3 surface-700 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
-                        </tr>
-                    </table>
-                </div>
-            </p-popover>
         </div>
     </ng-template>
     <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
@@ -95,7 +67,16 @@
                     <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
                     <p class="text-red-500" *ngIf="error">{{error}}</p>
                 </div>
-                <div class="ml-auto">
+                <div class="ml-auto flex align-items-center gap-2">
+                    <p-button *ngIf="isEditPage"
+                              type="button"
+                              icon="pi pi-trash"
+                              [rounded]="true"
+                              severity="danger"
+                              label="Excluir"
+                              [loading]="loading"
+                              [disabled]="loading"
+                              (onClick)="excluirConfirmation($event)" />
                     <p-button
                               type="submit"
                               [disabled]="form.invalid || loading"

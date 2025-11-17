@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { Roteiro } from '../../../models/roteiro.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Crypto, insertOrReplace, showError } from '../../../utils';
+import { Crypto, insertOrReplace, remove, showError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -144,7 +144,7 @@ export class FeriadoComponent implements OnDestroy {
 
         this.confirmationService.confirm({
             target: e.target,
-            message: 'Tem certeza que deseja salvar os dados do roteiro?',
+            message: 'Tem certeza que deseja salvar feriado?',
             header: 'Salvar dados',
             acceptLabel: 'Salvar',
             acceptIcon: 'pi pi-check',
@@ -168,7 +168,6 @@ export class FeriadoComponent implements OnDestroy {
                 if (res.success) {
                     // playSuccess();
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
-                    insertOrReplace(this.feriadoService, res.object);
                     this.visible = false;
                     this.visibleChange();
                 }
@@ -190,4 +189,50 @@ export class FeriadoComponent implements OnDestroy {
         }
         return lastValueFrom(this.feriadoService.create(this.object));
     }
+
+    excluirConfirmation(e: any) {
+        this.confirmationService.confirm({
+            target: e.target,
+            message: 'Tem certeza que deseja excluir feriado?',
+            header: 'Excluir dados',
+            acceptLabel: 'Excluir',
+            acceptIcon: 'pi pi-trash',
+            acceptButtonStyleClass: 'p-button-rounded',
+            rejectLabel: 'Cancelar',
+            rejectIcon: 'pi pi-times',
+            rejectButtonStyleClass: 'p-button-rounded p-button-text ',
+            accept: () => {
+                this.excluir(e)
+            }
+        })
+    }
+
+    async excluir(e: any) {
+
+        this.loading = true;
+
+       lastValueFrom(this.feriadoService.delete(this.object.id))
+            .then(res => {
+                this.loading = false;
+                if (res.success) {
+                    // playSuccess();
+                    this.toastrService.success(`Feriado excluído.`);
+                    remove(this.feriadoService, res.object);
+                    this.visible = false;
+                    this.visibleChange();
+                }
+                else {
+                    this.error = res.message;
+                    this.showError('Erro', this.error, e);
+                }
+            })
+            .catch((res: HttpErrorResponse) => {
+                this.error = res.error.message;
+                this.loading = false;
+                this.showError('Erro', this.error, e);
+            })
+    }
+
+
+
 }

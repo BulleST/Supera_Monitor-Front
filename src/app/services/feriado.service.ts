@@ -4,7 +4,7 @@ import { RequestResponse } from '../helpers/request-response.interface';
 import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
-import { getError, insert, replace } from '../utils';
+import { getError, insert, remove, replace } from '../utils';
 import { Feriado, InsertFeriadoRequest, UpdateFeriadoRequest } from '../models/feriado.model';
 
 @Injectable({
@@ -90,6 +90,21 @@ export class FeriadoService extends Service {
                     if (res.success) {
                         res.object = this.mapFeriado(res.object);
                         replace(this, res.object, 'list');
+                    }
+                    return res;
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível habilitar/desabilitar feriado. \n ${getError(err)}`);
+                }
+            }));
+    }
+
+    delete(id: number) {
+        return this.http.delete<RequestResponse>(`${this.url}/feriado/${id}`, {})
+            .pipe(tap({
+                next: (res) => {
+                    if (res.success) {
+                        remove(this, res.object, 'list');
                     }
                     return res;
                 },
