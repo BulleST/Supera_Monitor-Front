@@ -1,0 +1,111 @@
+<app-confirm-dialog></app-confirm-dialog>
+<p-dialog [header]="isEditPage ? 'Editar feriado'  : 'Cadastrar feriado'"
+          [maximizable]="true"
+          [draggable]="true"
+          [modal]="true"
+          [(visible)]="visible"
+          (visibleChange)="visibleChange()"
+          [style]="{ width: '600px', maxWidth: '95vw', maxHeight: '95vh' }"
+          appendTo="body">
+    <ng-template #header>
+        <div class="w-full flex align-items-center ">
+            <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
+            <p-button *ngIf="isEditPage"
+                      class="ml-auto"
+                      type="button"
+                      icon="pi pi-exclamation-circle"
+                      size="large"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="secondary"
+                      (onClick)="op.toggle($event)" />
+            <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
+                <div class="px-2">
+                    <h3 class="text-xl mb-2">Informações Adicionais</h3>
+                    <table class="w-full">
+                        <tr *ngIf="object.created">
+                            <td class="py-2 px-3 surface-800 border-right-1 border-700 font-light">Cadastrado em</td>
+                            <td class="py-2 px-3 surface-800 text-right">{{object.created | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                        <tr *ngIf="object.account_Created">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Cadastrado por</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{ object.account_Created }}</td>
+                        </tr>
+                        <tr *ngIf="object.deactivated">
+                            <td class="py-2 px-3 surface-700 border-right-1 border-600 font-light">Inativo em</td>
+                            <td class="py-2 px-3 surface-700 text-right">{{object.deactivated | date : 'dd/MM/yyyy \'às\' HH\'h\'mm'}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </p-popover>
+        </div>
+    </ng-template>
+    <form (ngSubmit)="sendConfirmation(form, $event)" #form="ngForm">
+        <div class="formgrid grid">
+            <!-- Descricao -->
+            <div class="field col-6">
+                <label for="descricao">Descrição: <span class="text-red-500">*</span></label>
+                <input type="text"
+                       pInputText
+                       #descricao="ngModel"
+                       [(ngModel)]="object.descricao"
+                       id="descricao"
+                       name="descricao"
+                       class="w-full"
+                       [required]="true">
+                <div *ngIf="descricao.touched && descricao.invalid && descricao.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="descricao.errors['required']">Esse campo é obrigatório.</p>
+                </div>
+            </div>
+            <!-- Data -->
+            <div class="field col-6">
+                <label for="data">Data: <span class="text-red-500">*</span></label>
+                <p-datepicker
+                              #data="ngModel"
+                              [(ngModel)]="object.data"
+                              (ngModelChange)="validateDate(data)"
+                              [showIcon]="true"
+                              [iconDisplay]="'input'"
+                              [selectOtherMonths]="true"
+                              [disabledDates]="invalidDates"
+                              [disabledDays]="[0]"
+                              inputId="data"
+                              name="data"
+                              class="w-full"
+                              styleClass="w-full"
+                              inputStyleClass="w-full"
+                              [required]="true"
+                              appendTo="body" />
+                <div *ngIf="data.touched && data.invalid && data.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="data.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="data.errors['invalid']">{{data.errors['invalid']}}</p>
+                </div>
+            </div>
+            <!-- Legenda -->
+            <div class="px-2 col-12"><p-divider layout="horizontal" /></div>
+            <div class="field col-12 mt-2 ">
+                <div class="flex align-items-center justify-content-start gap-2">
+                    <label for="corLegenda">Legenda:</label>
+                    <p-colorpicker [ngModel]="'#ff0000'" />
+                    <span>Feriado</span>
+                </div>
+            </div>
+            <div class="col-12 gap-2 flex flex-wrap align-items-center flex-wrap justify-content-between">
+                <div class="col">
+                    <p class="text-red-500" *ngIf="!error"><span class="text-red-500">*</span> Preencha os campos corretamente para salvar.</p>
+                    <p class="text-red-500" *ngIf="error">{{error}}</p>
+                </div>
+                <div class="ml-auto">
+                    <p-button
+                              type="submit"
+                              [disabled]="form.invalid || loading"
+                              styleClass="px-3"
+                              label="Salvar"
+                              icon="pi pi-check"
+                              [loading]="loading"
+                              [rounded]="true" />
+                </div>
+            </div>
+        </div>
+    </form>
+</p-dialog>

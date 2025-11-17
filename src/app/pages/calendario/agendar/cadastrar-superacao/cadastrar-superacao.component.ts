@@ -34,6 +34,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
 import { MonitoramentoService } from '../../../../services/monitoramento.service';
+import { FeriadoService } from '../../../../services/feriado.service';
 
 @Component({
     selector: 'app-cadastrar-superacao',
@@ -92,6 +93,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         private salaAulaService: SalaAulaService,
         private professorService: ProfessorService,
         private alunoService: AlunoService,
+        private feriadoService: FeriadoService,
         private turmaService: TurmaService,
         private roteiroService: RoteiroService,
         private eventoService: EventoService,
@@ -105,7 +107,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
         this.object.descricao = 'Superação';
 
-        let feriados = this.eventoService.feriados.subscribe(res => {
+        let feriados = this.feriadoService.list.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -217,7 +219,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.eventoService.getFeriados(this.ano))
+        lastValueFrom(this.feriadoService.getList())
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -234,7 +236,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 return range;
             });
 
-            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+            let feriadosDate = this.feriados.map(x => moment(x.data).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }

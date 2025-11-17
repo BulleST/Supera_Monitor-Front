@@ -119,4 +119,5 @@ export enum Monitoramento_Item_Status {
     PresenteReposicao = 'Presente na Reposição',
     PresenteNaAula = 'Presente',
     Aula = 'Aula',       
+    PrimeiraAula = 'Primeira Aula',       
 }

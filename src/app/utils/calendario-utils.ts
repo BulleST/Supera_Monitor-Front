@@ -10,6 +10,7 @@ import { EventoReuniaoRequest } from '../models/evento-reuniao.model'
 import { EventoAulaRequest } from '../models/evento-aula.model'
 import 'moment/locale/pt-br';
 import moment from 'moment';
+import { FeriadoService } from '../services/feriado.service'
 
 @Injectable({
     providedIn: 'root',
@@ -17,8 +18,11 @@ import moment from 'moment';
 export class CalendarioUtils {
     feriados: Feriado[] = []
 
-    constructor(private service: EventoService) {
-        this.service.feriados.subscribe(res => this.feriados = res)
+    constructor(
+        private eventoService: EventoService,
+        private feriadoService: FeriadoService,
+    ) {
+        this.feriadoService.list.subscribe(res => this.feriados = res)
         moment.locale('pt-br')
     }
 
@@ -161,8 +165,8 @@ export class CalendarioUtils {
         request.professores = evento.professor_Id ? [evento.professor_Id] : [];
         
         if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createAulaTurma(request))
-        return lastValueFrom(this.service.editAulaTurma(request))
+            return lastValueFrom(this.eventoService.createAulaTurma(request))
+        return lastValueFrom(this.eventoService.editAulaTurma(request))
     }
 
     requestReuniao(evento: Evento) {
@@ -172,8 +176,8 @@ export class CalendarioUtils {
         request.roteiro_Id = request.roteiro_Id == PseudoEvento.EventoId ? undefined : request.roteiro_Id;
 
         if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createReuniao(request))
-        return lastValueFrom(this.service.editReuniao(request))
+            return lastValueFrom(this.eventoService.createReuniao(request))
+        return lastValueFrom(this.eventoService.editReuniao(request))
     }
 
     requestOficina(evento: Evento) {
@@ -184,8 +188,8 @@ export class CalendarioUtils {
         request.roteiro_Id = request.roteiro_Id == PseudoEvento.EventoId ? undefined : request.roteiro_Id;
         
         if (evento.id == PseudoEvento.EventoId)
-            return lastValueFrom(this.service.createOficina(request))
-        return lastValueFrom(this.service.editOficina(request))
+            return lastValueFrom(this.eventoService.createOficina(request))
+        return lastValueFrom(this.eventoService.editOficina(request))
     }
 
     formatDate(date: Date) {

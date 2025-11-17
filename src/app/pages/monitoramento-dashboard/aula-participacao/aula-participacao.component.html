@@ -58,7 +58,7 @@
                 <p-badge *ngIf="item.status == Monitoramento_Item_Status.Feriado"
                          severity="contrast"
                          class="surface-900 border-900"
-                         [value]="'Aula Cancelada - ' + aula.feriado?.name" />
+                         [value]="'Aula Cancelada - ' + aula.feriado?.descricao" />
                 <p-badge *ngIf="item.status == Monitoramento_Item_Status.Recesso"
                          severity="danger"
                          class="bg-red-200 border-red-200"

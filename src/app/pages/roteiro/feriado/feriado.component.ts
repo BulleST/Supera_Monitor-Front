@@ -2,28 +2,27 @@ import { Component, OnDestroy } from '@angular/core';
 import { Roteiro } from '../../../models/roteiro.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Crypto, insertOrReplace, playAlert, playError, playSuccess, showError } from '../../../utils';
-import { RoteiroService } from '../../../services/roteiro.service';
+import { Crypto, insertOrReplace, showError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
 import { ToastrService } from 'ngx-toastr';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgForm, NgModel } from '@angular/forms';
 import moment from 'moment';
-import { FileSelectEvent } from 'primeng/fileupload';
 import { PrimeNG } from 'primeng/config';
-import { getRandomColor } from '../../../utils/ramdom-color';
+import { FeriadoService } from '../../../services/feriado.service';
+import { Feriado } from '../../../models/feriado.model';
 import { PseudoEvento } from '../../../models/reposicao.model';
 
 @Component({
-    selector: 'app-form',
+    selector: 'app-feriado',
     standalone: false,
-    templateUrl: './form.component.html',
-    styleUrl: './form.component.css',
+    templateUrl: './feriado.component.html',
+    styleUrl: './feriado.component.css',
     providers: [ConfirmationService]
 })
-export class FormComponent implements OnDestroy {
+export class FeriadoComponent implements OnDestroy {
     visible: boolean = false;
-    object = new Roteiro;
+    object = new Feriado;
     loading = false;
     error: string = '';
     isEditPage = false;
@@ -32,8 +31,8 @@ export class FormComponent implements OnDestroy {
     totalSize: number = 0;
     totalSizePercent: number = 0;
 
-    jornadas: Roteiro[] = [];
-    loadingJornada: boolean = false;
+    feriados: Feriado[] = [];
+    loadingFeriados: boolean = false;
 
     invalidDates: Date[] = [];
 
@@ -41,19 +40,21 @@ export class FormComponent implements OnDestroy {
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private crypto: Crypto,
-        private service: RoteiroService,
+        private feriadoService: FeriadoService,
         private confirmationService: ConfirmationService,
         private toastrService: ToastrService,
         private config: PrimeNG
     ) {
 
-        let list = this.service.list.subscribe(res => this.jornadas = res);
+        let list = this.feriadoService.list.subscribe(res => {
+			this.feriados = res
+			this.getInvalidDates();
+		});
         this.subscription.push(list);
 
+		this.loadFeriados();
+
         this.loadPage();
-
-        this.getInvalidDates();
-
     }
     ngOnDestroy(): void {
         this.subscription.forEach(item => item.unsubscribe());
@@ -62,12 +63,12 @@ export class FormComponent implements OnDestroy {
     loadPage() {
         let params = this.activatedRoute.params.subscribe(async res => {
             let id = this.crypto.decrypt(res['id'])
-            this.isEditPage = res['id'] && id != PseudoEvento.EventoId
+			this.isEditPage = res['id'] && id != PseudoEvento.EventoId
 
             if (this.isEditPage) {
                 this.loading = true;
 
-                lastValueFrom(this.service.get(id))
+                lastValueFrom(this.feriadoService.get(id))
                     .then(res => {
                         this.object = res;
                         this.loading = false;
@@ -79,12 +80,18 @@ export class FormComponent implements OnDestroy {
                     });
             } else {
                 this.visible = true;
-                let roteiro = this.service.getRoteiro().subscribe(res => this.object = res ?? new Roteiro);
-                this.subscription.push(roteiro)
             }
         })
         this.subscription.push(params);
     }
+
+
+	loadFeriados() {
+		this.loading  = true;
+		lastValueFrom(this.feriadoService.getList())
+		.then(res => this.loading = false)
+		.catch(res => this.loading = false);
+	}
 
     visibleChange() {
         if (!this.visible) {
@@ -92,73 +99,33 @@ export class FormComponent implements OnDestroy {
             this.router.navigate(route, { relativeTo: this.activatedRoute });
         }
     }
-
-    onSelectedFiles(event: FileSelectEvent) {
-        let files = event.currentFiles;
-        files.forEach((file) => {
-            this.totalSize += parseInt(this.formatSize(file.size));
-        });
-        this.totalSizePercent = this.totalSize / 10;
-    }
-    onRemoveTemplatingFile(event: MouseEvent, file: any, removeFileCallback: any, index: any) {
-        removeFileCallback(event, index);
-        this.totalSize -= parseInt(this.formatSize(file.size));
-        this.totalSizePercent = this.totalSize / 10;
-    }
-
-    formatSize(bytes: number) {
-        const k = 1024;
-        const dm = 3;
-        const sizes = this.config.translation.fileSizeTypes as string[];
-        if (bytes === 0) {
-            return `0 ${sizes[0]}`;
-        }
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-        return `${formattedSize} ${sizes[i]}`;
-    }
-
+  
 
     showError(header: string, message: string, e: any) {
         showError(this.confirmationService, header, message, e);
     }
 
-    async getInvalidDates() {
-        if (this.isEditPage == false) {
-            if (this.jornadas.length == 0) {
-                this.loadingJornada = true;
-                await lastValueFrom(this.service.getList()).then(res => this.jornadas = res);
-                this.loadingJornada = false;
-            }
-
-            this.jornadas.forEach(jornada => {
-                let data = new Date(jornada.dataInicio);
-
-                while (moment(data).isSameOrBefore(jornada.dataFim, 'date')) {
-                    this.invalidDates.push(data);
-                    data = moment(data).add(1, 'day').toDate();
-                }
-            })
-        }
-
+    getInvalidDates() {
+		this.feriados.forEach(jornada => {
+			let data = new Date(jornada.data);
+			this.invalidDates.push(data);
+		})
     }
 
     async validateDate(ngModel: NgModel) {
-        if (this.jornadas.length == 0) {
-            this.loadingJornada = true;
-            await lastValueFrom(this.service.getList()).then(res => this.jornadas = res);
-            this.loadingJornada = false;
+        if (this.feriados.length == 0) {
+            this.loadingFeriados = true;
+            await lastValueFrom(this.feriadoService.getList()).then(res => this.feriados = res);
+            this.loadingFeriados = false;
         }
 
-        let list = this.jornadas.sort((x, y) => x.dataInicio < y.dataInicio ? -1 : x.dataInicio < y.dataInicio ? 1 : 0)
+        let list = this.feriados.sort((x, y) => x.data.getTime() - y.data.getTime())
         let data = moment(ngModel.value).toDate()
-        let existe = list.find(x => data >= x.dataInicio && data <= x.dataFim && x.id != this.object.id);
+        let existe = list.find(x => moment(data).isSame(x.data) && x.id != this.object.id);
 
         if (existe) {
-            this.toastrService.error('Essa data já está em um outro tema.');
-            ngModel.control.setErrors({'invalid': 'Essa data já está sendo utilizada no período da semana ' + existe.semana + '.'});
+            this.toastrService.error('Outro feriado foi cadastrado para essa data.');
+            ngModel.control.setErrors({'invalid': 'Essa data já está sendo utilizada no feriado ' + existe.descricao + '.'});
             // playError();
 
         } else {
@@ -191,16 +158,6 @@ export class FormComponent implements OnDestroy {
         })
     }
 
-    recessoChanged() {
-        if (this.object.recesso) {
-            this.object.corLegenda = '#ff0000'
-        } 
-        else {
-            this.object.corLegenda = getRandomColor();
-        }
-    }
-
-
     async send(e: any) {
 
         this.loading = true;
@@ -211,9 +168,7 @@ export class FormComponent implements OnDestroy {
                 if (res.success) {
                     // playSuccess();
                     this.toastrService.success(this.isEditPage ? `Registro atualizado com sucesso.` : `Registro cadastrado com sucesso.`);
-                    res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
-                    res.object.active = true;
-                    insertOrReplace(this.service, res.object);
+                    insertOrReplace(this.feriadoService, res.object);
                     this.visible = false;
                     this.visibleChange();
                 }
@@ -231,8 +186,8 @@ export class FormComponent implements OnDestroy {
 
     request() {
         if (this.isEditPage) {
-            return lastValueFrom(this.service.edit(this.object));
+            return lastValueFrom(this.feriadoService.edit(this.object));
         }
-        return lastValueFrom(this.service.create(this.object));
+        return lastValueFrom(this.feriadoService.create(this.object));
     }
 }

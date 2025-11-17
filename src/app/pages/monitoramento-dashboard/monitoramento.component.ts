@@ -55,11 +55,13 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 		{ label: Monitoramento_Item_Status.Cancelada, value: Monitoramento_Item_Status.Cancelada, styleClass: 'surface-800' },
 		{ label: Monitoramento_Item_Status.Feriado, value: Monitoramento_Item_Status.Feriado, styleClass: 'bg-red-600' },
 		{ label: Monitoramento_Item_Status.ReposicaoAgendada, value: Monitoramento_Item_Status.ReposicaoAgendada, styleClass: 'bg-purple-500' },
-		{ label: Monitoramento_Item_Status.FaltaReposicao, value: Monitoramento_Item_Status.FaltaReposicao, styleClass: 'bg-blue-600' },
+		{ label: Monitoramento_Item_Status.ReposicaoDesmarcada, value: Monitoramento_Item_Status.ReposicaoDesmarcada, styleClass: 'bg-purple-800' },
+		{ label: Monitoramento_Item_Status.FaltaReposicao, value: Monitoramento_Item_Status.FaltaReposicao, styleClass: 'bg-blue-500' },
 		{ label: Monitoramento_Item_Status.FaltaAula, value: Monitoramento_Item_Status.FaltaAula, styleClass: 'bg-red-500' },
-		{ label: Monitoramento_Item_Status.FaltaAgendada, value: Monitoramento_Item_Status.FaltaAgendada, styleClass: 'bg-red-500' },
+		{ label: Monitoramento_Item_Status.FaltaAgendada, value: Monitoramento_Item_Status.FaltaAgendada, styleClass: 'bg-red-200' },
 		{ label: Monitoramento_Item_Status.PresenteReposicao, value: Monitoramento_Item_Status.PresenteReposicao, styleClass: 'bg-green-300' },
 		{ label: Monitoramento_Item_Status.PresenteNaAula, value: Monitoramento_Item_Status.PresenteNaAula, styleClass: 'bg-green-500' },
+		{ label: Monitoramento_Item_Status.PrimeiraAula, value: Monitoramento_Item_Status.PrimeiraAula, styleClass: 'bg-pink-500' },
 		{ label: Monitoramento_Item_Status.Aula, value: Monitoramento_Item_Status.Aula, styleClass: 'surface-200' },
 	]
 
@@ -174,7 +176,7 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 			// let tr = $(`th[data-mes="${(new Date().getMonth())}"]`)
 			let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
 			console.log(tr)
-	
+
 			let left = $(tr).offset()?.left ?? 0
 			console.log(left)
 			$(container).animate({
@@ -254,33 +256,46 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	}
 
 	filtrarStatus(value: Monitoramento_Item_Status | null, roteiro: Monitoramento_Roteiro, table: Table) {
-		// let alunosFiltered = this.alunos.filter(aluno => {
-		//     let item = aluno.aulas.find(x => x.roteiro.id == roteiro.id
-		//         && moment(x.roteiro.dataInicio).isSame(roteiro.dataInicio, 'date')
-		//         && moment(x.roteiro.dataFim).isSame(roteiro.dataFim, 'date')
-		//         && x.roteiro.semana == roteiro.semana)
 
-		//     if (!value) {
-		//         return true;
-		//     }
+		let alunosFiltered = this.alunos.filter(aluno => {
 
-		//     if (!item) {
-		//         return false;
-		//     }
+			let item;
 
-		//     if (item.status === value && item.show) {
-		//         return true;
-		//     }
+			if (!value) {
+				return true;
+			}
 
-		//     return false;
-		// });
+			else if (value == Monitoramento_Item_Status.PrimeiraAula) {
 
-		// table.filteredValue = alunosFiltered;
+				item = aluno.items.filter(x => {
+					var primeiraAula = aluno.primeiraAula_Id == x.id;
+					var data = x.reposicaoPara ? x.reposicaoPara.aula.data : x.aula.aula.data;
+					var intervalo = moment(data).isBetween(roteiro.dataInicio, roteiro.dataFim, 'date', '[]')
+					return primeiraAula && intervalo;
+				})
+			}
+			else {
+				item = aluno.items.filter(x => {
+					var statusIgual = x.status == value;
+					var data = x.reposicaoPara ? x.reposicaoPara.aula.data : x.aula.aula.data;
+					var intervalo = moment(data).isBetween(roteiro.dataInicio, roteiro.dataFim, 'date', '[]');
+					return statusIgual && intervalo
+				})
+			}
+
+			if (item.length > 0) {
+				return true
+			}
+
+			return false;
+		});
+
+		table.filteredValue = alunosFiltered;
 	}
-		
-		showAluno(aluno: Monitoramento_Aluno) {
-			showAluno(this.dialogService, aluno.id);
-		}
+
+	showAluno(aluno: Monitoramento_Aluno) {
+		showAluno(this.dialogService, aluno.id);
+	}
 
 
 }

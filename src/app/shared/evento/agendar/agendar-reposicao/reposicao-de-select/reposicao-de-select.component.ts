@@ -11,6 +11,7 @@ import { SalaAndar } from '../../../../../models/sala-aula.model';
 import { Feriado } from '../../../../../models/feriado.model';
 import { ConfirmationService } from 'primeng/api';
 import { AlunoService } from '../../../../../services/alunos.service';
+import { FeriadoService } from '../../../../../services/feriado.service';
 
 @Component({
     selector: 'app-reposicao-de-select',
@@ -38,7 +39,8 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
     loadingFeriados = false;
 
     constructor(
-        private service: EventoService,
+        private eventoService: EventoService,
+        private feriadoService: FeriadoService,
         private activatedRoute: ActivatedRoute,
         private toastr: ToastrService,
         private alunoService: AlunoService,
@@ -52,10 +54,10 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
         this.subscription.push(onVisibleChange);
 
 
-		let eventoReposicaoPara = this.service.getEventoReposicaoPara().subscribe(res => this.eventoReposicaoPara = res);
+		let eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => this.eventoReposicaoPara = res);
 		this.subscription.push(eventoReposicaoPara);
 
-        let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
+        let eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
             
             let params = this.activatedRoute.snapshot.queryParamMap;
 
@@ -83,7 +85,8 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
             }
 		});
         this.subscription.push(aluno);
-        let feriados = this.service.feriados.subscribe(res => this.feriados = res);
+        
+        let feriados = this.feriadoService.list.subscribe(res => this.feriados = res);
         this.subscription.push(feriados);
     }
 
@@ -119,7 +122,7 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
 
     eventoChanged() {
         this.onEventoChanged.emit(this.evento);
-        this.service.setEventoReposicaoDe(this.evento)
+        this.eventoService.setEventoReposicaoDe(this.evento)
     }
 
     loadEventosReposicaoDe() {
@@ -141,7 +144,7 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
     
     
             this.loading = true;
-            return lastValueFrom(this.service.getList(request))
+            return lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
                     this.list = res.eventos.filter(aula => {
                         const alunoEstaNaAula = aula.alunos.find(x => x.aluno_Id == this.aluno!.id);

@@ -35,6 +35,7 @@ import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
 import { MonitoramentoService } from '../../../../services/monitoramento.service';
 import { showAluno } from '../../../../utils/show-aluno';
+import { FeriadoService } from '../../../../services/feriado.service';
 
 @Component({
     selector: 'app-agendar-superacao',
@@ -99,6 +100,7 @@ export class AgendarSuperacaoComponent implements OnInit, OnDestroy {
         private turmaService: TurmaService,
         private roteiroService: RoteiroService,
         private eventoService: EventoService,
+        private feriadoService: FeriadoService,
         private jornadaService: JornadaSuperaService,
         private monitoramentoService: MonitoramentoService,
         public mensagemWhatsapp: MensagemWhatsapp,
@@ -109,7 +111,7 @@ export class AgendarSuperacaoComponent implements OnInit, OnDestroy {
         this.instance = this.dialogService.getInstance(this.ref);
         this.object.descricao = 'Superação';
 
-        let feriados = this.eventoService.feriados.subscribe(res => {
+        let feriados = this.feriadoService.list.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -251,7 +253,7 @@ export class AgendarSuperacaoComponent implements OnInit, OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.eventoService.getFeriados(this.ano))
+        lastValueFrom(this.feriadoService.getList())
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -275,7 +277,7 @@ export class AgendarSuperacaoComponent implements OnInit, OnDestroy {
                 return range;
             });
 
-            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+            let feriadosDate = this.feriados.map(x => moment(x.data).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }

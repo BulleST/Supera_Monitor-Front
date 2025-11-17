@@ -16,6 +16,7 @@ import { CalendarioRequest } from '../../../../../models/calendario.model'
 import { ProfessorService } from '../../../../../services/professor.service'
 import { ToastrService } from 'ngx-toastr'
 import { AlunoService } from '../../../../../services/alunos.service'
+import { FeriadoService } from '../../../../../services/feriado.service'
 
 @Component({
 	selector: 'app-falta-calendario-select',
@@ -84,9 +85,10 @@ export class FaltaCalendarioSelectComponent implements OnDestroy, AfterViewInit 
 	constructor(
 		private confirmationService: ConfirmationService,
 		private changeDetector: ChangeDetectorRef,
-		private service: EventoService,
+		private eventoService: EventoService,
 		private calendarioUtils: CalendarioUtils,
 		private professorService: ProfessorService,
+		private feriadoService: FeriadoService,
 		private toastrService: ToastrService,
 		private alunoService: AlunoService,
 	) {
@@ -103,7 +105,7 @@ export class FaltaCalendarioSelectComponent implements OnDestroy, AfterViewInit 
 				.catch(res => this.loadingProfessores = false)
 		}
 
-		let feriados = this.service.feriados.subscribe(res => this.feriados = res);
+		let feriados = this.feriadoService.list.subscribe(res => this.feriados = res);
 		this.subscription.push(feriados);
 
 	}
@@ -189,7 +191,7 @@ export class FaltaCalendarioSelectComponent implements OnDestroy, AfterViewInit 
 
 	getCalendario() {
 		var aluno = this.aluno as Aluno;
-		return lastValueFrom(this.service.getList(this.calendarioRequest))
+		return lastValueFrom(this.eventoService.getList(this.calendarioRequest))
 			.then(res => {
 				this.feriados = res.feriados;
 				this.eventos = res.eventos.filter(evento => {
@@ -216,7 +218,7 @@ export class FaltaCalendarioSelectComponent implements OnDestroy, AfterViewInit 
 			calendar.removeAllEvents()
 		}
 
-		let feriadosDates = this.feriados.map((x) => moment(x.date).format('YYYY-MM-DD'))
+		let feriadosDates = this.feriados.map((x) => moment(x.data).format('YYYY-MM-DD'))
 		let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id)
 			&& x.active == true
 			&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
@@ -244,14 +246,11 @@ export class FaltaCalendarioSelectComponent implements OnDestroy, AfterViewInit 
 				textColor: 'white',
 				backgroundColor: 'red',
 				borderColor: 'red',
-				title: item.name,
-				start: moment(item.date).toDate(),
-				end: moment(item.date).toDate(),
+				title: item.descricao,
+				start: moment(item.data).toDate(),
+				end: moment(item.data).toDate(),
 				allDay: true,
 				extendedProps: {
-					id: PseudoEvento.EventoId,
-					data: moment(item.date).toDate(),
-					descricao: item.name,
 					evento_Tipo_Id: EventoTipo.Feriado,
 					...item,
 				},

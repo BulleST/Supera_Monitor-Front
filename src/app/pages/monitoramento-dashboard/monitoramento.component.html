@@ -131,16 +131,22 @@
                 </div>
             </th>
             <ng-container *ngFor="let mes of mesesAno">
+
                 <ng-container *ngFor="let roteiro of mes.roteiros; let i = index;">
+
                     <th [ngClass]="{ 'bg-red-200 border-red-500': roteiro.recesso === true }">
+
                         <div *ngIf="!roteiro.recesso">
+
                             <p-columnFilter
                                             field="turma"
                                             type="text"
                                             class="p-column-filter-inline"
                                             [showMenu]="false"
                                             matchMode="equals">
+
                                 <ng-template #filter let-value let-filter="filterCallback">
+
                                     <p-select [options]="filterStatus"
                                               [ngModel]="value"
                                               inputId="status-{{roteiro.semana}}"
@@ -395,33 +401,37 @@
         </tr>
     </ng-template>
     <ng-template #emptymessage>
-        <ng-container *ngIf="loading">
-            <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
-        </ng-container>
-    </ng-template>
-    <ng-template #loadingbody let-columns="columns">
-        <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
-    </ng-template>
-</p-table>
-<ng-template #loadingTemplate>
-    <ng-container *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]; let i = index;">
-        <tr style="height: 35px;">
-            <td pFrozenColumn>
-                <p-skeleton width="13rem" />
-            </td>
-            <td>
-                <p-skeleton width="10rem" />
+        <tr>
+            <td colspan="2" pFrozenColumn alignFrozen="left" [frozen]="true">
+                Nenhum registro encontrado
             </td>
             <ng-container *ngFor="let mes of mesesAno">
                 <ng-container *ngFor="let roteiro of mes.roteiros">
-                    <td>
-                        <p-skeleton width="6rem" />
-                    </td>
+                    <td></td>
                 </ng-container>
             </ng-container>
         </tr>
-    </ng-container>
-</ng-template>
+    </ng-template>
+    <ng-template #loadingbody let-columns="columns">
+        <ng-container *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]; let i = index;">
+            <tr style="height: 35px;">
+                <td pFrozenColumn>
+                    <p-skeleton width="13rem" />
+                </td>
+                <td>
+                    <p-skeleton width="10rem" />
+                </td>
+                <ng-container *ngFor="let mes of mesesAno">
+                    <ng-container *ngFor="let roteiro of mes.roteiros">
+                        <td>
+                            <p-skeleton width="6rem" />
+                        </td>
+                    </ng-container>
+                </ng-container>
+            </tr>
+        </ng-container>
+    </ng-template>
+</p-table>
 <ng-template #abacoTemplate let-abaco="abaco" let-pagina="pagina" let-reposicao="reposicao">
     <div class="event-abaco" [pTooltip]="reposicao">
         <p class="event-abaco-name"

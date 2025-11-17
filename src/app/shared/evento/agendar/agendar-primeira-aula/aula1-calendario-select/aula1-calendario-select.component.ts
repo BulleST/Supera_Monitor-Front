@@ -16,6 +16,7 @@ import { CalendarioRequest } from '../../../../../models/calendario.model'
 import { ProfessorService } from '../../../../../services/professor.service'
 import { ToastrService } from 'ngx-toastr'
 import { SalaAndar } from '../../../../../models/sala-aula.model'
+import { FeriadoService } from '../../../../../services/feriado.service'
 
 @Component({
   selector: 'app-aula1-calendario-select',
@@ -88,7 +89,8 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 	constructor(
 		private confirmationService: ConfirmationService,
 		private changeDetector: ChangeDetectorRef,
-		private service: EventoService,
+		private eventoService: EventoService,
+		private feriadoService: FeriadoService,
 		private calendarioUtils: CalendarioUtils,
 		private professorService: ProfessorService,
 		private toastrService: ToastrService,
@@ -106,7 +108,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 				.catch(res => this.loadingProfessores = false)
 		}
 
-		let feriados = this.service.feriados.subscribe(res => this.feriados = res);
+		let feriados = this.feriadoService.list.subscribe(res => this.feriados = res);
 		this.subscription.push(feriados)
 	}
 
@@ -179,7 +181,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 
 	getCalendario() {
 		var aluno = this.aluno as Aluno;
-		return lastValueFrom(this.service.getList(this.calendarioRequest))
+		return lastValueFrom(this.eventoService.getList(this.calendarioRequest))
 			.then(list => {
 				this.eventos = list.eventos.filter(evento => {
 					const eventoAtivo = evento.active;
@@ -206,7 +208,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 			calendar.removeAllEvents()
 		}
 
-		let feriadosDates = this.feriados.map((x) => moment(x.date).format('YYYY-MM-DD'))
+		let feriadosDates = this.feriados.map((x) => moment(x.data).format('YYYY-MM-DD'))
 		let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id)
 			&& x.active == true
 			&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
@@ -234,14 +236,11 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 				textColor: 'white',
 				backgroundColor: 'red',
 				borderColor: 'red',
-				title: item.name,
-				start: moment(item.date).toDate(),
-				end: moment(item.date).toDate(),
+				title: item.descricao,
+				start: moment(item.data).toDate(),
+				end: moment(item.data).toDate(),
 				allDay: true,
 				extendedProps: {
-					id: PseudoEvento.EventoId,
-					data: moment(item.date).toDate(),
-					descricao: item.name,
 					evento_Tipo_Id: EventoTipo.Feriado,
 					...item,
 				},
@@ -258,7 +257,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 
 	async loadFeriados() {
 		this.loadingFeriados = true
-		await lastValueFrom(this.service.getFeriados(this.ano))
+		await lastValueFrom(this.feriadoService.getList())
 			.then(res => this.loadingFeriados = false)
 			.catch(res => this.loadingFeriados = false)
 	}
@@ -274,7 +273,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 		this.calendarioRequest.intervaloAte = arg.view.currentEnd
 
 		let ano = moment(this.data).year();
-		let temFeriado = this.feriados.filter(x => moment(x.date).year() == ano);
+		let temFeriado = this.feriados.filter(x => moment(x.data).year() == ano);
 
 		if (!temFeriado.length || !this.feriados.length) {
 			this.ano = ano;

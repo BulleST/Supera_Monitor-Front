@@ -31,6 +31,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { showAgendarReposicaoConfirm } from '../../utils/show-reposicao-confirm';
 import { AlunoService } from '../../services/alunos.service';
 import { Aluno } from '../../models/alunos.model';
+import { FeriadoService } from '../../services/feriado.service';
 
 @Component({
     selector: 'app-calendario',
@@ -111,6 +112,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         private calendarioUtils: CalendarioUtils,
         private dialogService: DialogService,
         private alunoService: AlunoService,
+        private feriadoService: FeriadoService,
     ) {
 
         let screen = this.mobileService.get().subscribe(res => {
@@ -132,7 +134,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         let perfilCognitivo = this.perfilCognitivoService.list.subscribe(res => this.perfilCognitivo = res);
         this.subscription.push(perfilCognitivo);
 
-        let feriados = this.service.feriados.subscribe(res => this.feriados = res);
+        let feriados = this.feriadoService.list.subscribe(res => this.feriados = res);
         this.subscription.push(feriados);
 
         if (this.perfilCognitivo.length == 0) {
@@ -225,14 +227,11 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
                 textColor: 'white',
                 backgroundColor: 'red',
                 borderColor: 'red',
-                title: item.name,
-                start: moment(item.date).startOf('day').toDate(),
-                end: moment(item.date).endOf('day').toDate(),
+                title: item.descricao,
+                start: moment(item.data).startOf('day').toDate(),
+                end: moment(item.data).endOf('day').toDate(),
                 allDay: true,
                 extendedProps: {
-                    id: PseudoEvento.EventoId,
-                    data: moment(item.date).toDate(),
-                    descricao: item.name,
                     evento_Tipo_Id: EventoTipo.Feriado,
                     ...item,
                 },
@@ -250,7 +249,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
         this.scrollToTime();
 
         // Exibe ou esconde allDaySlot
-        let feriadosSemana = this.feriados.filter(x => moment(x.date).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'date', '[]'));
+        let feriadosSemana = this.feriados.filter(x => moment(x.data).isBetween(this.calendarioRequest.intervaloDe, this.calendarioRequest.intervaloAte, 'date', '[]'));
         this.calendarioOptions.allDaySlot = feriadosSemana.length > 0;;
 
     }

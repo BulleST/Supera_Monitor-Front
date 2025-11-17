@@ -5,76 +5,118 @@
             <span class="text-xl font-normal">Roteiro Supera <span *ngIf="currentTitle" class="font-bold text-xl"> - {{currentTitle}}</span></span>
         </h2>
     </div>
-    <div class="p-toolbar-group-end align-items-stretch">
+    <div class="p-toolbar-group-end flex align-items-stretch gap-2">
+        
         <p-button
                   icon="pi pi-angle-left text-sm"
-                  (onClick)="prev()" 
+                  (onClick)="prev()"
                   severity="secondary"
                   pTooltip="Próximo"
                   tooltipPosition="top"
-                  class="mr-2" 
                   styleClass="h-full" />
+
         <p-button
-                (onClick)="today()"
-                severity="secondary"
-                pTooltip="Hoje"
-                tooltipPosition="top"
-                class="mr-2"
-                label="hoje"
-                styleClass="surface-900 border-900 hover:surface-700 hover:border-700 text-white" />
+                  (onClick)="today()"
+                  severity="contrast"
+                  pTooltip="Hoje"
+                  tooltipPosition="top"
+                  label="hoje" />
+
         <p-button
                   icon="pi pi-angle-right text-sm"
-                  (onClick)="next()" 
+                  (onClick)="next()"
                   severity="secondary"
                   pTooltip="Anterior"
                   tooltipPosition="top"
-                  class="mr-2 h-full" 
+                  class="h-full"
                   styleClass="h-full" />
+
         <p-button
                   icon="pi pi-sync text-sm"
                   (onClick)="update()"
-                  severity="secondary"
+                  severity="contrast"
                   label="atualizar"
+                  [rounded]="true"
                   pTooltip="Atualizar roteiro"
                   tooltipPosition="top"
-                  class="mr-2 h-full" />
+                  class="h-full" />
+
         <p-button
                   icon="pi pi-plus text-sm"
                   label="Cadastrar"
-                  [routerLink]="['cadastrar' ]"
                   [rounded]="true"
-                  pTooltip="Cadastrar roteiro"
-                  tooltipPosition="top"
-                  styleClass="px-3" />
+                  styleClass="px-3"
+                  (onClick)="popover.toggle($event)" />
+
+        <p-popover #popover appendTo="body" styleClass="p-0 flex flex-column gap-1">
+            <p-button
+                label="Roteiro"
+                severity="secondary"
+                [routerLink]="['cadastrar']"
+                styleClass="bg-white border-white  hover:surface-100 hover:border-100 text-500 w-full justify-content-start"
+                />
+                <p-button
+                label="Feriado"
+                severity="secondary"
+                [routerLink]="[ 'feriado']"
+                    styleClass="bg-white border-white  hover:surface-100 hover:border-100 text-500 w-full justify-content-start"
+            />
+        </p-popover>
     </div>
 </p-toolbar>
 <p-contextmenu #contextMenu [model]="items" appendTo="body" />
-<full-calendar [options]="calendarioOptions" #fullCalendar >
+<full-calendar [options]="calendarioOptions" #fullCalendar>
+
+
     <ng-template #eventContent let-arg>
+        <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
+        <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
+            
+            <div  [style]="{ color: evento.textColor}" 
+            class="flex align-items-center justify-content-center gap-2 cursor-pointer"
+            (click)="edit(evento)"
+            title="Clique para ver mais">
+
+                <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
+                    <i class="pi pi-star-fill text-xs"></i>
+                    <p>{{evento.tema}} - Semana {{evento.semana}}</p>
+                    <i class="pi pi-star-fill text-xs"></i>
+                </ng-container>
+                <ng-container *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">
+                    <p class="white-space-nowrap text-overflow-ellipsis overflow-hidden">{{evento.descricao}}</p>
+                </ng-container>
+            </div>
+        </ng-template>
+    </ng-template>
+
+    <!-- <ng-template #eventContent let-arg>
         <ng-container *ngIf="!loading; else loadingEvent">
             <ng-container *ngTemplateOutlet="eventoTemplate; context: { evento: arg.event.extendedProps, arg: arg }"></ng-container>
             <ng-template #eventoTemplate let-evento="evento" let-arg="arg">
-                    <div class="py-1 cursor-pointer "
-                         (click)="edit(evento)"
-                         title="Clique para ver mais">
-                    
-                        <p class="text-sm my-1">
+                <div class="py-1 cursor-pointer "
+                     (click)="edit(evento)"
+                     title="Clique para ver mais">
+                    <p class="text-sm my-1">
+                        <span *ngIf="evento.evento_Tipo_Id == EventoTipo.Feriado">Feriado {{evento.semana}}</span>
+                        <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
                             <i class="pi pi-calendar mr-2 text-sm"></i>
-                            <span *ngIf="evento.recesso" >Recesso</span>
-                            <span *ngIf="!evento.recesso" >Semana {{evento.semana}}</span>
-                        </p>
-                        <!-- <pre>{{arg|json}}</pre> -->
+                            <span *ngIf="evento.recesso">Recesso</span>
+                            <span *ngIf="!evento.recesso">Semana {{evento.semana}}</span>
+                        </ng-container>
+                    </p>
+                    <ng-container *ngIf="evento.evento_Tipo_Id != EventoTipo.Feriado">
                         <div class="flex align-items-center justify-content-center gap-2 my-2">
                             <i class="pi pi-star-fill" [style]="{ color: evento.textColor}"></i>
                             <p class="text-lg font-bold">{{evento.tema}}</p>
                             <i class="pi pi-star-fill" [style]="{ color: evento.textColor}"></i>
                         </div>
-                    </div>
+                    </ng-container>
+                </div>
             </ng-template>
         </ng-container>
         <ng-template #loadingEvent>
             <p-skeleton width="100%" height="calc(3rem + 10vh)" />
         </ng-template>
-    </ng-template>
+    </ng-template> -->
 </full-calendar>
 <router-outlet></router-outlet>

@@ -6,7 +6,6 @@ import { ToastrService } from "ngx-toastr";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { EventoService } from "../services/evento.service";
 import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
-import { Aluno } from "../models/alunos.model";
 import { showError } from "./error";
 import { ConfirmationService } from "primeng/api";
 import { lastValueFrom } from "rxjs";
@@ -24,7 +23,6 @@ export class MensagemWhatsapp {
     constructor(
         private calendarioUtils: CalendarioUtils,
         private toastr: ToastrService,
-        private clipboard: Clipboard,
         private eventoService: EventoService,
         private confirmationService: ConfirmationService,
     ) {
@@ -173,7 +171,7 @@ export class MensagemWhatsapp {
         if (!evento.active) {
             mensagem += `\r\nInfelizmente precisamos cancelar a ${tipo} do dia ${data}.`
             if (evento.feriado)
-                mensagem += `\r\nMotivo: Feriado - ${evento.feriado.name}.`
+                mensagem += `\r\nMotivo: Feriado - ${evento.feriado.descricao}.`
             else
                 mensagem += `\r\nMotivo: ${evento.observacao}.`
         }

@@ -22,6 +22,7 @@ import { Roteiro } from '../../../../models/roteiro.model';
 import { RoteiroService } from '../../../../services/roteiro.service';
 import { MonitoramentoService } from '../../../../services/monitoramento.service';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
+import { FeriadoService } from '../../../../services/feriado.service';
 
 @Component({
     selector: 'app-cadastrar-reuniao',
@@ -69,6 +70,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         private router: Router,
         private confirmationService: ConfirmationService,
         private salaAulaService: SalaAulaService,
+        private feriadoService: FeriadoService,
         private professorService: ProfessorService,
         private roteiroService: RoteiroService,
         private eventoService: EventoService,
@@ -79,7 +81,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
         private calendarioUtils: CalendarioUtils,
     ) {
         this.object.descricao = 'Reunião';
-        let feriados = this.eventoService.feriados.subscribe(res => {
+        let feriados = this.feriadoService.list.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -155,7 +157,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.eventoService.getFeriados(this.ano))
+        lastValueFrom(this.feriadoService.getList())
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -173,7 +175,7 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 return range;
             });
 
-            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+            let feriadosDate = this.feriados.map(x => moment(x.data).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }

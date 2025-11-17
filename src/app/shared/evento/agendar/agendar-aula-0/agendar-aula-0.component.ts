@@ -33,6 +33,7 @@ import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-aluno
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog'
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos'
 import { showAluno } from '../../../../utils/show-aluno'
+import { FeriadoService } from '../../../../services/feriado.service'
 
 @Component({
     selector: 'app-agendar-aula-0',
@@ -97,7 +98,8 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
         private professorService: ProfessorService,
         private alunoService: AlunoService,
         private roteiroService: RoteiroService,
-        private service: EventoService,
+        private eventoService: EventoService,
+        private feriadoService: FeriadoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
         private nameFirstWordPipe: NameFirstWordPipe,
@@ -107,7 +109,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
 
         this.object.descricao = 'Aula 0';
 
-        let feriados = this.service.feriados.subscribe(res => {
+        let feriados = this.feriadoService.list.subscribe(res => {
             this.feriados = res;
             this.setInvalidDates();
         });
@@ -158,7 +160,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
             this.loadAlunos();
         }
 
-        let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active))
+        let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active))
         this.subscription.push(eventos)
 
         this.loadFeriados()
@@ -248,7 +250,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
 
     loadFeriados() {
         this.loadingFeriados = true;
-        lastValueFrom(this.service.getFeriados(this.ano))
+        lastValueFrom(this.feriadoService.getList())
             .then(res => this.loadingFeriados = false)
             .catch(res => this.loadingFeriados = false);
     }
@@ -272,7 +274,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
                 return range
             });
 
-            let feriadosDate = this.feriados.map(x => moment(x.date).toDate());
+            let feriadosDate = this.feriados.map(x => moment(x.data).toDate());
 
             this.invalidDates = [... new Set(recessosDate.concat(feriadosDate))];
         }
@@ -323,7 +325,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
         request.intervaloAte = moment(data).add(1, 'day').toDate()
 
         this.loadingEventos = true
-        await lastValueFrom(this.service.getList(request))
+        await lastValueFrom(this.eventoService.getList(request))
             .then(res => (this.loadingEventos = false))
             .catch(res => (this.loadingEventos = false))
 
@@ -491,7 +493,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
             let mensagem = '';
 
             if (aluno.aulaZero_Id) {
-                aulaZero = await lastValueFrom(this.service.get(aluno.aulaZero_Id));
+                aulaZero = await lastValueFrom(this.eventoService.get(aluno.aulaZero_Id));
                 participacaoAulaZero = aulaZero.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
 
                 if (participacaoAulaZero.presente && aulaZero.finalizado) {
@@ -673,7 +675,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
         this.object.alunos = this.selectedAlunos.map(x => x.id);
         // this.object.professores = [this.object.professor_Id];
 
-        await lastValueFrom(this.service.createAula0(this.object))
+        await lastValueFrom(this.eventoService.createAula0(this.object))
             .then(async res => {
                 this.loading = false;
                 if (res.success) {
@@ -683,7 +685,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
                         this.close(true);
                     }
                     this.toastrService.success('Aula zero cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.service.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit(res.object.id);
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar aula zero. <br> ${res.message}`, e);
