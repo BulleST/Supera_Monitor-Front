@@ -24,22 +24,24 @@
     height: 20px;
 }
 
-.event-data {
+.event-data {    
     display: flex;
-    width: 100%;
+    align-items: center;
+    row-gap: 5px;
+    width: 71px;
+    border: 1px var(--p-surface-100) solid;
+    border-top: none;
+    padding: 0 3px;
 }
 
 .event-data-day,
 .event-data-hour {
     width: 100%;
-    padding: 0 3px;
+    padding: 0 0;
     flex: 1;
     background: white;
     text-align: center;
     font-size: 9px;
-    border: 1px var(--p-surface-200) solid;
-    border-top: none;
-    border-right: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
