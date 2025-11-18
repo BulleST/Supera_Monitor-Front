@@ -32,7 +32,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
     @Output() onVisibleChange = new EventEmitter<boolean>();
 
     constructor(
-        private service: AlunoService,
+        private alunoService: AlunoService,
         private crypto: Crypto,
         private activatedRoute: ActivatedRoute,
         private toastr: ToastrService,
@@ -60,7 +60,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
         });
 		this.subscription.push(eventoReposicaoPara)
 
-        let aluno = this.service.getAluno().subscribe(alunoRes => {
+        let aluno = this.alunoService.getAluno().subscribe(alunoRes => {
 
             let params = this.activatedRoute.snapshot.queryParamMap;
 
@@ -80,24 +80,21 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 return;
             }
 
-                if (!this.service.list.value.length) {
-                    this.loadingAlunos = true;
-                    lastValueFrom(this.service.getList())
-                        .then(res => this.loadingAlunos = false)
-                        .catch(res => this.loadingAlunos = false);
-                }
+            if (!this.alunoService.list.value.length) {
+                this.loadingAlunos = true;
+                lastValueFrom(this.alunoService.getList())
+                    .then(res => this.loadingAlunos = false)
+                    .catch(res => this.loadingAlunos = false);
+            }
 
-                let alunos = this.service.list.subscribe(list => {
-                    this.alunos = list;
+            let alunos = this.alunoService.list.subscribe(list => {
+                this.alunos = list;
 
-                    this.setAlunos();
-
-                    if (this.aluno_Id) {
-                        let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
-                        this.aluno = this.alunos[index];
-                    }
-                });
-                this.subscription.push(alunos)
+                this.setAlunos();
+                
+				this.setAluno();
+            });
+            this.subscription.push(alunos)
 
         });
         this.subscription.push(aluno);
@@ -117,6 +114,12 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
         let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
         return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
     }
+
+	setAluno() {
+		let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
+		this.aluno = this.alunos[index];
+        return this.aluno;
+	}
 
     setAlunos() {
         if (this.alunos.length) {
@@ -170,25 +173,24 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
         if (!this.aluno_Id) return;
 
         this.loading = true;
+        
+        this.setAluno();
 
-        let aluno = this.alunos.find(x => x.id == this.aluno_Id);
-        this.onAlunoChanged.emit(aluno);
 
-        return lastValueFrom(this.service.get(this.aluno_Id))
+        return lastValueFrom(this.alunoService.get(this.aluno_Id))
             .then(res => {
                 this.aluno = res;
-                let index = this.alunos.findIndex(x => x.id == res.id);
-                if (index != -1) this.alunos.splice(index, 1, res);
                 this.loading = false;
-                this.service.setAluno(this.aluno)
-                this.onAlunoChanged.emit(aluno);
+                this.alunoService.setAluno(this.aluno)
+                this.onAlunoChanged.emit(this.aluno);
 
                 return res;
             })
             .catch(res => {
                 this.loading = false;
                 this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-                return undefined;
+                this.onAlunoChanged.emit(this.aluno);
+				return this.aluno;
             })
     }
 

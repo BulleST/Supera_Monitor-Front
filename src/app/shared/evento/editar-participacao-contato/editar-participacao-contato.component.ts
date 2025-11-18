@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Evento_Participacao_Aluno, statusContato } from '../../../models/evento-participacao-aluno.model';
+import { Evento_Participacao_Aluno, statusContato, UpdateParticipacaoAlunoRequest } from '../../../models/evento-participacao-aluno.model';
 import { lastValueFrom, Subscription } from 'rxjs';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CalendarioUtils, getError, MensagemWhatsapp, showError } from '../../../utils';
@@ -144,9 +144,16 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 
 		this.loading = true;
 
-		let request = {
+		let request: UpdateParticipacaoAlunoRequest = {
 			participacao_Id: this.participacao.id,
+			presente: this.participacao.presente,
 			observacao: this.participacao.observacao,
+			apostila_Abaco_Id: this.participacao.apostila_Abaco_Id,
+			apostila_AH_Id: this.participacao.apostila_AH_Id,
+			numeroPaginaAbaco: this.participacao.numeroPaginaAbaco,
+			numeroPaginaAH: this.participacao.numeroPaginaAH,
+			reposicaoDe_Evento_Id: this.participacao.reposicaoDe_Evento_Id,
+			deactivated: this.participacao.deactivated,
 			contatoObservacao: this.participacao.contatoObservacao,
 			alunoContactado: this.participacao.alunoContactado,
 			statusContato_Id: this.participacao.statusContato_Id,

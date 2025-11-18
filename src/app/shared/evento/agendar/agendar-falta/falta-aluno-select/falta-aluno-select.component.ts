@@ -33,7 +33,7 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 	@Output() onAlunoChanged = new EventEmitter<Aluno>();
 
 	constructor(
-		private service: AlunoService,
+		private alunoService: AlunoService,
 		private crypto: Crypto,
 		private activatedRoute: ActivatedRoute,
 		private toastr: ToastrService,
@@ -50,42 +50,43 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 		});
 		this.subscription.push(evento)
 
-		let aluno = this.service.getAluno().subscribe(alunoRes => {
+		let aluno = this.alunoService.getAluno().subscribe(alunoRes => {
 
 			let params = this.activatedRoute.snapshot.queryParamMap;
-			let alunoIdParam = params.get('aluno_id');
-			this.readonly = !!alunoIdParam;
 
-			if (!alunoRes && alunoIdParam) {
-				this.aluno_Id = this.crypto.decrypt(alunoIdParam);
+			let idParam = params.get('aluno_id');
 
-				if (!this.aluno_Id) return;
+            this.readonly = idParam != null && idParam != 'null';
 
-				this.loadAluno(this.aluno_Id)
+            if (idParam) {
+                this.aluno_Id = this.crypto.decrypt(idParam);
+            }
+
+            this.aluno_Id = alunoRes?.id;
+            this.aluno = alunoRes;
+
+			if (!alunoRes && idParam) {
+				this.aluno_Id = this.crypto.decrypt(idParam);
+				this.loadAluno()
 				return;
 			}
 
-			this.aluno = alunoRes;
-			this.aluno_Id = alunoRes?.id;
-
-			if (!this.readonly) {
-				if (!this.service.list.value.length) {
-					this.loadingAlunos = true;
-					lastValueFrom(this.service.getList())
-						.then(res => this.loadingAlunos = false)
-						.catch(res => this.loadingAlunos = false);
-				}
-
-				let alunos = this.service.list.subscribe(list => {
-					this.alunos = list;
-
-					this.setAlunos();
-
-					this.setAluno();
-				});
-				this.subscription.push(alunos)
-
+			if (!this.alunoService.list.value.length) {
+				this.loadingAlunos = true;
+				lastValueFrom(this.alunoService.getList())
+					.then(res => this.loadingAlunos = false)
+					.catch(res => this.loadingAlunos = false);
 			}
+
+			let alunos = this.alunoService.list.subscribe(list => {
+				this.alunos = list;
+
+				this.setAlunos();
+
+				this.setAluno();
+			});
+			this.subscription.push(alunos)
+
 		});
 		this.subscription.push(aluno);
 	}
@@ -105,14 +106,13 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 	}
 
 	setAluno() {
-		if (this.aluno) {
-			let index = this.alunos.findIndex(x => x.id == this.aluno!.id);
-			if (index != -1) this.alunos.splice(index, 1, this.aluno);
-			this.aluno = this.alunos[index];
-		}
+		let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
+		this.aluno = this.alunos[index];
+        return this.aluno;
 	}
+
 	setAlunos() {
-		this.alunos = this.service.list.value;
+		this.alunos = this.alunoService.list.value;
 		if (this.alunos.length && this.evento) {
 			if (this.evento) {
 				var evento = this.evento as Evento;
@@ -134,38 +134,40 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 		this.setAluno();
 	}
 
-	loadAluno(aluno_Id: number) {
+	loadAluno() {
+        if (!this.aluno_Id) return;
 		this.loading = true;
+		
+		this.setAluno();
 
-
-		return lastValueFrom(this.service.get(aluno_Id))
+		return lastValueFrom(this.alunoService.get(this.aluno_Id))
 			.then(res => {
-				this.aluno = res;
-				this.setAluno();
+                this.aluno = res;
+                this.loading = false;
+                this.alunoService.setAluno(this.aluno)
+                this.onAlunoChanged.emit(this.aluno);
+
 				return res;
 			})
 			.catch(res => {
 				this.loading = false;
 				this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-				let aluno = this.alunos.find(x => x.id == aluno_Id) as Aluno;
-				this.onAlunoChanged.emit(aluno);
-				return aluno;
+				this.onAlunoChanged.emit(this.aluno);
+				return this.aluno;
 			})
 	}
 
+	alunoChanged(e: SelectChangeEvent, model: NgModel) {
+		if (e.value) {
+			this.aluno_Id = e.value;
+			this.loadAluno()
+		}
+	}
+	
 	showError(header: string, message: string, e: any, innerMessage?: string) {
 		showError(this.confirmationService, header, message, e, innerMessage)
 	}
 
-	alunoChanged(e: SelectChangeEvent, model: NgModel) {
-		if (this.aluno) {
-			this.onAlunoChanged.emit(this.aluno)
-			this.service.setAluno(this.aluno)
-			this.aluno_Id = this.aluno?.id;
-			this.loadAluno(this.aluno.id)
-				this.setAluno();
-		}
-	}
 
 
 }

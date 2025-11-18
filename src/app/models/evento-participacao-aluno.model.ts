@@ -51,7 +51,7 @@ export class Evento_Participacao_Aluno {
 
     // // Não mapeado
     // loadingFoto?: boolean = false;
-    
+
     created: Date = new Date;
     deactivated?: Date;
     active: boolean = true;
@@ -62,20 +62,37 @@ export class Evento_Participacao_Aluno {
     primeiraAula_Id?: number;
     aulaZero_Id?: number;
 
-    alunoContactado?: Date; 
+    alunoContactado?: Date;
     statusContato_Id?: number;
     contatoObservacao?: string;
 }
 
 
+export class UpdateParticipacaoAlunoRequest {
+    participacao_Id: number = 0;
+    presente?: boolean;
+    observacao?: string;
+    apostila_AH_Id?: number;
+    apostila_Abaco_Id?: number;
+    numeroPaginaAH?: number;
+    numeroPaginaAbaco?: number;
+    reposicaoDe_Evento_Id?: number;
+    deactivated?: Date;
+    contatoObservacao?: string;
+    alunoContactado?: Date;
+    statusContato_Id?: number;
+
+}
+
+
 export var statusContato = [
-        { value: 1, label: 'Não compareceu' },
-        { value: 2, label: 'Aguardando Retorno' },
-        { value: 3, label: 'Optou por não repor' },
-        { value: 4, label: 'Aula Cancelada' },
-        { value: 5, label: 'Reposição Agendada' },
-        { value: 6, label: 'Reposição Realizada' },
-        { value: 7, label: 'Não Compareceu na reposição' },
-        { value: 8, label: 'Reposição Desmarcada' },
-        { value: 9, label: 'Outro' },
-    ]
+    { value: 1, label: 'Não compareceu' },
+    { value: 2, label: 'Aguardando Retorno' },
+    { value: 3, label: 'Optou por não repor' },
+    { value: 4, label: 'Aula Cancelada' },
+    { value: 5, label: 'Reposição Agendada' },
+    { value: 6, label: 'Reposição Realizada' },
+    { value: 7, label: 'Não Compareceu na reposição' },
+    { value: 8, label: 'Reposição Desmarcada' },
+    { value: 9, label: 'Outro' },
+]

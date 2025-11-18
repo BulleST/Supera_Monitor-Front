@@ -9,16 +9,17 @@
                       [loading]="loadingAlunos"
                       name="aluno_Id"
                       inputId="aluno_Id"
-                      #aluno_Id="ngModel"
-                      [(ngModel)]="aluno"
+                      #fieldAluno="ngModel"
+                      [(ngModel)]="aluno_Id"
                       [ngModelOptions]="{ standalone: true }"
-                      (onChange)="alunoChanged($event, aluno_Id)"
+                      (onChange)="alunoChanged($event, fieldAluno)"
                       [required]="true"
                       [filter]="true"
                       filterBy="nome,turma,professor"
                       [virtualScroll]="true"
                       [virtualScrollItemSize]="43"
                       optionLabel="nome"
+                      optionValue="id"
                       [readonly]="readonly"
                       [disabled]="readonly"
                       placeholder="Selecione um aluno"
@@ -54,9 +55,9 @@
                 </ng-template>
             </p-select>
         </p-iconfield>
-        <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-            <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-            <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+        <div *ngIf="fieldAluno.touched && fieldAluno.invalid && fieldAluno.errors">
+            <p class="text-red-500 mt-2 mb-0" *ngIf="fieldAluno.errors['required']">Esse campo é obrigatório.</p>
+            <p class="text-red-500 mt-2 mb-0" *ngIf="fieldAluno.errors['indisponivel']">Aluno indisponível.</p>
         </div>
     </ng-container>
     <ng-template #alunoSelecionadoTemplate>
