@@ -128,4 +128,5 @@
 .event-abaco p {
     padding: 0 5px;
     text-transform: capitalize;
+    height: 21px;
 }
