@@ -311,7 +311,7 @@
                           [rounded]="true"
                           (onClick)="popoverMenu.toggle($event)" />
                 <p-popover appendTo="body" #popoverMenu styleClass="-mt-1">
-                    <div class="flex flex-column">
+                    <div class="flex flex-column gap-2">
                         <ng-container *ngIf="[EventoTipo.Reuniao].includes(aula.evento_Tipo_Id) == false">
                             <!-- Reposição -->
                             <p-button (onClick)="goToAgendarReposicao()"
@@ -320,7 +320,8 @@
                                       [text]="true"
                                       severity="secondary"
                                       styleClass="justify-content-start surface-50"
-                                      [disabled]="participacao.presente === true 
+                                      [disabled]="
+                                               participacao.presente === true 
                                             || item.reposicaoPara 
                                             || participacao.reposicaoDe_Evento_Id 
                                             || participacao.reposicaoPara_Evento_Id

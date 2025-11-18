@@ -139,6 +139,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
 
                     });
 
+                    this.list = this.list.sort((x, y) => x.data.getTime() - y.data.getTime())
                     this.setEvento();
                     this.loading = false;
                 })

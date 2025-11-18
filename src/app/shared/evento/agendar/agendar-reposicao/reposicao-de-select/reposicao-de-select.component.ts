@@ -159,8 +159,8 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
                             && naoEhReposicao
                             && naoGanhouPresenca
                     });
-    
-                    this.list = this.list.sort((x, y) => y.data.getTime() - x.data.getTime())
+                    this.list = this.list.sort((x, y) => x.data.getTime() - y.data.getTime())
+
                     this.loading = false;
                     this.setEvento();
                 })
