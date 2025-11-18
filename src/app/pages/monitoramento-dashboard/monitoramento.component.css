@@ -24,16 +24,14 @@
     height: 20px;
 }
 
-.event-abaco, 
 .event-data {
     display: flex;
     width: 100%;
 }
 
-.event-abaco-name,
-.event-abaco-page,
 .event-data-day,
 .event-data-hour {
+    width: 100%;
     padding: 0 3px;
     flex: 1;
     background: white;
@@ -42,6 +40,9 @@
     border: 1px var(--p-surface-200) solid;
     border-top: none;
     border-right: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 /* .event-status >span {
     margin-left: 5px;
@@ -67,13 +68,13 @@
     width: 100%;
     height: 100%;
     cursor: pointer;
+    padding: 0 2px 0 0;
 }
 
 .event-cell-inner {
     display: flex;
     flex-flow: column;
-    max-width: 100%;
-    width: max-content;
+    width: 100%;
     height: 100%;
     flex: none;
 }
@@ -118,4 +119,13 @@
     height: var(--size);
     border-radius: 50%;
     line-height: 0;
+}
+
+.event-abaco {
+    text-align: left;
+}
+
+.event-abaco p {
+    padding: 0 5px;
+    text-transform: capitalize;
 }

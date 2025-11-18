@@ -131,22 +131,16 @@
                 </div>
             </th>
             <ng-container *ngFor="let mes of mesesAno">
-
                 <ng-container *ngFor="let roteiro of mes.roteiros; let i = index;">
-
                     <th [ngClass]="{ 'bg-red-200 border-red-500': roteiro.recesso === true }">
-
                         <div *ngIf="!roteiro.recesso">
-
                             <p-columnFilter
                                             field="turma"
                                             type="text"
                                             class="p-column-filter-inline"
                                             [showMenu]="false"
                                             matchMode="equals">
-
                                 <ng-template #filter let-value let-filter="filterCallback">
-
                                     <p-select [options]="filterStatus"
                                               [ngModel]="value"
                                               inputId="status-{{roteiro.semana}}"
@@ -185,20 +179,30 @@
             <td pFrozenColumn
                 alignFrozen="left"
                 [frozen]="true"
-                colspan="2"
                 [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }">
-                <div class="flex align-items-center gap-2 line-height-1 py-2 justify-content-between">
+                <div class="flex align-items-center gap-2 line-height-1 py-1 white-space-nowrap">
                     <i class="fa fa-users-between-lines ml-1"></i>
-                    <span class="mr-auto font-bold">{{aluno.turma}}</span>
+                    <span>{{aluno.turma}}</span>
                 </div>
             </td>
+            <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda}"></td>
             <ng-container *ngFor="let item of aluno.items; let i = index">
-                <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }"
-                class="text-xs">
-                    <span>{{item.aula.aula.data | date : 'dd/MM'}}</span>
-                    <span>{{item.aula.aula.data | date : 'HH:mm'}}</span>
+                <td 
+                
+                class="text-sm line-height-1 white-space-nowrap"
+                    [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }"
+                    pFrozenColumn
+                    alignFrozen="right"
+                    [frozen]="i == aluno.items.length - 1">
+                    <ng-container *ngIf="i == aluno.items.length - 1">
+                        <span>{{calculaAlunosMesmaTurma(aluno.turma_Id)}}</span>
+                    </ng-container>
+                    <ng-container *ngIf="i < aluno.items.length - 1">
+                        <span [class.hidden]="!item.show || item.status == Monitoramento_Item_Status.Recesso">
+                            {{item.aula.aula.data | date : 'dd/MM  HH\'h\'mm'}}
+                        </span>
+                    </ng-container>
                 </td>
-
             </ng-container>
             <!-- <ng-container *ngFor="let mes of mesesAno; let indexMes = index;">
                 <ng-container *ngFor="let roteiro of mes.roteiros; let indexRoteiro = index;">
@@ -334,12 +338,6 @@
                             </ng-container>
                             <!-- PresenteNaAula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteNaAula">
-                                <div class="event-status bg-green-500 border-1 border-green-500">
-                                    <span pTooltip="Presente">Presente</span>
-                                    <span class="event-turma"
-                                          [pTooltip]="item.aula.aula.turma"
-                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
-                                </div>
                                 <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
                                     abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
@@ -348,12 +346,6 @@
                             </ng-container>
                             <!-- PresenteReposicao -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteReposicao">
-                                <div class="event-status bg-green-200 border-1 border-green-200 text-green-700">
-                                    <span pTooltip="Presente - Reposição">Presente</span>
-                                    <span class="event-turma"
-                                          [pTooltip]="item.aula.aula.turma"
-                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
-                                </div>
                                 <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
                                     abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
@@ -410,9 +402,7 @@
     </ng-template>
     <ng-template #emptymessage>
         <tr>
-            <td colspan="2" pFrozenColumn alignFrozen="left" [frozen]="true">
-                Nenhum registro encontrado
-            </td>
+            <td colspan="2" pFrozenColumn alignFrozen="left" [frozen]="true"> Nenhum registro encontrado </td>
             <ng-container *ngFor="let mes of mesesAno">
                 <ng-container *ngFor="let roteiro of mes.roteiros">
                     <td></td>
@@ -442,22 +432,21 @@
 </p-table>
 <ng-template #abacoTemplate let-abaco="abaco" let-pagina="pagina" let-reposicao="reposicao">
     <div class="event-abaco" [pTooltip]="reposicao">
-        <p class="event-abaco-name"
-        [ngClass]="{
+        <p class="event-abaco-name border-1"
+           [ngClass]="{
             'bg-green-200 border-green-200 text-green-600': reposicao,
             'bg-green-500 border-green-500 text-white': !reposicao,
         }">
-            <span [pTooltip]="abaco" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis lowercase">
-                {{abaco}}
+            <span [pTooltip]="abaco" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis">
+                {{(abaco ?? '').toLowerCase()}}
             </span>
         </p>
-        <p class="event-abaco-page"
-            [ngClass]="{
+        <p class="event-abaco-page border-1"
+           [ngClass]="{
                 'bg-green-200 border-green-200 text-green-600': reposicao,
                 'bg-green-500 border-green-500 text-white': !reposicao,
             }">
-            <span [pTooltip]="'Página '+ pagina" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis">
-                pág. {{pagina}}
+            <span [pTooltip]="'Página '+ pagina" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis"> pág. {{pagina}}
             </span>
         </p>
     </div>
