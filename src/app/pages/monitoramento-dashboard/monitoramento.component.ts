@@ -114,9 +114,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	}
 
 	onLoading() {
-		let container = document.querySelectorAll('.p-datatable-table-container')[0] as HTMLElement;
-		container.scrollLeft = 0;
-
 		this.loading = true;
 		this.mesesAno = Array.from({ length: 12 }, (v, i) => {
 			return {
@@ -161,6 +158,7 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 					return a;
 				});
 
+				// this.scrollView();
 				this.loading = false;
 			})
 			.catch(res => {

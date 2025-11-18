@@ -10,11 +10,6 @@
                                   [corLegenda]="aula.corLegenda"
                                   [professor]="aula.professor"></app-legend-color>
             </p>
-            <!-- <app-evento-participacao-status 
-            [evento]="item.aula.aula"
-            [participacao]="item.aula.participacao"
-            [primeiraAula_Id]="aluno.primeiraAula_Id"
-            [reposicaoPara]="item.reposicaoPara?.aula" /> -->
             <div class="flex align-items-center gap-2 mt-2">
                 <p-badge *ngIf="aluno.primeiraAula_Id == item.id"
                          severity="danger"
@@ -43,14 +38,14 @@
                          severity="warn"
                          class="bg-yellow-500 border-yellow-500"
                          value="Faltou - Aluno Contatato" />
-                         <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAula"
-                                  severity="danger"
-                                  class="bg-red-500 border-red-500"
-                                  value="Faltou - Aluno Não Contatato" />
-                                  <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAgendada"
-                                           severity="danger"
-                                           class="bg-red-100 border-red-100 text-red-600"
-                                           value="Falta Agendada" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAula"
+                         severity="danger"
+                         class="bg-red-500 border-red-500"
+                         value="Faltou - Aluno Não Contatato" />
+                <p-badge *ngIf="item.status == Monitoramento_Item_Status.FaltaAgendada"
+                         severity="danger"
+                         class="bg-red-100 border-red-100 text-red-600"
+                         value="Falta Agendada" />
                 <p-badge *ngIf="item.status == Monitoramento_Item_Status.Cancelada"
                          severity="contrast"
                          class="surface-900 border-900"
@@ -308,15 +303,17 @@
                     </div>
                 </p-popover>
             </div>
-            <p-button *ngIf="[Monitoramento_Item_Status.ReposicaoAgendada,
-                        Monitoramento_Item_Status.ReposicaoDesmarcada,
-                        Monitoramento_Item_Status.FaltaAgendada,
-                        Monitoramento_Item_Status.FaltaReposicao,
-                        Monitoramento_Item_Status.FaltaAula].includes(item.status )"
-                label="Ver contato"
-            icon="pi pi-phone"
-            [rounded]="true"
-            (onClick)="showContatoFalta()"/>
+            <!--  *ngIf="[Monitoramento_Item_Status.ReposicaoAgendada,
+                Monitoramento_Item_Status.ReposicaoDesmarcada,
+                Monitoramento_Item_Status.FaltaAlunoContatado,
+                Monitoramento_Item_Status.FaltaAgendada,
+                Monitoramento_Item_Status.FaltaReposicao,
+                Monitoramento_Item_Status.FaltaAula].includes(item.status )" -->
+            <p-button
+                      label="Ver contato"
+                      icon="pi pi-phone"
+                      [rounded]="true"
+                      (onClick)="showContatoFalta()" />
             <div class="ml-auto">
                 <p-button label="Ver Aula"
                           icon="pi pi-arrow-right"
