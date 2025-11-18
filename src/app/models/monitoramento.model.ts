@@ -35,6 +35,7 @@ export interface Monitoramento_Aluno {
     corLegenda: string;
     turma: string;
     turma_Id: number;
+    apostila_Kit_Id?: number;
     items: Monitoramento_Aluno_Item[];
 }
 
@@ -85,8 +86,12 @@ export interface Monitoramento_Participacao {
     
     apostila_Abaco?: string;
     apostila_AH?: string;
-    numeroPaginaAbaco?: number;
-    numeroPaginaAH?: number;
+
+    apostila_Abaco_Id?: number;
+    apostila_AH_Id?: number;
+
+    numeroPaginaAbaco: number;
+    numeroPaginaAH: number;
 
     alunoContactado?: Date; 
     statusContato_Id?: StatusContato;

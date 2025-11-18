@@ -1,74 +1,8 @@
-.primeira-aula {
-    width: 16px;
-    background-color: var(--p-pink-500);
-    font-size: 0.8rem;
-    color: white;
-    text-align: center;
-    writing-mode: vertical-rl;
-}
-
-.event-status {
-    width: 71px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: .5rem;
-    border-width: 1px;
-    text-align: center;
-    color: white;
-    font-size: .75rem;
-    position: relative;
-    padding: 0 5px;
-    line-height: 1;
-    height: 20px;
-}
-
-.event-data {    
-    display: flex;
-    align-items: center;
-    row-gap: 5px;
-    width: 71px;
-    border: 1px var(--p-surface-100) solid;
-    border-top: none;
-    padding: 0 3px;
-}
-
-.event-data-day,
-.event-data-hour {
-    width: 100%;
-    padding: 0 0;
-    flex: 1;
-    background: white;
-    text-align: center;
-    font-size: 9px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-/* .event-status >span {
-    margin-left: 5px;
-} */
-.event-status-presente {
-    font-size: .75rem;
-    width: 100%;
-    color: white;
-    border-width: 1px;
-}
-
-.event-status-presente .apostila {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .5rem;
-    padding: 0 .25rem;
-}
-
 .event-cell {
     display: flex;
     align-items: stretch;
-    width: 100%;
-    height: 100%;
+    width: 75px;
+    height: 42px;
     cursor: pointer;
     padding: 0 2px 0 0;
 }
@@ -79,6 +13,104 @@
     width: 100%;
     height: 100%;
     flex: none;
+    background-color: var(--surface-50);
+}
+tr:nth-child(2n) .event-cell-inner {
+    background-color: rgba(0, 00, 0, 0.1);
+}
+.event-cell-inner:hover {
+    /* box-shadow: 0px 9px 46px 8px rgba(0, 0, 0, 0.12), 0px 24px 38px 3px rgba(0, 0, 0, 0.14), 0px 11px 15px rgba(0, 0, 0, 0.2) !important; */
+    box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 4px 5px rgba(0, 0, 0, 0.14), 0px 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+.event-status {
+    width: 100%;
+    height: 100%;
+    max-height: 21px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: 0 5px;
+    border-width: 1px;
+    color: white;
+    font-size: .75rem;
+    text-align: center;
+    line-height: 1;
+    flex: 1;
+}
+.event-status > span:not(.event-turma) {
+    flex: 1 1 0% !important;
+    width: 100% !important;
+}
+.event-turma {
+    --size: 10px;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    line-height: 0;
+}
+
+.event-data {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    row-gap: 5px;
+    border: 1px var(--p-surface-100) solid;
+    border-top: none;
+    padding: 0 3px;
+    background-color: white;
+    flex: 1;
+}
+
+.event-data-day,
+.event-data-hour {
+    width: 100%;
+    padding: 0 0;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    background: white;
+    text-align: center;
+    font-size: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1;
+}
+
+.event-abaco {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: 0px 0;
+    line-height: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+    text-transform: capitalize;
+}
+
+.event-abaco p {
+    text-transform: capitalize;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    padding: 0px 1px;
+    display: flex;
+    align-items: center;
+}
+
+.primeira-aula {
+    width: 16px;
+    background-color: var(--p-pink-500);
+    font-size: 0.8rem;
+    color: white;
+    text-align: center;
+    writing-mode: vertical-rl;
 }
 
 ::ng-deep .p-table-monitoramento {
@@ -98,37 +130,4 @@
 
 ::ng-deep .p-datatable-scrollable-table>.p-datatable-tbody>.p-datatable-row-group-header {
     z-index: 3 !important;
-}
-
-::ng-deep .p-datatable-scrollable-table>.p-datatable-tbody>.p-datatable-row-group-header>td.ultima-celula,
-.p-table-monitoramento .p-datatable-thead>tr>th.ultima-celula,
-.p-table-monitoramento .p-datatable-tbody tr td.ultima-celula {
-    position: sticky;
-    right: 0;
-    display: block;
-    width: 0;
-    height: 35px;
-    border: none;
-    border-right-width: 2px;
-    border-right-style: solid;
-    padding: 0 !important;
-}
-
-
-.event-turma {
-    --size: 10px;
-    width: var(--size);
-    height: var(--size);
-    border-radius: 50%;
-    line-height: 0;
-}
-
-.event-abaco {
-    text-align: left;
-}
-
-.event-abaco p {
-    padding: 0 5px;
-    text-transform: capitalize;
-    height: 19.5px;
 }

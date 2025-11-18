@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, map, of, tap } from 'rxjs';
+import { BehaviorSubject, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { Evento, EventoCancelamentoRequest } from '../models/evento.model';
 import { EventoTurmaExtraRequest, EventoAulaRequest } from '../models/evento-aula.model';
@@ -15,10 +15,10 @@ import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { RoteiroService } from './roteiro.service';
 import { Roteiro } from '../models/roteiro.model';
-import { PrimeiraAulaRequest, PseudoEvento, ReposicaoRequest } from '../models/reposicao.model';
+import { PrimeiraAulaRequest, ReposicaoRequest } from '../models/reposicao.model';
 import { MyMap } from '../utils/map';
 import { EventoChamadaRequest } from '../models/evento-chamada.model';
-import { Feriado } from '../models/feriado.model';
+import { UpdateParticipacaoAlunoRequest } from '../models/evento-participacao-aluno.model';
 import { EventoAgendarFaltaRequest } from '../models/evento-agendar-falta-request.model';
 import { UrlService } from '../utils/url.service';
 import { statusContato } from '../models/evento-participacao-aluno.model';
@@ -316,7 +316,7 @@ export class EventoService extends Service {
         return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
     }
 
-    atualizarParticipacao(request: any) {
+    atualizarParticipacao(request: UpdateParticipacaoAlunoRequest) {
         return this.http.put<RequestResponse>(`${this.url}/eventos/participacao/atualizar`, request);
     }
     

@@ -81,7 +81,6 @@ export class UpdateParticipacaoAlunoRequest {
     contatoObservacao?: string;
     alunoContactado?: Date;
     statusContato_Id?: number;
-
 }
 
 

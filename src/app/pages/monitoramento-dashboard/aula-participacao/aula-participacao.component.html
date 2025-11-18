@@ -1,3 +1,4 @@
+<app-confirm-dialog></app-confirm-dialog>
 <div class="flex flex-column">
     <header class="flex align-items-baseline justify-content-between gap-2 pt-3 pl-3">
         <div>
@@ -74,163 +75,215 @@
     <p-divider />
     <section class="px-3 flex-1 h-full">
         <!-- <pre>{{ item.reposicaoPara| json  }}</pre> -->
-        <table class="mx-auto">
-            <!-- Data -->
-            <tr>
-                <td class="text-right">
-                    <label>Data:</label>
-                </td>
-                <td class="w-min" colspan="4">
-                    <p-iconfield>
-                        <p-inputicon class="pi pi-calendar text-primary-500" />
-                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
-                            <span *ngIf="item.reposicaoPara">
-                                {{item.reposicaoPara.aula.data | date : 'dd/MM/yyyy HH:mm' }}
-                            </span>
-                            <span [ngClass]="{
-                                'text-500 ml-auto pl-3 line-through': item.reposicaoPara
-                            }">
-                                {{aula.data | date : 'dd/MM/yyyy HH:mm' }}
-                            </span>
-                        </div>
-                    </p-iconfield>
-                </td>
-            </tr>
-            <!-- Turma -->
-            <tr>
-                <td class="text-right">
-                    <label>Turma:</label>
-                </td>
-                <td class="w-min" colspan="4">
-                    <p-iconfield>
-                        <p-inputicon class="fa fa-users-between-lines text-primary-500" />
-                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
-                            <span *ngIf="item.reposicaoPara">
-                                {{item.reposicaoPara.aula.turma }}
-                            </span>
-                            <span [ngClass]="{
-                                'text-500 ml-auto pl-3 line-through': item.reposicaoPara
-                            }">
-                                {{aula.turma }}
-                            </span>
-                        </div>
-                    </p-iconfield>
-                </td>
-            </tr>
-            <!-- Educador -->
-            <tr>
-                <td class="text-right">
-                    <label>Educador:</label>
-                </td>
-                <td class="w-min" colspan="4">
-                    <p-iconfield>
-                        <p-inputicon class="fa fa-user-graduate text-primary-500" />
-                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
-                            <ng-container *ngIf="item.reposicaoPara">
-                                <span>{{item.reposicaoPara.aula.professor }}</span>
+        <form #form="ngForm" (ngSubmit)="atualizarConfirm($event, form)">
+            <table class="mx-auto">
+                <!-- Data -->
+                <tr>
+                    <td class="text-right">
+                        <label>Data:</label>
+                    </td>
+                    <td class="w-min" colspan="4">
+                        <p-iconfield>
+                            <p-inputicon class="pi pi-calendar text-primary-500" />
+                            <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                                <span *ngIf="item.reposicaoPara">
+                                    {{item.reposicaoPara.aula.data | date : 'dd/MM/yyyy HH:mm' }}
+                                </span>
+                                <span [ngClass]="{
+                                    'text-500 ml-auto pl-3 line-through': item.reposicaoPara
+                                }">
+                                    {{aula.data | date : 'dd/MM/yyyy HH:mm' }}
+                                </span>
+                            </div>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Turma -->
+                <tr>
+                    <td class="text-right">
+                        <label>Turma:</label>
+                    </td>
+                    <td class="w-min" colspan="4">
+                        <p-iconfield>
+                            <p-inputicon class="fa fa-users-between-lines text-primary-500" />
+                            <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                                <span *ngIf="item.reposicaoPara">
+                                    {{item.reposicaoPara.aula.turma }}
+                                </span>
+                                <span [ngClass]="{
+                                    'text-500 ml-auto pl-3 line-through': item.reposicaoPara
+                                }">
+                                    {{aula.turma }}
+                                </span>
+                            </div>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Educador -->
+                <tr>
+                    <td class="text-right">
+                        <label>Educador:</label>
+                    </td>
+                    <td class="w-min" colspan="4">
+                        <p-iconfield>
+                            <p-inputicon class="fa fa-user-graduate text-primary-500" />
+                            <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                                <ng-container *ngIf="item.reposicaoPara">
+                                    <span>{{item.reposicaoPara.aula.professor }}</span>
+                                    <app-legend-color class="line-height-1"
+                                                      [corLegenda]="item.reposicaoPara.aula.corLegenda"
+                                                      [professor]="item.reposicaoPara.aula.professor"></app-legend-color>
+                                </ng-container>
+                                <span [ngClass]="{
+                                    'text-500 ml-auto pl-3 line-through': item.reposicaoPara
+                                }">
+                                    {{aula.professor }}
+                                </span>
                                 <app-legend-color class="line-height-1"
-                                                  [corLegenda]="item.reposicaoPara.aula.corLegenda"
-                                                  [professor]="item.reposicaoPara.aula.professor"></app-legend-color>
-                            </ng-container>
-                            <span [ngClass]="{
-                                'text-500 ml-auto pl-3 line-through': item.reposicaoPara
-                            }">
-                                {{aula.professor }}
-                            </span>
-                            <app-legend-color class="line-height-1"
-                                              [corLegenda]="aula.corLegenda"
-                                              [professor]="aula.professor"></app-legend-color>
+                                                  [corLegenda]="aula.corLegenda"
+                                                  [professor]="aula.professor"></app-legend-color>
+                            </div>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Sala -->
+                <tr>
+                    <td class="text-right">
+                        <label>Sala:</label>
+                    </td>
+                    <td class="w-min" colspan="4">
+                        <p-iconfield>
+                            <p-inputicon class="bi bi-door-open text-primary-500" />
+                            <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
+                                <span *ngIf="item.reposicaoPara">
+                                    {{item.reposicaoPara.aula.sala }}
+                                </span>
+                                <span [ngClass]="{
+                                    'text-500 ml-auto pl-3 line-through': item.reposicaoPara
+                                }">
+                                    {{aula.sala }}
+                                </span>
+                            </div>
+                        </p-iconfield>
+                    </td>
+                </tr>
+                <!-- Ábaco -->
+                <tr>
+                    <td class="text-right">
+                        <label for="apostila_Abaco_Id">Ábaco:</label>
+                    </td>
+                    <td class="w-min">
+                        <div class="w-15rem">
+                            <p-iconfield>
+                                <p-inputicon class="bi bi-book text-primary-500" />
+                                <p-select
+                                          [options]="apostilasAbacoAluno"
+                                          [(ngModel)]="participacaoAluno.apostila_Abaco_Id"
+                                          name="apostila_Abaco_Id"
+                                          inputId="apostila_Abaco_Id"
+                                          [required]="true"
+                                          [dropdownIcon]="readonly ? 'pi' : 'pi pi-angle-down'"
+                                          [readonly]="readonly"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          appendTo="body"
+                                          fluid />
+                            </p-iconfield>
                         </div>
-                    </p-iconfield>
-                </td>
-            </tr>
-            <!-- Sala -->
-            <tr>
-                <td class="text-right">
-                    <label>Sala:</label>
-                </td>
-                <td class="w-min" colspan="4">
-                    <p-iconfield>
-                        <p-inputicon class="bi bi-door-open text-primary-500" />
-                        <div class="p-inputtext white-space-nowrap flex align-items-center gap-2">
-                            <span *ngIf="item.reposicaoPara">
-                                {{item.reposicaoPara.aula.sala }}
-                            </span>
-                            <span [ngClass]="{
-                                'text-500 ml-auto pl-3 line-through': item.reposicaoPara
-                            }">
-                                {{aula.sala }}
-                            </span>
+                    </td>
+                    <td class="text-right">
+                        <label>Página:</label>
+                    </td>
+                    <td>
+                        <div class="w-5rem">
+                            <p-inputnumber
+                                           [(ngModel)]="participacaoAluno.numeroPaginaAbaco"
+                                           inputId="numeroPaginaAbaco"
+                                           name="numeroPaginaAbaco"
+                                           [min]="0"
+                                           [max]="selectedApostilaAbaco?.numeroTotalPaginas"
+                                           [step]="0"
+                                           [required]="true"
+                                          [readonly]="readonly"
+                                          autocomplete="off"
+                                           class="h-full"
+                                           inputStyleClass="h-full text-center"
+                                           fluid />
                         </div>
-                    </p-iconfield>
-                </td>
-            </tr>
-            <!-- Ábaco -->
-            <tr>
-                <td class="text-right">
-                    <label>Ábaco:</label>
-                </td>
-                <td class="w-min">
-                    <p-iconfield class="w-min">
-                        <p-inputicon class="bi bi-book text-primary-500" />
-                        <input type="text"
-                               pInputText
-                               [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco) ?? ''"
-                               readonly>
-                        <!-- style="field-sizing: content" -->
-                    </p-iconfield>
-                </td>
-                <td class="text-right">
-                    <label>Página:</label>
-                </td>
-                <td>
-                    <input type="text"
-                           pInputText
-                           [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco : item.aula.participacao.numeroPaginaAbaco) ?? ''"
-                           readonly
-                           class="w-full"
-                           style="max-width: 8rem;">
-                </td>
-            </tr>
-            <!-- AH -->
-            <tr>
-                <td class="text-right">
-                    <label>AH:</label>
-                </td>
-                <td class="w-min">
-                    <p-iconfield class="w-min">
-                        <p-inputicon class="bi bi-book text-primary-500" />
-                        <input type="text"
-                               pInputText
-                               [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.apostila_AH : item.aula.participacao.apostila_AH) ?? ''"
-                               readonly>
-                        <!-- style="field-sizing: content" -->
-                    </p-iconfield>
-                </td>
-                <td class="text-right">
-                    <label>Página:</label>
-                </td>
-                <td>
-                    <input type="text"
-                           pInputText
-                           [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAH : item.aula.participacao.numeroPaginaAH) ?? ''"
-                           readonly
-                           class="w-full"
-                           style="max-width: 8rem;">
-                </td>
-            </tr>
-            <tr>
-                <td class="text-right vertical-align-top">
-                    <label>Observações: </label>
-                </td>
-                <td colspan="3">
-                    <textarea pTextarea
-                              readonly
-                              [value]="(item.reposicaoPara ? item.reposicaoPara.participacao.observacao : item.aula.participacao.observacao) ?? ''"
-                              fluid></textarea>
-                </td>
-            </tr>
-        </table>
+                    </td>
+                </tr>
+                <!-- AH -->
+                <tr>
+                    <td class="text-right">
+                        <label>AH:</label>
+                    </td>
+                    <td class="w-min">
+                        <div class="w-15rem">
+                            <p-iconfield>
+                                <p-inputicon class="bi bi-book text-primary-500" />
+                                <p-select
+                                          [options]="apostilasAHAluno"
+                                          [(ngModel)]="participacaoAluno.apostila_AH_Id"
+                                          name="apostila_AH_Id"
+                                          inputId="apostila_AH_Id"
+                                          [required]="true"
+                                          [dropdownIcon]="readonly ? 'pi' : 'pi pi-angle-down'"
+                                          [readonly]="readonly"
+                                          optionLabel="nome"
+                                          optionValue="id"
+                                          appendTo="body"
+                                          fluid />
+                            </p-iconfield>
+                        </div>
+                    </td>
+                    <td class="text-right">
+                        <label>Página:</label>
+                    </td>
+                    <td>
+                        <div class="w-5rem">
+                            <p-inputnumber
+                                           [(ngModel)]="participacaoAluno.numeroPaginaAH"
+                                           inputId="numeroPaginaAH"
+                                           name="numeroPaginaAH"
+                                           [min]="0"
+                                           [max]="selectedApostilaAH?.numeroTotalPaginas"
+                                           [step]="0"
+                                          [readonly]="readonly"
+                                          [required]="true"
+                                           autocomplete="off"
+                                           class="h-full"
+                                           inputStyleClass="h-full text-center"
+                                           fluid />
+                        </div>
+                    </td>
+                </tr>
+                <!-- Observações -->
+                <tr>
+                    <td class="text-right vertical-align-top">
+                        <label for="observacao">Observações: </label>
+                    </td>
+                    <td colspan="3">
+                        <textarea pTextarea
+                                  [(ngModel)]="participacaoAluno.observacao"
+                                  id="observacao"
+                                  name="observacao"
+                                  [readonly]="readonly"
+                                  fluid></textarea>
+                    </td>
+                </tr>
+                <tr *ngIf="!readonly">
+                    <td></td>
+                    <td colspan="3">
+                        <p-button type="submit"
+                                  label="Salvar"
+                                  icon="pi pi-check"
+                                  [disabled]="loading || form.invalid"
+                                  [loading]="loading"
+                                  fluid />
+                    </td>
+                </tr>
+            </table>
+        </form>
     </section>
     <div class="mt-auto sticky bottom-0">
         <p-divider layout="horizontal" />

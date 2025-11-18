@@ -338,20 +338,33 @@
                             </ng-container>
                             <!-- PresenteNaAula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteNaAula">
+                                <div class="event-status bg-green-500 border-1 border-green-500">
+                                    <span pTooltip="Presente">Presente</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
                                 <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
                                     abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
                                     reposicao: item.reposicaoPara ? true : false
                                 }"></ng-container>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- PresenteReposicao -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteReposicao">
+                                <div class="event-status bg-green-200 border-1 border-green-200 text-green-600">
+                                    <span pTooltip="Presente - Reposição">Presente</span>
+                                    <span class="event-turma"
+                                          [pTooltip]="item.aula.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                </div>
                                 <ng-container *ngTemplateOutlet="abacoTemplate; context: { 
                                     abaco: item.reposicaoPara ? item.reposicaoPara.participacao.apostila_Abaco : item.aula.participacao.apostila_Abaco, 
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
                                     reposicao: item.reposicaoPara ? true : false
                                 }"></ng-container>
-                                <!-- <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container> -->
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- ReposicaoAgendada -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.ReposicaoAgendada">
@@ -361,7 +374,7 @@
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
                             </ng-container>
                             <!-- FaltaAlunoContatado -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAlunoContatado">
@@ -385,13 +398,13 @@
                             </ng-container>
                             <!-- Aula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.Aula">
-                                <div class="event-status surface-50 border-1 border-100 text-500">
-                                    <span pTooltip="Aula">Aula</span>
+                               <div class="event-status bg-transparent">
+                                    <span pTooltip="Aula não lançada" class="opacity-0">Aula</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
-                                </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                </div> 
+                                <!-- <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container> -->
                             </ng-container>
                         </div>
                         <span *ngIf="aluno.primeiraAula_Id == item.id" class="primeira-aula">1ª aula</span>
@@ -437,8 +450,8 @@
             'bg-green-200 border-green-200 text-green-600': reposicao,
             'bg-green-500 border-green-500 text-white': !reposicao,
         }">
-            <span [pTooltip]="abaco" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis">
-                {{(abaco ?? '').toLowerCase()}}
+            <span [pTooltip]="abaco" class="text-xs">
+                {{(abaco ?? '???').toLowerCase()}}
             </span>
         </p>
         <p class="event-abaco-page border-1"
@@ -446,7 +459,7 @@
                 'bg-green-200 border-green-200 text-green-600': reposicao,
                 'bg-green-500 border-green-500 text-white': !reposicao,
             }">
-            <span [pTooltip]="'Página '+ pagina" class="text-xs white-space-nowrap overflow-hidden w-2rem text-overflow-ellipsis"> pág. {{pagina}}
+            <span [pTooltip]="'Página '+ pagina" class="text-xs"> pág. {{pagina}}
             </span>
         </p>
     </div>
