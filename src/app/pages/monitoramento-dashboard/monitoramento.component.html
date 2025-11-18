@@ -192,7 +192,15 @@
                     <span class="mr-auto font-bold">{{aluno.turma}}</span>
                 </div>
             </td>
-            <ng-container *ngFor="let mes of mesesAno; let indexMes = index;">
+            <ng-container *ngFor="let item of aluno.items; let i = index">
+                <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }"
+                class="text-xs">
+                    <span>{{item.aula.aula.data | date : 'dd/MM'}}</span>
+                    <span>{{item.aula.aula.data | date : 'HH:mm'}}</span>
+                </td>
+
+            </ng-container>
+            <!-- <ng-container *ngFor="let mes of mesesAno; let indexMes = index;">
                 <ng-container *ngFor="let roteiro of mes.roteiros; let indexRoteiro = index;">
                     <ng-container *ngIf="indexMes == mesesAno.length - 1  && indexRoteiro == mes.roteiros.length - 1; else elseTemplate">
                         <td pFrozenColumn
@@ -211,7 +219,7 @@
                         <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></td>
                     </ng-template>
                 </ng-container>
-            </ng-container>
+            </ng-container> -->
         </tr>
     </ng-template>
     <ng-template #body let-aluno let-rowIndex="rowIndex">

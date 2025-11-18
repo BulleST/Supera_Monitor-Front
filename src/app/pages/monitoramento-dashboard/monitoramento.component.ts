@@ -181,8 +181,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 				scrollLeft: left
 			}, 800);
 		}, 200);
-
-
 	}
 
 	customSort(event: SortEvent) {
