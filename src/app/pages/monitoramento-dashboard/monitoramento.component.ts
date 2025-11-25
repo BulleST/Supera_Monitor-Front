@@ -185,7 +185,12 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 
 	customSort(event: SortEvent) {
 		event.data?.sort((x, y) => {
-			let a = x.turma == y.turma ? 0 :
+
+			let a = x.turma == y.turma ? (
+				x.nome == y.nome ? 0 :
+				x.nome > y.nome ? 1 :
+				-1
+			) :
 				x.turma == 'Indefinido' ? 1 :
 					y.turma == 'Indefinido' ? -1 :
 						x.turma < y.turma ? -1 :

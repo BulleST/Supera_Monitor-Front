@@ -92,21 +92,10 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 
 		window.open(object.link, '_blank');
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+		this.removeItemLista(aluno);
 
 		
 
-		if (
-			   this.mensagemTipo == MensagemTipo.Cancelamento 
-			|| this.mensagemTipo == MensagemTipo.FaltaAgendada
-			|| this.mensagemTipo == MensagemTipo.Falta
-			|| this.mensagemTipo == MensagemTipo.ReposicaoDesmarcada
-			|| this.mensagemTipo == MensagemTipo.ConfirmacaoReposicao
-		) {
-			this.showContato(aluno, participacao!);
-		}
-		else {
-			this.removeItemLista(aluno);
-		}
 		return object;
 	}
 

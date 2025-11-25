@@ -46,6 +46,7 @@ export class SelectedEventoComponent implements OnChanges {
     instance: DynamicDialogComponent | undefined;
     refChild: DynamicDialogRef | undefined;
 
+    botaoVerEvento = '';
 
     constructor(
         private service: EventoService,
@@ -290,5 +291,9 @@ export class SelectedEventoComponent implements OnChanges {
 
     showAluno(participacao: Evento_Participacao_Aluno) {
         showAluno(this.dialogService, participacao.aluno_Id);
+    }
+
+    getNomeBotaoverEvento() {
+        
     }
 }
