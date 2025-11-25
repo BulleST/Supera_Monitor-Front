@@ -9,6 +9,7 @@ import { Account } from '../../models/account.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { UrlService } from '../../utils/url.service';
 import { ToggleButtonChangeEvent } from 'primeng/togglebutton';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-nav-menu',
@@ -37,11 +38,11 @@ export class NavMenuComponent implements OnDestroy, AfterViewInit {
     options = [
         {
             label: 'Local',
-            value: 'https://localhost:7281/back'
+            value: environment.urlLocal
         },
         {
             label: 'PRD',
-            value: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back'
+            value: environment.urlPRD
         }
     ]
    

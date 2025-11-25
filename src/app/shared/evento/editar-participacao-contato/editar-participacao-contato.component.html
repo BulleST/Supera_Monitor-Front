@@ -55,13 +55,13 @@
             </p-iconfield>
         </div>
         <!-- Data -->
-        <div class="field col-3">
+            <div class="field col-6">
             <label for="data">Data:</label>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-calendar" />
                 <input type="text"
                        pInputText
-                       [value]="evento.data | date : 'dd/MM'"
+                       [value]="evento.data | date : 'dd/MM/yyyy HH:mm'"
                        id="data"
                        name="data"
                        fluid
@@ -69,7 +69,7 @@
             </p-iconfield>
         </div>
         <!-- Horário -->
-        <div class="field col-3">
+        <!-- <div class="field col-3">
             <label for="horario">Horário:</label>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-clock" />
@@ -81,7 +81,7 @@
                        fluid
                        readonly>
             </p-iconfield>
-        </div>
+        </div> -->
         <!-- Roteiro -->
         <div class="field col-6">
             <label for="semana">Semana:</label>

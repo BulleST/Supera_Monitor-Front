@@ -43,7 +43,46 @@ export class MensagemWhatsapp {
             });
     }
 
-    async enviarMensagemFalta(evento: Evento, participacao: Evento_Participacao_Aluno, e: any) {
+    carregarSugestoesReposicao(reposicaoDe: Evento, participacao: Evento_Participacao_Aluno) {
+        let request = {
+                intervaloDe: moment(reposicaoDe.data, 'YYYY-MM-DD').toDate(),
+                intervaloAte:moment(reposicaoDe.data, 'YYYY-MM-DD').add(7, 'days').toDate(),
+                perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
+            };
+            let sugestoes: Evento[] = [];
+
+            return lastValueFrom(this.eventoService.getList(request))
+                .then(res => {
+                    sugestoes = res.eventos.filter(reposicaoPara => {
+                        const eventoAtivo = reposicaoPara.active;
+                        const temVagas = reposicaoPara.vagasDisponiveisEvento > 0;
+                        const alunoNoEvento = reposicaoPara.alunos.find(x => x.aluno_Id == participacao.id);
+                        const ehAula = reposicaoPara.evento_Tipo_Id == EventoTipo.Aula || reposicaoPara.evento_Tipo_Id == EventoTipo.TurmaExtra
+                        const perfilCompativel = !participacao.perfilCognitivo_Id || reposicaoPara.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id)
+                        const aulaNaoFinalizada = !reposicaoPara.finalizado;
+                        const naoEhFeriado = !reposicaoPara.feriado;
+                        const salaValida = !participacao.restricaoMobilidade || reposicaoPara.andar == SalaAndar.Terreo;
+                        const turmaDoAluno = reposicaoPara.turma_Id == participacao.turma_Id
+                        const mesmoHorario = moment(reposicaoPara.data).isSame(reposicaoDe.data, 'minutes');
+
+                        return eventoAtivo
+                            && temVagas 
+                            && !alunoNoEvento
+                            && ehAula
+                            && perfilCompativel
+                            && aulaNaoFinalizada
+                            && naoEhFeriado
+                            && salaValida
+                            && !turmaDoAluno
+                            && !mesmoHorario;
+                    });
+
+                    return sugestoes;
+                })
+    }
+
+
+    async enviarMensagemFalta(reposicaoDe: Evento, participacao: Evento_Participacao_Aluno, e: any) {
         if (!participacao.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
             return;
@@ -54,48 +93,21 @@ export class MensagemWhatsapp {
             return;
         }
 
-        let sugestoes: Evento[] = [];
-        let data = moment(evento.data).format('YYYY-MM-DD')
-        let prazo = moment(data).add(1, 'month')
+        let sugestoes: Evento[] = []
+        let data = moment(reposicaoDe.data).format('YYYY-MM-DD')
+        let prazo = moment(data).add(7, 'days');
 
-        // Se estiver dentro do prazo de 1 mes, insere sugestão
+        // Se estiver dentro do prazo de 1 semana, insere sugestão
         if (moment(prazo).isSameOrAfter(new Date, 'date')) {
-            let request = {
-                intervaloDe: moment(data, 'YYYY-MM-DD').add(1, 'day').toDate(),
-                intervaloAte: prazo.toDate(),
-                perfil_Cognitivo_Id: participacao.perfilCognitivo_Id,
-            }
-            await lastValueFrom(this.eventoService.getList(request))
-                .then(res => {
-                    sugestoes = res.eventos.filter(aula => {
-                        const alunosAtivos = aula.alunos.filter(x => x.active);
-                        const alunoNaoEstaNaAula = !alunosAtivos.find(x => x.aluno_Id == participacao.id);
-                        const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                        const temVagas = alunosAtivos.length < aula.capacidadeMaximaEvento;
-                        const ehPerfilCognitivoCompativel = !participacao.perfilCognitivo_Id || aula.perfilCognitivo.map(x => x.id).includes(participacao.perfilCognitivo_Id);
-                        const aulaNaoFinalizada = !aula.finalizado;
-                        const aulaEstaAtiva = aula.active;
-                        const naoEhFeriado = !aula.feriado;
-                        const salaValida = !participacao.restricaoMobilidade || aula.andar == SalaAndar.Terreo;
-
-                        return alunoNaoEstaNaAula
-                            && ehAula
-                            && temVagas
-                            && ehPerfilCognitivoCompativel
-                            && aulaNaoFinalizada
-                            && aulaEstaAtiva
-                            && naoEhFeriado
-                            && salaValida;
-                    });
-                })
+            sugestoes = await this.carregarSugestoesReposicao(reposicaoDe, participacao);
         }
 
-        let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, evento, participacao, sugestoes);
+        let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, reposicaoDe, participacao, sugestoes);
         window.open(object.link, '_blank');
         this.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemCondicao(aluno: any, id: number) {
+    enviarMensagemJornadaSupera(aluno: any, id: number) {
         let object = null;
 
         if (id && aluno && aluno.celular) {

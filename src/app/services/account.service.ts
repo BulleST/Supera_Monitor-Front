@@ -29,9 +29,7 @@ export class AccountService {
         private urlService: UrlService
     ) {
 
-        this.urlService.getUrl().subscribe(res => {
-            this.url = res;
-        })
+        this.urlService.getUrl().subscribe(res => this.url = res)
 
         this.account = this.accountSubject.asObservable();
 

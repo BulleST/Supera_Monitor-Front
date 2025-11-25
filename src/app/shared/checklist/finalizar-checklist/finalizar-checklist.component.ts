@@ -80,7 +80,7 @@ export class FinalizarChecklistComponent implements OnInit {
 
 	enviarMensagemCondicao() {
 		var aluno = {nome: this.view.aluno, celular: this.view.celular}
-		this.mensagemWhatsapp.enviarMensagemCondicao(aluno, this.view.checklistItemId);
+		this.mensagemWhatsapp.enviarMensagemJornadaSupera(aluno, this.view.checklistItemId);
 	}
 
 	sendConfirmation(form: NgForm, e: any) {

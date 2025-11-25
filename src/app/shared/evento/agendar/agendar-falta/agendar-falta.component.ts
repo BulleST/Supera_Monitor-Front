@@ -14,8 +14,7 @@ import { RequestResponse } from '../../../../helpers/request-response.interface'
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { EventoAgendarFaltaRequest } from '../../../../models/evento-agendar-falta-request.model';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
-import { showContatoFalta } from '../../../../utils/show-contato-falta';
-import { EditarParticipacaoContatoComponent, EditarContatoView, EditarContatoTipo } from '../../editar-participacao-contato/editar-participacao-contato.component';
+import { showContato } from '../../../../utils/show-contato';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
 import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
@@ -218,11 +217,15 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 	sendMensagemAluno(evento: Evento) {
 		if (this.aluno) {
 			var aluno = this.aluno as Aluno;
+			var participacao = evento.alunos.find(x => x.aluno_Id == aluno.id)
 			var ref = showEnviarMensagemAlunos(
 				this.dialogService,
 				[aluno],
 				evento,
-				MensagemTipo.FaltaAgendada
+				MensagemTipo.FaltaAgendada,
+				undefined,
+				undefined,
+				participacao,
 			)
 			var onClose = ref.onClose.subscribe(res => {
 				this.close();
@@ -236,13 +239,12 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 	}
 
 
-	showContatoFalta() {
+	showContato() {
 		if (this.evento && this.participacao) {
-			this.refChild = showContatoFalta(
+			this.refChild = showContato(
 				this.dialogService,
 				this.evento,
-				this.participacao,
-				EditarContatoTipo.FaltaAgendada
+				this.participacao
 			);
 			let onClose = this.refChild.onClose.subscribe(res => this.close())
 			this.subscription.push(onClose);

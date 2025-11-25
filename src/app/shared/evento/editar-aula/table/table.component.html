@@ -1,0 +1,323 @@
+<p-table #table
+         [value]="evento.alunos"
+         dataKey="id"
+         stripedRows
+         styleClass="-mt-2">
+    <ng-template pTemplate="emptymessage">
+        <p class="text-400 p-1">Nenhum aluno inscrito</p>
+    </ng-template>
+    <ng-template #body let-participacao let-editing="editing" let-rowIndex="rowIndex">
+        <tr class="static z-0">
+            <!-- Nome -->
+            <td pFrozenColumn class="pb-1 z-2 w-15rem">
+                <div class="flex align-items-center gap-2">
+                    <div class="w-full">
+                        <div class="flex align-items-center gap-1 w-full">
+                            <p-button type="button"
+                                      (onClick)="enviarMensagem(participacao)"
+                                      (auxclick)="enviarMensagem(participacao)"
+                                      (contextmenu)="enviarMensagem(participacao)"
+                                      [disabled]="!participacao.celular || readonly"
+                                      icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
+                                      severity="success"
+                                      [text]="true"
+                                      class="-mt-1" />
+                            <p class="p-button-link cursor-pointer hover:underline mr-auto"
+                               [pTooltip]="'Clique para ver mais: ' + participacao.aluno"
+                               (click)="showAluno(participacao)">
+                                <span class="overflow-hidden max-w-full text-overflow-ellipsis white-space-nowrap max-w-14rem pr-2 capitalize">
+                                    {{ participacao.aluno | nameAbv }}
+                                </span>
+                            </p>
+                            <div class="ml-auto">
+                                <app-evento-participacao-status [evento]="evento"
+                                                                [participacao]="participacao"
+                                                                [reposicaoDe]="participacao.reposicaoDe_Evento"
+                                                                [reposicaoPara]="participacao.reposicaoPara_Evento"
+                                                                [primeiraAula_Id]="participacao.primeiraAula_Id" />
+                            </div>
+                        </div>
+                        <p class="text-sm w-min ml-2 flex align-items-center gap-2 line-height-1">
+                            <b>Jornada: </b>
+                        </p>
+                    </div>
+                </div>
+            </td>
+            <td class="pt-2 pb-1 w-max" style="height: 73px;">
+                <ng-container *ngIf="!participacao.reposicaoPara_Evento_Id && participacao.active">
+                    <div class="flex justify-content-start gap-2 w-full">
+                        <!-- Presença -->
+                        <div class="flex align-items-end" style="height: 50px" *ngIf="!readonly">
+                            <div class="flex align-items-stretch gap-2" style="height: 32px">
+                                <div class="w-2rem">
+                                    <p-button *ngIf="participacao.presente === false"
+                                              [disabled]="!participacao.celular || readonly"
+                                              [severity]="participacao.celular ? 'success' : 'secondary'"
+                                              icon="pi pi-whatsapp"
+                                              iconPos="right"
+                                              [text]="true"
+                                              pTooltip="Enviar mensagem de falta"
+                                              (onClick)="enviarMensagemFalta(participacao, $event)"
+                                              (contextmenu)="enviarMensagemFalta(participacao, $event)"
+                                              (auxclick)="enviarMensagemFalta(participacao, $event)"
+                                              fluid />
+                                </div>
+                                <p-button #presencaButton
+                                          [disabled]=" readonly"
+                                          [severity]="participacao.presente == true ? 'success' : participacao.presente == false ? 'danger' : 'secondary'"
+                                          [label]="participacao.presente === true ? 'Presente' : participacao.presente === false ? 'Faltou' : 'Marcar presença'"
+                                          (onClick)="presente(participacao)"
+                                          (keydown.arrowDown)="presencaNext(rowIndex, $event)"
+                                          (keydown.arrowUp)="presencaPrev(rowIndex, $event)"
+                                          [icon]="participacao.presente === true ? 'pi pi-check text-sm' : participacao.presente === false ? 'pi pi-times text-sm -ml-1' : 'pi pi-check text-sm'"
+                                          styleClass="w-7rem"
+                                          class="w-7rem" />
+                            </div>
+                        </div>
+                        <ng-container *ngIf="participacao.presente || !evento.finalizado">
+                            <p-panel [showHeader]="false"
+                                     #blockedUiApostilas
+                                     styleClass="px-0 pb-0 border-none bg-transparent w-full"
+                                     class="w-full">
+                                <div class="flex align-items-center gap-2">
+                                    <!-- Ábaco -->
+                                    <div class="flex flex-column w-10rem col">
+                                        <label class="ml-1 text-sm" for="apostila_Abaco[{{ rowIndex }}]"> Abaco: </label>
+                                        <p-iconfield>
+                                            <p-inputicon styleClass="fa fa-book-open" />
+                                            <ng-container *ngTemplateOutlet="apostilaAbacoTemplate; context: { participacao, rowIndex }"></ng-container>
+                                        </p-iconfield>
+                                    </div>
+                                    <!-- Página Ábaco -->
+                                    <div class="flex flex-column w-4rem">
+                                        <label class="ml-1 text-sm" for="numeroPaginaAbaco[{{ rowIndex }}]"> Página: </label>
+                                        <div style="height: 33px">
+                                            <ng-container *ngTemplateOutlet="paginaAbacoTemplate; context: { participacao, rowIndex }"></ng-container>
+                                        </div>
+                                    </div>
+                                    <!-- AH -->
+                                    <div class="flex flex-column w-10rem col">
+                                        <label class="ml-1 text-sm" for="apostila_AH[{{ rowIndex }}]"> AH: </label>
+                                        <p-iconfield>
+                                            <p-inputicon styleClass="fa fa-book-open" />
+                                            <ng-container *ngTemplateOutlet="apostilaAHTemplate; context: { participacao, rowIndex }"></ng-container>
+                                        </p-iconfield>
+                                    </div>
+                                    <!-- Página AH -->
+                                    <div class="flex flex-column w-4rem">
+                                        <label class="ml-1 text-sm" for="numeroPaginaAH[{{ rowIndex }}]"> Página: </label>
+                                        <div style="height: 33px">
+                                            <ng-container *ngTemplateOutlet="paginaAHTemplate; context: { participacao, rowIndex }"></ng-container>
+                                        </div>
+                                    </div>
+                                    <!-- Observações -->
+                                    <div class="flex flex-column col">
+                                        <label for="observacao" class="ml-1 text-sm white-space-nowrap"> Observações de aula: </label>
+                                        <div style="height: 33px">
+                                            <ng-container *ngTemplateOutlet="observacoesTemplate; context: { participacao, rowIndex }"></ng-container>
+                                        </div>
+                                    </div>
+                                </div>
+                            </p-panel>
+                            <p-blockui [target]="blockedUiApostilas" [blocked]="!participacao.presente" />
+                        </ng-container>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="evento.finalizado && !participacao.presente">
+                        <div class="flex flex-column align-items-start justify-content-start w-full px-4">
+                            <label class="text-sm line-height-4">Aluno contatado:</label>
+                            <div class="flex align-items-center gap-2">
+                                <p-button [severity]="participacao.alunoContactado ? 'success' : 'danger'"
+                                          [label]="participacao.alunoContactado ? 'Sim' : 'Não'"
+                                          [icon]="participacao.alunoContactado ? 'pi pi-check text-sm' : 'pi pi-times text-sm' "
+                                          [pTooltip]="participacao.alunoContactado ? 'Contato realizado em ' +(participacao.alunoContactado | date : 'dd/MM/yyyy HH:mm') : ''"
+                                          class="w-6rem pointer-events-none"
+                                          styleClass="w-full" />
+                                <p-button
+                                          icon="pi pi-whatsapp"
+                                          severity="success"
+                                          [label]="participacao.alunoContactado ? 'Ver contato' : 'Fazer contato'"
+                                          [styleClass]="participacao.alunoContactado ? 'bg-yellow-500 border-yellow-500 hover:bg-yellow-600 hover:border-yellow-600' : ''"
+                                          (onClick)="contatoToggle(participacao)" />
+                            </div>
+                        </div>
+                </ng-container>
+                <!-- <ng-container *ngIf="participacao.reposicaoPara_Evento_Id || !participacao.active">
+                    <div class="flex justify-content-start  gap-2 "> -->
+                <!-- <div class="flex flex-column align-items-end" style="height: 50px">
+                            <label class="text-sm mr-1 flex line-height-4">Aluno contatado:</label>
+                            <p-button [severity]="participacao.alunoContactado ? 'warn' : 'danger'"
+                                      [label]="participacao.alunoContactado ? 'Sim' : 'Não'"
+                                      (onClick)="contatoToggle (participacao)"
+                                      [styleClass]="participacao.alunoContactado ? 'bg-yellow-500 border-yellow-500' : ''"
+                                      [icon]="participacao.alunoContactado ? 'pi pi-check text-sm' : 'pi pi-times text-sm -ml-1' "
+                                      [pTooltip]="participacao.alunoContactado ? 'Contato realizado em' +(participacao.alunoContactado | date : 'dd/MM/yyyy HH:mm') : ''"
+                                      class="w-7rem" />
+                        </div>
+                        <p-panel [showHeader]="false" #blockedUiContato styleClass="px-0 pb-0 border-none bg-transparent">
+                            <div class="flex align-items-center gap-2 pr-2"> -->
+                <!-- Data do Contato -->
+                <!-- <div class="flex flex-column" style="width: calc(14rem)" *ngIf="participacao.alunoContactado">
+                                    <label class="ml-1 text-sm" for="statusContato_Id[{{ rowIndex }}]"> Data do Contato: 
+                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
+                                    </label>
+                                    <ng-container *ngTemplateOutlet="dataContatoTemplate; context: { participacao, rowIndex }"></ng-container>
+                                </div> -->
+                <!-- Status de Contato -->
+                <!-- <div class="flex flex-column" style="width: calc(14rem)">
+                                    <label class="ml-1 text-sm" for="statusContato_Id[{{ rowIndex }}]"> Status Contato: 
+                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
+                                    </label>
+                                    <ng-container *ngTemplateOutlet="statusContatoTemplate; context: { participacao, rowIndex }"></ng-container>
+                                </div> -->
+                <!-- Observações de Contato -->
+                <!-- <div class="flex flex-column" style="width: calc(14rem + 10px)">
+                                    <label class="ml-1 text-sm"> Observações de Contato: 
+                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
+                                    </label>
+                                    <div style="height: 33px">
+                                        <ng-container *ngTemplateOutlet="observacoesContatoTemplate; context: { participacao, rowIndex }"></ng-container>
+                                    </div>
+                                </div> -->
+                <!-- Observações -->
+                <!-- <div class="flex flex-column w-12rem">
+                                    <label class="ml-1 text-sm">Observações de aula:</label>
+                                    <div style="height: 33px">
+                                        <ng-container *ngTemplateOutlet="observacoesTemplate; context: { participacao, rowIndex }"></ng-container>
+                                    </div>
+                                </div> -->
+                <!-- </div>
+                        </p-panel> -->
+                <!-- </div>
+                </ng-container> -->
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+<ng-template #dataContatoTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-datePicker
+                  inputId="alunoContactado[{{rowIndex}}]"
+                  name="alunoContactado[{{rowIndex}}]"
+                  [(ngModel)]="participacao.alunoContactado"
+                  [showIcon]="true"
+                  [disabled]="readonly"
+                  dateFormat="dd/mm/yy"
+                  hourFormat="24"
+                  iconDisplay="input"
+                  appendTo="body"
+                  fluid />
+</ng-template>
+<ng-template #statusContatoTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-select
+              [options]="statusContato"
+              [(ngModel)]="participacao.statusContato_Id"
+              name="statusContato_Id[{{rowIndex}}]"
+              inputId="statusContato_Id[{{rowIndex}}]"
+              [required]="participacao.alunoContactado"
+              [readonly]="readonly"
+              [dropdownIcon]="readonly ? 'pi hidden' : 'pi pi-angle-down'"
+              appendTo="body"
+              fluid />
+</ng-template>
+<ng-template #observacoesContatoTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <textarea pTextarea
+              [(ngModel)]="participacao.contatoObservacao"
+              name="contatoObservacao[{{rowIndex}}]"
+              id="contatoObservacao[{{rowIndex}}]"
+              style="resize: vertical;"
+              [required]="participacao.alunoContactado"
+              [readonly]="readonly"
+              class="h-full"
+              fluid></textarea>
+</ng-template>
+<ng-template #observacoesTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <textarea pTextarea
+              [(ngModel)]="participacao.observacoes"
+              name="observacoes[{{rowIndex}}]"
+              id="observacoes[{{rowIndex}}]"
+              style="resize: vertical;"
+              [readonly]="readonly"
+              class="h-full"
+              fluid></textarea>
+</ng-template>
+<ng-template #apostilaAbacoTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-select [options]="participacao.apostilasAbacoList"
+              (onChange)="apostilaAbacoChange(participacao, $event)"
+              (onFocus)="apostilaAbacoClick(participacao)"
+              autocomplete="off"
+              [(ngModel)]="participacao.apostilaAbacoObject"
+              #apostila_Abaco="ngModel"
+              name="apostila_Abaco[{{ rowIndex }}]"
+              inputId="apostila_Abaco[{{ rowIndex }}]"
+              optionLabel="nome"
+              [required]="true"
+              filterBy="nome"
+              appendTo="body"
+              placeholder="Selecione"
+              styleClass="{{ participacao.presente === false || readonly ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+              [required]="participacao.presente === true"
+              [readonly]="participacao.presente === false || readonly"
+              [dropdownIcon]="participacao.presente === false || readonly ? 'pi hidden' : 'pi pi-angle-down'"
+              fluid />
+</ng-template>
+<ng-template #apostilaAHTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-select [options]="participacao.apostilasAHList"
+              (onChange)="apostilaAHChange(participacao, $event)"
+              (onFocus)="apostilaAHClick(participacao)"
+              [(ngModel)]="participacao.apostilaAHObject"
+              #apostila_AH="ngModel"
+              name="apostila_AH[{{ rowIndex }}]"
+              inputId="apostila_AH[{{ rowIndex }}]"
+              optionLabel="nome"
+              [required]="true"
+              filterBy="nome"
+              appendTo="body"
+              placeholder="Selecione"
+              styleClass="{{ participacao.presente === false || readonly ? 'pointer-events-none p-select-no-dropdown' : '' }}"
+              [required]="participacao.presente === true"
+              [readonly]="participacao.presente === false || readonly"
+              [dropdownIcon]="participacao.presente === false || readonly ? 'pi hidden' : 'pi pi-angle-down'"
+              fluid />
+</ng-template>
+<ng-template #paginaAHTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-inputnumber [(ngModel)]="participacao.numeroPaginaAH"
+                   inputId="numeroPaginaAH[{{ rowIndex }}]"
+                   name="numeroPaginaAH[{{ rowIndex }}]"
+                   (onFocus)="inputFocus(participacao)"
+                   (onInput)="numeroPaginaAHChange(participacao, $event, numeroPaginaAH)"
+                   (keydown.enter)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
+                   (keydown.arrowDown)="apostilaAHInputNumberNext(rowIndex, apostilaAHInput)"
+                   (keydown.arrowUp)="apostilaAHInputNumberPrev(rowIndex, apostilaAHInput)"
+                   autocomplete="off"
+                   #numeroPaginaAH="ngModel"
+                   #apostilaAHInput
+                   [min]="0"
+                   [max]="participacao.apostilaAHObject?.numeroTotalPaginas"
+                   [step]="0"
+                   inputStyleClass="h-full text-center"
+                   class="h-full"
+                   [required]="participacao.presente === true"
+                   [readonly]="participacao.presente === false || readonly"
+                   fluid />
+</ng-template>
+<ng-template #paginaAbacoTemplate let-participacao="participacao" let-rowIndex="rowIndex">
+    <p-inputnumber [(ngModel)]="participacao.numeroPaginaAbaco"
+                   inputId="numeroPaginaAbaco[{{ rowIndex }}]"
+                   name="numeroPaginaAbaco[{{ rowIndex }}]"
+                   #numeroPaginaAbaco="ngModel"
+                   #apostilaAbacoInput
+                   (onFocus)="inputFocus(participacao)"
+                   (onBlur)="numeroPaginaAbacoChange(participacao, $event, numeroPaginaAbaco)"
+                   (keydown.enter)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
+                   (keydown.arrowdown)="apostilaAbacoInputNumberNext(rowIndex, apostilaAbacoInput)"
+                   (keydown.arrowUp)="apostilaAbacoInputNumberPrev(rowIndex, apostilaAbacoInput)"
+                   autocomplete="off"
+                   [min]="0"
+                   [max]="participacao.apostilaAbacoObject?.numeroTotalPaginas"
+                   [step]="0"
+                   inputStyleClass="h-full text-center"
+                   class="h-full"
+                   [required]="participacao.presente === true"
+                   [readonly]="participacao.presente === false || readonly"
+                   fluid />
+</ng-template>

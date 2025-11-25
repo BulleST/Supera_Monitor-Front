@@ -71,7 +71,7 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     }
 
     enviarMensagemCondicao(item: JornadaSupera_List_Checklist_Item_Aluno, aluno: JornadaSupera_List_Aluno) {
-        this.mensagemWhatsapp.enviarMensagemCondicao(aluno, item.checklist_Item_Id);
+        this.mensagemWhatsapp.enviarMensagemJornadaSupera(aluno, item.checklist_Item_Id);
     }
 
     finalizarChecklist(item: JornadaSupera_List_Checklist_Item_Aluno) {

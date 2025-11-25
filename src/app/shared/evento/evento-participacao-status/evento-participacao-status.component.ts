@@ -1,8 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
 import { Evento } from '../../../models/evento.model';
-import { Monitoramento_Aula, Monitoramento_Participacao } from '../../../models/monitoramento.model';
-import { showContatoFalta } from '../../../utils/show-contato-falta';
+import { showContato } from '../../../utils/show-contato';
 import { DialogService } from 'primeng/dynamicdialog';
 import { EditarContatoTipo } from '../editar-participacao-contato/editar-participacao-contato.component';
 import { lastValueFrom } from 'rxjs';
@@ -55,14 +54,8 @@ export class EventoParticipacaoStatusComponent implements OnChanges {
 
 	}
 
-	show() {
-		var tipo = EditarContatoTipo.Falta;
-		if (!this.participacao.active)
-			tipo = EditarContatoTipo.FaltaAgendada
-		else if (!this.evento.active) {
-			tipo = EditarContatoTipo.Cancelamento
-		}
-		showContatoFalta(this.dialogService, this.evento, this.participacao, tipo);
+	showContatoFalta() {
+		showContato(this.dialogService, this.evento, this.participacao);
 	}
 
 

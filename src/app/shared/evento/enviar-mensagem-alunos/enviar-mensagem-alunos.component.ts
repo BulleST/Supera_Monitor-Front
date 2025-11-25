@@ -4,14 +4,9 @@ import { Evento, EventoTipo } from '../../../models/evento.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CalendarioUtils, MensagemWhatsapp, showError } from '../../../utils';
 import { ConfirmationService } from 'primeng/api';
-import { showContatoFalta } from '../../../utils/show-contato-falta';
 import { Evento_Participacao_Aluno } from '../../../models/evento-participacao-aluno.model';
-import { EditarContatoTipo } from '../editar-participacao-contato/editar-participacao-contato.component';
 import { EventoService } from '../../../services/evento.service';
-import { CalendarioRequest } from '../../../models/calendario.model';
-import moment from 'moment';
-import { lastValueFrom } from 'rxjs';
-import { SalaAndar } from '../../../models/sala-aula.model';
+import { showContato } from '../../../utils/show-contato';
 
 @Component({
 	selector: 'app-enviar-mensagem-alunos',
@@ -61,36 +56,6 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 		showError(this.confirmationService, header, message, e, innerMessage);
 	}
 
-
-	async loadSugestoes(aluno: Aluno) {
-		var request: CalendarioRequest = {
-			intervaloDe: this.evento.data,
-			intervaloAte: moment(this.evento.data).add(1, 'month').toDate(),
-			perfil_Cognitivo_Id: aluno.perfilCognitivo_Id
-		}
-		var response = await lastValueFrom(this.eventoService.getList(request))
-		var list = response.eventos.filter(x => {
-			const ativo = x.active;
-			const temVagas = x.vagasDisponiveisEvento > 0;
-			const alunoNoEvento = x.alunos.find(x => x.aluno_Id == aluno.id);
-			const ehAula = x.evento_Tipo_Id == EventoTipo.Aula || x.evento_Tipo_Id == EventoTipo.TurmaExtra
-			const perfilcompativel = aluno.perfilCognitivo_Id  || x.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id)
-			const aulaNaoFinalizada = !x.finalizado;
-			const naoEhFeriado = !x.feriado;
-			const salaValida = !aluno.restricaoMobilidade || x.andar == SalaAndar.Terreo;
-			
-			return ativo
-				&& temVagas 
-				&& !alunoNoEvento
-				&& ehAula
-				&& perfilcompativel
-				&& aulaNaoFinalizada
-				&& naoEhFeriado
-				&& salaValida
-		})
-		return list;
-	}
-
 	enviarMensagem(aluno: Aluno) {
 		var participacao = this.view.participacao;
 
@@ -106,6 +71,7 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 		}
 		else if (this.mensagemTipo == MensagemTipo.Cancelamento) {
 			object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.nome, aluno.celular, this.evento);
+			this.showContato(aluno, participacao!);
 		}
 		else if (this.mensagemTipo == MensagemTipo.ConfirmacaoReposicao) {
 			object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, this.view.reposicaoDe!, this.view.reposicaoPara!);
@@ -114,34 +80,29 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 			object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
 		}
 		else if (this.mensagemTipo == MensagemTipo.Falta) {
-				this.loadSugestoes(aluno)
-					.then(sugestoes => {
-						object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, sugestoes, true);
-					})
+			this.showContato(aluno, participacao!);
 		}
 		else if (this.mensagemTipo == MensagemTipo.FaltaReposicao) {
-			object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, [], false);
+			this.showContato(aluno, participacao!);
 		}
 		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
-			var podeRemarcar = !participacao?.reposicaoDe_Evento_Id && !participacao?.reposicaoPara_Evento_Id;
-			if (podeRemarcar) {
-				this.loadSugestoes(aluno)
-					.then(sugestoes => {
-						object = this.mensagemWhatsapp.enviarMensagemAgendamentoFalta(aluno.nome, aluno.celular, this.evento, sugestoes, podeRemarcar);
-					})
-			}
-			else {
-			}
+			this.showContato(aluno, participacao!);
+			
 		}
 
 		window.open(object.link, '_blank');
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 
-		if (this.mensagemTipo == MensagemTipo.Cancelamento) {
-			this.showContatoFalta(aluno, participacao!, EditarContatoTipo.Cancelamento);
-		}
-		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
-			this.showContatoFalta(aluno, participacao!, EditarContatoTipo.FaltaAgendada);
+		
+
+		if (
+			   this.mensagemTipo == MensagemTipo.Cancelamento 
+			|| this.mensagemTipo == MensagemTipo.FaltaAgendada
+			|| this.mensagemTipo == MensagemTipo.Falta
+			|| this.mensagemTipo == MensagemTipo.ReposicaoDesmarcada
+			|| this.mensagemTipo == MensagemTipo.ConfirmacaoReposicao
+		) {
+			this.showContato(aluno, participacao!);
 		}
 		else {
 			this.removeItemLista(aluno);
@@ -155,9 +116,9 @@ export class EnviarMensagemAlunosComponent implements OnInit {
 			this.alunos.splice(index, 1);
 	}
 
-	showContatoFalta(aluno: Aluno, participacao: Evento_Participacao_Aluno, tipo: EditarContatoTipo) {
+	showContato(aluno: Aluno, participacao: Evento_Participacao_Aluno) {
 
-		var ref = showContatoFalta(this.dialogService, this.evento, participacao, tipo);
+		var ref = showContato(this.dialogService, this.evento, participacao);
 		var onClose = ref.onClose.subscribe(res => {
 			this.removeItemLista(aluno);
 			if (this.alunos.length == 0) {

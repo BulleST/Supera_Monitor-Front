@@ -46,7 +46,7 @@ import { EditarReuniaoComponent } from './evento/editar-evento/editar-reuniao/ed
 import { EditarSuperacaoComponent } from './evento/editar-evento/editar-superacao/editar-superacao.component';
 import { EventoParticipacaoStatusComponent } from './evento/evento-participacao-status/evento-participacao-status.component';
 import { IndisponivelTooltipComponent } from './indisponivel-tooltip/indisponivel-tooltip.component';
-import { ReposicaoParaTooltipComponent } from './reposicao-para-tooltip/reposicao-para-tooltip.component';
+import { EventoReposicaoTooltipComponent } from './evento/evento-reposicao-tooltip/evento-reposicao-tooltip.component';
 import { LegendColorComponent } from './legend-color/legend-color.component';
 import { ProfileComponent } from './profile/profile.component';
 import { SalaAulaComponent } from './sala-aula/sala-aula.component';
@@ -58,6 +58,8 @@ import { AutoFocus } from "primeng/autofocus";
 import { AlunoJornadaComponent } from './checklist/aluno-jornada/aluno-jornada.component';
 import { AgendarAula0Component } from './evento/agendar/agendar-aula-0/agendar-aula-0.component';
 import { AgendarSuperacaoComponent } from './evento/agendar/agendar-superacao/agendar-superacao.component';
+import { TableComponent } from './evento/editar-aula/table/table.component';
+import { CardComponent } from './evento/editar-aula/card/card.component';
 
 @NgModule({
     declarations: [
@@ -118,7 +120,7 @@ import { AgendarSuperacaoComponent } from './evento/agendar/agendar-superacao/ag
 
         EventoParticipacaoStatusComponent,
         IndisponivelTooltipComponent,
-        ReposicaoParaTooltipComponent,
+        EventoReposicaoTooltipComponent,
 
         LegendColorComponent,
         ProfileComponent,
@@ -128,6 +130,8 @@ import { AgendarSuperacaoComponent } from './evento/agendar/agendar-superacao/ag
         EditarParticipacaoContatoComponent,
         EnviarMensagemAlunosComponent,
         AlunoJornadaComponent,
+        TableComponent,
+        CardComponent,
 
 
 
@@ -152,7 +156,7 @@ import { AgendarSuperacaoComponent } from './evento/agendar/agendar-superacao/ag
         LegendColorComponent,
         IndisponivelTooltipComponent,
         EventoItemHoverComponent,
-        ReposicaoParaTooltipComponent,
+        EventoReposicaoTooltipComponent,
         TableHeaderFilterComponent,
         ConfirmDialogComponent,
         SalaAulaComponent,

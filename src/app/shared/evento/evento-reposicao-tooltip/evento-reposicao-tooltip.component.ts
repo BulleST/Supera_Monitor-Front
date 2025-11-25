@@ -1,14 +1,14 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CalendarioUtils } from '../../utils';
-import { Evento } from '../../models/evento.model';
+import { CalendarioUtils } from '../../../utils';
+import { Evento } from '../../../models/evento.model';
 
 @Component({
-	selector: 'app-reposicao-para-tooltip',
+	selector: 'app-evento-reposicao-tooltip',
 	standalone: false,
-	templateUrl: './reposicao-para-tooltip.component.html',
-	styleUrl: './reposicao-para-tooltip.component.css'
+	templateUrl: './evento-reposicao-tooltip.component.html',
+	styleUrl: './evento-reposicao-tooltip.component.css'
 })
-export class ReposicaoParaTooltipComponent implements OnChanges {
+export class EventoReposicaoTooltipComponent implements OnChanges {
 	@Input() evento!: Evento;
 
 	tipo: string = ''

@@ -14,6 +14,7 @@ import { MegaMenu } from 'primeng/megamenu';
 import { Account } from '../../models/account.model';
 import { SelectChangeEvent } from 'primeng/select';
 import { UrlService } from '../../utils/url.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-header',
@@ -35,11 +36,11 @@ export class HeaderComponent implements OnDestroy {
     options = [
         {
             label: 'Local',
-            value: 'https://localhost:7281/back'
+            value: environment.urlLocal
         },
         {
             label: 'PRD',
-            value: 'https://supera-monitor-back-e4hwhteuewdmd8ea.canadacentral-01.azurewebsites.net/back'
+            value: environment.urlPRD
         }
     ]
 

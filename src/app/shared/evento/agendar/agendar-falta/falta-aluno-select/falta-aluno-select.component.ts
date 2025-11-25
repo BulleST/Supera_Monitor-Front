@@ -67,7 +67,7 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 
 			if (!alunoRes && idParam) {
 				this.aluno_Id = this.crypto.decrypt(idParam);
-				this.loadAluno()
+				// this.loadAluno()
 				return;
 			}
 
@@ -134,33 +134,35 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 		this.setAluno();
 	}
 
-	loadAluno() {
-        if (!this.aluno_Id) return;
-		this.loading = true;
+	// loadAluno() {
+    //     if (!this.aluno_Id) return;
+	// 	this.loading = true;
 		
-		this.setAluno();
+	// 	this.setAluno();
 
-		return lastValueFrom(this.alunoService.get(this.aluno_Id))
-			.then(res => {
-                this.aluno = res;
-                this.loading = false;
-                this.alunoService.setAluno(this.aluno)
-                this.onAlunoChanged.emit(this.aluno);
+	// 	return lastValueFrom(this.alunoService.get(this.aluno_Id))
+	// 		.then(res => {
+    //             this.aluno = res;
+    //             this.loading = false;
+    //             this.alunoService.setAluno(this.aluno)
+    //             this.onAlunoChanged.emit(this.aluno);
 
-				return res;
-			})
-			.catch(res => {
-				this.loading = false;
-				this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-				this.onAlunoChanged.emit(this.aluno);
-				return this.aluno;
-			})
-	}
+	// 			return res;
+	// 		})
+	// 		.catch(res => {
+	// 			this.loading = false;
+	// 			this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
+	// 			this.onAlunoChanged.emit(this.aluno);
+	// 			return this.aluno;
+	// 		})
+	// }
 
 	alunoChanged(e: SelectChangeEvent, model: NgModel) {
 		if (e.value) {
 			this.aluno_Id = e.value;
-			this.loadAluno()
+			this.aluno = this.alunos.find(x => x.id == this.aluno_Id)
+			this.onAlunoChanged.emit(this.aluno)
+			// this.loadAluno()
 		}
 	}
 	

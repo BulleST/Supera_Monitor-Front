@@ -12,8 +12,7 @@ import { AlunoService } from '../../../services/alunos.service';
 import { showAluno } from '../../../utils/show-aluno';
 import { Evento, EventoTipo } from '../../../models/evento.model';
 import { Aluno } from '../../../models/alunos.model';
-import { showContatoFalta } from '../../../utils/show-contato-falta';
-import { EditarContatoTipo } from '../../../shared/evento/editar-participacao-contato/editar-participacao-contato.component';
+import { showContato } from '../../../utils/show-contato';
 import { Evento_Participacao_Aluno, UpdateParticipacaoAlunoRequest } from '../../../models/evento-participacao-aluno.model';
 import { ApostilaService } from '../../../services/apostila.service';
 import { Apostila, ApostilaTipo } from '../../../models/apostila.model';
@@ -291,19 +290,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 
 		var participacao = this.eventoCalendario.alunos.find(x => x.aluno_Id == this.aluno.id) as Evento_Participacao_Aluno;
 
-
-		var tipo = EditarContatoTipo.Cancelamento;
-		if (this.item.status == Monitoramento_Item_Status.ReposicaoAgendada)
-			tipo = EditarContatoTipo.ReposicaoAgendada;
-		if (this.item.status == Monitoramento_Item_Status.ReposicaoDesmarcada)
-			tipo = EditarContatoTipo.ReposicaoAgendada;
-		if (this.item.status == Monitoramento_Item_Status.FaltaAgendada)
-			tipo = EditarContatoTipo.FaltaAgendada;
-		if (this.item.status == Monitoramento_Item_Status.FaltaReposicao)
-			tipo = EditarContatoTipo.FaltaReposicao;
-		if (this.item.status == Monitoramento_Item_Status.FaltaAula)
-			tipo = EditarContatoTipo.Falta;
-		showContatoFalta(this.dialogService, this.eventoCalendario, participacao, tipo)
+		showContato(this.dialogService, this.eventoCalendario, participacao)
 	}
 
 

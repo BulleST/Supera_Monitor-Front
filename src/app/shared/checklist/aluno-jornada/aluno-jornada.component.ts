@@ -179,7 +179,7 @@ export class AlunoJornadaComponent {
 	}
 
 	enviarMensagemCondicao(item: JornadaSupera_List_Checklist_Item_Aluno) {
-		this.mensagemWhatsapp.enviarMensagemCondicao(this.aluno.nome, item.checklist_Item_Id);
+		this.mensagemWhatsapp.enviarMensagemJornadaSupera(this.aluno.nome, item.checklist_Item_Id);
 	}
 }
 

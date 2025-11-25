@@ -24,28 +24,30 @@
 </header>
 <form #form="ngForm" (ngSubmit)="sendConfirmation($event)">
     <!-- Aluno -->
-    <app-falta-aluno-select class="w-full formgrid grid"
+    <app-falta-aluno-select *ngIf="true"
+                            class="w-full formgrid grid"
                             (onAlunoChanged)="alunoChanged($event)"></app-falta-aluno-select>
     <!-- Evento -->
-    <app-falta-evento-selected *ngIf="evento"
-                                class="w-full formgrid grid"
-                                (onEventoChanged)="eventoChanged($event)"></app-falta-evento-selected>
+    <app-falta-evento-selected 
+                            *ngIf="evento"
+                            class="w-full formgrid grid"
+                            (onEventoChanged)="eventoChanged($event)"></app-falta-evento-selected>
     <!-- Calendario -->
-    <app-falta-calendario-select *ngIf="!evento && aluno"
-                                 class="w-full formgrid grid"
-                                 (onEventoChanged)="eventoChanged($event)"></app-falta-calendario-select>
+    <app-falta-calendario-select 
+                            *ngIf="!evento && aluno"
+                            class="w-full formgrid grid"
+                            (onEventoChanged)="eventoChanged($event)"></app-falta-calendario-select>
     <!-- Footer -->
-        <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
-        
-            <div class="ml-auto">
-                <p-button (onClick)="sendConfirmation($event)"
-                          styleClass="w-full px-3"
-                          label="Marcar falta"
-                          [icon]="'pi pi-check'"
-                          [loading]="loading"
-                          tooltipPosition="top"
-                          [disabled]="!evento || !aluno"
-                          [rounded]="true" />
-            </div>
+    <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
+        <div class="ml-auto">
+            <p-button (onClick)="sendConfirmation($event)"
+                      styleClass="w-full px-3"
+                      label="Marcar falta"
+                      [icon]="'pi pi-check'"
+                      [loading]="loading"
+                      tooltipPosition="top"
+                      [disabled]="!evento || !aluno"
+                      [rounded]="true" />
         </div>
+    </div>
 </form>

@@ -5,8 +5,6 @@ import { Professor } from '../../../models/professor.model';
 import { SalaAula, SalaAulaId } from '../../../models/sala-aula.model';
 import { Apostila, ApostilaTipo } from '../../../models/apostila.model';
 import { MobileService, ScreenWidth } from '../../../utils/mobile';
-import { Button } from 'primeng/button';
-import { InputNumber } from 'primeng/inputnumber';
 import { ConfirmationService } from 'primeng/api';
 import { CalendarioUtils, getError, MensagemWhatsapp, showError, validaAlunos, validaAlunoSalaAula, validaProfessores, validaSalaAulas } from '../../../utils';
 import { ApostilaService } from '../../../services/apostila.service';
@@ -29,6 +27,8 @@ import { RequestResponse } from '../../../helpers/request-response.interface';
 import { EventoChamadaRequest } from '../../../models/evento-chamada.model';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { MonitoramentoService } from '../../../services/monitoramento.service';
+import { showContato } from '../../../utils/show-contato';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-editar-aula',
@@ -42,7 +42,6 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
     instance: DynamicDialogComponent | undefined;
     loading = false;
     maximized = false;
-    activeIndexAluno = 0;
 
     view = new EditarAulaView;
     evento: Evento = new Evento;
@@ -73,9 +72,6 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
     SalaAulaId = SalaAulaId;
 
     @ViewChild('sala_Id') sala_Id!: NgModel;
-    @ViewChildren('presencaButton') presencaButton!: QueryList<Button>;
-    @ViewChildren('apostilaAbacoInput') apostilaAbacoInput!: QueryList<InputNumber>;
-    @ViewChildren('apostilaAHInput') apostilaAHInput!: QueryList<InputNumber>;
 
 
     statusContato = statusContato;
@@ -90,6 +86,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
         private mobileService: MobileService,
         private calendarioUtils: CalendarioUtils,
         private toastr: ToastrService,
+        private router: Router,
         private eventoService: EventoService,
         private jornadaService: JornadaSuperaService,
         private monitoramentoService: MonitoramentoService,
@@ -163,11 +160,19 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
         if (this.instance && this.instance.data) {
             this.view = this.instance.data['view'];
             this.evento = this.view.evento;
-            this.getDuracaoEvento();
-            this.tipoString = this.getTipo(this.evento);
-            this.setApostilasAlunos();
-            this.readonly = this.evento.finalizado || !this.evento.active
+            this.loadEvent();
         }
+    }
+
+    loadEvent() {
+
+        this.tipoString = this.getTipo(this.evento);
+        this.readonly = this.evento.finalizado || !this.evento.active;
+
+        this.evento.alunos.sort((x, y) => x.aluno > y.aluno ? 1 : -1);
+
+        this.getDuracaoEvento();
+        this.setApostilasAlunos();
     }
 
     ngOnDestroy(): void {
@@ -339,9 +344,11 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
 
     enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
         this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+        showContato(this.dialogService, this.evento, aluno);
+
     }
 
-    presente(item: Evento_Participacao_Aluno, status: any) {
+    presente(item: Evento_Participacao_Aluno) {
         item.presente = !item.presente;
     }
 
@@ -401,7 +408,7 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
 
     clonedRow: { [aluno_Id: number]: Evento_Participacao_Aluno } = {}
 
-    inputFocus(e: any, item: Evento_Participacao_Aluno) {
+    inputFocus(item: Evento_Participacao_Aluno) {
         this.clonedRow[item.aluno_Id as number] = { ...item }
     }
 
@@ -548,101 +555,6 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
         }
     }
 
-    presencaPrev(index: number, e: any) {
-        let newIndex = index - 1;
-
-        if (index <= 0) {
-            newIndex = this.presencaButton.length - 1;
-        }
-
-        let element = this.presencaButton.get(newIndex);
-        let button = $(`p-button[${element?.attrSelector}]`).find('button')
-
-        button.trigger('focus');
-    }
-
-    presencaNext(index: number, e: any) {
-        let newIndex = index + 1;
-
-        if (index >= this.presencaButton.length - 1) {
-            newIndex = 0;
-        }
-
-        let element = this.presencaButton.get(newIndex);
-        let button = $(`p-button[${element?.attrSelector}]`).find('button')
-
-        button.trigger('focus');
-    }
-
-    apostilaAbacoInputNumberNext(index: number, inputNumber: InputNumber) {
-        let newIndex = index + 1;
-
-
-        if (index >= this.presencaButton.length - 1) {
-            newIndex = 0;
-        }
-
-        var row = this.evento.alunos[newIndex];
-        if (row.presente === false) {
-            this.apostilaAbacoInputNumberNext(newIndex, inputNumber)
-            return
-        }
-
-        let element = this.apostilaAbacoInput.get(newIndex)
-        element?.input.nativeElement.focus();
-    }
-
-    apostilaAHInputNumberNext(index: number, inputNumber: InputNumber) {
-        let newIndex = index + 1;
-
-        if (index >= this.presencaButton.length - 1) {
-            newIndex = 0;
-        }
-
-        var row = this.evento.alunos[newIndex];
-        if (row.presente === false) {
-            this.apostilaAHInputNumberNext(newIndex, inputNumber)
-            return
-        }
-
-        let element = this.apostilaAHInput.get(newIndex)
-        element?.input.nativeElement.focus();
-    }
-
-    apostilaAbacoInputNumberPrev(index: number, inputNumber: InputNumber) {
-        let newIndex = index - 1;
-
-        if (index <= 0) {
-            newIndex = this.presencaButton.length - 1;
-        }
-
-        var row = this.evento.alunos[newIndex];
-        if (row.presente === false) {
-            this.apostilaAbacoInputNumberPrev(newIndex, inputNumber)
-            return
-        }
-
-        let element = this.apostilaAbacoInput.get(newIndex)
-        element?.input.nativeElement.focus();
-    }
-
-    apostilaAHInputNumberPrev(index: number, inputNumber: InputNumber) {
-        let newIndex = index - 1;
-
-        if (index <= 0) {
-            newIndex = this.presencaButton.length - 1;
-        }
-
-        var row = this.evento.alunos[newIndex];
-        if (row.presente === false) {
-            this.apostilaAHInputNumberPrev(newIndex, inputNumber)
-            return
-        }
-
-        let element = this.apostilaAbacoInput.get(newIndex)
-        element?.input.nativeElement.focus();
-    }
-
     showAluno(participacao: Evento_Participacao_Aluno) {
         showAluno(this.dialogService, participacao.aluno_Id);
     }
@@ -680,7 +592,13 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
                     this.monitoramentoService.onReload.emit(res.object.id);
                     this.eventoService.onReload.emit(res.object.id)
                     this.evento.id = res.object.id
-                    this.eventoService.setEvento(this.evento)
+
+                    this.evento = res.object;
+                    this.loadEvent();
+                    this.eventoService.setEvento(this.evento);
+
+
+
                     this.toastr.success('Dados atualizados com sucesso.')
                 }
             })
@@ -733,6 +651,9 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
                         this.jornadaService.onReload.emit(res.object.id);
                         this.monitoramentoService.onReload.emit(res.object.id);
                         this.eventoService.onReload.emit(res.object.id)
+
+                        this.loadEvent();
+
                         this.toastr.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
 
                         this.confirmationService.confirm({
@@ -816,13 +737,8 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
     }
 
 
-    contatoToggle(item: Evento_Participacao_Aluno) {
-        if (item.alunoContactado) {
-            item.alunoContactado = undefined
-        }
-        else {
-            item.alunoContactado = new Date;
-        }
+    showContatoFalta(participacao: Evento_Participacao_Aluno) {
+        showContato(this.dialogService, this.evento, participacao)
     }
 
     getTurma(turma_Id?: number) {
