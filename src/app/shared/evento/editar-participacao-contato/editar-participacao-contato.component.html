@@ -55,7 +55,7 @@
             </p-iconfield>
         </div>
         <!-- Data -->
-            <div class="field col-6">
+        <div class="field col-6">
             <label for="data">Data:</label>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-calendar" />
@@ -113,50 +113,62 @@
         <!-- O aluno foi contatado? -->
         <div class="col-12 flex align-items-center gap-2 mb-2">
             <span class="font-bold">O aluno foi contatado?</span>
-            <p-button
+            <!-- <p-button
                       [icon]="alunoContactado ? 'pi pi-check' : 'pi pi-times'"
                       [label]="alunoContactado ? 'Sim' : 'Não'"
                       [severity]="alunoContactado ? 'success' : 'danger'"
                       (onClick)="alunoContactadoChanged()"
+                      size="small" /> -->
+
+            <p-button icon="pi pi-check"
+                severity="success"
+                label="Sim"
+                (onClick)="alunoContactadoChanged(true)"
+                size="small"
+                    [styleClass]="alunoContactado ? 'pointer-events-none' : 'opacity-30'" />
+
+            <p-button icon="pi pi-times"
+                severity="danger"
+                label="Não"
+                (onClick)="alunoContactadoChanged(false)"
+                size="small" 
+                    [styleClass]="alunoContactado ? 'opacity-30' : 'pointer-events-none'" />
+        
+            <p-button type="button"
+                      (onClick)="enviarMensagemFalta($event)"
+                      (auxclick)="enviarMensagemFalta($event)"
+                      (contextmenu)="enviarMensagemFalta($event)"
+                      [disabled]="!participacao.celular"
+                      icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
+                      [severity]="participacao.celular ? 'success' : 'secondary'"
+                      label="Enviar mensagem"
                       size="small" />
-            <ng-container *ngIf="evento && participacao && !participacao.alunoContactado">
-                <p-button type="button"
-                          (onClick)="enviarMensagemFalta($event)"
-                          (auxclick)="enviarMensagemFalta($event)"
-                          (contextmenu)="enviarMensagemFalta($event)"
-                          [disabled]="!participacao.celular"
-                          icon="pi pi-whatsapp {{!participacao.celular ? 'text-300' : ''}}"
-                          [severity]="participacao.celular ? 'success' : 'secondary'"
-                          pTooltip="Enviar mensagem de falta"
-                          label="Enviar mensagem"
-                          size="small" />
-            </ng-container>
         </div>
-        <ng-container *ngIf="participacao.alunoContactado">
-            <!-- Quando -->
-            <div class="field col">
-                <label for="alunoContactado" class="font-bold">
-                    <span>Quando?</span>
-                </label>
-                <p-datepicker
-                              #_alunoContactado="ngModel"
-                              [(ngModel)]="participacao.alunoContactado"
-                              [disabled]="!participacao.alunoContactado"
-                              placeholder="dd/mm/yy hh:mm"
-                              [showIcon]="true"
-                              [iconDisplay]="'input'"
-                              inputId="alunoContactado"
-                              name="alunoContactado"
-                              [showTime]="true"
-                              dateFormat="dd/mm/yy"
-                              hourFormat="24"
-                              [selectOtherMonths]="true"
-                              [keepInvalid]="true"
-                              [disabledDays]="[0]"
-                              appendTo="body"
-                              fluid />
-            </div>
-        </ng-container>
+        <ng-container *ngIf="alunoContactado">
+            
+        <!-- Quando -->
+        <div class="field col">
+            <label for="alunoContactado" class="font-bold">
+                <span>Quando?</span>
+            </label>
+            <p-datepicker
+                            #_alunoContactado="ngModel"
+                            [(ngModel)]="participacao.alunoContactado"
+                            [disabled]="!participacao.alunoContactado"
+                            placeholder="dd/mm/yy hh:mm"
+                            [showIcon]="true"
+                            [iconDisplay]="'input'"
+                            inputId="alunoContactado"
+                            name="alunoContactado"
+                            [showTime]="true"
+                            dateFormat="dd/mm/yy"
+                            hourFormat="24"
+                            [selectOtherMonths]="true"
+                            [keepInvalid]="true"
+                            [disabledDays]="[0]"
+                            appendTo="body"
+                            fluid />
+        </div>
         <!-- Status do contato -->
         <div class="field col">
             <label for="statusContato_Id" class="font-bold">
@@ -179,13 +191,14 @@
         <div class="field col-12">
             <label for="contatoObservacao" class="font-bold"> Retorno do contato: </label>
             <textarea pTextarea
-                   id="contatoObservacao"
-                   name="contatoObservacao"
-                   [(ngModel)]="participacao.contatoObservacao"
-                   #contatoObservacao="ngModel"
-                   [disabled]="!alunoContactado"
-                   fluid> </textarea>
+                      id="contatoObservacao"
+                      name="contatoObservacao"
+                      [(ngModel)]="participacao.contatoObservacao"
+                      #contatoObservacao="ngModel"
+                      [disabled]="!alunoContactado"
+                      fluid> </textarea>
         </div>
+        </ng-container>
     </div>
     <div class="col-12 px-1 flex align-items-center justify-content-end">
         <p-button type="submit"

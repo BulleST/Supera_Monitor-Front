@@ -11,6 +11,7 @@ import { Evento } from '../../../models/evento.model';
 import { NgForm } from '@angular/forms';
 import { MonitoramentoService } from '../../../services/monitoramento.service';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
+import { StatusContato } from '../../../models/evento-status-contato.enum';
 
 @Component({
 	selector: 'app-editar-participacao-contato',
@@ -36,6 +37,11 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 	status = statusContato;
 
 	EditarContatoTipo = EditarContatoTipo;
+
+	options = [
+		{ label: 'Sim', value: true, severity: 'success', icon: 'pi pi-check' },
+		{ label: 'Não', value: false, severity: 'danger', icon: 'pi pi-times' }
+	]
 
 
 	constructor(
@@ -81,8 +87,8 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 		this.instance!.maximize();
 	}
 
-	alunoContactadoChanged() {
-		this.alunoContactado = !this.alunoContactado;
+	alunoContactadoChanged(alunoContactado: boolean) {
+		this.alunoContactado = alunoContactado;
 		if (!this.alunoContactado) {
 			this.participacao.alunoContactado = undefined;
 			this.participacao.statusContato_Id = undefined;
@@ -93,6 +99,22 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 	}
 
 	enviarMensagemFalta(e: any) {
+		this.alunoContactado = true;
+		
+		if (!this.participacao.alunoContactado) {
+			this.participacao.alunoContactado = new Date;
+			this.participacao.statusContato_Id = StatusContato.AguardandoRetorno;
+			this.participacao.contatoObservacao = '';
+			
+
+            var requestParticipacao: UpdateParticipacaoAlunoRequest = {
+                participacao_Id: this.participacao.id,
+                ...this.participacao
+            }
+
+			lastValueFrom(this.eventoService.atualizarParticipacao(requestParticipacao));
+
+		}
 		if (this.evento && this.participacao) {
 			this.mensagemWhatsapp.enviarMensagemFalta(this.evento, this.participacao, e)
 				.then(res => {
