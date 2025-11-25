@@ -15,6 +15,10 @@ import { showAluno } from '../../utils/show-aluno';
 import { ToastrService } from 'ngx-toastr';
 import $ from 'jquery';
 import { Router } from '@angular/router';
+import { EventoService } from '../../services/evento.service';
+import { Evento_Participacao_Aluno } from '../../models/evento-participacao-aluno.model';
+import { Evento } from '../../models/evento.model';
+import { showContato } from '../../utils/show-contato';
 
 @Component({
 	selector: 'app-monitoramento',
@@ -69,13 +73,14 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	constructor(
 		private router: Router,
 		private mensagemWhatsapp: MensagemWhatsapp,
-		private service: MonitoramentoService,
+		private monitoramentoService: MonitoramentoService,
+		private eventoService: EventoService,
 		private crypto: Crypto,
 		private toastr: ToastrService,
 		private dialogService: DialogService,
 		private calendarioUtils: CalendarioUtils,
 	) {
-		let calendarioReload = this.service.onReload.subscribe(res => {
+		let calendarioReload = this.monitoramentoService.onReload.subscribe(res => {
 			console.log('onReload', res)
 			this.update();
 		});
@@ -145,7 +150,7 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 
 	setDashboard() {
 		this.loading = true;
-		lastValueFrom(this.service.getDashboard(this.request))
+		lastValueFrom(this.monitoramentoService.getDashboard(this.request))
 			.then(res => {
 				// Seta meses do ano
 				this.mesesAno = res.mesesRoteiro;
@@ -205,7 +210,84 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 	}
 
+
+	 async enviarMensagemFalta(aluno: Monitoramento_Aluno, item: Monitoramento_Aluno_Item, e: any) {
+
+
+		// var eventoId = item.reposicaoPara ? item.reposicaoPara.aula.id : item.aula.aula.id;
+		// var evento = await lastValueFrom(this.eventoService.get(eventoId));
+		// var participacao = evento.alunos.find(x => x.aluno_Id == aluno.id) as Evento_Participacao_Aluno;
+
+
+		var aula = item.reposicaoPara ? item.reposicaoPara.aula : item.aula.aula;
+		var aulaParticipacao = item.reposicaoPara ? item.reposicaoPara.participacao : item.aula.participacao;
+
+		var evento = aula as any;
+		var participacao: Evento_Participacao_Aluno = {
+				id: aulaParticipacao.id,
+			
+				aluno_Id: aluno.id,
+				aluno: aluno.nome,
+				celular: aluno.celular,
+			
+				evento_Id: aula.id,
+			
+				reposicaoDe_Evento_Id: aulaParticipacao.reposicaoDe_Evento_Id,
+				reposicaoPara_Evento_Id: aulaParticipacao.reposicaoPara_Evento_Id,
+			
+				presente: aulaParticipacao.presente,
+				observacao: aulaParticipacao.observacao,
+			
+				apostila_Abaco_Id: aulaParticipacao.apostila_Abaco_Id,
+				numeroPaginaAbaco: aulaParticipacao.numeroPaginaAbaco,
+				apostilasAbacoList: [],
+				
+				apostila_AH_Id: aulaParticipacao.apostila_AH_Id,
+				numeroPaginaAH: aulaParticipacao.numeroPaginaAH,
+				apostilasAHList: [],
+			
+				created: new Date,
+				deactivated: aulaParticipacao.deactivated,
+				active: aulaParticipacao.active,
+			
+				restricaoMobilidade: aluno.restricaoMobilidade,
+				restricoes: [],
+			
+				primeiraAula_Id: aluno.primeiraAula_Id,
+				aulaZero_Id: aluno.aulaZero_Id,
+			
+				alunoContactado: aulaParticipacao.alunoContactado,
+				statusContato_Id: aulaParticipacao.statusContato_Id,
+				contatoObservacao: aulaParticipacao.contatoObservacao,
+		}
+
+		var response = await this.mensagemWhatsapp.enviarMensagemFalta(evento, participacao, e);
+
+		if (response) {
+
+			evento = response.evento;
+			participacao = response.participacao;
+	
+			if (item.status == Monitoramento_Item_Status.FaltaAgendada 
+				|| item.status == Monitoramento_Item_Status.FaltaAula
+				|| item.status == Monitoramento_Item_Status.FaltaReposicao
+				|| item.status == Monitoramento_Item_Status.ReposicaoDesmarcada
+			) {
+				item.status = Monitoramento_Item_Status.FaltaAlunoContatado;
+			}
+	
+			showContato(this.dialogService, evento, participacao)
+		}
+
+		
+	}
+
+	showAluno(aluno: Monitoramento_Aluno) {
+		showAluno(this.dialogService, aluno.id);
+	}
+
 	showAula(item: Monitoramento_Aluno_Item, aluno: Monitoramento_Aluno) {
+		console.log('showAula', item, aluno)
 		this.router.navigate(['monitoramento', 'aula'])
 		this.ref = this.dialogService.open(AulaParticipacaoComponent, {
 			header: 'Aula',
@@ -292,10 +374,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 		});
 
 		table.filteredValue = alunosFiltered;
-	}
-
-	showAluno(aluno: Monitoramento_Aluno) {
-		showAluno(this.dialogService, aluno.id);
 	}
 
 

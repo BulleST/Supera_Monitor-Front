@@ -36,6 +36,7 @@ export interface Monitoramento_Aluno {
     turma: string;
     turma_Id: number;
     apostila_Kit_Id?: number;
+    restricaoMobilidade: boolean;
     items: Monitoramento_Aluno_Item[];
 }
 

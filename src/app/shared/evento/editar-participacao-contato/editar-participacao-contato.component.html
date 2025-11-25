@@ -98,21 +98,17 @@
         </div>
         <!-- OBS -->
         <div class="field col-12">
-            <label for="observacao" class="font-bold">Motivo da falta: <span class="text-red-500">*</span></label>
+            <label for="observacao" class="font-bold">Motivo da falta:</label>
             <textarea pTextarea
                       id="observacao"
                       name="observacao"
                       [(ngModel)]="participacao.observacao"
                       #observacao="ngModel"
-                      [required]="true"
                       placeholder="Insira aqui o motivo..."
                       rows="2"
-                      [required]="alunoContactado"
                       fluid
-                      [pAutoFocus]="true"></textarea>
-            <ng-container *ngIf="observacao.touched && observacao.errors">
-                <p class="text-red-500" *ngIf="observacao.errors['required']">Esse campo é obrigatório</p>
-            </ng-container>
+                      [pAutoFocus]="true">
+            </textarea>
         </div>
         <!-- O aluno foi contatado? -->
         <div class="col-12 flex align-items-center gap-2 mb-2">

@@ -139,7 +139,7 @@ export class CalendarioUtils {
         else if (evento.evento_Tipo_Id == EventoTipo.Superacao) return 'superação'
         else if (evento.evento_Tipo_Id == EventoTipo.Oficina) return 'oficina'
         else if (evento.evento_Tipo_Id == EventoTipo.Reuniao) return 'reunião'
-        else return 'evento'
+        else return 'aula'
     }
 
     request(evento: Evento) {

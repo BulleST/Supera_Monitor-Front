@@ -5,11 +5,12 @@ import { CalendarioUtils } from "./calendario-utils";
 import { ToastrService } from "ngx-toastr";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { EventoService } from "../services/evento.service";
-import { Evento_Participacao_Aluno } from "../models/evento-participacao-aluno.model";
+import { Evento_Participacao_Aluno, UpdateParticipacaoAlunoRequest } from "../models/evento-participacao-aluno.model";
 import { showError } from "./error";
 import { ConfirmationService } from "primeng/api";
 import { lastValueFrom } from "rxjs";
 import { SalaAndar } from "../models/sala-aula.model";
+import { StatusContato } from "../models/evento-status-contato.enum";
 
 @Injectable({
     providedIn: 'root'
@@ -34,11 +35,13 @@ export class MensagemWhatsapp {
     }
 
     copiarMensagem(mensagem: string) {
+        console.log(mensagem);
         navigator.clipboard.writeText(mensagem)
             .then(() => {
                 this.toastr.info('Mensagem copiada para área de transferência');
             })
-            .catch(() => {
+            .catch(res => {
+        console.error('mensagem', res);
                 this.toastr.error('Erro ao copiar mensagem');
             });
     }
@@ -82,7 +85,7 @@ export class MensagemWhatsapp {
     }
 
 
-    async enviarMensagemFalta(reposicaoDe: Evento, participacao: Evento_Participacao_Aluno, e: any) {
+    async enviarMensagemFalta(evento: Evento, participacao: Evento_Participacao_Aluno, e: any) {
         if (!participacao.celular) {
             this.showError('Celular não informado', 'O aluno não possui um número de celular cadastrado.', e.target);
             return;
@@ -94,17 +97,39 @@ export class MensagemWhatsapp {
         }
 
         let sugestoes: Evento[] = []
-        let data = moment(reposicaoDe.data).format('YYYY-MM-DD')
-        let prazo = moment(data).add(7, 'days');
+        let data = moment(evento.data).format('YYYY-MM-DD')
+        let prazo = moment(data).add(1, 'month');
 
-        // Se estiver dentro do prazo de 1 semana, insere sugestão
-        if (moment(prazo).isSameOrAfter(new Date, 'date')) {
-            sugestoes = await this.carregarSugestoesReposicao(reposicaoDe, participacao);
+        let req = []
+
+        // Se estiver dentro do prazo de 1 mes, insere sugestão de reposicao
+        if (moment(prazo).isSameOrAfter(new Date, 'date')
+            && !participacao.reposicaoDe_Evento_Id
+            && !participacao.reposicaoPara_Evento_Id) {
+            sugestoes = await this.carregarSugestoesReposicao(evento, participacao);
         }
 
-        let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, reposicaoDe, participacao, sugestoes);
+        let object = this.enviarMensagemFaltaSend(participacao.aluno, participacao.celular!, evento, participacao, sugestoes);
         window.open(object.link, '_blank');
         this.copiarMensagem(object.mensagem);
+        
+        if (!participacao.alunoContactado) {
+            participacao.statusContato_Id = StatusContato.AguardandoRetorno;
+            participacao.alunoContactado = new Date;
+            participacao.contatoObservacao = '';
+            
+            var requestParticipacao: UpdateParticipacaoAlunoRequest = {
+                participacao_Id: participacao.id,
+                ...participacao
+            }
+            var response = await lastValueFrom(this.eventoService.atualizarParticipacao(requestParticipacao));
+            evento = response.object as Evento;
+            participacao = evento.alunos.find(x => x.id == participacao.id) as Evento_Participacao_Aluno
+        }
+
+        
+        return {evento, participacao}
+
     }
 
     enviarMensagemJornadaSupera(aluno: any, id: number) {
@@ -175,7 +200,7 @@ export class MensagemWhatsapp {
         nome = array[0];
         celular = celular.replace(/\D/g, '')
         let tipo = this.calendarioUtils.getEventoTipo(evento);
-        let data = moment(evento.data).format('DD [de] MMMM [às] HH[h]mm');
+        let data = moment(evento.data).format('DD/MMM [às] HH[h]mm');
         let mensagem = `Olá ${nome}, 
             \r\n Espero que esteja bem!`;
 

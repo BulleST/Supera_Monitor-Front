@@ -117,8 +117,13 @@ export class EditarOficinaComponent implements OnChanges, OnDestroy {
         item.presente = !item.presente;
     }
 
-    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+    enviarMensagemFalta(participacao: Evento_Participacao_Aluno, e: any) {
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e)
+        .then(res => {
+            if (res) {
+                participacao = res.participacao
+            }
+        })
     }
 
     showAluno(participacao: Evento_Participacao_Aluno) {

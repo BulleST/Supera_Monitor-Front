@@ -61,18 +61,10 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			this.view = this.instance.data['view'];
 			this.evento = this.view.evento;
 			this.participacao = this.view.participacao;
+			this.participacao.alunoContactado = this.participacao.alunoContactado ? moment(this.participacao.alunoContactado).toDate() : undefined;
+
 			this.tipo = this.view.tipo;
 			this.alunoContactado = !!this.participacao.alunoContactado;
-
-			if (this.tipo == EditarContatoTipo.Cancelamento) {
-				this.participacao.observacao = 'Aula Cancelada';
-			}
-			else if (this.tipo == EditarContatoTipo.FaltaAgendada && !this.participacao.observacao) {
-				this.participacao.observacao = 'Falta agendada';
-			}
-			else if (this.tipo == EditarContatoTipo.Falta && !this.participacao.observacao) {
-				// this.participacao.observacao = 'Aluno faltou';
-			}
 
 		}
 	}
@@ -102,7 +94,12 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 
 	enviarMensagemFalta(e: any) {
 		if (this.evento && this.participacao) {
-			this.mensagemWhatsapp.enviarMensagemFalta(this.evento, this.participacao, e);
+			this.mensagemWhatsapp.enviarMensagemFalta(this.evento, this.participacao, e)
+				.then(res => {
+					if (res) {
+						this.participacao = res.participacao
+					}
+				})
 		}
 	}
 

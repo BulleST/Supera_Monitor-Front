@@ -137,8 +137,13 @@ export class SelectedEventoComponent implements OnChanges {
     }
 
 
-    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
+    enviarMensagemFalta(participacao: Evento_Participacao_Aluno, e: any) {
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e)
+        .then(res => {
+            if (res) {
+                participacao = res.participacao
+            }
+        })
     }
 
 

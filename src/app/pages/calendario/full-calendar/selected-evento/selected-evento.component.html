@@ -345,7 +345,7 @@
                     <p [innerHTML]="'Motivo: ' + evento.observacao" class="white-space-nowrap"></p>
                 </ng-template>
                 <p-button
-                          [label]="evento.finalizado ? 'Lançar {{ tipoEventoString }}' : 'Ver {{ tipoEventoString }}'"
+                          [label]="(evento.finalizado ? 'Lançar ' : 'Ver ') + tipoEventoString"
                           icon="pi pi-arrow-right text-xs fadeinleft animation-duration-300 animation-delay-400 "
                           iconPos="right"
                           [rounded]="true"

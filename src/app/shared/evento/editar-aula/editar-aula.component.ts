@@ -342,9 +342,14 @@ export class EditarAulaComponent implements OnInit, OnDestroy {
         this.mensagemWhatsapp.copiarMensagem(object.mensagem);
     }
 
-    enviarMensagemFalta(aluno: Evento_Participacao_Aluno, e: any) {
-        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, aluno, e);
-        showContato(this.dialogService, this.evento, aluno);
+    enviarMensagemFalta(participacao: Evento_Participacao_Aluno, e: any) {
+        this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e)
+        .then(res => {
+            if (res) {
+                participacao = res.participacao
+            }
+        })
+        showContato(this.dialogService, this.evento, participacao);
 
     }
 
