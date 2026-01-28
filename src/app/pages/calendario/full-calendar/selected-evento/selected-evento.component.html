@@ -85,12 +85,12 @@
                                         <p class="flex flex-row align-items-center gap-1">
                                             <i class="pi pi-calendar text-xs"></i>
                                             <span>
-                                                {{evento.vagasDisponiveisEvento}}/{{evento.alunosAtivosEvento}} </span>
+                                                {{evento.vagasDisponiveisEvento}} vagas / {{evento.alunosAtivosEvento}} alunos </span>
                                         </p>
                                         <p class="flex flex-row align-items-center gap-1" *ngIf="evento.evento_Tipo_Id == EventoTipo.Aula">
                                             <i class="fa fa-users-between-lines text-xs"></i>
                                             <span>
-                                                {{evento.vagasDisponiveisTurma}}/{{evento.alunosAtivosTurma}} </span>
+                                                {{evento.vagasDisponiveisTurma}} vagas / {{evento.alunosAtivosTurma}} matriculados</span>
                                         </p>
                                         <ng-template #tooltipVagas>
                                             <p class="flex flex-row align-items-center gap-1 white-space-nowrap">

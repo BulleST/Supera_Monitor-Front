@@ -246,7 +246,7 @@ export var alunosColumns: ColumnTable[] = [
     },
     {
         field: 'restricaoMobilidade',
-        label: 'Restrição de Mobilidade',
+        label: 'Mobilidade Reduzida',
         displayType: DisplayType.options,
         sortable: true,
         filterOptions: {

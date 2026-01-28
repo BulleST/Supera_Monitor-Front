@@ -357,15 +357,15 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
         }
 
         if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
-            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+            model.control.setErrors({ restricaoMobilidade: 'Mobilidade Reduzida' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
             let sala = item.descricao;
             let mensagem = alunosRestricao.length > 1 ?
-                `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
-                : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+                `Os(as) alunos(as) ${alunos} têm mobilidade reduzida e não podem participar da aula zero na sala ${sala}.`
+                : `O(a) aluno(a) ${alunos} tem mobilidade reduzida e não pode participar da aula zero na sala ${sala}.`;
 
             this.showError(
-                'Restrição de Mobilidade',
+                'Mobilidade Reduzida',
                 mensagem,
                 e.originalEvent
             );
@@ -405,8 +405,8 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
             const salaValid = validaAlunoSalaAula(this.object.sala_Id, aluno.id, this.salaAulas, this.alunos);
             if (!salaValid) {
                 this.showError(
-                    'Restrição de Mobilidade',
-                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    'Mobilidade Reduzida',
+                    `O aluno(a) ${nome} tem mobilidade reduzida e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
                     e.originalEvent
                 );
 
@@ -470,7 +470,7 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                 mensagem += restricoes.map(x => `<li>${x.descricao}</li>`);
 
             if (aluno.restricaoMobilidade)
-                mensagem += '<li><b>Restrição de mobilidade</b></li>';
+                mensagem += '<li><b>Mobilidade reduzida</b></li>';
 
             mensagem += `</ul>`;
             mensagem += `<p class="text-sm text-red-500">

@@ -52,7 +52,7 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 		let aluno = this.service.getAluno().subscribe(alunoRes => {
 
-            let params = this.activatedRoute.snapshot.queryParamMap;
+			let params = this.activatedRoute.snapshot.queryParamMap;
 			let alunoIdParam = params.get('aluno_id');
 			this.readonly = !!alunoIdParam;
 
@@ -73,27 +73,25 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 			this.aluno = alunoRes;
 			this.aluno_Id = alunoRes?.id;
 
+
+			console.log('readonly', this.readonly)
+
 			if (!this.readonly) {
-				if (!this.service.list.value.length) {
-					this.loadingAlunos = true;
-					lastValueFrom(this.service.getList())
-						.then(res => this.loadingAlunos = false)
-						.catch(res => this.loadingAlunos = false);
-				}
+				this.loadingAlunos = true;
+				lastValueFrom(this.service.getListPrimeiraAulaDropdown())
+					.then(res => {
+						this.loadingAlunos = false;
+						this.alunos = res;
 
-				let alunos = this.service.list.subscribe(list => {
-					this.alunos = list;
+						this.setAlunos();
 
-					this.setAlunos();
-
-					if (alunoRes) {
-						let index = this.alunos.findIndex(x => x.id == alunoRes.id);
-						if (index != -1) this.alunos.splice(index, 1, alunoRes);
-						this.aluno = this.alunos[index];
-					}
-				});
-				this.subscription.push(alunos)
-
+						if (alunoRes) {
+							let index = this.alunos.findIndex(x => x.id == alunoRes.id);
+							if (index != -1) this.alunos.splice(index, 1, alunoRes);
+							this.aluno = this.alunos[index];
+						}
+					})
+					.catch(res => this.loadingAlunos = false);
 			}
 		});
 		this.subscription.push(aluno);
@@ -121,35 +119,34 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 	setAlunos() {
 		if (this.alunos.length && this.evento) {
-			this.alunos = this.service.list.value;
+			
+			let evento = this.evento as Evento;
 
-			if (this.evento) {
-				var evento = this.evento as Evento;
-				this.alunos = this.alunos.filter(aluno => {
-					
-					const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
-					const falta = alunoEstaNaAula && alunoEstaNaAula.presente === false;
-					const faltaAgendada = alunoEstaNaAula && alunoEstaNaAula.active === false;
-					const reposicaoDe = alunoEstaNaAula && alunoEstaNaAula.reposicaoDe_Evento_Id;
-					const reposicaoPara = alunoEstaNaAula && alunoEstaNaAula.reposicaoPara_Evento_Id;
-					const primeiraAula = aluno.primeiraAula_Id == evento.id;
-					const salaCompativel = !aluno.restricaoMobilidade || evento.andar == SalaAndar.Terreo;
-					const temVagas = evento.vagasDisponiveisEvento > 0;
-					const alunoAtivo = aluno.active || moment(aluno.deactivated).isSameOrAfter(evento.data, 'date');
-					const alunosDoEvento = temVagas || alunoEstaNaAula;
-
-					return alunosDoEvento
+			this.alunos = this.alunos.filter(aluno => {
+				
+				const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
+				const falta = alunoEstaNaAula && alunoEstaNaAula.presente === false;
+				const faltaAgendada = alunoEstaNaAula && alunoEstaNaAula.active === false;
+				const reposicaoDe = alunoEstaNaAula && alunoEstaNaAula.reposicaoDe_Evento_Id;
+				const reposicaoPara = alunoEstaNaAula && alunoEstaNaAula.reposicaoPara_Evento_Id;
+				const primeiraAula = aluno.primeiraAula_Id == evento.id;
+				const salaCompativel = !aluno.restricaoMobilidade || evento.andar == SalaAndar.Terreo;
+				const temVagas = evento.vagasDisponiveisEvento > 0;
+				const alunoAtivo = aluno.active || moment(aluno.deactivated).isSameOrAfter(evento.data, 'date');
+				const alunosDoEvento = temVagas || alunoEstaNaAula;
+				
+				const condicao = alunosDoEvento
 						&& salaCompativel
 						&& alunoAtivo
 						&& !primeiraAula
 						&& !falta
 						&& !faltaAgendada
 						&& !reposicaoDe
-						&& !reposicaoPara
+						&& !reposicaoPara;
+			
+				return condicao;
 
-				})
-
-			}
+			})
 		}
 	}
 
@@ -184,19 +181,19 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 			this.aluno = await this.loadAluno(this.aluno.id);
 
 			if (this.aluno.restricaoMobilidade && this.evento?.sala_Id == SalaAndar.Terreo) {
-				var data = moment(this.evento.data).format('DD/MM/YYYY HH:mm')
+				let data = moment(this.evento.data).format('DD/MM/YYYY HH:mm')
 				return this.showError('Sala Incompatível',
 					`O aluno tem mobilidade reduzida e não poderá participar da aula no dia ${data} na sala ${this.evento.sala} no ${this.evento.andar}º andar`,
 					e.originalEvent
 				)
 			}
-			var restricoes = this.aluno.restricoes.filter(x => x.active)
+			let restricoes = this.aluno.restricoes.filter(x => x.active)
 			if (restricoes.length || this.aluno.restricaoMobilidade) {
 
 				let message = 'Esse aluno possui as seguintes restrições. <ul class="my-1">';
 
 				if (this.aluno.restricaoMobilidade) {
-					message += '<li>Restrição de mobilidade.</li>'
+					message += '<li>Mobilidade reduzida.</li>'
 				}
 				if (restricoes.length)
 					message += restricoes.map(x => `<li>${x.descricao}</li>`).join('');

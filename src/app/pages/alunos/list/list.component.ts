@@ -329,7 +329,7 @@ export class ListComponent implements OnDestroy {
         let mensagem = 'O aluno possui as seguintes restrições: <ul>';
 
         if (item.restricaoMobilidade) {
-            mensagem += `<li>Restrição de mobilidade</li>`
+            mensagem += `<li>Mobilidade Reduzida</li>`
         }
         if (restricoes.length > 0) {
             mensagem += restricoes.map(x => `<li>${x.descricao}</li>`).join('');

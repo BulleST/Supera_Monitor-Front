@@ -90,27 +90,30 @@
                 </p-iconField>
             </ng-container>
             <ng-container *ngIf="!aluno">
-                <p-multiselect [options]="alunos"
-                                [loading]="loadingAlunos || loadingEventos"
-                                [(ngModel)]="selectedAlunos"
-                                [disabled]="loadingEventos || !data || !horario"
-                                (onChange)="alunoChanged($event, aluno_Id)"
-                                [readonly]="aluno_Id"
-                                #aluno_Id="ngModel"
-                                display="chip"
-                                optionLabel="nome"
+                <!-- panelStyleClass="p-select-stripped" -->
+                <!-- -->
+                <!-- 
+                    display="chip"
+                -->
+                    <p-multiselect [options]="alunos"
+                                #_aluno_Id="ngModel"
                                 name="aluno_Id"
                                 inputId="aluno_Id"
-                                [required]="true"
+                                [(ngModel)]="selectedAlunos"
+                                (onChange)="alunoChanged($event, _aluno_Id)"
+                                [virtualScroll]="true"
+                                [virtualScrollItemSize]="54" 
+                                [loading]="loadingAlunos || loadingEventos"
                                 [filter]="true"
                                 filterBy="nome"
                                 [showToggleAll]="false"
-                                [virtualScroll]="true"
-                                [virtualScrollItemSize]="54"
+                                [disabled]="loadingEventos || !data || !horario"
+                                [required]="true"
+                                [readonly]="aluno_Id"
+                                optionLabel="nome"
                                 optionDisabled="deactivated, disponivel"
                                 placeholder="Selecione"
                                 appendTo="body"
-                                panelStyleClass="p-select-stripped"
                                 fluid>
                     <ng-template #selecteditems let-selectedOptions>
                         <ng-container *ngFor="let aluno of selectedOptions">
@@ -154,13 +157,14 @@
                                     <span class="font-normal">Turma {{item.turma}}</span>
                                 </p>
                             </div>
-                            <p-badge [value]="item.perfilCognitivo" />
+                            <p-tag [value]="item.perfilCognitivo"
+                            icon="fa fa-brain" />
                         </div>
                     </ng-template>
                 </p-multiselect>
-                <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                    <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+                <div *ngIf="_aluno_Id.touched && _aluno_Id.invalid && _aluno_Id.errors">
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['required']">Esse campo é obrigatório.</p>
+                    <p class="text-red-500 mt-2 mb-0" *ngIf="_aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
                 </div>
             </ng-container>
         </div>
@@ -269,7 +273,7 @@
 
             <p-button type="submit"
                         styleClass="w-full px-3"
-                        label="Finalizar agendamento"
+                        label="Agendar"
                         icon="pi pi-check"
                         [loading]="loading"
                         [rounded]="true"

@@ -86,10 +86,10 @@ export class Header {
                     }
                 },
                 {
-                    label: 'Educadores',
-                    tooltip: 'Educadores',
-                    iconFontawesome: faPersonChalkboard,
-                    routerLink: ['educadores'],
+                    label: 'Turmas',
+                    tooltip: 'Turmas',
+                    iconFontawesome: faUsersBetweenLines,
+                    routerLink: ['turmas'],
                     routerLinkActiveOptions: { exact: false },
                     routerLinkActive: 'active-link',
                     command: e => {
@@ -97,10 +97,10 @@ export class Header {
                     }
                 },
                 {
-                    label: 'Turmas',
-                    tooltip: 'Turmas',
-                    iconFontawesome: faUsersBetweenLines,
-                    routerLink: ['turmas'],
+                    label: 'Educadores',
+                    tooltip: 'Educadores',
+                    iconFontawesome: faPersonChalkboard,
+                    routerLink: ['educadores'],
                     routerLinkActiveOptions: { exact: false },
                     routerLinkActive: 'active-link',
                     command: e => {

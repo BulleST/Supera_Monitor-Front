@@ -150,15 +150,15 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
             this.loadTurmas();
         }
 
-        let alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active);
-            this.setAluno();
-        })
-        this.subscription.push(alunos)
+        // let alunos = this.alunoService.list.subscribe(res => {
+        //     this.alunos = res.filter(x => x.active);
+        //     this.setAluno();
+        // })
+        // this.subscription.push(alunos)
 
-        if (this.alunos.length == 0) {
-            this.loadAlunos();
-        }
+        // if (this.alunos.length == 0) {
+        this.loadAlunos();
+        // }
 
         let eventos = this.eventoService.eventos.subscribe(res => this.eventos = res.filter(x => x.active))
         this.subscription.push(eventos)
@@ -243,8 +243,11 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
 
     loadAlunos() {
         this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.getList())
-            .then(res => this.loadingAlunos = false)
+        lastValueFrom(this.alunoService.getListAulaZeroDropdown())
+            .then(res => {
+                this.loadingAlunos = false;
+                this.alunos = res;
+            })
             .catch(res => this.loadingAlunos = false);
     }
 
@@ -431,15 +434,15 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
         let alunosRestricao = this.selectedAlunos.filter(x => x.restricaoMobilidade);
         console.log('alunosRestricao', alunosRestricao)
         if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
-            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+            model.control.setErrors({ restricaoMobilidade: 'Mobilidade Reduzida' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.nome)).join(', ')
             let sala = item.descricao;
             let mensagem = alunosRestricao.length > 1 ?
-                `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
-                : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+                `Os(as) alunos(as) ${alunos} têm mobilidade reduzida e não podem participar da aula zero na sala ${sala}.`
+                : `O(a) aluno(a) ${alunos} tem mobilidade reduzida e não pode participar da aula zero na sala ${sala}.`;
 
             this.showError(
-                'Restrição de Mobilidade',
+                'Mobilidade Reduzida',
                 mensagem,
                 e.originalEvent
             );
@@ -479,8 +482,8 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
             const salaValid = validaAlunoSalaAula(this.object.sala_Id, aluno.id, this.salaAulas, this.alunos);
             if (!salaValid) {
                 this.showError(
-                    'Restrição de Mobilidade',
-                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    'Mobilidade Reduzida',
+                    `O aluno(a) ${nome} tem mobilidade reduzida e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
                     e.originalEvent
                 );
 
@@ -546,18 +549,20 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
     }
 
     aulaZeroMensagem(aluno: Aluno, aulaZero: Evento, participacaoAulaZero: Evento_Participacao_Aluno) {
-        let mensagem = `<br>
-                    <p>Outra aula zero já foi cadastrada: </p>`;
+        let mensagem = `<p>Outra aula zero já foi cadastrada para o dia <b>${moment(aulaZero.data).format('DD/MM HH:mm')}</b>`;
 
         if (!aulaZero.active) {
-            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Cancelada (${aulaZero.observacao})</p>`;
+            mensagem += ` e foi cancelada (${aulaZero.observacao})</p>`;
         }
-        else if (aulaZero.active && participacaoAulaZero.presente === false && participacaoAulaZero.active === true) {
-            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Faltou (${participacaoAulaZero.observacao})</p>`;
+        else if (!participacaoAulaZero.active) {
+            mensagem += ` e foi cancelada (${participacaoAulaZero.observacao})</p>`;
+        }
+        else if (participacaoAulaZero.presente === false) {
+            mensagem += ` e o aluno faltou (${participacaoAulaZero.observacao})</p>`;
         }
         else {
-            mensagem += `<p>${moment(aulaZero.data).format('DD/MM HH:mm')} - Ativa</p>`;
-            mensagem += `<p class="text-sm text-red-500">(Ao continuar, essa aula zero que está ativa será cancelada automaticamente)</p>`;
+            mensagem += `e está ativa</p>`;
+            mensagem += `<p class="text-sm text-red-500">(Ao continuar, a aula zero agendada será cancelada automaticamente)</p>`;
         }
         return mensagem;
     }
@@ -576,7 +581,7 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
                 mensagem += restricoes.map(x => `<li>${x.descricao}</li>`);
 
             if (aluno.restricaoMobilidade)
-                mensagem += '<li><b>Restrição de mobilidade</b></li>';
+                mensagem += '<li><b>Mobilidade reduzida</b></li>';
 
             mensagem += `</ul>`;
             mensagem += `<p class="text-sm text-red-500">

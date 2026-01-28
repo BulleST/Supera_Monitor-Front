@@ -333,8 +333,8 @@ export class TabDadosCadastraisComponent implements OnChanges, OnDestroy {
 
 			if (this.object.restricaoMobilidade && this.selectedTurma.andar > SalaAndar.Terreo) {
 				valid = false;
-				header = 'Restrição de mobilidade';
-				message = `O aluno(a) tem restrição de mobilidade e não poderá participar dessa turma no ${this.selectedTurma.andar}º andar.`;
+				header = 'Mobilidade reduzida';
+				message = `O aluno(a) tem mobilidade reduzida e não poderá participar dessa turma no ${this.selectedTurma.andar}º andar.`;
 			}
 
 			else if (this.object.perfilCognitivo_Id && !perfisTurma.includes(this.object.perfilCognitivo_Id)) {
@@ -400,7 +400,7 @@ export class TabDadosCadastraisComponent implements OnChanges, OnDestroy {
 		let message = 'O aluno apresenta as seguintes restrições: <ul>';
 
 		if (this.object.restricaoMobilidade) {
-			message += `<li class="font-bold">Restrição de mobilidade.</li>`
+			message += `<li class="font-bold">Mobilidade reduzida.</li>`
 		}
 
 		if (restricoes.length > 0) {

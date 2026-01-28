@@ -111,11 +111,36 @@ export class AlunoService extends Service {
     getList() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/all`)
             .pipe(tap({
-                next: async list => {
-                    await list.map(async aluno => {
-                        return await this.mapAluno(aluno)
-                    });
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
                     this.list.next(list);
+                    return list
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getListAulaZeroDropdown() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/aula-zero`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    return list
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getListPrimeiraAulaDropdown() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/primeira-aula`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    return list
                 },
                 error: err => {
                     this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)

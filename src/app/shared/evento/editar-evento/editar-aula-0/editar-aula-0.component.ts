@@ -159,15 +159,15 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
         } 
         
         if (alunosRestricao.length && item.andar > SalaAndar.Terreo) {
-            model.control.setErrors({ restricaoMobilidade: 'Restrição de Mobilidade' })
+            model.control.setErrors({ restricaoMobilidade: 'Mobilidade Reduzida' })
             let alunos = alunosRestricao.map(x => this.nameFirstWordPipe.transform(x.aluno)).join(', ')
             let sala = item.descricao;
             let mensagem = alunosRestricao.length > 1 ?
-                        `Os(as) alunos(as) ${alunos} têm restrição de mobilidade e não podem participar da aula zero na sala ${sala}.`
-                        : `O(a) aluno(a) ${alunos} tem restrição de mobilidade e não pode participar da aula zero na sala ${sala}.`;
+                        `Os(as) alunos(as) ${alunos} têm mobilidade reduzida e não podem participar da aula zero na sala ${sala}.`
+                        : `O(a) aluno(a) ${alunos} tem mobilidade reduzida e não pode participar da aula zero na sala ${sala}.`;
             
             this.showError(
-                'Restrição de Mobilidade',
+                'Mobilidade Reduzida',
                 mensagem,
                 e.originalEvent
             );
@@ -202,7 +202,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
             && ((aluno.turma_Id && aluno.turma_Id == turma.id) || (aluno.turma_Id != turma.id && turma.vagasDisponiveis > 0))
             // Turma compatível com o perfil do aluno
             && ((aluno.perfilCognitivo_Id && turma.perfilCognitivo.map(x => x.id).includes(aluno.perfilCognitivo_Id)) || (!aluno.perfilCognitivo_Id))
-            // Turma que seja no térreo se o aluno tiver restrição de mobilidade
+            // Turma que seja no térreo se o aluno tiver mobilidade reduzida
             && ((aluno.restricaoMobilidade && turma.andar == SalaAndar.Terreo) || !aluno.restricaoMobilidade)
         );
 
@@ -239,7 +239,7 @@ export class EditarAula0Component implements OnChanges, OnDestroy {
             model.control.setValue(null)
             return this.showError(
                 'Restricao de Mobilidade', 
-                `O aluno(a) ${aluno.aluno} possui restrição de mobilidade e não pode participar dessa turma que ocorre na sala ${turma.sala} - ${turma.andar}º andar.`,
+                `O aluno(a) ${aluno.aluno} possui mobilidade reduzida e não pode participar dessa turma que ocorre na sala ${turma.sala} - ${turma.andar}º andar.`,
                 e.originalEvent
             );
         }

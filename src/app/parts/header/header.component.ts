@@ -66,15 +66,16 @@ export class HeaderComponent implements OnDestroy {
         
     ) {
 
-        var menuAsideOpen = this.header.menuAsideOpen.subscribe(res => this.menuMobileOpen = res)
+        let menuAsideOpen = this.header.menuAsideOpen.subscribe(res => this.menuMobileOpen = res)
         this.subscription.push(menuAsideOpen);
-        var screen = this.mobileService.get().subscribe(res => this.screen = res)
+
+        let screen = this.mobileService.get().subscribe(res => this.screen = res)
         this.subscription.push(screen);
 
-        var accountData = this.header.accountData.subscribe(res => this.accountData = res)
+        let accountData = this.header.accountData.subscribe(res => this.accountData = res)
         this.subscription.push(accountData);
 
-        var navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
+        let navigationItems = this.header.navigationItems.subscribe(res => this.items = res);
         this.subscription.push(navigationItems);
 
         let account = this.accountService.accountSubject.subscribe(res => this.account = res);
@@ -97,10 +98,10 @@ export class HeaderComponent implements OnDestroy {
 
     setModal() {
 
-        var profile = localStorage.getItem('profile') == 'true';
+        let profile = localStorage.getItem('profile') == 'true';
         this.accountService.profileModalOpen.emit(profile);
 
-        var changePassword = localStorage.getItem('change-password') == 'true';
+        let changePassword = localStorage.getItem('change-password') == 'true';
         this.accountService.profileModalOpen.emit(changePassword);
 
     }

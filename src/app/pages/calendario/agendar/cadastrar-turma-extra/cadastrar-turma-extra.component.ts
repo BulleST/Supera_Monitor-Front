@@ -556,7 +556,7 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
         if (restricoes.length) {
             let message = 'Esse aluno possui as seguintes restrições.';
             if (aluno.restricaoMobilidade) {
-                message += '<br>Restrição de mobilidade.'
+                message += '<br>Mobilidade reduzida.'
             }
             if (aluno.restricoes.filter(x => x.active).length)
                 message += aluno.restricoes.filter(x => x.active).map(x => `<br>${x.descricao}`).join('');

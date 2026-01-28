@@ -148,7 +148,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 // os unicos alunos a estarem disponiveis são os alunos que 
                 // não estão naquela aula
                 // e que tem perfil compativel
-                // e que não tenha restrição de mobilidade caso a aula não seja no térreo
+                // e que não tenha mobilidade reduzida caso a aula não seja no térreo
 
                 let alunosAula = this.eventoReposicaoPara.alunos
                     .map(x => x.aluno_Id)

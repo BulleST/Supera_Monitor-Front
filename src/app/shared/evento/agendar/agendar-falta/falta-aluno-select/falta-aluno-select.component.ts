@@ -158,12 +158,11 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 	// }
 
 	alunoChanged(e: SelectChangeEvent, model: NgModel) {
-		if (e.value) {
-			this.aluno_Id = e.value;
-			this.aluno = this.alunos.find(x => x.id == this.aluno_Id)
-			this.onAlunoChanged.emit(this.aluno)
-			// this.loadAluno()
-		}
+		this.aluno_Id = e.value;
+		this.aluno = this.alunos.find(x => x.id == this.aluno_Id)
+		this.onAlunoChanged.emit(this.aluno);
+		this.alunoService.setAluno(this.aluno);
+		// this.loadAluno()
 	}
 	
 	showError(header: string, message: string, e: any, innerMessage?: string) {

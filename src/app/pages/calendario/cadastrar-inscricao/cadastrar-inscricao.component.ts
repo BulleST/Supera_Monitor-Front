@@ -232,8 +232,8 @@ export class CadastrarInscricaoComponent implements OnDestroy {
 
             if (aluno.restricaoMobilidade && this.evento.andar > SalaAndar.Terreo) {
                 this.showError(
-                    'Restrição de Mobilidade',
-                    `O aluno(a) ${nome} tem restrição de mobilidade e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
+                    'Mobilidade Reduzida',
+                    `O aluno(a) ${nome} tem mobilidade reduzida e não pode subir escadas. <br> Selecione uma sala no térreo para ele poder participar.`,
                     e.originalEvent
                 );
 
