@@ -123,7 +123,7 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
     setAlunos() {
         if (this.alunos.length) {
-            this.alunos = this.alunos.filter(x => x.active == true && !!x.turma_Id);
+            this.alunos = this.alunos.filter(x => x.active == true);
 
 
             let params = this.activatedRoute.snapshot.queryParamMap;
