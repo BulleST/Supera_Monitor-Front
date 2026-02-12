@@ -15,6 +15,7 @@
              [globalFilterFields]="tableGlobalFilterFields"
              dataKey="id"
              stripedRows
+             size="small"
              [loading]="tableLoading"
              [showLoader]="false"
              [rowHover]="list.length > 0"
@@ -297,14 +298,16 @@
                     {{aluno.numeroPaginaAH}}
                 </td>
                 <td class="w-5rem">
-                    <p-checkbox
-                                [ngModel]="aluno.restricaoMobilidade"
-                                [binary]="true"
-                                [readonly]="true" />
-                    <span class="ml-2">
-                        <span *ngIf="aluno.restricaoMobilidade">Sim</span>
-                        <span *ngIf="!aluno.restricaoMobilidade">Não</span>
-                    </span>
+                    <div class="flex align-items-center line-height-1 gap-2">
+                        <p-checkbox
+                                    [ngModel]="aluno.restricaoMobilidade"
+                                    [binary]="true"
+                                    [readonly]="true" />
+                        <span class="line-height-1">
+                            <span *ngIf="aluno.restricaoMobilidade">Sim</span>
+                            <span *ngIf="!aluno.restricaoMobilidade">Não</span>
+                        </span>
+                    </div>
                 </td>
                 <td class="w-5rem">
                     <ng-container *ngIf="aluno.active">

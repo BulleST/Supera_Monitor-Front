@@ -186,7 +186,8 @@
                                     <p class="font-bold mb-1 flex align-items-center ">
                                         <app-legend-color [corLegenda]="item.corLegenda"
                                                           [professor_Id]="item.id"
-                                                          [professor]="item.nome"></app-legend-color>S <span class="mr-2">{{ item.nome }}</span>
+                                                          [professor]="item.nome"></app-legend-color>
+                                        <span class="mr-2">{{ item.nome }}</span>
                                         <p-badge *ngIf="item.disponivel == false"
                                                  value="Indisponível"
                                                  severity="danger"

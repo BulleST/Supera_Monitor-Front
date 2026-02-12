@@ -163,8 +163,6 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
 
                     return !alunoEstaNaAula && perfilCompativel && salaValida;
                 });
-
-
             }
         }
     }
