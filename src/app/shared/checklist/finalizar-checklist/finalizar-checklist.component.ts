@@ -4,7 +4,7 @@ import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng
 import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
 import { MensagemWhatsapp, showError } from '../../../utils';
 import { ChecklistService } from '../../../services/checklist.service';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { NgForm } from '@angular/forms';
@@ -30,6 +30,8 @@ export class FinalizarChecklistComponent implements OnInit {
 
 	ChecklistItemId = ChecklistItemId;
 
+	subscription: Subscription[] = [];
+
 	constructor(
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
@@ -45,12 +47,12 @@ export class FinalizarChecklistComponent implements OnInit {
 
 	ngOnInit(): void {
 		if (this.instance && this.instance.data) {
-
 			this.view = this.instance.data['view'];
 		}
 	}
 
 	close(finalizado: boolean) {
+		this.subscription.forEach(item => item.unsubscribe());
 		this.ref.close(finalizado);
 	}
 
@@ -66,6 +68,7 @@ export class FinalizarChecklistComponent implements OnInit {
 				this.close(true);
 			}
 		});
+		this.subscription.push(onClose)
 	}
 
 	showAgendarSuperacao() {
@@ -76,6 +79,7 @@ export class FinalizarChecklistComponent implements OnInit {
 				this.close(true);
 			}
 		});
+		this.subscription.push(onClose)
 	}
 
 	enviarMensagemCondicao() {

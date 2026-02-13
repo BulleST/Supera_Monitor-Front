@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist, JornadaSupera_List_Checklist_Item_Aluno } from '../../../models/jornada-supera-list.model';
 import { Aluno } from '../../../models/alunos.model';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subscription } from 'rxjs';
 import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
@@ -12,6 +12,7 @@ import { showChecklistDetalhes } from '../../../utils/show-aluno-checklist-detal
 import { FinalizarChecklistComponentView } from '../finalizar-checklist/finalizar-checklist.component';
 import { showFinalizarChecklist } from '../../../utils/show-finalizar-checklist';
 import { MensagemWhatsapp } from '../../../utils';
+import { showAlunoJornada } from '../../../utils/show-aluno-checklist-items-list';
 
 @Component({
 	selector: 'app-aluno-jornada',
@@ -38,6 +39,7 @@ export class AlunoJornadaComponent {
 	activeIndex = 0;
 
 	JornadaSuperaStatus = JornadaSuperaStatus
+	subscription: Subscription[] = [];
 
 	constructor(
 		private dialogService: DialogService,
@@ -52,16 +54,20 @@ export class AlunoJornadaComponent {
 		this.instance = this.dialogService.getInstance(this.ref);
 
 		let onReload = this.jornadaSuperaService.onReload.subscribe(res => {
-			console.log('onReload', res)
-			this.loadJornada();
-
-		})
+			this.loadJornada()
+			// .then(res => {
+			// 	this.close(true);
+			// 	showAlunoJornada(this.dialogService, this.aluno_Id, this.aluno, this.jornada)
+			// })
+		});
+		this.subscription.push(onReload);
 	}
 
 	ngOnInit(): void {
 		if (this.instance && this.instance.data) {
 			this.view = this.instance.data['view'];
 			this.aluno = this.view.aluno;
+			this.aluno_Id = this.view.aluno_Id;
 
 			if (this.view.jornada) {
 				this.jornada = this.view.jornada
@@ -75,6 +81,7 @@ export class AlunoJornadaComponent {
 	}
 
 	close(finalizado: boolean) {
+		this.subscription.forEach(item => item.unsubscribe());
 		this.ref.close(finalizado);
 	}
 
@@ -83,12 +90,12 @@ export class AlunoJornadaComponent {
 		this.instance!.maximize();
 	}
 
-	loadJornada() {
+	async loadJornada() {
 		if (!this.aluno_Id) {
 			return;
 		}
 		this.loading = true;
-		lastValueFrom(this.jornadaSuperaService.getJornadaAluno(this.aluno_Id))
+		return lastValueFrom(this.jornadaSuperaService.getJornadaAluno(this.aluno_Id))
 			.then(res => {
 				this.loading = false;
 				this.jornada = res;
@@ -139,6 +146,9 @@ export class AlunoJornadaComponent {
 	}
 
 	showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno, checklist: JornadaSupera_List_Checklist) {
+		console.log('showChecklistDetalhes');
+		console.log('item', item);
+		console.log('checklist', checklist);
 		let view: AlunoChecklistDetalhesView = {
 			alunoChecklistItemId: item.id,
 
@@ -181,9 +191,10 @@ export class AlunoJornadaComponent {
 			status: item.status,
 		}
 
-		var ref = showFinalizarChecklist(this.dialogService, view);
+		let ref = showFinalizarChecklist(this.dialogService, view);
 
-		ref.onClose.subscribe(res => item.finalizado = res)
+		let onClose = ref.onClose.subscribe(res => item.finalizado = res);
+		this.subscription.push(onClose);
 	}
 
 	enviarMensagemCondicao(item: JornadaSupera_List_Checklist_Item_Aluno) {

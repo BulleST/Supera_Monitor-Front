@@ -32,7 +32,6 @@
     </div>
 </header>
 <section>
-    <pre>{{jornada|json}}</pre>
     <p-accordion [(value)]="activeIndex">
         <ng-container *ngFor="let checklist of jornada.checklists; let i = index">
             <p-accordion-panel [value]="checklist.id">
