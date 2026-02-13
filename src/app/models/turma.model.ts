@@ -151,41 +151,41 @@ export var turmaColumns: ColumnTable[] = [
             width: '15px'
         },
     },
-    {
-        field: 'temGrupo',
-        label: 'Grupo',
-        displayType: DisplayType.link,
-        sortable: true,
-        filterOptions: {
-            type: FilterType.boolean,
-            matchMode: FilterMatchMode.EQUALS.toString(),
-            value: undefined,
-            icon: undefined,
-            primeElement: 'select',
-            primeElementOptions: {
-                icon: undefined,
-                format: undefined,
-                placeholder: undefined,
-                options: [
-                    {
-                        value: undefined,
-                        label: "Todos",
-                        icon: 'pi pi-bars text-primary-500'
-                    },
-                    {
-                        value: true,
-                        label: "Tem grupo",
-                        icon: "pi pi-check text-green-500",
-                    },
-                    {
-                        value: false,
-                        label: "Não tem grupo",
-                        icon: "pi pi-times text-red-500",
-                    }
-                ]
-            }
-        }
-    },
+    // {
+    //     field: 'temGrupo',
+    //     label: 'Grupo',
+    //     displayType: DisplayType.link,
+    //     sortable: true,
+    //     filterOptions: {
+    //         type: FilterType.boolean,
+    //         matchMode: FilterMatchMode.EQUALS.toString(),
+    //         value: undefined,
+    //         icon: undefined,
+    //         primeElement: 'select',
+    //         primeElementOptions: {
+    //             icon: undefined,
+    //             format: undefined,
+    //             placeholder: undefined,
+    //             options: [
+    //                 {
+    //                     value: undefined,
+    //                     label: "Todos",
+    //                     icon: 'pi pi-bars text-primary-500'
+    //                 },
+    //                 {
+    //                     value: true,
+    //                     label: "Tem grupo",
+    //                     icon: "pi pi-check text-green-500",
+    //                 },
+    //                 {
+    //                     value: false,
+    //                     label: "Não tem grupo",
+    //                     icon: "pi pi-times text-red-500",
+    //                 }
+    //             ]
+    //         }
+    //     }
+    // },
     {
         field: 'active',
         label: 'Status',

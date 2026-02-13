@@ -175,7 +175,8 @@
                     <div *ngFor="let item of professores; let i = index"
                          class="flex align-items-center justify-content-between gap-2 ">
                         <div class="font-bold flex align-items-center gap-2">
-                            <app-legend-color [corLegenda]="item.corLegenda"
+                            <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                               [professor_Id]="item.id"
                                               [professor]="item.nome"></app-legend-color>
                             <span>{{ item.nome }}</span>

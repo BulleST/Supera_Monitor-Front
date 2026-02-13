@@ -3,7 +3,8 @@ import { BehaviorSubject, map, tap } from 'rxjs';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Service } from '../helpers/service.service';
 import { Aluno_Restricao, Aluno_Restricao_Request } from '../models/aluno-restricao.model';
-import { getError, insertOrReplace } from '../utils';
+import { getError, insert, insertOrReplace, replace } from '../utils';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -15,12 +16,13 @@ export class AlunoRestricaoService extends Service {
 
     getList(aluno_Id: number) {
         return this.http.get<Aluno_Restricao[]>(`${this.url}/restricoes/all/${aluno_Id}`)
-            .pipe(map(res => {
-                res.map(item => {
+            .pipe(map(list => {
+                list.map(item => {
                     item.active = !item.deactivated;
                     return item
                 });
-                return res;
+                list = list.sort(sortBy('descricao'))
+                return list;
             }))
     }
 
@@ -28,7 +30,7 @@ export class AlunoRestricaoService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/restricoes/`, model)
             .pipe(tap({
                 next: (res: RequestResponse) => {
-                    insertOrReplace(this, res.object, 'list');
+                    insert(this, res.object, 'list', ['descricao']);
                     this.restricaoCreated.emit(res.object);
                 },
                 error: err => {
@@ -41,7 +43,7 @@ export class AlunoRestricaoService extends Service {
         return this.http.patch<RequestResponse>(`${this.url}/restricoes/toggle-active/${id}`, {})
             .pipe(tap({
                 next: (res: RequestResponse) => {
-                    insertOrReplace(this, res.object, 'list');
+                    replace(this, res.object, 'list', ['descricao']);
                     this.restricaoCreated.emit(res.object);
                 },
                 error: err => {

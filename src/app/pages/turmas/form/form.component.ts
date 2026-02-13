@@ -104,7 +104,7 @@ export class FormComponent implements OnDestroy, AfterViewInit {
 
         if (this.perfisCognitivos.length == 0) {
             this.loadingPerfisCognitivos = true;
-            lastValueFrom(this.perfilCognitivoService.getList('turma form'))
+            lastValueFrom(this.perfilCognitivoService.getList())
                 .then(res => this.loadingPerfisCognitivos = false)
                 .catch(res => this.loadingPerfisCognitivos = false);
         }

@@ -5,7 +5,7 @@ import { getError } from '../utils';
 import { Checklist } from '../models/checklist.model';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { Aluno } from '../models/alunos.model';
-import { Aluno_CheckList_Item } from '../models/aluno-checklist-item.model';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -21,9 +21,10 @@ export class ChecklistService extends Service {
     
     getList() {
         return this.http.get<Checklist[]>(`${this.url}/checklist/all/`).pipe(tap({
-            next: res => {
-                this.list.next(res);
-                this.listSubject.next(res);
+            next: list => {
+                list = list.sort(sortBy('ordem'))
+                this.list.next(list);
+                this.listSubject.next(list);
             },
             error: err => {
                 this.toastrService.error(`Não foi possível carregar checklist. \n ${getError(err)}`);

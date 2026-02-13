@@ -33,7 +33,8 @@
                             <div class="flex align-items-center justify-content-between">
                                 <p class="text-sm">
                                     
-                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.professor_Id"
                                                       [professor]="item.professor"
                                                       [turma_Id]="item.id"></app-legend-color>
@@ -69,7 +70,8 @@
                         <div>
                             <p class="font-bold mb-1 flex align-items-center ">
                                 
-                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.id"
                                                       [professor]="item.nome"></app-legend-color>
                                 <span class="mr-2">{{ item.nome }}</span>
@@ -119,7 +121,8 @@
                                 <ng-container *ngTemplateOutlet="corLegendaTemplate; context: { corLegenda: getCorTurma(item.turma_Id) }"></ng-container>
                                 <ng-template #corLegendaTemplate let-corLegenda="corLegenda">
                                     
-                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.professor_Id"
                                                       [professor]="item.professor"
                                                       [turma_Id]="item.turma_Id"></app-legend-color>

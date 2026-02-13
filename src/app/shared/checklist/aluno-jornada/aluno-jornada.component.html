@@ -32,6 +32,7 @@
     </div>
 </header>
 <section>
+    <pre>{{jornada|json}}</pre>
     <p-accordion [(value)]="activeIndex">
         <ng-container *ngFor="let checklist of jornada.checklists; let i = index">
             <p-accordion-panel [value]="checklist.id">
@@ -87,8 +88,8 @@
                                             inputId="finalizado[{{index}}]"
                                             name="finalizado[{{index}}]"
                                             [ngClass]="{ 
-                            'pointer-events-none' : item.finalizado,
-                        }"
+                                                'pointer-events-none' : item.finalizado,
+                                            }"
                                             class="p-checkbox-green"
                                             [binary]="true"
                                             (onChange)="finalizarChecklist(item, checklist)"></p-checkbox>

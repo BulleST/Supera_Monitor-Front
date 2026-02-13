@@ -441,7 +441,8 @@
         <div class="flex align-items-center gap-2">
             <!-- Cor legenda -->
             <div class="w-2rem h-2rem p-1 flex flex-none align-items-center justify-content-center">
-                <app-legend-color [corLegenda]="item.corLegenda"
+                <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                   [professor_Id]="item.professor_Id"
                                   [professor]="item.professor"
                                   [turma_Id]="item.turma_Id"></app-legend-color>
@@ -463,7 +464,8 @@
             </p>
             <p>{{item.eventoReposicaoEmAndamento.descricao}}</p>
             <p *ngIf="item.eventoReposicaoEmAndamento.professor">
-                <app-legend-color [corLegenda]="item.eventoReposicaoEmAndamento.corLegenda"
+                <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.eventoReposicaoEmAndamento.corLegenda"
                                   [professor_Id]="item.eventoReposicaoEmAndamento.professor_Id"
                                   [professor]="item.eventoReposicaoEmAndamento.professor"
                                   [turma_Id]="item.eventoReposicaoEmAndamento.turma_Id"></app-legend-color>

@@ -14,6 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { Aluno_Historico } from '../models/aluno-historico.model';
 import { UrlService } from '../utils/url.service';
 import { Aluno_Vigencia } from '../models/aluno-vigencia.model';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -113,6 +114,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
                     this.list.next(list);
                     return list
                 },
@@ -127,6 +129,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
                     return list
                 },
                 error: err => {
@@ -140,6 +143,7 @@ export class AlunoService extends Service {
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
                     return list
                 },
                 error: err => {
@@ -160,29 +164,28 @@ export class AlunoService extends Service {
 
     getHistorico(id: number) {
         return this.http.get<Aluno_Historico[]>(`${this.url}/alunos/historico/${id}`)
-            .pipe(tap(res => {
-                res = res.map(x => {
+            .pipe(tap(list => {
+                list = list.map(x => {
                     x.data = moment(x.data).toDate();
                     return x
                 });
-                res.sort((x, y) => y.id - x.id);
-
-                this.historico.next(res);
-                return of(res)
+                list = list.sort(sortBy('id'))
+                this.historico.next(list);
+                return of(list)
             }))
     }
 
     getVigencia(id: number) {
         return this.http.get<Aluno_Vigencia[]>(`${this.url}/alunos/vigencia/${id}`)
-            .pipe(tap(res => {
-                res = res.map(x => {
+            .pipe(tap(list => {
+                list = list.map(x => {
                     x.dataInicioVigencia = moment(x.dataInicioVigencia).toDate();
                     x.dataFimVigencia = x.dataFimVigencia ? moment(x.dataFimVigencia).toDate() : undefined;
                     return x
                 });
-                res = res.sort((x, y) => y.id - x.id);
-                this.vigencia.next(res);
-                return of(res)
+                list = list.sort(sortBy('id'))
+                this.vigencia.next(list);
+                return of(list)
             }))
     }
 
@@ -210,13 +213,6 @@ export class AlunoService extends Service {
             }));
     }
 
-    // getStatus() {
-    //     return this.http.get<Pessoa_Status[]>(`${this.url}/pessoas/status/all`)
-    //         .pipe(tap({
-    //             error: err => this.toastrService.error(`Não foi possível carregar status. \n ${getError(err)}`)
-    //         }));
-    // }
-
     getSexo() {
         return this.http.get<Pessoa_Sexo[]>(`${this.url}/pessoas/sexos/all`)
             .pipe(tap({
@@ -241,7 +237,7 @@ export class AlunoService extends Service {
                 next: res => {
                     if (res.success) {
                         res.object = this.mapAluno(res.object)
-                        replace(this, res.object, 'list')
+                        replace(this, res.object, 'list', ['nome'])
                     }
                     return res;
                 },
@@ -257,7 +253,7 @@ export class AlunoService extends Service {
                 next: res => {
                     if (res.success) {
                         res.object = this.mapAluno(res.object)
-                        replace(this, res.object, 'list')
+                        replace(this, res.object, 'list', ['nome'])
                     }
                     return res;
                 },

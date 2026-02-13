@@ -9,18 +9,20 @@
         </div>
     </ng-template>
     <ng-template #notLoading>
-        <div class="flex align-items-center mt-4">
-            <ng-template [ngIf]="error" [ngIfElse]="notError">
-                <i class="pi pi-times-circle text-2xl mr-4 text-red-500"></i>
-                <p class="my-0" *ngIf="error" [innerHTML]="error" style="word-break: break-word;"></p>
-                <p class="my-0" *ngIf="!error" [innerHTML]="'Um erro ocorreu na verificação de conta.'"></p>
-            </ng-template>
+            <ng-container *ngIf="error; else notError">
+                <div class="flex align-items-center mt-4">
+                    <i class="pi pi-times-circle text-2xl mr-4 text-red-500"></i>
+                        <p class="my-0" *ngIf="error" [innerHTML]="error" style="word-break: break-word;"></p>
+                        <p class="my-0" *ngIf="!error" [innerHTML]="'Um erro ocorreu na verificação de conta.'"></p>
+                </div>
+            </ng-container>
             <ng-template #notError>
-                <i class="pi pi-check-circle text-2xl mr-4 text-green-400"></i>
-                <span class="my-0" *ngIf="success" [innerHTML]="success"></span>
-                <span class="my-0" *ngIf="!success" [innerHTML]="'verificação concluída com sucesso.'"></span>
+                <div class="flex align-items-center mt-4">
+                    <i class="pi pi-check-circle text-2xl mr-4 text-green-400"></i>
+                    <span class="my-0" *ngIf="success" [innerHTML]="success"></span>
+                    <span class="my-0" *ngIf="!success" [innerHTML]="'verificação concluída com sucesso.'"></span>
+                </div>
                 <a class="text-primary link" [routerLink]="['..', 'login']">Fazer login</a>
             </ng-template>
-        </div>
     </ng-template>
 </div>

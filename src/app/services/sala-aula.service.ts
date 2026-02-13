@@ -5,6 +5,7 @@ import { Service } from '../helpers/service.service';
 import { SalaAula } from '../models/sala-aula.model';
 import { MyMap } from '../utils/map';
 import { getError } from '../utils';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -16,6 +17,7 @@ export class SalaAulaService extends Service {
         return this.http.get<SalaAula[]>(`${this.url}/salas/all/`)
             .pipe(tap({
                 next: list => {
+                    list = list.sort(sortBy('online', 'andar', 'numeroSala'))
                     this.list.next(list);
                     return of(list);
                 },

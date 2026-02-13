@@ -6,6 +6,7 @@ import { Account, AccountRequest } from '../models/account.model';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError, insert, replace } from '../utils';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -27,6 +28,8 @@ export class UserService extends Service {
         return this.http.get<Account[]>(`${this.url}/users/all/`)
             .pipe(tap({
                 next: list => {
+                    list = list.sort(sortBy('name'));
+                    
                     this.list.next(list);
                     return of(list);
                 },
@@ -41,7 +44,7 @@ export class UserService extends Service {
             if (this.list.value.length == 0)
                 await lastValueFrom(this.getList());
 
-            var item = this.list.value.find(x => x.id == id) as Account;
+            let item = this.list.value.find(x => x.id == id) as Account;
             if (!item) {
                 this.toastrService.error(`Usuário não encontrado.`);
                return reject('Usuário não encontrado.')
@@ -52,13 +55,12 @@ export class UserService extends Service {
     }
 
     create(model: Account) {
-        var request = MyMap(model, new AccountRequest)
+        let request = MyMap(model, new AccountRequest)
         return this.http.post<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        // res.object = this.mapAluno(res.object)
-                        insert(this, res.object, 'list')
+                        insert(this, res.object, 'list', ['name'])
                     }
                     return res;
                 },
@@ -69,13 +71,12 @@ export class UserService extends Service {
     }
 
     edit(model: Account) {
-        var request = MyMap(model, new AccountRequest)
+        let request = MyMap(model, new AccountRequest)
         return this.http.put<RequestResponse>(`${this.url}/users`, request)
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        // res.object = this.mapAluno(res.object)
-                        replace(this, res.object, 'list')
+                        replace(this, res.object, 'list', ['name'])
                     }
                     return res;
                 },
@@ -90,8 +91,7 @@ export class UserService extends Service {
             .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        // res.object = this.mapAluno(res.object)
-                        replace(this, res.object, 'list')
+                        replace(this, res.object, 'list', ['name'])
                     }
                     return res;
                 },
@@ -105,10 +105,6 @@ export class UserService extends Service {
         return this.http.patch<RequestResponse>(`${this.url}/users/reset-password/${id}`, {})
             .pipe(tap({
                 next: res => {
-                    // if (res.success) {
-                    //     res.object = this.mapAluno(res.object)
-                    //     replace(this, res.object, 'list')
-                    // }
                     return res;
                 },
                 error: err => {

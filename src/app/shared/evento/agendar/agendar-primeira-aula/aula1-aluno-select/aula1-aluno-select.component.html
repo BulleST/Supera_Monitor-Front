@@ -44,7 +44,8 @@
                             </div>
                             <div class="flex align-items-center gap-2">
                                 <div class="w-2rem pl-1 flex justify-content-center">
-                                    <app-legend-color [corLegenda]="item.corLegenda"
+                                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.professor_Id"
                                                       [professor]="item.professor"
                                                       [turma_Id]="item.turma_Id"></app-legend-color>
@@ -86,7 +87,8 @@
                             </div>
                             <p class="event-property-description">
                                 <span>Turma: {{aluno.turma}}</span>
-                                <app-legend-color [corLegenda]="aluno.corLegenda"
+                                <app-legend-color class="line-height-1"
+                                                        [corLegenda]="aluno.corLegenda"
                                                   [professor_Id]="aluno.professor_Id"
                                                   [professor]="aluno.professor"
                                                   [turma_Id]="aluno.turma_Id"></app-legend-color>

@@ -119,9 +119,7 @@ export class FinalizarChecklistComponent implements OnInit {
 				if (res.success == true) {
 					this.toastr.success(`Checklist ${this.view.checklistItem} finalizado com sucesso!`);
 					this.close(true);
-					if (window.location.pathname.includes('jornada-supera')) {
-						this.jornadaSuperaService.onReload.emit();
-					}
+					this.jornadaSuperaService.onReload.emit();
 				}
 				else {
 					this.showError('Erro', 'Não foi possível finalizar o checklist.', e, res.message)

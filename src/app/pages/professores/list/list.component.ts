@@ -76,7 +76,10 @@ export class ListComponent implements OnDestroy {
         let screen = this.mobileService.get().subscribe(res => this.screen = res);
         this.subscription.push(screen);
         
-        let list = this.service.list.subscribe(res => this.list = res);
+        let list = this.service.list.subscribe(res => {
+            this.list = res;
+            console.log(this.list)
+        });
         this.subscription.push(list);
         
         if (!this.list.length) this.update()
@@ -84,6 +87,7 @@ export class ListComponent implements OnDestroy {
 
 
     ngOnDestroy(): void {
+        console.log('professor ondestroy')
         this.subscription.forEach(item => item.unsubscribe());
     }
 
@@ -91,10 +95,7 @@ export class ListComponent implements OnDestroy {
         this.tableLoading = true;
         lastValueFrom(this.service.getList())
             .then(res => this.tableLoading = false)
-            .catch(res => {
-                this.tableLoading = false;
-
-            });
+            .catch(res => this.tableLoading = false);
     }
 
     contextMenuSelectionChange(item: any) {
@@ -123,17 +124,6 @@ export class ListComponent implements OnDestroy {
                 icon: 'fa-solid fa-key text-grey-400',
                 command: (event: any) => this.resetPassword(event, item)
             },
-            // { separator: true },
-            // {
-            //     label: 'Calendário de aulas',
-            //     icon: 'fa-solid fa-calendar',
-            //     command: () => {
-            //         let encrypted = this.crypto.encrypt(item.id);
-            //         this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
-            //     }
-            // },
-
-
         ];
     }
 
@@ -187,7 +177,7 @@ export class ListComponent implements OnDestroy {
             rejectLabel: 'Cancelar',
 
             accept: () => {
-                lastValueFrom(this.userService.deactivated(item.account_Id, deactivated))
+                lastValueFrom(this.service.deactivated(item, deactivated))
                     .then(res => {
                         if (res.success) {
                             this.toastrService.success(deactivated 
@@ -264,15 +254,6 @@ export class ListComponent implements OnDestroy {
                 icon: 'fa-solid fa-key text-grey-400',
                 command: (event: any) => this.resetPassword(event, item)
             },
-            // { separator: true },
-            // {
-            //     label: 'Calendário de aulas',
-            //     icon: 'fa-solid fa-calendar',
-            //     command: () => {
-            //         let encrypted = this.crypto.encrypt(item.id);
-            //         this.router.navigate(['calendario', encrypted], { relativeTo: this.activatedRoute });
-            //     }
-            // },
         ];
 
         if (toggle) {
@@ -285,24 +266,6 @@ export class ListComponent implements OnDestroy {
     edit(item: any) {
         let encrypted = this.crypto.encrypt(item.id);
         this.router.navigate(['editar', encrypted], { relativeTo: this.activatedRoute });
-    }
-
-    filterDateTime(value: any, col: ColumnTable, callback: Function, dt: Table) {
-
-
-        let filterService = dt.filterService;
-        let filterDt: any = dt.filters[col.field];
-        let matchMode = filterDt['matchMode'];
-        let filter: any = dt.filters[col.field];
-
-        let a = filter(value)
-
-
-
-
-
-
-
     }
 
 }

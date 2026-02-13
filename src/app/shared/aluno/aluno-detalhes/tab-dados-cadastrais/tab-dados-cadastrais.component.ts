@@ -179,7 +179,7 @@ export class TabDadosCadastraisComponent implements OnChanges, OnDestroy {
 		lastValueFrom(this.jornadaSuperaService.getJornadaAluno(this.aluno_Id))
 			.then(res => {
 				this.loadingJornada = false;
-				this.jornadaAluno = res[0];
+				this.jornadaAluno = res;
 				this.setJornadaAtual();
 			})
 			.catch(res => {

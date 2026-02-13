@@ -24,6 +24,7 @@ import { UrlService } from '../utils/url.service';
 import { statusContato } from '../models/evento-participacao-aluno.model';
 import { RequestResponse } from '../helpers/request-response.interface';
 import { FeriadoService } from './feriado.service';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -33,7 +34,6 @@ export class EventoService extends Service {
     eventoReposicaoDe = new BehaviorSubject<Evento | undefined>(undefined);
     eventoReposicaoPara = new BehaviorSubject<Evento | undefined>(undefined);
     eventos = new BehaviorSubject<Evento[]>([]);
-    // feriados = new BehaviorSubject<Feriado[]>([]);
     statusContato = new BehaviorSubject<{ value: any, label: string }[]>(statusContato);
 
     onReload = new EventEmitter<number>();
@@ -140,6 +140,8 @@ export class EventoService extends Service {
                         evento = this.mapEvento(evento);
                         return evento;
                     });
+
+                    eventos = eventos.sort(sortBy('data'))
                     this.eventos.next(eventos);
 
                     let feriados = res.feriados;
@@ -149,6 +151,7 @@ export class EventoService extends Service {
                         feriado.deactivated = feriado.deactivated ? moment(feriado.deactivated).toDate() : undefined;
                         return feriado;
                     });
+                    feriados = feriados.sort(sortBy('data'))
 
                     this.feriadoService.list.next(feriados)
 
@@ -198,31 +201,7 @@ export class EventoService extends Service {
                 return evento;
             }));
     }
-
-    // getFeriados(ano: number = new Date().getFullYear()) {
-    //     let token = '19159|Nm1JCRUJeS7kndMrL4WxoGxfalWQvoel';
-    //     token = '20487|fbPtn71wk6mjsGDWRdU8mGECDlNZhyM7';
-    //     // return this.http.get<Feriado[]>(`https://api.invertexto.com/v1/holidays/${ano}?token=${token}&state=SP `)
-    //     return this.http.get<Feriado[]>(`${this.url}/eventos/feriado/${ano}`)
-    //         .pipe(tap({
-    //             next: res => {
-    //                 let list = this.feriados.value;
-    //                 res.forEach(item => {
-    //                     let index = list.findIndex(x => moment(item.date).isSame(x.date));
-    //                     if (index == -1) list.push(item);
-    //                     else list.splice(index, 1, item);
-    //                 });
-    //                 this.feriados.next(list);
-    //                 return of(list);
-    //             },
-    //             error: res => {
-    //                 this.feriados.next([]);
-    //                 return of([]);
-    //             }
-    //         }));
-    // }
-
-   
+       
     createAulaTurma(model: EventoAulaRequest) {
         let request = MyMap(model, new EventoAulaRequest()) as EventoAulaRequest;
         request.data = moment(model.data).format('YYYY-MM-DD[T]HH:mm:ss') as any;

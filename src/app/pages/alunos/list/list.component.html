@@ -167,7 +167,8 @@
                                     </ng-template>
                                     <ng-template #selectedItem let-selectedOption>
                                         <div class="flex align-items-center gap-2">
-                                            <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                            <app-legend-color class="line-height-1"
+                                                              [corLegenda]="selectedOption.corLegenda"
                                                               [professor]="selectedOption.professor"
                                                               [professor_Id]="selectedOption.professor_Id"
                                                               [turma_Id]="selectedOption.id"></app-legend-color>
@@ -178,7 +179,8 @@
                                         <div class="flex align-items-start gap-2 w-full">
                                             <div class="w-full">
                                                 <div class="flex align-items-center gap-2">
-                                                    <app-legend-color [corLegenda]="turma.corLegenda"
+                                                    <app-legend-color class="line-height-1"
+                                                                      [corLegenda]="turma.corLegenda"
                                                                       [professor]="turma.professor"
                                                                       [professor_Id]="turma.professor_Id"
                                                                       [turma_Id]="turma.id"></app-legend-color>
@@ -207,7 +209,8 @@
                         </ng-template>
                         <ng-template #output>
                             <div class="flex align-items-center gap-2">
-                                <app-legend-color [corLegenda]="aluno.corLegenda"
+                                <app-legend-color class="line-height-1"
+                                                  [corLegenda]="aluno.corLegenda"
                                                   [professor_Id]="aluno.professor_Id"
                                                   [professor]="aluno.professor"
                                                   [turma_Id]="aluno.turma_Id"></app-legend-color>

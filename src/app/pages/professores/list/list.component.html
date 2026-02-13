@@ -106,7 +106,8 @@
         <ng-template #body let-item let-index="rowIndex">
             <tr class="white-space-nowrap">
                 <td>
-                    <app-legend-color [corLegenda]="item.corLegenda"
+                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                       [professor_Id]="item.id"
                                       [professor]="item.nome"></app-legend-color>
                 </td>

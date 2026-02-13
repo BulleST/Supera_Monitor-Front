@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'moment/locale/pt-br';
 import { Monitoramento_Aluno_Item, Monitoramento_Item_Status, Monitoramento_Request, Monitoramento_Response } from '../models/monitoramento.model';
 import { MyMap } from '../utils/map';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -32,9 +33,15 @@ export class MonitoramentoService extends Service {
                         item.status = status;
                         return item;
                     });
+                    // aluno.items = aluno.items.sort(sortBy('aula.aula.data'))
 
                     return aluno
                 })
+
+                res.mesesRoteiro = res.mesesRoteiro.sort(sortBy('mes'))
+                res.alunos = res.alunos.sort(sortBy('mes'))
+                
+
                 this.dashboard.next(res)
                 return res;
             }));

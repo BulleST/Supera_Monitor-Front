@@ -6,12 +6,27 @@ import { MyMap } from '../utils/map';
 import moment from 'moment';
 import { Service } from '../helpers/service.service';
 import { getError, insert, replace } from '../utils';
+import { sortBy } from 'sort-by-typescript';
+import { UrlService } from '../utils/url.service';
+import { ToastrService } from 'ngx-toastr';
+import { HttpClient } from '@angular/common/http';
+import { UserService } from './user.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ProfessorService extends Service {
     override list = new BehaviorSubject<Professor[]>([]);
+
+    constructor(
+        private userService: UserService,
+         http: HttpClient,
+        toastrService: ToastrService,
+         urlService: UrlService
+
+    ) {
+        super(http, toastrService, urlService);
+    }
 
     mapProfessor(item: Professor) {
         if (item.expedienteInicio)
@@ -23,9 +38,9 @@ export class ProfessorService extends Service {
         if (item.dataInicio)
             item.dataInicio = new Date(moment(item.dataInicio).format('YYYY-MM-DD'))
         
-        item.active = !item.deactivated;
+        item.active = item.deactivated ? false : true; 
         item.activeString = item.active ? 'Ativo' : 'Inativo';
-        return item
+        return item;
     }
 
     getNivelCertificacao() {
@@ -41,9 +56,9 @@ export class ProfessorService extends Service {
         return this.http.get<Professor[]>(`${this.url}/professor/all/`)
             .pipe(tap({
                 next: list => {
-                    list = list.map(item => {
-                        return this.mapProfessor(item);
-                    })
+                    list = list.map(item => this.mapProfessor(item));
+                    list = list.sort(sortBy('nome'));
+                    
                     this.list.next(list);
                     return of(list);
                 },
@@ -54,18 +69,26 @@ export class ProfessorService extends Service {
     }
 
     get(id: number) {
-        return new Promise<Professor>(async (resolve, reject) => {
-            if (this.list.value.length == 0)
-                await lastValueFrom(this.getList());
-
-            var item = this.list.value.find(x => x.id == id) as Professor;
-            if (!item) {
-                this.toastrService.error(`Professor não encontrado.`);
-                return reject('Professor não encontrado.')
+        return this.http.get<Professor>(`${this.url}/professor/${id}`).pipe(tap({
+            next: res => {
+                return of(this.mapProfessor(res));
+            },
+            error: err => {
+                this.toastrService.error(`Não foi possível carregar educador(a). \n ${getError(err)}`);
             }
+        }));
+        // return new Promise<Professor>(async (resolve, reject) => {
+        //     if (this.list.value.length == 0)
+        //         await lastValueFrom(this.getList());
 
-            return resolve(item);
-        })
+        //     var item = this.list.value.find(x => x.id == id) as Professor;
+        //     if (!item) {
+        //         this.toastrService.error(`Professor não encontrado.`);
+        //         return reject('Professor não encontrado.')
+        //     }
+
+        //     return resolve(item);
+        // })
     }
 
     create(model: Professor) {
@@ -77,7 +100,11 @@ export class ProfessorService extends Service {
                 next: res => {
                     if (res.success) {
                         res.object = this.mapProfessor(res.object);
-                        insert(this, res.object, 'list');
+                        // let list = this.list.value;
+                        // list.push(res.object);
+                        // list = list.sort(sortBy('nome'));
+                        // this.list.next(list);
+                        insert(this, res.object, 'list', ['nome'])
                     }
                     return res;
                 },
@@ -96,7 +123,13 @@ export class ProfessorService extends Service {
                 next: res => {
                     if (res.success) {
                         res.object = this.mapProfessor(res.object);
-                        replace(this, res.object, 'list');
+                        // let list = this.list.value;
+                        // let index = list.findIndex(x => x.id == model.id);
+                        // if (index == -1) list.push(res.object);
+                        // else list.splice(index, 1, res.object)
+                        // list = list.sort(sortBy('nome'));
+                        // this.list.next(list);
+                        replace(this, res.object, 'list', ['nome'])
                     }
                     return res;
                 },
@@ -106,13 +139,25 @@ export class ProfessorService extends Service {
             }));
     }
 
-    deactivated(id: number, activated: boolean = true) {
-        return this.http.patch<RequestResponse>(`${this.url}/professor/${id}/${activated}`, {})
-            .pipe(tap({
+    deactivated(item: Professor, activated: boolean = true) {
+        return this.userService.deactivated(item.account_Id, activated)
+        .pipe(tap({
                 next: res => {
                     if (res.success) {
-                        res.object = this.mapProfessor(res.object);
-                        replace(this, res.object, 'list');
+                        item.active = res.object.active;
+                        item.deactivated = res.object.deactivated;
+                        
+                        item = this.mapProfessor(item);
+                        replace(this, item, 'list', ['nome'])
+                        
+                        // let list = this.list.value;
+                        // let index = list.findIndex(x => x.id == item.id);
+                        // if (index == -1) list.push(item);
+                        // else list.splice(index, 1, item)
+                        // list = list.sort(sortBy('nome'));
+                        // this.list.next(list);
+
+                        res.object = item;
                     }
                     return res;
                 },

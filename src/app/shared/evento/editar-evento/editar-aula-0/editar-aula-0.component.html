@@ -65,7 +65,8 @@
                 <div class="flex align-items-center justify-content-between w-full gap-2">
                     <div>
                         <p class="font-bold mb-1 flex align-items-center gap-2">
-                            <app-legend-color [corLegenda]="item.corLegenda"
+                            <app-legend-color class="line-height-1"
+                                                        [corLegenda]="item.corLegenda"
                                               [professor_Id]="item.id"
                                               [professor]="item.nome"></app-legend-color>
                             <span>{{ item.nome }}</span>
@@ -312,7 +313,8 @@
         <ng-template let-option #item>
             <div class="w-full">
                 <div class="flex align-items-center gap-2">
-                    <app-legend-color [corLegenda]="option.corLegenda"
+                    <app-legend-color class="line-height-1"
+                                                        [corLegenda]="option.corLegenda"
                                       [professor_Id]="option.professor_Id"
                                       [professor]="option.professor"
                                       [turma_Id]="option.id"></app-legend-color>

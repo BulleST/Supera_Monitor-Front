@@ -3,6 +3,7 @@ import { BehaviorSubject, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import { PerfilCognitivo } from '../models/perfil-cognitivo.model';
 import { getError } from '../utils';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -10,10 +11,11 @@ import { getError } from '../utils';
 export class PerfilCognitivoService extends Service {
     override list = new BehaviorSubject<PerfilCognitivo[]>([]);
 
-    getList(where?: string) {
+    getList() {
         return this.http.get<PerfilCognitivo[]>(`${this.url}/turmas/perfil/all/`)
             .pipe(tap({
                 next: list => {
+                    list = list.sort(sortBy('nome'))
                     this.list.next(list);
                     return of(list);
                 },
@@ -22,7 +24,4 @@ export class PerfilCognitivoService extends Service {
                 }
             }));
     }
-
-
-
 }

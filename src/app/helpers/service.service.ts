@@ -22,5 +22,12 @@ export class Service {
             this.url = res;
         })
     }
+    insert(object: any, sortProperty = 'id') {
+        var list = this.list.value as any[];
+        list.push(object) 
+        list = list.sort((x, y) => x[sortProperty] < y[sortProperty] ? -1 : 1);
+        this.list.next(list);
+    }
+
 
 }

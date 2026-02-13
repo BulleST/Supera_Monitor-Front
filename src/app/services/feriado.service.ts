@@ -6,6 +6,7 @@ import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError, insert, remove, replace } from '../utils';
 import { Feriado, InsertFeriadoRequest, UpdateFeriadoRequest } from '../models/feriado.model';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -24,7 +25,8 @@ export class FeriadoService extends Service {
         return this.http.get<Feriado[]>(`${this.url}/feriado/all/`)
             .pipe(tap({
                 next: list => {
-                    list.map(feriado => this.mapFeriado(feriado))
+                    list = list.map(feriado => this.mapFeriado(feriado))
+                    list = list.sort(sortBy('data'))
                     this.list.next(list);
                     return of(list);
                 },
@@ -54,7 +56,7 @@ export class FeriadoService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapFeriado(res.object);
-                        insert(this, res.object, 'list');
+                        insert(this, res.object, 'list', ['data']);
                     }
                     return res;
                 },
@@ -73,7 +75,7 @@ export class FeriadoService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapFeriado(res.object);
-                        replace(this, res.object, 'list');
+                        replace(this, res.object, 'list', ['data']);
                     }
                     return res;
                 },
@@ -89,7 +91,7 @@ export class FeriadoService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapFeriado(res.object);
-                        replace(this, res.object, 'list');
+                        replace(this, res.object, 'list', ['data']);
                     }
                     return res;
                 },
@@ -104,7 +106,7 @@ export class FeriadoService extends Service {
             .pipe(tap({
                 next: (res) => {
                     if (res.success) {
-                        remove(this, res.object, 'list');
+                        remove(this, res.object, 'list', ['data']);
                     }
                     return res;
                 },

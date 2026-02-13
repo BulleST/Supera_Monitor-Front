@@ -6,6 +6,7 @@ import moment from 'moment';
 import { MyMap } from '../utils/map';
 import { Service } from '../helpers/service.service';
 import { getError, insert, replace } from '../utils';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -34,6 +35,8 @@ export class TurmaService extends Service {
             .pipe(tap({
                 next: list => {
                     list.map(turma => this.mapTurma(turma))
+                    list = list.sort(sortBy('diaSemana', 'horario'));
+
                     this.list.next(list);
                     return of(list);
                 },
@@ -45,8 +48,8 @@ export class TurmaService extends Service {
 
     get(id: number) {
         return this.http.get<Turma>(`${this.url}/turmas/${id}`).pipe(tap({
-            next: turma => {
-                return of(this.mapTurma(turma));
+            next: res => {
+                return of(this.mapTurma(res));
             },
             error: err => {
                 this.toastrService.error(`Não foi possível carregar turma. \n ${getError(err)}`);
@@ -66,7 +69,7 @@ export class TurmaService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapTurma(res.object);
-                        insert(this, res.object, 'list');
+                        insert(this, res.object, 'list', ['diaSemana', 'horario'])
                     }
                     return res;
                 },
@@ -88,7 +91,8 @@ export class TurmaService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapTurma(res.object);
-                        replace(this, res.object, 'list');
+
+                        replace(this, res.object, 'list', ['diaSemana', 'horario'])
                     }
                     return res;
                 },
@@ -104,7 +108,7 @@ export class TurmaService extends Service {
                 next: (res) => {
                     if (res.success) {
                         res.object = this.mapTurma(res.object);
-                        replace(this, res.object, 'list');
+                        replace(this, res.object, 'list', ['diaSemana', 'horario'])
                     }
                     return res;
                 },
@@ -113,6 +117,4 @@ export class TurmaService extends Service {
                 }
             }));
     }
-
-
 }

@@ -139,7 +139,7 @@ export class CalendarioComponent implements OnDestroy, AfterViewInit {
 
         if (this.perfilCognitivo.length == 0) {
             this.loadingPerfilCognitivo = true;
-            lastValueFrom(this.perfilCognitivoService.getList('calendario'))
+            lastValueFrom(this.perfilCognitivoService.getList())
                 .then(res => this.loadingPerfilCognitivo = false)
                 .catch(res => this.loadingPerfilCognitivo = false);
         }

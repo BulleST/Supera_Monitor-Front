@@ -1,9 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { BehaviorSubject, map, tap } from 'rxjs';
+import { BehaviorSubject, map, of, tap } from 'rxjs';
 import { Service } from '../helpers/service.service';
 import 'moment/locale/pt-br';
 import { JornadaSupera_Card_Checklist, JornadaSupera_Request } from '../models/jornada-supera-cards.model';
-import { JornadaSupera_List_Aluno } from '../models/jornada-supera-list.model';
+import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist } from '../models/jornada-supera-list.model';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +17,7 @@ export class JornadaSuperaService extends Service {
     onReload = new EventEmitter<JornadaSupera_Request | undefined>();
     loadingCards = new EventEmitter<boolean>();
     loadingList = new EventEmitter<boolean>();
-    
+
     exibicao = new BehaviorSubject<boolean>(true);
     request = new BehaviorSubject<JornadaSupera_Request>(new JornadaSupera_Request);
 
@@ -51,10 +52,11 @@ export class JornadaSuperaService extends Service {
         this.loadingCards.emit(true);
         return this.http.post<JornadaSupera_Card_Checklist[]>(`${this.url}/jornada-supera/cards`, request)
             .pipe(tap({
-                next: res => {
+                next: list => {
                     this.loadingCards.emit(false);
-                    this.cards.next(res)
-                    return res;
+                    list = list.sort(sortBy('numeroSemana', 'nome'))
+                    this.cards.next(list)
+                    return list;
                 },
                 error: res => {
                     this.loadingCards.emit(false);
@@ -66,10 +68,11 @@ export class JornadaSuperaService extends Service {
         this.loadingList.emit(true);
         return this.http.post<JornadaSupera_List_Aluno[]>(`${this.url}/jornada-supera/list`, request)
             .pipe(tap({
-                next: res => {
+                next: list => {
                     this.loadingList.emit(false);
-                    this.list.next(res)
-                    return res;
+                    list = list.sort(sortBy('turma_Id', 'nome'))
+                    this.list.next(list)
+                    return list;
                 },
                 error: res => {
                     this.loadingList.emit(false);
@@ -80,6 +83,17 @@ export class JornadaSuperaService extends Service {
     getJornadaAluno(aluno_Id: number) {
         var request = { aluno_Id: aluno_Id, pendenteSemana: false };
         return this.http.post<JornadaSupera_List_Aluno[]>(`${this.url}/jornada-supera/list`, request)
+            .pipe(map(res => {
+                let item = res[0];
+                item.checklists = item.checklists.sort(sortBy('ordem'))
+                this.loadingList.emit(false);
+                return item;
+            }),
+            tap({
+                error: res => {
+                    this.loadingList.emit(false);
+                }
+            }))
     }
 
 }

@@ -7,7 +7,7 @@ import { JornadaSuperaService } from '../../../services/jornada-supera.service';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSuperaStatus } from '../../../models/jornada-supera-status.model';
 import moment from 'moment';
-import { AlunoChecklistDetalhesComponent, AlunoChecklistDetalhesView } from '../aluno-checklist-detalhes/aluno-checklist-detalhes.component';
+import { AlunoChecklistDetalhesView } from '../aluno-checklist-detalhes/aluno-checklist-detalhes.component';
 import { showChecklistDetalhes } from '../../../utils/show-aluno-checklist-detalhes';
 import { FinalizarChecklistComponentView } from '../finalizar-checklist/finalizar-checklist.component';
 import { showFinalizarChecklist } from '../../../utils/show-finalizar-checklist';
@@ -42,14 +42,20 @@ export class AlunoJornadaComponent {
 	constructor(
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
-		private jornadaSuperaService: JornadaSuperaService,
 		private toastr: ToastrService,
 		private mensagemWhatsapp: MensagemWhatsapp,
+		private jornadaSuperaService: JornadaSuperaService,
 
 
 	) {
 
 		this.instance = this.dialogService.getInstance(this.ref);
+
+		let onReload = this.jornadaSuperaService.onReload.subscribe(res => {
+			console.log('onReload', res)
+			this.loadJornada();
+
+		})
 	}
 
 	ngOnInit(): void {
@@ -85,7 +91,8 @@ export class AlunoJornadaComponent {
 		lastValueFrom(this.jornadaSuperaService.getJornadaAluno(this.aluno_Id))
 			.then(res => {
 				this.loading = false;
-				this.jornada = res[0];
+				this.jornada = res;
+				console.log('jornada', this.jornada)
 				this.setJornadaAtual();
 			})
 			.catch(res => {
@@ -128,10 +135,11 @@ export class AlunoJornadaComponent {
 
 			}
 		}
+		console.log('jornadaAtual', this.jornadaAtual)
 	}
-	showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno, checklist: JornadaSupera_List_Checklist) {
 
-		var view: AlunoChecklistDetalhesView = {
+	showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno, checklist: JornadaSupera_List_Checklist) {
+		let view: AlunoChecklistDetalhesView = {
 			alunoChecklistItemId: item.id,
 
 			checklist: checklist.nome,

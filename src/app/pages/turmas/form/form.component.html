@@ -174,7 +174,8 @@
                             <div *ngIf="selectedOption">
                                 <p class="font-bold mb-1 flex align-items-center ">
                                     <span class="mr-2">{{ selectedOption.nome }}</span>
-                                    <app-legend-color [corLegenda]="selectedOption.corLegenda"
+                                    <app-legend-color class="line-height-1"
+                                                      [corLegenda]="selectedOption.corLegenda"
                                                       [professor_Id]="selectedOption.id"
                                                       [professor]="selectedOption.nome"></app-legend-color>
                                 </p>
@@ -183,8 +184,9 @@
                         <ng-template let-item #item>
                             <div class="flex align-items-center justify-content-between w-full gap-2">
                                 <div>
-                                    <p class="font-bold mb-1 flex align-items-center ">
-                                        <app-legend-color [corLegenda]="item.corLegenda"
+                                    <p class="font-bold mb-1 flex align-items-center gap-1">
+                                        <app-legend-color class="line-height-1"
+                                                          [corLegenda]="item.corLegenda"
                                                           [professor_Id]="item.id"
                                                           [professor]="item.nome"></app-legend-color>
                                         <span class="mr-2">{{ item.nome }}</span>

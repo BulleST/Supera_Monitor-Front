@@ -7,6 +7,7 @@ import 'moment/locale/pt-br'
 import { Service } from '../helpers/service.service';
 import { getError } from '../utils';
 import { Roteiro, RoteiroRequest } from '../models/roteiro.model';
+import { sortBy } from 'sort-by-typescript';
 
 @Injectable({
     providedIn: 'root',
@@ -50,6 +51,7 @@ export class RoteiroService extends Service {
                         x.active = !x.deactivated;
                         return x
                     })
+                    list = list.sort(sortBy('dataInicio'))
                     this.list.next(list);
                     return of(list);
                 },
@@ -95,11 +97,13 @@ export class RoteiroService extends Service {
         return this.http.post<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 next: res => {
-                    // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
-                    // insertOrReplace(this, res.object, 'list');
-                    // this.toastrService.success(`Registro cadastrado com sucesso.`);
-                    // // playSuccess();
-
+                    if (res.success) {
+                        res.object = this.mapRoteiro(res.object);
+                        let list = this.list.value;
+                        list.push(res.object);
+                        list = list.sort(sortBy('dataInicio'));
+                        this.list.next(list);
+                    }
                     return res;
                 },
                 error: err => {
@@ -114,11 +118,15 @@ export class RoteiroService extends Service {
         return this.http.put<RequestResponse>(`${this.url}/roteiros`, request)
             .pipe(tap({
                 next: res => {
-                    // res.object.dataFim = moment(res.object.dataFim).add(23, 'h').toDate();
-                    // insertOrReplace(this, res.object, 'list');
-                    // this.toastrService.success(`Registro atualizado com sucesso.`);
-                    // // playSuccess();
-
+                    if (res.success) {
+                        res.object = this.mapRoteiro(res.object);
+                        let list = this.list.value;
+                        let index = list.findIndex(x => x.id == model.id);
+                        if (index == -1) list.push(res.object);
+                        else list.splice(index, 1, res.object)
+                        list = list.sort(sortBy('dataInicio'));
+                        this.list.next(list);
+                    }
                     return res;
                 },
                 error: err => {
