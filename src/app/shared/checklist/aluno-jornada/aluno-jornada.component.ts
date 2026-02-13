@@ -36,7 +36,7 @@ export class AlunoJornadaComponent {
 	jornadaAtualIcon = '';
 	jornadaAtualItemsFinalizados = '';
 
-	activeIndex = 0;
+	activeIndex: number = undefined as any;
 
 	JornadaSuperaStatus = JornadaSuperaStatus
 	subscription: Subscription[] = [];
@@ -53,13 +53,7 @@ export class AlunoJornadaComponent {
 
 		this.instance = this.dialogService.getInstance(this.ref);
 
-		let onReload = this.jornadaSuperaService.onReload.subscribe(res => {
-			this.loadJornada()
-			// .then(res => {
-			// 	this.close(true);
-			// 	showAlunoJornada(this.dialogService, this.aluno_Id, this.aluno, this.jornada)
-			// })
-		});
+			let onReload = this.jornadaSuperaService.onReload.subscribe(res => this.loadJornada());
 		this.subscription.push(onReload);
 	}
 
@@ -112,6 +106,7 @@ export class AlunoJornadaComponent {
 		if (!this.aluno || !this.jornada) {
 			return;
 		}
+		if (this.activeIndex)
 
 		this.jornadaAtual = this.jornada.checklists.find(x => x.id == this.aluno.checklist_Id);
 
@@ -122,12 +117,12 @@ export class AlunoJornadaComponent {
 
 			if (this.jornada.checklists.find(x => x.status == JornadaSuperaStatus.Atrasado)) {
 				this.jornadaAtualNome = '90 dias encerrados com pendências';
-				this.jornadaAtualIcon = 'pi pi-times-circle text-red-500';
-				this.activeIndex = this.jornada.checklists[this.jornada.checklists.length - 1].id;
 			}
 			else if (this.jornada.checklists.find(x => x.status == JornadaSuperaStatus.FinalizadoComAtraso)) {
 				this.jornadaAtualNome = '90 dias encerrados com atraso';
-				this.jornadaAtualIcon = 'pi pi-times-circle text-red-500';
+			}
+			this.jornadaAtualIcon = 'pi pi-times-circle text-red-500';
+			if (!this.activeIndex) {
 				this.activeIndex = this.jornada.checklists[this.jornada.checklists.length - 1].id;
 			}
 		}

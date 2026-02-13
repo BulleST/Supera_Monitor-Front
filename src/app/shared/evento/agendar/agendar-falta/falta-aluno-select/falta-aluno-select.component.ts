@@ -36,7 +36,6 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 		private alunoService: AlunoService,
 		private crypto: Crypto,
 		private activatedRoute: ActivatedRoute,
-		private toastr: ToastrService,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private confirmationService: ConfirmationService,
 		private eventoService: EventoService,
@@ -45,7 +44,7 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 
 		let evento = this.eventoService.getEvento().subscribe(res => {
 			this.evento = res;
-				this.setAluno();
+			this.setAluno();
 			this.setAlunos();
 		});
 		this.subscription.push(evento)
@@ -67,7 +66,6 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 
 			if (!alunoRes && idParam) {
 				this.aluno_Id = this.crypto.decrypt(idParam);
-				// this.loadAluno()
 				return;
 			}
 
@@ -126,43 +124,18 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 					return alunoEstaNaAula
 						&& alunoAtivo
 						&& alunoNaoMarcouFalta;
-
 				})
-
 			}
 		}
 		this.setAluno();
 	}
 
-	// loadAluno() {
-    //     if (!this.aluno_Id) return;
-	// 	this.loading = true;
-		
-	// 	this.setAluno();
-
-	// 	return lastValueFrom(this.alunoService.get(this.aluno_Id))
-	// 		.then(res => {
-    //             this.aluno = res;
-    //             this.loading = false;
-    //             this.alunoService.setAluno(this.aluno)
-    //             this.onAlunoChanged.emit(this.aluno);
-
-	// 			return res;
-	// 		})
-	// 		.catch(res => {
-	// 			this.loading = false;
-	// 			this.toastr.error('Não foi possível carregar o aluno.', 'Erro')
-	// 			this.onAlunoChanged.emit(this.aluno);
-	// 			return this.aluno;
-	// 		})
-	// }
-
+	
 	alunoChanged(e: SelectChangeEvent, model: NgModel) {
 		this.aluno_Id = e.value;
 		this.aluno = this.alunos.find(x => x.id == this.aluno_Id)
 		this.onAlunoChanged.emit(this.aluno);
 		this.alunoService.setAluno(this.aluno);
-		// this.loadAluno()
 	}
 	
 	showError(header: string, message: string, e: any, innerMessage?: string) {

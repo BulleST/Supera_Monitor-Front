@@ -100,6 +100,8 @@ export interface Monitoramento_Participacao {
 
     reposicaoDe_Evento_Id?: number;
     reposicaoPara_Evento_Id?: number;
+
+    primeiraAula: boolean;
 }
 
 

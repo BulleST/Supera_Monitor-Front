@@ -137,9 +137,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 	}
 
 	setApostilaAluno() {
-
-
-		var participacao =
+		let participacao =
 			this.reposicaoPara ?
 				{ ...this.reposicaoPara.participacao } :
 				{ ...this.participacao };
@@ -153,11 +151,13 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 			observacao: participacao.observacao,
 			deactivated: participacao.deactivated,
 			reposicaoDe_Evento_Id: participacao.reposicaoDe_Evento_Id,
-			
+			primeiraAula: participacao.primeiraAula,
+			primeiraAula_Id: this.aluno.primeiraAula_Id,
+
 			apostila_Abaco_Id: participacao.apostila_Abaco_Id,
-			numeroPaginaAbaco:  participacao.numeroPaginaAbaco,
+			numeroPaginaAbaco: participacao.numeroPaginaAbaco,
 			apostila_AH_Id: participacao.apostila_AH_Id,
-			numeroPaginaAH:  participacao.numeroPaginaAH,
+			numeroPaginaAH: participacao.numeroPaginaAH,
 
 			alunoContactado: participacao.alunoContactado,
 			statusContato_Id: participacao.statusContato_Id,
@@ -186,8 +186,8 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 		}
 
 
-		this.readonly = !this.participacaoAluno.presente 
-						|| !this.participacaoAluno.active
+		this.readonly = !this.participacaoAluno.presente
+			|| !this.participacaoAluno.active
 	}
 
 	async goToAula() {
@@ -217,7 +217,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 	}
 
 	async goToAgendarFalta() {
-		var reqs = [];
+		let reqs = [];
 		if (!this.eventoCalendario) reqs.push(this.loadEvento())
 		if (!this.alunoList) reqs.push(this.loadAluno())
 
@@ -235,7 +235,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 	}
 
 	async goToAgendarReposicao() {
-		var reqs = [];
+		let reqs = [];
 		if (!this.eventoCalendario) reqs.push(this.loadEvento())
 		if (!this.alunoList) reqs.push(this.loadAluno())
 
@@ -253,7 +253,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 	}
 
 	async goToPrimeiraAula() {
-		var reqs = [];
+		let reqs = [];
 		if (!this.eventoCalendario) reqs.push(this.loadEvento())
 		if (!this.alunoList) reqs.push(this.loadAluno())
 
@@ -288,7 +288,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 		if (!this.eventoCalendario)
 			await this.loadEvento();
 
-		var participacao = this.eventoCalendario.alunos.find(x => x.aluno_Id == this.aluno.id) as Evento_Participacao_Aluno;
+		let participacao = this.eventoCalendario.alunos.find(x => x.aluno_Id == this.aluno.id) as Evento_Participacao_Aluno;
 
 		showContato(this.dialogService, this.eventoCalendario, participacao)
 	}
@@ -299,61 +299,61 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 	}
 
 	atualizarConfirm(e: any, form: NgForm) {
-        if (form.invalid) {
-            return this.showError('OPA!', `Não foi possível salvar! <br> Preencha os dados corretamente para continuar`, e);
+		if (form.invalid) {
+			return this.showError('OPA!', `Não foi possível salvar! <br> Preencha os dados corretamente para continuar`, e);
 		}
-        this.confirmationService.confirm({
-            target: e.target,
-            message: `Tem certeza que deseja atualizar os dados?`,
-            header: `Atualizar dados?`,
-            acceptIcon: 'pi pi-check',
-            acceptLabel: 'Atualizar',
-            acceptButtonStyleClass: 'p-button-rounded',
-            rejectVisible: true,
-            rejectIcon: 'pi pi-times',
-            rejectLabel: 'Cancelar',
-            rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
-            accept: async () => {
-                this.atualizar(e)
-            },
-            reject: () => { },
-        })
+		this.confirmationService.confirm({
+			target: e.target,
+			message: `Tem certeza que deseja atualizar os dados?`,
+			header: `Atualizar dados?`,
+			acceptIcon: 'pi pi-check',
+			acceptLabel: 'Atualizar',
+			acceptButtonStyleClass: 'p-button-rounded',
+			rejectVisible: true,
+			rejectIcon: 'pi pi-times',
+			rejectLabel: 'Cancelar',
+			rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+			accept: async () => {
+				this.atualizar(e)
+			},
+			reject: () => { },
+		})
 
 	}
 
 	atualizar(e: any) {
 
 		this.loading = true;
-				let request: UpdateParticipacaoAlunoRequest = {
-					participacao_Id: this.participacaoAluno.id,
-					presente: this.participacaoAluno.presente,
-					observacao: this.participacaoAluno.observacao,
-					apostila_Abaco_Id: this.participacaoAluno.apostila_Abaco_Id,
-					apostila_AH_Id: this.participacaoAluno.apostila_AH_Id,
-					numeroPaginaAbaco: this.participacaoAluno.numeroPaginaAbaco,
-					numeroPaginaAH: this.participacaoAluno.numeroPaginaAH,
-					reposicaoDe_Evento_Id: this.participacaoAluno.reposicaoDe_Evento_Id,
-					deactivated: this.participacaoAluno.deactivated,
-					contatoObservacao: this.participacaoAluno.contatoObservacao,
-					alunoContactado: this.participacaoAluno.alunoContactado,
-					statusContato_Id: this.participacaoAluno.statusContato_Id,
-				}
+		let request: UpdateParticipacaoAlunoRequest = {
+			participacao_Id: this.participacaoAluno.id,
+			presente: this.participacaoAluno.presente,
+			observacao: this.participacaoAluno.observacao,
+			apostila_Abaco_Id: this.participacaoAluno.apostila_Abaco_Id,
+			apostila_AH_Id: this.participacaoAluno.apostila_AH_Id,
+			numeroPaginaAbaco: this.participacaoAluno.numeroPaginaAbaco,
+			numeroPaginaAH: this.participacaoAluno.numeroPaginaAH,
+			reposicaoDe_Evento_Id: this.participacaoAluno.reposicaoDe_Evento_Id,
+			deactivated: this.participacaoAluno.deactivated,
+			contatoObservacao: this.participacaoAluno.contatoObservacao,
+			alunoContactado: this.participacaoAluno.alunoContactado,
+			statusContato_Id: this.participacaoAluno.statusContato_Id,
+		}
 		lastValueFrom(this.eventoService.atualizarParticipacao(request))
-		.then(res => {
-			this.loading = false;
-			if (res.success) {
-				this.toastr.success('Dados atualizados com sucesso', 'Sucesso');
-				this.monitoramentoService.onReload.emit(true)
-			}
-			else {
-				this.showError('Erro', `Não foi possível atualizar dados <br> ${res.message}`, e);
+			.then(res => {
+				this.loading = false;
+				if (res.success) {
+					this.toastr.success('Dados atualizados com sucesso', 'Sucesso');
+					this.monitoramentoService.onReload.emit(true)
+				}
+				else {
+					this.showError('Erro', `Não foi possível atualizar dados <br> ${res.message}`, e);
+					this.toastr.error('Não foi possível atualizar dados', 'Erro')
+				}
+			})
+			.catch(res => {
+				this.loading = false;
+				this.showError('Erro', `Não foi possível atualizar dados`, e, getError(res));
 				this.toastr.error('Não foi possível atualizar dados', 'Erro')
-			}
-		})
-		.catch(res => {
-			this.loading = false;
-			this.showError('Erro', `Não foi possível atualizar dados`, e, getError(res));
-			this.toastr.error('Não foi possível atualizar dados', 'Erro')
-		})
+			})
 	}
 }

@@ -253,6 +253,7 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 				restricaoMobilidade: aluno.restricaoMobilidade,
 				restricoes: [],
 			
+				primeiraAula: aulaParticipacao.primeiraAula,
 				primeiraAula_Id: aluno.primeiraAula_Id,
 				aulaZero_Id: aluno.aulaZero_Id,
 			
