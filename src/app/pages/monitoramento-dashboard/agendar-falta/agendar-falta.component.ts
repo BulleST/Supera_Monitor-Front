@@ -31,7 +31,7 @@ export class AgendarFaltaComponent implements OnDestroy {
         this.subscription.forEach(e => e.unsubscribe());
     }
 
-	close() {
+	close(success: boolean) {
 		let routeBack = '../../';
 		let params = this.activatedRoute.snapshot.params;
 		for (const [key, value] of Object.entries(params)) {
@@ -47,7 +47,7 @@ export class AgendarFaltaComponent implements OnDestroy {
 
 		var ref = showAgendarFalta(this.dialogService, aluno, evento); 
 		var onClose = ref.onClose.subscribe(res => {
-			this.close();
+			this.close(res);
 		});
 		this.subscription.push(onClose);
 

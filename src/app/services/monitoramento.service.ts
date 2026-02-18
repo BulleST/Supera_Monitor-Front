@@ -53,7 +53,7 @@ export class MonitoramentoService extends Service {
         let participacao = item.aula.participacao;
         let reposicaoPara = item.reposicaoPara;
 
-        if (aula.recesso)
+        if (aula.recesso === true)
             return Monitoramento_Item_Status.Recesso;
 
         else if (aula.active === false && !aula.feriado)

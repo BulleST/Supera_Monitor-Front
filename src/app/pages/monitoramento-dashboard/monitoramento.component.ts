@@ -81,7 +81,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 		private calendarioUtils: CalendarioUtils,
 	) {
 		let calendarioReload = this.monitoramentoService.onReload.subscribe(res => {
-			console.log('onReload', res)
 			this.update();
 		});
 		this.subscription.push(calendarioReload);
@@ -142,7 +141,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	}
 
 	update() {
-		console.log('update');
 		this.onLoading();
 
 		this.setDashboard();
@@ -175,13 +173,10 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	scrollView() {
 		setTimeout(() => {
 			let container = $('.p-datatable-table-container')
-			console.log(container)
 			// let tr = $(`th[data-mes="${(new Date().getMonth())}"]`)
 			let tr = document.querySelectorAll(`th[data-mes="${(new Date().getMonth())}"]`)[0] as HTMLElement
-			console.log(tr)
 
 			let left = $(tr).offset()?.left ?? 0
-			console.log(left)
 			$(container).animate({
 				scrollLeft: left
 			}, 800);
@@ -288,7 +283,6 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	}
 
 	showAula(item: Monitoramento_Aluno_Item, aluno: Monitoramento_Aluno) {
-		console.log('showAula', item, aluno)
 		this.router.navigate(['monitoramento', 'aula'])
 		this.ref = this.dialogService.open(AulaParticipacaoComponent, {
 			header: 'Aula',

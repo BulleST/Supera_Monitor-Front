@@ -14,7 +14,6 @@ import { RequestResponse } from '../../../../helpers/request-response.interface'
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { EventoAgendarFaltaRequest } from '../../../../models/evento-agendar-falta-request.model';
 import { Evento_Participacao_Aluno } from '../../../../models/evento-participacao-aluno.model';
-import { showContato } from '../../../../utils/show-contato';
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos';
 import { MensagemTipo } from '../../enviar-mensagem-alunos/enviar-mensagem-alunos.component';
 import { JornadaSuperaService } from '../../../../services/jornada-supera.service';
@@ -81,10 +80,10 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 		this.subscription.forEach((item) => item.unsubscribe())
 	}
 
-	close() {
+	close(success: boolean) {
 		this.eventoService.setEvento(undefined)
 		this.alunoService.setAluno(undefined);
-		this.ref.close();
+		this.ref.close(success);
 	}
 
 	maximize() {
@@ -227,29 +226,14 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 				undefined,
 				participacao,
 			)
-			var onClose = ref.onClose.subscribe(res => {
-				this.close();
-			})
+			let onClose = ref.onClose.subscribe(res => this.close(true))
 			this.subscription.push(onClose)
 		}
 		else {
-			this.close();
-		}
-
-	}
-
-
-	showContato() {
-		if (this.evento && this.participacao) {
-			this.refChild = showContato(
-				this.dialogService,
-				this.evento,
-				this.participacao
-			);
-			let onClose = this.refChild.onClose.subscribe(res => this.close())
-			this.subscription.push(onClose);
+			this.close(true);
 		}
 	}
+
 
 }
 

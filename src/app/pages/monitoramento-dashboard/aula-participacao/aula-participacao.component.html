@@ -12,7 +12,8 @@
                                   [professor]="aula.professor"></app-legend-color>
             </p>
             <div class="flex align-items-center gap-2 mt-2">
-                <p-badge *ngIf="aluno.primeiraAula_Id == item.id"
+                <p> <span>status:</span><b>{{item.status}}</b></p>
+                    <p-badge *ngIf="participacao.primeiraAula"
                          severity="danger"
                          class="bg-pink-500 border-pink-500"
                          value="1ª Aula" />

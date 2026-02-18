@@ -415,7 +415,7 @@
                                 <!-- <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container> -->
                             </ng-container>
                         </div>
-                        <span *ngIf="aluno.primeiraAula_Id == item.id" class="primeira-aula">1ª aula</span>
+                        <span *ngIf="item.aula.participacao.primeiraAula" class="primeira-aula">1ª aula</span>
                     </div>
                 </td>
             </ng-container>
