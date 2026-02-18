@@ -66,6 +66,8 @@ export class Evento_Participacao_Aluno {
     alunoContactado?: Date;
     statusContato_Id?: number;
     contatoObservacao?: string;
+
+    agendouFalta?: Date
 }
 
 

@@ -101,7 +101,7 @@ export class MonitoramentoService extends Service {
             )
                 return Monitoramento_Item_Status.FaltaAula;
 
-            else if (participacao.active === false)
+            else if (participacao.agendouFalta)
                 return Monitoramento_Item_Status.FaltaAgendada;
 
             else if (aula.finalizado === true

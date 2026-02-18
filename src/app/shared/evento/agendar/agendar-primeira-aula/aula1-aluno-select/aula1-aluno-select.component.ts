@@ -179,9 +179,8 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 	}
 
 	async alunoChanged(e: SelectChangeEvent, model: NgModel) {
-		console.log('aula1 alunoChanged', this.aluno)
-		if (this.aluno) {
-			this.aluno = await this.loadAluno(this.aluno.id);
+		if (this.aluno_Id) {
+			this.aluno = await this.loadAluno(this.aluno_Id);
 
 			if (this.aluno.restricaoMobilidade && this.evento?.sala_Id == SalaAndar.Terreo) {
 				let data = moment(this.evento.data).format('DD/MM/YYYY HH:mm')

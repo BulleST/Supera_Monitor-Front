@@ -9,7 +9,6 @@ import { ConfirmationService } from 'primeng/api'
 import { Aluno } from '../../../../../models/alunos.model'
 import { Feriado } from '../../../../../models/feriado.model'
 import { Professor } from '../../../../../models/professor.model'
-import { PseudoEvento } from '../../../../../models/reposicao.model'
 import { EventoService } from '../../../../../services/evento.service'
 import { EventoTipo, Evento } from '../../../../../models/evento.model'
 import { CalendarioRequest } from '../../../../../models/calendario.model'
@@ -180,7 +179,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 	}
 
 	getCalendario() {
-		var aluno = this.aluno as Aluno;
+		const aluno = this.aluno as Aluno;
 		return lastValueFrom(this.eventoService.getList(this.calendarioRequest))
 			.then(list => {
 				this.eventos = list.eventos.filter(evento => {
@@ -211,7 +210,9 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 		let feriadosDates = this.feriados.map((x) => moment(x.data).format('YYYY-MM-DD'))
 		let eventos = this.eventos.filter((x) => [EventoTipo.Aula, EventoTipo.TurmaExtra].includes(x.evento_Tipo_Id)
 			&& x.active == true
-			&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false)
+			&& feriadosDates.includes(moment(x.data).format('YYYY-MM-DD')) == false
+			&& moment(x.data).isSameOrAfter(this.aluno?.created, 'date')
+		)
 
 		let events = eventos.map((item) => {
 			let style = this.calendarioUtils.getEventStyles(item);

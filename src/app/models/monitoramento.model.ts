@@ -102,6 +102,8 @@ export interface Monitoramento_Participacao {
     reposicaoPara_Evento_Id?: number;
 
     primeiraAula: boolean;
+    agendouFalta?: Date
+
 }
 
 

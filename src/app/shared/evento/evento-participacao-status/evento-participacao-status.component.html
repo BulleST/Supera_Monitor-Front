@@ -3,14 +3,12 @@
               value="1ª aula"
               title="1ª aula"
               class="bg-pink-500 border-pink-500" />
-     <p-badge *ngIf="!participacao.active 
-                     && !participacao.reposicaoDe_Evento_Id
-                     && !participacao.reposicaoPara_Evento_Id"
+     <p-badge *ngIf="participacao.agendouFalta"
               value="Agendou falta"
               title="Agendou falta"
               class="bg-red-500 border-red-500 cursor-pointer white-space-nowrap hover:shadow-3"
               title="Clique para ver informações de contato"
-              pTooltip="Falta agendada no dia {{participacao.deactivated | date : 'dd/MM/yyyy HH:mm' }}"
+              pTooltip="Falta agendada no dia {{participacao.agendouFalta | date : 'dd/MM/yyyy HH:mm' }}"
               (click)="showContatoFalta()" />
      <p-badge *ngIf="participacao.reposicaoPara_Evento_Id"
               value="Agendou reposição"

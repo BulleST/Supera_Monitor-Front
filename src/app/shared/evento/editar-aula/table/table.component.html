@@ -142,54 +142,6 @@
                             </div>
                         </div>
                 </ng-container>
-                <!-- <ng-container *ngIf="participacao.reposicaoPara_Evento_Id || !participacao.active">
-                    <div class="flex justify-content-start  gap-2 "> -->
-                <!-- <div class="flex flex-column align-items-end" style="height: 50px">
-                            <label class="text-sm mr-1 flex line-height-4">Aluno contatado:</label>
-                            <p-button [severity]="participacao.alunoContactado ? 'warn' : 'danger'"
-                                      [label]="participacao.alunoContactado ? 'Sim' : 'Não'"
-                                      (onClick)="contatoToggle (participacao)"
-                                      [styleClass]="participacao.alunoContactado ? 'bg-yellow-500 border-yellow-500' : ''"
-                                      [icon]="participacao.alunoContactado ? 'pi pi-check text-sm' : 'pi pi-times text-sm -ml-1' "
-                                      [pTooltip]="participacao.alunoContactado ? 'Contato realizado em' +(participacao.alunoContactado | date : 'dd/MM/yyyy HH:mm') : ''"
-                                      class="w-7rem" />
-                        </div>
-                        <p-panel [showHeader]="false" #blockedUiContato styleClass="px-0 pb-0 border-none bg-transparent">
-                            <div class="flex align-items-center gap-2 pr-2"> -->
-                <!-- Data do Contato -->
-                <!-- <div class="flex flex-column" style="width: calc(14rem)" *ngIf="participacao.alunoContactado">
-                                    <label class="ml-1 text-sm" for="statusContato_Id[{{ rowIndex }}]"> Data do Contato: 
-                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
-                                    </label>
-                                    <ng-container *ngTemplateOutlet="dataContatoTemplate; context: { participacao, rowIndex }"></ng-container>
-                                </div> -->
-                <!-- Status de Contato -->
-                <!-- <div class="flex flex-column" style="width: calc(14rem)">
-                                    <label class="ml-1 text-sm" for="statusContato_Id[{{ rowIndex }}]"> Status Contato: 
-                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
-                                    </label>
-                                    <ng-container *ngTemplateOutlet="statusContatoTemplate; context: { participacao, rowIndex }"></ng-container>
-                                </div> -->
-                <!-- Observações de Contato -->
-                <!-- <div class="flex flex-column" style="width: calc(14rem + 10px)">
-                                    <label class="ml-1 text-sm"> Observações de Contato: 
-                                        <span *ngIf="participacao.alunoContactado && !readonly" class="text-red-500">*</span>
-                                    </label>
-                                    <div style="height: 33px">
-                                        <ng-container *ngTemplateOutlet="observacoesContatoTemplate; context: { participacao, rowIndex }"></ng-container>
-                                    </div>
-                                </div> -->
-                <!-- Observações -->
-                <!-- <div class="flex flex-column w-12rem">
-                                    <label class="ml-1 text-sm">Observações de aula:</label>
-                                    <div style="height: 33px">
-                                        <ng-container *ngTemplateOutlet="observacoesTemplate; context: { participacao, rowIndex }"></ng-container>
-                                    </div>
-                                </div> -->
-                <!-- </div>
-                        </p-panel> -->
-                <!-- </div>
-                </ng-container> -->
             </td>
         </tr>
     </ng-template>
