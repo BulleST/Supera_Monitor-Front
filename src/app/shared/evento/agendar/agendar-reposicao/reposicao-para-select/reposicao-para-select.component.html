@@ -13,7 +13,7 @@
                           [(ngModel)]="data"
                           placeholder="dd/mm/yyyy"
                           dateFormat="dd/mm/yy"
-                            (ngModelChange)="loadEventosReposicaoPara()"
+                          (ngModelChange)="loadEventosReposicaoPara()"
                           [showIcon]="!readonly"
                           [disabled]="readonly"
                           [iconDisplay]="'input'"
@@ -24,6 +24,7 @@
                           [keepInvalid]="true"
                           [disabledDays]="[0]"
                           appendTo="body"
+                          [maxDate]="maxDate"
                           fluid />
             <div *ngIf="_data.touched && _data.invalid && _data.errors">
                 <p class="text-red-500 ml-2" *ngIf="_data.errors['required']">Esse campo é obrigatório.</p>

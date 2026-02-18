@@ -10,6 +10,8 @@ import moment from 'moment';
 import { PseudoEvento } from '../../../../../models/reposicao.model';
 import { SalaAndar } from '../../../../../models/sala-aula.model';
 import { AlunoService } from '../../../../../services/alunos.service';
+import { sortBy } from 'sort-by-typescript';
+import { provideImgixLoader } from '@angular/common';
 
 @Component({
     selector: 'app-reposicao-para-select',
@@ -31,6 +33,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
     @Output() onVisibleChange = new EventEmitter<boolean>();
 
     SalaAndar = SalaAndar;
+    maxDate?: Date = undefined;
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -54,6 +57,9 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
         this.subscription.push(aluno);
 
         let eventoReposicaoDe = this.service.getEventoReposicaoDe().subscribe(res => {
+            if (res) {
+                this.maxDate = moment(res.data).add(1, 'month').toDate();
+            }
             this.eventoReposicaoDe = res;
             this.loadEventosReposicaoPara();
             this.setEvento();
@@ -92,6 +98,11 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
     }
 
     loadEventosReposicaoPara() {
+        console.log('loadEventosReposicaoPara')
+        console.log('aluno', this.aluno)
+        console.log('eventoReposicaoDe', this.eventoReposicaoDe)
+        console.log('data', this.data)
+        console.log('maxDate', this.maxDate)
         if (!this.aluno) {
             return undefined;
         }
@@ -101,9 +112,10 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
         else {
             let request: CalendarioRequest = {
                 perfil_Cognitivo_Id: this.aluno.perfilCognitivo_Id,
-                intervaloDe: moment(this.eventoReposicaoDe.data).toDate(),
-                intervaloAte: moment(this.eventoReposicaoDe.data).add(1, 'month').toDate(),
+                intervaloDe: moment(this.data).toDate(),
+                intervaloAte: moment(this.data).add(1, 'month').toDate(),
             }
+            console.log('request', request)
 
 
             this.loading = true;
@@ -111,35 +123,37 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
                 .then(res => {
 
                     this.list = res.eventos.filter(aula => {
+                        console.groupCollapsed(moment(aula.data).format('DD/MM HH:mm'), aula)
                         const aulaAtiva = aula.active;
+                        const aulaNaoFinalizada = !aula.finalizado;
+                        const aulaTemVagas = aula.alunosAtivosEvento < aula.capacidadeMaximaEvento;
                         const alunoNaoEstaNaAula = !aula.alunos.find(x => x.aluno_Id == this.aluno!.id);
                         const ehAula = aula.evento_Tipo_Id == EventoTipo.Aula || aula.evento_Tipo_Id == EventoTipo.TurmaExtra;
-                        const temVagas = aula.alunos.filter(x => x.active).length < aula.capacidadeMaximaEvento;
                         const perfilCognitivo = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
-                        const aulaNaoFinalizada = !aula.finalizado;
-                        const aulaEstaAtiva = aula.active;
-                        const ehPerfilCognitivoCompativel = aula.perfilCognitivo.map(x => x.id).includes(this.aluno!.perfilCognitivo_Id);
+                        const ehPerfilCognitivoCompativel = !this.aluno?.perfilCognitivo_Id || perfilCognitivo;
                         const naoEhFeriado = !aula.feriado;
                         const salaValida = !this.aluno?.restricaoMobilidade || (this.aluno.restricaoMobilidade && aula.andar == SalaAndar.Terreo)
                         const mesmaAula = this.eventoReposicaoDe!.id == aula.id && ![aula.id].includes(PseudoEvento.EventoId);
                         const mesmaDataHora = moment(this.eventoReposicaoDe!.data).isSame(aula.data);
 
-                        return aulaAtiva
+                        const result = 
+                            aulaAtiva
+                            && aulaNaoFinalizada
+                            && aulaTemVagas
                             && alunoNaoEstaNaAula
                             && ehAula
-                            && temVagas
-                            && perfilCognitivo
-                            && aulaNaoFinalizada
-                            && aulaEstaAtiva
                             && ehPerfilCognitivoCompativel
                             && naoEhFeriado
                             && salaValida
                             && !mesmaAula
                             && !mesmaDataHora;
-
+                        console.log('result', result);
+                        console.groupEnd();
+                        return result;
                     });
 
-                    this.list = this.list.sort((x, y) => x.data.getTime() - y.data.getTime())
+                    this.list = this.list.sort(sortBy('data'))
+                    console.log('list', this.list);
                     this.setEvento();
                     this.loading = false;
                 })
@@ -152,6 +166,9 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
     }
 
     setEvento() {
+        console.log('setEvento');
+        console.log('evento', this.evento);
+        console.log('list', this.list);
         if (this.evento && this.list) {
             let index = this.list.findIndex(x => x.id == this.evento!.id
                 && moment(this.evento!.data).isSame(x.data)

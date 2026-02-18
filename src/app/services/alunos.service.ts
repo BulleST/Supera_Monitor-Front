@@ -45,8 +45,10 @@ export class AlunoService extends Service {
     getAluno() {
         if (!this.aluno.value) {
             let itemString = localStorage.getItem('aluno');
-            let item = itemString ? this.mapAluno(JSON.parse(itemString)) : undefined;
-            this.aluno.next(item);
+            if (itemString) {
+                let item = itemString ? this.mapAluno(JSON.parse(itemString)) : undefined;
+                this.aluno.next(item);
+            }
         }
         return this.aluno;
     }
@@ -140,6 +142,34 @@ export class AlunoService extends Service {
 
     getListPrimeiraAulaDropdown() {
         return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/primeira-aula`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
+                    return list
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getListReposicaoDeDropdown(evento_Id: number) {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/reposicao-de/${evento_Id}`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
+                    return list
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
+    getListReposicaoParaDropdown(evento_Id: number) {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/reposicao-para/${evento_Id}`)
             .pipe(tap({
                 next: list => {
                     list = list.map(aluno => this.mapAluno(aluno));

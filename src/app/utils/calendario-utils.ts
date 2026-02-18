@@ -51,7 +51,7 @@ export class CalendarioUtils {
                 g: 0,
                 b: 0,
             }
-        return rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114 > 180
+        return rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114 > 200
             ? '#2e2e2e'
             : '#fff'
     }

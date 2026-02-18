@@ -56,8 +56,10 @@ export class EventoService extends Service {
     getEvento() {
         if (!this.evento.value) {
             let eventoString = localStorage.getItem('evento');
-            let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
-            this.evento.next(evento);
+            if (eventoString) {
+                let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
+                this.evento.next(evento);
+            }
         }
         return this.evento;
     }
@@ -76,8 +78,10 @@ export class EventoService extends Service {
     getEventoReposicaoDe() {
         if (!this.eventoReposicaoDe.value) {
             let eventoString = localStorage.getItem('evento-reposicao-de');
-            let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
-            this.eventoReposicaoDe.next(evento);
+            if (eventoString) {
+                let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
+                this.eventoReposicaoDe.next(evento);
+            }
         }
         return this.eventoReposicaoDe;
     }
@@ -94,8 +98,10 @@ export class EventoService extends Service {
     getEventoReposicaoPara() {
         if (!this.eventoReposicaoPara.value) {
             let eventoString = localStorage.getItem('evento-reposicao-para');
-            let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
-            this.eventoReposicaoPara.next(evento);
+            if (eventoString) {
+                let evento = eventoString ? this.mapEvento(JSON.parse(eventoString)) : undefined;
+                this.eventoReposicaoPara.next(evento);
+            }
         }
         return this.eventoReposicaoPara;
     }

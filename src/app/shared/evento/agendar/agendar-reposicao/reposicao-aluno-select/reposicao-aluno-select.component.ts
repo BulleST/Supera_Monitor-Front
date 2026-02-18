@@ -48,17 +48,11 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
         })
         this.subscription.push(onVisibleChange);
         
-		const eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => {
-            this.eventoReposicaoDe = res;
-            this.setAlunos();
-        });
-		this.subscription.push(eventoReposicaoDe)
+		const eventoReposicaoDe = this.eventoService.getEventoReposicaoDe().subscribe(res => this.eventoReposicaoDe = res);
+		this.subscription.push(eventoReposicaoDe);
 
-		const eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => {
-            this.eventoReposicaoPara = res;
-            this.setAlunos();
-        });
-		this.subscription.push(eventoReposicaoPara)
+		const eventoReposicaoPara = this.eventoService.getEventoReposicaoPara().subscribe(res => this.eventoReposicaoPara = res);
+		this.subscription.push(eventoReposicaoPara);
 
         let aluno = this.alunoService.getAluno().subscribe(alunoRes => {
 
@@ -80,24 +74,41 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
                 return;
             }
 
-            if (!this.alunoService.list.value.length) {
-                this.loadingAlunos = true;
-                lastValueFrom(this.alunoService.getList())
-                    .then(res => this.loadingAlunos = false)
-                    .catch(res => this.loadingAlunos = false);
-            }
-
             let alunos = this.alunoService.list.subscribe(list => {
                 this.alunos = list;
-
-                this.setAlunos();
-                
 				this.setAluno();
             });
             this.subscription.push(alunos)
 
         });
         this.subscription.push(aluno);
+
+        let paramMap = this.activatedRoute.paramMap.subscribe(params => {
+            
+            console.log('paramMap', params)
+            let request = null;
+
+            if (params.get('evento_reposicao_de') && this.eventoReposicaoDe) {
+                request = this.alunoService.getListReposicaoDeDropdown(this.eventoReposicaoDe.id);
+            }
+
+            if (params.get('evento_reposicao_para') && this.eventoReposicaoPara) {
+                request = this.alunoService.getListReposicaoParaDropdown(this.eventoReposicaoPara.id);
+            }
+
+            if(!params.get('evento_reposicao_de') && !params.get('evento_reposicao_para')) {
+                request = this.alunoService.getList();
+            }
+
+            if (request) {
+                this.loadingAlunos = true;
+                lastValueFrom(request)
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false)
+            }
+
+        });
+        this.subscription.push(paramMap);
     }
 
     ngOnDestroy(): void {
@@ -121,50 +132,32 @@ export class ReposicaoAlunoSelectComponent implements OnDestroy {
         return this.aluno;
 	}
 
-    setAlunos() {
-        if (this.alunos.length) {
-            this.alunos = this.alunos.filter(x => x.active == true);
-
-
+    setAlunos(where: string) {
+        console.log('setAlunos', where)
             let params = this.activatedRoute.snapshot.queryParamMap;
+            console.log('params', params)
+
+            var request = null;
 
             if (params.get('evento_reposicao_de') && this.eventoReposicaoDe) {
-
-                // Se um evento estiver selecionado, 
-                // os unicos alunos a estarem disponiveis são os alunos daquela aula que
-                // estão ativos e que não tem reposição agendada
-
-                let alunosAula = this.eventoReposicaoDe.alunos
-                    .filter(x =>  !x.reposicaoDe_Evento_Id && !x.reposicaoPara_Evento_Id)
-                    .map(x => x.aluno_Id)
-
-                this.alunos = this.alunos.filter(x => alunosAula.includes(x.id))
-
+                request = this.alunoService.getListReposicaoDeDropdown(this.eventoReposicaoDe.id);
             }
 
             if (params.get('evento_reposicao_para') && this.eventoReposicaoPara) {
-
-                // Se um evento estiver selecionado, 
-                // os unicos alunos a estarem disponiveis são os alunos que 
-                // não estão naquela aula
-                // e que tem perfil compativel
-                // e que não tenha mobilidade reduzida caso a aula não seja no térreo
-
-                let alunosAula = this.eventoReposicaoPara.alunos
-                    .map(x => x.aluno_Id)
-
-                let perfilAula = this.eventoReposicaoPara.perfilCognitivo.map(x => x.id)
-
-                this.alunos = this.alunos.filter(aluno => {
-
-                    let alunoEstaNaAula = alunosAula.includes(aluno.id)
-                    let perfilCompativel = perfilAula.includes(aluno.perfilCognitivo_Id) || !aluno.perfilCognitivo_Id
-                    let salaValida = !aluno.restricaoMobilidade || this.eventoReposicaoPara?.andar == SalaAndar.Terreo;
-
-                    return !alunoEstaNaAula && perfilCompativel && salaValida;
-                });
+                request = this.alunoService.getListReposicaoParaDropdown(this.eventoReposicaoPara.id);
             }
-        }
+
+            if(!params.get('evento_reposicao_de') && !params.get('evento_reposicao_para')) {
+                request = this.alunoService.getList();
+            }
+
+            if (request) {
+                this.loadingAlunos = true;
+                lastValueFrom(request)
+                .then(res => this.loadingAlunos = false)
+                .catch(res => this.loadingAlunos = false)
+            }
+        // }
     }
 
     loadAluno() {
