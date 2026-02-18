@@ -133,16 +133,9 @@ export class ReposicaoDeSelectComponent implements OnDestroy {
             this.data = this.data ?? new Date;
             let request: CalendarioRequest = {
                 aluno_Id: this.aluno?.id,
-                intervaloDe: moment(this.data).startOf('month').toDate(),
-                intervaloAte: moment(this.data).endOf('month').toDate(),
+                intervaloDe: moment(this.data).toDate(),
+                intervaloAte: moment(this.data).toDate(),
             }
-            if (this.eventoReposicaoPara) {
-                this.data = this.eventoReposicaoPara.data;
-                request.intervaloDe = moment(this.data).subtract(1, 'month').toDate();
-                request.intervaloAte = moment(this.data).add(1, 'month').toDate();
-            }
-    
-    
             this.loading = true;
             return lastValueFrom(this.eventoService.getList(request))
                 .then(res => {
