@@ -389,8 +389,8 @@
                                     <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Reposição Agendada">Reposição</span>
                                     <span class="event-turma"
-                                          [pTooltip]="item.aula.aula.turma"
-                                          [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
+                                          [pTooltip]="item.reposicaoPara.aula.turma"
+                                          [ngStyle]="{ backgroundColor: item.reposicaoPara.aula.corLegenda }"></span>
                                 </div>
                                 <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
                             </ng-container>

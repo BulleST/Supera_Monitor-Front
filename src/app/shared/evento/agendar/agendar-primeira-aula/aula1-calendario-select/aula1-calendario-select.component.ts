@@ -301,7 +301,7 @@ export class Aula1CalendarioSelectComponent implements OnChanges, OnDestroy {
 				header: 'Selecionar aula',
 				acceptIcon: 'pi pi-check',
 				rejectIcon: 'pi pi-times',
-				acceptLabel: 'Selecioanr',
+				acceptLabel: 'Selecionar',
 				rejectLabel: 'Cancelar',
 				acceptButtonStyleClass: 'p-button-rounded',
 				rejectButtonStyleClass: 'p-button-rounded p-button-outlined',

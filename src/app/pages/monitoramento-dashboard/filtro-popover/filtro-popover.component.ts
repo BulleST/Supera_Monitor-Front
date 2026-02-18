@@ -76,12 +76,6 @@ export class FiltroPopoverComponent  implements OnDestroy, AfterViewInit {
                 .catch(res => this.loadingAlunos = false);
         }
 
-        this.accountService.account.subscribe(res => {
-            if (!localStorage.getItem('professor_Id')) {
-                this.request.professor_Id = res?.professor_Id;
-            }
-        });
-
         if (!!localStorage.getItem('professor_Id')) {
             this.request.professor_Id = parseInt(localStorage.getItem('professor_Id')!)
         }

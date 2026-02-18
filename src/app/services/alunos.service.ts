@@ -182,6 +182,20 @@ export class AlunoService extends Service {
             }));
     }
 
+    getListAgendarFaltaDropdown() {
+        return this.http.get<Aluno[]>(`${this.url}/alunos/dropdown/agendar-falta`)
+            .pipe(tap({
+                next: list => {
+                    list = list.map(aluno => this.mapAluno(aluno));
+                    list = list.sort(sortBy('nome'))
+                    return list
+                },
+                error: err => {
+                    this.toastrService.error(`Não foi possível carregar alunos. \n ${getError(err)}`)
+                }
+            }));
+    }
+
     get(id: number) {
         return this.http.get<Aluno>(`${this.url}/alunos/${id}`)
             .pipe(tap({

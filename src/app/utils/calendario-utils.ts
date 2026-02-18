@@ -39,8 +39,8 @@ export class CalendarioUtils {
     }
 
     getTextColor(hex: string) {
-        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-        let rgb = result
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+        const rgb = result
             ? {
                 r: parseInt(result[1], 16),
                 g: parseInt(result[2], 16),
@@ -51,9 +51,14 @@ export class CalendarioUtils {
                 g: 0,
                 b: 0,
             }
-        return rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114 > 200
+
+
+        const calc = Math.round( rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114);
+        const resultHex =  calc > 150
             ? '#2e2e2e'
-            : '#fff'
+            : '#fff';
+        // console.log(`%c${hex} - ${calc}`, `color: ${resultHex}; font-size: 16px; background-color: ${hex};`)
+        return resultHex
     }
 
     eventRandomId() {

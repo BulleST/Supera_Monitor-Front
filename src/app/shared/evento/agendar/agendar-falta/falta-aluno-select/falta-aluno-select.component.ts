@@ -42,9 +42,10 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 
 	) {
 
+		this.loadAlunos();
+
 		let evento = this.eventoService.getEvento().subscribe(res => {
 			this.evento = res;
-			this.setAluno();
 			this.setAlunos();
 		});
 		this.subscription.push(evento)
@@ -55,38 +56,22 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 
 			let idParam = params.get('aluno_id');
 
-            this.readonly = idParam != null && idParam != 'null';
+			this.readonly = idParam != null && idParam != 'null';
 
-            if (idParam) {
-                this.aluno_Id = this.crypto.decrypt(idParam);
-            }
+			if (idParam) {
+				this.aluno_Id = this.crypto.decrypt(idParam);
+			}
 
-            this.aluno_Id = alunoRes?.id;
-            this.aluno = alunoRes;
+			this.aluno_Id = alunoRes?.id;
+			this.aluno = alunoRes;
 
 			if (!alunoRes && idParam) {
 				this.aluno_Id = this.crypto.decrypt(idParam);
 				return;
 			}
-
-			if (!this.alunoService.list.value.length) {
-				this.loadingAlunos = true;
-				lastValueFrom(this.alunoService.getList())
-					.then(res => this.loadingAlunos = false)
-					.catch(res => this.loadingAlunos = false);
-			}
-
-			let alunos = this.alunoService.list.subscribe(list => {
-				this.alunos = list;
-
-				this.setAlunos();
-
-				this.setAluno();
-			});
-			this.subscription.push(alunos)
-
+			this.setAlunos();
 		});
-		this.subscription.push(aluno);
+				this.subscription.push(aluno);
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -97,47 +82,62 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 		this.subscription.forEach(item => item.unsubscribe());
 	}
 
+	loadAlunos() {
+		this.loadingAlunos = true;
+		lastValueFrom(this.alunoService.getListAgendarFaltaDropdown())
+			.then(res => {
+				this.loadingAlunos = false;
+				this.alunos = res;
+				this.setAlunos();
+			})
+			.catch(res => this.loadingAlunos = false);
+	}
+
+
+	setAlunos() {
+		if (this.alunos.length && this.evento) {
+			const evento = this.evento as Evento;
+
+			this.alunos = this.alunos.filter(aluno => {
+				const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
+				const alunoAtivo = alunoEstaNaAula?.active;
+				const alunoNaoMarcouFalta = alunoEstaNaAula
+					&& alunoEstaNaAula.active
+					&& alunoEstaNaAula.presente !== false;
+
+				const result = alunoEstaNaAula
+					&& alunoAtivo
+					&& alunoNaoMarcouFalta;
+
+				return result;
+			})
+		}
+		
+		this.setAluno();
+	}
+
+	setAluno() {
+		if (this.alunos.length && this.aluno_Id) {
+			let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
+			this.aluno = this.alunos[index];
+		}
+		return this.aluno;
+	}
+
 	enviarMensagem(aluno: Aluno) {
 		let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
 		window.open(object.link, '_blank');
 		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
 	}
 
-	setAluno() {
-		let index = this.alunos.findIndex(x => x.id == this.aluno_Id);
-		this.aluno = this.alunos[index];
-        return this.aluno;
-	}
 
-	setAlunos() {
-		this.alunos = this.alunoService.list.value;
-		if (this.alunos.length && this.evento) {
-			if (this.evento) {
-				var evento = this.evento as Evento;
-				this.alunos = this.alunos.filter(aluno => {
-					const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
-					const alunoAtivo = alunoEstaNaAula?.active;
-					const alunoNaoMarcouFalta = alunoEstaNaAula 
-						&& alunoEstaNaAula.active 
-						&& alunoEstaNaAula.presente !== false;
-
-					return alunoEstaNaAula
-						&& alunoAtivo
-						&& alunoNaoMarcouFalta;
-				})
-			}
-		}
-		this.setAluno();
-	}
-
-	
 	alunoChanged(e: SelectChangeEvent, model: NgModel) {
 		this.aluno_Id = e.value;
 		this.aluno = this.alunos.find(x => x.id == this.aluno_Id)
 		this.onAlunoChanged.emit(this.aluno);
 		this.alunoService.setAluno(this.aluno);
 	}
-	
+
 	showError(header: string, message: string, e: any, innerMessage?: string) {
 		showError(this.confirmationService, header, message, e, innerMessage)
 	}
