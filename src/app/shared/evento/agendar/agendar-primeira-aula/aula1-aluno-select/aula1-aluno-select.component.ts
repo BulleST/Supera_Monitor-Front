@@ -44,6 +44,7 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 	) {
 
+
 		this.onVisibleChange.subscribe(res => {
 			if (!res) {
 				this.ngOnDestroy();
@@ -56,7 +57,6 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 			let alunoIdParam = params.get('aluno_id');
 			this.readonly = !!alunoIdParam;
 
-
 			if (!alunoRes && alunoIdParam) {
 				this.aluno_Id = this.crypto.decrypt(alunoIdParam);
 
@@ -64,35 +64,21 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 				this.loadAluno(this.aluno_Id)
 					.then(aluno => {
+						this.aluno = aluno;
 						this.service.setAluno(aluno)
 						this.onAlunoChanged.emit(aluno);
 					})
 				return;
 			}
-
-			this.aluno = alunoRes;
-			this.aluno_Id = alunoRes?.id;
-
-
-			console.log('readonly', this.readonly)
+			else {
+				this.aluno = alunoRes;
+				this.aluno_Id = alunoRes?.id;
+			}
 
 			if (!this.readonly) {
-				this.loadingAlunos = true;
-				lastValueFrom(this.service.getListPrimeiraAulaDropdown())
-					.then(res => {
-						this.loadingAlunos = false;
-						this.alunos = res;
-
-						this.setAlunos();
-
-						if (alunoRes) {
-							let index = this.alunos.findIndex(x => x.id == alunoRes.id);
-							if (index != -1) this.alunos.splice(index, 1, alunoRes);
-							this.aluno = this.alunos[index];
-						}
-					})
-					.catch(res => this.loadingAlunos = false);
+				this.loadAlunos();
 			}
+
 		});
 		this.subscription.push(aluno);
 	}
@@ -106,15 +92,15 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 		this.subscription.forEach(item => item.unsubscribe());
 	}
 
-	enviarMensagem(aluno: Aluno) {
-		let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
-		window.open(object.link, '_blank');
-		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-	}
-
-	getRestricoes(aluno: Aluno) {
-		let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
-		return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
+	loadAlunos() {
+		this.loadingAlunos = true;
+		lastValueFrom(this.service.getListPrimeiraAulaDropdown())
+			.then(res => {
+				this.loadingAlunos = false;
+				this.alunos = res;
+				this.setAlunos();
+			})
+			.catch(res => this.loadingAlunos = false);
 	}
 
 	setAlunos() {
@@ -148,6 +134,23 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 			})
 		}
+
+		this.setAluno();
+	}
+
+	setAluno() {
+
+	}
+
+	enviarMensagem(aluno: Aluno) {
+		let object = this.mensagemWhatsapp.enviarMensagem(aluno.nome, aluno.celular);
+		window.open(object.link, '_blank');
+		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+	}
+
+	getRestricoes(aluno: Aluno) {
+		let restricoes = aluno.restricoes.filter(x => x.active).map(x => x.descricao)
+		return restricoes.length ? restricoes.join(', ') : 'Nenhuma restrição';
 	}
 
 	loadAluno(aluno_Id: number) {
@@ -182,7 +185,8 @@ export class Aula1AlunoSelectComponent implements OnChanges, OnDestroy {
 
 			if (this.aluno.restricaoMobilidade && this.evento?.sala_Id == SalaAndar.Terreo) {
 				let data = moment(this.evento.data).format('DD/MM/YYYY HH:mm')
-				return this.showError('Sala Incompatível',
+				return this.showError(
+					'Sala Incompatível',
 					`O aluno tem mobilidade reduzida e não poderá participar da aula no dia ${data} na sala ${this.evento.sala} no ${this.evento.andar}º andar`,
 					e.originalEvent
 				)

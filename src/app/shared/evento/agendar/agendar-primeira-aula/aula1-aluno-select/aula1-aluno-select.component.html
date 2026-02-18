@@ -6,20 +6,22 @@
             <label for="aluno_Id">Selecione o aluno: <span class="text-red-500">*</span></label>
             <p-iconfield>
                 <p-inputicon styleClass="fa-solid fa-user" />
+                
                 <p-select [options]="alunos"
                           [loading]="loadingAlunos"
                           name="aluno_Id"
                           inputId="aluno_Id"
-                          #aluno_Id="ngModel"
-                          [(ngModel)]="aluno"
+                          #fieldAluno="ngModel"
+                          [(ngModel)]="aluno_Id"
                           [ngModelOptions]="{ standalone: true }"
-                          (onChange)="alunoChanged($event, aluno_Id)"
+                          (onChange)="alunoChanged($event, fieldAluno)"
                           [required]="true"
                           [filter]="true"
                           filterBy="nome,turma,professor"
                           [virtualScroll]="true"
                           [virtualScrollItemSize]="43"
                           optionLabel="nome"
+                          optionValue="id"
                           [readonly]="readonly"
                           [disabled]="readonly"
                           placeholder="Selecione um aluno"
@@ -45,7 +47,7 @@
                             <div class="flex align-items-center gap-2">
                                 <div class="w-2rem pl-1 flex justify-content-center">
                                     <app-legend-color class="line-height-1"
-                                                        [corLegenda]="item.corLegenda"
+                                                            [corLegenda]="item.corLegenda"
                                                       [professor_Id]="item.professor_Id"
                                                       [professor]="item.professor"
                                                       [turma_Id]="item.turma_Id"></app-legend-color>
@@ -56,9 +58,9 @@
                     </ng-template>
                 </p-select>
             </p-iconfield>
-            <div *ngIf="aluno_Id.touched && aluno_Id.invalid && aluno_Id.errors">
-                <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['required']">Esse campo é obrigatório.</p>
-                <p class="text-red-500 mt-2 mb-0" *ngIf="aluno_Id.errors['indisponivel']">Aluno indisponível.</p>
+            <div *ngIf="fieldAluno.touched && fieldAluno.invalid && fieldAluno.errors">
+                <p class="text-red-500 mt-2 mb-0" *ngIf="fieldAluno.errors['required']">Esse campo é obrigatório.</p>
+                <p class="text-red-500 mt-2 mb-0" *ngIf="fieldAluno.errors['indisponivel']">Aluno indisponível.</p>
             </div>
         </ng-container>
         <ng-template #alunoSelecionadoTemplate>

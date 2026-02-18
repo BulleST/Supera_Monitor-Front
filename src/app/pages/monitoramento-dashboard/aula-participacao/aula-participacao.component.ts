@@ -80,21 +80,12 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 		this.instance = this.dialogService.getInstance(this.ref);
 
 		let onReload = this.monitoramentoService.onReload.subscribe(res => {
-			console.log('onReload')
 			let dashboard = this.monitoramentoService.dashboard.subscribe(dashboard => {
 				const aluno = dashboard.alunos.find(x => x.id == this.aluno.id) as Monitoramento_Aluno;
 				const item = aluno?.items.find(x => x.id == this.item.id) as Monitoramento_Aluno_Item;
 				const aula = item?.aula.aula as Monitoramento_Aula;
 				const participacao = item?.aula.participacao as Monitoramento_Participacao;
 				const reposicaoPara = item?.reposicaoPara as Monitoramento_Aula_Participacao_Rel;
-				
-				console.log('dashboard', dashboard)
-				console.log('aluno', aluno)
-				console.log('item', item)
-				console.log('aula', aula)
-				console.log('participacao', participacao)
-				console.log('reposicaoPara', reposicaoPara)
-	
 				this.aluno = aluno;
 				this.item = item;
 				this.aula = aula;

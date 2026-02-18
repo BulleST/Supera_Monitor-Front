@@ -311,9 +311,9 @@ export class ListComponent implements OnDestroy {
     }
 
     turmaChanged(item: Aluno, model: NgModel, e: SelectChangeEvent) {
-        let turma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
-        let restricoes = item.restricoes.filter(x => x.active)
-        if (restricoes.length > 0) {
+        let restricoes = item.restricoes.filter(x => x.active);
+        
+        if (restricoes.length > 0 || item.restricaoMobilidade) {
             this.alunoRestricaoConfirm(item, model, e);
         }
         else {
@@ -324,7 +324,7 @@ export class ListComponent implements OnDestroy {
 
     alunoRestricaoConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
 
-        let restricoes = item.restricoes.filter(x => x.active)
+        const restricoes = item.restricoes.filter(x => x.active);
 
         let mensagem = 'O aluno possui as seguintes restrições: <ul>';
 
@@ -359,17 +359,8 @@ export class ListComponent implements OnDestroy {
     turmaTransferirConfirm(item: Aluno, model: NgModel, e: SelectChangeEvent) {
         let novaTurma = this.turmas.find(x => x.id == item.turma_Id) as Turma;
 
-        item.turma = novaTurma.nome;
-        item.turma_Id = novaTurma.id;
-        item.corLegenda = novaTurma.corLegenda;
-        item.professor = novaTurma.professor;
-        item.professor_Id = novaTurma.professor_Id;
-        item.diaSemana = novaTurma.diaSemana;
-        item.horario = novaTurma.horario;
-        item.linkGrupo = novaTurma.linkGrupo;
-
-
-        let mensagem = `Tem certeza que deseja mudar o aluno da turma <span class="font-bold">${item.turma}</span> para a turma <span class="font-bold">${novaTurma.nome}</span>`
+        let mensagem = `Tem certeza que deseja transferir o aluno(a) para a turma <span class="font-bold">${novaTurma.nome}</span>?`;
+       
         this.confirmationService.confirm({
             target: e.originalEvent.target as any,
             message: mensagem,
@@ -382,6 +373,15 @@ export class ListComponent implements OnDestroy {
             rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
             accept: async () => {
                 this.tableLoading = true;
+
+                item.turma = novaTurma.nome;
+                item.turma_Id = novaTurma.id;
+                item.corLegenda = novaTurma.corLegenda;
+                item.professor = novaTurma.professor;
+                item.professor_Id = novaTurma.professor_Id;
+                item.diaSemana = novaTurma.diaSemana;
+                item.horario = novaTurma.horario;
+                item.linkGrupo = novaTurma.linkGrupo;
 
                 let novoAluno = await lastValueFrom(this.service.get(item.id));
                 novoAluno.turma_Id = novaTurma.id;
