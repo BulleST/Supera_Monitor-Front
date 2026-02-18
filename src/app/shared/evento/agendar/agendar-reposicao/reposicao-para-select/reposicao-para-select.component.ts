@@ -113,7 +113,7 @@ export class ReposicaoParaSelectComponent implements OnDestroy {
             let request: CalendarioRequest = {
                 perfil_Cognitivo_Id: this.aluno.perfilCognitivo_Id,
                 intervaloDe: moment(this.data).toDate(),
-                intervaloAte: moment(this.data).add(1, 'month').toDate(),
+                intervaloAte: moment(this.data).toDate(),
             }
             console.log('request', request)
 
