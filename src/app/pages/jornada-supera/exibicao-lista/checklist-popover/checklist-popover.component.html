@@ -19,12 +19,15 @@
                                 inputId="finalizado[{{index}}]"
                                 name="finalizado[{{index}}]"
                                 [ngClass]="{ 
-                            'pointer-events-none' : item.finalizado,
-                        }"
+                                    'pointer-events-none' : item.finalizado,
+                                }"
                                 class="p-checkbox-green"
                                 [binary]="true"
                                 (onChange)="finalizarChecklist(item)"></p-checkbox>
-                    <span class="white-space-nowrap">{{item.checklist_Item}}</span>
+                    <label for="finalizado[{{index}}]"
+                           class="white-space-nowrap cursor-pointer">
+                        {{item.checklist_Item}}
+                    </label>
                     <div class="pl-2 ml-auto">
                         <ng-container *ngIf="item.finalizado">
                             <p-button
@@ -36,7 +39,8 @@
                                       tooltipPosition="bottom"
                                       (onClick)="showChecklistDetalhes(item)" />
                         </ng-container>
-                        <ng-container *ngIf="item.finalizado == false && checklistsMensagemWhatsapp.includes(item.checklist_Item_Id)">
+                        <ng-container
+                                      *ngIf="item.finalizado == false && checklistsMensagemWhatsapp.includes(item.checklist_Item_Id)">
                             <p-button type="button"
                                       icon="pi pi-whatsapp"
                                       [severity]="aluno.celular ? 'success' : 'secondary'"

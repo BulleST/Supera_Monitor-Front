@@ -89,8 +89,9 @@ export class AgendarReposicaoComponent implements OnInit, OnDestroy {
 	}
 
     ngOnDestroy(): void {
+		this.eventoService.setEvento(undefined);
+		this.alunoService.setAluno(undefined);
         this.subscription.forEach((item) => item.unsubscribe())
-		this.subscription = [];
     }
 
     close() {

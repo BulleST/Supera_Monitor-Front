@@ -33,6 +33,10 @@ import { AgendarPrimeiraAulaComponent } from './evento/agendar/agendar-primeira-
 import { Aula1AlunoSelectComponent } from './evento/agendar/agendar-primeira-aula/aula1-aluno-select/aula1-aluno-select.component';
 import { Aula1CalendarioSelectComponent } from './evento/agendar/agendar-primeira-aula/aula1-calendario-select/aula1-calendario-select.component';
 import { Aula1EventoSelectedComponent } from './evento/agendar/agendar-primeira-aula/aula1-evento-selected/aula1-evento-selected.component';
+import { AgendarOficinaComponent } from './evento/agendar/agendar-oficina/agendar-oficina.component';
+import { OficinaAlunoSelectComponent } from './evento/agendar/agendar-oficina/oficina-aluno-select/oficina-aluno-select.component';
+import { OficinaCalendarioSelectComponent } from './evento/agendar/agendar-oficina/oficina-calendario-select/oficina-calendario-select.component';
+import { OficinaEventoSelectedComponent } from './evento/agendar/agendar-oficina/oficina-evento-selected/oficina-evento-selected.component';
 import { AgendarReposicaoComponent } from './evento/agendar/agendar-reposicao/agendar-reposicao.component';
 import { ReposicaoConfirmComponent } from './evento/agendar/agendar-reposicao/_reposicao-confirm/reposicao-confirm.component';
 import { ReposicaoAlunoSelectComponent } from './evento/agendar/agendar-reposicao/reposicao-aluno-select/reposicao-aluno-select.component';
@@ -93,6 +97,12 @@ import { CardComponent } from './evento/editar-aula/card/card.component';
         Aula1AlunoSelectComponent,
         Aula1CalendarioSelectComponent,
         Aula1EventoSelectedComponent,
+
+        // > evento > agendar > oficina
+        AgendarOficinaComponent,
+        OficinaAlunoSelectComponent,
+        OficinaCalendarioSelectComponent,
+        OficinaEventoSelectedComponent,
 
         // > evento > agendar > reposicao
         AgendarReposicaoComponent,

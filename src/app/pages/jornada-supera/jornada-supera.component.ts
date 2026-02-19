@@ -25,20 +25,20 @@ export class JornadaSuperaComponent implements OnDestroy {
     loadingCards = false;
 
     constructor(
-        private service: JornadaSuperaService,
+        private jornadaSuperaService: JornadaSuperaService,
     ) {
 
-        let list = this.service.list.subscribe(res => this.list = res);
+        let list = this.jornadaSuperaService.list.subscribe(res => this.list = res);
         this.subscription.push(list);
 
-        let cards = this.service.cards.subscribe(res => this.cards = res);
+        let cards = this.jornadaSuperaService.cards.subscribe(res => this.cards = res);
         this.subscription.push(cards);
 
-        let exibicao = this.service.exibicao.subscribe(res => this.exibicao = res);
+        let exibicao = this.jornadaSuperaService.exibicao.subscribe(res => this.exibicao = res);
         this.subscription.push(exibicao);
 
-        var onReload = this.service.onReload.subscribe(res => {
-            this.request = res ?? this.service.getRequest().value;
+        var onReload = this.jornadaSuperaService.onReload.subscribe(res => {
+            this.request = res ?? this.jornadaSuperaService.getRequest().value;
             this.update();
         });
         this.subscription.push(onReload);
@@ -56,14 +56,14 @@ export class JornadaSuperaComponent implements OnDestroy {
 
     getCard() {
         this.loadingCards = true;
-        lastValueFrom(this.service.getCard(this.request))
+        lastValueFrom(this.jornadaSuperaService.getCard(this.request))
             .then(res => this.loadingCards = false)
             .catch(res => this.loadingCards = false);
     }
 
     getList() {
         this.loadingList = true;
-        lastValueFrom(this.service.getList(this.request))
+        lastValueFrom(this.jornadaSuperaService.getList(this.request))
             .then(res => this.loadingList = false)
             .catch(res => this.loadingList = false);
     }

@@ -741,9 +741,9 @@ export class CadastrarTurmaExtraComponent implements OnDestroy {
                 this.loading = false;
 
                 if (res.success) {
-                    this.jornadaService.onReload.emit(res.object.id);
-                    this.monitoramentoService.onReload.emit(res.object.id);
-                    this.eventoService.onReload.emit(res.object.id);
+                    this.jornadaService.onReload.emit();
+                    this.monitoramentoService.onReload.emit();
+                    this.eventoService.onReload.emit();
                     if (this.object.alunos.length > 0) {
                         this.sendMensagemAlunos(res.object);
                     } else {

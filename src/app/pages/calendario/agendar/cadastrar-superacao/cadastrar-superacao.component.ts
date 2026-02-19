@@ -575,9 +575,9 @@ export class CadastrarSuperacaoComponent implements OnDestroy {
                         this.visibleChange()
                     }
                     this.toastrService.success('Superação cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.jornadaService.onReload.emit(res.object.id);
-                    this.monitoramentoService.onReload.emit(res.object.id);
-                    this.eventoService.onReload.emit(res.object.id);
+                    this.jornadaService.onReload.emit();
+                    this.monitoramentoService.onReload.emit();
+                    this.eventoService.onReload.emit();
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar superação. <br> ${res.message}`, e);

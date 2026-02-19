@@ -79,53 +79,21 @@
             </ng-container>
         </tr>
     </ng-template>
-    <!-- <ng-template #groupheader let-aluno let-expanded="expanded">
-        <tr pRowGroupHeader>
-            <td pFrozenColumn
-                alignFrozen="left"
-                [frozen]="true"
-                colspan="2"
-                [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda, color: getTextColor(aluno.corLegenda) }">
-                <div class="flex align-items-center gap-2 line-height-1 py-2 justify-content-between">
-                    <i class="fa fa-users-between-lines ml-1"></i>
-                    <span class="mr-auto font-bold">{{aluno.turma}}</span>
-                </div>
-            </td>
-            <ng-container *ngFor="let checklist of aluno.checklists; let index = index;">
-                <ng-container *ngIf="index == aluno.checklists.length - 1; else elseTemplate">
-                    <td pFrozenColumn
-                        alignFrozen="right"
-                        [frozen]="true"
-                        [style]="{ 
-                            backgroundColor: aluno.corLegenda, 
-                            color: getTextColor(aluno.corLegenda),
-                            borderColor: aluno.corLegenda
-                        }"
-                        class="white-space-nowrap text-right">
-                        {{calculaAlunosMesmaTurma(aluno.turma_Id)}}
-                    </td>
-                </ng-container>
-                <ng-template #elseTemplate>
-                    <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></td>
-                </ng-template>
-            </ng-container>
-        </tr>
-    </ng-template> -->
     <ng-template #body let-aluno let-rowIndex="rowIndex">
         @if(!loading) {
             @if(rowIndex == 0) {
                 <ng-container *ngTemplateOutlet="groupHeader; context: { aluno }"></ng-container>
-                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="rowTemplate"></ng-container>
             }
             @else if ((dt.filteredValue ?? list)[rowIndex - 1].turma_Id != aluno.turma_Id) {
                 <ng-container *ngTemplateOutlet="groupHeader; context: { aluno: aluno }"></ng-container>
-                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="rowTemplate"></ng-container>
             }
             @else {
-                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+                <ng-container *ngTemplateOutlet="rowTemplate"></ng-container>
             }
         }
-        <ng-template #elseTemplate>
+        <ng-template #rowTemplate>
             <tr class="cursor-pointer">
                 <!-- Nome -->
                 <td class="w-10rem overflow-hidden text-overflow-ellipsis sticky left-0 z-2 fadein">

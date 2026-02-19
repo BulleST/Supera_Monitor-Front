@@ -177,9 +177,9 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.jornadaService.onReload.emit(res.object.id);
-					this.monitoramentoService.onReload.emit(res.object.id);
-					this.eventoService.onReload.emit(res.object.id);
+					this.jornadaService.onReload.emit();
+					this.monitoramentoService.onReload.emit();
+					this.eventoService.onReload.emit();
 					this.toastr.success(`Status atualizado com sucesso`)
 					this.close();
 				}
@@ -225,9 +225,9 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.jornadaService.onReload.emit(res.object.id);
-					this.monitoramentoService.onReload.emit(res.object.id);
-					this.eventoService.onReload.emit(res.object.id);
+					this.jornadaService.onReload.emit();
+					this.monitoramentoService.onReload.emit();
+					this.eventoService.onReload.emit();
 					this.toastr.success(`Falta cancelada com sucesso`)
 					this.close();
 				}

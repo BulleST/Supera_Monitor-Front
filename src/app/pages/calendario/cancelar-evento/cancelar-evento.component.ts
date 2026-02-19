@@ -31,6 +31,7 @@ import { DialogService } from 'primeng/dynamicdialog'
 import { showEnviarMensagemAlunos } from '../../../utils/show-enviar-mensagem-alunos'
 import { JornadaSuperaService } from '../../../services/jornada-supera.service'
 import { MonitoramentoService } from '../../../services/monitoramento.service'
+import { SalaAulaPipe } from '../../../utils/sala-aula.pipe'
 
 @Component({
     selector: 'app-cancelar-evento',
@@ -74,6 +75,8 @@ export class CancelarEventoComponent implements OnDestroy {
         private calendarioUtils: CalendarioUtils,
         private turmaService: TurmaService,
         private alunoService: AlunoService,
+        private salaAulaPipe: SalaAulaPipe,
+
     ) {
         let professores = this.professorService.list.subscribe(res => {
             this.professores = res;
@@ -174,10 +177,7 @@ export class CancelarEventoComponent implements OnDestroy {
     }
 
     getSala(evento: Evento) {
-        if (!evento.sala_Id)
-            return 'Indefinido'
-        var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
-        return evento.sala + ' - ' + andar
+        return this.salaAulaPipe.getFullDescription(evento);
     }
 
     goToReagendamento() {
@@ -270,9 +270,9 @@ export class CancelarEventoComponent implements OnDestroy {
                     this.loading = false;
                     if (res.success) {
                         this.toastrService.success(`A ${this.tipoEventoString} foi cancelada com sucesso`, 'Cancelamento realizado')
-                        this.jornadaService.onReload.emit(res.object.id);
-                        this.monitoramentoService.onReload.emit(res.object.id);
-                        this.eventoService.onReload.emit(res.object.id)
+                        this.jornadaService.onReload.emit();
+                        this.monitoramentoService.onReload.emit();
+                        this.eventoService.onReload.emit()
 
                         if (this.evento.alunos.length > 0) {
                             this.sendMensagemAlunos(res.object)

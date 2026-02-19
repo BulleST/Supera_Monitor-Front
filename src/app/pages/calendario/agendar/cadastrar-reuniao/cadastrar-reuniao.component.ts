@@ -465,9 +465,9 @@ export class CadastrarReuniaoComponent implements OnDestroy {
                 this.visible = false
                 this.visibleChange();
                 this.toastrService.success('Reunião cadastrada com sucesso.', 'Agendamento finalizado');
-                this.jornadaService.onReload.emit(res.object.id);
-                this.monitoramentoService.onReload.emit(res.object.id);
-                this.eventoService.onReload.emit(res.object.id);
+                this.jornadaService.onReload.emit();
+                this.monitoramentoService.onReload.emit();
+                this.eventoService.onReload.emit();
             })
             .catch(res => {
                 this.loading = false;

@@ -6,6 +6,7 @@ import { SalaAndar } from '../../../../../models/sala-aula.model';
 import { EventoService } from '../../../../../services/evento.service';
 import { ActivatedRoute } from '@angular/router';
 import moment from 'moment';
+import { SalaAulaPipe } from '../../../../../utils/sala-aula.pipe';
 
 @Component({
 	selector: 'app-falta-evento-selected',
@@ -29,6 +30,7 @@ export class FaltaEventoSelectedComponent implements OnChanges, OnDestroy {
 	constructor(
 		private service: EventoService,
 		private activatedRoute: ActivatedRoute,
+        private salaAulaPipe: SalaAulaPipe,
 
 	) {
 
@@ -64,10 +66,8 @@ export class FaltaEventoSelectedComponent implements OnChanges, OnDestroy {
 	}
 
 	getSala(evento: Evento) {
-		var andar = evento.andar > SalaAndar.Terreo ? evento.andar + 'º andar' : 'Térreo'
-		return evento.sala + ' - ' + andar
+        return this.salaAulaPipe.getFullDescription(evento);
 	}
-
 
 	selecionarOutraData() {
 		this.evento = undefined as any;

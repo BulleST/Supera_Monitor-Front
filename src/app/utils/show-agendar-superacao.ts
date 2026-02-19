@@ -1,8 +1,8 @@
 import { DialogService } from "primeng/dynamicdialog";
-import { AgendarAula0Component } from "../shared/evento/agendar/agendar-aula-0/agendar-aula-0.component";
+import { AgendarSuperacaoComponent } from "../shared/evento/agendar/agendar-superacao/agendar-superacao.component";
 
 export function showAgendarAulaZero(dialogService: DialogService, aluno_Id?: number) {
-    return dialogService.open(AgendarAula0Component, {
+    return dialogService.open(AgendarSuperacaoComponent, {
         showHeader: false,
         closable: true,
         maximizable: true,

@@ -361,7 +361,7 @@ export class AulaParticipacaoComponent implements OnInit, OnDestroy {
 				this.loading = false;
 				if (res.success) {
 					this.toastr.success('Dados atualizados com sucesso', 'Sucesso');
-					this.monitoramentoService.onReload.emit(true)
+					this.monitoramentoService.onReload.emit()
 				}
 				else {
 					this.showError('Erro', `Não foi possível atualizar dados <br> ${res.message}`, e);

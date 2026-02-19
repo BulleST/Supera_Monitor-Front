@@ -26,6 +26,11 @@ export class PrimeiraAulaRequest {
     aluno_Id: number = 0;
 }
 
+export class OficinaInscricaoRequest {
+    evento_Id: number = 0;
+    aluno_Id: number = 0;
+}
+
 export class ReagendarAulaView {
     id: number = PseudoEvento.EventoId;
     professor_Id: number = 0;

@@ -93,10 +93,11 @@
                       severity="secondary"
                       rounded 
                       (onClick)="showAluno()"/>
-            <p-button *ngIf="showEvento"
+            <p-button *ngIf="exibirBotaoShowEvento"
                       label="Ver {{eventoNome}}"
                       icon="pi pi-calendar"
-                      rounded />
+                      rounded 
+                      (onClick)="showEvento()"/>
         </div>
     </div>
 </div>

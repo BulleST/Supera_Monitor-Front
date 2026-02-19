@@ -79,6 +79,8 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.forEach((item) => item.unsubscribe())
+		this.eventoService.setEvento(undefined)
+		this.alunoService.setAluno(undefined);
     }
 
     close(success: boolean) {
@@ -307,9 +309,9 @@ export class AgendarFaltaComponent implements OnInit, OnDestroy {
     finally() {
         let evento = this.evento as Evento;
         
-        this.jornadaService.onReload.emit(undefined);
-        this.monitoramentoService.onReload.emit(evento.id);
-        this.eventoService.onReload.emit(evento.id);
+        this.jornadaService.onReload.emit();
+        this.monitoramentoService.onReload.emit();
+        this.eventoService.onReload.emit();
         this.toastrService.success('Falta agendada com sucesso!');
         this.sendMensagemAluno();
     }

@@ -34,6 +34,8 @@ import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng
 import { showEnviarMensagemAlunos } from '../../../../utils/show-enviar-mensagem-alunos'
 import { showAluno } from '../../../../utils/show-aluno'
 import { FeriadoService } from '../../../../services/feriado.service'
+import { JornadaSuperaService } from '../../../../services/jornada-supera.service'
+import { MonitoramentoService } from '../../../../services/monitoramento.service'
 
 @Component({
     selector: 'app-agendar-aula-0',
@@ -99,6 +101,8 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
         private alunoService: AlunoService,
         private roteiroService: RoteiroService,
         private eventoService: EventoService,
+        private jornadaService: JornadaSuperaService,
+        private monitoramentoService: MonitoramentoService,
         private feriadoService: FeriadoService,
         private mensagemWhatsapp: MensagemWhatsapp,
         private calendarioUtils: CalendarioUtils,
@@ -177,6 +181,8 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subscription.forEach(e => e.unsubscribe())
+		this.eventoService.setEvento(undefined)
+		this.alunoService.setAluno(undefined);
     }
 
     setAluno() {
@@ -690,7 +696,9 @@ export class AgendarAula0Component implements OnInit, OnDestroy {
                         this.close(true);
                     }
                     this.toastrService.success('Aula zero cadastrada com sucesso.', 'Agendamento finalizado');
-                    this.eventoService.onReload.emit(res.object.id);
+                    this.eventoService.onReload.emit();
+					this.jornadaService.onReload.emit();
+					this.monitoramentoService.onReload.emit();
                 }
                 else {
                     this.showError('Agendamento falhou', `Não foi possível agendar aula zero. <br> ${res.message}`, e);

@@ -105,9 +105,9 @@ export class ReposicaoConfirmComponent implements OnInit {
 			.then(res => {
 				this.loading = false;
 				if (res.success) {
-					this.jornadaService.onReload.emit(res.object.id);
-					this.monitoramentoService.onReload.emit(res.object.id);
-					this.eventoService.onReload.emit(res.object.id);
+					this.jornadaService.onReload.emit();
+					this.monitoramentoService.onReload.emit();
+					this.eventoService.onReload.emit();
 					this.sendMensagemAluno(res.object);
 					var data = moment(reposicaoPara.data).format('DD/MM/YYYY [às] HH[h]mm');
 					this.toastr.success(`Reposição agendada para o dia ${data}`);

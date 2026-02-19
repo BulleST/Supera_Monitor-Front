@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { DialogService, DynamicDialogComponent, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ChecklistItemId } from '../../../models/checklist-item-id.enum';
 import { showAluno } from '../../../utils/show-aluno';
+import { showEvento } from '../../../utils/show-editar-evento';
+import { EventoService } from '../../../services/evento.service';
+import { lastValueFrom, Subscription } from 'rxjs';
 
 @Component({
 	selector: 'app-aluno-checklist-detalhes',
@@ -15,11 +18,14 @@ export class AlunoChecklistDetalhesComponent {
 	loading = false;
 	view = new AlunoChecklistDetalhesView;
 
-	showEvento = false;
+	exibirBotaoShowEvento = false;
 	eventoNome = '';
 	maximized = false;
 
+    subscription: Subscription[] = [];
+
 	constructor(
+		private eventoService: EventoService,
 		private dialogService: DialogService,
 		private ref: DynamicDialogRef,
 	) {
@@ -32,7 +38,7 @@ export class AlunoChecklistDetalhesComponent {
 
 			this.view = this.instance.data['view'];
 
-			this.showEvento = [
+			this.exibirBotaoShowEvento = [
 				ChecklistItemId.Agendamento1Oficina,
 				ChecklistItemId.Agendamento2Oficina,
 				ChecklistItemId.Agendamento1Superacao,
@@ -69,6 +75,7 @@ export class AlunoChecklistDetalhesComponent {
 	}
 
 	close(finalizado: boolean) {
+        this.subscription.forEach(item => item.unsubscribe());
 		this.ref.close(finalizado);
 	}
 
@@ -81,6 +88,19 @@ export class AlunoChecklistDetalhesComponent {
         showAluno(this.dialogService, this.view.aluno_Id);
 	}
 
+    async showEvento() {
+        if (this.view.evento_Id) {
+            const evento = await lastValueFrom(this.eventoService.get(this.view.evento_Id));
+            this.eventoService.setEvento(evento);
+
+            const ref = showEvento(
+                evento,
+                this.dialogService
+            );
+            const onClose = ref.onClose.subscribe(res => this.eventoService.setEvento(undefined));
+            this.subscription.push(onClose);
+        }
+    }
 
 }
 

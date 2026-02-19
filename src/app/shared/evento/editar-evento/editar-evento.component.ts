@@ -268,9 +268,9 @@ export class EditarEventoComponent implements OnInit, OnDestroy {
             .then(res => {
                 this.loading = false
                 if (res.success) {
-					this.jornadaService.onReload.emit(res.object.id);
-                    this.monitoramentoService.onReload.emit(res.object.id);
-                    this.eventoService.onReload.emit(res.object.id)
+					this.jornadaService.onReload.emit();
+                    this.monitoramentoService.onReload.emit();
+                    this.eventoService.onReload.emit()
                     this.evento.id = res.object.id
                     this.eventoService.setEvento(this.evento)
                     this.toastr.success('Dados atualizados com sucesso.')
@@ -322,9 +322,9 @@ export class EditarEventoComponent implements OnInit, OnDestroy {
                     this.loading = false;
                     if (res.success) {
                         this.evento = res.object;
-                        this.jornadaService.onReload.emit(res.object.id);
-                        this.monitoramentoService.onReload.emit(res.object.id);
-                        this.eventoService.onReload.emit(res.object.id)
+                        this.jornadaService.onReload.emit();
+                        this.monitoramentoService.onReload.emit();
+                        this.eventoService.onReload.emit()
                         this.toastr.success(`${this.tipoString} finalizada com sucesso.`, 'Sucesso');
 
                         this.confirmationService.confirm({

@@ -60,7 +60,7 @@
             <input type="text"
                    pInputText
                    id="educador"
-                   [value]="evento.professor"
+                   [value]="evento.professor ?? 'Indefinido'"
                    readonly
                    fluid />
         </p-iconfield>

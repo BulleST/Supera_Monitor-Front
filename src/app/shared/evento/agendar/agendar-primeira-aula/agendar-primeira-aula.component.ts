@@ -75,6 +75,8 @@ export class AgendarPrimeiraAulaComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.subscription.forEach((item) => item.unsubscribe())
+		this.eventoService.setEvento(undefined)
+		this.alunoService.setAluno(undefined);
 	}
 
 	close() {
@@ -180,9 +182,9 @@ export class AgendarPrimeiraAulaComponent implements OnInit, OnDestroy {
 			.then(res => {
 				if (res.success) {
 					this.loading = false;
-					this.jornadaService.onReload.emit(res.object.id);
-					this.monitoramentoService.onReload.emit(res.object.id);
-					this.eventoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit();
+					this.monitoramentoService.onReload.emit();
+					this.jornadaService.onReload.emit();
 					this.toastrService.success(res.message);
 					if (this.aluno?.celular) {
 						this.sendMensagemAluno(e, evento);
