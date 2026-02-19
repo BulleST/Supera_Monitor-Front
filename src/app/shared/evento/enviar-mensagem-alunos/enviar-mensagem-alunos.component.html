@@ -40,9 +40,9 @@
 <div class="mt-3">
     <div *ngFor="let aluno of alunos">
         <p-button type="button"
-                  (onClick)="enviarMensagem(aluno)"
-                  (auxclick)="enviarMensagem(aluno)"
-                  (contextmenu)="enviarMensagem(aluno)"
+                  (onClick)="enviarMensagem(aluno, $event)"
+                  (auxclick)="enviarMensagem(aluno, $event)"
+                  (contextmenu)="enviarMensagem(aluno, $event)"
                   [disabled]="!aluno.celular"
                   icon="pi pi-whatsapp {{!aluno.celular ? 'text-300' : 'text-green-500'}}"
                   styleClass="text-700 w-full text-left justify-content-start"

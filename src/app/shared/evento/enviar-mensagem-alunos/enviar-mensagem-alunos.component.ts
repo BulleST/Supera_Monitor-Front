@@ -9,131 +9,136 @@ import { EventoService } from '../../../services/evento.service';
 import { showContato } from '../../../utils/show-contato';
 
 @Component({
-	selector: 'app-enviar-mensagem-alunos',
-	standalone: false,
-	templateUrl: './enviar-mensagem-alunos.component.html',
-	styleUrl: './enviar-mensagem-alunos.component.css',
-	providers: [ConfirmationService],
+    selector: 'app-enviar-mensagem-alunos',
+    standalone: false,
+    templateUrl: './enviar-mensagem-alunos.component.html',
+    styleUrl: './enviar-mensagem-alunos.component.css',
+    providers: [ConfirmationService],
 })
 export class EnviarMensagemAlunosComponent implements OnInit {
-	alunos: Aluno[] = [];
-	evento!: Evento;
-	instance: DynamicDialogComponent | undefined;
-	tipoString = '';
-	mensagemTipo!: MensagemTipo;
-	view = new EnviarMensagemAlunosView;
-	MensagemTipo = MensagemTipo;
+    alunos: Aluno[] = [];
+    evento!: Evento;
+    instance: DynamicDialogComponent | undefined;
+    tipoString = '';
+    mensagemTipo!: MensagemTipo;
+    view = new EnviarMensagemAlunosView;
+    MensagemTipo = MensagemTipo;
 
-	constructor(
-		private dialogService: DialogService,
-		private ref: DynamicDialogRef,
-		private calendarioUtils: CalendarioUtils,
-		public mensagemWhatsapp: MensagemWhatsapp,
-		private confirmationService: ConfirmationService,
-		private eventoService: EventoService,
+    constructor(
+        private dialogService: DialogService,
+        private ref: DynamicDialogRef,
+        private calendarioUtils: CalendarioUtils,
+        public mensagemWhatsapp: MensagemWhatsapp,
+        private confirmationService: ConfirmationService,
+        private eventoService: EventoService,
 
-	) {
+    ) {
 
-		this.instance = this.dialogService.getInstance(this.ref);
+        this.instance = this.dialogService.getInstance(this.ref);
 
-	}
+    }
 
-	ngOnInit(): void {
-		if (this.instance && this.instance.data) {
-			this.view = this.instance.data['view'];
-			this.evento = this.view.evento;
-			this.alunos = this.view.alunos;
-			this.mensagemTipo = this.view.tipo;
-			this.tipoString = this.calendarioUtils.getEventoTipo(this.evento);
-		}
-	}
+    ngOnInit(): void {
+        if (this.instance && this.instance.data) {
+            this.view = this.instance.data['view'];
+            this.evento = this.view.evento;
+            this.alunos = this.view.alunos;
+            this.mensagemTipo = this.view.tipo;
+            this.tipoString = this.calendarioUtils.getEventoTipo(this.evento);
+        }
+    }
 
-	close() {
-		this.ref.close();
-	}
+    close() {
+        this.ref.close();
+    }
 
-	showError(header: string, message: string, e: any, innerMessage?: string) {
-		showError(this.confirmationService, header, message, e, innerMessage);
-	}
+    showError(header: string, message: string, e: any, innerMessage?: string) {
+        showError(this.confirmationService, header, message, e, innerMessage);
+    }
 
-	enviarMensagem(aluno: Aluno) {
-		var participacao = this.view.participacao;
+    enviarMensagem(aluno: Aluno, e: any) {
+        const participacao = this.view.participacao;
 
-		if (!aluno.celular) {
-			this.showError('Erro', 'Nenhum celular cadastrado', aluno);
-			return;
-		}
+        if (!aluno.celular) {
+            this.showError('Erro', 'Nenhum celular cadastrado', aluno);
+            return;
+        }
 
-		let object = { link: '', mensagem: '' };
+        let object: { link: string, mensagem: string } | undefined = undefined;
 
-		if (this.mensagemTipo == MensagemTipo.Agendamento) {
-			object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
-		}
-		else if (this.mensagemTipo == MensagemTipo.Cancelamento) {
-			object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.nome, aluno.celular, this.evento);
-			this.showContato(aluno, participacao!);
-		}
-		else if (this.mensagemTipo == MensagemTipo.ConfirmacaoReposicao) {
-			object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, this.view.reposicaoDe!, this.view.reposicaoPara!);
-		}
-		else if (this.mensagemTipo == MensagemTipo.Inscricao) {
-			object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
-		}
-		else if (this.mensagemTipo == MensagemTipo.Falta) {
-			this.showContato(aluno, participacao!);
-		}
-		else if (this.mensagemTipo == MensagemTipo.FaltaReposicao) {
-			this.showContato(aluno, participacao!);
-		}
-		else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
-			this.showContato(aluno, participacao!);
-			
-		}
+        if (this.mensagemTipo == MensagemTipo.Agendamento) {
+            object = this.mensagemWhatsapp.enviarMensagemAgendamento(aluno.nome, aluno.celular, this.evento);
+        }
+        else if (this.mensagemTipo == MensagemTipo.Cancelamento) {
+            object = this.mensagemWhatsapp.enviarMensagemCancelamento(aluno.nome, aluno.celular, this.evento);
+            if (participacao)
+                this.showContato(aluno, participacao);
+        }
+        else if (this.mensagemTipo == MensagemTipo.ConfirmacaoReposicao) {
+            object = this.mensagemWhatsapp.enviarMensagemReposicao(aluno.nome, aluno.celular, this.view.reposicaoDe!, this.view.reposicaoPara!);
+        }
+        else if (this.mensagemTipo == MensagemTipo.Inscricao) {
+            object = this.mensagemWhatsapp.enviarMensagemInscricao(aluno.nome, aluno.celular, this.evento);
+        }
+        else if (this.mensagemTipo == MensagemTipo.Falta) {
+            if (participacao)
+                this.showContato(aluno, participacao);
+        }
+        else if (this.mensagemTipo == MensagemTipo.FaltaReposicao) {
+            if (participacao)
+                this.showContato(aluno, participacao);
+        }
+        else if (this.mensagemTipo == MensagemTipo.FaltaAgendada) {
+            if (participacao) {
+                this.mensagemWhatsapp.enviarMensagemFalta(this.evento, participacao, e);
+                this.showContato(aluno, participacao);
+            }
+        }
 
-		window.open(object.link, '_blank');
-		this.mensagemWhatsapp.copiarMensagem(object.mensagem);
-		this.removeItemLista(aluno);
+        if (object) {
+            window.open(object.link, '_blank');
+            this.mensagemWhatsapp.copiarMensagem(object.mensagem);
+        }
+        this.removeItemLista(aluno);
 
-		
+        return object;
+    }
 
-		return object;
-	}
+    removeItemLista(aluno: Aluno) {
+        let index = this.alunos.findIndex(x => x.id == aluno.id)
+        if (index != -1)
+            this.alunos.splice(index, 1);
+    }
 
-	removeItemLista(aluno: Aluno) {
-		let index = this.alunos.findIndex(x => x.id == aluno.id)
-		if (index != -1)
-			this.alunos.splice(index, 1);
-	}
+    showContato(aluno: Aluno, participacao: Evento_Participacao_Aluno) {
 
-	showContato(aluno: Aluno, participacao: Evento_Participacao_Aluno) {
-
-		var ref = showContato(this.dialogService, this.evento, participacao);
-		var onClose = ref.onClose.subscribe(res => {
-			this.removeItemLista(aluno);
-			if (this.alunos.length == 0) {
-				this.close();
-			}
-		});
-	}
+        const ref = showContato(this.dialogService, this.evento, participacao);
+        const onClose = ref.onClose.subscribe(res => {
+            this.removeItemLista(aluno);
+            if (this.alunos.length == 0) {
+                this.close();
+            }
+        });
+    }
 
 }
 
 export class EnviarMensagemAlunosView {
-	evento: Evento = new Evento;
-	alunos: Aluno[] = [];
-	tipo: MensagemTipo = MensagemTipo.Agendamento;
-	reposicaoDe?: Evento;
-	reposicaoPara?: Evento;
+    evento: Evento = new Evento;
+    alunos: Aluno[] = [];
+    tipo: MensagemTipo = MensagemTipo.Agendamento;
+    reposicaoDe?: Evento;
+    reposicaoPara?: Evento;
     participacao?: Evento_Participacao_Aluno
 }
 
 export enum MensagemTipo {
-	Agendamento,
-	Inscricao,
-	Cancelamento,
-	ConfirmacaoReposicao,
-	FaltaAgendada,
-	Falta,
-	FaltaReposicao,
-	ReposicaoDesmarcada,
+    Agendamento,
+    Inscricao,
+    Cancelamento,
+    ConfirmacaoReposicao,
+    FaltaAgendada,
+    Falta,
+    FaltaReposicao,
+    ReposicaoDesmarcada,
 }

@@ -79,7 +79,7 @@
             </ng-container>
         </tr>
     </ng-template>
-    <ng-template #groupheader let-aluno let-expanded="expanded">
+    <!-- <ng-template #groupheader let-aluno let-expanded="expanded">
         <tr pRowGroupHeader>
             <td pFrozenColumn
                 alignFrozen="left"
@@ -110,18 +110,20 @@
                 </ng-template>
             </ng-container>
         </tr>
-    </ng-template>
+    </ng-template> -->
     <ng-template #body let-aluno let-rowIndex="rowIndex">
-        @if(rowIndex == 0) {
-            <ng-container *ngTemplateOutlet="groupHeader; context: { aluno }"></ng-container>
-            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
-        }
-        @else if ((dt.filteredValue ?? list)[rowIndex - 1].turma_Id != aluno.turma_Id) {
-            <ng-container *ngTemplateOutlet="groupHeader; context: { aluno: aluno }"></ng-container>
-            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
-        }
-        @else {
-            <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+        @if(!loading) {
+            @if(rowIndex == 0) {
+                <ng-container *ngTemplateOutlet="groupHeader; context: { aluno }"></ng-container>
+                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+            }
+            @else if ((dt.filteredValue ?? list)[rowIndex - 1].turma_Id != aluno.turma_Id) {
+                <ng-container *ngTemplateOutlet="groupHeader; context: { aluno: aluno }"></ng-container>
+                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+            }
+            @else {
+                <ng-container *ngTemplateOutlet="elseTemplate"></ng-container>
+            }
         }
         <ng-template #elseTemplate>
             <tr class="cursor-pointer">
@@ -170,7 +172,7 @@
     </ng-template>
     <ng-template #loadingbody let-columns="columns">
         <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">
-            <ng-container *ngFor="let col of [-1,-10,1,2,3,4,5,6,7,8,9,10,11,12]">
+            <ng-container *ngFor="let col of [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14]">
                 <td class="fadein">
                     <p-skeleton />
                 </td>

@@ -32,9 +32,9 @@ export function showContato(dialogService: DialogService,
     evento: Evento,
     participacao: Evento_Participacao_Aluno
 ) {
-    var tipo = getTipo(evento, participacao);
+    const tipo = getTipo(evento, participacao);
 
-    var view: EditarContatoView = {
+    const view: EditarContatoView = {
         evento,
         participacao,
         tipo

@@ -137,10 +137,6 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		// playAlert();
-
-		const data = moment(this.evento.data).format('DD/MM/YY [às] HH[h]mm');
-
 		this.confirmationService.confirm({
 			target: e.target,
 			message: `Tem certeza que deseja salvar o status de contato?`,
@@ -201,6 +197,49 @@ export class EditarParticipacaoContatoComponent implements OnInit, OnDestroy {
 		return this.calendarioUtils.requestAulaTurma(evento);
 	}
 
+
+    
+	cancelarFaltaConfirmation( e: any) {
+
+		this.confirmationService.confirm({
+			target: e.target,
+			message: `Tem certeza que deseja cancelar falta?`,
+			header: 'Cancelar falta',
+			acceptIcon: 'pi pi-check',
+			rejectIcon: 'pi pi-times',
+			acceptLabel: 'Sim',
+			rejectLabel: 'Não',
+			acceptButtonStyleClass: 'p-button-rounded',
+			rejectButtonStyleClass: 'p-button-rounded p-button-outlined',
+			accept: () => {
+				this.cancelarFalta(e);
+			},
+			reject: () => {
+			}
+		});
+	}
+
+	async cancelarFalta(e: any) {
+		this.loading = true;
+		await lastValueFrom(this.eventoService.cancelarFaltaAgendada(this.participacao.id))
+			.then(res => {
+				this.loading = false;
+				if (res.success) {
+					this.jornadaService.onReload.emit(res.object.id);
+					this.monitoramentoService.onReload.emit(res.object.id);
+					this.eventoService.onReload.emit(res.object.id);
+					this.toastr.success(`Falta cancelada com sucesso`)
+					this.close();
+				}
+				else {
+					this.showError('Erro', `Não foi possível cancelar falta. <br> ${res.message}`, e)
+				}
+			})
+			.catch(res => {
+				this.loading = false;
+				this.showError('Erro', `Não foi possível cancelar falta. <br> ${getError(res)}`, e)
+			})
+	}
 }
 
 export class EditarContatoView {

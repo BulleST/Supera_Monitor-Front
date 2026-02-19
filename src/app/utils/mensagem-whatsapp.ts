@@ -18,8 +18,6 @@ import { StatusContato } from "../models/evento-status-contato.enum";
 export class MensagemWhatsapp {
 
     linkWhatsApp = 'https://web.whatsapp.com/send/?phone=<phone>&text=<message>';
-    // linkWhatsApp = 'https://api.whatsapp.com/send?phone=<phone>&text=<message>';
-    // linkWhatsApp = 'https://wa.me//<phone>?text=<message>';
 
     constructor(
         private calendarioUtils: CalendarioUtils,

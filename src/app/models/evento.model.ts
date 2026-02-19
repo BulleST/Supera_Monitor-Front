@@ -8,6 +8,7 @@ export class Evento {
     id: number = PseudoEvento.EventoId;
     data: Date = new Date;
     evento_Tipo_Id: number = EventoTipo.Aula;
+    evento_Tipo: string = '';
     descricao: string = '';
     observacao: string = '';
     finalizado: boolean = false;

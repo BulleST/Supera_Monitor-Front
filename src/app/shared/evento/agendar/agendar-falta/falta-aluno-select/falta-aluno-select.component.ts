@@ -4,7 +4,6 @@ import { lastValueFrom, Subscription } from 'rxjs';
 import { Evento } from '../../../../../models/evento.model';
 import { AlunoService } from '../../../../../services/alunos.service';
 import { ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { Crypto, MensagemWhatsapp, showError } from '../../../../../utils';
 import { SelectChangeEvent } from 'primeng/select';
 import { ControlContainer, NgForm, NgModel } from '@angular/forms';
@@ -101,14 +100,12 @@ export class FaltaAlunoSelectComponent implements OnDestroy {
 			this.alunos = this.alunos.filter(aluno => {
 				const alunoEstaNaAula = evento.alunos.find(x => x.aluno_Id == aluno.id);
 				const alunoAtivo = alunoEstaNaAula?.active;
-				const alunoNaoMarcouFalta = alunoEstaNaAula
-					&& alunoEstaNaAula.active
-					&& alunoEstaNaAula.presente !== false;
-
+				const alunoNaoMarcou = alunoEstaNaAula?.presente === null;
+                
 				const result = alunoEstaNaAula
-					&& alunoAtivo
-					&& alunoNaoMarcouFalta;
-
+                                && alunoAtivo
+                                && alunoNaoMarcou;
+                                
 				return result;
 			})
 		}

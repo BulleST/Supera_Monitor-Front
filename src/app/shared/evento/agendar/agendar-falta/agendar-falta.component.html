@@ -37,6 +37,25 @@
                             *ngIf="!evento && aluno"
                             class="w-full formgrid grid"
                             (onEventoChanged)="eventoChanged($event)"></app-falta-calendario-select>
+
+    <div class="field col-12">
+        <label for="observacao">Motivo da falta: <span class="text-red-500">*</span></label>
+        <textarea 
+            pTextarea 
+            rows="5"
+            [autoResize]="true"
+            placeholder="Aproveite para contar o motivo da falta"
+            id="observacao"
+            name="observacao"
+            #observacao="ngModel"
+            [(ngModel)]="request.observacao"
+            [required]="true"
+            fluid
+        ></textarea>
+        <div *ngIf="observacao.touched && observacao.errors">
+            <p class="text-red-500" *ngIf="observacao.errors['requires']">Este campo é obrigatório.</p>
+        </div>
+    </div>
     <!-- Footer -->
     <div class="col-12 px-2 gap-4 flex flex-wrap align-items-center justify-content-between">
         <div class="ml-auto">

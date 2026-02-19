@@ -200,11 +200,26 @@
         </div>
         </ng-container>
     </div>
-    <div class="col-12 px-1 flex align-items-center justify-content-end">
+    <div class="col-12 px-1 flex align-items-center justify-content-between">
+        <ng-container *ngIf="participacao.agendouFalta 
+                    && evento.vagasDisponiveisEvento > 0
+                    && evento.finalizado === false">
+
+            <p-button type="button"
+                      fluid
+                      label="Cancelar falta"
+                      icon="pi pi-eraser"
+                      severity="secondary"
+                      [loading]="loading"
+                      [rounded]="true" 
+                      (onClick)="cancelarFaltaConfirmation($event)"/>
+        </ng-container>
+
         <p-button type="submit"
                   fluid
                   label="Salvar"
                   icon="pi pi-check"
+                  class="ml-auto"
                   [loading]="loading"
                   [rounded]="true"
                   [disabled]="form.invalid || loading || !evento || !participacao" />

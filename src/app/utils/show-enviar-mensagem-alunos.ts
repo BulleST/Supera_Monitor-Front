@@ -12,7 +12,7 @@ export function showEnviarMensagemAlunos(dialogService: DialogService,
     reposicaoPara?: Evento,
     participacao?: Evento_Participacao_Aluno
 ) {
-    var view: EnviarMensagemAlunosView = {
+    const view: EnviarMensagemAlunosView = {
         alunos,
         evento,
         tipo,
