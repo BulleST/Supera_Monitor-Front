@@ -3,9 +3,10 @@ import { MensagemWhatsapp } from '../../../../utils';
 import { JornadaSupera_Card_Checklist_Item_Aluno, JornadaSupera_Card_Checklist_Item, JornadaSupera_Card_Checklist } from './../../../../models/jornada-supera-cards.model';
 import { JornadaSuperaStatus } from '../../../../models/jornada-supera-status.model';
 import { DialogService } from 'primeng/dynamicdialog';
-import { FinalizarChecklistComponentView } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
 import { showAluno } from '../../../../utils/show-aluno';
-import { showFinalizarChecklist } from '../../../../utils/show-finalizar-checklist';
+import { AlunoService } from '../../../../services/alunos.service';
+import { EventoService } from '../../../../services/evento.service';
+import { finalizarChecklistCondicional } from '../../../../utils/show-finalizar-checklist';
 
 @Component({
     selector: 'app-checklist-item-aluno',
@@ -29,6 +30,8 @@ export class ChecklistItemAlunoComponent implements OnChanges {
     constructor(
         private mensagemWhatsapp: MensagemWhatsapp,
         private dialogService: DialogService,
+        private alunoService: AlunoService,
+        private eventoService: EventoService,
     ) {
 
     }
@@ -79,22 +82,23 @@ export class ChecklistItemAlunoComponent implements OnChanges {
 
     finalizarChecklist() {
 
-        var view: FinalizarChecklistComponentView = {
-            alunoId: this.alunoChecklistItem.aluno_Id,
-            alunoChecklistItemId: this.alunoChecklistItem.id,
-            checklistItemId: this.item.id,
-            checklistId: this.checklist.id,
-
-            checklistItem: this.item.nome,
-            aluno: this.alunoChecklistItem.aluno,
-            turma: this.alunoChecklistItem.turma,
-            corLegenda: this.alunoChecklistItem.corLegenda,
+        finalizarChecklistCondicional({
+            dialogService: this.dialogService,
+            alunoService: this.alunoService,
+            eventoService: this.eventoService,
+            aluno_Id:  this.alunoChecklistItem.aluno_Id,
+            checklist_Id: this.checklist.id,
+            checklist_Item: this.item.nome,
+            checklist_Item_Id: this.item.id,
+            aluno_Checklist_Item_Id: this.alunoChecklistItem.id,
             prazo: this.alunoChecklistItem.prazo,
+            finalizado: this.alunoChecklistItem.finalizado,
             status: this.alunoChecklistItem.status,
+            aluno: this.alunoChecklistItem.aluno,
             celular: this.alunoChecklistItem.celular,
-        }
-        
-        var ref = showFinalizarChecklist(this.dialogService, view);
+            corLegenda: this.alunoChecklistItem.corLegenda,
+            turma: this.alunoChecklistItem.turma
+        });
        
     }
     

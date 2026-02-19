@@ -1,21 +1,16 @@
 import { Component, Input, OnChanges, OnDestroy, SimpleChanges, ViewChild } from '@angular/core';
 import { Popover } from 'primeng/popover';
-import { lastValueFrom, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { MensagemWhatsapp } from '../../../../utils';
 import { ToastrService } from 'ngx-toastr';
 import { JornadaSupera_List_Aluno, JornadaSupera_List_Checklist, JornadaSupera_List_Checklist_Item_Aluno } from '../../../../models/jornada-supera-list.model';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import {  FinalizarChecklistComponentView } from '../../../../shared/checklist/finalizar-checklist/finalizar-checklist.component';
+import { DialogService } from 'primeng/dynamicdialog';
 import { AlunoChecklistDetalhesView } from '../../../../shared/checklist/aluno-checklist-detalhes/aluno-checklist-detalhes.component';
 import { showChecklistDetalhes } from '../../../../utils/show-aluno-checklist-detalhes';
-import { showFinalizarChecklist } from '../../../../utils/show-finalizar-checklist';
-import { ChecklistItemId, checklistsMensagemWhatsapp } from '../../../../models/checklist-item-id.enum';
-import { showAgendarAulaZero } from '../../../../utils/show-agendar-superacao';
-import { showAgendarSuperacao } from '../../../../utils/show-agendar-aula-zero';
-import { showAgendarPrimeiraAula } from '../../../../utils/show-agendar-primeira-aula';
+import { checklistsMensagemWhatsapp } from '../../../../models/checklist-item-id.enum';
 import { AlunoService } from '../../../../services/alunos.service';
-import { showAgendarOficina } from '../../../../utils/show-agendar-oficina';
 import { EventoService } from '../../../../services/evento.service';
+import { finalizarChecklistCondicional } from '../../../../utils/show-finalizar-checklist';
 
 @Component({
     selector: 'app-checklist-popover-jornada',
@@ -83,54 +78,24 @@ export class ChecklistPopoverComponent implements OnDestroy, OnChanges {
     }
 
     async finalizarChecklist(item: JornadaSupera_List_Checklist_Item_Aluno) {
-        let ref: DynamicDialogRef | null = null;
-        if (item.checklist_Item_Id == ChecklistItemId.AgendamentoAulaZero) {
-            ref = showAgendarAulaZero(this.dialogService, this.aluno.id);
-        }
-        else if (item.checklist_Item_Id == ChecklistItemId.Agendamento1Superacao || item.checklist_Item_Id == ChecklistItemId.Agendamento2Superacao) {
-            ref = showAgendarSuperacao(this.dialogService, this.aluno.id);
-        }
-        else if (item.checklist_Item_Id == ChecklistItemId.AgendamentoPrimeiraAula) {
-            const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
-            this.alunoService.setAluno(aluno);
 
-            ref = showAgendarPrimeiraAula(this.dialogService, aluno, undefined)
-        }
-        else if (item.checklist_Item_Id == ChecklistItemId.Agendamento1Oficina || item.checklist_Item_Id == ChecklistItemId.Agendamento2Oficina) {
-            const aluno = await lastValueFrom(this.alunoService.get(this.aluno.id))
-            this.alunoService.setAluno(aluno);
-
-            ref = showAgendarOficina(this.dialogService, aluno)
-        }
-        else {
-
-            const view: FinalizarChecklistComponentView = {
-                    alunoId: this.aluno.id,
-                    alunoChecklistItemId: item.id,
-                    checklistItemId: item.checklist_Item_Id,
-                    checklistId: this.checklist.id,
-    
-                    checklistItem: item.checklist_Item,
-                    aluno: this.aluno.nome,
-                    turma: this.aluno.turma,
-                    corLegenda: this.aluno.corLegenda,
-                    celular: this.aluno.celular,
-                    prazo: item.prazo,
-                    status: item.status,
-            }
-    
-            ref = showFinalizarChecklist(this.dialogService, view);
-    
-        }
-        if (ref) {
-            ref.onClose.subscribe(res => {
-                console.log('onClose', res)
-                item.finalizado = res;
-                this.alunoService.setAluno(undefined);
-                this.eventoService.setEvento(undefined);
-            })
-        }
-
+        finalizarChecklistCondicional({
+            dialogService: this.dialogService,
+            alunoService: this.alunoService,
+            eventoService: this.eventoService,
+            aluno_Id: this.aluno.id,
+            checklist_Id: this.checklist.id,
+            checklist_Item: item.checklist_Item,
+            checklist_Item_Id: item.checklist_Item_Id,
+            aluno_Checklist_Item_Id: item.id,
+            prazo: item.prazo,
+            finalizado: item.finalizado,
+            status: item.status,
+            aluno: this.aluno.nome,
+            celular: this.aluno.celular,
+            corLegenda: this.aluno.corLegenda,
+            turma: this.aluno.turma
+        })
     }
 
     showChecklistDetalhes(item: JornadaSupera_List_Checklist_Item_Aluno) {

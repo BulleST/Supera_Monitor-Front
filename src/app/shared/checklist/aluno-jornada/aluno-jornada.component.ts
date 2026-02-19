@@ -10,9 +10,11 @@ import moment from 'moment';
 import { AlunoChecklistDetalhesView } from '../aluno-checklist-detalhes/aluno-checklist-detalhes.component';
 import { showChecklistDetalhes } from '../../../utils/show-aluno-checklist-detalhes';
 import { FinalizarChecklistComponentView } from '../finalizar-checklist/finalizar-checklist.component';
-import { showFinalizarChecklist } from '../../../utils/show-finalizar-checklist';
+import { finalizarChecklistCondicional, showFinalizarChecklist } from '../../../utils/show-finalizar-checklist';
 import { MensagemWhatsapp } from '../../../utils';
 import { showAlunoJornada } from '../../../utils/show-aluno-checklist-items-list';
+import { AlunoService } from '../../../services/alunos.service';
+import { EventoService } from '../../../services/evento.service';
 
 @Component({
 	selector: 'app-aluno-jornada',
@@ -47,6 +49,8 @@ export class AlunoJornadaComponent {
 		private toastr: ToastrService,
 		private mensagemWhatsapp: MensagemWhatsapp,
 		private jornadaSuperaService: JornadaSuperaService,
+		private alunoService: AlunoService,
+		private eventoService: EventoService,
 
 
 	) {
@@ -170,26 +174,23 @@ export class AlunoJornadaComponent {
 	}
 
 	finalizarChecklist(item: JornadaSupera_List_Checklist_Item_Aluno, checklist: JornadaSupera_List_Checklist) {
-
-		var view: FinalizarChecklistComponentView = {
-			alunoId: this.aluno.id,
-			alunoChecklistItemId: item.id,
-			checklistItemId: item.checklist_Item_Id,
-			checklistId: checklist.id,
-
-			checklistItem: item.checklist_Item,
-			aluno: this.aluno.nome,
-			turma: this.aluno.turma,
-			corLegenda: this.aluno.corLegenda,
-			celular: this.aluno.celular,
-			prazo: item.prazo,
-			status: item.status,
-		}
-
-		let ref = showFinalizarChecklist(this.dialogService, view);
-
-		let onClose = ref.onClose.subscribe(res => item.finalizado = res);
-		this.subscription.push(onClose);
+        finalizarChecklistCondicional({
+            dialogService: this.dialogService,
+            alunoService: this.alunoService,
+            eventoService: this.eventoService,
+            checklist_Id: checklist.id,
+            checklist_Item: item.checklist_Item,
+            checklist_Item_Id: item.checklist_Item_Id,
+            aluno_Checklist_Item_Id: item.id,
+            prazo: item.prazo,
+            finalizado: item.finalizado,
+            status: item.status,
+            aluno_Id:  this.aluno.id,
+            aluno: this.aluno.nome,
+            celular: this.aluno.celular,
+            corLegenda: this.aluno.corLegenda,
+            turma: this.aluno.turma
+        });
 	}
 
 	enviarMensagemCondicao(item: JornadaSupera_List_Checklist_Item_Aluno) {

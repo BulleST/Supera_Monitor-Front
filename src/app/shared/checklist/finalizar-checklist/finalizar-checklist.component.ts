@@ -152,5 +152,5 @@ export class FinalizarChecklistComponentView {
 	celular?: string;
 	prazo: Date = new Date;
 	status: JornadaSuperaStatus = JornadaSuperaStatus.ARealizar;
-
+    finalizado: boolean = false;
 }
