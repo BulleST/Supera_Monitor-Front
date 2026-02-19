@@ -11,13 +11,14 @@
         <div class="w-full flex align-items-center ">
             <span class="p-dialog-title">{{isEditPage ? 'Editar' : 'Cadastrar'}}</span>
             <p-button *ngIf="isEditPage"
-                      class="ml-auto"
+                    label="Informações adicionais"
+                      class="ml-auto outline-none"
                       type="button"
                       icon="pi pi-exclamation-circle"
-                      size="large"
+                      size="small"
                       [text]="true"
                       [rounded]="true"
-                      severity="secondary"
+                      severity="info"
                       (onClick)="op.toggle($event)" />
             <p-popover #op styleClass="popover-styled surface-900 border-900 white-space-nowrap text-white min-w-20rem">
                 <div class="px-2">

@@ -120,11 +120,11 @@ export var turmaColumns: ColumnTable[] = [
     {
         field: 'capacidadeMaximaAlunos',
         label: 'Limite',
-        displayType: DisplayType.mask,
+        displayType: DisplayType.text,
         sortable: true,
         filterOptions: {
             type: FilterType.numeric,
-            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
+            matchMode: FilterMatchMode.EQUALS.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
@@ -141,14 +141,31 @@ export var turmaColumns: ColumnTable[] = [
         sortable: true,
         filterOptions: {
             type: FilterType.numeric,
-            matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO.toString(),
+            matchMode: FilterMatchMode.EQUALS.toString(),
             value: undefined,
             icon: undefined,
             primeElement: 'inputnumber',
             primeElementOptions: {}
         },
         options: {
-            width: '15px'
+            width: '15px',
+        },
+    },
+    {
+        field: 'alunosAtivos',
+        label: 'Alunos Matriculados',
+        displayType: DisplayType.text,
+        sortable: true,
+        filterOptions: {
+            type: FilterType.numeric,
+            matchMode: FilterMatchMode.EQUALS.toString(),
+            value: undefined,
+            icon: undefined,
+            primeElement: 'inputnumber',
+            primeElementOptions: {}
+        },
+        options: {
+            width: '15px',
         },
     },
     // {

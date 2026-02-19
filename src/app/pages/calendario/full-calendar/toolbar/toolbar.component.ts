@@ -124,7 +124,7 @@ export class ToolbarComponent implements OnChanges, OnDestroy {
     loadingRoteiro = false;
     
     data = new Date;
-    minData = new Date(2025, 0, 1);
+    minData = new Date(2024, 0, 1);
     loadedAnos: number[] = [];
 
 

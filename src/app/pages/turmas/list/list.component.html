@@ -109,83 +109,90 @@
             </tr>
         </ng-template>
         <ng-template #body let-item let-index="rowIndex">
-            <tr class="white-space-nowrap">
-                <td>
-                    <app-legend-color class="line-height-1"
-                                      [corLegenda]="item.corLegenda"
-                                      [professor_Id]="item.professor_Id"
-                                      [professor]="item.professor"
-                                      [turma_Id]="item.id"></app-legend-color>
-                </td>
-                <td>
-                    <ng-container *ngIf="item.linkGrupo">
-                        <a [href]="item.linkGrupo" target="_blank">
+            <ng-container *ngIf="!tableLoading">
+                <tr class="white-space-nowrap">
+                    <td>
+                        <app-legend-color class="line-height-1"
+                                          [corLegenda]="item.corLegenda"
+                                          [professor_Id]="item.professor_Id"
+                                          [professor]="item.professor"
+                                          [turma_Id]="item.id"></app-legend-color>
+                    </td>
+                    <td>
+                        <ng-container *ngIf="item.linkGrupo">
+                            <a [href]="item.linkGrupo" target="_blank">
+                                {{item.nome}}
+                            </a>
+                        </ng-container>
+                        <ng-container *ngIf="!item.linkGrupo">
                             {{item.nome}}
-                        </a>
-                    </ng-container>
-                    <ng-container *ngIf="!item.linkGrupo">
-                        {{item.nome}}
-                    </ng-container>
-                </td>
-                <td>{{item.professor}}</td>
-                <td>{{item.diasDeAulaString}}</td>
-                <td>{{item.sala}}</td>
-                <td>{{item.perfilCognitivoString}}</td>
-                <td>{{item.capacidadeMaximaAlunos}} aluno(s)</td>
-                <td>
-                    <ng-container *ngIf="item.vagasDisponiveis == 0"><span class="text-300">Nenhuma vaga </span></ng-container>
-                    <ng-container *ngIf="item.vagasDisponiveis == 1">{{item.vagasDisponiveis}} vaga</ng-container>
-                    <ng-container *ngIf="item.vagasDisponiveis > 1">{{item.vagasDisponiveis}} vagas</ng-container>
-                </td>
-                <!-- <td>
-                    <ng-container *ngIf="item.linkGrupo">
-                        <a [href]="item.linkGrupo"
-                           target="_blank">
-                            <p-button
-                                      icon="pi pi-whatsapp"
-                                      label="Ver grupo"
-                                      [rounded]="true"
-                                      severity="success" />
-                        </a>
-                    </ng-container>
-                    <ng-container *ngIf="!item.linkGrupo">
-                        <div pTooltip="Link para grupo não cadastrado" tooltipPosition="top">
-                            <p-button
-                                      icon="pi pi-whatsapp"
-                                      label="Ver grupo"
-                                      [rounded]="true"
-                                      severity="success"
-                                      [disabled]="true" />
-                        </div>
-                    </ng-container>
-                </td> -->
-                <td class="w-5rem">
-                    <ng-container *ngIf="item.active">
-                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                               icon="pi pi-check mr-2 text-xs"
-                               value="Ativo"
-                               severity="success"
-                               [pTooltip]="'Ativo'" />
-                    </ng-container>
-                    <ng-container *ngIf="!item.active">
-                        <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
-                               icon="pi pi-times mr-2 text-xs"
-                               value="Inativo"
-                               severity="danger"
-                               [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
-                    </ng-container>
-                </td>
-                <td pFrozenColumn
-                    alignFrozen="right">
-                    <p-button
-                              [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
-                              [severity]="'secondary'"
-                              [rounded]="true"
-                              title="Ver mais"
-                              styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
-                              (onClick)="showContextMenu($event, item)" />
-                </td>
-            </tr>
+                        </ng-container>
+                    </td>
+                    <td>{{item.professor}}</td>
+                    <td>{{item.diasDeAulaString}}</td>
+                    <td>{{item.sala}}</td>
+                    <td>{{item.perfilCognitivoString}}</td>
+                    <td class="text-center">Limite: {{item.capacidadeMaximaAlunos}}</td>
+                    <td class="text-center">
+                        <ng-container *ngIf="item.vagasDisponiveis == 0"><span class="text-300">Nenhuma vaga </span></ng-container>
+                        <ng-container *ngIf="item.vagasDisponiveis == 1">{{item.vagasDisponiveis}} vaga</ng-container>
+                        <ng-container *ngIf="item.vagasDisponiveis > 1">{{item.vagasDisponiveis}} vagas</ng-container>
+                    </td>
+                    <td class="text-center">
+                        <ng-container *ngIf="item.alunosAtivos == 0"><span class="text-300">Nenhum matriculado </span></ng-container>
+                        <ng-container *ngIf="item.alunosAtivos == 1">{{item.alunosAtivos}} matriculado</ng-container>
+                        <ng-container *ngIf="item.alunosAtivos > 1">{{item.alunosAtivos}} matriculados</ng-container>
+                    </td>
+                    <!-- <td>
+                        <ng-container *ngIf="item.linkGrupo">
+                            <a [href]="item.linkGrupo"
+                               target="_blank">
+                                <p-button
+                                          icon="pi pi-whatsapp"
+                                          label="Ver grupo"
+                                          [rounded]="true"
+                                          severity="success" />
+                            </a>
+                        </ng-container>
+                        <ng-container *ngIf="!item.linkGrupo">
+                            <div pTooltip="Link para grupo não cadastrado" tooltipPosition="top">
+                                <p-button
+                                          icon="pi pi-whatsapp"
+                                          label="Ver grupo"
+                                          [rounded]="true"
+                                          severity="success"
+                                          [disabled]="true" />
+                            </div>
+                        </ng-container>
+                    </td> -->
+                    <td class="w-5rem">
+                        <ng-container *ngIf="item.active">
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   icon="pi pi-check mr-2 text-xs"
+                                   value="Ativo"
+                                   severity="success"
+                                   [pTooltip]="'Ativo'" />
+                        </ng-container>
+                        <ng-container *ngIf="!item.active">
+                            <p-tag styleClass="font-normal flex align-items-baseline justify-content-center w-5rem"
+                                   icon="pi pi-times mr-2 text-xs"
+                                   value="Inativo"
+                                   severity="danger"
+                                   [pTooltip]=" 'Inativo desde ' + (item['deactivated'] | date : 'dd/MM/yyyy HH:mm')" />
+                        </ng-container>
+                    </td>
+                    <td pFrozenColumn
+                        alignFrozen="right">
+                        <p-button
+                                  [icon]="cm.visible() && tableSelectedItem.id == item.id ? 'pi pi-times' : 'pi pi-cog'"
+                                  [severity]="'secondary'"
+                                  [rounded]="true"
+                                  title="Ver mais"
+                                  styleClass="bg-transparent border-transparent {{index % 2 == 0 ? 'hover:surface-100' : 'hover:surface-50'}} hover:text-primary-500 hover:shadow-4"
+                                  (onClick)="showContextMenu($event, item)" />
+                    </td>
+                </tr>
+            </ng-container>
         </ng-template>
         <ng-template #loadingbody let-columns="columns">
             <tr *ngFor="let item of [1,2,3,4,5,6,7,8,9,0]" style="height: 43px;">

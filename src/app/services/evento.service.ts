@@ -301,6 +301,10 @@ export class EventoService extends Service {
         return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar`, request);
     }
 
+    cancelarFaltaAgendada(participacaoId: number) {
+        return this.http.patch<RequestResponse>(`${this.url}/eventos/participacao/cancelar-falta/${participacaoId}`, {});
+    }
+
     atualizarParticipacao(request: UpdateParticipacaoAlunoRequest) {
         return this.http.put<RequestResponse>(`${this.url}/eventos/participacao/atualizar`, request);
     }

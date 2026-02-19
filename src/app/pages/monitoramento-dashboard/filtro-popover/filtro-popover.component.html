@@ -31,7 +31,7 @@
                         <div class="w-full">
                             <p class="font-bold">{{ item.nome }}</p>
                             <div class="flex align-items-center justify-content-between">
-                                <p class="text-sm">
+                                <p class="text-sm flex align-items-center gap-2">
                                     
                                     <app-legend-color class="line-height-1"
                                                         [corLegenda]="item.corLegenda"
@@ -68,7 +68,7 @@
                 <ng-template let-item #item>
                     <div class="flex align-items-center justify-content-between w-full gap-2">
                         <div>
-                            <p class="font-bold mb-1 flex align-items-center ">
+                            <p class="font-bold mb-1 flex align-items-center gap-2 ">
                                 
                                     <app-legend-color class="line-height-1"
                                                         [corLegenda]="item.corLegenda"

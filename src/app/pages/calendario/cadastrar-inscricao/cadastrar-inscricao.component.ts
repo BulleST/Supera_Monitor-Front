@@ -78,45 +78,27 @@ export class CadastrarInscricaoComponent implements OnDestroy {
             this.visibleChange();
             return
         }
-
-        let alunos = this.alunoService.list.subscribe(res => {
-            this.alunos = res.filter(x => x.active == true);
-            this.setAlunos();
-        });
-        this.subscription.push(alunos);
-
-        this.loadingAlunos = true;
-        lastValueFrom(this.alunoService.getList())
-            .then(res => this.loadingAlunos = false)
-            .catch(res => this.loadingAlunos = false);
-
-        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active == true));
-        this.subscription.push(turmas);
-
-        if (this.turmas.length == 0) {
-            this.loadingTurmas = true;
-            lastValueFrom(this.turmaService.getList())
-                .then(res => this.loadingTurmas = false)
-                .catch(res => this.loadingTurmas = false);
-        }
+        
+        this.loadTurmas();
 
         let eventos = this.service.eventos.subscribe(res => this.eventos = res.filter(x => x.active == true));
         this.subscription.push(eventos);
 
         let evento = this.service.getEvento().subscribe(async res => {
+            this.loadAlunos();
             if (res) {
                 this.evento = res;
                 this.visible = true;
                 this.verificaDisponibilidade();
-
+                
                 let minutos = this.evento.duracaoMinutos % 60
                 let horas = this.evento.duracaoMinutos / 60;
                 let horaRedonda = (horas - Math.floor(horas)) == 0;
-
+                
                 this.duracaoEvento = horaRedonda ?
                     horas.toString().padStart(2, '0') + 'h' :
                     horas.toString().padStart(2, '0') + 'h' + minutos.toString().padStart(2, '0') + 'm';
-
+                    
                 this.setAlunos();
             }
         });
@@ -143,15 +125,39 @@ export class CadastrarInscricaoComponent implements OnDestroy {
         }
     }
 
-    showError(header: string, message: string, e: any) {
-        showError(this.confirmationService, header, message, e);
+    loadTurmas() {
+        let turmas = this.turmaService.list.subscribe(res => this.turmas = res.filter(x => x.active));
+        this.subscription.push(turmas);
+
+        this.loadingTurmas = true;
+        lastValueFrom(this.turmaService.getList())
+            .then(res => this.loadingTurmas = false)
+            .catch(res => this.loadingTurmas = false);
+    }
+
+    loadAlunos() {
+        const request = this.evento ? this.alunoService.getListAulaZeroDropdown() : this.alunoService.getList();
+
+        this.loadingAlunos = true;
+
+        lastValueFrom(request)
+            .then(res => {
+                this.loadingAlunos = false;
+                this.alunos = res;
+                this.setAlunos();
+            })
+            .catch(res => this.loadingAlunos = false);
     }
 
     setAlunos() {
         if (this.evento && this.alunos.length) {
-            let alunosOficina = this.evento.alunos.map(x => x.aluno_Id);
-            this.alunos = this.alunos.filter(x => alunosOficina.includes(x.id) == false)
+            let alunosEvento = this.evento.alunos.filter(x => x.active).map(x => x.aluno_Id);
+            this.alunos = this.alunos.filter(x => alunosEvento.includes(x.id) == false)
         }
+    }
+
+    showError(header: string, message: string, e: any) {
+        showError(this.confirmationService, header, message, e);
     }
 
     get sala() {
@@ -321,6 +327,7 @@ export class CadastrarInscricaoComponent implements OnDestroy {
                 }
             })
             .catch(res => {
+                this.loading = false;
                 this.showError('Agendamento falhou',
                     `Não foi possível inscrever o aluno ${aluno.nome}. <br> ${getError(res)}`,
                     e);
