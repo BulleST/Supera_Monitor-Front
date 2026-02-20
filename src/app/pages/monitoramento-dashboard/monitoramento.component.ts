@@ -97,6 +97,10 @@ export class MonitoramentoComponent implements OnDestroy, AfterViewInit {
 	getTextColor(color: string) {
 		return this.calendarioUtils.getTextColor(color)
 	}
+    
+    getFooterGroupBackgroundColor(color: string) {
+        return this.calendarioUtils.setHexOpacity(color, 30)
+    }
 
 	ngAfterViewInit(): void {
 		this.scrollView();

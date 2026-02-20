@@ -94,7 +94,9 @@
                         </ng-container>
                         <ng-container *ngIf="!roteiro.recesso">
                             <p class="text-white font-light text-sm">Semana {{roteiro.semana}}</p>
-                            <p class="text-sm">{{roteiro.dataInicio | date : 'dd/MM' }} - {{roteiro.dataFim | date : 'dd/MM' }} </p>
+                            <p class="text-sm">{{roteiro.dataInicio | date : 'dd/MM' }} -
+                                {{roteiro.dataFim | date : 'dd/MM' }}
+                            </p>
                         </ng-container>
                         <p-popover #popoverRoteiro styleClass="-mt-1" appendTo="body">
                             <div class="flex align-items-center gap-2">
@@ -102,7 +104,9 @@
                                 <span class="font-bold text-base">Semana {{roteiro.semana}} - {{roteiro.tema}} </span>
                                 <i class="pi pi-star-fill text-xl -mt-1" [style]="{ color: roteiro.corLegenda  }"></i>
                             </div>
-                            <p class="white-space-nowrap"> Do dia {{roteiro.dataInicio | date : 'dd/MM' }} ao dia {{roteiro.dataFim | date : 'dd/MM' }} </p>
+                            <p class="white-space-nowrap"> Do dia {{roteiro.dataInicio | date : 'dd/MM' }} ao dia
+                                {{roteiro.dataFim | date : 'dd/MM' }}
+                            </p>
                         </p-popover>
                     </th>
                 </ng-container>
@@ -155,13 +159,15 @@
                                               fluid>
                                         <ng-template #selectedItem let-selectedOption>
                                             <div *ngIf="selectedOption" class="flex align-items-center gap-2">
-                                                <span class="w-1rem h-1rem border-circle flex-none flex {{selectedOption.styleClass}}"></span>
+                                                <span
+                                                      class="w-1rem h-1rem border-circle flex-none flex {{selectedOption.styleClass}}"></span>
                                                 <span>{{selectedOption.label}}</span>
                                             </div>
                                         </ng-template>
                                         <ng-template let-option #item>
                                             <div class="flex align-items-center gap-2">
-                                                <span class="w-1rem h-1rem border-circle flex-none flex {{option.styleClass}}"></span>
+                                                <span
+                                                      class="w-1rem h-1rem border-circle flex-none flex {{option.styleClass}}"></span>
                                                 <span>{{option.label}}</span>
                                             </div>
                                         </ng-template>
@@ -193,14 +199,9 @@
                     pFrozenColumn
                     alignFrozen="right"
                     [frozen]="i == aluno.items.length - 1">
-                    <!-- <ng-container *ngIf="i == aluno.items.length - 1">
-                        <span>{{calculaAlunosMesmaTurma(aluno.turma_Id)}}</span>
-                    </ng-container> -->
-                    <!-- <ng-container *ngIf="i < aluno.items.length - 1"> -->
-                        <span [class.hidden]="!item.show || item.status == Monitoramento_Item_Status.Recesso">
-                            {{item.aula.aula.data | date : 'dd/MM  HH\'h\'mm'}}
-                        </span>
-                    <!-- </ng-container> -->
+                    <span [class.hidden]="!item.show || item.status == Monitoramento_Item_Status.Recesso">
+                        {{item.aula.aula.data | date : 'dd/MM  HH\'h\'mm'}}
+                    </span>
                 </td>
             </ng-container>
         </tr>
@@ -238,7 +239,7 @@
             <td class="white-space-nowrap px-2 py-1 ">
                 <div class="flex align-items-center gap-2">
                     <app-legend-color class="line-height-1"
-                                                        [corLegenda]="aluno.corLegenda"
+                                      [corLegenda]="aluno.corLegenda"
                                       [professor_Id]="aluno.professor_Id"
                                       [professor]="aluno.professor"
                                       [turma_Id]="aluno.turma_Id"></app-legend-color>
@@ -248,9 +249,9 @@
             <ng-container *ngFor="let item of aluno.items; let itemIndex = index">
                 <td class="p-1 text-center px-0"
                     [ngClass]="{
-                    'bg-grey-300': item.status != Monitoramento_Item_Status.Recesso,
-                    'bg-red-200 border-red-500': item.status == Monitoramento_Item_Status.Recesso
-                }">
+                        'bg-grey-300': item.status != Monitoramento_Item_Status.Recesso,
+                        'bg-red-200 border-red-500': item.status == Monitoramento_Item_Status.Recesso,
+                    }">
                     <div [ngClass]="{
                         'event-cell': true,
                         'hidden': !item.show || item.status == Monitoramento_Item_Status.Recesso
@@ -259,79 +260,93 @@
                             <!-- Recesso -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.Recesso">
                                 <div class="event-status bg-red-200 border-1 border-red-200 text-red-700">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Recesso">Recesso</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- Cancelada -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.Cancelada">
                                 <div class="event-status surface-900 border-1 border-900">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Cancelada">Cancelada</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- Feriado -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.Feriado">
                                 <div class="event-status surface-800 border-1 border-800">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Feriado">Feriado</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- FaltaAula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAula">
                                 <div class="event-status bg-red-500 border-1 border-red-500">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Falta - Aluno não contatado">Falta</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- FaltaAgendada -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAgendada">
                                 <div class="event-status bg-red-200 border-1 border-red-200 text-red-600">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Falta Agendada">Falta</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- FaltaReposicao -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaReposicao">
                                 <div class="event-status bg-blue-500 border-1 border-blue-500">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Falta - Reposição">Falta</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- FaltaAlunoContatado -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.FaltaAlunoContatado">
                                 <div class="event-status bg-yellow-500 border-1 border-yellow-500">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Falta - Aluno Contatado">Falta</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- PresenteNaAula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteNaAula">
@@ -346,7 +361,8 @@
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
                                     reposicao: item.reposicaoPara ? true : false
                                 }"></ng-container>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- PresenteReposicao -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.PresenteReposicao">
@@ -361,18 +377,21 @@
                                     pagina: item.reposicaoPara ? item.reposicaoPara.participacao.numeroPaginaAbaco: item.aula.participacao.numeroPaginaAbaco,
                                     reposicao: item.reposicaoPara ? true : false
                                 }"></ng-container>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- ReposicaoAgendada -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.ReposicaoAgendada">
                                 <div class="event-status bg-purple-500 border-1 border-purple-500">
-                                    <ng-container *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
+                                    <ng-container
+                                                  *ngTemplateOutlet="mensagemFaltaTemplate; context: { aluno, item }"></ng-container>
                                     <span pTooltip="Reposição Agendada">Reposição</span>
                                     <span class="event-turma"
                                           [pTooltip]="item.reposicaoPara.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.reposicaoPara.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara.aula.data }"></ng-container>
                             </ng-container>
                             <!-- ReposicaoDesmarcada -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.ReposicaoDesmarcada">
@@ -382,7 +401,8 @@
                                           [pTooltip]="item.aula.aula.turma"
                                           [ngStyle]="{ backgroundColor: item.aula.aula.corLegenda }"></span>
                                 </div>
-                                <ng-container *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
+                                <ng-container
+                                              *ngTemplateOutlet="dataTemplate; context: { data: item.reposicaoPara ? item.reposicaoPara.aula.data : item.aula.aula.data }"></ng-container>
                             </ng-container>
                             <!-- Aula -->
                             <ng-container *ngIf="item.status == Monitoramento_Item_Status.Aula">
@@ -403,18 +423,32 @@
     </ng-template>
     <ng-template #groupfooter let-aluno let-expanded="expanded">
 
-        <tr pRowGroupfooter>
-            <td class="surface-100"></td>
-            <td class="surface-100"></td>
-            <td class="surface-100" [colSpan]="aluno.items.length"></td>
-            <td class="surface-100"
-             pFrozenColumn
-                    alignFrozen="right">
-                <div class="flex align-items-center gap-2 line-height-1 py-1 white-space-nowrap">
+        <tr pRowGroupfooter [style]="{ background: getFooterGroupBackgroundColor(aluno.corLegenda) }">
+            <!-- Nome -->
+            <td class="border-1 border-right-none"
+                pFrozenColumn
+                alignFrozen="left"
+                [frozen]="true"
+                [style]="{ borderColor: aluno.corLegenda, background: 'transparent!important' }">
+                <div class="flex align-items-center gap-2 py-1 white-space-nowrap">
                     <span>Total: </span>
                     <span>{{calculaAlunosMesmaTurma(aluno.turma_Id)}}</span>
                     <i class="fa fa-user"></i>
                 </div>
+            </td>
+
+            <!-- Turma -->
+            <td class="border-top-1 border-bottom-1"
+                [style]="{ borderColor: aluno.corLegenda, background: 'transparent!important' }">
+            </td>
+            <!-- Semanas -->
+            <td class="border-top-1 border-bottom-1"
+                [colSpan]="aluno.items.length - 1"
+                [style]="{ borderColor: aluno.corLegenda, background: 'transparent!important' }">
+            </td>
+            <!-- AlunosLength -->
+            <td class="border-1 border-left-none" 
+                [style]="{ borderColor: aluno.corLegenda, background: 'transparent!important' }">
             </td>
         </tr>
     </ng-template>

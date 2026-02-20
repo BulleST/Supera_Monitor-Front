@@ -131,3 +131,14 @@ tr:nth-child(2n) .event-cell-inner {
 ::ng-deep .p-datatable-scrollable-table>.p-datatable-tbody>.p-datatable-row-group-header {
     z-index: 3 !important;
 }
+
+
+::ng-deep tr.after::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 110px;
+    width: 1px;
+    background: red;
+}
