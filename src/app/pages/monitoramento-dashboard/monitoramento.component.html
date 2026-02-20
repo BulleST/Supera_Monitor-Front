@@ -193,36 +193,16 @@
                     pFrozenColumn
                     alignFrozen="right"
                     [frozen]="i == aluno.items.length - 1">
-                    <ng-container *ngIf="i == aluno.items.length - 1">
+                    <!-- <ng-container *ngIf="i == aluno.items.length - 1">
                         <span>{{calculaAlunosMesmaTurma(aluno.turma_Id)}}</span>
-                    </ng-container>
-                    <ng-container *ngIf="i < aluno.items.length - 1">
+                    </ng-container> -->
+                    <!-- <ng-container *ngIf="i < aluno.items.length - 1"> -->
                         <span [class.hidden]="!item.show || item.status == Monitoramento_Item_Status.Recesso">
                             {{item.aula.aula.data | date : 'dd/MM  HH\'h\'mm'}}
                         </span>
-                    </ng-container>
+                    <!-- </ng-container> -->
                 </td>
             </ng-container>
-            <!-- <ng-container *ngFor="let mes of mesesAno; let indexMes = index;">
-                <ng-container *ngFor="let roteiro of mes.roteiros; let indexRoteiro = index;">
-                    <ng-container *ngIf="indexMes == mesesAno.length - 1  && indexRoteiro == mes.roteiros.length - 1; else elseTemplate">
-                        <td pFrozenColumn
-                            alignFrozen="right"
-                            [frozen]="true"
-                            [style]="{ 
-                                backgroundColor: aluno.corLegenda, 
-                                color: getTextColor(aluno.corLegenda),
-                                borderColor: aluno.corLegenda
-                            }"
-                            class="white-space-nowrap text-right">
-                            {{calculaAlunosMesmaTurma(aluno.turma_Id)}}
-                        </td>
-                    </ng-container>
-                    <ng-template #elseTemplate>
-                        <td [style]="{ backgroundColor: aluno.corLegenda, borderColor: aluno.corLegenda }"></td>
-                    </ng-template>
-                </ng-container>
-            </ng-container> -->
         </tr>
     </ng-template>
     <ng-template #body let-aluno let-rowIndex="rowIndex">
@@ -419,6 +399,23 @@
                     </div>
                 </td>
             </ng-container>
+        </tr>
+    </ng-template>
+    <ng-template #groupfooter let-aluno let-expanded="expanded">
+
+        <tr pRowGroupfooter>
+            <td class="surface-100"></td>
+            <td class="surface-100"></td>
+            <td class="surface-100" [colSpan]="aluno.items.length"></td>
+            <td class="surface-100"
+             pFrozenColumn
+                    alignFrozen="right">
+                <div class="flex align-items-center gap-2 line-height-1 py-1 white-space-nowrap">
+                    <span>Total: </span>
+                    <span>{{calculaAlunosMesmaTurma(aluno.turma_Id)}}</span>
+                    <i class="fa fa-user"></i>
+                </div>
+            </td>
         </tr>
     </ng-template>
     <ng-template #emptymessage>
